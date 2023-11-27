@@ -703,7 +703,7 @@ class CLSS_AndruavUnit_Drone_Row extends React.Component{
                         <div key={this.props.prop_key+'34'} className = {'col-12  css_margin_zero css_padding_zero '+ v_armed.css}>{v_armed.text}</div>
                     </div>
                 </div>
-                <div key={this.props.prop_key+'4'} className = {'col-2  col-lg-1   d-none d-lg-flex css_margin_zero css_padding_zero '   + css_ekf_enabled}>
+                <div key={this.props.prop_key+'4'} className = {'col-2  col-lg-1   d-none d-lg-grid css_margin_zero css_padding_zero '   + css_ekf_enabled}>
                         <div key={this.props.prop_key+'41'} className = 'row  css_margin_zero  '>
                             {ctrl_ekf}
                         </div>
@@ -723,7 +723,7 @@ class CLSS_AndruavUnit_Drone_Row extends React.Component{
                         <CLSS_CTRL_BATTERY key={v_andruavUnit.partyID + "_ctrl_bat1"} id={v_andruavUnit.partyID + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
                         <CLSS_CTRL_BATTERY key={v_andruavUnit.partyID + "_ctrl_bat2"} id={v_andruavUnit.partyID + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
                 </div>
-                <div key={this.props.prop_key+'7'} className = 'col-2  col-lg-1   d-none d-lg-flex css_margin_zero css_padding_zero '>
+                <div key={this.props.prop_key+'7'} className = 'col-2  col-lg-1   d-none d-lg-grid css_margin_zero css_padding_zero '>
                     <div className = 'row  css_margin_zero css_padding_zero'>
                         <div className = {'col-12  css_margin_zero text-white'+ v_gps1.css}><span className='fss-4'>{v_gps1.value}</span></div>
                     </div>
@@ -753,7 +753,7 @@ class CLSS_AndruavUnit_Drone_Row extends React.Component{
                     </div>
                 </div>
             
-                <div key={this.props.prop_key+'10'} className = {'col-2  col-lg-1   d-none d-lg-flex  css_margin_zero ' + v_wind.WS.css   + css_ws_enabled}>
+                <div key={this.props.prop_key+'10'} className = {'col-2  col-lg-1   d-none d-lg-grid  css_margin_zero ' + v_wind.WS.css   + css_ws_enabled}>
                     <div className = 'row  css_margin_zero'>
                         <div className = 'col-12  col-xxl-4 css_margin_zero text-warning al_l'>WS/Z:</div>
                         <div className = 'col-12  col-xxl-8 css_margin_zero text-white al_r' > {v_wind.WS.value} / {v_wind.WZ.value}<span className='text-warning'>{v_wind.WS.unit}</span></div>
