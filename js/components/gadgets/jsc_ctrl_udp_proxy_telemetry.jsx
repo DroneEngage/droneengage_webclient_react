@@ -137,8 +137,8 @@ export  class CLSS_CTRL_UDP_PROXY_TELEMETRY   extends React.Component {
         
         var rows = [];
         rows = (
-        <div key={Math.random().toString(36)}  className= 'row padding_zero css_user_select_text'>
-                            <div key={Math.random().toString(36)} className = { v_telemetry_lvl_class + ' row al_l css_margin_zero'}>
+        <div className= 'row padding_zero css_user_select_text'>
+                            <div className = { v_telemetry_lvl_class + ' row al_l css_margin_zero'}>
                                 <div className= 'col-12  margin_2px padding_zero css_user_select_text'>
                                 <p className=' rounded-3 cursor_hand textunit' title ='Smart Telemetry'>
                                 <span title="dec_tel" onClick={ (e) => this.fn_changeTelemetryOptimizationLevel(v_andruavUnit,-1)}>
@@ -160,7 +160,7 @@ export  class CLSS_CTRL_UDP_PROXY_TELEMETRY   extends React.Component {
                                 </p>
                                 </div>
                             </div>
-                            <div key={Math.random().toString(36)} className = 'row al_l css_margin_zero css_user_select_text'>
+                            <div className = 'row al_l css_margin_zero css_user_select_text'>
                                 {v_udp_data}
                             </div>
                         </div>);

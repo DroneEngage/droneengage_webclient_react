@@ -65,7 +65,7 @@ export  class CLSS_RX_MESSAGE  extends React.Component {
                 </tr>);
           });
 
-        return  (<div key={Math.random().toString(36)} className="">
+        return  (<div key={'CLSS_RX_MESSAGE' + this.props.p_unit.partyID } className="">
             <table className = "table table-dark table-striped">
                 <thead>
                     <tr>

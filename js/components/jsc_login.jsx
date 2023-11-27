@@ -118,7 +118,7 @@ export class CLSS_LoginControl extends React.Component {
 		}
 		if (this.props.simple == null) {
 			return (
-				<div key={Math.random().toString(36)}  className="card text-white border-light mb-3" >
+				<div key={'CLSS_LoginControl_simple'}  className="card text-white border-light mb-3" >
 					<div className="card-header  text-center"> <strong>{login}</strong></div>
 					<div id='login_form' className="card-body">
 						<div className={this.state.is_connected == true ? "hidden" : " "} >
@@ -147,7 +147,7 @@ export class CLSS_LoginControl extends React.Component {
 				css = "bg-danger";
 			}
 			control.push(
-				<div key={Math.random().toString(36)}  className="dropdown">
+				<div key={'CLSS_LoginControl_complex'} className="dropdown">
 					<button className={'btn btn-secondary dropdown-toggle ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
 						{title}
 					</button>
