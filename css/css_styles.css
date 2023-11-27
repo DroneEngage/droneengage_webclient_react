@@ -912,6 +912,8 @@ tr.IsShutdown_false td.camera.m_IsGCS_false
             font-weight: bold !important;
         }
 */
+
+
 .hover_hand:hover
 {
 	cursor: pointer;
@@ -1016,6 +1018,11 @@ padding-left: 5px
 .css_user_select_text
 {
 	user-select: text !important;
+}
+
+.css_dotted_border {
+	border-left: 1px dotted var(--bs-light);
+	border-right: 1px dotted var(--bs-light);
 }
 
 .blink_error {
