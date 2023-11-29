@@ -131,13 +131,12 @@ class CLSS_CameraDialog extends React.Component
 		    return;
 		}
         
-        if (me._isMounted!==true) return ;
-        p_me.setState({'p_session':p_session});
+        if (p_me._isMounted!==true) return ;
         
 		//$('#modal_ctrl_cam').attr('data-original-title', 'Camera Control - ' + p_session.m_unit.m_unitName);
 		//$('#modal_ctrl_cam').show();
 
-        p_me.setState({'m_update': me.state.m_update +1});
+        p_me.setState({'p_session':p_session,'m_update': p_me.state.m_update +1});
         $('#modal_ctrl_cam').show();
     }
 
