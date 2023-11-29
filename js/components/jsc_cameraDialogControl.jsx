@@ -89,7 +89,7 @@ class CLSS_CameraDevice extends React.Component {
             //     v_startRecord = false;
             // }
             return (
-                    <div key="cam_dev" className="row al_l css_margin_zero">
+                    <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className="row al_l css_margin_zero">
                             <div className= "col-8   si-09x css_margin_zero text-white">
                             <label>{this.state.v_track.ln}</label>
                             </div>
@@ -112,8 +112,13 @@ class CLSS_CameraDialog extends React.Component
     {
         super();
         this.state = {
-			
+			'm_update': 0,
+            
 		};
+        
+        
+        this._isMounted = false;
+        
         window.AndruavLibs.EventEmitter.fn_subscribe(EE_displayCameraDlgForm,this, this.fn_displayDialog);
         window.AndruavLibs.EventEmitter.fn_subscribe(EE_hideCameraDlgForm,this, this.fn_closeDialog);
     }
@@ -126,12 +131,13 @@ class CLSS_CameraDialog extends React.Component
 		    return;
 		}
         
+        if (me._isMounted!==true) return ;
         p_me.setState({'p_session':p_session});
         
 		//$('#modal_ctrl_cam').attr('data-original-title', 'Camera Control - ' + p_session.m_unit.m_unitName);
 		//$('#modal_ctrl_cam').show();
 
-        p_me.forceUpdate();
+        p_me.setState({'m_update': me.state.m_update +1});
         $('#modal_ctrl_cam').show();
     }
 
@@ -214,11 +220,14 @@ class CLSS_CameraDialog extends React.Component
 
     componentWillUnmount ()
     {
-        window.AndruavLibs.EventEmitter.fn_unsubscribe(EE_displayCameraDlgForm,this);
+        this._isMounted = false;
+		window.AndruavLibs.EventEmitter.fn_unsubscribe(EE_displayCameraDlgForm,this);
         window.AndruavLibs.EventEmitter.fn_unsubscribe(EE_hideCameraDlgForm,this);
     } 
 
     componentDidMount () {
+        this._isMounted = true;
+        
         $('#txtShootingInterval').val(1);
         $('#txtTotalImages').val(1);
         this.fn_initDialog();
@@ -250,8 +259,8 @@ class CLSS_CameraDialog extends React.Component
         
 
         return (
-            <div id="modal_ctrl_cam" data-toggle="tooltip" title="Camera Control" className="card width_fit_max css_ontop border-light p-2 ">
-                <div className="card-header text-center">
+            <div key='camera_dialog' id="modal_ctrl_cam" data-toggle="tooltip" title="Camera Control" className="card width_fit_max css_ontop border-light p-2 ">
+                <div key='camera_hdr' className="card-header text-center">
 						<div className="row">
 						  <div className="col-10">
 							<h4 className="text-success text-start">Streams of' {v_unitName} </h4>
@@ -262,8 +271,8 @@ class CLSS_CameraDialog extends React.Component
 						</div>
 				</div>
                       
-                <div id="card-body" className="card-body">
-                    <div className='row'>
+                <div key='camera_body'  id="card-body" className="card-body">
+                    <div key='camera_v_streanms'  className='row'>
                                 {v_streanms}
                     </div>
                     <div className="tab-content">
