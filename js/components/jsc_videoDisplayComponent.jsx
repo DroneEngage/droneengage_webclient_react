@@ -604,10 +604,10 @@ class CLSS_CVideoControl extends React.Component {
         // bug: if the tab is already selected then click will not be effective.
         // you need to deactivate the tab in case it is active
         // eq(0) is another bug as using [0] will return a DOM object and you need a JQuery object.
-        $('#div_video_control ul li a[href="#' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
+        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
         
         // simulate click
-        $('#div_video_control ul li a[href="#' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]')[0].click();
+        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]')[0].click();
         
 
     }
