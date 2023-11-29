@@ -2983,7 +2983,7 @@ class CAndruavClient {
                         v_andruavMessage.lng = v_andruavMessage.lng * 0.0000001;
                     }
 
-                    v_andruavMessage.img = prv_extractBinary(data, out.nextIndex, byteLength);
+                    v_andruavMessage.img = data.subarray(out.nextIndex, byteLength);
                     const des=v_andruavMessage.des!=null?v_andruavMessage.des:"no description";
                     const prv=v_andruavMessage.des!=null?v_andruavMessage.prv:"not defined";
                     const spd=v_andruavMessage.spd!=null?v_andruavMessage.spd:0;

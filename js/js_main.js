@@ -2282,10 +2282,9 @@ function fn_handleKeyBoard() {
 		/**
 		 Called when message [CONST_TYPE_AndruavMessage_IMG] is received from a UNIT or GCS 
 	   */
-		function EVT_msgFromUnit_IMG(p_andruavUnit, img, description, latitude, logitude, gpsProvider, time, altitude, speed, bearing, accuracy) {
+		function EVT_msgFromUnit_IMG(p_andruavUnit, bin, description, latitude, logitude, gpsProvider, time, altitude, speed, bearing, accuracy) {
 
 
-			var bin = fn_Str2BinaryArray(img);
 			if (bin.length>0)
 			{
 				var blob = new Blob([bin], { type: 'image/jpeg' });
@@ -2352,7 +2351,7 @@ function fn_handleKeyBoard() {
 			$('video-rtc-div').hide();
 			$('#video-rtc-div').html('');
 			$('#unitVideo').show();
-			var bin = fn_Str2BinaryArray(img);
+			var bin = img; //fn_Str2BinaryArray(img);
 			$('#unitVideo').attr('src', 'data:image/jpeg;base64,' + fn_arrayBufferToBase64(bin));
 		}
 

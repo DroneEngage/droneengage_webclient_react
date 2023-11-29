@@ -288,14 +288,6 @@ function prv_extractString(data,startIndex,endIndex)
 }
 
 
-function prv_extractBinary(data,startIndex,endIndex)
-{
-
-    const binaryData = data.subarray(startIndex, endIndex);
-    const binaryString = String.fromCharCode.apply(null, binaryData);
-    return binaryString;
-}	
-
 
 function fn_encrypt(num)
 {
