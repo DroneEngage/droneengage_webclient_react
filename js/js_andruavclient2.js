@@ -468,7 +468,7 @@ class CAndruavClient {
         this.v_callbackListeners[p_messageID] = p_callback;
     }
 
-    fn_callbackOnMessageID_Answer (p_messageID)
+    fn_callbackOnMessageID_Answer (p_messageID, v_session)
     {
         if (this.v_callbackListeners.hasOwnProperty(p_messageID) === true) {
             this.v_callbackListeners[p_messageID](v_session);
@@ -1764,7 +1764,7 @@ class CAndruavClient {
                             //     this.v_callbackListeners[CONST_TYPE_AndruavMessage_CameraList](v_session);
                             //     delete this.v_callbackListeners[CONST_TYPE_AndruavMessage_CameraList];
                             // }
-                            this.fn_callbackOnMessageID_Answer(CONST_TYPE_AndruavMessage_CameraList);
+                            this.fn_callbackOnMessageID_Answer(CONST_TYPE_AndruavMessage_CameraList, v_session);
                         }
                     } else {
                         // NO AVAILABLE CAMERA
