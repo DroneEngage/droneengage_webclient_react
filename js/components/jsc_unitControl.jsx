@@ -968,9 +968,9 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         var imu=[];
         // https://icons.getbootstrap.com/icons/caret-down-fill/
         imu.push (
-                <div key='imu_1' id='imu_1' className= 'row al_l  css_margin_zero '>
+                <div key='imu_1' id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div className = 'row al_l css_margin_zero d-flex '>
-                        <div className= 'col-6 col-md-3 user-select-none '>
+                        <div className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p className=' rounded-3 text-warning cursor_hand textunit' title ='Ground Speed'>
                                 <span title={"decrease speed"} onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed - CONST_DEFAULT_SPEED_STEP )}>
                                     <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -990,20 +990,20 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                                 </p>
                                 
                         </div>
-                        <div key='gps' className= 'col-6 col-md-3 user-select-none  '>
-                                <p id='gps' className={' rounded-3 textunit text-center cursor_hand  ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
+                        <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
+                                <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
                         </div>
-                        <div key='DFM' className= 'col-6 col-md-3 user-select-none '>
-                                  <p id='DFM' className={' rounded-3 text-center textunit ' + v_distanceToMe_class} title ="Unit's distance from Me (Browser Location)" >{"DFM: " + v_distanceToMe_text}</p>
+                        <div key='DFM' className= 'col-6 col-md-3 user-select-none p-1'>
+                                  <p id='DFM' className={' rounded-3 text-center textunit_att_btn p-1  ' + v_distanceToMe_class} title ="Unit's distance from Me (Browser Location)" >{"DFM: " + v_distanceToMe_text}</p>
                          </div>
-                        <div key='fence' className= 'col-6 col-md-3 user-select-none '>
-                        <p id='fence' className={'rounded-3 textunit text-center cursor_hand ' + v_fence_class} title ='Fence Violation Status' onClick={ (e) => fn_openFenceManager(v_andruavUnit.partyID)} >{v_fence_text}</p>
+                        <div key='fence' className= 'col-6 col-md-3 user-select-none p-1'>
+                        <p id='fence' className={'rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + v_fence_class} title ='Fence Violation Status' onClick={ (e) => fn_openFenceManager(v_andruavUnit.partyID)} >{v_fence_text}</p>
                         </div>
                     </div>
 
                     <div key='alt_ctrl'   className = 'row al_l css_margin_zero d-flex '>
-                        <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  '>
-                                  <p id='alt'   className=' rounded-3 cursor_hand textunit text-warning' >
+                        <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  p-1'>
+                                  <p id='alt'   className=' rounded-3 cursor_hand textunit_att_btn text-warning p-1' >
                                         <span title={"decrease altitude"} onClick={ (e) => this.fn_doChangeAltitudeByStep(v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.alt - fn_convertToMeter(window.AndruavLibs.LocalStorage.fn_getDefaultAltitude()) )}>
                                             <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
@@ -1022,17 +1022,17 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                                   </p>
                               
                         </div>
-                        <div key='alt_ctrl2'  className= 'col-6 col-md-3 css_margin_zero user-select-none '>
-                                <p id='alt'   className={' rounded-3  textunit text-center ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
+                        <div key='alt_ctrl2'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                                <p id='alt'   className={' rounded-3  textunit_att_btn text-center p-1 ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
                                 {v_flight_status_text + " "}   <small> {v_flyingTime}</small>
                                 </p>
                         </div>
-                        <div key='alt_ctrl3'  className= 'col-6 col-md-3 css_margin_zero user-select-none '>
-                            <p id='wpd' className={' rounded-3 textunit text-center ' + distanceToWP_class} title ='Distance to next waypoint' >{'wp: '+ wpdst_text}</p>
+                        <div key='alt_ctrl3'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                            <p id='wpd' className={' rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class} title ='Distance to next waypoint' >{'wp: '+ wpdst_text}</p>
                             
                         </div>
-                        <div key='alt_ctrl4' className= 'col-6 col-md-3 css_margin_zero user-select-none '>
-                        <p id='fcb_mode'  className={' rounded-3 textunit   text-center ' + v_flight_mode_class} title ={v_fcb_mode_title} onClick={ (e) => this.fn_connectToFCB(v_andruavUnit,true)}> {v_flight_mode_text } </p>
+                        <div key='alt_ctrl4' className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <p id='fcb_mode'  className={' rounded-3 textunit_att_btn   text-center p-1 ' + v_flight_mode_class} title ={v_fcb_mode_title} onClick={ (e) => this.fn_connectToFCB(v_andruavUnit,true)}> {v_flight_mode_text } </p>
                         </div>
                     </div>
 

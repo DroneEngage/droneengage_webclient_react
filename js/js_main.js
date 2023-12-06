@@ -268,6 +268,9 @@ function fn_handleKeyBoard() {
 		function fn_showVideoMainTab() {
 			$('#div_map_view').hide();
 			$('#div_video_control').show();
+
+			$('#btn_showMap').show();
+			$('#btn_showVideo').hide();
 		}
 
 
@@ -285,8 +288,13 @@ function fn_handleKeyBoard() {
 			$('#andruav_unit_list_array_float').hide();
 			
 			$('#btn_showSettings').show();
+
 			$('#btn_showVideo').show();
 			$('#btn_showMap').show();
+
+			$([document.documentElement, document.body]).animate({
+				scrollTop: $("#row_2").offset().top
+			}, 100);
 		}
 
 		function fn_activateMapCameraSectionOnly()
@@ -302,7 +310,7 @@ function fn_handleKeyBoard() {
 			
 			$('#btn_showSettings').hide();
 			$('#btn_showVideo').show();
-			$('#btn_showMap').show();
+			$('#btn_showMap').hide();
 		}
 
 
@@ -336,7 +344,7 @@ function fn_handleKeyBoard() {
 			
 			$('#btn_showSettings').hide();
 			$('#btn_showVideo').show();
-			$('#btn_showMap').show();
+			$('#btn_showMap').hide();
 		}
 
 		function fn_activateAllViews()
@@ -357,6 +365,10 @@ function fn_handleKeyBoard() {
 			$('#btn_showSettings').show();
 			$('#btn_showVideo').show();
 			$('#btn_showMap').show();
+
+			$([document.documentElement, document.body]).animate({
+				scrollTop: $("#row_2").offset().top
+			}, 100);
 		}
 
 		function fn_activateVehicleCardOnly()
@@ -467,10 +479,16 @@ function fn_handleKeyBoard() {
 		function fn_showMap() {
 			$('#div_video_control').hide();
 			$('#div_map_view').show();
+			$('#btn_showMap').hide();
+			$('#btn_showVideo').show();
 		}
 
 		function fn_showSettings() {
 			$('#andruavUnits_in').toggle();
+			
+			$([document.documentElement, document.body]).animate({
+				scrollTop: $("#row_2").offset().top
+			}, 100);
 		}
 
 		function onWEBRTCSessionStarted(c_talk) {

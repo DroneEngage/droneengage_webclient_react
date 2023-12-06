@@ -796,6 +796,13 @@ div.msgerror {
 	width:135px !important;
 }
 
+.textunit_att_btn {
+	display: inline-block;
+	font-size: smaller !important;
+	width:100% !important;
+	height: -webkit-fill-available !important;
+}
+
 .textunit_nowidth {
 	display: inline-block;
 	font-size: smaller !important;
