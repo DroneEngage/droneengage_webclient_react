@@ -1,3 +1,5 @@
+var build_number = "20231214-01";
+
 
 // auto connect variables
 var v_connectState 	= false;  	
