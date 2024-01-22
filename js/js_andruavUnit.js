@@ -515,6 +515,9 @@ class C_GUIHelper
 	}
 }
 
+/**
+ * Handles message counters.
+ */
 class C_Messages
 {
 	constructor(p_parent)
@@ -550,7 +553,12 @@ class C_Messages
 		}
 	}
 
-
+	/**
+	 * Stores messages status to know what message is sent to or from this unit so we can ignore repeated messages.
+	 * @param {*} message_id message id
+	 * @param {*} interval_ms send it every ms
+	 * @param {*} from_time last time sent .
+	 */
 	fn_doNotRepeatMessageBefore(message_id, interval_ms,from_time)
 	{
 		this.m_messages_repeat[message_id] = {
@@ -559,6 +567,12 @@ class C_Messages
 		}
 	}
 
+	/**
+	 * Test if a message can be processed, sent or ignored.
+	 * if true then can be added or can be re-send.
+	 * @param {*} message_id 
+	 * @returns 
+	 */
 	fn_sendMessageAllowed(message_id)
 	{
 		const data = this.m_messages_repeat[message_id];
