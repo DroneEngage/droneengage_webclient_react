@@ -103,17 +103,17 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
             );
         }
 
-        const v_date = (new Date(v_andruavUnit.m_NetworkStatus.m_lastActiveTime));
+        const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
         return (
             <div key={v_andruavUnit.partyID + 'settings'}>
             <div key={v_andruavUnit.partyID + 'settings_1'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_11'} className="col-6 cursor_hand">
-                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received {parseFloat(v_andruavUnit.m_NetworkStatus.m_received_bytes/1024).toFixed(2)} KB</b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received {parseFloat(v_andruavUnit.m_Messages.m_received_bytes/1024).toFixed(2)} KB</b></small></span></p>
                 </div>
                 
                 <div key={v_andruavUnit.partyID + 'settings_12'} className="col-6 cursor_hand">
-                    <p className="textunit user-select-all m-0" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received {v_andruavUnit.m_NetworkStatus.m_received_msg} msgs</b></small></span></p>
+                    <p className="textunit user-select-all m-0" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received {v_andruavUnit.m_Messages.m_received_msg} msgs</b></small></span></p>
                 </div>
             </div>
             <div key={v_andruavUnit.partyID + 'settings_2'} className='row css_margin_zero padding_zero '>

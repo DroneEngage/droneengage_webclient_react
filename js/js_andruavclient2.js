@@ -205,10 +205,10 @@ class CAndruavClient {
         for (var i = 0; i < len; ++ i) {
             v_unit = arr[i];
             if (v_unit.m_IsMe == false) {
-                if ((now - v_unit.m_NetworkStatus.m_lastActiveTime) > CONST_checkStatus_Interverl1) {
+                if ((now - v_unit.m_Messages.m_lastActiveTime) > CONST_checkStatus_Interverl1) {
                     v_unit.m_IsShutdown = true;
                     window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitUpdated, v_unit);
-                } else if ((now - v_unit.m_NetworkStatus.m_lastActiveTime) > CONST_checkStatus_Interverl0) { // less time
+                } else if ((now - v_unit.m_Messages.m_lastActiveTime) > CONST_checkStatus_Interverl0) { // less time
                     this.API_requestID(v_unit.partyID);
                 } else {
                     if (v_unit.m_IsShutdown == false) { // received a message from a v_unit that where marked off
@@ -1654,9 +1654,9 @@ class CAndruavClient {
         }
 
         p_unit.m_Messages.fn_addMsg(msg.messageType);
-        p_unit.m_NetworkStatus.m_received_msg++;
-        p_unit.m_NetworkStatus.m_received_bytes += evt.data.length;
-        p_unit.m_NetworkStatus.m_lastActiveTime = Date.now();
+        p_unit.m_Messages.m_received_msg++;
+        p_unit.m_Messages.m_received_bytes += evt.data.length;
+        p_unit.m_Messages.m_lastActiveTime = Date.now();
         
         switch (msg.messageType) {
 
@@ -1912,7 +1912,7 @@ class CAndruavClient {
                         window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitUpdated, p_unit);
                     } else {
                         p_unit.m_defined = true;
-                        p_unit.m_NetworkStatus.m_lastActiveTime = Date.now();
+                        p_unit.m_Messages.m_lastActiveTime = Date.now();
                         p_unit.m_IsMe = false;
                         p_unit.m_IsGCS = p_jmsg.GS;
                         p_unit.m_unitName = p_jmsg.UD;
@@ -3042,9 +3042,9 @@ class CAndruavClient {
             }
         
             v_unit.m_Messages.fn_addMsg(p_jmsg.messageType);
-            v_unit.m_NetworkStatus.m_received_msg++;
-            v_unit.m_NetworkStatus.m_received_bytes +=data.length;
-            v_unit.m_NetworkStatus.m_lastActiveTime = Date.now();
+            v_unit.m_Messages.m_received_msg++;
+            v_unit.m_Messages.m_received_bytes +=data.length;
+            v_unit.m_Messages.m_lastActiveTime = Date.now();
             Me.prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
             
             data = null;

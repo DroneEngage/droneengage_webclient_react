@@ -444,16 +444,6 @@ class C_Terrain
 	}
 }
 
-class C_NetWorkStatus
-{
-	constructor (p_parent)
-	{
-		this.m_parent 	= p_parent;
-		this.m_received_msg	= 0;
-		this.m_received_bytes = 0;
-		this.m_lastActiveTime = 0;
-	}
-}
 
 class C_EKF
 {
@@ -526,6 +516,10 @@ class C_Messages
 		this.m_messages_repeat = {};
 		this.m_messages_in = {};
 		this.m_messages_in_mavlink = {};
+
+		this.m_received_msg	= 0;
+		this.m_received_bytes = 0;
+		this.m_lastActiveTime = 0;
 	}
 
 	
@@ -659,7 +653,6 @@ class CAndruavUnitObject
 		this.m_GPS_Info3				= new C_GPS (this);
 		this.m_Nav_Info 				= new C_NavInfo(this);
 		this.m_Terrain_Info 			= new C_Terrain (this);
-		this.m_NetworkStatus 			= new C_NetWorkStatus (this);
 		// create a buffer for flight path
 		Object.seal(this.m_NetworkStatus);
 		Object.seal(this.m_Nav_Info);
