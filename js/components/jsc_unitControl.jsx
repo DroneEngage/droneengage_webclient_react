@@ -1334,7 +1334,42 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         }
 
      
-      
+        ////////////////////////////////////TABS ---- START
+        var container_tabs=[];
+        var container_controls=[];
+        
+
+        container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
+                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Home</a>
+                        </li>);
+        container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
+                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
+                        </li>);
+        container_tabs.push(<li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
+                        <a className="nav-link  " data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID}>Details</a>
+                        </li>);
+
+
+        // Adding an empty tab
+        container_tabs.push(<li className="nav-item">
+                        <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
+                        </li>);
+        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
+                            {this.renderIMU(v_andruavUnit)}
+                            {this.renderControl(v_andruavUnit)}
+                    </div>);
+        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabCLSS_MESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
+                            <CLSS_MESSAGE_LOG  p_unit={v_andruavUnit}/>
+                    </div>);
+        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabCLSS_CTRL_SETTINGS'} className="tab-pane fade" id={"details" + v_andruavUnit.partyID}>
+                            <CLSS_CTRL_SETTINGS p_unit={v_andruavUnit}/>
+                    </div>);
+        
+        // Adding an empty tab
+        container_controls.push(<div className="tab-pane fade" id={"p2p" + v_andruavUnit.partyID}>
+                    </div>);
+        ////////////////////////////////////TABS ---- END
+
 
      return (
             
@@ -1347,33 +1382,11 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                 {rows}
              </div>
              
-                <ul key={v_andruavUnit.partyID + 'ul'} className="nav nav-tabs">
-                    <li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Home</a>
-                    </li>
-                    <li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
-                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
-                    </li>
-                    <li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
-                        <a className="nav-link  " data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID}>Details</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
-                    </li>
+             <ul key={v_andruavUnit.partyID + 'ul'} className="nav nav-tabs">
+                    {container_tabs}
                 </ul>
                 <div key={v_andruavUnit.partyID + 'myTabContent'} id="myTabContent" className="tab-content padding_zero">
-                    <div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
-                            {this.renderIMU(v_andruavUnit)}
-                            {this.renderControl(v_andruavUnit)}
-                    </div>
-                    <div key={v_andruavUnit.partyID + 'myTabContent_2'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
-                            <CLSS_MESSAGE_LOG  p_unit={v_andruavUnit}/>
-                    </div>
-                    <div key={v_andruavUnit.partyID + 'myTabContent_3'} className="tab-pane fade" id={"details" + v_andruavUnit.partyID}>
-                            <CLSS_CTRL_SETTINGS p_unit={v_andruavUnit}/>
-                    </div>
-                    <div className="tab-pane fade" id={"empty" + v_andruavUnit.partyID}>
-                    </div>
+                    {container_controls}
                 </div>
             </div>		
        );
