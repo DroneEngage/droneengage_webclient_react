@@ -123,6 +123,10 @@ const CONST_FLIGHT_PX4_POSCTL_ORBIT            			= 215;
 const CONST_FLIGHT_CONTROL_UNKNOWN            			= 999;
 
 
+// P2P Connection Type
+const CONST_TYPE_UNKNOWN								= 0;
+const CONST_TYPE_ESP32_MESH								= 1;
+
 function fn_getFullName(m_groupName, p_partyID)
 	{
 		//return m_groupName.replace(" ","_") + "_X_" + partyID.replace(" ","_");
@@ -317,6 +321,20 @@ class C_Swarm
 		this.m_formation_as_follower = CONST_TASHKEEL_SERB_NO_SWARM;
 		this.m_following = null;
 	};
+}
+
+class C_P2P
+{
+		constructor (p_parent)
+		{
+			this.m_parent = p_parent;
+			this.m_address_1;
+			this.m_address_2;
+			this.m_connection_type = CONST_TYPE_UNKNOWN;
+			this.m_parent_address = '';
+			this.m_parent_connected = false;
+			this.m_detected_units = {};
+		};
 }
 
 
@@ -665,6 +683,7 @@ class CAndruavUnitObject
 		this.m_DetectedTargets			= new C_DetectedTargets(this);
 											
 		this.m_Swarm 					= new C_Swarm(this);
+		this.m_P2P						= new C_P2P(this);
 		this.m_SignalStatus				= {m_wifi:false, m_mobile:false, m_mobileSignalLevel:0, m_mobileNetworkType:0, m_mobileNetworkTypeRank:0};
 		
 		this.m_FCBParameters 			= new C_FCBParameters(this);

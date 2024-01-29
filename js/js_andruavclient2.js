@@ -1793,6 +1793,8 @@ class CAndruavClient {
                     var v_trigger_on_vehiclechanged = false;
                     var v_trigger_on_swarm_status = false,
                         v_trigger_on_swarm_status2 = false;
+                    var v_trigger_on_p2p_status = false;
+                    
 
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
@@ -1908,6 +1910,21 @@ class CAndruavClient {
                             v_trigger_on_swarm_status2 = (p_unit.m_Swarm.m_following  != null);
                             p_unit.m_Swarm.m_following = null;
                         } 
+
+                        if (p_jmsg.hasOwnProperty('p2') ===true)
+                        {
+                            const p2p = p_jmsg.p2;
+                            v_trigger_on_p2p_status = (p_unit.m_P2P.m_connection_type != p2p.p2p_connection_type)
+                                || (p_unit.m_P2P.m_parent_address != p2p.parent_address)
+                                || (p_unit.m_P2P.m_parent_connected != p2p.parent_connection_status);
+                            // p2p communication is available.
+                            p_unit.m_P2P.m_connection_type  = p2p.c;
+                            p_unit.m_P2P.m_address_1        = p2p.a1;
+                            p_unit.m_P2P.m_address_2        = p2p.a2;
+                            p_unit.m_P2P.m_parent_address   = p2p.pa;
+                            p_unit.m_P2P.m_parent_connected = p2p.pc;
+                        }
+
                         this.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
                         window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitUpdated, p_unit);
                     } else {
@@ -1991,6 +2008,20 @@ class CAndruavClient {
                         } else {
                             p_unit.m_Swarm.m_following = null;
                         }
+
+                        if (p_jmsg.hasOwnProperty('p2') ===true)
+                        {
+                            // p2p communication is available.
+                            v_trigger_on_p2p_status = true;
+                            const p2p = p_jmsg.p2;
+                            p_unit.m_P2P.m_connection_type  = p2p.c;
+                            p_unit.m_P2P.m_address_1        = p2p.a1;
+                            p_unit.m_P2P.m_address_2        = p2p.a2;
+                            p_unit.m_P2P.m_parent_address   = p2p.pa;
+                            p_unit.m_P2P.m_parent_connected = p2p.pc;
+                        }
+
+                        
                         
                         this.m_andruavUnitList.Add(p_unit.partyID, p_unit);
                         this._fn_onNewUnitAdded(p_unit);
