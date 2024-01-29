@@ -100,7 +100,7 @@ export  class CLSS_MESSAGE_LOG  extends React.Component {
         }
         
         return (
-            <div className="">
+            <div key={this.props.p_unit.partyID + "_msgctrl"} className="">
                  <div key='params' id="parameters_sublist" className='d-flex justify-content-end'>
                             <button type="button" className='btn btn-success btn-sm ctrlbtn me-5'  title='Clear Messages' onClick={(e) => this.fn_clear(e)}>Clear</button>
                  </div>
