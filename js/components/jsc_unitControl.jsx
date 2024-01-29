@@ -1025,15 +1025,15 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                               
                         </div>
                         <div key='alt_ctrl2'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
-                                <p id='alt'   className={' rounded-3  textunit_att_btn text-center p-1 ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
+                                <p id='fstatus'   className={' rounded-3  textunit_att_btn text-center p-1 ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
                                 {v_flight_status_text + " "}   <small> {v_flyingTime}</small>
                                 </p>
                         </div>
-                        <div key='alt_ctrl3'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <div key='wpd_ctrl3'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                             <p id='wpd' className={' rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class} title ='Distance to next waypoint' >{'wp: '+ wpdst_text}</p>
                             
                         </div>
-                        <div key='alt_ctrl4' className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <div key='fcb_mode_ctrl4' className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                         <p id='fcb_mode'  className={' rounded-3 textunit_att_btn   text-center p-1 ' + v_flight_mode_class} title ={v_fcb_mode_title} onClick={ (e) => this.fn_connectToFCB(v_andruavUnit,true)}> {v_flight_mode_text } </p>
                         </div>
                     </div>
