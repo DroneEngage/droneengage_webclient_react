@@ -20,6 +20,11 @@ c_app.set('port',c_webport);
 c_app.use(express.static(__dirname + '/'));
 
 const v_fs = require('fs');
+//const v_keyFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cer/cer2/private_1.key"));
+//const v_certFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cer/cer2/certificate.crt"));
+
+const v_keyFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cesca_local/cesca.key"));
+const v_certFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cesca_local/cesca.crt"));
 const v_keyFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/localssl.key"));
 const v_certFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/localssl.crt"));
 

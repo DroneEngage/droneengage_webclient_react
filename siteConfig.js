@@ -15,7 +15,7 @@ const CONST_TEST_MODE = true;
 const CONST_PROD_MODE_IP = 'airgap.droneengage.com'; 
 const CONST_TEST_MODE_IP = "192.168.1.144";
 const CONST_TEST_MODE_ENABLE_LOG = false; 
-const CONST_TITLE = "Drone Engage";
+const CONST_TITLE = "CESCA - Drone Engage";
 
 /**
  * Links that are used in Header
@@ -48,3 +48,4 @@ const CONST_ICE_SERVERS =  [
     {urls: 'turn:cloud.ardupilot.org', 'credential':'1234', 'username':'andruav_ap'},
     {urls: "stun:stun1.l.google.com:19302"},
     ];
+
