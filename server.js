@@ -25,8 +25,6 @@ const v_fs = require('fs');
 
 const v_keyFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cesca_local/cesca.key"));
 const v_certFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/cesca_local/cesca.crt"));
-const v_keyFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/localssl.key"));
-const v_certFile = v_fs.readFileSync(v_path.join(__dirname,  "./ssl/localssl.crt"));
 
 const v_options = {
     key: v_keyFile,
