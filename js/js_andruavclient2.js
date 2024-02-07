@@ -1921,6 +1921,8 @@ class CAndruavClient {
                             p_unit.m_P2P.m_connection_type  = p2p.c;
                             p_unit.m_P2P.m_address_1        = p2p.a1;
                             p_unit.m_P2P.m_address_2        = p2p.a2;
+                            p_unit.m_P2P.m_wifi_channel     = p2p.wc;
+                            p_unit.m_P2P.m_wifi_password    = p2p.wp;
                             p_unit.m_P2P.m_parent_address   = p2p.pa;
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
                         }

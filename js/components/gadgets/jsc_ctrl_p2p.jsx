@@ -47,11 +47,24 @@ export class CLSS_CTRL_P2P extends React.Component {
         return (
             <div key={v_andruavUnit.partyID + "_ctl_p2p"} className="">
                 <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
-                    <div key={v_andruavUnit.partyID + 'p2p_11'} className="col-12 ">
-                    <p key={v_andruavUnit.partyID + 'p2p_111'} className="textunit_nowidth user-select-all m-0"><span><small><b>P2P Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p>
-                        <p key={v_andruavUnit.partyID + 'p2p_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_address_1}</b></span> </b></small></span></p>
+                    <div key={v_andruavUnit.partyID + 'p2p_11'} className="col-6 ">
+                        <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.partyID + 'p2p_111'} className="textunit_nowidth user-select-all m-0"><span><small><b>P2P Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p>
+                        </div>
+                        <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.partyID + 'p2p_211'} className="textunit_nowidth user-select-all m-0"><span><small><b>Channel <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_channel}</b></span></b></small></span></p>
+                        </div>
+                    </div>
+                    <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-6 ">
+                        <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.partyID + 'p2p_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_address_1}</b></span> </b></small></span></p>
+                        </div>
+                        <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.partyID + 'p2p_2111'} className="textunit_nowidth user-select-all m-0"><span><small><b>GROUP <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_password}</b></span> </b></small></span></p>
+                        </div>
                     </div>
                 </div>
+
             </div>
         );
     }

@@ -330,6 +330,8 @@ class C_P2P
 			this.m_parent = p_parent;
 			this.m_address_1;
 			this.m_address_2;
+			this.m_wifi_channel=0;
+			this.m_wifi_password='';
 			this.m_connection_type = CONST_TYPE_UNKNOWN;
 			this.m_parent_address = '';
 			this.m_parent_connected = false;
