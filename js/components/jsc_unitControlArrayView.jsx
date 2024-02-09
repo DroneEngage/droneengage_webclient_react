@@ -899,7 +899,7 @@ class CLSS_AndruavUnitListArray extends React.Component {
         if (this.state.andruavUnitPartyIDs.length == 0) 
         {
 
-            unit.push (<div key={'CLSS_AndruavUnitListArray_unit_length' + this.props.prop_key} className='bg-success'>NO ONLINE UNITS</div>);
+            unit.push (<div key={'CLSS_AndruavUnitListArray_unit_length_empty' + this.props.prop_key} className='bg-success'>NO ONLINE UNITS</div>);
         }
         else 
             {
