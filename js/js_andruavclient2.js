@@ -1925,6 +1925,7 @@ class CAndruavClient {
                             p_unit.m_P2P.m_wifi_password    = p2p.wp;
                             p_unit.m_P2P.m_parent_address   = p2p.pa;
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
+                            p_unit.m_P2P.m_firmware         = p2p.f;
                         }
 
                         this.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);

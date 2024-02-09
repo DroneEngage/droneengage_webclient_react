@@ -39,7 +39,7 @@ export class CLSS_CTRL_P2P extends React.Component {
                 break;
             
             case CONST_TYPE_ESP32_MESH:
-                txt_connection_type='ep32-mesh';
+                txt_connection_type='ep32-mesh fw:' + v_andruavUnit.m_P2P.m_firmware;
                 css_connection_type='text-success';
                 break;
         }
