@@ -161,7 +161,9 @@ export class CLSS_CTRL_SWARM extends React.Component {
                 var v_out = v_unit; // need a local copy 
                 // list drones that are not me and are leaders.
                 c_items.push(
-                     <a key={v_unit.m_unitName+"s"} className="dropdown-item" href="#" onClick={() => this.fn_requestToFollow(v_out)}>{v_unit.m_unitName}</a>
+                     <a key={v_unit.m_unitName+"s"} className="dropdown-item" href="#" onClick={(unit => {
+                        return () => this.fn_requestToFollow(unit);
+                      })(v_unit)}>{v_unit.m_unitName}</a>
                 );     
             }
         }
