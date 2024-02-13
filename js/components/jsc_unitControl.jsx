@@ -650,7 +650,6 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         var v_flight_status_class;
         var distanceToWP_class;
         var wpdst_text;
-        var v_leader_class,v_leader_text;
         var v_flyingTime = " ";
         var v_totalFlyingTime = " ";
         var v_now = (new Date()).valueOf() ;
@@ -688,10 +687,6 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         v_totalFlyingTime = fn_getTimeDiffDetails_Shortest ( (c_delta + v_andruavUnit.m_FlyingTotalDuration));
         
         
-        v_leader_class = (v_andruavUnit.m_Swarm.m_isLeader==true)?"btn-success":"btn-danger";
-        v_leader_text  = (v_andruavUnit.m_Swarm.m_isLeader==true)?"Press to leave swarm":"press to become a leader";
-        
-
         if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed==null) 
         {
             v_speed_text = 'NA'; 
