@@ -33,6 +33,14 @@ export class CLSS_CTRL_P2P extends React.Component {
         const  v_andruavUnit = this.props.p_unit;
         var txt_connection_type='nothing';
         var css_connection_type= 'text-warning';
+        var txt_address = ': ON';
+        var css_txt_address = 'text-warning';
+
+        if (v_andruavUnit.m_P2P.m_driver_connected===false)
+        {
+            css_txt_address='text-disabled';
+            txt_address = ': OFF';
+        }
         switch(v_andruavUnit.m_P2P.m_connection_type)
         {
             case CONST_TYPE_UNKNOWN:
@@ -80,7 +88,7 @@ export class CLSS_CTRL_P2P extends React.Component {
                     </div>
                     <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-6 ">
                         <div key={v_andruavUnit.partyID + 'p2p_211'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_2111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_address_1}</b></span> </b></small></span></p>
+                            <p key={v_andruavUnit.partyID + 'p2p_2111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className={css_txt_address} ><b>{v_andruavUnit.m_P2P.m_address_1 + txt_address }</b></span> </b></small></span></p>
                         </div>
                         <div key={v_andruavUnit.partyID + 'p2p_212'} className='row css_margin_zero padding_zero '>
                             <p key={v_andruavUnit.partyID + 'p2p_2121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Group <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_password}</b></span> </b></small></span></p>

@@ -1926,6 +1926,7 @@ class CAndruavClient {
                             p_unit.m_P2P.m_parent_address   = p2p.pa;
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
                             p_unit.m_P2P.m_firmware         = p2p.f;
+                            p_unit.m_P2P.m_driver_connected = p2p.a;
                         }
 
                         this.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
@@ -2022,6 +2023,7 @@ class CAndruavClient {
                             p_unit.m_P2P.m_address_2        = p2p.a2;
                             p_unit.m_P2P.m_parent_address   = p2p.pa;
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
+                            p_unit.m_P2P.m_driver_connected = p2p.a;
                         }
 
                         

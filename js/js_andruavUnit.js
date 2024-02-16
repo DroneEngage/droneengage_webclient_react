@@ -337,6 +337,7 @@ class C_P2P
 			this.m_parent_address = '';
 			this.m_parent_connected = false;
 			this.m_detected_units = {};
+			this.m_driver_connected= false;
 		};
 }
 
