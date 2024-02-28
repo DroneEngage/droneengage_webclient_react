@@ -70,7 +70,7 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
                     }
                     else
                     {
-                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod'}  >&nbsp;-&nbsp;<span className='text-success'>{module.i} {module.v}</span></span>);
+                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d'}  >&nbsp;-&nbsp;<span className='text-success'>{module.i} {module.v}</span></span>);
                     }
                 }
             }
