@@ -3001,7 +3001,6 @@ class CAndruavClient {
                 break;
 
             case CONST_TYPE_AndruavMessage_IMG: {
-                    var out = prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
                     var v_andruavMessage;
                     if (andruavCMD.hasOwnProperty('ms')===false)
                     {   // backward compatibility with ANDRUAV   
@@ -3019,7 +3018,7 @@ class CAndruavClient {
                         v_andruavMessage.lng = v_andruavMessage.lng * 0.0000001;
                     }
 
-                    v_andruavMessage.img = data.subarray(out.nextIndex, byteLength);
+                    v_andruavMessage.img = data.subarray(v_internalCommandIndexByteBased, byteLength);
                     const des=v_andruavMessage.des!=null?v_andruavMessage.des:"no description";
                     const prv=v_andruavMessage.des!=null?v_andruavMessage.prv:"not defined";
                     const spd=v_andruavMessage.spd!=null?v_andruavMessage.spd:0;
