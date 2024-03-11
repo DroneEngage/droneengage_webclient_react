@@ -66,11 +66,11 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
                     
                     if (module.d == true)
                     {
-                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d'}  >&nbsp;-&nbsp;<span className='text-danger'>{module.i} {module.v}</span> <span className='blink_alert animate_iteration_5s'>OFFLINE</span></span>);
+                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module}  >&nbsp;-&nbsp;<span className='text-danger'>{module.i} {module.v}</span> <span className='blink_alert animate_iteration_5s'>OFFLINE</span></span>);
                     }
                     else
                     {
-                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d'}  >&nbsp;-&nbsp;<span className='text-success'>{module.i} {module.v}</span></span>);
+                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module}  >&nbsp;-&nbsp;<span className='text-success'>{module.i} {module.v}</span></span>);
                     }
                 }
             }
