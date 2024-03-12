@@ -24,7 +24,7 @@ class CLSS_CameraDevice extends React.Component {
     {
         if (this.props.prop_session == null) return ;
         var camera_index;
-        if (v_andruavClient.m_isDE === true) {
+        if (this.props.prop_session.m_unit.m_isDE === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {
@@ -43,7 +43,7 @@ class CLSS_CameraDevice extends React.Component {
     {
         if (this.props.prop_session == null) return ;
         var camera_index;
-        if (v_andruavClient.m_isDE === true) {
+        if (this.props.prop_session.m_unit.m_isDE === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {
@@ -149,12 +149,12 @@ class CLSS_CameraDialog extends React.Component
 
    fn_getInterval()
     {
-        return $('#txtShootingInterval').val();
+        return $('#txt_ShootingInterval').val();
     }
 
     fn_getNumOfShots()
     {
-        return $('#txtTotalImages').val();
+        return $('#txt_TotalImages').val();
     }
 
     fn_initDialog()
@@ -181,17 +181,17 @@ class CLSS_CameraDialog extends React.Component
         });
         $('#modal_ctrl_cam').find('#btnTakeImage').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
-            v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txtTotalImages').val(), $('#modal_ctrl_cam').find('#txtShootingInterval').val(), 0);
+            v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
         $('#modal_ctrl_cam').find('#btnFCBTakeImage').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
-            v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txtTotalImages').val(), $('#modal_ctrl_cam').find('#txtShootingInterval').val(), 0);
+            v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
 
-        $('#modal_ctrl_cam').find('#txtTotalImages').bind("mousedown", function () {
+        $('#modal_ctrl_cam').find('#txt_TotalImages').bind("mousedown", function () {
             $(this).parents('tr').removeClass('draggable');
         });
-        $('#modal_ctrl_cam').find('#txtShootingInterval').bind("mousedown", function () {
+        $('#modal_ctrl_cam').find('#txt_ShootingInterval').bind("mousedown", function () {
             $(this).parents('tr').removeClass('draggable');
         });
     }
@@ -227,8 +227,8 @@ class CLSS_CameraDialog extends React.Component
     componentDidMount () {
         this._isMounted = true;
         
-        $('#txtShootingInterval').val(1);
-        $('#txtTotalImages').val(1);
+        $('#txt_ShootingInterval').val(1);
+        $('#txt_TotalImages').val(1);
         this.fn_initDialog();
     }
 
