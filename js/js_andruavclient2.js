@@ -3005,6 +3005,8 @@ class CAndruavClient {
                     if (andruavCMD.hasOwnProperty('ms')===false)
                     {   // backward compatibility with ANDRUAV   
                         try {
+                            var out = prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
+                            v_internalCommandIndexByteBased = out.nextIndex;
                             v_andruavMessage = JSON.parse(out.text);
                         } catch (err) {
                             fn_console_log(err);
