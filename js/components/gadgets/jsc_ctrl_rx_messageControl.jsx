@@ -57,7 +57,7 @@ export  class CLSS_RX_MESSAGE  extends React.Component {
             msg.push(
                 <tr>
                     <td className="text-success">
-                        <small>{message_names[key]}</small>
+                        <small>{">> " + message_names[key]}</small>
                     </td>
                     <td>
                         <small>{msg_in_mavlink[key]}</small>
