@@ -133,11 +133,9 @@ class CLSS_CameraDialog extends React.Component
         
         if (p_me._isMounted!==true) return ;
         
-		//$('#modal_ctrl_cam').attr('data-original-title', 'Camera Control - ' + p_session.m_unit.m_unitName);
-		//$('#modal_ctrl_cam').show();
-
-        p_me.setState({'p_session':p_session,'m_update': p_me.state.m_update +1});
+		p_me.setState({'p_session':p_session,'m_update': p_me.state.m_update +1});
         $('#modal_ctrl_cam').show();
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_gotoUnitPressed()
@@ -298,10 +296,10 @@ class CLSS_CameraDialog extends React.Component
                     <div id="modal_ctrl_cam_footer" className="form-group text-center localcontainer css_ontop">
                         <div className= "row">
                             <div className= "col-md-6">
-                                <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e)=>this.fn_opacityDialog}>opaque</button>
+                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
                             </div>
                             <div className= "col-md-6">
-                                <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e)=>this.fn_gotoUnitPressed()}>Goto</button>
+                                <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>
                             </div>
                             {/* <div className= "col-md-4">
                                 <button id="btnShot" type="button" className="btn btn-sm btn-warning"  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
