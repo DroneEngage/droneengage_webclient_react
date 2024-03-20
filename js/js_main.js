@@ -2011,6 +2011,10 @@ function fn_handleKeyBoard() {
 			window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_andruavUnit);
 		}
 
+		function EVT_andruavUnitP2PUpdated (p_andruavUnit)
+		{
+			window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitP2PUpdated, p_andruavUnit);
+		}
 		
 		function EVT_andruavUnitFCBUpdated(p_andruavUnit) {
 			if (p_andruavUnit.m_useFCBIMU == true) {
@@ -3112,6 +3116,7 @@ function fn_handleKeyBoard() {
 				v_andruavClient.EVT_andruavUnitArmedUpdated 		= EVT_andruavUnitArmedUpdated;
 				v_andruavClient.EVT_andruavUnitGeoFenceBeforeDelete = EVT_andruavUnitGeoFenceBeforeDelete;
 				v_andruavClient.EVT_andruavUnitFCBUpdated 			= EVT_andruavUnitFCBUpdated;
+				v_andruavClient.EVT_andruavUnitP2PUpdated			= EVT_andruavUnitP2PUpdated;
 				v_andruavClient.EVT_msgFromUnit_NavInfo 			= EVT_msgFromUnit_NavInfo;
 				v_andruavClient.EVT_BadMavlink						= EVT_BadMavlink;
 				v_andruavClient.EVT_andruavUnitFlyingUpdated 		= EVT_andruavUnitFlyingUpdated;

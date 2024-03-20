@@ -6,11 +6,11 @@ export class CLSS_CTRL_P2P extends React.Component {
                 m_update: 0
 		};
 
-        window.AndruavLibs.EventEmitter.fn_subscribe (EE_unitUpdated,this,this.fn_unitUpdated);
+        window.AndruavLibs.EventEmitter.fn_subscribe (EE_unitP2PUpdated,this,this.fn_unitUpdated);
     }
 
     componentWillUnmount () {
-        window.AndruavLibs.EventEmitter.fn_unsubscribe (EE_unitUpdated,this);
+        window.AndruavLibs.EventEmitter.fn_unsubscribe (EE_unitP2PUpdated,this);
     }
 
     componentDidMount () 
@@ -18,6 +18,10 @@ export class CLSS_CTRL_P2P extends React.Component {
         this.state.m_update = 1;
     }
 
+    fn_resetP2P (p_andruavUnit)
+    {
+        v_andruavClient.API_resetP2P(p_andruavUnit)
+    }
     
     fn_unitUpdated (p_me,p_andruavUnit)
     {
@@ -72,6 +76,22 @@ export class CLSS_CTRL_P2P extends React.Component {
             txt_parent_mac = v_andruavUnit.m_P2P.m_parent_address;
         }
 
+        var cmd_btns = [];
+        if (CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true)
+        if (window.AndruavLibs.AndruavAuth.fn_do_canControl())
+        {
+            cmd_btns.push(<div key={v_andruavUnit.partyID + 'p2p_2'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                
+                <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-12 mt-1">
+                <div key={v_andruavUnit.partyID + 'p2p_22'} className = 'row al_l css_margin_zero d-flex '>
+                    <div key={v_andruavUnit.partyID + 'p2p_221'} className= 'col-6 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.partyID + 'p2p_2211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Change UDP Proxy Port' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
+                    </div>
+                </div>
+                </div>
+            </div>);
+        }
+
         return (
             <div key={v_andruavUnit.partyID + "_ctl_p2p"} className="">
                 <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
@@ -98,6 +118,7 @@ export class CLSS_CTRL_P2P extends React.Component {
                         </div>
                     </div>
                 </div>
+                {cmd_btns}
 
             </div>
         );

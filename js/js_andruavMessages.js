@@ -71,6 +71,8 @@ const CONST_TYPE_AndruavMessage_ServoChannel                = 6001;
 const CONST_TYPE_AndruavBinaryMessage_ServoOutput           = 6501;
 const CONST_TYPE_AndruavBinaryMessage_Mavlink               = 6502;
 const CONST_TYPE_AndruavBinaryMessage_SWARM_Mavlink         = 6503;
+const CONST_TYPE_AndruavMessage_P2P_ACTION                  = 6505
+const CONST_TYPE_AndruavMessage_P2P_STATUS                  = 6506
 
 // System Messages
 const CONST_TYPE_AndruavSystem_LoadTasks                    = 9001;
@@ -130,7 +132,10 @@ const CONST_RemoteCommand_SET_UDPPROXY_CLIENT_PORT          = 506;
 const CONST_RemoteCommand_MISSION_COUNT                     = 507;
 const CONST_RemoteCommand_MISSION_CURRENT                   = 508;
 
-
+// P2P Actions
+const CONST_P2P_ACTION_RESTART_TO_MAC                        = 0;
+const CONST_P2P_ACTION_CONNECT_TO_MAC                        = 1;
+const CONST_P2P_ACTION_CANDICATE_MAC                         = 2;
 
 var message_names = {
     1002: "GPS",

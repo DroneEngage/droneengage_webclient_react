@@ -272,6 +272,7 @@ class CAndruavClient {
         this.EVT_andruavUnitFCBUpdated = function () {};
         
         // CODEBLOCK_START
+        this.EVT_andruavUnitP2PUpdated = function () {};
         this.EVT_andruavUnitSwarmUpdated2 = function () {};
         this.EVT_andruavUnitSwarmUpdated = function () {};
         // CODEBLOCK_END
@@ -872,33 +873,51 @@ class CAndruavClient {
 
 
     // CODEBLOCK_START
-    API_makeSwarm(p_partyID, p_formationID) {
+    API_resetP2P(p_andruavUnit) {
+        if (p_andruavUnit.partyID == null) return ;
+        
+        let p_msg = {
+            a: CONST_P2P_ACTION_RESTART_TO_MAC,
+
+            
+        }
+
+        this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
+    }
+
+    API_makeSwarm(p_andruavUnit, p_formationID) {
+        if (p_andruavUnit.partyID == null) return ;
+        
         let p_msg = {
             a: p_formationID, // m_formation_as_leader
-            b: p_partyID // Leader
+            b: p_andruavUnit.partyID // Leader
         };
 
-        this.API_sendCMD(p_partyID, CONST_TYPE_AndruavMessage_MakeSwarm, p_msg);
+        this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_MakeSwarm, p_msg);
     }
     // CODEBLOCK_END
 
+    // API_updateSwarm(p_andruavUnit, p_action, p_slaveIndex, p_leaderPartyID) {
+    //     if (p_andruavUnit.partyID == null) return ;
+        
+    //     let p_msg = {
+    //         a: p_action, // m_formation as a follower
+    //         b: p_slaveIndex, // index ... could be -1 to take available location.
+    //         c: p_leaderPartyID, // LeaderPartyID
+    //         d: p_andruavUnit.partyID // SlavePartyID
+    //     };
+
+    //     this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_UpdateSwarm, p_msg);
+    // };
+    
+
+
     // CODEBLOCK_START
-    API_updateSwarm(p_partyID, p_action, p_slaveIndex, p_leaderPartyID) {
-        let p_msg = {
-            a: p_action, // m_formation as a follower
-            b: p_slaveIndex, // index ... could be -1 to take available location.
-            c: p_leaderPartyID, // LeaderPartyID
-            d: p_partyID // SlavePartyID
-        };
+    API_requestFromDroneToFollowAnother(p_andruavUnit, slaveIndex, leaderPartyID, do_follow) {
 
-        this.API_sendCMD(p_partyID, CONST_TYPE_AndruavMessage_UpdateSwarm, p_msg);
-    };
-    // CODEBLOCK_END
+        if (p_andruavUnit.partyID == null) return ;
 
-
-    // CODEBLOCK_START
-    API_requestFromDroneToFollowAnother(partyID, slaveIndex, leaderPartyID, do_follow) {
-
+        const partyID = p_andruavUnit.partyID;
         let p_msg = {
             a: slaveIndex, // index ... could be -1 to take available location.
             c: partyID, // slave
@@ -1916,7 +1935,9 @@ class CAndruavClient {
                             const p2p = p_jmsg.p2;
                             v_trigger_on_p2p_status = (p_unit.m_P2P.m_connection_type != p2p.p2p_connection_type)
                                 || (p_unit.m_P2P.m_parent_address != p2p.parent_address)
-                                || (p_unit.m_P2P.m_parent_connected != p2p.parent_connection_status);
+                                || (p_unit.m_P2P.m_parent_connected != p2p.parent_connection_status)
+                                || (p_unit.m_P2P.m_driver_connected != p2p.m_driver_connected);
+
                             // p2p communication is available.
                             p_unit.m_P2P.m_connection_type  = p2p.c;
                             p_unit.m_P2P.m_address_1        = p2p.a1;
@@ -2033,7 +2054,11 @@ class CAndruavClient {
 
                         this.EVT_andruavUnitAdded(p_unit);
                     }
+                    
                     // CODEBLOCK_START
+                    if (v_trigger_on_p2p_status)
+                        this.EVT_andruavUnitP2PUpdated(p_unit);
+
                     if (v_trigger_on_swarm_status) 
                         this.EVT_andruavUnitSwarmUpdated(p_unit)
                     
