@@ -3,12 +3,13 @@ var build_number = "20240123-01";
 
 // auto connect variables
 var v_connectState 	= false;  	
-var v_connectRetries  = 0;  	
+var v_connectRetries  = 5;  	
 
 
 
 const CONST_DFM_FAR                 = 3000; // more than 10 Km is far.
 const CONST_DFM_SAFE                = 1000; // less than 1 Km is safe.
+const CONST_MAX_MESSAGE_LOG         = 5; 
 
 var v_displayMode                   = 0;
 var active_gamepad_index            = 0;
@@ -45,6 +46,7 @@ const EE_onMessage                  = "EE_onMessage";
 const EE_onPreferenceChanged        = "EE_onPreferenceChanged";
 const EE_unitAdded                  = "EE_unitAdded";
 const EE_unitUpdated                = "EE_unitUpdated";
+const EE_unitP2PUpdated             = "EE_unitP2PUpdated";
 const EE_unitNavUpdated             = "EE_unitNavUpdated";
 const EE_onSocketStatus             = "EE_onSocketStatus";
 const EE_onGUIMessage               = "EE_onGUIMessage";
