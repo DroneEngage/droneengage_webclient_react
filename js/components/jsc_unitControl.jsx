@@ -129,13 +129,20 @@ class CLSS_AndruavUnit extends React.Component {
       fn_changeSpeed (p_andruavUnit);
     }
 
-    fn_changeSpeedByStep (e, p_andruavUnit, p_speed)
+    fn_changeSpeedByStep (e, p_andruavUnit, p_step)
     {
+        var p_speed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed;
+        if (p_speed == 0)
+        {
+            p_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+        }
+        p_speed = parseFloat(p_speed) + p_step;
         if (p_speed == null) return ;
         
         if (p_speed <= 0 )
         {
             // BAD SPEED
+            // TODO: Put a popup message here.
             v_SpeakEngine.fn_speak('speed cannot be zero');
             return ;
         }
@@ -152,7 +159,7 @@ class CLSS_AndruavUnit extends React.Component {
         
         
         if (v_useMetricSystem == true) {
-            v_speak = v_speak + p_speed.toFixed(1) + "meter per second";
+            v_speak = v_speak + p_speed.toFixed(1) + " meter per second";
         }
         else {
             v_speak = v_speak + (p_speed * CONST_METER_TO_MILE).toFixed(1) + "mile per hour";
@@ -969,7 +976,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                     <div className = 'row al_l css_margin_zero d-flex '>
                         <div className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p className=' rounded-3 text-warning cursor_hand textunit' title ='Ground Speed'>
-                                <span title={"decrease speed"} onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed - CONST_DEFAULT_SPEED_STEP )}>
+                                <span title={"decrease speed"} onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, - CONST_DEFAULT_SPEED_STEP )}>
                                     <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                     </svg>
@@ -979,7 +986,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                                  {'GS: ' + v_speed_text}
                                  &nbsp;</b></small>
                                 </span>
-                                <span title="increase speed" onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed + CONST_DEFAULT_SPEED_STEP )}>
+                                <span title="increase speed" onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, + CONST_DEFAULT_SPEED_STEP )}>
                                     <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
                                     </svg>
