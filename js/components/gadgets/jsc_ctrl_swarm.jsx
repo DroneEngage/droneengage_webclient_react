@@ -7,7 +7,6 @@ export class CLSS_CTRL_SWARM extends React.Component {
         this.state = {
         };
 
-        window.AndruavLibs.EventEmitter.fn_subscribe(EE_BattViewToggle,this,this.fn_toggle_global);
     }
 
     fn_toggleMakeSwarm (p_formationID)
@@ -75,7 +74,7 @@ export class CLSS_CTRL_SWARM extends React.Component {
     
     render ()
     {
-        if (CONST_FEATURE.DISABLE_SWARM === true)
+        if ((CONST_FEATURE.DISABLE_SWARM === true) || (window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled()!==true))
         {
             return (
                 <div></div>

@@ -2422,8 +2422,16 @@ function fn_handleKeyBoard() {
 
 		var EVT_DistinationPointChanged = function (p_andruavUnit) {
 
-			if ((CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS===true) && (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type == CONST_DESTINATION_SWARM_MY_LOCATION))
+    
+			if (((CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS===true) || (window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled()!==true))
+				&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type == CONST_DESTINATION_SWARM_MY_LOCATION))
 			{
+				if (p_andruavUnit.m_gui.m_marker_destination!=null)
+				{
+					AndruavLibs.AndruavMap.fn_hideItem(p_andruavUnit.m_gui.m_marker_destination);
+					p_andruavUnit.m_gui.m_marker_destination = null;
+					p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon  = true;
+				}
 				return ;
 			}
 			var v_latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
