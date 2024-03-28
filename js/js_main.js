@@ -1589,9 +1589,21 @@ function fn_handleKeyBoard() {
 				v_menuitems = 0;
 			}
 			else {
-				for (var i = 0; i < size; ++i) {
 
-					var p_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(keys[i]);
+				var sortedPartyIDs;
+				if (window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled()===true)
+				{
+					// Sort the array alphabetically
+					sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
+				}
+				else
+				{
+					sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsArray();
+				}
+				sortedPartyIDs.map(function (partyID)
+				{
+
+					let p_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(partyID));
 					if ((p_andruavUnit != null) && (p_andruavUnit.m_IsGCS != true)) {
 						if ((p_andruavUnit.m_VehicleType == VEHICLE_ROVER)
 						 || (p_andruavUnit.m_VehicleType == VEHICLE_BOAT)) {
@@ -1619,7 +1631,7 @@ function fn_handleKeyBoard() {
 							}
 						}
 					}
-				}
+				});
 			}
 
 			v_contextHTML += v_contextMenu;
@@ -2696,21 +2708,16 @@ function fn_handleKeyBoard() {
 		}
 
 		function showAndruavHomePointInfo(p_lat, p_lng, p_andruavUnit) {
-			//var wayPointStep = wayPointSteps[i];
 			var _style = "", _icon = "";
 
 
 			var v_contentString = "<p class='img-rounded bg-primary text-white" + _style + "'><strong> Home of " + p_andruavUnit.m_unitName + _icon + "</strong></p><span class='help-block'><small>lat:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat).toFixed(6) + ",lng:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lng).toFixed(6) + "</small></span>";
 
 			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
-			// infowindow.setContent(v_contentString);
-			// infowindow.setPosition(event.latLng);
-			// infowindow.open(map);
 		}
 
 		function fn_showWaypointInfo(p_lat, p_lng, p_wayPointStep, p_andruavUnit) {
 
-			//var wayPointStep = wayPointSteps[i];
 			var v_style = " css_margin_5px ", v_icon = "";
 
 			var contentString = null;
@@ -2734,10 +2741,6 @@ function fn_handleKeyBoard() {
 					break;
 			}
 
-			// infowindow.setContent(v_contentString);
-			// infowindow.setPosition(event.latLng);
-			// infowindow.open(map);
-
 			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 		}
 
@@ -2754,10 +2757,7 @@ function fn_handleKeyBoard() {
 
 			var v_contentString = "<p class='img-rounded " + _style + "'><strong>" + geoFenceInfo.m_geoFenceName + _icon + "</strong></p><span class='help-block'>" + p_lat.toFixed(7) + " " + p_lng.toFixed(7) + "</span>";
 			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + AndruavLibs.AndruavMap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + CONST_DEFAULT_ALTITUDE + "," + CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
-			// infowindow.setContent(v_contentString);
-			// infowindow.setPosition(event.latLng);
-			// infowindow.open(map);
-
+			
 			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 
 		}

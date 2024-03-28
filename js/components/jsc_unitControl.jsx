@@ -1577,21 +1577,7 @@ class CLSS_AndruavUnitList extends React.Component {
             if (window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled()===true)
             {
                 // Sort the array alphabetically
-                sortedPartyIDs = this.state.andruavUnitPartyIDs.slice().sort(function(a, b) {
-                    // Custom sorting criteria
-                    // Modify this logic based on your requirements
-                    var unitA = v_andruavClient.m_andruavUnitList.fn_getUnit(a);
-                    var unitB = v_andruavClient.m_andruavUnitList.fn_getUnit(b);
-                    var nameA = unitA ? unitA.m_unitName : '';
-                    var nameB = unitB ? unitB.m_unitName : '';
-                    if (nameA < nameB) {
-                      return -1;
-                    }
-                    if (nameA > nameB) {
-                      return 1;
-                    }
-                    return 0;
-                  });
+                sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
             }
             else
             {
@@ -1600,7 +1586,7 @@ class CLSS_AndruavUnitList extends React.Component {
             
             sortedPartyIDs.map(function (partyID)
             {
-                var v_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(partyID);
+                var v_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(partyID));
                 
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined!==true))return ;

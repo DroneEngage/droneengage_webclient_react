@@ -724,7 +724,30 @@ class CAndruavUnitList
 		this.count = 0;
 	}
 
+	fn_getUnitsArray()
+	{
+		return Object.entries(this.List);
+	}
 
+	fn_getUnitsSorted()
+    {
+        var sorted = Object.entries(this.List).sort(
+            function(a, b) {
+				const name_a = a[1].m_unitName? a[1].m_unitName:'' ;
+				const name_b = b[1].m_unitName? b[1].m_unitName:'';
+				if (name_a < name_b) {
+					return -1;
+				}
+				if (name_a > name_b) {
+				  return 1;
+				}
+				return 0;
+			  });
+
+		return sorted;
+    }
+
+    
 	Add (partyID,andruavUnit)
 	{
 		if (this.List[partyID]!=null) return ;

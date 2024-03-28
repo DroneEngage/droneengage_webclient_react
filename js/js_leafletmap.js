@@ -15,7 +15,6 @@ class CLeafLetAndruavMap {
         this.Me = this;
         this.m_Map = null;
         this.m_isMapInit = false;
-        this.m_infowindow = null;
         this.m_elevator = null;
         this.m_markGuided = null;
     };
