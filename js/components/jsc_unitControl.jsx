@@ -972,7 +972,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         var imu=[];
         // https://icons.getbootstrap.com/icons/caret-down-fill/
         imu.push (
-                <div key='imu_1' id='imu_1' className= 'row al_l  css_margin_zero'>
+                <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div className = 'row al_l css_margin_zero d-flex '>
                         <div className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p className=' rounded-3 text-warning cursor_hand textunit' title ='Ground Speed'>
@@ -1005,7 +1005,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                         </div>
                     </div>
 
-                    <div key='alt_ctrl'   className = 'row al_l css_margin_zero d-flex '>
+                    <div key={'alt_ctrl' + v_andruavUnit.partyID}   className = 'row al_l css_margin_zero d-flex '>
                         <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  p-1'>
                                   <p id='alt'   className=' rounded-3 cursor_hand textunit_att_btn text-warning ' >
                                         <span title={"decrease altitude"} onClick={ (e) => this.fn_doChangeAltitudeByStep(v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.alt - fn_convertToMeter(window.AndruavLibs.LocalStorage.fn_getDefaultAltitude()) )}>
@@ -1026,21 +1026,21 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                                   </p>
                               
                         </div>
-                        <div key='alt_ctrl2'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <div key={'alt_ctrl2'  + v_andruavUnit.partyID} className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                                 <p id='fstatus'   className={' rounded-3  textunit_att_btn text-center p-1 ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
                                 {v_flight_status_text + " "}   <small> {v_flyingTime}</small>
                                 </p>
                         </div>
-                        <div key='wpd_ctrl3'  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <div key={'wpd_ctrl3' + v_andruavUnit.partyID}  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                             <p id='wpd' className={' rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class} title ='Distance to next waypoint' >{'wp: '+ wpdst_text}</p>
                             
                         </div>
-                        <div key='fcb_mode_ctrl4' className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
+                        <div key={'fcb_mode_ctrl4'  + v_andruavUnit.partyID}className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                         <p id='fcb_mode'  className={' rounded-3 textunit_att_btn   text-center p-1 ' + v_flight_mode_class} title ={v_fcb_mode_title} onClick={ (e) => this.fn_connectToFCB(v_andruavUnit,true)}> {v_flight_mode_text } </p>
                         </div>
                     </div>
 
-                    <div key='yaw_ctrl' className = 'row al_l bg-gradient css_margin_zero user-select-none '>
+                    <div key={'yaw_ctrl'  + v_andruavUnit.partyID} className = 'row al_l bg-gradient css_margin_zero user-select-none '>
                         <div key='yaw_ctrl1' className= 'col-4   padding_zero'>
                                 <p id='yaw' className=' rounded-3 text-white css_margin_zero '><small>{v_yaw_text}</small></p><div id ='imu_v_yaw_knob'>{v_yaw_knob}</div>
                         </div>
