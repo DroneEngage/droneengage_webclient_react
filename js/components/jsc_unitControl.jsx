@@ -1572,7 +1572,33 @@ class CLSS_AndruavUnitList extends React.Component {
         else 
         {
             var me = this;
-            this.state.andruavUnitPartyIDs.map(function (partyID)
+
+            var sortedPartyIDs;
+            if (window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled()===true)
+            {
+                // Sort the array alphabetically
+                sortedPartyIDs = this.state.andruavUnitPartyIDs.slice().sort(function(a, b) {
+                    // Custom sorting criteria
+                    // Modify this logic based on your requirements
+                    var unitA = v_andruavClient.m_andruavUnitList.fn_getUnit(a);
+                    var unitB = v_andruavClient.m_andruavUnitList.fn_getUnit(b);
+                    var nameA = unitA ? unitA.m_unitName : '';
+                    var nameB = unitB ? unitB.m_unitName : '';
+                    if (nameA < nameB) {
+                      return -1;
+                    }
+                    if (nameA > nameB) {
+                      return 1;
+                    }
+                    return 0;
+                  });
+            }
+            else
+            {
+                sortedPartyIDs = this.state.andruavUnitPartyIDs;
+            }
+            
+            sortedPartyIDs.map(function (partyID)
             {
                 var v_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(partyID);
                 

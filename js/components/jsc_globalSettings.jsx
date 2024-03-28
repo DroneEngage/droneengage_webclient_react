@@ -28,7 +28,7 @@ class CLSS_FireEvent extends React.Component {
   }
 
   render() {
-    if (window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled()!=='true')
+    if (window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled()!==true)
     {
       return (
                 <div></div>
@@ -74,7 +74,16 @@ class CLSS_DisplayItems extends React.Component {
           window.AndruavLibs.EventEmitter.fn_dispatch(EE_onPreferenceChanged);
         });
           
-    
+          
+    $('#check_unit_sort').prop("checked", v_enable_unit_sort);
+    $('#check_unit_sort').change(function (e)
+        {
+          var state = $(this).prop('checked');
+          v_enable_unit_sort = state;
+          window.AndruavLibs.LocalStorage.fn_setUnitSortEnabled(state);
+          window.AndruavLibs.EventEmitter.fn_dispatch(EE_onPreferenceChanged);
+        });
+     
     $('#toggle_GCS').change(function (e)
         {
           var state = $(this).prop('checked');
@@ -150,6 +159,8 @@ class CLSS_Preferences extends React.Component {
       $('#check_enable_speech')[0].checked = window.AndruavLibs.LocalStorage.fn_getSpeechEnabled();
       $('#volume_range')[0].value = window.AndruavLibs.LocalStorage.fn_getVolume();
       $('#check_tabs_display')[0].checked = window.AndruavLibs.LocalStorage.fn_getTabsDisplayEnabled();
+      $('#check_unit_sort')[0].checked = window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled();
+      $('#check_advanced')[0].checked = window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled();
   }
 
 
@@ -195,6 +206,14 @@ class CLSS_Preferences extends React.Component {
     window.AndruavLibs.EventEmitter.fn_dispatch (EE_onPreferenceChanged);
   }
 
+  fn_sortUnits ()
+  {
+    const enabled = $('#check_unit_sort')[0].checked;
+    v_enable_tabs_display = enabled;
+    window.AndruavLibs.LocalStorage.fn_setUnitSortEnabled(enabled);
+    window.AndruavLibs.EventEmitter.fn_dispatch (EE_onPreferenceChanged);
+  }
+
   fn_enableGCS ()
   {
     const enabled = $('#check_gcs_display')[0].checked;
@@ -225,7 +244,9 @@ class CLSS_Preferences extends React.Component {
             </div>
             <div className="row mb-12 align-items-center">
               <label className="col-sm-4 col-form-label al_l " >Toggle Tabs</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_tabs_display" onClick={ () => this.fn_enableTabsDisplay()} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_tabs_display" onClick={ () => this.fn_enableTabsDisplay()} />
+              <label className="col-sm-4 col-form-label al_r" >Sort Units</label>
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" onClick={ () => this.fn_sortUnits()} />
             </div>
             <div className="row mb-12 align-items-center">
               <label className="col-sm-4 col-form-label al_l " >Advanced Options</label>

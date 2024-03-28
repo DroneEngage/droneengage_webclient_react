@@ -140,6 +140,15 @@ class C_LocalStorage {
     fn_getTabsDisplayEnabled = function () {
         return this.getDefaultAttribute('_vTabsDisplayEnabled', true) === 'true';
     }
+
+    fn_setUnitSortEnabled = function (value) {
+        localStorage._vUnitSortEnabled = value;
+    }
+
+    fn_getUnitSortEnabled = function (value) {
+        return this.getDefaultAttribute('_vUnitSortEnabled', true) === 'true';
+    }
+    
     
     fn_setGoogleMapKey = function (value) {
         localStorage._vGoogleMapKey = value;
@@ -154,7 +163,7 @@ class C_LocalStorage {
     }
 
     fn_getAdvancedOptionsEnabled = function () {
-        return this.getDefaultAttribute('_vAdvancedOptionsEnabled', true);
+        return this.getDefaultAttribute('_vAdvancedOptionsEnabled', true) === 'true';
     }
 
     fn_setGCSDisplayEnabled = function (value) {
