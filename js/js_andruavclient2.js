@@ -1667,7 +1667,7 @@ class CAndruavClient {
                 }
                 else
                 {
-                    console.log ("skip");
+                    fn_console_log ("skip");
                 }
             }
         }
@@ -2688,7 +2688,7 @@ class CAndruavClient {
             {
                 // bad mavlink ... make sure you are using MAVLINK V2
                 //this.EVT_BadMavlink();
-                console.log("BAD MAVLINK");
+                fn_console_log("BAD MAVLINK");
                 continue;
             }
             p_unit.m_Messages.fn_addMavlinkMsg(c_mavlinkMessage);

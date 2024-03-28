@@ -123,7 +123,7 @@ class CAndruavGamePad {
     fn_addgamepad(me, p_gamepad) {
         var v_padStatus = new fn_Obj_padStatus();
 
-        console.log(p_gamepad.id);
+        fn_console_log(p_gamepad.id);
         var vendorNumber;
         var productNumber;
         if (fn_isFireFox())
@@ -151,8 +151,7 @@ class CAndruavGamePad {
             }
         }
 
-        console.log("vendorNumber:" + vendorNumber);  
-        console.log("productNumber:" + productNumber);
+        fn_console_log("vendorNumber:" + vendorNumber + " ::: productNumber:" + productNumber);
 
         if ((vendorNumber=="06f7") && (productNumber == "0003"))
         {

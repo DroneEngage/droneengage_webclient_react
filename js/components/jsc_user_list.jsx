@@ -238,7 +238,7 @@ class CLSS_UserList extends React.Component {
     fn_displayForm (p_me, p_res)
     {
         p_me.setState({'users':p_res.users});
-        console.log (p_res.users);
+        fn_console_log (p_res.users);
     }
 
     fn_onSearch (e)
