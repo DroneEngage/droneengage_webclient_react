@@ -247,40 +247,14 @@ class CAndruavClient {
         this.andruavGeoFences = {};
         this.videoFrameCount = 0;
         this.socketStatus = CONST_SOCKET_STATUS_FREASH;
-        this.fn_onSocketStatus = function (status, statusName) {}; // ovveride to read socket status
-        this.EVT_onError = function (err) {};
         this.EVT_onOpen = function () {};
         this.EVT_onClose = function () {};
-        this.EVT_onMessage = function (evt) {};
-        this.EVT_onSend = function (msg) {};
-        this.EVT_onLog = function (msg) {};
-        this.EVT_msgFromUnit_GPS = function () {};
-        this.EVT_andruavSignalling = function () {};
-        this.EVT_msgFromUnit_WayPoints = function () {};
-        this.EVT_msgFromUnit_WayPointsUpdated = function () {};
-        this.EVT_onDeleted = function () {};
-        this.EVT_msgFromUnit_NavInfo = function () {};
-        this.EVT_BadMavlink = function () {};
-        this.EVT_msgFromUnit_IMG = function () {};
-        this.EVT_msgFromUnit_IMUStatistics = function () {};
-        this.EVT_videoStateChanged = function () {};
-        this.EVT_msgFromUnit_VIDEO = function () {};
-        this.EVT_andruavUnitAdded = function () {};
-        this.EVT_andruavUnitArmedUpdated = function () {};
-        this.EVT_andruavUnitFightModeUpdated = function () {};
-        this.EVT_andruavUnitFlyingUpdated = function () {};
-        this.EVT_andruavUnitFCBUpdated = function () {};
         
-        // CODEBLOCK_START
-        this.EVT_andruavUnitP2PUpdated = function () {};
-        this.EVT_andruavUnitSwarmUpdated2 = function () {};
-        this.EVT_andruavUnitSwarmUpdated = function () {};
-        // CODEBLOCK_END
+        
+        
+        
+        
 
-        this.EVT_HomePointChanged = function () {};
-        this.EVT_DistinationPointChanged = function () {};
-        this.EVT_andruavUnitVehicleTypeUpdated = function () {};
-        this.EVT_andruavUnitModuleUpdated = function () {};
         /**
 			 * 	Received when a notification sent by remote UNIT.
 			 * 	It could be error, warning or notification.
@@ -307,12 +281,9 @@ class CAndruavClient {
 			Description			: 
 									Message
 			*/
-        this.EVT_andruavUnitError = function () {};
         this.EVT_andruavUnitGeoFenceDeleted = function () {};
-        this.EVT_andruavUnitGeoFenceBeforeDelete = function () {};
-        this.EVT_andruavUnitGeoFenceUpdated = function () {};
-        this.EVT_andruavUnitGeoFenceHit = function () {};
-
+        
+        
 
         this.m_andruavUnitList = new CAndruavUnitList();
         this.m_adsbObjectList = new CADSBObjectList();
@@ -1115,7 +1086,8 @@ class CAndruavClient {
         }
 
         this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        this.EVT_videoStateChanged(p_andruavUnit, p_OnOff);
+        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: p_andruavUnit, onff:p_OnOff});
+
     };
 
 
@@ -1534,7 +1506,7 @@ class CAndruavClient {
             Act: v_OnOff
         };
         this.API_sendCMD(p_target, CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        this.EVT_videoStateChanged(v_unit, v_OnOff);
+        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: v_unit, onff:v_OnOff});
     };
 
 
@@ -1583,7 +1555,7 @@ class CAndruavClient {
         geoFenceInfo.m_maximumDistance = v_maximumDistance;
 
         geoFenceInfo.isEditable = (p_andruavUnit == null);
-        this.EVT_andruavUnitGeoFenceUpdated(p_andruavUnit, geoFenceInfo);
+        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitGeoFenceUpdated", {unit: p_andruavUnit, fence: geoFenceInfo});
     };
 
     // please move it out side
@@ -1729,7 +1701,9 @@ class CAndruavClient {
                 if (p_jmsg.hasOwnProperty('b')) {
                     p_unit.m_Nav_Info.p_Location.bearing = parseFloat(p_jmsg.b); // can be null
                 }
-                Me.EVT_msgFromUnit_GPS(p_unit);
+                
+                window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_GPS", p_unit);
+                
                 break;
 
             case CONST_TYPE_AndruavMessage_CameraFlash: {
@@ -1846,10 +1820,10 @@ class CAndruavClient {
                             if(p_unit.m_version != p_jmsg['dv'])
                             {
                                 p_unit.m_version = p_jmsg['dv'];
-                                Me.EVT_andruavUnitError (p_unit, {
+                                Me.EVT_andruavUnitError ({ unit:p_unit, err:{
                                     notification_Type:5,
                                     Description: "DE SW ver:" + p_unit.m_version
-                                });
+                                }});
                             }
                         }
                         
@@ -1976,10 +1950,10 @@ class CAndruavClient {
                             p_unit.m_isDE = true;
                             p_unit.m_version = p_jmsg['dv'];
                             setTimeout(function () {
-                                Me.EVT_andruavUnitError (p_unit, {
+                                window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitError", {unit: p_unit, err:{
                                     notification_Type:5,
                                     Description: "DE SW ver:" + p_unit.m_version
-                                });
+                                }});
                 
                             }, 1000);
                         }
@@ -2052,37 +2026,48 @@ class CAndruavClient {
                         this.m_andruavUnitList.Add(p_unit.partyID, p_unit);
                         this._fn_onNewUnitAdded(p_unit);
 
-                        this.EVT_andruavUnitAdded(p_unit);
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitAdded", p_unit);
+
                     }
                     
                     // CODEBLOCK_START
-                    if (v_trigger_on_p2p_status)
-                        this.EVT_andruavUnitP2PUpdated(p_unit);
+                    if (v_trigger_on_p2p_status) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitP2PUpdated, p_unit);
+                    }
 
-                    if (v_trigger_on_swarm_status) 
-                        this.EVT_andruavUnitSwarmUpdated(p_unit)
+                    if (v_trigger_on_swarm_status) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitSwarmUpdated", p_unit);
+                    }
                     
-                    if (v_trigger_on_swarm_status2) 
-                        this.EVT_andruavUnitSwarmUpdated2(p_unit)
+                    if (v_trigger_on_swarm_status2) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitSwarmUpdated2", p_unit);
+                    }
                     
                     // CODEBLOCK_END
-                    if (v_trigger_on_FCB) 
-                        this.EVT_andruavUnitFCBUpdated(p_unit);
+                    if (v_trigger_on_FCB) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitFCBUpdated", p_unit);
+                    }
                     
-                    if (v_trigger_on_armed) 
-                        this.EVT_andruavUnitArmedUpdated(p_unit);
+                    if (v_trigger_on_armed) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitArmedUpdated", p_unit);
+                    }
                     
-                    if (v_trigger_on_flying) 
-                        this.EVT_andruavUnitFlyingUpdated(p_unit);
+                    if (v_trigger_on_flying){
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitFlyingUpdated", p_unit);
+                    }
                     
-                    if (v_trigger_on_flightMode) 
-                        this.EVT_andruavUnitFightModeUpdated(p_unit);
-                    
-                    if (v_trigger_on_vehiclechanged) 
-                        this.EVT_andruavUnitVehicleTypeUpdated(p_unit);
+                    if (v_trigger_on_flightMode) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitFightModeUpdated", p_unit);
+                    }
+                    if (v_trigger_on_vehiclechanged) {
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitVehicleTypeUpdated", p_unit);
+                    } 
                         
-                    if (v_trigger_on_module_changed)
-                        this.EVT_andruavUnitModuleUpdated(p_unit);
+                    if (v_trigger_on_module_changed) {
+                        // TODO:  not handled... please handle
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitModuleUpdated", p_unit);
+                    } 
+                        
                 }
 
                 break;
@@ -2116,7 +2101,8 @@ class CAndruavClient {
 
                             for (var i = 0; i < size; ++ i) {
                                 if (keys[i] == fenceName) {
-                                    Me.EVT_andruavUnitGeoFenceBeforeDelete(Me.andruavGeoFences[keys[i]]);
+                                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitGeoFenceBeforeDelete", Me.andruavGeoFences[keys[i]]);
+
                                     Me.andruavGeoFences.splice(i, 1);
                                     break;
                                 }
@@ -2190,7 +2176,8 @@ class CAndruavClient {
                     p_unit.m_Geo_Tags.p_HomePoint.lng = p_jmsg.O;
                     p_unit.m_Geo_Tags.p_HomePoint.alt = p_jmsg.A;
 
-                    this.EVT_HomePointChanged(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_HomePointChanged", p_unit);
+
                 }
                 break;
 
@@ -2210,7 +2197,8 @@ class CAndruavClient {
                     
                     p_unit.m_Geo_Tags.fn_addDestinationPoint(p_jmsg.T, p_jmsg.O, p_jmsg.A, destination_type);
 
-                    this.EVT_DistinationPointChanged(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_DistinationPointChanged", p_unit);
+                    
                 }
                 break;
 
@@ -2287,9 +2275,10 @@ class CAndruavClient {
                     };
                     if (p_jmsg.hasOwnProperty('d')) 
                         geoFenceHitInfo.distance = p_jmsg.d;
-                     else 
+                    else 
                         geoFenceHitInfo.distance = Number.NaN;
-                     Me.EVT_andruavUnitGeoFenceHit(p_unit, geoFenceHitInfo);
+                        
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitGeoFenceHit", {unit: p_unit, fenceHit: geoFenceHitInfo});
                 }
                 break;
 
@@ -2360,7 +2349,10 @@ class CAndruavClient {
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                    }Me.EVT_msgFromUnit_WayPointsUpdated(p_unit, p_jmsg.P, p_jmsg.R);
+                    }
+                    
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_WayPointsUpdated", {unit: p_unit, mir: p_jmsg.P, status: p_jmsg.R});
+                    
 
 
                 }
@@ -2387,7 +2379,7 @@ class CAndruavClient {
                     v_error.infoType = p_jmsg.IT;
                     v_error.notification_Type = p_jmsg.NT;
                     v_error.Description = p_jmsg.DS;
-                    Me.EVT_andruavUnitError(p_unit, v_error);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_andruavUnitError",{unit:p_unit, err:v_error});
 
 
                 }
@@ -2505,9 +2497,9 @@ class CAndruavClient {
                         }
                     }
                     if (v_isChunck === WAYPOINT_NO_CHUNK) { // old format message is not a chunk
-                        this.EVT_msgFromUnit_WayPoints(p_unit, wayPoint);
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_WayPoints", {unit: p_unit, wps: wayPoint});
                     } else if (v_isChunck === WAYPOINT_LAST_CHUNK) { // end of chunks
-                        this.EVT_msgFromUnit_WayPoints(p_unit, wayPoint);
+                        window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_WayPoints", {unit: p_unit, wps: wayPoint});
                         delete this.v_waypointsCache[p_unit.partyID];
                     }
                 }
@@ -2533,7 +2525,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Orientation.yaw = parseFloat(p_jmsg.y);
                     p_unit.m_Nav_Info._Target.alt_error = parseFloat(p_jmsg.f);
 
-                    this.EVT_msgFromUnit_NavInfo(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_unit);
                 }
                 break;
 
@@ -2565,7 +2557,8 @@ class CAndruavClient {
         } else {
             clearInterval(this.timerID);
         }
-        this.fn_onSocketStatus(status, c_SOCKET_STATUS[status - 1]);
+        window.AndruavLibs.EventEmitter.fn_dispatch("fn_onSocketStatus", {status:status, name: c_SOCKET_STATUS[status - 1]});
+        //this.fn_onSocketStatus(status, c_SOCKET_STATUS[status - 1]);
     };
 
 
@@ -2584,7 +2577,9 @@ class CAndruavClient {
         if (msg.messageType === CONST_TYPE_AndruavSystem_LogoutCommServer) {
             if (msg.msgPayload.s.indexOf('OK:del') != -1) {
                 Me.setSocketStatus(CONST_SOCKET_STATUS_FREASH);
-                Me.EVT_onDeleted();
+                //Me.EVT_onDeleted();
+                window.AndruavLibs.EventEmitter.fn_dispatch("EVT_onDeleted");
+
             } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
             }
             return;
@@ -2709,7 +2704,8 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Orientation.roll_speed = c_mavlinkMessage.rollspeed; // in radiuas
                     p_unit.m_Nav_Info.p_Orientation.pitch_speed = c_mavlinkMessage.pitchspeed; // in radiuas
                     p_unit.m_Nav_Info.p_Orientation.yaw_speed = c_mavlinkMessage.yawspeed;
-                    this.EVT_msgFromUnit_NavInfo(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_unit);
+
                 }
                 break;
 
@@ -2722,7 +2718,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info._Target.target_bearing = c_mavlinkMessage.target_bearing;
                     p_unit.m_Nav_Info._Target.wp_dist = c_mavlinkMessage.wp_dist;
                     p_unit.m_Nav_Info._Target.alt_error = c_mavlinkMessage.alt_error;
-                    this.EVT_msgFromUnit_NavInfo(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_unit);
                 }
                     break;
 
@@ -2837,7 +2833,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Location.lng = (c_mavlinkMessage.lon * 0.0000001);
                     p_unit.m_Nav_Info.p_Location.alt_abs = c_mavlinkMessage.alt * 0.001;
                     p_unit.m_Nav_Info.p_Location.alt = c_mavlinkMessage.relative_alt * 0.001;
-                    this.EVT_msgFromUnit_GPS(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_GPS", p_unit);
                 }
                 break;
 
@@ -2949,8 +2945,9 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryRemaining = c_mavlinkMessage.battery_remaining;
                     
                     p_unit.m_GPS_Info1.m_isValid = true;
-                    this.EVT_msgFromUnit_NavInfo(p_unit);
-                    this.EVT_msgFromUnit_GPS(p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_unit);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_GPS", p_unit);
+
                 }
                     break;
 
@@ -2969,8 +2966,10 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryRemaining = c_mavlinkMessage.battery;
                     
                     p_unit.m_GPS_Info1.m_isValid = true;
-                    this.EVT_msgFromUnit_NavInfo(p_unit);
-                    this.EVT_msgFromUnit_GPS(p_unit);
+                    
+                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitNavUpdated, p_unit);
+
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_GPS", p_unit);
                 }
                     break;
                 
@@ -3051,7 +3050,8 @@ class CAndruavClient {
                     const spd=v_andruavMessage.spd!=null?v_andruavMessage.spd:0;
                     const ber=v_andruavMessage.des!=null?v_andruavMessage.ber:0;
                     const acc=v_andruavMessage.des!=null?v_andruavMessage.acc:-1;
-                    this.EVT_msgFromUnit_IMG(v_unit, v_andruavMessage.img, des, v_andruavMessage.lat, v_andruavMessage.lng, prv, v_andruavMessage.tim, v_andruavMessage.alt, spd, ber, acc);
+                    window.AndruavLibs.EventEmitter.fn_dispatch("EVT_msgFromUnit_IMG", 
+                        {v_unit: v_unit, img:v_andruavMessage.img, des:des, lat:v_andruavMessage.lat, lng:v_andruavMessage.lng, prv:prv, tim:v_andruavMessage.tim, alt:v_andruavMessage.alt, spd:spd, ber:ber, acc:acc});
 
                 }
                 break;
@@ -3133,8 +3133,7 @@ class CAndruavClient {
     fn_connect(p_accesscode) {
 
         if (p_accesscode == null) {
-            alert("Bad Login");
-            this.EVT_onError('accesscode cannot be null');
+            alert("Password cannot be empty");
             return;
         }
 
@@ -3160,7 +3159,6 @@ class CAndruavClient {
                 if (isbinary == null) {
                     isbinary = false;
                 }
-                Me.EVT_onSend(msg);
                 Me.ws.send(msg, {binary: isbinary});
             };
             // OnOpen callback of Websocket
@@ -3183,7 +3181,6 @@ class CAndruavClient {
                             Me.prv_parseCommunicationMessage(Me, p_jmsg ,evt);
                             break;
                     }
-                    Me.EVT_onMessage(evt);
                     fn_console_log('msg:' + JSON.stringify(p_jmsg)); // evt.data));
                 } else {
 
@@ -3199,7 +3196,6 @@ class CAndruavClient {
 
             this.ws.onerror = function (err) {
                 Me.setSocketStatus(CONST_SOCKET_STATUS_ERROR);
-                Me.EVT_onError(err);
             };
         } else { // The browser doesn't support WebSocket
             alert("WebSocket NOT supported by your Browser!");
