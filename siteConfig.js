@@ -11,10 +11,10 @@
  * Communication Server
  */
 
-const CONST_TEST_MODE = false;
-const CONST_PROD_MODE_IP = 'airgap.droneengage.cesca.ru'; 
+const CONST_TEST_MODE = true;
+const CONST_PROD_MODE_IP = 'airgap.droneengage.com'; 
 const CONST_TEST_MODE_IP = "127.0.0.1";
-const CONST_TEST_MODE_ENABLE_LOG = false; 
+const CONST_TEST_MODE_ENABLE_LOG = false;  // should be used together with CONST_TEST_MODE
 const CONST_TITLE = "CESCA - Drone Engage";
 
 /**
