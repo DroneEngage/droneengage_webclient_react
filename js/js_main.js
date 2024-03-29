@@ -2351,8 +2351,7 @@ function fn_handleKeyBoard() {
 				p_andruavUnit.m_gui.defaultHight = CONST_DEFAULT_ALTITUDE;
 				p_andruavUnit.m_gui.defaultCircleRadius = CONST_DEFAULT_RADIUS;
 			}
-			//  hlp_createHTMLforUnit(p_andruavUnit);
-
+			
 			v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + " unit added");
 
 			window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitAdded, p_andruavUnit);
@@ -2372,9 +2371,9 @@ function fn_handleKeyBoard() {
 				AndruavLibs.AndruavMap.fn_addListenerOnClickMarker(v_home, 
 					function (p_lat, p_lng) {
 						update_timeout = setTimeout(function () {
-						//if (dontexecute) return ;
-						showAndruavHomePointInfo(p_lat, p_lng, p_andruavUnit);
-					}, 300);
+						
+							showAndruavHomePointInfo(p_lat, p_lng, p_andruavUnit);
+						}, 300);
 				});
 			}
 
@@ -2719,7 +2718,6 @@ function fn_handleKeyBoard() {
 		function EVT_andruavUnitGeoFenceBeforeDelete(me, geoFenceInfo) {
 			if (geoFenceInfo != null) {
 				if (geoFenceInfo.flightPath != null) {
-					//geoFenceInfo.flightPath.setMap(null);
 					AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 				}
 			}
@@ -2733,7 +2731,6 @@ function fn_handleKeyBoard() {
 					var geoFenceInfo = v_andruavClient.andruavGeoFences[keys[i]];
 
 					if (geoFenceInfo.flightPath != null) {
-						//geoFenceInfo.flightPath.setMap(null);
 						AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 					}
 
@@ -2760,16 +2757,8 @@ function fn_handleKeyBoard() {
 			switch (geoFenceInfo.fencetype) {
 				case CONST_TYPE_LinearFence:
 					v_geoFence = AndruavLibs.AndruavMap.fn_drawPolyline(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
-					// var v_geoFence = new google.maps.Polyline({
-					// 	path: geoFenceCoordinates,
-					// 	geodesic: true,
-					// 	strokeColor: geoFenceInfo.m_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-					// 	strokeOpacity: 0.9,
-					// 	strokeWeight: 2
-					// });
 					geoFenceInfo.flightPath = v_geoFence;
-					//v_geoFence.setMap(map);
-
+					
 					if (v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
@@ -2778,7 +2767,6 @@ function fn_handleKeyBoard() {
 						var oldgeoFenceInfo = v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
 							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
-							//geoFenceInfo.flightPath.setMap(null);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
@@ -2788,15 +2776,6 @@ function fn_handleKeyBoard() {
 
 				case CONST_TYPE_PolygonFence:
 
-					// var geoFence = new google.maps.Polygon({
-					// 	path: geoFenceCoordinates,
-					// 	geodesic: true,
-					// 	fillColor: geoFenceInfo.m_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-					// 	//strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
-					// 	strokeOpacity: 1.0,
-					// 	fillOpacity: 0.45,
-					// 	strokeWeight: 0  // you can use width with violation
-					// });
 					var v_geoFence = AndruavLibs.AndruavMap.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
@@ -2810,7 +2789,6 @@ function fn_handleKeyBoard() {
 						var oldgeoFenceInfo = v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
 							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
-							//geoFenceInfo.flightPath.setMap(null);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
@@ -2820,21 +2798,10 @@ function fn_handleKeyBoard() {
 
 				case CONST_TYPE_CylinderFence:
 
-					// var geoFence = new google.maps.Circle({
-					// 	fillColor: geoFenceInfo.m_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-					// 	//strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
-					// 	strokeOpacity: 1.0,
-					// 	strokeWeight: 0,
-					// 	fillOpacity: 0.45,
-					// 	map: map,
-					// 	center: geoFenceCoordinates[0],
-					// 	radius: geoFenceInfo.m_maximumDistance
-					// });
 					var v_geoFence = AndruavLibs.AndruavMap.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
-					//geoFence.setMap(map);
-
+					
 					if (v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
@@ -2843,7 +2810,6 @@ function fn_handleKeyBoard() {
 						var oldgeoFenceInfo = v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
 							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
-							//geoFenceInfo.flightPath.setMap(null);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
@@ -2922,8 +2888,6 @@ function fn_handleKeyBoard() {
 			window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitUpdated, p_andruavUnit);
 		}
 
-
-		//////////////////////////////////////////////////////////////////////
 
 		function gui_hidesubmenus() {
 			$('div#debugpanel').hide();
@@ -3095,7 +3059,7 @@ function fn_handleKeyBoard() {
 			setTimeout (function ()
 				{
 					// because it can take time to update database so an early relead in vehicle will be false.
-						v_andruavClient.API_requestReloadLocalGroupGeoFenceTasks (null);
+					v_andruavClient.API_requestReloadLocalGroupGeoFenceTasks (null);
 				}, 3000);
 		}
 	
@@ -3232,8 +3196,6 @@ function fn_handleKeyBoard() {
 				{
 					v_andruavClient.API_saveGeoFenceTasks(window.AndruavLibs.AndruavAuth.m_username,v_andruavClient.m_groupName,null,'_drone_',1,cmd);
 				}
-				//cmds.push (cmd);
-				//cmdtxt = cmdtxt + JSON.stringify(cmd);
 			}
 
 
@@ -3272,8 +3234,7 @@ function fn_handleKeyBoard() {
 		
 
 		function fn_on_ready() {
-			//fn_loadMaps();
-
+			
 			if ((typeof(CONST_MAP_GOOLE) == "undefined") || (CONST_MAP_GOOLE === true))
 			{
 				var v_script = v_G_createElement('script');
@@ -3296,7 +3257,6 @@ function fn_handleKeyBoard() {
 			enableDragging();
 
 			// Blink Map Link
-			//setInterval (function () { $('#mapeditor_span').toggleClass ('label-warning');}, 3000);
 			setInterval(function () { $('#webplugin_span').toggleClass('label-danger'); }, 2000);
 
 			fn_showMap();
