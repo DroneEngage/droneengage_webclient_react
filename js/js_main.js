@@ -3046,29 +3046,29 @@ function fn_handleKeyBoard() {
 				v_andruavClient.m_server_port_ss = window.AndruavLibs.AndruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
 				v_andruavClient.server_AuthKey = window.AndruavLibs.AndruavAuth.server_AuthKey;
 				v_andruavClient._permissions_ = window.AndruavLibs.AndruavAuth.fn_getPermission();
-				v_andruavClient.EVT_onOpen = EVT_onOpen;
-				v_andruavClient.EVT_onClose = EVT_onClose;
-				window.AndruavLibs.EventEmitter.fn_subscribe("fn_onSocketStatus",this,this.fn_onSocketStatus);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_onDeleted",this,this.EVT_onDeleted);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_msgFromUnit_GPS",this,this.EVT_msgFromUnit_GPS);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_msgFromUnit_IMG",this,this.EVT_msgFromUnit_IMG);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitAdded",this,this.EVT_andruavUnitAdded);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_HomePointChanged",this,this.EVT_HomePointChanged);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_DistinationPointChanged",this,this.EVT_DistinationPointChanged);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitError",this,this.EVT_andruavUnitError);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitGeoFenceUpdated",this,this.EVT_andruavUnitGeoFenceUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitGeoFenceHit",this,this.EVT_andruavUnitGeoFenceHit);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_msgFromUnit_WayPoints",this,this.EVT_msgFromUnit_WayPoints);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_msgFromUnit_WayPointsUpdated",this,this.EVT_msgFromUnit_WayPointsUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitArmedUpdated",this,this.EVT_andruavUnitArmedUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitGeoFenceBeforeDelete",this,this.EVT_andruavUnitGeoFenceBeforeDelete);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitFCBUpdated",this,this.EVT_andruavUnitFCBUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_WS_OPEN,this,this.EVT_onOpen);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_WS_CLOSE,this,this.EVT_onClose);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_onSocketStatus2,this,this.fn_onSocketStatus);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_onDeleted,this,this.EVT_onDeleted);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_HomePointChanged,this,this.EVT_HomePointChanged);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitError,this,this.EVT_andruavUnitError);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
 				
 				
 				
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitFlyingUpdated",this,this.EVT_andruavUnitFlyingUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitFightModeUpdated",this,this.EVT_andruavUnitFightModeUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe("EVT_andruavUnitVehicleTypeUpdated",this,this.EVT_andruavUnitArmedUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitArmedUpdated);
 				
 				
 				

@@ -43,6 +43,26 @@ const v_colorDrawPathes = ['#D9524F', '#337AB7', '#62D284', '#F0AD4E'];
 
 //////////////////////////////////
 //LOCAL EVENTS
+const EE_WS_OPEN                            = "EVT_1";
+const EE_WS_CLOSE                           = "EVT_2";
+const EE_onDeleted                          = "EVT_3";
+const EE_msgFromUnit_GPS                    = "EVT_4";
+const EE_msgFromUnit_IMG                    = "EVT_5";
+const EE_andruavUnitAdded                   = "EVT_6";
+const EE_HomePointChanged                   = "EVT_7";
+const EE_DistinationPointChanged            = "EVT_8";
+const EE_andruavUnitError                   = "EVT_9";
+const EE_andruavUnitGeoFenceUpdated         = "EVT_10";
+const EE_andruavUnitGeoFenceHit             = "EVT_11";
+const EE_msgFromUnit_WayPoints              = "EVT_12";
+const EE_msgFromUnit_WayPointsUpdated       = "EVT_13";
+const EE_andruavUnitArmedUpdated            = "EVT_14";
+const EE_andruavUnitGeoFenceBeforeDelete    = "EVT_15";
+const EE_andruavUnitFCBUpdated              = "EVT_16";
+const EE_andruavUnitFlyingUpdated           = "EVT_17";
+const EE_andruavUnitFightModeUpdated        = "EVT_18";
+const EE_andruavUnitVehicleTypeUpdated      = "EVT_19";
+
 const EE_onMessage                  = "EE_onMessage";    
 const EE_onPreferenceChanged        = "EE_onPreferenceChanged";
 const EE_unitAdded                  = "EE_unitAdded";
@@ -50,6 +70,7 @@ const EE_unitUpdated                = "EE_unitUpdated";
 const EE_unitP2PUpdated             = "EE_unitP2PUpdated";
 const EE_unitNavUpdated             = "EE_unitNavUpdated";
 const EE_onSocketStatus             = "EE_onSocketStatus";
+const EE_onSocketStatus2            = "EE_onSocketStatus2";
 const EE_onGUIMessage               = "EE_onGUIMessage";
 const EE_onGUIMessageHide           = "EE_onGUIMessageHide";
 const EE_updateLogin                = "EE_updateLogin";
