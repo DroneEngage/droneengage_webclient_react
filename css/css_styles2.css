@@ -793,6 +793,11 @@ div.msgerror {
 .textunit {
 	display: inline-block;
 	font-size: smaller !important;
+}
+
+.textunit_w135 {
+	display: inline-block;
+	font-size: smaller !important;
 	width:135px !important;
 }
 

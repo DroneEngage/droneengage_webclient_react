@@ -52,7 +52,7 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
         }
         else
         {
-            module_version.push(<span key={v_andruavUnit.partyID + 'settings_dev'} className=''>DE version: {v_andruavUnit.m_version}</span>);
+            module_version.push(<span key={v_andruavUnit.partyID + 'settings_dev'} className=''>DE&nbsp;version:&nbsp;{v_andruavUnit.m_version}</span>);
             const len = v_andruavUnit.m_modules.length;
             if (len==0)
             {
@@ -66,11 +66,11 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
                     
                     if (module.d == true)
                     {
-                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module.i}  >&nbsp;-&nbsp;<span className='text-danger'>{module.i} {module.v}</span> <span className='blink_alert animate_iteration_5s'>OFFLINE</span></span>);
+                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module.i}  >&nbsp;-&nbsp;<span className='text-danger'>{module.i}&nbsp;{module.v}</span> <span className='blink_alert animate_iteration_5s'>OFFLINE</span></span>);
                     }
                     else
                     {
-                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module.i}  >&nbsp;-&nbsp;<span className='text-success'>{module.i} {module.v}</span></span>);
+                        module_version.push(<span key={v_andruavUnit.partyID + 'settings_mod_d' + module.i}  >&nbsp;-&nbsp;<span className='text-success'>{module.i}&nbsp;{module.v}</span></span>);
                     }
                 }
             }
@@ -109,21 +109,21 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
             <div key={v_andruavUnit.partyID + 'settings'}>
             <div key={v_andruavUnit.partyID + 'settings_1'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_11'} className="col-6 cursor_hand">
-                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{parseFloat(v_andruavUnit.m_Messages.m_received_bytes/1024).toFixed(2)} </span> KB</b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit_w135 user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{parseFloat(v_andruavUnit.m_Messages.m_received_bytes/1024).toFixed(2)} </span> KB</b></small></span></p>
                 </div>
                 
                 <div key={v_andruavUnit.partyID + 'settings_12'} className="col-6 cursor_hand">
-                    <p className="textunit user-select-all m-0" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{v_andruavUnit.m_Messages.m_received_msg} </span>msgs</b></small></span></p>
+                    <p className="textunit_w135 user-select-all m-0" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{v_andruavUnit.m_Messages.m_received_msg} </span>msgs</b></small></span></p>
                 </div>
             </div>
             <div key={v_andruavUnit.partyID + 'settings_2'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_21'} className="col-12 ">
-                    <p key={v_andruavUnit.partyID + 'settings_211'} className="textunit_nowidth user-select-all curd m-0"><span><small><b>{module_version}</b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_211'} className="textunit user-select-all m-0"><span><small><b>{module_version}</b></small></span></p>
                 </div>
             </div>
             <div key={v_andruavUnit.partyID + 'settings_3'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_31'} className="col-12">
-                    <p key={v_andruavUnit.partyID + 'settings_311'} className="textunit_nowidth user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_311'} className="textunit_w135 user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                 </div>
             </div>
             {cmd_btns}
