@@ -1343,7 +1343,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
          
 
         container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Home</a>
+                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
                         </li>);
         container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
                         <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
