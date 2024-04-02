@@ -339,6 +339,14 @@ class C_P2P
 			this.m_detected_units = {};
 			this.m_driver_connected= false;
 		};
+
+		fn_isMyMac(mac)
+		{
+			if ((mac == this.m_address_1) || (mac == this.m_address_2))
+				return true;
+
+			return false;
+		}
 }
 
 
@@ -557,6 +565,10 @@ class C_Messages
 		}
 	}
 
+	/**
+	 * message type counter.
+	 * @param {*} message_id 
+	 */
 	fn_addMsg (message_id)
 	{
 		if (this.m_messages_in.hasOwnProperty(message_id)==false)
@@ -747,6 +759,16 @@ class CAndruavUnitList
 		return sorted;
     }
 
+	fn_getUnitByP2PMac(mac)
+	{
+		for (var name in this.List)
+		{
+			const unit = this.List[name];
+			if (unit.m_P2P.fn_isMyMac(mac)) return unit;
+		}
+
+		return null;
+	}
     
 	Add (partyID,andruavUnit)
 	{

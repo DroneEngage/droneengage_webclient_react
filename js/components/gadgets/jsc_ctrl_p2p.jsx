@@ -71,9 +71,16 @@ export class CLSS_CTRL_P2P extends React.Component {
 
 
         var txt_parent_mac='--:--:--:--:--';
+        var txt_parent_name = '';
         if (v_andruavUnit.m_P2P.m_parent_address!="")
         {
+            const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
             txt_parent_mac = v_andruavUnit.m_P2P.m_parent_address;
+            if (unit!=null)
+            {
+                txt_parent_name = "  " + unit.m_unitName;
+            }
+            
         }
 
         var cmd_btns = [];
@@ -103,7 +110,7 @@ export class CLSS_CTRL_P2P extends React.Component {
                             <p key={v_andruavUnit.partyID + 'p2p_1121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Channel <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_channel}</b></span></b></small></span></p>
                         </div>
                         <div key={v_andruavUnit.partyID + 'p2p_113'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Mac  <span className='text-warning' ><b>{txt_parent_mac}</b></span></b></small></span></p>
+                            <p key={v_andruavUnit.partyID + 'p2p_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Mac  <span className='text-warning' ><b>{txt_parent_mac}</b></span><span className="text-success">{txt_parent_name}</span></b></small></span></p>
                         </div>
                     </div>
                     <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-6 ">
