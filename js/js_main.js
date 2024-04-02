@@ -1675,7 +1675,7 @@ function fn_handleKeyBoard() {
 				this.m_markGuided = null;
 			}
 			
-            m_markGuided = AndruavLibs.AndruavMap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,24], true, true);
+            m_markGuided = AndruavLibs.AndruavMap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,16], true, true);
             AndruavLibs.AndruavMap.fn_setPosition(this.m_markGuided , p_position);
 			
 			AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (m_markGuided,
