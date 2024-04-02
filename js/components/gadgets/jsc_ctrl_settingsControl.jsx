@@ -123,7 +123,7 @@ export  class CLSS_CTRL_SETTINGS   extends React.Component {
             </div>
             <div key={v_andruavUnit.partyID + 'settings_3'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_31'} className="col-12">
-                    <p key={v_andruavUnit.partyID + 'settings_311'} className="textunit_w135 user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                 </div>
             </div>
             {cmd_btns}
