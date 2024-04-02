@@ -2399,7 +2399,7 @@ function fn_handleKeyBoard() {
 			var v_latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 			if (p_andruavUnit.m_gui.m_marker_destination == null) {
-				p_andruavUnit.m_gui.m_marker_destination = AndruavLibs.AndruavMap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName);
+				p_andruavUnit.m_gui.m_marker_destination = AndruavLibs.AndruavMap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon===true)
@@ -2643,7 +2643,10 @@ function fn_handleKeyBoard() {
 					if (p_andruavUnit.m_Swarm.m_following != null)
 					{
 						var v_andruavUnitLeader = v_andruavClient.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
-						markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">'+ v_andruavUnitLeader.m_unitName +'</span>'
+						if (v_andruavUnitLeader!=null)
+						{
+							markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">'+ v_andruavUnitLeader.m_unitName +'</span>'
+						}
 					}
 					
 					if (CONST_MAP_GOOLE === true)
