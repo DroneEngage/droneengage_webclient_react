@@ -3032,7 +3032,7 @@ function fn_handleKeyBoard() {
 				
 				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
 				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitArmedUpdated);
+				window.AndruavLibs.EventEmitter.fn_subscribe(EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
 				
 				
 				
