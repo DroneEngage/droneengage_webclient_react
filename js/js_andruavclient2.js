@@ -1905,10 +1905,11 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('p2') ===true)
                         {
                             const p2p = p_jmsg.p2;
-                            v_trigger_on_p2p_status = (p_unit.m_P2P.m_connection_type != p2p.p2p_connection_type)
-                                || (p_unit.m_P2P.m_parent_address != p2p.parent_address)
-                                || (p_unit.m_P2P.m_parent_connected != p2p.parent_connection_status)
-                                || (p_unit.m_P2P.m_driver_connected != p2p.m_driver_connected);
+                            v_trigger_on_p2p_status = (p_unit.m_P2P.m_connection_type != p2p.c)
+                                || (p_unit.m_P2P.m_parent_address != p2p.pa)
+                                || (p_unit.m_P2P.m_parent_connected != p2p.pc)
+                                || (p_unit.m_P2P.m_driver_connected != p2p.a)
+                                || (p_unit.m_P2P.m_p2p_connected != p2p.o);
 
                             // p2p communication is available.
                             p_unit.m_P2P.m_connection_type  = p2p.c;
@@ -1920,6 +1921,7 @@ class CAndruavClient {
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
                             p_unit.m_P2P.m_firmware         = p2p.f;
                             p_unit.m_P2P.m_driver_connected = p2p.a;
+                            p_unit.m_P2P.m_p2p_connected    = p2p.o;
                         }
 
                         this.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
@@ -2017,6 +2019,7 @@ class CAndruavClient {
                             p_unit.m_P2P.m_parent_address   = p2p.pa;
                             p_unit.m_P2P.m_parent_connected = p2p.pc;
                             p_unit.m_P2P.m_driver_connected = p2p.a;
+                            p_unit.m_P2P.m_p2p_connected    = p2p.o;
                         }
 
                         

@@ -37,13 +37,22 @@ export class CLSS_CTRL_P2P extends React.Component {
         const  v_andruavUnit = this.props.p_unit;
         var txt_connection_type='nothing';
         var css_connection_type= 'text-warning';
-        var txt_address = ': ON';
-        var css_txt_address = 'text-warning';
+        
+        var txt_address = ': OFF';
+        var css_txt_address = 'text-disabled';
 
-        if (v_andruavUnit.m_P2P.m_driver_connected===false)
+        if (v_andruavUnit.m_P2P.m_driver_connected===true)
         {
-            css_txt_address='text-disabled';
-            txt_address = ': OFF';
+            if (v_andruavUnit.m_P2P.m_p2p_connected===true)
+            {
+                css_txt_address='text-success';
+                txt_address = ': Connected';
+            }
+            else
+            {
+                css_txt_address='text-warning';
+                txt_address = ': ON';
+            }
         }
         switch(v_andruavUnit.m_P2P.m_connection_type)
         {
@@ -82,6 +91,8 @@ export class CLSS_CTRL_P2P extends React.Component {
             }
             
         }
+
+        
 
         var cmd_btns = [];
         if (CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true)
