@@ -1361,7 +1361,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         }
        
         // Adding an empty tab
-        container_tabs.push(<li className="nav-item"> + key={v_andruavUnit.partyID + 'li5'}
+        container_tabs.push(<li key={v_andruavUnit.partyID + 'liempty'} className="nav-item">  
                         <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
                         </li>);
         container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
@@ -1383,7 +1383,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         }
        
         // Adding an empty tab
-        container_controls.push(<div className="tab-pane fade" id={"p2p" + v_andruavUnit.partyID}>
+        container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabCLSS_CTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
                     </div>);
         ////////////////////////////////////TABS ---- END
 
