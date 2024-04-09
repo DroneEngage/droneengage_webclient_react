@@ -915,12 +915,13 @@ class CLSS_AndruavUnitListArray extends React.Component {
                 }
                 else
                 {
-                    sortedPartyIDs = this.state.andruavUnitPartyIDs;
+                    sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsArray();
                 }
-                sortedPartyIDs.map(function (partyID)
+                sortedPartyIDs.map(function (object)
                 {
-                    var v_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(partyID));
-                    
+                    const partyID = object[0];
+                    const v_andruavUnit = object[1];
+                
                     if ((v_andruavUnit==null) || (v_andruavUnit.m_defined!==true))return ;
 
                     if (v_andruavUnit.m_IsGCS===true)

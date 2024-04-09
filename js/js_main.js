@@ -1599,10 +1599,10 @@ function fn_handleKeyBoard() {
 				{
 					sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsArray();
 				}
-				sortedPartyIDs.map(function (partyID)
+				sortedPartyIDs.map(function (object)
 				{
 
-					let p_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(partyID));
+					let p_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(object[0]));
 					if ((p_andruavUnit != null) && (p_andruavUnit.m_IsGCS != true)) {
 						if ((p_andruavUnit.m_VehicleType == VEHICLE_ROVER)
 						 || (p_andruavUnit.m_VehicleType == VEHICLE_BOAT)) {
@@ -2212,6 +2212,8 @@ function fn_handleKeyBoard() {
 					
 					AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
+							var id = '#h'+p_andruavUnit.partyID +' a';
+							$(id).tab('show');
 							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
 							infowindow2.m_ignoreMouseOut = true;
 						});

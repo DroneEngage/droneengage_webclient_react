@@ -1355,13 +1355,13 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
 
         if ((CONST_FEATURE.DISABLE_P2P!=null) && (CONST_FEATURE.DISABLE_P2P===false)) 
         {
-            container_tabs.push(<li className="nav-item">
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.partyID}>P2P</a>
             </li>);
         }
        
         // Adding an empty tab
-        container_tabs.push(<li className="nav-item">
+        container_tabs.push(<li className="nav-item"> + key={v_andruavUnit.partyID + 'li5'}
                         <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
                         </li>);
         container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
@@ -1577,16 +1577,19 @@ class CLSS_AndruavUnitList extends React.Component {
             if (window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled()===true)
             {
                 // Sort the array alphabetically
+                // returns array
                 sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
             }
             else
             {
-                sortedPartyIDs = this.state.andruavUnitPartyIDs;
+                // returns list
+                sortedPartyIDs = v_andruavClient.m_andruavUnitList.fn_getUnitsArray();
             }
             
-            sortedPartyIDs.map(function (partyID)
+            sortedPartyIDs.map(function (object)
             {
-                var v_andruavUnit = v_andruavClient.m_andruavUnitList.fn_getUnit(parseInt(partyID));
+                const partyID = object[0];
+                const v_andruavUnit = object[1];
                 
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined!==true))return ;
@@ -1604,7 +1607,7 @@ class CLSS_AndruavUnitList extends React.Component {
                         // Display in Tabs
                         var header_info = me.getHeaderInfo(v_andruavUnit);
                         units_header.push(
-                            <li key={'h' + partyID} className="nav-item nav-units">
+                            <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
                                 <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.partyID}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
