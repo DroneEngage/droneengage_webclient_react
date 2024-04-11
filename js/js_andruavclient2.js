@@ -842,14 +842,23 @@ class CAndruavClient {
 
 
     // CODEBLOCK_START
+
+    API_scanP2P(p_andruavUnit) {
+        if (p_andruavUnit.partyID == null) return ;
+        
+        let p_msg = {
+            a: CONST_P2P_ACTION_SCAN_NETWORK,
+        };
+
+        this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
+    }
+    
     API_resetP2P(p_andruavUnit) {
         if (p_andruavUnit.partyID == null) return ;
         
         let p_msg = {
             a: CONST_P2P_ACTION_RESTART_TO_MAC,
-
-            
-        }
+        };
 
         this.API_sendCMD(p_andruavUnit.partyID, CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
     }

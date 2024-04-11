@@ -136,6 +136,9 @@ const CONST_RemoteCommand_MISSION_CURRENT                   = 508;
 const CONST_P2P_ACTION_RESTART_TO_MAC                        = 0;
 const CONST_P2P_ACTION_CONNECT_TO_MAC                        = 1;
 const CONST_P2P_ACTION_CANDICATE_MAC                         = 2;
+const CONST_P2P_ACTION_SCAN_NETWORK                          = 3;
+
+
 
 var message_names = {
     1002: "GPS",

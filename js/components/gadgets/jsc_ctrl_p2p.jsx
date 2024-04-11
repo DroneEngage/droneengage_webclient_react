@@ -20,7 +20,12 @@ export class CLSS_CTRL_P2P extends React.Component {
 
     fn_resetP2P (p_andruavUnit)
     {
-        v_andruavClient.API_resetP2P(p_andruavUnit)
+        v_andruavClient.API_resetP2P(p_andruavUnit);
+    }
+
+    fn_scanP2P (p_andruavUnit)
+    {
+        v_andruavClient.API_scanP2P(p_andruavUnit);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)
@@ -104,6 +109,9 @@ export class CLSS_CTRL_P2P extends React.Component {
                 <div key={v_andruavUnit.partyID + 'p2p_22'} className = 'row al_l css_margin_zero d-flex '>
                     <div key={v_andruavUnit.partyID + 'p2p_221'} className= 'col-6 col-sm-3 user-select-none '>
                     <p key={v_andruavUnit.partyID + 'p2p_2211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Change UDP Proxy Port' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
+                    </div>
+                    <div key={v_andruavUnit.partyID + 'p2p_222'} className= 'col-6 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.partyID + 'p2p_2212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Change UDP Proxy Port' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
                     </div>
                 </div>
                 </div>
