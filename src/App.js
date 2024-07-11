@@ -1,5 +1,7 @@
 import logo from './logo.svg';
-import './App.css';
+import './css/App.css';
+
+import { CFieldChecked } from './jsc_module_1';
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
           rel="noopener noreferrer"
         >
           Learn React
+          <CFieldChecked></CFieldChecked>
         </a>
       </header>
     </div>
