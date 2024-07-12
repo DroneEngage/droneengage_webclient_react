@@ -149,14 +149,6 @@ export function  fn_base64ToArrayBuffer(base64) {
 }
 
 
-export function  fn_point2LatLng(point, map) {
-    var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
-    var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
-    var scale = Math.pow(2, map.getZoom());
-    var worldPoint = new google.maps.Point(point.x / scale + bottomLeft.x, point.y / scale + topRight.y);
-    return map.getProjection().fromPointToLatLng(worldPoint);
-}
-
 export function  absAngle(a) 
 {
 	// this yields correct counter-clock-wise numbers, like 350deg for -370
@@ -168,16 +160,6 @@ export function  isClockwiseAngle (p_start, p_end)
 	return (p_start - p_end >= 0 && p_start - p_end <= 180) || (p_start - p_end <= -180) ? true : false;
 }
 		
-export function  angleDelta(a, b) 
-{
-	const abs_a = absAngle(a);
-	const abs_b = absAngle(b);
-	const delta = Math.abs(abs_a - abs_b);
-	let sign = abs_a > abs_b || delta >= 180 ? -1 : 1;
-    return {diff:(180 - Math.abs(delta - 180)) * sign, dir:direction};
-}
-
-
 export function  fn_calcDistance(lat1, lon1, lat2, lon2) 
 {
         var R = 6371e3; // metres
@@ -281,7 +263,7 @@ export function  prv_extractString(data,startIndex,endIndex)
             return  {'text':"", 'nextIndex': startIndex};
         }
 
-        export const text = new TextDecoder().decode(data.slice(startIndex, i));
+        const text = new TextDecoder().decode(data.slice(startIndex, i));
         out.text = text;
         out.nextIndex = i+1;
         return out;

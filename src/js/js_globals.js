@@ -143,11 +143,11 @@ var CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and
 
 
 
-var CONST_MAP_GOOLE_PLUGIN   = false; 
-var CONST_MAP_GOOLE   = false; 
-var CONST_MAP_EDITOR  = false;
+export var CONST_MAP_GOOLE_PLUGIN   = false; 
+export var CONST_MAP_GOOLE   = false; 
+export var CONST_MAP_EDITOR  = false;
 
-var VAR_MAP_LEAFLET_URL;
+export var VAR_MAP_LEAFLET_URL;
 
 // CHOOSE YOUR MAP SOURCE
 VAR_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ";
@@ -160,7 +160,7 @@ export const CONST_DISABLE_ADSG = true;
 
 
 
-function fn_console_log(p_txt)
+export function fn_console_log(p_txt)
 {
     //CODEBLOCK_START
     if ((siteConfig.CONST_TEST_MODE == true)  && (siteConfig.CONST_TEST_MODE_ENABLE_LOG == true))
@@ -170,7 +170,7 @@ function fn_console_log(p_txt)
     //CODEBLOCK_END
 }
 
-function fn_date_now()
+export function fn_date_now()
 {
     return Date.now();
 }
@@ -178,5 +178,5 @@ function fn_date_now()
 
 
 
-var v_andruavClient = null;
+export var v_andruavClient = null;
 		

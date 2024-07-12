@@ -3,6 +3,8 @@ import $ from 'jquery';
 
 import * as js_globals from '../js/js_globals';
 import * as js_andruavclient2 from '../js/js_andruavclient2';
+import * as js_andruavMessage from '../js/js_andruavMessages'
+import {v_SpeakEngine}  from '../js/js_speak'
 
 const res_CLSS_LoginControl =
 {
@@ -38,10 +40,10 @@ export class CLSS_LoginControl extends React.Component {
 
 	
 	fn_onSocketStatus(me, params) {
-		fn_console_log('REACT:' + JSON.stringify(params));
+		js_globals.fn_console_log('REACT:' + JSON.stringify(params));
 
 		if (me._isMounted!==true) return ;
-    	if (params.status == CONST_SOCKET_STATUS_REGISTERED) {
+    	if (params.status == js_andruavMessage.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
 			me.setState({ btnConnectText: res_CLSS_LoginControl[window.AndruavLibs.LocalStorage.fn_getLanguage()]['2'] });
 			me.state.username = $('#txtUnitID').val();
