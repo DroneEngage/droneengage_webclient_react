@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Outlet, Link } from "react-router-dom";
 import {CLSS_HeaderControl} from '../components/jsc_header'
 const Layout = () => {

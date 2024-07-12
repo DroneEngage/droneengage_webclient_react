@@ -1,4 +1,4 @@
-import * as  siteConfig from './siteConfig.js'
+import * as  js_siteConfig from './js_siteConfig.js'
 
 
 export const build_number = "20240703-01";
@@ -6,8 +6,8 @@ export const build_number = "20240703-01";
 
 
 // auto connect variables
-var v_connectState 	= false;  	
-var v_connectRetries  = 5;  	
+export var v_connectState 	 = false;  	
+export var v_connectRetries  = 5;  	
 
 
 
@@ -19,27 +19,27 @@ var v_displayMode                   = 0;
 var active_gamepad_index            = 0;
 
 // Metric System        
-var v_useMetricSystem               = true;
+export var v_useMetricSystem               = true;
 
-var CONST_DEFAULT_ALTITUDE          = 100;  // 100 m
-var CONST_DEFAULT_RADIUS            = 50;   // 50 m
-var CONST_DEFAULT_ALTITUDE_min      = 1;    //  m		
-var CONST_DEFAULT_ALTITUDE_STEP     = 3;    //  m		
-var CONST_DEFAULT_RADIUS_min        = 5;    //  m
-var CONST_DEFAULT_SPEED_MIN         = 5;    //  m/s
-var CONST_DEFAULT_SPEED_STEP        = 1;    //  m/s
-var CONST_DEFAULT_VOLUME            = 50;
+export var CONST_DEFAULT_ALTITUDE          = 100;  // 100 m
+export var CONST_DEFAULT_RADIUS            = 50;   // 50 m
+export var CONST_DEFAULT_ALTITUDE_min      = 1;    //  m		
+export var CONST_DEFAULT_ALTITUDE_STEP     = 3;    //  m		
+export var CONST_DEFAULT_RADIUS_min        = 5;    //  m
+export var CONST_DEFAULT_SPEED_MIN         = 5;    //  m/s
+export var CONST_DEFAULT_SPEED_STEP        = 1;    //  m/s
+export var CONST_DEFAULT_VOLUME            = 50;
 // GUI 
 export const CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT = 40;
 
 
-var v_EnableADSB     = false;
-var v_en_Drone       = true;
-var v_en_GCS         = true;
-var v_enable_tabs_display = false;
-var v_enable_unit_sort = true;
-var v_enable_gcs_display = false;
-var v_gamePadMode = 2;
+export var v_EnableADSB     = false;
+export var v_en_Drone       = true;
+export var v_en_GCS         = true;
+export var v_enable_tabs_display = false;
+export var v_enable_unit_sort = true;
+export var v_enable_gcs_display = false;
+export var v_gamePadMode = 2;
 
 
 // map Color Selection
@@ -163,7 +163,7 @@ export const CONST_DISABLE_ADSG = true;
 export function fn_console_log(p_txt)
 {
     //CODEBLOCK_START
-    if ((siteConfig.CONST_TEST_MODE == true)  && (siteConfig.CONST_TEST_MODE_ENABLE_LOG == true))
+    if ((js_siteConfig.CONST_TEST_MODE == true)  && (js_siteConfig.CONST_TEST_MODE_ENABLE_LOG == true))
     {
         console.log (p_txt);
     }

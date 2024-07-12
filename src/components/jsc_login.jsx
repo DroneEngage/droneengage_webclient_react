@@ -1,10 +1,15 @@
 import React from 'react';
+import ReactDOM from "react-dom/client";
+
 import $ from 'jquery'; 
 
-import * as js_globals from '../js/js_globals';
+import * as js_globals from '../js/js_globals'
+import * as js_helpers from '../js/js_helpers';
+import * as  js_siteConfig from './js_siteConfigs';
+import {QueryString, fn_connect} from '../js/js_main';
 import * as js_andruavclient2 from '../js/js_andruavclient2';
-import * as js_andruavMessage from '../js/js_andruavMessages'
-import {v_SpeakEngine}  from '../js/js_speak'
+import * as js_andruavMessage from '../js/js_andruavMessages';
+import {v_SpeakEngine}  from '../js/js_speak';
 
 const res_CLSS_LoginControl =
 {
@@ -70,9 +75,9 @@ export class CLSS_LoginControl extends React.Component {
 	clickConnect(e) {
 		// Getting an array of DOM elements
 		// Then finding which element was clicked
-		if (v_connectState == true) {
-			v_connectState = false;
-			v_connectRetries = 0;
+		if (js_globals.v_connectState == true) {
+			js_globals.v_connectState = false;
+			js_globals.v_connectRetries = 0;
 		}
 
 		fn_connect();
@@ -138,7 +143,7 @@ export class CLSS_LoginControl extends React.Component {
 							<div className="form-group al_l">
 								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
 								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : window.AndruavLibs.LocalStorage.fn_getUnitID()} />
-								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + fn_generateRandomString(2)}/></div>
+								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/></div>
 							<br />
 						</div>
 						<div id='login_btn mb-2 ' className='text-center'>
@@ -174,7 +179,7 @@ export class CLSS_LoginControl extends React.Component {
 								<div className="form-group al_l">
 									<label htmlFor="txtUnitID"  id="unitID" className="text-muted">GCS ID</label>
 									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : window.AndruavLibs.LocalStorage.fn_getUnitID()} />
-									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + fn_generateRandomString(2)}/>
+									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/>
 								</div>
 								<br />
 							</div>
@@ -208,7 +213,7 @@ export class CLSS_LoginControl extends React.Component {
 
 if ($('#login_div').length != 0) {
 
-	if (CONST_TEST_MODE === true)
+	if (js_siteConfig.CONST_TEST_MODE === true)
 	{
 		ReactDOM.render(
 			<React.StrictMode>

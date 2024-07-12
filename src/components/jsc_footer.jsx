@@ -1,4 +1,5 @@
 import React from 'react';
+import * as  js_siteConfig from './siteConfig.js'
 
 class CLSS_FooterControl extends React.Component {
 	constructor()
@@ -24,7 +25,7 @@ class CLSS_FooterControl extends React.Component {
 
 
 
-if (CONST_TEST_MODE === true)
+if (js_siteConfig.CONST_TEST_MODE === true)
 	{
         ReactDOM.render(
             <React.StrictMode>

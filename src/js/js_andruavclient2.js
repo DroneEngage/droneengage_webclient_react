@@ -16,6 +16,7 @@
 
 /*jshint esversion: 6 */
 "use strict";
+import * as js_andruavMessages from './js/js_andruavMessages'
 
 
 const WAYPOINT_NO_CHUNK = 0;
@@ -75,7 +76,7 @@ class CAndruavClient {
         this.v_waypointsCache = {};
         this.v_callbackListeners = {};
         this.fn_init();
-        this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
+        //this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
     }
 
     _fn_checkStatus() {
@@ -88,7 +89,7 @@ class CAndruavClient {
             if (!unit.m_IsMe) {
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
 
-            if (timeSinceLastActive > CONST_checkStatus_Interverl1) {
+            if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
                 unit.m_IsShutdown = true;
                 window.AndruavLibs.EventEmitter.fn_dispatch(EE_unitUpdated, unit);
             } else if (timeSinceLastActive > CONST_checkStatus_Interverl0) {

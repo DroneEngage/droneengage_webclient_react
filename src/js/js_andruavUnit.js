@@ -15,7 +15,10 @@
  *************************************************************************************/
 /*jshint esversion: 6 */
 
-import * as andruavMessage from './js_andruavMessages'
+import * as js_globals from './js_globals'
+import * as js_andruavMessage from './js_andruavMessages'
+import * as js_circularBuffer from './js_circularBuffer'
+import { mavlink20, MAVLink20Processor } from './js_mavlink_v2';
 
 // Vehicle Types
 const VEHICLE_UNKNOWN 						= 0;
@@ -153,14 +156,14 @@ class C_Video
 		const c_activeTracks = Object.keys(this.m_videoactiveTracks);
 		if (c_activeTracks.length ==0 )
 		{	// NO ACTIVE VIDEOS ARE DEFINED
-			return andruavMessage.CONST_VIDEOSTREAMING_OFF;
+			return CONST_VIDEOSTREAMING_OFF;
 		}
 		var len = c_activeTracks.length;
 		for (var i=0;i<len;++i)
 		{	
-			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming == andruavMessage.CONST_VIDEOSTREAMING_ON)
+			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming == CONST_VIDEOSTREAMING_ON)
 			{  // ONE TRACK IS ACTIVE
-				return andruavMessage.CONST_VIDEOSTREAMING_ON;
+				return CONST_VIDEOSTREAMING_ON;
 				
 			}
 		}
@@ -177,7 +180,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & andruavMessage.CONST_CAMERA_SUPPORT_FLASHING)
+			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_FLASHING)
 		}
 		if (track.hasOwnProperty("f")===true)
 		{
@@ -195,7 +198,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & andruavMessage.CONST_CAMERA_SUPPORT_DUAL_CAM)
+			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_DUAL_CAM)
 		}
 		if (track.hasOwnProperty("f")===true)
 		{	// both flashing & dual camera uses f field om Andruav
@@ -212,7 +215,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & andruavMessage.CONST_CAMERA_SUPPORT_ZOOMING)
+			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_ZOOMING)
 		}
 		if (track.hasOwnProperty("z")===true)
 		{
@@ -229,7 +232,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & andruavMessage.CONST_CAMERA_SUPPORT_ROTATION)
+			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_ROTATION)
 		}
 		if (track.hasOwnProperty("z")===true)
 		{
@@ -251,7 +254,7 @@ class C_Video
 		var j=0;
 		for (var i=0;i<len;++i)
 		{	
-			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming == andruavMessage.CONST_VIDEOSTREAMING_ON)
+			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming == CONST_VIDEOSTREAMING_ON)
 			{  // ON TRACK IS ACTIVE
 				j+=1;
 			}
@@ -266,25 +269,26 @@ class C_Video
 	{
 		const c_activeTracks = Object.keys(this.m_videoactiveTracks);
 
-		if (this.VideoRecording == andruavMessage.CONST_VIDEOSTREAMING_ON)
+		if (this.VideoRecording == CONST_VIDEOSTREAMING_ON)
 		{
-			return andruavMessage.CONST_VIDEOSTREAMING_ON;
+			return CONST_VIDEOSTREAMING_ON;
 		}
 
 		if (c_activeTracks.length ==0 )
 		{	// NO ACTIVE VIDEOS ARE DEFINED
-			return andruavMessage.CONST_VIDEOSTREAMING_OFF;
+			return CONST_VIDEOSTREAMING_OFF;
 		}
 		var len = c_activeTracks.length;
 		for (var i=0;i<len;++i)
 		{	
-			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoRecording == andruavMessage.CONST_VIDEOSTREAMING_OFF)
+			if (this.m_videoactiveTracks[c_activeTracks[i]].VideoRecording == 
+				CONST_VIDEOSTREAMING_OFF)
 			{  // ON TRACK IS ACTIVE
-				return andruavMessage.CONST_VIDEOSTREAMING_ON;
+				return CONST_VIDEOSTREAMING_ON;
 			}
 		}
 
-		return andruavMessage.CONST_VIDEOSTREAMING_OFF;
+		return CONST_VIDEOSTREAMING_OFF;
 	};
 }
 
@@ -388,8 +392,8 @@ class C_Swarm
 	{
 		this.m_parent = p_parent;
 		this.m_isLeader = false;
-		this.m_formation_as_leader = andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
-		this.m_formation_as_follower = andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
+		this.m_formation_as_leader = js_andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
+		this.m_formation_as_follower = js_andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
 		this.m_following = null;
 	};
 }
@@ -618,7 +622,7 @@ class C_GUIHelper
 	{
 		this.m_parent 	= p_parent;
 		// actual lines on map
-		this.m_gui_flightPath = new CLSS_CustomCircularBuffer(CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT); 
+		this.m_gui_flightPath = new js_circularBuffer.CLSS_CustomCircularBuffer(js_globals.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT); 
 		this.m_wayPoint_markers = [];
 		this.m_wayPoint_polygons = [];
 		this.m_marker = null;
@@ -653,15 +657,15 @@ class C_Modules
 			var module = jsonmodules[i];
 			switch (module.c.toLowerCase())
 			{
-				case TYPE_MODULE_CLASS_FCB:
+				case js_andruavMessage.TYPE_MODULE_CLASS_FCB:
 					this.has_fcb = true;	
 				break;
 
-				case TYPE_MODULE_CLASS_GPIO:
+				case js_andruavMessage.TYPE_MODULE_CLASS_GPIO:
 					this.has_gpio = true;	
 				break;
 				
-				case TYPE_MODULE_CLASS_SOUND:
+				case js_andruavMessage.TYPE_MODULE_CLASS_SOUND:
 					this.has_sound = true;	
 				break;
 			}
@@ -677,6 +681,7 @@ class C_Messages
 {
 	constructor(p_parent)
 	{
+		this.m_parent = p_parent;
 		this.fn_reset();
 	}
 
@@ -740,7 +745,6 @@ class C_Messages
 
 	fn_reset()
 	{
-		this.m_parent = parent;
 		this.m_messages_repeat = {};
 		this.m_messages_in = {};
 		this.m_messages_in_mavlink = {};
@@ -767,7 +771,7 @@ class CAndruavUnitObject
 		this.m_inZone 					= null;  // name of A ZONE  that the unit is IN. 
 		this.m_unitName					="unknown";
 		this.partyID					= null;
-		this.m_groupName;
+		this.m_groupName				= null;
 		this.m_isFlying					= false; 
 		this.m_FlyingLastStartTime		= 0; // flight duration of latest or current flight.
 		this.m_FlyingTotalDuration		= 0; 
@@ -964,23 +968,23 @@ class CAndruavUnitList
 
 	fn_getUnitKeys ()
 	{
-		if (v_andruavClient==null) return undefined;
-		return Object.keys(v_andruavClient.m_andruavUnitList.List);
+		if (js_globals.v_andruavClient==null) return undefined;
+		return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List);
 	};
 
 
 	fn_getUnitValues ()
 	{
-		if (v_andruavClient==null) return undefined;
-		return Object.values(v_andruavClient.m_andruavUnitList.List);
+		if (js_globals.v_andruavClient==null) return undefined;
+		return Object.values(js_globals.v_andruavClient.m_andruavUnitList.List);
 	};
 
 
 	fn_getUnitCount ()
 	{
-		if (v_andruavClient==null) return 0;
-		if (v_andruavClient.m_andruavUnitList == null) return 0;
-		return Object.keys(v_andruavClient.m_andruavUnitList.List).length; 
+		if (js_globals.v_andruavClient==null) return 0;
+		if (js_globals.v_andruavClient.m_andruavUnitList == null) return 0;
+		return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List).length; 
 	};
 
 

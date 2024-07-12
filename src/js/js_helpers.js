@@ -325,10 +325,10 @@ String.prototype._fn_hexDecode = function(){
 
 
 export function   fn_loadCss (path) {
-        var style = doc.createElement('link');
+        var style = document.createElement('link');
         style.rel = 'stylesheet';
         style.href = './css/' + path + '.css';
-        doc.head.appendChild(style);
+        document.head.appendChild(style);
 }
 
 export function  fn_generateRandomString(length)
@@ -506,4 +506,3 @@ export function  fn_getNetworkType (p_networkType)
  }
     
 
-fn_eval = eval;

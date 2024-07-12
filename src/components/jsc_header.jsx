@@ -3,7 +3,8 @@ import ReactDOM from "react-dom/client";
 
 import {CLSS_LoginControl} from './jsc_login.jsx'
 import {CLSS_CTRL_Layout} from './jsc_ctrl_layoutControl.jsx'
-import * as siteConfig from '../js/siteConfig.js'
+import * as  js_siteConfig from './js_siteConfig.js'
+
 
 class CLSS_HeaderControl extends React.Component {
     constructor() {
@@ -18,24 +19,24 @@ class CLSS_HeaderControl extends React.Component {
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                         <a className="navbar-brand fs-3" href="#">
                             <img src="./images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top" alt="" />
-                            {siteConfig.CONST_TITLE}
+                            {js_siteConfig.CONST_TITLE}
                         </a>
                         <div className="collapse navbar-collapse" id="navbarNav">
                             <ul className="navbar-nav">
                                 <li key="Home" className="nav-item active">
-                                    <a className="nav-link" href={siteConfig.CONST_HOME_URL}>Home </a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_HOME_URL}>Home </a>
                                 </li>
                                 <li key="Geo" className="nav-item">
                                     <a className="nav-link" id='mapeditor' href="./mapeditor.html" target='_blank'>Geo Fence</a>
                                 </li>
                                 <li key="Manual" className="nav-item">
-                                    <a className="nav-link" href={siteConfig.CONST_MANUAL_URL} target='_blank' >Manual</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' >Manual</a>
                                 </li>
                                 <li key="FAQ" className="nav-item">
-                                    <a className="nav-link" href={siteConfig.CONST_FAQ_URL} target='_blank' >FAQ</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' >FAQ</a>
                                 </li>
                                 <li key="Contact" className="nav-item">
-                                    <a className="nav-link" href={siteConfig.CONST_CONTACT_URL} target='_blank' >Contact</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' >Contact</a>
                                 </li>
                                 <li key="Account" className="nav-item">
                                     <a className="nav-link" href="accounts.html" target='_blank' >Account</a>
@@ -58,7 +59,7 @@ class CLSS_HeaderControl extends React.Component {
 
 
 
-    if (siteConfig.CONST_TEST_MODE === true)
+    if (js_siteConfig.CONST_TEST_MODE === true)
 	{
         ReactDOM.render(
             <React.StrictMode>

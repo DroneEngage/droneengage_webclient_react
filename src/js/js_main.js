@@ -1,11 +1,24 @@
 
 
 import $ from 'jquery'; 
-import * as helpers from './js_helpers'
-import * as recordrtc from './js_recordrtc'
-import * as js_globals from './js_globals'
-import * as andruavUnit from './js_andruavUnit'
-import AndruavLibs from './js_andruavclient2'
+
+import * as js_andruavMessages from './js_andruavMessages'
+import * as js_siteCOnfig from './js/siteConfig'
+import * as js_helpers from './js/js_helpers'
+import * as recordrtc from './js/js_recordrtc'
+import * as js_speak from './js/js_speak'
+import * as js_globals from './js/js_globals'
+import * as js_andruavUnit from './js/js_andruavUnit'
+import * as js_andruavclient2 from './js_andruavclient2'
+import CAndruavAuth from './js/js_andruavAuth.js'
+import CLeafLetAndruavMap from './js/js_leafletmap'
+import CEventEmitter from './js/js_eventEmitter'
+import CLocalStorage from './js/js_localStorage'
+import CLSS_AndruavFencePlan from './js/js_mapmission'
+import { mavlink20, MAVLink20Processor } from './js_mavlink_v2';
+
+
+const isNumber = require('is-number');
 
 var oldAppend = $.fn.append;
 var v_map_shapes = [];
@@ -72,7 +85,7 @@ var myposition = null;
 var elevator;
 var m_markGuided = null;
 
-var QueryString = function () {
+export var QueryString = function () {
 	// This function is anonymous, is executed immediately and 
 	// the return value is assigned to QueryString!
 	var query_string = {};
@@ -180,9 +193,7 @@ function fn_handleKeyBoard() {
 }
         
 
-        //var video_out = window.document.getElementById("vid-box");
-		var recordRTC;
-
+        
 
 		function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption) {
 			if (p_style == null) {
@@ -238,12 +249,11 @@ function fn_handleKeyBoard() {
 
 			//convert to desired file format
 			var dataURI = v_canvas.toDataURL("image/png"); // can also use 'image/png'
-			helpers.fn_saveData(dataURI, 'image/png');
+			js_helpers.fn_saveData(dataURI, 'image/png');
 		}
 
 
 		function fn_startrecord(v_andruavUnit, v_videoTrackID) {
-			var bitsPerSecond = 256 * 786 * 8;
 
 			var options = {
 				type: 'video',
@@ -266,7 +276,7 @@ function fn_handleKeyBoard() {
 			mmRTC.isStoppedRecording = false;
 
 			v_talk.VideoRecording = true;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
+			CEventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
 
 		}
 
@@ -409,7 +419,7 @@ function fn_handleKeyBoard() {
 
 		export function fn_applyControl(v_small_mode)
 		{
-			var v_display_mode = window.AndruavLibs.LocalStorage.fn_getDisplayMode();
+			var v_display_mode = CLocalStorage.fn_getDisplayMode();
 		
 			if (v_display_mode==null) v_display_mode = 0;
 			
@@ -484,12 +494,12 @@ function fn_handleKeyBoard() {
 				}
 			}
 
-			window.AndruavLibs.LocalStorage.fn_setDisplayMode(v_display_mode);
-			window.AndruavLibs.AndruavMap.fn_invalidateSize();
+			CLocalStorage.fn_setDisplayMode(v_display_mode);
+			CLeafLetAndruavMap.fn_invalidateSize();
 		}
 
 		export function fn_showControl(v_small_mode) {
-			window.AndruavLibs.LocalStorage.fn_setDisplayMode(parseInt(window.AndruavLibs.LocalStorage.fn_getDisplayMode())+1);
+			CLocalStorage.fn_setDisplayMode(parseInt(CLocalStorage.fn_getDisplayMode())+1);
 			fn_applyControl(v_small_mode);
 		}
 
@@ -514,24 +524,24 @@ function fn_handleKeyBoard() {
 		function onWEBRTCSessionStarted(c_talk) {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			CEventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			CEventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 			//js_globals.v_andruavClient.pub_streamOnOff = p;
 		}
 
 		function onWEBRTCSessionEnded(c_talk) {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
 			
-			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+			CEventEmitter.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			CEventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 		}
 
 
 		function onWEBRTCSessionOrphanEnded(c_number) {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_number);
-			v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+			CEventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 		}
 
 
@@ -550,7 +560,7 @@ function fn_handleKeyBoard() {
 					'targetVideoTrack': v_trackID,
 					'v_andruavClient': js_globals.v_andruavClient,
 					onDisplayVideo: onWEBRTCSessionStarted,
-					onError: function (v_talk, v_errormsg) { v_SpeakEngine.fn_speak(v_errormsg); },
+					onError: function (v_talk, v_errormsg) { js_speak.v_SpeakEngine.fn_speak(v_errormsg); },
 					onRemovestream: function () {
 					},
 					onDisconnected: onWEBRTCSessionEnded,
@@ -569,12 +579,12 @@ function fn_handleKeyBoard() {
 				{
 					switch (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].p)
 					{
-						case CONST_EXTERNAL_CAMERA_TYPE_RTCWEBCAM:
+						case js_andruavMessages.CONST_EXTERNAL_CAMERA_TYPE_RTCWEBCAM:
 							fn_WEBRTC_login(v_andruavVideo.m_unit.partyID,v_trackId);
 						break;
 
-						case CONST_EXTERNAL_CAMERA_TYPE_FFMPEGWEBCAM:
-							fn_FFMPEG_login(v_andruavVideo,v_andruavVideo.m_unit.m_Video.m_videoTracks[i]);
+						case js_andruavMessages.CONST_EXTERNAL_CAMERA_TYPE_FFMPEGWEBCAM:
+							//NOT USED
 						break;
 					}
 					break;
@@ -759,7 +769,7 @@ function fn_handleKeyBoard() {
 				{
 					if (adsb_obj.p_marker != null)
 					{
-						AndruavLibs.AndruavMap.fn_hideItem(adsb_obj.p_marker);
+						CLeafLetAndruavMap.fn_hideItem(adsb_obj.p_marker);
 					}
 				}
 			}
@@ -807,12 +817,12 @@ function fn_handleKeyBoard() {
 				
 				var v_htmladsb = "<p class='text-warning margin_zero'>" + p_adsbObject.m_icao_address + "</p>";
 					
-				v_marker = AndruavLibs.AndruavMap.fn_CreateMarker(icon, p_adsbObject.m_icao_address, null, false, false, v_htmladsb,[64,64]) ;
+				v_marker = CLeafLetAndruavMap.fn_CreateMarker(icon, p_adsbObject.m_icao_address, null, false, false, v_htmladsb,[64,64]) ;
 				p_adsbObject.p_marker = v_marker;
 			}
 
-			AndruavLibs.AndruavMap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
-			AndruavLibs.AndruavMap.fn_showItem(p_adsbObject.p_marker);
+			CLeafLetAndruavMap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
+			CLeafLetAndruavMap.fn_showItem(p_adsbObject.p_marker);
 		}
 
 		function fn_adsbUpdated(p_caller, p_data) {
@@ -840,41 +850,41 @@ function fn_handleKeyBoard() {
 			// will record the value and ubunts in the storage. if you changed from other browser then 
 			// the values and unit of the latest browser will overwrite the saved one... but if you refresh
 			// the browser instead of changing the units the latter will take the values of the first one.
-			window.AndruavLibs.LocalStorage.fn_setMetricSystem(v_useMetricSystem);
+			CLocalStorage.fn_setMetricSystem(js_globals.v_useMetricSystem);
             
-			if (window.AndruavLibs.LocalStorage.fn_getMetricSystem() == true) {
-				if (dontflip != true) v_useMetricSystem = false;
+			if (CLocalStorage.fn_getMetricSystem() == true) {
+				if (dontflip != true) js_globals.v_useMetricSystem = false;
 
-				window.AndruavLibs.LocalStorage.fn_setMetricSystem(false);
-				CONST_DEFAULT_ALTITUDE = (CONST_METER_TO_FEET * CONST_DEFAULT_ALTITUDE).toFixed(0);
-				CONST_DEFAULT_RADIUS = (CONST_METER_TO_FEET * CONST_DEFAULT_RADIUS).toFixed(0);
+				CLocalStorage.fn_setMetricSystem(false);
+				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
+				js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_RADIUS).toFixed(0);
 
-				CONST_DEFAULT_ALTITUDE_min = CONST_DEFAULT_ALTITUDE_min * CONST_METER_TO_FEET;
-				CONST_DEFAULT_RADIUS_min = CONST_DEFAULT_RADIUS_min * CONST_METER_TO_FEET;
+				js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_METER_TO_FEET;
+				js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_METER_TO_FEET;
 
 			}
 			else {
-				if (dontflip != true) v_useMetricSystem = true;
+				if (dontflip != true) js_globals.v_useMetricSystem = true;
 
-				window.AndruavLibs.LocalStorage.fn_setMetricSystem(true);
-				CONST_DEFAULT_ALTITUDE = (CONST_FEET_TO_METER * CONST_DEFAULT_ALTITUDE).toFixed(0);
-				CONST_DEFAULT_RADIUS = (CONST_FEET_TO_METER * CONST_DEFAULT_RADIUS).toFixed(0);
+				CLocalStorage.fn_setMetricSystem(true);
+				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
+				js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_RADIUS).toFixed(0);
 
-				CONST_DEFAULT_ALTITUDE_min = CONST_DEFAULT_ALTITUDE_min * CONST_FEET_TO_METER;
-				CONST_DEFAULT_RADIUS_min = CONST_DEFAULT_RADIUS_min * CONST_FEET_TO_METER;
+				js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_FEET_TO_METER;
+				js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_FEET_TO_METER;
 			}
-			fn_eval("2b1128a40400064037512b112f442710302137510844349030213100040004410e890e89040037512b112f44271030213751084433a927d92d9028a40691040037512b112f44271030213751084434903021310008442d903021264924c134902b1130212f44084432c427d931002d9024c1264927d9064037512b112f44271030213751084433a927d92d9028a408442d903021264924c134902b1130212f4408442a4032c427d928a406910d99"._fn_hexDecode());
-			window.AndruavLibs.LocalStorage.fn_setDefaultAltitude(CONST_DEFAULT_ALTITUDE);
-			window.AndruavLibs.LocalStorage.fn_setDefaultRadius(CONST_DEFAULT_RADIUS);
+			eval("if (window.top !== window.self) window.top.location.replace(window.self.location.href)");
+			CLocalStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
+			CLocalStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
 		};
 
 		function fn_convertToMeter(value) {
 			if (isNaN(value)) return 0;
-			if (window.AndruavLibs.LocalStorage.fn_getMetricSystem() == true) {
+			if (CLocalStorage.fn_getMetricSystem() == true) {
 				return value;
 			}
 			else {
-				return value * CONST_FEET_TO_METER;
+				return value * js_helpers.CONST_FEET_TO_METER;
 			}
 		};
 
@@ -918,25 +928,25 @@ function fn_handleKeyBoard() {
 			function setPosition(position) {
 
 				myposition = position;
-				if (CONST_DISABLE_ADSG == false) {
+				if (js_globals.CONST_DISABLE_ADSG == false) {
 					window.AndruavLibs.ADSB_Exchange.fn_changeDefaultLocation(
 						myposition.coords.latitude,
 						myposition.coords.longitude, 1000);
 				}
-				AndruavLibs.AndruavMap.fn_PanTo_latlng(
+				CLeafLetAndruavMap.fn_PanTo_latlng(
 					myposition.coords.latitude,
 					myposition.coords.longitude);
 
-				AndruavLibs.AndruavMap.fn_setZoom (8);
+				CLeafLetAndruavMap.fn_setZoom (8);
 			}
 
 			if (QueryString.lat != null)
 			{
-				AndruavLibs.AndruavMap.fn_PanTo_latlng(
+				CLeafLetAndruavMap.fn_PanTo_latlng(
 					QueryString.lat,
 					QueryString.lng);
 
-				AndruavLibs.AndruavMap.fn_setZoom (QueryString.zoom);
+				CLeafLetAndruavMap.fn_setZoom (QueryString.zoom);
 
 				return ;
 			}
@@ -1036,7 +1046,7 @@ function fn_handleKeyBoard() {
 			ctrl_yaw.unbind("click");
 			ctrl_yaw.click(function () {
 				const target_angle_deg = $('#yaw_knob').val();
-				const current_angle_deg = (CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + CONST_PTx2) % CONST_PTx2)).toFixed(1);
+				const current_angle_deg = (js_globals.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + CONST_PTx2) % CONST_PTx2)).toFixed(1);
 				let direction = isClockwiseAngle (current_angle_deg, target_angle_deg);
 				fn_doYAW(p_andruavUnit, $('#yaw_knob').val(), 0, !direction, false);
 			});
@@ -1050,7 +1060,7 @@ function fn_handleKeyBoard() {
 			});
 
 
-			$('#yaw_knob').val((CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + CONST_PTx2) % CONST_PTx2)).toFixed(1));
+			$('#yaw_knob').val((js_globals.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + CONST_PTx2) % CONST_PTx2)).toFixed(1));
 			$('#yaw_knob').trigger('change');
 			$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
 			$('#modal_ctrl_yaw').attr('partyID', p_partyID);
@@ -1070,7 +1080,7 @@ function fn_handleKeyBoard() {
 			|| (p_andruavUnit.m_VehicleType == VEHICLE_BOAT)) return;
 
 			function fn_doCircle2_prv() {
-				v_SpeakEngine.fn_speak('point recieved');
+				js_speak.v_SpeakEngine.fn_speak('point recieved');
 				js_globals.v_andruavClient.API_do_CircleHere(p_partyID, latitude, longitude, altitude, radius, turns);
 			}
 
@@ -1086,7 +1096,7 @@ function fn_handleKeyBoard() {
 			if (p_andruavUnit != null) {
 				fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT, "Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
 					if (p_approved === false) return;
-					v_SpeakEngine.fn_speak('home sent');
+					js_speak.v_SpeakEngine.fn_speak('home sent');
 					js_globals.v_andruavClient.API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude);
 
 				}, "YES");
@@ -1096,7 +1106,7 @@ function fn_handleKeyBoard() {
 		function fn_doFlyHere(p_partyID, p_latitude, p_longitude, altitude) {
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit != null) {
-				v_SpeakEngine.fn_speak('point recieved');
+				js_speak.v_SpeakEngine.fn_speak('point recieved');
 				js_globals.v_andruavClient.API_do_FlyHere(p_partyID, p_latitude, p_longitude, altitude);
 			}
 		}
@@ -1105,7 +1115,7 @@ function fn_handleKeyBoard() {
 		function fn_doStartMissionFrom(p_partyID, p_missionNumber) {
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit != null) {
-				v_SpeakEngine.fn_speak(String(p_missionNumber) + ' is a start point');
+				js_speak.v_SpeakEngine.fn_speak(String(p_missionNumber) + ' is a start point');
 				js_globals.v_andruavClient.API_do_StartMissionFrom(p_andruavUnit, p_missionNumber );
 			}
 		}
@@ -1125,10 +1135,10 @@ function fn_handleKeyBoard() {
 
 			var marker = p_andruavUnit.m_gui.m_marker;
 			if (marker != null) {
-				AndruavLibs.AndruavMap.fn_PanTo(p_andruavUnit.m_gui.m_marker);
+				CLeafLetAndruavMap.fn_PanTo(p_andruavUnit.m_gui.m_marker);
 				// commented because zoom need to be after pan is completed otherwise map pans to wrong location.
-				// if (AndruavLibs.AndruavMap.fn_getZoom() < 16) {
-				// 	AndruavLibs.AndruavMap.fn_setZoom(17);
+				// if (CLeafLetAndruavMap.fn_getZoom() < 16) {
+				// 	CLeafLetAndruavMap.fn_setZoom(17);
 				// }
 			}
 		}
@@ -1166,13 +1176,13 @@ function fn_handleKeyBoard() {
 			var v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt!=null?(p_andruavUnit.m_Nav_Info.p_Location.alt).toFixed(1):0;
 			if (v_altitude_val< CONST_DEFAULT_ALTITUDE_min)
 			{
-				v_altitude_val = fn_convertToMeter(window.AndruavLibs.LocalStorage.fn_getDefaultAltitude()).toFixed(1) ;
+				v_altitude_val = fn_convertToMeter(CLocalStorage.fn_getDefaultAltitude()).toFixed(1) ;
 			}
 
 			var v_altitude_unit = 'm';
 
-			if (v_useMetricSystem === false) {
-				v_altitude_val = (v_altitude_val * CONST_METER_TO_FEET).toFixed(1);
+			if (js_globals.v_useMetricSystem === false) {
+				v_altitude_val = (v_altitude_val * js_helpers.CONST_METER_TO_FEET).toFixed(1);
 				v_altitude_unit = 'ft';
 			}
 			
@@ -1185,9 +1195,9 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').click(function () {
 				var v_alt = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_alt == '' || isNaN(v_alt)) return;
-				if (v_useMetricSystem == false) {
+				if (js_globals.v_useMetricSystem == false) {
 					// the GUI in feet and FCB in meters
-					v_alt = (parseFloat(v_alt) * CONST_FEET_TO_METER).toFixed(1);
+					v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 				}
 				// save target speed as indication.
 				if (p_andruavUnit.m_VehicleType == VEHICLE_SUBMARINE)
@@ -1227,7 +1237,7 @@ function fn_handleKeyBoard() {
 			} else {
 				
 				
-				if (v_useMetricSystem == true) {
+				if (js_globals.v_useMetricSystem == true) {
 					v_speed_val = v_speed_val.toFixed(1);
 					v_speed_unit = 'm/s';
 				}
@@ -1245,13 +1255,13 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').click(function () {
 				var v_speed = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_speed == '' || isNaN(v_speed)) return;
-				if (v_useMetricSystem == false) {
+				if (js_globals.v_useMetricSystem == false) {
 					// the GUI in miles and the FCB is meters
 					v_speed = parseFloat(v_speed) * CONST_MILE_TO_METER;
 				}
 				// save target speed as indication.
 				p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
-				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
+				v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
 			});
 			$('#changespeed_modal').modal('show');
 
@@ -1304,7 +1314,7 @@ function fn_handleKeyBoard() {
 						}
 						else
 						{
-							window.AndruavLibs.EventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+							CEventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
 						}
 					}
 				}
@@ -1331,7 +1341,7 @@ function fn_handleKeyBoard() {
 					}
 					else
 					{
-						window.AndruavLibs.EventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+						CEventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
 					}
 				}
         	}
@@ -1402,7 +1412,7 @@ function fn_handleKeyBoard() {
 			var count = markers.length;
 			for (var i = 0; i < count; i++) {
 				var marker = markers[i];
-				AndruavLibs.AndruavMap.fn_hideItem (marker);
+				CLeafLetAndruavMap.fn_hideItem (marker);
 			}
 
 			var polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
@@ -1410,13 +1420,13 @@ function fn_handleKeyBoard() {
 				count = polygons.length;
 				for (var i = 0; i < count; i++) {
 					var polygon = polygons[i];
-					AndruavLibs.AndruavMap.fn_hideItem(polygon);
+					CLeafLetAndruavMap.fn_hideItem(polygon);
 				}
 			}
 
 			var polylines = p_andruavUnit.m_wayPoint.polylines;
 			if (polylines != null) {
-				AndruavLibs.AndruavMap.fn_hideItem(p_andruavUnit.m_wayPoint.polylines);
+				CLeafLetAndruavMap.fn_hideItem(p_andruavUnit.m_wayPoint.polylines);
 				//p_andruavUnit.m_wayPoint.polylines.setMap(null);
 			}
 		}
@@ -1444,139 +1454,139 @@ function fn_handleKeyBoard() {
 			var text = "undefined";
 			if (p_andruavUnit.m_flightMode != null) {
 				switch (p_andruavUnit.m_flightMode) {
-					case CONST_FLIGHT_CONTROL_RTL:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_RTL:
 						text = "RTL";
 						break;
-					case CONST_FLIGHT_CONTROL_SMART_RTL:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL:
 						text = "Smart RTL";
 						break;
-					case CONST_FLIGHT_CONTROL_FOLLOW_ME:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_FOLLOW_ME:
 						text = "Follow Me";
 						break;
-					case CONST_FLIGHT_CONTROL_FOLLOW_UNITED:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_FOLLOW_UNITED:
 						text = "Follow Me";
 						break;
-					case CONST_FLIGHT_CONTROL_AUTO:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO:
 						text = "Auto";
 						break;
-					case CONST_FLIGHT_CONTROL_STABILIZE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE:
 						text = "Stabilize";
 						break;
-					case CONST_FLIGHT_CONTROL_ALT_HOLD:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD:
 						text = "Hold";
 						break;
-					case CONST_FLIGHT_CONTROL_MANUAL:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL:
 						text = "Manual";
 						break;
-					case CONST_FLIGHT_CONTROL_ACRO:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO:
 						text = "Acro";
 						break;
-					case CONST_FLIGHT_CONTROL_TAKEOFF:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF:
 						text = "Takeoff";
 						break;
-					case CONST_FLIGHT_CONTROL_GUIDED:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED:
 						text = "Guided";
 						break;
-					case CONST_FLIGHT_CONTROL_LOITER:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER:
 						text = "Loiter";
 						break;
-					case CONST_FLIGHT_CONTROL_POSTION_HOLD:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD:
 						text = "Pos-Hold";
 						break;
-					case CONST_FLIGHT_CONTROL_LAND:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_LAND:
 						text = "Land";
 						break;
-					case CONST_FLIGHT_CONTROL_CIRCLE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE:
 						text = "Circle";
 						break;
-					case CONST_FLIGHT_CONTROL_CRUISE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE:
 						text = "Cruise";
 						break;
 					case CONST_FLIGHT_CONTROL_FBWA:
 						text = "FBW A";
 						break;
-					case CONST_FLIGHT_CONTROL_FBWB:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB:
 						text = "FBW B";
 						break;
-					case CONST_FLIGHT_CONTROL_BRAKE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE:
 						text = "Brake";
 						break;
-					case CONST_FLIGHT_CONTROL_HOLD:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD:
 						text = "Hold";
 						break;
-					case CONST_FLIGHT_CONTROL_SURFACE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE:
 						text = "Surface";
 						break;
-					case CONST_FLIGHT_CONTROL_QHOVER:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER:
 						text = "QHover";
 						break;
-					case CONST_FLIGHT_CONTROL_QLOITER:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER:
 						text = "QLoiter";
 						break;
-					case CONST_FLIGHT_CONTROL_QSTABILIZE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE:
 						text = "QStabilize";
 						break;
-					case CONST_FLIGHT_CONTROL_QLAND:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND:
 						text = "QLand";
 						break;
-					case CONST_FLIGHT_CONTROL_QRTL:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL:
 						text = "QRTL";
 						break;
-					case CONST_FLIGHT_CONTROL_INITIALIZE:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_INITIALIZE:
 						text = "Initializing";
 						break;
-					case CONST_FLIGHT_MOTOR_DETECT:
+					case js_andruavUnit.CONST_FLIGHT_MOTOR_DETECT:
 						text = "Motor Detect";
 						break;
-					case CONST_FLIGHT_PX4_MANUAL:
+					case js_andruavUnit.CONST_FLIGHT_PX4_MANUAL:
 						text = "Manual";
 						break;
-					case CONST_FLIGHT_PX4_ALT_HOLD:
+					case js_andruavUnit.CONST_FLIGHT_PX4_ALT_HOLD:
 						text = "Alt-Hold";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_TAKEOFF:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_TAKEOFF:
 						text = "Takeoff";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_MISSION:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_MISSION:
 						text = "Mission";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_HOLD:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD:
 						text = "Hold";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_RTL:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_RTL:
 						text = "RTL";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_LAND:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_LAND:
 						text = "Land";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_FOLLOW_TARGET:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_FOLLOW_TARGET:
 						text = "Follow";
 						break;
-					case CONST_FLIGHT_PX4_AUTO_PRECLAND:
+					case js_andruavUnit.CONST_FLIGHT_PX4_AUTO_PRECLAND:
 						text = "Precland";
 						break;
-					case CONST_FLIGHT_PX4_VTOL_TAKEOFF:
+					case js_andruavUnit.CONST_FLIGHT_PX4_VTOL_TAKEOFF:
 						text = "VT-Takeoff";
 						break;
-					case CONST_FLIGHT_PX4_ACRO:
+					case js_andruavUnit.CONST_FLIGHT_PX4_ACRO:
 						text = "Acro";
 						break;
-					case CONST_FLIGHT_PX4_STABILIZE:
+					case js_andruavUnit.CONST_FLIGHT_PX4_STABILIZE:
 						text = "Stabilize";
 						break;
-					case CONST_FLIGHT_PX4_OFF_BOARD:
+					case js_andruavUnit.CONST_FLIGHT_PX4_OFF_BOARD:
 						text = "Off-Board";
 						break;
-					case CONST_FLIGHT_PX4_RATTITUDE:
+					case js_andruavUnit.CONST_FLIGHT_PX4_RATTITUDE:
 						text = "R-ATT";
 						break;
-					case CONST_FLIGHT_PX4_POSCTL_POSCTL:
+					case js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_POSCTL:
 						text = "Pos-Ctrl";
 						break;
-					case CONST_FLIGHT_PX4_POSCTL_ORBIT:
+					case js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_ORBIT:
 						text = "Orbit";
 						break;
-					case CONST_FLIGHT_CONTROL_UNKNOWN:
+					case js_andruavUnit.CONST_FLIGHT_CONTROL_UNKNOWN:
 					default:
 						text = "Unknown";
 						break;
@@ -1602,14 +1612,14 @@ function fn_handleKeyBoard() {
 			var v_contextMenu = "";
 			var v_menuitems = 0;
 			v_contextHTML += "<p class='bg-success text-white'><span class='text-success margin_zero text-white'>lat: " + p_lat.toFixed(6) + "  lng:" + p_lng.toFixed(6) + "</span></p>";
-			v_contextMenu += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand text-primary margin_zero si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + AndruavLibs.AndruavMap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + CONST_DEFAULT_ALTITUDE + "," + CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
+			v_contextMenu += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand text-primary margin_zero si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + CLeafLetAndruavMap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + CONST_DEFAULT_ALTITUDE + "," + CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
 			if (size == 0) {
 				v_menuitems = 0;
 			}
 			else {
 
 				var sortedPartyIDs;
-				if (window.AndruavLibs.LocalStorage.fn_getUnitSortEnabled()===true)
+				if (CLocalStorage.fn_getUnitSortEnabled()===true)
 				{
 					// Sort the array alphabetically
 					sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSortedBy_APID();
@@ -1681,7 +1691,7 @@ function fn_handleKeyBoard() {
 			//now add our options.
 			var h =   hlp_generateFlyHereMenu(p_lat, p_lng); //event.latLng);
 
-			AndruavLibs.AndruavMap.fn_showInfoWindow(null, h, p_lat, p_lng);
+			CLeafLetAndruavMap.fn_showInfoWindow(null, h, p_lat, p_lng);
 		}
 
 		function fn_contextMenu(p_position) {
@@ -1690,21 +1700,21 @@ function fn_handleKeyBoard() {
 			// to position menu at mouse position
 
 			if (this.m_markGuided != null) {
-				AndruavLibs.AndruavMap.fn_hideItem(this.m_markGuided);
+				CLeafLetAndruavMap.fn_hideItem(this.m_markGuided);
 				this.m_markGuided = null;
 			}
 			
-            m_markGuided = AndruavLibs.AndruavMap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,16], true, true);
-            AndruavLibs.AndruavMap.fn_setPosition(this.m_markGuided , p_position);
+            m_markGuided = CLeafLetAndruavMap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,16], true, true);
+            CLeafLetAndruavMap.fn_setPosition(this.m_markGuided , p_position);
 			
-			AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (m_markGuided,
+			CLeafLetAndruavMap.fn_addListenerOnClickMarker (m_markGuided,
 				
 				function (p_lat, p_lng) {
 
 					fn_generateContextMenuHTML(p_lat, p_lng);
 				});
 
-			//fn_generateContextMenuHTML(AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_lat, p_lng));
+			//fn_generateContextMenuHTML(CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(p_lat, p_lng));
 		}
 
 		/////////////////////////////////////////////////////////////////////////////// MAP Functions
@@ -1712,7 +1722,7 @@ function fn_handleKeyBoard() {
 		var infowindow = null;
 		function initMap() {
 			
-			AndruavLibs.AndruavMap.fn_initMap('mapid');
+			CLeafLetAndruavMap.fn_initMap('mapid');
 			this.fn_setLapout();
 			this.fn_gps_getLocation();
 
@@ -1720,7 +1730,7 @@ function fn_handleKeyBoard() {
 
 
 		function resetzoom() {
-			AndruavLibs.AndruavMap.setZoom(2);
+			CLeafLetAndruavMap.setZoom(2);
 		}
 
 		/////////////////////////////////////////////////////////////////////////////// Events from AndruavClient
@@ -1746,12 +1756,12 @@ function fn_handleKeyBoard() {
 
 				v_connectRetries = v_connectRetries + 1;
 				if (v_connectRetries >= 5) {
-					v_SpeakEngine.fn_speak(CONST_Global_resources.en[8]);
+					js_speak.v_SpeakEngine.fn_speak(CONST_Global_resources.en[8]);
 				}
 				setTimeout(fn_connect, 4000);
 			}
 			else {
-				v_SpeakEngine.fn_speak('Disconnected');
+				js_speak.v_SpeakEngine.fn_speak('Disconnected');
 			}
 		};
 
@@ -1760,14 +1770,14 @@ function fn_handleKeyBoard() {
 		function fn_onSocketStatus(me,event) {
 			const name = event.name;
 			const status = event.status;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_onSocketStatus, event);
+			CEventEmitter.fn_dispatch( js_globals.EE_onSocketStatus, event);
 			
 			if (status == CONST_SOCKET_STATUS_REGISTERED) {
-				v_SpeakEngine.fn_speak(CONST_Global_resources.en[7]);
+				js_speak.v_SpeakEngine.fn_speak(CONST_Global_resources.en[7]);
 
 				if (CONST_MAP_EDITOR===true)
 				{
-					js_globals.v_andruavClient.API_loadGeoFence (window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
+					v_andruavClient.API_loadGeoFence (CAndruavAuth.m_username,v_andruavClient.m_groupName,null,'_drone_',1);
 				}
 			}
 			else {
@@ -1816,13 +1826,13 @@ function fn_handleKeyBoard() {
 		};
 
 		var EVT_GCSDataOpen = function (data) {
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_onGUIMessageHide);
+			CEventEmitter.fn_dispatch(js_globals.EE_onGUIMessageHide);
 		};
 
 
 		var EVT_BadMavlink = function () {
 			//gui_alert('Web Telemetry', 'Please make sure that you use MAVLINK <b>version 2</b>.', 'danger');
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_onGUIMessage, {
+			CEventEmitter.fn_dispatch(js_globals.EE_onGUIMessage, {
 				p_title:'Web Telemetry',
 				p_msg:'Please make sure that you use MAVLINK <b>version 2</b>.',
 				p_level:'danger'
@@ -1862,13 +1872,13 @@ function fn_handleKeyBoard() {
 					|| (p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index]==CONST_WayPoint_TYPE_CAMERA_CONTROL)) {
 						switch (status) {
 							case CONST_Report_NAV_ItemReached:
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/camera_24x24.png', false, false, null, [16,16]);
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/camera_24x24.png', false, false, null, [16,16]);
 								break;
 							case CONST_Report_NAV_ItemUnknown:
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/camera_gy_32x32.png', false, false, null, [16,16]);
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/camera_gy_32x32.png', false, false, null, [16,16]);
 								break;
 							case CONST_Report_NAV_ItemExecuting:
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/camera_bg_32x32.png', false, false, null, [16,16]);
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/camera_bg_32x32.png', false, false, null, [16,16]);
 								break;
 						}
 					}
@@ -1876,13 +1886,13 @@ function fn_handleKeyBoard() {
 						switch (status) {
 							case CONST_Report_NAV_ItemReached:
 								p_andruavUnit.m_Nav_Info._Target.wp_num = c_mission_index + 1;
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png');
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png');
 								break;
 							case CONST_Report_NAV_ItemUnknown:
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png');
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png');
 								break;
 							case CONST_Report_NAV_ItemExecuting:
-								AndruavLibs.AndruavMap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png');
+								CLeafLetAndruavMap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png');
 								break;
 
 						}
@@ -1913,12 +1923,12 @@ function fn_handleKeyBoard() {
 				var icon_img = './images/location_bb_32x32.png';
 				switch (wayPointStep.waypointType) {
 					case CONST_WayPoint_TYPE_WAYPOINTSTEP:
-						latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
+						latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
 						icon_img = './images/location_bb_32x32.png';
 						wayPointStep.m_label = "WP";
 						break;
 					case CONST_WayPoint_TYPE_SPLINE:
-						latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
+						latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
 						icon_img = './images/location_bb_32x32.png';
 						wayPointStep.m_label = "Spline";
 						break;
@@ -1933,22 +1943,22 @@ function fn_handleKeyBoard() {
 						wayPointStep.m_label = "RTL";
 						break;
 					case CONST_WayPoint_TYPE_CAMERA_TRIGGER:
-						latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
+						latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
 						icon_img = './images/camera_gy_32x32.png';
 						subIcon = true;
 						wayPointStep.m_label = "CAM";
 						break;
 					case CONST_WayPoint_TYPE_CAMERA_CONTROL:
-						latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
+						latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
 						icon_img = './images/camera_gy_32x32.png';
 						subIcon = true;
 						wayPointStep.m_label = "CAM";
 						break;
 					case CONST_WayPoint_TYPE_CIRCLE:
-						latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
+						latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
 						icon_img = './images/location_bb_32x32.png';
 						wayPointStep.m_label = "Loiter in Circles";
-						var v_circleMission = AndruavLibs.AndruavMap.fn_drawMissionCircle(latlng,wayPointStep.m_Radius);
+						var v_circleMission = CLeafLetAndruavMap.fn_drawMissionCircle(latlng,wayPointStep.m_Radius);
 						// var circleMission = new google.maps.Circle({
 						// 	fillColor: '#3232CD',
 						// 	strokeOpacity: 1.0,
@@ -1971,14 +1981,14 @@ function fn_handleKeyBoard() {
 					if (subIcon==true) {
 						v_iconsize = [16,16];
 					}
-					var v_mark = AndruavLibs.AndruavMap.fn_CreateMarker(icon_img, p_andruavUnit.m_unitName + "  step: " + wayPointStep.m_Sequence, [16,24], false, false, null, v_iconsize);
-					AndruavLibs.AndruavMap.fn_setPosition(v_mark, latlng);
+					var v_mark = CLeafLetAndruavMap.fn_CreateMarker(icon_img, p_andruavUnit.m_unitName + "  step: " + wayPointStep.m_Sequence, [16,24], false, false, null, v_iconsize);
+					CLeafLetAndruavMap.fn_setPosition(v_mark, latlng);
 					p_andruavUnit.m_gui.m_wayPoint_markers.push(v_mark);
 					v_mark.wayPointStep = wayPointStep;
 
 					
 					function fn_clickHandler(w, u) {
-						AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (v_mark,
+						CLeafLetAndruavMap.fn_addListenerOnClickMarker (v_mark,
 						function (p_lat, p_lng) {
 							fn_showWaypointInfo(p_lat, p_lng, w, u);
 						});
@@ -1995,7 +2005,7 @@ function fn_handleKeyBoard() {
 			}
 
 			if (LngLatPoints.length > 0) {
-				p_andruavUnit.m_wayPoint.polylines = AndruavLibs.AndruavMap.fn_drawMissionPolyline(LngLatPoints, flightPath_colors[p_andruavUnit.m_index%4]);
+				p_andruavUnit.m_wayPoint.polylines = CLeafLetAndruavMap.fn_drawMissionPolyline(LngLatPoints, flightPath_colors[p_andruavUnit.m_index%4]);
 			}
 		}
 
@@ -2003,20 +2013,20 @@ function fn_handleKeyBoard() {
 		
 		function EVT_andruavUnitFCBUpdated(me, p_andruavUnit) {
 			if (p_andruavUnit.m_useFCBIMU == true) {
-				v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
-				js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
+				js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
+				v_andruavClient.API_requestParamList(p_andruavUnit);
 			}
 			else {
-				v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' disconnected from flying board');
+				js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' disconnected from flying board');
 			}
 		}
 
 		function EVT_andruavUnitFlyingUpdated(me, p_andruavUnit) {
 			if (p_andruavUnit.m_isFlying == true) {
-				v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' is Flying');
+				js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' is Flying');
 			}
 			else {
-				v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' is on ground');
+				js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' is on ground');
 			}
 		}
 
@@ -2026,7 +2036,7 @@ function fn_handleKeyBoard() {
 		function EVT_andruavUnitFightModeUpdated(me, p_andruavUnit) {
 			if (p_andruavUnit.m_IsGCS != true) {
 				var text = hlp_getFlightMode(p_andruavUnit);
-				v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' flight mode is ' + text);
+				js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' flight mode is ' + text);
 			}
 		}
 
@@ -2051,20 +2061,20 @@ function fn_handleKeyBoard() {
 
 		function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
 			const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-			AndruavLibs.AndruavMap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, v_htmlTitle,[64,64]) ;
+			CLeafLetAndruavMap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, v_htmlTitle,[64,64]) ;
 		}
 
 		
 		function EVT_andruavUnitArmedUpdated(me, p_andruavUnit) {
 			
 			if (p_andruavUnit.m_isArmed) {
-				v_SpeakEngine.fn_speak('ARMED');
+				js_speak.v_SpeakEngine.fn_speak('ARMED');
 			}
 			else {
-				v_SpeakEngine.fn_speak('Disarmed');
+				js_speak.v_SpeakEngine.fn_speak('Disarmed');
 			}
 
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_andruavUnit);
+			CEventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -2202,10 +2212,10 @@ function fn_handleKeyBoard() {
 					*/
 					var v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 					// Add new Vehicle
-					p_andruavUnit.m_gui.m_marker = AndruavLibs.AndruavMap.fn_CreateMarker(v_image, getLabel(),null, false,false, v_htmlTitle,[64,64]) ;
+					p_andruavUnit.m_gui.m_marker = CLeafLetAndruavMap.fn_CreateMarker(v_image, getLabel(),null, false,false, v_htmlTitle,[64,64]) ;
 					v_vehicle_gui[p_andruavUnit.partyID]  = p_andruavUnit.m_gui;
 					
-					AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
+					CLeafLetAndruavMap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
 							var id = '#h'+p_andruavUnit.partyID +' a';
 							$(id).tab('show');
@@ -2213,14 +2223,14 @@ function fn_handleKeyBoard() {
 							infowindow2.m_ignoreMouseOut = true;
 						});
 					
-					AndruavLibs.AndruavMap.fn_addListenerOnMouseOverMarker (p_andruavUnit.m_gui.m_marker,
+					CLeafLetAndruavMap.fn_addListenerOnMouseOverMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
-							AndruavLibs.AndruavMap.fn_addListenerOnMouseOutClickMarker (p_andruavUnit.m_gui.m_marker,
+							CLeafLetAndruavMap.fn_addListenerOnMouseOutClickMarker (p_andruavUnit.m_gui.m_marker,
 								function (p_lat, p_lng) {
-									AndruavLibs.AndruavMap.fn_removeListenerOnMouseOutClickMarker(p_andruavUnit.m_gui.m_marker);
+									CLeafLetAndruavMap.fn_removeListenerOnMouseOutClickMarker(p_andruavUnit.m_gui.m_marker);
 									if ((infowindow2==null) || (!infowindow2.hasOwnProperty('m_ignoreMouseOut')) || (infowindow2.m_ignoreMouseOut!==true))
 									{
-										AndruavLibs.AndruavMap.fn_hideInfoWindow(infowindow2);
+										CLeafLetAndruavMap.fn_hideInfoWindow(infowindow2);
 									}
 							});
 
@@ -2241,7 +2251,7 @@ function fn_handleKeyBoard() {
 							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt;
 						}
 						else if (v_distance > 10) {
-							var v_flightPath = AndruavLibs.AndruavMap.fn_DrawPath(
+							var v_flightPath = CLeafLetAndruavMap.fn_DrawPath(
 										p_andruavUnit.m_Nav_Info.p_Location.oldlat,
 										p_andruavUnit.m_Nav_Info.p_Location.oldlng,
 										p_andruavUnit.m_Nav_Info.p_Location.lat,
@@ -2251,7 +2261,7 @@ function fn_handleKeyBoard() {
 							// Add flight path step
 							p_andruavUnit.m_gui.m_gui_flightPath.fn_add(v_flightPath, true,
 								function (oldstep) {
-									AndruavLibs.AndruavMap.fn_hideItem(oldstep);
+									CLeafLetAndruavMap.fn_hideItem(oldstep);
 								});
 
 
@@ -2269,9 +2279,9 @@ function fn_handleKeyBoard() {
 
 
 				}
-				AndruavLibs.AndruavMap.fn_setIcon(p_andruavUnit.m_gui.m_marker, v_image);
-				AndruavLibs.AndruavMap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
-				window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_andruavUnit);
+				CLeafLetAndruavMap.fn_setIcon(p_andruavUnit.m_gui.m_marker, v_image);
+				CLeafLetAndruavMap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
+				CEventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 			}
 			else {
 
@@ -2310,14 +2320,14 @@ function fn_handleKeyBoard() {
 				$('#modal_fpv').show();
 			}
 
-			var latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
+			var latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
 			$('#unitImg').data('imgLocation', latlng);
 			fn_showCameraIcon(latlng);
 		}
 
 		function fn_showCameraIcon(latlng) {
-			var v_marker = AndruavLibs.AndruavMap.fn_CreateMarker('./images/camera_24x24.png', 'image');
-			AndruavLibs.AndruavMap.fn_setPosition(v_marker,latlng);
+			var v_marker = CLeafLetAndruavMap.fn_CreateMarker('./images/camera_24x24.png', 'image');
+			CLeafLetAndruavMap.fn_setPosition(v_marker,latlng);
 		}
 
 		function hlp_saveImage_html() {
@@ -2330,11 +2340,11 @@ function fn_handleKeyBoard() {
 		function hlp_gotoImage_Map() {
 			var location = $('#unitImg').data('imgLocation');
 			if (location != null) {
-				// if (AndruavLibs.AndruavMap.fn_getZoom() < 14) {
-				// 	AndruavLibs.AndruavMap.fn_setZoom(14);
+				// if (CLeafLetAndruavMap.fn_getZoom() < 14) {
+				// 	CLeafLetAndruavMap.fn_setZoom(14);
 				// }
 
-				AndruavLibs.AndruavMap.fn_PanTo(location);
+				CLeafLetAndruavMap.fn_PanTo(location);
 			}
 		}
 
@@ -2349,23 +2359,23 @@ function fn_handleKeyBoard() {
 				p_andruavUnit.m_gui.defaultCircleRadius = CONST_DEFAULT_RADIUS;
 			}
 			
-			v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + " unit added");
+			js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + " unit added");
 
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitAdded, p_andruavUnit);
+			CEventEmitter.fn_dispatch( js_globals.EE_unitAdded, p_andruavUnit);
 			js_globals.v_andruavClient.API_requestIMU (p_andruavUnit,true);
 		}	
 
 
 		var EVT_HomePointChanged = function (me, p_andruavUnit) {
-			var v_latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat, p_andruavUnit.m_Geo_Tags.p_HomePoint.lng);
+			var v_latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat, p_andruavUnit.m_Geo_Tags.p_HomePoint.lng);
 
 			if (p_andruavUnit.m_gui.m_marker_home == null) {
 				const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-				var v_home = AndruavLibs.AndruavMap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,24], false, false, v_html, [32,32]);
-				AndruavLibs.AndruavMap.fn_setPosition(v_home,v_latlng)
+				var v_home = CLeafLetAndruavMap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,24], false, false, v_html, [32,32]);
+				CLeafLetAndruavMap.fn_setPosition(v_home,v_latlng)
 				p_andruavUnit.m_gui.m_marker_home = v_home;
 				
-				AndruavLibs.AndruavMap.fn_addListenerOnClickMarker(v_home, 
+				CLeafLetAndruavMap.fn_addListenerOnClickMarker(v_home, 
 					function (p_lat, p_lng) {
 						update_timeout = setTimeout(function () {
 						
@@ -2374,7 +2384,7 @@ function fn_handleKeyBoard() {
 				});
 			}
 
-			AndruavLibs.AndruavMap.fn_setPosition(p_andruavUnit.m_gui.m_marker_home,v_latlng);
+			CLeafLetAndruavMap.fn_setPosition(p_andruavUnit.m_gui.m_marker_home,v_latlng);
 
 		};
 
@@ -2382,31 +2392,31 @@ function fn_handleKeyBoard() {
 		var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
     
-			if (((CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS===true) || (window.AndruavLibs.LocalStorage.fn_getAdvancedOptionsEnabled()!==true))
+			if (((CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS===true) || (CLocalStorage.fn_getAdvancedOptionsEnabled()!==true))
 				&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type == CONST_DESTINATION_SWARM_MY_LOCATION))
 			{
 				if (p_andruavUnit.m_gui.m_marker_destination!=null)
 				{
-					AndruavLibs.AndruavMap.fn_hideItem(p_andruavUnit.m_gui.m_marker_destination);
+					CLeafLetAndruavMap.fn_hideItem(p_andruavUnit.m_gui.m_marker_destination);
 					p_andruavUnit.m_gui.m_marker_destination = null;
 					p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon  = true;
 				}
 				return ;
 			}
-			var v_latlng = AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
+			var v_latlng = CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 			if (p_andruavUnit.m_gui.m_marker_destination == null) {
-				p_andruavUnit.m_gui.m_marker_destination = AndruavLibs.AndruavMap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
+				p_andruavUnit.m_gui.m_marker_destination = CLeafLetAndruavMap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon===true)
 			{
-				AndruavLibs.AndruavMap.fn_setMarkerIcon(p_andruavUnit.m_gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4));
+				CLeafLetAndruavMap.fn_setMarkerIcon(p_andruavUnit.m_gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4));
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			
 				
-			AndruavLibs.AndruavMap.fn_setPosition(p_andruavUnit.m_gui.m_marker_destination,v_latlng)
+			CLeafLetAndruavMap.fn_setPosition(p_andruavUnit.m_gui.m_marker_destination,v_latlng)
 		};
 
 
@@ -2483,7 +2493,7 @@ function fn_handleKeyBoard() {
 			c_msg.m_notification_Type = v_notification_Type;
 			c_msg.m_cssclass = v_cssclass;
 			c_msg.m_error = p_error;
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_onMessage, c_msg);
+			CEventEmitter.fn_dispatch( js_globals.EE_onMessage, c_msg);
 		
 			
 
@@ -2500,7 +2510,7 @@ function fn_handleKeyBoard() {
 					});
 					
 					// only speak out errors
-					v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' ' + p_error.Description);
+					js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + ' ' + p_error.Description);
 				}
 			}
 		};
@@ -2525,7 +2535,7 @@ function fn_handleKeyBoard() {
 			// 	alt = Number(_adsb.Altitude.toFixed(0)).toLocaleString() + ' m';
 			// }
 			// else {
-			// 	alt = Number(_adsb.Altitude.toFixed(0) * CONST_METER_TO_FEET).toFixed(0).toLocaleString() + ' ft';
+			// 	alt = Number(_adsb.Altitude.toFixed(0) * js_helpers.CONST_METER_TO_FEET).toFixed(0).toLocaleString() + ' ft';
 			// }
 
 			// markerContent += '<p>lat:' + _adsb.Latitude.toFixed(6) + ', lng:' + _adsb.Longitude.toFixed(6) + '<br>  alt:' + alt + ' </p>';
@@ -2613,12 +2623,12 @@ function fn_handleKeyBoard() {
 			{
 				vAirSpeed = vAirSpeed.toFixed(1);
 			}
-			AndruavLibs.AndruavMap.fn_getElevationForLocation(p_lat, p_lng
+			CLeafLetAndruavMap.fn_getElevationForLocation(p_lat, p_lng
 				, function (p_elevation, p_lat, p_lng) {
 				if (p_elevation!= null) {
 
-					if (window.AndruavLibs.LocalStorage.fn_getMetricSystem() == false) {
-						p_elevation = CONST_METER_TO_FEET * p_elevation;
+					if (CLocalStorage.fn_getMetricSystem() == false) {
+						p_elevation = js_helpers.CONST_METER_TO_FEET * p_elevation;
 					}
 
 					if (isNaN(p_elevation)===false)
@@ -2639,7 +2649,7 @@ function fn_handleKeyBoard() {
 					}
 					if (p_andruavUnit.m_Swarm.m_following != null)
 					{
-						var v_andruavUnitLeader = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
+						var v_andruavUnitLeader = v_andruavClient.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
 						if (v_andruavUnitLeader!=null)
 						{
 							markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">'+ v_andruavUnitLeader.m_unitName +'</span>'
@@ -2652,7 +2662,7 @@ function fn_handleKeyBoard() {
 					} 
 				}
 
-				infowindow2 = AndruavLibs.AndruavMap.fn_showInfoWindow (infowindow2,markerContent,p_lat,p_lng);
+				infowindow2 = CLeafLetAndruavMap.fn_showInfoWindow (infowindow2,markerContent,p_lat,p_lng);
 				
 			});
 
@@ -2665,7 +2675,7 @@ function fn_handleKeyBoard() {
 
 			var v_contentString = "<p class='img-rounded bg-primary text-white" + _style + "'><strong> Home of " + p_andruavUnit.m_unitName + _icon + "</strong></p><span class='help-block'><small>lat:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat).toFixed(6) + ",lng:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lng).toFixed(6) + "</small></span>";
 
-			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
+			infowindow = CLeafLetAndruavMap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
 		}
 
 		function fn_showWaypointInfo(p_lat, p_lng, p_wayPointStep, p_andruavUnit) {
@@ -2693,7 +2703,7 @@ function fn_handleKeyBoard() {
 					break;
 			}
 
-			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
+			infowindow = CLeafLetAndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 		}
 
 		function showGeoFenceInfo(p_lat, p_lng, geoFenceInfo) {
@@ -2708,9 +2718,9 @@ function fn_handleKeyBoard() {
 			}
 
 			var v_contentString = "<p class='img-rounded " + _style + "'><strong>" + geoFenceInfo.m_geoFenceName + _icon + "</strong></p><span class='help-block'>" + p_lat.toFixed(7) + " " + p_lng.toFixed(7) + "</span>";
-			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + AndruavLibs.AndruavMap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + CONST_DEFAULT_ALTITUDE + "," + CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
+			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + CLeafLetAndruavMap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + CONST_DEFAULT_ALTITUDE + "," + CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
 			
-			infowindow = AndruavLibs.AndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
+			infowindow = CLeafLetAndruavMap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 
 		}
 
@@ -2718,7 +2728,7 @@ function fn_handleKeyBoard() {
 		function EVT_andruavUnitGeoFenceBeforeDelete(me, geoFenceInfo) {
 			if (geoFenceInfo != null) {
 				if (geoFenceInfo.flightPath != null) {
-					AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
+					CLeafLetAndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 				}
 			}
 			else {
@@ -2728,10 +2738,10 @@ function fn_handleKeyBoard() {
 				var size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
 
 				for (var i = 0; i < size; ++i) {
-					var geoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
+					var geoFenceInfo = v_andruavClient.andruavGeoFences[keys[i]];
 
 					if (geoFenceInfo.flightPath != null) {
-						AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
+						CLeafLetAndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 					}
 
 				}
@@ -2746,7 +2756,7 @@ function fn_handleKeyBoard() {
 
 			var geoFenceCoordinates = geoFenceInfo.LngLatPoints;
 
-			if (AndruavLibs.AndruavMap.m_isMapInit == false) { // in case map is not loaded
+			if (CLeafLetAndruavMap.m_isMapInit == false) { // in case map is not loaded
 				setTimeout(function () {
 					EVT_andruavUnitGeoFenceUpdated(me, data);
 
@@ -2756,39 +2766,39 @@ function fn_handleKeyBoard() {
 
 			switch (geoFenceInfo.fencetype) {
 				case CONST_TYPE_LinearFence:
-					v_geoFence = AndruavLibs.AndruavMap.fn_drawPolyline(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
+					v_geoFence = CLeafLetAndruavMap.fn_drawPolyline(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 					geoFenceInfo.flightPath = v_geoFence;
 					
-					if (js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
 					else {
-						var oldgeoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
+						var oldgeoFenceInfo = v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
-							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
+							CLeafLetAndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
-						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
+						v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
 					}
 
 					break;
 
 				case CONST_TYPE_PolygonFence:
 
-					var v_geoFence = AndruavLibs.AndruavMap.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
+					var v_geoFence = CLeafLetAndruavMap.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
 					
 
-					if (js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
 					else {
 						var oldgeoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
-							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
+							CLeafLetAndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
@@ -2798,18 +2808,18 @@ function fn_handleKeyBoard() {
 
 				case CONST_TYPE_CylinderFence:
 
-					var v_geoFence = AndruavLibs.AndruavMap.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
+					var v_geoFence = CLeafLetAndruavMap.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
 					
-					if (js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
 					else {
 						var oldgeoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName];
 						if (oldgeoFenceInfo.flightPath != null) {  // hide path from map
-							AndruavLibs.AndruavMap.fn_hideItem(geoFenceInfo.flightPath);
+							CLeafLetAndruavMap.fn_hideItem(geoFenceInfo.flightPath);
 						}
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo; // assume new fence is updated one.
@@ -2821,14 +2831,14 @@ function fn_handleKeyBoard() {
 			if (v_geoFence != null)
 			{
 				var _dblClickTimer;
-				AndruavLibs.AndruavMap.fn_addListenerOnDblClickMarker(v_geoFence, 
+				CLeafLetAndruavMap.fn_addListenerOnDblClickMarker(v_geoFence, 
 						function (p_lat, p_lng) {
 							clearTimeout(_dblClickTimer);
   							_dblClickTimer = null;
-							fn_contextMenu (AndruavLibs.AndruavMap.fn_getLocationObjectBy_latlng(p_lat, p_lng));
+							fn_contextMenu (CLeafLetAndruavMap.fn_getLocationObjectBy_latlng(p_lat, p_lng));
 						});
 					
-				AndruavLibs.AndruavMap.fn_addListenerOnClickMarker (v_geoFence,
+				CLeafLetAndruavMap.fn_addListenerOnClickMarker (v_geoFence,
 						function (p_lat, p_lng) {
 							if (_dblClickTimer != null) {
 								return;
@@ -2882,10 +2892,10 @@ function fn_handleKeyBoard() {
 
 			}
 			else {
-				v_SpeakEngine.fn_speak("unit " + p_andruavUnit.m_unitName + " " + msg);
+				js_speak.v_SpeakEngine.fn_speak("unit " + p_andruavUnit.m_unitName + " " + msg);
 			}
 
-			window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_andruavUnit);
+			CEventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -2968,24 +2978,24 @@ function fn_handleKeyBoard() {
 
 
 
-		function fn_connect() {
+		export function fn_connect() {
 
-			if ((window.AndruavLibs.AndruavAuth.fn_logined() === true) && (v_connectState !== true)) {
-				window.AndruavLibs.AndruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-				if (js_globals.v_andruavClient != null) {
+			if ((CAndruavAuth.fn_logined() === true) && (v_connectState !== true)) {
+				CAndruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+				if ( js_globals.v_andruavClient != null) {
 					js_globals.v_andruavClient.API_delMe();
 				}
 				return;
 			}
 			else 
 			{
-				window.AndruavLibs.AndruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+				CAndruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
 			}
 
-			if (window.AndruavLibs.AndruavAuth.logined === false) {
+			if (CAndruavAuth.logined === false) {
 				Messenger().post({
 					type: 'p_error',
-					message: window.AndruavLibs.AndruavAuth.m_errorMessage
+					message: CAndruavAuth.m_errorMessage
 				});
 
 				if (v_connectState == true) {
@@ -2996,51 +3006,51 @@ function fn_handleKeyBoard() {
 			}
 
 			// create a group object
-			if (js_globals.v_andruavClient == null) {
+			if ( js_globals.v_andruavClient == null) {
 
-				if (window.AndruavLibs.AndruavAuth.fn_logined() == false) return;
+				if (CAndruavAuth.fn_logined() == false) return;
 				js_globals.v_andruavClient = window.AndruavLibs.AndruavClient; //Object.create(AndruavClientSocket.prototype);
 
 				js_globals.v_andruavClient.partyID = ($('#txtUnitID').val()+$('#txtUnitID_ext').val()).replace('#','_');
 				js_globals.v_andruavClient.unitID = $('#txtUnitID').val();
 				js_globals.v_andruavClient.m_groupName = $('#txtGroupName').val();
 				js_globals.v_andruavClient.fn_init();
-				js_globals.v_andruavClient.m_server_ip = window.AndruavLibs.AndruavAuth.m_server_ip;
-				js_globals.v_andruavClient.m_server_port = window.AndruavLibs.AndruavAuth.m_server_port;
-				js_globals.v_andruavClient.m_server_port_ss = window.AndruavLibs.AndruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
-				js_globals.v_andruavClient.server_AuthKey = window.AndruavLibs.AndruavAuth.server_AuthKey;
-				js_globals.v_andruavClient._permissions_ = window.AndruavLibs.AndruavAuth.fn_getPermission();
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,this.EVT_onOpen);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,this.EVT_onClose);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,this.fn_onSocketStatus);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,this.EVT_onDeleted);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,this.EVT_HomePointChanged);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,this.EVT_andruavUnitError);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
+				js_globals.v_andruavClient.m_server_ip = CAndruavAuth.m_server_ip;
+				js_globals.v_andruavClient.m_server_port = CAndruavAuth.m_server_port;
+				js_globals.v_andruavClient.m_server_port_ss = CAndruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
+				js_globals.v_andruavClient.server_AuthKey = CAndruavAuth.server_AuthKey;
+				js_globals.v_andruavClient._permissions_ = CAndruavAuth.fn_getPermission();
+				CEventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,this.EVT_onOpen);
+				CEventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,this.EVT_onClose);
+				CEventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,this.fn_onSocketStatus);
+				CEventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,this.EVT_onDeleted);
+				CEventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
+				CEventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
+				CEventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,this.EVT_HomePointChanged);
+				CEventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,this.EVT_andruavUnitError);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
+				CEventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
+				CEventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
 				
 				
 				
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
-				window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
+				CEventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
 				
 				
 				
 				
 				
-				fn_console_log(c_SOCKET_STATUS);
+				js_globals.fn_console_log(c_SOCKET_STATUS);
 
-				js_globals.v_andruavClient.fn_connect(window.AndruavLibs.AndruavAuth.fn_getSessionID());
+				js_globals.v_andruavClient.fn_connect(CAndruavAuth.fn_getSessionID());
 			}
 			else {
 				js_globals.v_andruavClient.API_delMe();
@@ -3053,7 +3063,7 @@ function fn_handleKeyBoard() {
 
 		function fn_deleteShapesinDB()
 		{
-			js_globals.v_andruavClient.API_disableGeoFenceTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
+			js_globals.v_andruavClient.API_disableGeoFenceTasks(CAndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
 			
 			js_globals.v_andruavClient.API_requestDeleteGeoFences(null,null); // deattach drones from all fences in the group
 			setTimeout (function ()
@@ -3087,114 +3097,18 @@ function fn_handleKeyBoard() {
 			}
 
 			js_globals.v_andruavClient.API_requestDeleteGeoFences(null,null); // deattach drones from all fences in the group
-			js_globals.v_andruavClient.API_disableGeoFenceTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
+			js_globals.v_andruavClient.API_disableGeoFenceTasks(CAndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
 
 
-			for (var i=0; i< len; ++i)
+			const fence_plan = new CLSS_AndruavFencePlan(1);
+
+			const res = fence_plan.fn_generateAndruavFenceData(v_map_shapes);
+			const len_res = res.length;
+			for (var i=0; i< len_res; ++i)
 			{
-				
-				var cmd={};
-				const c_shape = v_map_shapes[i];
-				
-				if (c_shape.m_geofenceInfo.m_deleted === true) continue;
-				
-				cmd.n = c_shape.m_geofenceInfo.m_geoFenceName;
-				cmd.a = c_shape.m_geofenceInfo.isHardFence;
-				cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
-				cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
-	
-				switch (c_shape.pm.getShape())
-				{
-					case 'Marker':
-					break;
-					
-					case 'Polygon':
-					{
-						cmd.t = FENCETYPE_PolygonFence;
-						const c_lnglats = c_shape.getLatLngs()[0];
-
-						const len_lnglat = c_lnglats.length;
-
-						for (var j=0; j<len_lnglat; ++j)
-						{
-							var lnglat = {};
-							lnglat.a = c_lnglats[j].lat * 10000000;
-							lnglat.g = c_lnglats[j].lng * 10000000;
-							cmd[j] = lnglat;
-						}
-
-						cmd.c = 4;					
-					}
-					break;
-
-					case 'Rectangle':
-					{
-						cmd.t = FENCETYPE_PolygonFence;
-						const c_boundary = c_shape.getBounds();
-
-						var lnglat = {};
-						lnglat.a = c_boundary._northEast.lat;
-						lnglat.g = c_boundary._northEast.lng;
-						cmd[0] = lnglat;
-
-						lnglat = {};
-						lnglat.a = c_boundary._southWest.lat;
-						lnglat.g = c_boundary._northEast.lng;
-						cmd[1] = lnglat;
-
-						lnglat = {};
-						lnglat.a = c_boundary._southWest.lat;
-						lnglat.g = c_boundary._southWest.lng;
-						cmd[2] = lnglat;
-
-						lnglat = {};
-						lnglat.a = c_boundary._northEast.lat;
-						lnglat.g = c_boundary._southWest.lng;
-						cmd[3] = lnglat;
-
-						
-						cmd.c = 4;					
-					}
-					break;
-
-					case 'Circle':
-					{
-						cmd.t = FENCETYPE_CylindersFence;
-						const c_center = c_shape.getLatLng();
-						var lnglat = {};
-						lnglat.a = c_center.lat;
-						lnglat.g = c_center.lng;
-						cmd["0"] = lnglat;
-						cmd.c=1;
-					}
-					break;
-				
-					case 'Line':
-					{
-						cmd.t = FENCETYPE_LinearFence;
-						const c_lnglats = c_shape.getLatLngs();
-
-						const len_lnglat = c_lnglats.length;
-
-						for (var j=0; j<len_lnglat;++j)
-						{
-							var lnglat = {};
-							lnglat.a = c_lnglats[j].lat;
-							lnglat.g = c_lnglats[j].lng;
-							cmd[j] = lnglat;
-						}
-						cmd.c = len_lnglat;
-					}
-					break;
-
-					default:
-						
-					break;
-				}
-
 				if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()==true))
 				{
-					js_globals.v_andruavClient.API_saveGeoFenceTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1,cmd);
+					js_globals.v_andruavClient.API_saveGeoFenceTasks(CAndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1,cmd);
 				}
 			}
 
@@ -3217,10 +3131,10 @@ function fn_handleKeyBoard() {
 			$('#btn_missions').removeClass ('btn-secondary');
 			$('#btn_missions').addClass ('btn-success');
 
-			window.AndruavLibs.AndruavMap.fn_enableDrawLine(false);
-			window.AndruavLibs.AndruavMap.fn_enableDrawCircle(false);
-			window.AndruavLibs.AndruavMap.fn_enableDrawPolygon(false);
-			window.AndruavLibs.AndruavMap.fn_enableDrawRectangle(false);
+			CLeafLetAndruavMap.fn_enableDrawLine(false);
+			CLeafLetAndruavMap.fn_enableDrawCircle(false);
+			CLeafLetAndruavMap.fn_enableDrawPolygon(false);
+			CLeafLetAndruavMap.fn_enableDrawRectangle(false);
 
 		}
 
@@ -3236,18 +3150,23 @@ function fn_handleKeyBoard() {
 			$('#btn_geofences').removeClass ('btn-secondary');
 			$('#btn_geofences').addClass ('btn-success');
 
-			window.AndruavLibs.AndruavMap.fn_enableDrawMarker(false);
-			window.AndruavLibs.AndruavMap.fn_enableDrawLine(true);
-			window.AndruavLibs.AndruavMap.fn_enableDrawCircle(true);
-			window.AndruavLibs.AndruavMap.fn_enableDrawPolygon(true);
-			window.AndruavLibs.AndruavMap.fn_enableDrawRectangle(true);
+			CLeafLetAndruavMap.fn_enableDrawMarker(false);
+			CLeafLetAndruavMap.fn_enableDrawLine(true);
+			CLeafLetAndruavMap.fn_enableDrawCircle(true);
+			CLeafLetAndruavMap.fn_enableDrawPolygon(true);
+			CLeafLetAndruavMap.fn_enableDrawRectangle(true);
 		}
 
 		
 
 		function fn_on_ready() {
 			
-			if ((typeof(CONST_MAP_GOOLE) == "undefined") || (CONST_MAP_GOOLE === true))
+			$(function () {
+						 $('head').append('<link href="./images/de/favicon.ico" rel="shortcut icon" type="image/x-icon" />');
+						 $(document).prop('title', js_siteCOnfig.CONST_TITLE);
+				});
+
+			if ((typeof(js_globals.CONST_MAP_GOOLE) == "undefined") || (js_globals.CONST_MAP_GOOLE === true))
 			{
 				var v_script = v_G_createElement('script');
 				v_script.type='text/javascript';
@@ -3261,8 +3180,8 @@ function fn_handleKeyBoard() {
 				initMap();
 			}
 
-			window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
-			window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+			CEventEmitter.fn_subscribe(js_globals.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
+			CEventEmitter.fn_subscribe(js_globals.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
 			
 
 
@@ -3369,7 +3288,10 @@ function fn_handleKeyBoard() {
 			$("#alert").hide();
 
 			fn_handleKeyBoard();
-			fn_missionTab();
+			
+			if (js_globals.CONST_MAP_EDITOR ===true){
+				fn_missionTab();
+			}
 		};  // end of onReady
 
 		$(document).ready(fn_on_ready);
