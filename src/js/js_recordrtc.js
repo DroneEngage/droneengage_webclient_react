@@ -9,7 +9,7 @@
 // Muaz Khan     - www.MuazKhan.com
 // MIT License   - www.WebRTC-Experiment.com/licence
 // --------------------------------------------------
-import * as js_globals from '../js/js_globals';
+import {js_globals} from './js_globals.js';
 
 
 

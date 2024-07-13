@@ -92,4 +92,4 @@ class CEventEmitter {
 // 	}
 //   })(new CEventEmitter());
   
-  export default CEventEmitter.getInstance();
+  export var js_eventEmitter =  CEventEmitter.getInstance();

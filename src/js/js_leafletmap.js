@@ -10,8 +10,8 @@ import $ from 'jquery';
 import L from 'leaflet';
 
 import * as js_siteConfig from './js_siteConfig'
-import * as js_globals from './js_globals'
-import * as js_eventEmitter from './js_eventEmitter'
+import {js_globals} from './js_globals.js';
+import {js_eventEmitter} from './js_eventEmitter'
 
 import {fn_contextMenu} from './js_main'
 class CLeafLetAndruavMap {

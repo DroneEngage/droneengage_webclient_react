@@ -8,12 +8,13 @@ import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import * as recordrtc from './js_recordrtc'
 import * as js_speak from './js_speak'
-import * as js_globals from './js_globals'
+import {js_globals} from './js_globals.js';
+
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruavclient2 from './js_andruavclient2'
 import * as js_andruavAuth from './js_andruavAuth'
 import * as js_leafletmap from './js_leafletmap'
-import * as js_eventEmitter from './js_eventEmitter'
+import {js_eventEmitter} from './js_eventEmitter'
 import * as js_localStorage from './js_localStorage'
 import * as js_mapmission from './js_mapmission'
 

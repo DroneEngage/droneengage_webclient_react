@@ -1,4 +1,4 @@
-import * as js_globals from '../js/js_globals';
+import {js_globals} from './js_globals.js';
 import * as js_localStorage from './js_localStorage'
 
 /***************************************************

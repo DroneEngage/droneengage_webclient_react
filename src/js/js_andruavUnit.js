@@ -15,7 +15,7 @@
  *************************************************************************************/
 /*jshint esversion: 6 */
 
-import * as js_globals from './js_globals'
+import {js_globals} from './js_globals.js';
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_circularBuffer from './js_circularBuffer'
 import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';

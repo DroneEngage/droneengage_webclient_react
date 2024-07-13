@@ -4,7 +4,9 @@
 
 *****************************************************/
 import * as js_helpers from './js_helpers'
-import * as js_globals from './js_globals'
+import {js_globals} from './js_globals.js';
+import {js_eventEmitter} from './js_eventEmitter'
+
 import * as js_andruavMessages from './js_andruavMessages'
 
 import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';
@@ -26,7 +28,7 @@ export class CLSS_AndruavFencePlan
 	
 	static getInstance() {
         if (!CLSS_AndruavFencePlan.instance) {
-            CLSS_AndruavFencePlan.instance = new CLSS_AndruavFencePlan();
+            CLSS_AndruavFencePlan.instance = new CLSS_AndruavFencePlan(1);
         }
         return CLSS_AndruavFencePlan.instance;
     }
@@ -351,7 +353,7 @@ class CLSS_AndruavMissionPlan
 		this.fn_updatePath();
 
 		   
-        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
+        js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 				
 	};
 
@@ -382,7 +384,7 @@ class CLSS_AndruavMissionPlan
 			}
         }
                 
-        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
+        js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 	};
 
 			
@@ -408,7 +410,7 @@ class CLSS_AndruavMissionPlan
 
         this.v_markers = [];
                 
-        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
+        js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 	};
 
 	/**

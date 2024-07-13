@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import $ from 'jquery'; 
 
-import * as js_globals from '../js/js_globals'
+import {js_globals} from '../js/js_globals.js';
 import * as js_helpers from '../js/js_helpers';
 import * as  js_siteConfig from '../js/js_siteConfig'
 import {QueryString, fn_connect} from '../js/js_main';
@@ -40,7 +40,7 @@ export class CLSS_LoginControl extends React.Component {
 			btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['1'],
 		};
 		this._isMounted = false;
-    	// window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
+    	// js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
 	}
 
 	
@@ -86,7 +86,7 @@ export class CLSS_LoginControl extends React.Component {
 
 	componentWillUnmount() {
 		this._isMounted = false;
-		// window.AndruavLibs.EventEmitter.fn_unsubscribe(EE_onSocketStatus, this);
+		// js_eventEmitter.fn_unsubscribe(EE_onSocketStatus, this);
 	}
 
 	componentDidMount() {

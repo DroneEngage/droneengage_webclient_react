@@ -7,6 +7,7 @@
 import $ from 'jquery'; 
 import * as  js_siteConfig from './js_siteConfig.js'
 import * as js_andruavMessages from './js_andruavMessages'
+import {js_eventEmitter} from './js_eventEmitter'
 
 
 const EE_Auth_Logined      		 	 = "_EA_96A4ED6B1E1_";
@@ -151,12 +152,12 @@ class CAndruavAuth {
                 Me._m_permissions_ = v_res.per;
                 if (v_res.prm==null) v_res.prm = 0xffffffff;  // auth server does not support permission (backward compatibility)
                 Me._m_perm = v_res.prm;
-                window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Logined, v_res);
+                js_eventEmitter.fn_dispatch(EE_Auth_Logined, v_res);
             } else {
                 Me._m_logined = false;
                 Me.m_error = v_res.e;
                 Me.m_errorMessage = 'Cannot Login .. ' + v_res.em;
-                window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
+                js_eventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
 
             }
         },
@@ -164,7 +165,7 @@ class CAndruavAuth {
             Me._m_logined = false;
             Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
             Me.m_errorMessage = 'Cannot Login .. Bad Connection';
-            window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
+            js_eventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
 
         },
         async: false // remove it later when you SYNC with 2eN
@@ -210,15 +211,15 @@ class CAndruavAuth {
 				v_res = JSON.parse(v__res);
 
 				if (v_res.e == 0) {
-					window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_Created, v_res);
+					js_eventEmitter.fn_dispatch(EE_Auth_Account_Created, v_res);
 				} else {
-					window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+					js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				Me._m_logined = false;
 				Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-				window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+				js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
 			},
 			async: false // remove it later when you SYNC with 2eN
 		});
@@ -266,15 +267,15 @@ class CAndruavAuth {
                 v_res = JSON.parse(v__res);
 
                 if (v_res.e == 0) {
-                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_Regenerated, v_res);
+                    js_eventEmitter.fn_dispatch(EE_Auth_Account_Regenerated, v_res);
                 } else {
-                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+                    js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 Me._m_logined = false;
                 Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-                window.AndruavLibs.EventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+                js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
             },
             async: false // remove it later when you SYNC with 2eN
         });
