@@ -26,20 +26,12 @@ class CLSS_FooterControl extends React.Component {
 
 
 if (js_siteConfig.CONST_TEST_MODE === true)
-	{
-        ReactDOM.render(
-            <React.StrictMode>
-		    <CLSS_FooterControl />
-            </React.StrictMode>,
-        	
-            window.document.getElementById('footer_div')
-        );
-    
-    }
-    else
-    {
-        ReactDOM.render(
-        <CLSS_FooterControl  />,
-        window.document.getElementById('footer_div')
-        );
-    }
+{
+    const root = ReactDOM.createRoot(document.getElementById('footer_div'));
+    root.render(<React.StrictMode><CLSS_FooterControl /></React.StrictMode>);
+}
+else
+{
+    const root = ReactDOM.createRoot(document.getElementById('footer_div'));
+    root.render(<CLSS_FooterControl />);
+}

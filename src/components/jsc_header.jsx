@@ -61,20 +61,13 @@ class CLSS_HeaderControl extends React.Component {
 
     if (js_siteConfig.CONST_TEST_MODE === true)
 	{
-        ReactDOM.render(
-            <React.StrictMode>
-		    <CLSS_HeaderControl />
-            </React.StrictMode>,
-        	
-            window.document.getElementById('header_div')
-        );
+        const root = ReactDOM.createRoot(document.getElementById('header_div'));
+        root.render(<React.StrictMode><CLSS_HeaderControl /></React.StrictMode>);
     
     }
     else
     {
-        ReactDOM.render(
-            <CLSS_HeaderControl />,
-            window.document.getElementById('header_div')
-        );
+        const root = ReactDOM.createRoot(document.getElementById('header_div'));
+        root.render(<CLSS_HeaderControl />);
     }
 

@@ -7,6 +7,11 @@ import './css/App.css';
 import { CFieldChecked } from './jsc_module_1';
 
 function App() {
+
+  useEffect(() => {
+  }
+  );
+
   return (
     <div className="App">
       <header className="App-header">

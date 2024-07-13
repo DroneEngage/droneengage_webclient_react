@@ -1676,7 +1676,7 @@ function fn_handleKeyBoard() {
 		var infowindow = null;
 		function initMap() {
 			
-			js_leafletmap.default.fn_initMap('mapid');
+			//js_leafletmap.default.fn_initMap('mapid');
 			this.fn_setLapout();
 			this.fn_gps_getLocation();
 
@@ -3116,7 +3116,7 @@ function fn_handleKeyBoard() {
 
 		
 
-		function fn_on_ready() {
+		export function fn_on_ready() {
 			
 			$(function () {
 						 $('head').append('<link href="./images/de/favicon.ico" rel="shortcut icon" type="image/x-icon" />');
