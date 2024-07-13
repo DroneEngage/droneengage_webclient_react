@@ -1,4 +1,5 @@
 import * as js_globals from '../js/js_globals';
+import * as js_localStorage from './js_localStorage'
 
 /***************************************************
 
@@ -14,7 +15,7 @@ class CSpeakEngine
 	{
 		var Me = this;
 		
-		this._v_enable_speak =  window.AndruavLibs.LocalStorage.fn_getSpeechEnabled()===true;
+		this._v_enable_speak =  js_localStorage.default.fn_getSpeechEnabled()===true;
 		this._v_speakmsg ='';
 		this._v_to_speak = {};
 		this._v_index = 0;
@@ -28,7 +29,7 @@ class CSpeakEngine
 		{
 			this._v_speakmsg.voice = voices[3]; // Note: some voices don't support altering params
 			this._v_speakmsg.voiceURI = 'native';
-			this._v_speakmsg.volume = window.AndruavLibs.LocalStorage.fn_getVolume() / 100; // 1; // 0 to 1
+			this._v_speakmsg.volume = js_localStorage.default.fn_getVolume() / 100; // 1; // 0 to 1
 			this._v_speakmsg.rate = 1; // 0.1 to 10
 			this._v_speakmsg.pitch = 1; //0 to 2
 			this._v_speakmsg.lang = 'en-US';
@@ -68,8 +69,8 @@ class CSpeakEngine
 	}
 	fn_updateSettings()
 	{
-		this._v_enable_speak = window.AndruavLibs.LocalStorage.fn_getSpeechEnabled()===true;
-		this._v_speakmsg.volume = window.AndruavLibs.LocalStorage.fn_getVolume() / 100; // 1; // 0 to 1
+		this._v_enable_speak = js_localStorage.default.fn_getSpeechEnabled()===true;
+		this._v_speakmsg.volume = js_localStorage.default.fn_getVolume() / 100; // 1; // 0 to 1
 	}
 
 	fn_speak (text)

@@ -6,20 +6,35 @@ Generated from: all.xml,ardupilotmega.xml,ASLUAV.xml,common.xml,development.xml,
 Note: this file has been auto-generated. DO NOT EDIT
 */
 
-jspack = require("jspack").jspack,
-    _ = require("underscore"),
-    events = require("events"), // for .emit(..), MAVLink20Processor inherits from events.EventEmitter
-    util = require("util");
+import {jspack} from 'jspack' 
+import _, { map } from 'underscore'
 
-var Buffer = require('buffer').Buffer; // required in react - no impact in node
-var Long = require('long');
+
+var jjspack = jspack; // mhefny
+//var events = new EventEmitter(); // mhefny
+
 
 // Add a convenience method to Buffer
-Buffer.prototype.toByteArray = function () {
-  return Array.prototype.slice.call(this, 0)
-}
+// Buffer.prototype.toByteArray = function () {
+//   return Array.prototype.slice.call(this, 0)
+// }
 
-mavlink20 = function(){};
+
+function inherits(ctor, superCtor) {
+    if (superCtor) {
+      ctor.super_ = superCtor
+      ctor.prototype = Object.create(superCtor.prototype, {
+        constructor: {
+          value: ctor,
+          enumerable: false,
+          writable: true,
+          configurable: true
+        }
+      })
+    }
+  };
+
+export var mavlink20 = function(){};
 
 // Implement the CRC-16/MCRF4XX function (present in the Python version through the mavutil.py package)
 mavlink20.x25Crc = function(buffer, crcIN) {
@@ -37,10 +52,6 @@ mavlink20.x25Crc = function(buffer, crcIN) {
 }
 
 mavlink20.WIRE_PROTOCOL_VERSION = "2.0";
-mavlink20.PROTOCOL_MARKER_V1 = 0xFE 
-mavlink20.PROTOCOL_MARKER_V2 = 0xFD 
-mavlink20.HEADER_LEN_V1 = 6 
-mavlink20.HEADER_LEN_V2 = 10 
 mavlink20.HEADER_LEN = 10;
 
 mavlink20.MAVLINK_TYPE_CHAR     = 0
@@ -56,7 +67,6 @@ mavlink20.MAVLINK_TYPE_FLOAT    = 9
 mavlink20.MAVLINK_TYPE_DOUBLE   = 10
 
 mavlink20.MAVLINK_IFLAG_SIGNED = 0x01
-mavlink20.MAVLINK_SIGNATURE_BLOCK_LEN = 13
 
 // Mavlink headers incorporate sequence, source system (platform) and source component. 
 mavlink20.header = function(msgId, mlen, seq, srcSystem, srcComponent, incompat_flags=0, compat_flags=0,) {
@@ -71,7 +81,7 @@ mavlink20.header = function(msgId, mlen, seq, srcSystem, srcComponent, incompat_
 
 }
 mavlink20.header.prototype.pack = function() {
-    return jspack.Pack('BBBBBBBHB', [253, this.mlen, this.incompat_flags, this.compat_flags, this.seq, this.srcSystem, this.srcComponent, ((this.msgId & 0xFF) << 8) | ((this.msgId >> 8) & 0xFF), this.msgId>>16]);
+    return jjspack.Pack('BBBBBBBHB', [253, this.mlen, this.incompat_flags, this.compat_flags, this.seq, this.srcSystem, this.srcComponent, ((this.msgId & 0xFF) << 8) | ((this.msgId >> 8) & 0xFF), this.msgId>>16]);
 }
         
 // Base class declaration: mavlink.message will be the parent class for each
@@ -79,88 +89,33 @@ mavlink20.header.prototype.pack = function() {
 mavlink20.message = function() {};
 
 // Convenience setter to facilitate turning the unpacked array of data into member properties
-mavlink20.message.prototype.set = function(args,verbose) {
-// inspect
-    _.each(this.fieldnames, function(e, i) {
-        var num = parseInt(i,10);
-        if (this.hasOwnProperty(e) && isNaN(num)  ){ // asking for an attribute that's non-numeric is ok unless its already an attribute we have
-            if ( verbose >= 1) { console.log("WARNING, overwriting an existing property is DANGEROUS:"+e+" ==>"+i+"==>"+args[i]+" -> "+JSON.stringify(this)); }
-        }
-    }, this);
-                    //console.log(this.fieldnames);
-// then modify
+mavlink20.message.prototype.set = function(args) {
     _.each(this.fieldnames, function(e, i) {
         this[e] = args[i];
     }, this);
 };
 
-// trying to be the same-ish as the python function of the same name
-mavlink20.message.prototype.sign_packet = function( mav) {
-    var crypto= require('crypto');
-    var h =  crypto.createHash('sha256');
-
-    //mav.signing.timestamp is a 48bit number, or 6 bytes.
-
-        // due to js not being able to shift numbers  more than 32, we'll use this instead.. 
-        // js stores all its numbers as a 64bit float with 53 bits of mantissa, so have room for 48 ok. 
-        // positive shifts left, negative shifts right
-        function shift(number, shift) { 
-            return number * Math.pow(2, shift); 
-        } 
-
-    var thigh = shift(mav.signing.timestamp,-32) // 2 bytes from the top, shifted right by 32 bits
-    var tlow  = (mav.signing.timestamp & 0xfffffff )  // 4 bytes from the bottom
-
-    // I means unsigned 4bytes, H means unsigned 2 bytes
-    // first add the linkid(1 byte) and timestamp(6 bytes) that start the signature
-    this._msgbuf = this._msgbuf.concat(jspack.Pack('<BIH', [mav.signing.link_id, tlow, thigh  ] ) );
- 
-    h.update(mav.signing.secret_key); // secret is already a Buffer
-    h.update(new Buffer.from(this._msgbuf));
-    var hashDigest = h.digest();
-    sig = hashDigest.slice(0,6)
-    this._msgbuf  = this._msgbuf.concat( ... sig ); 
-
-    mav.signing.timestamp += 1
-} 
-
-
 // This pack function builds the header and produces a complete MAVLink message,
 // including header and message CRC.
 mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
 
-    this._payload = payload;
-    var plen = this._payload.length;
-    //in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
-    // variable length arrays and smaller packets
-    while ((plen > 1) && ( (this._payload[plen-1] == 0) || (this._payload[plen-1] == null) ) ) {
-            plen = plen - 1;
-    }
-    this._payload = this._payload.slice(0, plen);
-    // signing is our first incompat flag. 
-    var incompat_flags = 0; 
-    if (mav.signing.sign_outgoing){ 
-            incompat_flags |= mavlink20.MAVLINK_IFLAG_SIGNED 
-    } 
-    // header 
-    this._header = new mavlink20.header(this._id, this._payload.length, mav.seq, mav.srcSystem, mav.srcComponent, incompat_flags, 0,);
-    // payload     
-    this._msgbuf = this._header.pack().concat(this._payload);
-    // crc -  for now, assume always using crc_extra = True.  TODO: check/fix this. 
-    var crc = mavlink20.x25Crc(this._msgbuf.slice(1));
+    this.payload = payload;
+    var plen = this.payload.length;
+        //in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
+        // variable length arrays and smaller packets
+        while (plen > 1 && this.payload[plen-1] == 0) {
+                plen = plen - 1;
+        }
+        this.payload = this.payload.slice(0, plen);
+        var incompat_flags = 0;
+    this.header = new mavlink20.header(this.id, this.payload.length, mav.seq, mav.srcSystem, mav.srcComponent, incompat_flags, 0,);    
+    this.msgbuf = this.header.pack().concat(this.payload);
+    var crc = mavlink20.x25Crc(this.msgbuf.slice(1));
+
+    // For now, assume always using crc_extra = True.  TODO: check/fix this.
     crc = mavlink20.x25Crc([crc_extra], crc);
-    this._msgbuf = this._msgbuf.concat(jspack.Pack('<H', [crc] ) );
-
-    // signing 
-    this._signed     = false 
-    this._link_id    = undefined 
-
-    //console.log(mav.signing); 
-    //optionally add signing 
-    if (mav.signing.sign_outgoing){ 
-                this.sign_packet(mav) 
-    } 
-    return this._msgbuf;
+    this.msgbuf = this.msgbuf.concat(jjspack.Pack('<H', [crc] ) );
+    return this.msgbuf;
 
 }
 
@@ -4023,7 +3978,6 @@ mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH = 52000
 mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH_RESPONSE = 52001
 mavlink20.messages = {};
 
-
 /* 
 Offsets and calibrations values for hardware sensors. This makes it
 easier to debug the calibration process.
@@ -4042,32 +3996,24 @@ easier to debug the calibration process.
                 accel_cal_z               : Accel Z calibration. (float)
 
 */
-    mavlink20.messages.sensor_offsets = function( ...moreargs ) {
-    [ this.mag_ofs_x , this.mag_ofs_y , this.mag_ofs_z , this.mag_declination , this.raw_press , this.raw_temp , this.gyro_cal_x , this.gyro_cal_y , this.gyro_cal_z , this.accel_cal_x , this.accel_cal_y , this.accel_cal_z ] = moreargs;
+mavlink20.messages.sensor_offsets = function(mag_ofs_x, mag_ofs_y, mag_ofs_z, mag_declination, raw_press, raw_temp, gyro_cal_x, gyro_cal_y, gyro_cal_z, accel_cal_x, accel_cal_y, accel_cal_z) {
 
-    this._format = '<fiiffffffhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENSOR_OFFSETS;
+    this.format = '<fiiffffffhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENSOR_OFFSETS;
     this.order_map = [9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 134;
-    this._name = 'SENSOR_OFFSETS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENSOR_OFFSETS';
 
     this.fieldnames = ['mag_ofs_x', 'mag_ofs_y', 'mag_ofs_z', 'mag_declination', 'raw_press', 'raw_temp', 'gyro_cal_x', 'gyro_cal_y', 'gyro_cal_z', 'accel_cal_x', 'accel_cal_y', 'accel_cal_z'];
 
-}
 
-mavlink20.messages.sensor_offsets.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sensor_offsets.prototype = new mavlink20.message();
 mavlink20.messages.sensor_offsets.prototype.pack = function(mav) {
-    var orderedfields = [ this.mag_declination, this.raw_press, this.raw_temp, this.gyro_cal_x, this.gyro_cal_y, this.gyro_cal_z, this.accel_cal_x, this.accel_cal_y, this.accel_cal_z, this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mag_declination, this.raw_press, this.raw_temp, this.gyro_cal_x, this.gyro_cal_y, this.gyro_cal_z, this.accel_cal_x, this.accel_cal_y, this.accel_cal_z, this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z]));
 }
-
 
 /* 
 Set the magnetometer offsets
@@ -4079,32 +4025,24 @@ Set the magnetometer offsets
                 mag_ofs_z                 : Magnetometer Z offset. (int16_t)
 
 */
-    mavlink20.messages.set_mag_offsets = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.mag_ofs_x , this.mag_ofs_y , this.mag_ofs_z ] = moreargs;
+mavlink20.messages.set_mag_offsets = function(target_system, target_component, mag_ofs_x, mag_ofs_y, mag_ofs_z) {
 
-    this._format = '<hhhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_MAG_OFFSETS;
+    this.format = '<hhhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_MAG_OFFSETS;
     this.order_map = [3, 4, 0, 1, 2];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 219;
-    this._name = 'SET_MAG_OFFSETS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_MAG_OFFSETS';
 
     this.fieldnames = ['target_system', 'target_component', 'mag_ofs_x', 'mag_ofs_y', 'mag_ofs_z'];
 
-}
 
-mavlink20.messages.set_mag_offsets.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_mag_offsets.prototype = new mavlink20.message();
 mavlink20.messages.set_mag_offsets.prototype.pack = function(mav) {
-    var orderedfields = [ this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z, this.target_system, this.target_component]));
 }
-
 
 /* 
 State of autopilot RAM.
@@ -4114,32 +4052,24 @@ State of autopilot RAM.
                 freemem32                 : Free memory (32 bit). (uint32_t)
 
 */
-    mavlink20.messages.meminfo = function( ...moreargs ) {
-    [ this.brkval , this.freemem , this.freemem32 ] = moreargs;
+mavlink20.messages.meminfo = function(brkval, freemem, freemem32) {
 
-    this._format = '<HHI';
-    this._id = mavlink20.MAVLINK_MSG_ID_MEMINFO;
+    this.format = '<HHI';
+    this.id = mavlink20.MAVLINK_MSG_ID_MEMINFO;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 208;
-    this._name = 'MEMINFO';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MEMINFO';
 
     this.fieldnames = ['brkval', 'freemem', 'freemem32'];
 
-}
 
-mavlink20.messages.meminfo.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.meminfo.prototype = new mavlink20.message();
 mavlink20.messages.meminfo.prototype.pack = function(mav) {
-    var orderedfields = [ this.brkval, this.freemem, this.freemem32];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.brkval, this.freemem, this.freemem32]));
 }
-
 
 /* 
 Raw ADC output.
@@ -4152,32 +4082,24 @@ Raw ADC output.
                 adc6                      : ADC output 6. (uint16_t)
 
 */
-    mavlink20.messages.ap_adc = function( ...moreargs ) {
-    [ this.adc1 , this.adc2 , this.adc3 , this.adc4 , this.adc5 , this.adc6 ] = moreargs;
+mavlink20.messages.ap_adc = function(adc1, adc2, adc3, adc4, adc5, adc6) {
 
-    this._format = '<HHHHHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_AP_ADC;
+    this.format = '<HHHHHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_AP_ADC;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 188;
-    this._name = 'AP_ADC';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AP_ADC';
 
     this.fieldnames = ['adc1', 'adc2', 'adc3', 'adc4', 'adc5', 'adc6'];
 
-}
 
-mavlink20.messages.ap_adc.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ap_adc.prototype = new mavlink20.message();
 mavlink20.messages.ap_adc.prototype.pack = function(mav) {
-    var orderedfields = [ this.adc1, this.adc2, this.adc3, this.adc4, this.adc5, this.adc6];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.adc1, this.adc2, this.adc3, this.adc4, this.adc5, this.adc6]));
 }
-
 
 /* 
 Configure on-board Camera Control System.
@@ -4195,32 +4117,24 @@ Configure on-board Camera Control System.
                 extra_value               : Correspondent value to given extra_param. (float)
 
 */
-    mavlink20.messages.digicam_configure = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.mode , this.shutter_speed , this.aperture , this.iso , this.exposure_type , this.command_id , this.engine_cut_off , this.extra_param , this.extra_value ] = moreargs;
+mavlink20.messages.digicam_configure = function(target_system, target_component, mode, shutter_speed, aperture, iso, exposure_type, command_id, engine_cut_off, extra_param, extra_value) {
 
-    this._format = '<fHBBBBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DIGICAM_CONFIGURE;
+    this.format = '<fHBBBBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DIGICAM_CONFIGURE;
     this.order_map = [2, 3, 4, 1, 5, 6, 7, 8, 9, 10, 0];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 84;
-    this._name = 'DIGICAM_CONFIGURE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DIGICAM_CONFIGURE';
 
     this.fieldnames = ['target_system', 'target_component', 'mode', 'shutter_speed', 'aperture', 'iso', 'exposure_type', 'command_id', 'engine_cut_off', 'extra_param', 'extra_value'];
 
-}
 
-mavlink20.messages.digicam_configure.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.digicam_configure.prototype = new mavlink20.message();
 mavlink20.messages.digicam_configure.prototype.pack = function(mav) {
-    var orderedfields = [ this.extra_value, this.shutter_speed, this.target_system, this.target_component, this.mode, this.aperture, this.iso, this.exposure_type, this.command_id, this.engine_cut_off, this.extra_param];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.extra_value, this.shutter_speed, this.target_system, this.target_component, this.mode, this.aperture, this.iso, this.exposure_type, this.command_id, this.engine_cut_off, this.extra_param]));
 }
-
 
 /* 
 Control on-board Camera Control System to take shots.
@@ -4237,32 +4151,24 @@ Control on-board Camera Control System to take shots.
                 extra_value               : Correspondent value to given extra_param. (float)
 
 */
-    mavlink20.messages.digicam_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.session , this.zoom_pos , this.zoom_step , this.focus_lock , this.shot , this.command_id , this.extra_param , this.extra_value ] = moreargs;
+mavlink20.messages.digicam_control = function(target_system, target_component, session, zoom_pos, zoom_step, focus_lock, shot, command_id, extra_param, extra_value) {
 
-    this._format = '<fBBBBbBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DIGICAM_CONTROL;
+    this.format = '<fBBBBbBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DIGICAM_CONTROL;
     this.order_map = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 22;
-    this._name = 'DIGICAM_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DIGICAM_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'session', 'zoom_pos', 'zoom_step', 'focus_lock', 'shot', 'command_id', 'extra_param', 'extra_value'];
 
-}
 
-mavlink20.messages.digicam_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.digicam_control.prototype = new mavlink20.message();
 mavlink20.messages.digicam_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.extra_value, this.target_system, this.target_component, this.session, this.zoom_pos, this.zoom_step, this.focus_lock, this.shot, this.command_id, this.extra_param];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.extra_value, this.target_system, this.target_component, this.session, this.zoom_pos, this.zoom_step, this.focus_lock, this.shot, this.command_id, this.extra_param]));
 }
-
 
 /* 
 Message to configure a camera mount, directional antenna, etc.
@@ -4275,32 +4181,24 @@ Message to configure a camera mount, directional antenna, etc.
                 stab_yaw                  : (1 = yes, 0 = no). (uint8_t)
 
 */
-    mavlink20.messages.mount_configure = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.mount_mode , this.stab_roll , this.stab_pitch , this.stab_yaw ] = moreargs;
+mavlink20.messages.mount_configure = function(target_system, target_component, mount_mode, stab_roll, stab_pitch, stab_yaw) {
 
-    this._format = '<BBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MOUNT_CONFIGURE;
+    this.format = '<BBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MOUNT_CONFIGURE;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 19;
-    this._name = 'MOUNT_CONFIGURE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MOUNT_CONFIGURE';
 
     this.fieldnames = ['target_system', 'target_component', 'mount_mode', 'stab_roll', 'stab_pitch', 'stab_yaw'];
 
-}
 
-mavlink20.messages.mount_configure.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mount_configure.prototype = new mavlink20.message();
 mavlink20.messages.mount_configure.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.mount_mode, this.stab_roll, this.stab_pitch, this.stab_yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mount_mode, this.stab_roll, this.stab_pitch, this.stab_yaw]));
 }
-
 
 /* 
 Message to control a camera mount, directional antenna, etc.
@@ -4313,32 +4211,24 @@ Message to control a camera mount, directional antenna, etc.
                 save_position             : If "1" it will save current trimmed position on EEPROM (just valid for NEUTRAL and LANDING). (uint8_t)
 
 */
-    mavlink20.messages.mount_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.input_a , this.input_b , this.input_c , this.save_position ] = moreargs;
+mavlink20.messages.mount_control = function(target_system, target_component, input_a, input_b, input_c, save_position) {
 
-    this._format = '<iiiBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MOUNT_CONTROL;
+    this.format = '<iiiBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MOUNT_CONTROL;
     this.order_map = [3, 4, 0, 1, 2, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 21;
-    this._name = 'MOUNT_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MOUNT_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'input_a', 'input_b', 'input_c', 'save_position'];
 
-}
 
-mavlink20.messages.mount_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mount_control.prototype = new mavlink20.message();
 mavlink20.messages.mount_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.input_a, this.input_b, this.input_c, this.target_system, this.target_component, this.save_position];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.input_a, this.input_b, this.input_c, this.target_system, this.target_component, this.save_position]));
 }
-
 
 /* 
 Message with some status from autopilot to GCS about camera or antenna
@@ -4352,32 +4242,24 @@ mount.
                 mount_mode                : Mount operating mode. (uint8_t)
 
 */
-    mavlink20.messages.mount_status = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.pointing_a , this.pointing_b , this.pointing_c , this.mount_mode ] = moreargs;
+mavlink20.messages.mount_status = function(target_system, target_component, pointing_a, pointing_b, pointing_c, mount_mode) {
 
-    this._format = '<iiiBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MOUNT_STATUS;
+    this.format = '<iiiBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MOUNT_STATUS;
     this.order_map = [3, 4, 0, 1, 2, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 134;
-    this._name = 'MOUNT_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MOUNT_STATUS';
 
     this.fieldnames = ['target_system', 'target_component', 'pointing_a', 'pointing_b', 'pointing_c', 'mount_mode'];
 
-}
 
-mavlink20.messages.mount_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mount_status.prototype = new mavlink20.message();
 mavlink20.messages.mount_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.pointing_a, this.pointing_b, this.pointing_c, this.target_system, this.target_component, this.mount_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.pointing_a, this.pointing_b, this.pointing_c, this.target_system, this.target_component, this.mount_mode]));
 }
-
 
 /* 
 A fence point. Used to set a point when from GCS -> MAV. Also used to
@@ -4391,32 +4273,24 @@ return a point from MAV -> GCS.
                 lng                       : Longitude of point. (float)
 
 */
-    mavlink20.messages.fence_point = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.idx , this.count , this.lat , this.lng ] = moreargs;
+mavlink20.messages.fence_point = function(target_system, target_component, idx, count, lat, lng) {
 
-    this._format = '<ffBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_FENCE_POINT;
+    this.format = '<ffBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_FENCE_POINT;
     this.order_map = [2, 3, 4, 5, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 78;
-    this._name = 'FENCE_POINT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FENCE_POINT';
 
     this.fieldnames = ['target_system', 'target_component', 'idx', 'count', 'lat', 'lng'];
 
-}
 
-mavlink20.messages.fence_point.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.fence_point.prototype = new mavlink20.message();
 mavlink20.messages.fence_point.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lng, this.target_system, this.target_component, this.idx, this.count];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lng, this.target_system, this.target_component, this.idx, this.count]));
 }
-
 
 /* 
 Request a current fence point from MAV.
@@ -4426,32 +4300,24 @@ Request a current fence point from MAV.
                 idx                       : Point index (first point is 1, 0 is for return point). (uint8_t)
 
 */
-    mavlink20.messages.fence_fetch_point = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.idx ] = moreargs;
+mavlink20.messages.fence_fetch_point = function(target_system, target_component, idx) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_FENCE_FETCH_POINT;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_FENCE_FETCH_POINT;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 68;
-    this._name = 'FENCE_FETCH_POINT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FENCE_FETCH_POINT';
 
     this.fieldnames = ['target_system', 'target_component', 'idx'];
 
-}
 
-mavlink20.messages.fence_fetch_point.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.fence_fetch_point.prototype = new mavlink20.message();
 mavlink20.messages.fence_fetch_point.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.idx];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
 }
-
 
 /* 
 Status of DCM attitude estimator.
@@ -4465,32 +4331,24 @@ Status of DCM attitude estimator.
                 error_yaw                 : Average error_yaw value. (float)
 
 */
-    mavlink20.messages.ahrs = function( ...moreargs ) {
-    [ this.omegaIx , this.omegaIy , this.omegaIz , this.accel_weight , this.renorm_val , this.error_rp , this.error_yaw ] = moreargs;
+mavlink20.messages.ahrs = function(omegaIx, omegaIy, omegaIz, accel_weight, renorm_val, error_rp, error_yaw) {
 
-    this._format = '<fffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AHRS;
+    this.format = '<fffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AHRS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 127;
-    this._name = 'AHRS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AHRS';
 
     this.fieldnames = ['omegaIx', 'omegaIy', 'omegaIz', 'accel_weight', 'renorm_val', 'error_rp', 'error_yaw'];
 
-}
 
-mavlink20.messages.ahrs.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ahrs.prototype = new mavlink20.message();
 mavlink20.messages.ahrs.prototype.pack = function(mav) {
-    var orderedfields = [ this.omegaIx, this.omegaIy, this.omegaIz, this.accel_weight, this.renorm_val, this.error_rp, this.error_yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.omegaIx, this.omegaIy, this.omegaIz, this.accel_weight, this.renorm_val, this.error_rp, this.error_yaw]));
 }
-
 
 /* 
 Status of simulation environment, if used.
@@ -4508,32 +4366,24 @@ Status of simulation environment, if used.
                 lng                       : Longitude. (int32_t)
 
 */
-    mavlink20.messages.simstate = function( ...moreargs ) {
-    [ this.roll , this.pitch , this.yaw , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.lat , this.lng ] = moreargs;
+mavlink20.messages.simstate = function(roll, pitch, yaw, xacc, yacc, zacc, xgyro, ygyro, zgyro, lat, lng) {
 
-    this._format = '<fffffffffii';
-    this._id = mavlink20.MAVLINK_MSG_ID_SIMSTATE;
+    this.format = '<fffffffffii';
+    this.id = mavlink20.MAVLINK_MSG_ID_SIMSTATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 154;
-    this._name = 'SIMSTATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SIMSTATE';
 
     this.fieldnames = ['roll', 'pitch', 'yaw', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'lat', 'lng'];
 
-}
 
-mavlink20.messages.simstate.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.simstate.prototype = new mavlink20.message();
 mavlink20.messages.simstate.prototype.pack = function(mav) {
-    var orderedfields = [ this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lng];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lng]));
 }
-
 
 /* 
 Status of key hardware.
@@ -4542,32 +4392,24 @@ Status of key hardware.
                 I2Cerr                    : I2C error count. (uint8_t)
 
 */
-    mavlink20.messages.hwstatus = function( ...moreargs ) {
-    [ this.Vcc , this.I2Cerr ] = moreargs;
+mavlink20.messages.hwstatus = function(Vcc, I2Cerr) {
 
-    this._format = '<HB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HWSTATUS;
+    this.format = '<HB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HWSTATUS;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 21;
-    this._name = 'HWSTATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HWSTATUS';
 
     this.fieldnames = ['Vcc', 'I2Cerr'];
 
-}
 
-mavlink20.messages.hwstatus.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hwstatus.prototype = new mavlink20.message();
 mavlink20.messages.hwstatus.prototype.pack = function(mav) {
-    var orderedfields = [ this.Vcc, this.I2Cerr];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Vcc, this.I2Cerr]));
 }
-
 
 /* 
 Status generated by radio.
@@ -4581,32 +4423,24 @@ Status generated by radio.
                 fixed                     : Count of error corrected packets. (uint16_t)
 
 */
-    mavlink20.messages.radio = function( ...moreargs ) {
-    [ this.rssi , this.remrssi , this.txbuf , this.noise , this.remnoise , this.rxerrors , this.fixed ] = moreargs;
+mavlink20.messages.radio = function(rssi, remrssi, txbuf, noise, remnoise, rxerrors, fixed) {
 
-    this._format = '<HHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RADIO;
+    this.format = '<HHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RADIO;
     this.order_map = [2, 3, 4, 5, 6, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 21;
-    this._name = 'RADIO';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RADIO';
 
     this.fieldnames = ['rssi', 'remrssi', 'txbuf', 'noise', 'remnoise', 'rxerrors', 'fixed'];
 
-}
 
-mavlink20.messages.radio.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.radio.prototype = new mavlink20.message();
 mavlink20.messages.radio.prototype.pack = function(mav) {
-    var orderedfields = [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
 }
-
 
 /* 
 Status of AP_Limits. Sent in extended status stream when AP_Limits is
@@ -4623,32 +4457,24 @@ enabled.
                 mods_triggered            : AP_Limit_Module bitfield of triggered modules. (uint8_t)
 
 */
-    mavlink20.messages.limits_status = function( ...moreargs ) {
-    [ this.limits_state , this.last_trigger , this.last_action , this.last_recovery , this.last_clear , this.breach_count , this.mods_enabled , this.mods_required , this.mods_triggered ] = moreargs;
+mavlink20.messages.limits_status = function(limits_state, last_trigger, last_action, last_recovery, last_clear, breach_count, mods_enabled, mods_required, mods_triggered) {
 
-    this._format = '<IIIIHBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LIMITS_STATUS;
+    this.format = '<IIIIHBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LIMITS_STATUS;
     this.order_map = [5, 0, 1, 2, 3, 4, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 144;
-    this._name = 'LIMITS_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LIMITS_STATUS';
 
     this.fieldnames = ['limits_state', 'last_trigger', 'last_action', 'last_recovery', 'last_clear', 'breach_count', 'mods_enabled', 'mods_required', 'mods_triggered'];
 
-}
 
-mavlink20.messages.limits_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.limits_status.prototype = new mavlink20.message();
 mavlink20.messages.limits_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.last_trigger, this.last_action, this.last_recovery, this.last_clear, this.breach_count, this.limits_state, this.mods_enabled, this.mods_required, this.mods_triggered];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.last_trigger, this.last_action, this.last_recovery, this.last_clear, this.breach_count, this.limits_state, this.mods_enabled, this.mods_required, this.mods_triggered]));
 }
-
 
 /* 
 Wind estimation.
@@ -4658,32 +4484,24 @@ Wind estimation.
                 speed_z                   : Vertical wind speed. (float)
 
 */
-    mavlink20.messages.wind = function( ...moreargs ) {
-    [ this.direction , this.speed , this.speed_z ] = moreargs;
+mavlink20.messages.wind = function(direction, speed, speed_z) {
 
-    this._format = '<fff';
-    this._id = mavlink20.MAVLINK_MSG_ID_WIND;
+    this.format = '<fff';
+    this.id = mavlink20.MAVLINK_MSG_ID_WIND;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 1;
-    this._name = 'WIND';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'WIND';
 
     this.fieldnames = ['direction', 'speed', 'speed_z'];
 
-}
 
-mavlink20.messages.wind.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.wind.prototype = new mavlink20.message();
 mavlink20.messages.wind.prototype.pack = function(mav) {
-    var orderedfields = [ this.direction, this.speed, this.speed_z];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.direction, this.speed, this.speed_z]));
 }
-
 
 /* 
 Data packet, size 16.
@@ -4693,32 +4511,24 @@ Data packet, size 16.
                 data                      : Raw data. (uint8_t)
 
 */
-    mavlink20.messages.data16 = function( ...moreargs ) {
-    [ this.type , this.len , this.data ] = moreargs;
+mavlink20.messages.data16 = function(type, len, data) {
 
-    this._format = '<BB16s';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA16;
+    this.format = '<BB16s';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA16;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 16];
-    this.array_len_map = [0, 0, 16];
     this.crc_extra = 234;
-    this._name = 'DATA16';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA16';
 
     this.fieldnames = ['type', 'len', 'data'];
 
-}
 
-mavlink20.messages.data16.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data16.prototype = new mavlink20.message();
 mavlink20.messages.data16.prototype.pack = function(mav) {
-    var orderedfields = [ this.type, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
-
 
 /* 
 Data packet, size 32.
@@ -4728,32 +4538,24 @@ Data packet, size 32.
                 data                      : Raw data. (uint8_t)
 
 */
-    mavlink20.messages.data32 = function( ...moreargs ) {
-    [ this.type , this.len , this.data ] = moreargs;
+mavlink20.messages.data32 = function(type, len, data) {
 
-    this._format = '<BB32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA32;
+    this.format = '<BB32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA32;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 32];
-    this.array_len_map = [0, 0, 32];
     this.crc_extra = 73;
-    this._name = 'DATA32';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA32';
 
     this.fieldnames = ['type', 'len', 'data'];
 
-}
 
-mavlink20.messages.data32.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data32.prototype = new mavlink20.message();
 mavlink20.messages.data32.prototype.pack = function(mav) {
-    var orderedfields = [ this.type, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
-
 
 /* 
 Data packet, size 64.
@@ -4763,32 +4565,24 @@ Data packet, size 64.
                 data                      : Raw data. (uint8_t)
 
 */
-    mavlink20.messages.data64 = function( ...moreargs ) {
-    [ this.type , this.len , this.data ] = moreargs;
+mavlink20.messages.data64 = function(type, len, data) {
 
-    this._format = '<BB64s';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA64;
+    this.format = '<BB64s';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA64;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 64];
-    this.array_len_map = [0, 0, 64];
     this.crc_extra = 181;
-    this._name = 'DATA64';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA64';
 
     this.fieldnames = ['type', 'len', 'data'];
 
-}
 
-mavlink20.messages.data64.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data64.prototype = new mavlink20.message();
 mavlink20.messages.data64.prototype.pack = function(mav) {
-    var orderedfields = [ this.type, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
-
 
 /* 
 Data packet, size 96.
@@ -4798,32 +4592,24 @@ Data packet, size 96.
                 data                      : Raw data. (uint8_t)
 
 */
-    mavlink20.messages.data96 = function( ...moreargs ) {
-    [ this.type , this.len , this.data ] = moreargs;
+mavlink20.messages.data96 = function(type, len, data) {
 
-    this._format = '<BB96s';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA96;
+    this.format = '<BB96s';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA96;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 96];
-    this.array_len_map = [0, 0, 96];
     this.crc_extra = 22;
-    this._name = 'DATA96';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA96';
 
     this.fieldnames = ['type', 'len', 'data'];
 
-}
 
-mavlink20.messages.data96.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data96.prototype = new mavlink20.message();
 mavlink20.messages.data96.prototype.pack = function(mav) {
-    var orderedfields = [ this.type, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
-
 
 /* 
 Rangefinder reporting.
@@ -4832,32 +4618,24 @@ Rangefinder reporting.
                 voltage                   : Raw voltage if available, zero otherwise. (float)
 
 */
-    mavlink20.messages.rangefinder = function( ...moreargs ) {
-    [ this.distance , this.voltage ] = moreargs;
+mavlink20.messages.rangefinder = function(distance, voltage) {
 
-    this._format = '<ff';
-    this._id = mavlink20.MAVLINK_MSG_ID_RANGEFINDER;
+    this.format = '<ff';
+    this.id = mavlink20.MAVLINK_MSG_ID_RANGEFINDER;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 83;
-    this._name = 'RANGEFINDER';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RANGEFINDER';
 
     this.fieldnames = ['distance', 'voltage'];
 
-}
 
-mavlink20.messages.rangefinder.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rangefinder.prototype = new mavlink20.message();
 mavlink20.messages.rangefinder.prototype.pack = function(mav) {
-    var orderedfields = [ this.distance, this.voltage];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.distance, this.voltage]));
 }
-
 
 /* 
 Airspeed auto-calibration.
@@ -4876,32 +4654,24 @@ Airspeed auto-calibration.
                 Pcz                       : EKF Pcz. (float)
 
 */
-    mavlink20.messages.airspeed_autocal = function( ...moreargs ) {
-    [ this.vx , this.vy , this.vz , this.diff_pressure , this.EAS2TAS , this.ratio , this.state_x , this.state_y , this.state_z , this.Pax , this.Pby , this.Pcz ] = moreargs;
+mavlink20.messages.airspeed_autocal = function(vx, vy, vz, diff_pressure, EAS2TAS, ratio, state_x, state_y, state_z, Pax, Pby, Pcz) {
 
-    this._format = '<ffffffffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AIRSPEED_AUTOCAL;
+    this.format = '<ffffffffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AIRSPEED_AUTOCAL;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 167;
-    this._name = 'AIRSPEED_AUTOCAL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AIRSPEED_AUTOCAL';
 
     this.fieldnames = ['vx', 'vy', 'vz', 'diff_pressure', 'EAS2TAS', 'ratio', 'state_x', 'state_y', 'state_z', 'Pax', 'Pby', 'Pcz'];
 
-}
 
-mavlink20.messages.airspeed_autocal.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.airspeed_autocal.prototype = new mavlink20.message();
 mavlink20.messages.airspeed_autocal.prototype.pack = function(mav) {
-    var orderedfields = [ this.vx, this.vy, this.vz, this.diff_pressure, this.EAS2TAS, this.ratio, this.state_x, this.state_y, this.state_z, this.Pax, this.Pby, this.Pcz];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vx, this.vy, this.vz, this.diff_pressure, this.EAS2TAS, this.ratio, this.state_x, this.state_y, this.state_z, this.Pax, this.Pby, this.Pcz]));
 }
-
 
 /* 
 A rally point. Used to set a point when from GCS -> MAV. Also used to
@@ -4919,32 +4689,24 @@ return a point from MAV -> GCS.
                 flags                     : Configuration flags. (uint8_t)
 
 */
-    mavlink20.messages.rally_point = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.idx , this.count , this.lat , this.lng , this.alt , this.break_alt , this.land_dir , this.flags ] = moreargs;
+mavlink20.messages.rally_point = function(target_system, target_component, idx, count, lat, lng, alt, break_alt, land_dir, flags) {
 
-    this._format = '<iihhHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RALLY_POINT;
+    this.format = '<iihhHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RALLY_POINT;
     this.order_map = [5, 6, 7, 8, 0, 1, 2, 3, 4, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 138;
-    this._name = 'RALLY_POINT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RALLY_POINT';
 
     this.fieldnames = ['target_system', 'target_component', 'idx', 'count', 'lat', 'lng', 'alt', 'break_alt', 'land_dir', 'flags'];
 
-}
 
-mavlink20.messages.rally_point.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rally_point.prototype = new mavlink20.message();
 mavlink20.messages.rally_point.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lng, this.alt, this.break_alt, this.land_dir, this.target_system, this.target_component, this.idx, this.count, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lng, this.alt, this.break_alt, this.land_dir, this.target_system, this.target_component, this.idx, this.count, this.flags]));
 }
-
 
 /* 
 Request a current rally point from MAV. MAV should respond with a
@@ -4955,32 +4717,24 @@ RALLY_POINT message. MAV should not respond if the request is invalid.
                 idx                       : Point index (first point is 0). (uint8_t)
 
 */
-    mavlink20.messages.rally_fetch_point = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.idx ] = moreargs;
+mavlink20.messages.rally_fetch_point = function(target_system, target_component, idx) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RALLY_FETCH_POINT;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RALLY_FETCH_POINT;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 234;
-    this._name = 'RALLY_FETCH_POINT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RALLY_FETCH_POINT';
 
     this.fieldnames = ['target_system', 'target_component', 'idx'];
 
-}
 
-mavlink20.messages.rally_fetch_point.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rally_fetch_point.prototype = new mavlink20.message();
 mavlink20.messages.rally_fetch_point.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.idx];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
 }
-
 
 /* 
 Status of compassmot calibration.
@@ -4993,32 +4747,24 @@ Status of compassmot calibration.
                 CompensationZ             : Motor Compensation Z. (float)
 
 */
-    mavlink20.messages.compassmot_status = function( ...moreargs ) {
-    [ this.throttle , this.current , this.interference , this.CompensationX , this.CompensationY , this.CompensationZ ] = moreargs;
+mavlink20.messages.compassmot_status = function(throttle, current, interference, CompensationX, CompensationY, CompensationZ) {
 
-    this._format = '<ffffHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMPASSMOT_STATUS;
+    this.format = '<ffffHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMPASSMOT_STATUS;
     this.order_map = [4, 0, 5, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 240;
-    this._name = 'COMPASSMOT_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMPASSMOT_STATUS';
 
     this.fieldnames = ['throttle', 'current', 'interference', 'CompensationX', 'CompensationY', 'CompensationZ'];
 
-}
 
-mavlink20.messages.compassmot_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.compassmot_status.prototype = new mavlink20.message();
 mavlink20.messages.compassmot_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.current, this.CompensationX, this.CompensationY, this.CompensationZ, this.throttle, this.interference];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.current, this.CompensationX, this.CompensationY, this.CompensationZ, this.throttle, this.interference]));
 }
-
 
 /* 
 Status of secondary AHRS filter if available.
@@ -5031,32 +4777,24 @@ Status of secondary AHRS filter if available.
                 lng                       : Longitude. (int32_t)
 
 */
-    mavlink20.messages.ahrs2 = function( ...moreargs ) {
-    [ this.roll , this.pitch , this.yaw , this.altitude , this.lat , this.lng ] = moreargs;
+mavlink20.messages.ahrs2 = function(roll, pitch, yaw, altitude, lat, lng) {
 
-    this._format = '<ffffii';
-    this._id = mavlink20.MAVLINK_MSG_ID_AHRS2;
+    this.format = '<ffffii';
+    this.id = mavlink20.MAVLINK_MSG_ID_AHRS2;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 47;
-    this._name = 'AHRS2';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AHRS2';
 
     this.fieldnames = ['roll', 'pitch', 'yaw', 'altitude', 'lat', 'lng'];
 
-}
 
-mavlink20.messages.ahrs2.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ahrs2.prototype = new mavlink20.message();
 mavlink20.messages.ahrs2.prototype.pack = function(mav) {
-    var orderedfields = [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng]));
 }
-
 
 /* 
 Camera Event.
@@ -5072,32 +4810,24 @@ Camera Event.
                 p4                        : Parameter 4 (meaning depends on event_id, see CAMERA_STATUS_TYPES enum). (float)
 
 */
-    mavlink20.messages.camera_status = function( ...moreargs ) {
-    [ this.time_usec , this.target_system , this.cam_idx , this.img_idx , this.event_id , this.p1 , this.p2 , this.p3 , this.p4 ] = moreargs;
+mavlink20.messages.camera_status = function(time_usec, target_system, cam_idx, img_idx, event_id, p1, p2, p3, p4) {
 
-    this._format = '<QffffHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_STATUS;
+    this.format = '<QffffHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_STATUS;
     this.order_map = [0, 6, 7, 5, 8, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 189;
-    this._name = 'CAMERA_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_STATUS';
 
     this.fieldnames = ['time_usec', 'target_system', 'cam_idx', 'img_idx', 'event_id', 'p1', 'p2', 'p3', 'p4'];
 
-}
 
-mavlink20.messages.camera_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.p1, this.p2, this.p3, this.p4, this.img_idx, this.target_system, this.cam_idx, this.event_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.p1, this.p2, this.p3, this.p4, this.img_idx, this.target_system, this.cam_idx, this.event_id]));
 }
-
 
 /* 
 Camera Capture Feedback.
@@ -5118,32 +4848,24 @@ Camera Capture Feedback.
                 completed_captures        : Completed image captures. (uint16_t)
 
 */
-    mavlink20.messages.camera_feedback = function( ...moreargs ) {
-    [ this.time_usec , this.target_system , this.cam_idx , this.img_idx , this.lat , this.lng , this.alt_msl , this.alt_rel , this.roll , this.pitch , this.yaw , this.foc_len , this.flags , this.completed_captures ] = moreargs;
+mavlink20.messages.camera_feedback = function(time_usec, target_system, cam_idx, img_idx, lat, lng, alt_msl, alt_rel, roll, pitch, yaw, foc_len, flags, completed_captures) {
 
-    this._format = '<QiiffffffHBBBH';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_FEEDBACK;
+    this.format = '<QiiffffffHBBBH';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_FEEDBACK;
     this.order_map = [0, 10, 11, 9, 1, 2, 3, 4, 5, 6, 7, 8, 12, 13];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 52;
-    this._name = 'CAMERA_FEEDBACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_FEEDBACK';
 
     this.fieldnames = ['time_usec', 'target_system', 'cam_idx', 'img_idx', 'lat', 'lng', 'alt_msl', 'alt_rel', 'roll', 'pitch', 'yaw', 'foc_len', 'flags', 'completed_captures'];
 
-}
 
-mavlink20.messages.camera_feedback.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_feedback.prototype = new mavlink20.message();
 mavlink20.messages.camera_feedback.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.lat, this.lng, this.alt_msl, this.alt_rel, this.roll, this.pitch, this.yaw, this.foc_len, this.img_idx, this.target_system, this.cam_idx, this.flags, this.completed_captures];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lng, this.alt_msl, this.alt_rel, this.roll, this.pitch, this.yaw, this.foc_len, this.img_idx, this.target_system, this.cam_idx, this.flags, this.completed_captures]));
 }
-
 
 /* 
 2nd Battery status
@@ -5152,32 +4874,24 @@ mavlink20.messages.camera_feedback.prototype.pack = function(mav) {
                 current_battery           : Battery current, -1: autopilot does not measure the current. (int16_t)
 
 */
-    mavlink20.messages.battery2 = function( ...moreargs ) {
-    [ this.voltage , this.current_battery ] = moreargs;
+mavlink20.messages.battery2 = function(voltage, current_battery) {
 
-    this._format = '<Hh';
-    this._id = mavlink20.MAVLINK_MSG_ID_BATTERY2;
+    this.format = '<Hh';
+    this.id = mavlink20.MAVLINK_MSG_ID_BATTERY2;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 174;
-    this._name = 'BATTERY2';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'BATTERY2';
 
     this.fieldnames = ['voltage', 'current_battery'];
 
-}
 
-mavlink20.messages.battery2.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.battery2.prototype = new mavlink20.message();
 mavlink20.messages.battery2.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current_battery];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current_battery]));
 }
-
 
 /* 
 Status of third AHRS filter if available. This is for ANU research
@@ -5195,32 +4909,24 @@ group (Ali and Sean).
                 v4                        : Test variable4. (float)
 
 */
-    mavlink20.messages.ahrs3 = function( ...moreargs ) {
-    [ this.roll , this.pitch , this.yaw , this.altitude , this.lat , this.lng , this.v1 , this.v2 , this.v3 , this.v4 ] = moreargs;
+mavlink20.messages.ahrs3 = function(roll, pitch, yaw, altitude, lat, lng, v1, v2, v3, v4) {
 
-    this._format = '<ffffiiffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AHRS3;
+    this.format = '<ffffiiffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AHRS3;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 229;
-    this._name = 'AHRS3';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AHRS3';
 
     this.fieldnames = ['roll', 'pitch', 'yaw', 'altitude', 'lat', 'lng', 'v1', 'v2', 'v3', 'v4'];
 
-}
 
-mavlink20.messages.ahrs3.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ahrs3.prototype = new mavlink20.message();
 mavlink20.messages.ahrs3.prototype.pack = function(mav) {
-    var orderedfields = [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng, this.v1, this.v2, this.v3, this.v4];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng, this.v1, this.v2, this.v3, this.v4]));
 }
-
 
 /* 
 Request the autopilot version from the system/component.
@@ -5229,32 +4935,24 @@ Request the autopilot version from the system/component.
                 target_component          : Component ID. (uint8_t)
 
 */
-    mavlink20.messages.autopilot_version_request = function( ...moreargs ) {
-    [ this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.autopilot_version_request = function(target_system, target_component) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_VERSION_REQUEST;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 85;
-    this._name = 'AUTOPILOT_VERSION_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AUTOPILOT_VERSION_REQUEST';
 
     this.fieldnames = ['target_system', 'target_component'];
 
-}
 
-mavlink20.messages.autopilot_version_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.autopilot_version_request.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_version_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
-
 
 /* 
 Send a block of log data to remote location.
@@ -5265,32 +4963,24 @@ Send a block of log data to remote location.
                 data                      : Log data block. (uint8_t)
 
 */
-    mavlink20.messages.remote_log_data_block = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seqno , this.data ] = moreargs;
+mavlink20.messages.remote_log_data_block = function(target_system, target_component, seqno, data) {
 
-    this._format = '<IBB200s';
-    this._id = mavlink20.MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
+    this.format = '<IBB200s';
+    this.id = mavlink20.MAVLINK_MSG_ID_REMOTE_LOG_DATA_BLOCK;
     this.order_map = [1, 2, 0, 3];
-    this.len_map = [1, 1, 1, 200];
-    this.array_len_map = [0, 0, 0, 200];
     this.crc_extra = 159;
-    this._name = 'REMOTE_LOG_DATA_BLOCK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'REMOTE_LOG_DATA_BLOCK';
 
     this.fieldnames = ['target_system', 'target_component', 'seqno', 'data'];
 
-}
 
-mavlink20.messages.remote_log_data_block.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.remote_log_data_block.prototype = new mavlink20.message();
 mavlink20.messages.remote_log_data_block.prototype.pack = function(mav) {
-    var orderedfields = [ this.seqno, this.target_system, this.target_component, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.data]));
 }
-
 
 /* 
 Send Status of each log block that autopilot board might have sent.
@@ -5301,32 +4991,24 @@ Send Status of each log block that autopilot board might have sent.
                 status                    : Log data block status. (uint8_t)
 
 */
-    mavlink20.messages.remote_log_block_status = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seqno , this.status ] = moreargs;
+mavlink20.messages.remote_log_block_status = function(target_system, target_component, seqno, status) {
 
-    this._format = '<IBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS;
+    this.format = '<IBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_REMOTE_LOG_BLOCK_STATUS;
     this.order_map = [1, 2, 0, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 186;
-    this._name = 'REMOTE_LOG_BLOCK_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'REMOTE_LOG_BLOCK_STATUS';
 
     this.fieldnames = ['target_system', 'target_component', 'seqno', 'status'];
 
-}
 
-mavlink20.messages.remote_log_block_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.remote_log_block_status.prototype = new mavlink20.message();
 mavlink20.messages.remote_log_block_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.seqno, this.target_system, this.target_component, this.status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.status]));
 }
-
 
 /* 
 Control vehicle LEDs.
@@ -5339,32 +5021,24 @@ Control vehicle LEDs.
                 custom_bytes              : Custom Bytes. (uint8_t)
 
 */
-    mavlink20.messages.led_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.instance , this.pattern , this.custom_len , this.custom_bytes ] = moreargs;
+mavlink20.messages.led_control = function(target_system, target_component, instance, pattern, custom_len, custom_bytes) {
 
-    this._format = '<BBBBB24s';
-    this._id = mavlink20.MAVLINK_MSG_ID_LED_CONTROL;
+    this.format = '<BBBBB24s';
+    this.id = mavlink20.MAVLINK_MSG_ID_LED_CONTROL;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 24];
-    this.array_len_map = [0, 0, 0, 0, 0, 24];
     this.crc_extra = 72;
-    this._name = 'LED_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LED_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'instance', 'pattern', 'custom_len', 'custom_bytes'];
 
-}
 
-mavlink20.messages.led_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.led_control.prototype = new mavlink20.message();
 mavlink20.messages.led_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.instance, this.pattern, this.custom_len, this.custom_bytes];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.instance, this.pattern, this.custom_len, this.custom_bytes]));
 }
-
 
 /* 
 Reports progress of compass calibration.
@@ -5380,32 +5054,24 @@ Reports progress of compass calibration.
                 direction_z               : Body frame direction vector for display. (float)
 
 */
-    mavlink20.messages.mag_cal_progress = function( ...moreargs ) {
-    [ this.compass_id , this.cal_mask , this.cal_status , this.attempt , this.completion_pct , this.completion_mask , this.direction_x , this.direction_y , this.direction_z ] = moreargs;
+mavlink20.messages.mag_cal_progress = function(compass_id, cal_mask, cal_status, attempt, completion_pct, completion_mask, direction_x, direction_y, direction_z) {
 
-    this._format = '<fffBBBBB10s';
-    this._id = mavlink20.MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
+    this.format = '<fffBBBBB10s';
+    this.id = mavlink20.MAVLINK_MSG_ID_MAG_CAL_PROGRESS;
     this.order_map = [3, 4, 5, 6, 7, 8, 0, 1, 2];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 10];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 10];
     this.crc_extra = 92;
-    this._name = 'MAG_CAL_PROGRESS';
-
-    this._instance_field = 'compass_id';
-    this._instance_offset = 12;
+    this.name = 'MAG_CAL_PROGRESS';
 
     this.fieldnames = ['compass_id', 'cal_mask', 'cal_status', 'attempt', 'completion_pct', 'completion_mask', 'direction_x', 'direction_y', 'direction_z'];
 
-}
 
-mavlink20.messages.mag_cal_progress.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mag_cal_progress.prototype = new mavlink20.message();
 mavlink20.messages.mag_cal_progress.prototype.pack = function(mav) {
-    var orderedfields = [ this.direction_x, this.direction_y, this.direction_z, this.compass_id, this.cal_mask, this.cal_status, this.attempt, this.completion_pct, this.completion_mask];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.direction_x, this.direction_y, this.direction_z, this.compass_id, this.cal_mask, this.cal_status, this.attempt, this.completion_pct, this.completion_mask]));
 }
-
 
 /* 
 EKF Status message including flags and variances.
@@ -5419,32 +5085,24 @@ EKF Status message including flags and variances.
                 airspeed_variance         : Airspeed variance. (float)
 
 */
-    mavlink20.messages.ekf_status_report = function( ...moreargs ) {
-    [ this.flags , this.velocity_variance , this.pos_horiz_variance , this.pos_vert_variance , this.compass_variance , this.terrain_alt_variance , this.airspeed_variance ] = moreargs;
+mavlink20.messages.ekf_status_report = function(flags, velocity_variance, pos_horiz_variance, pos_vert_variance, compass_variance, terrain_alt_variance, airspeed_variance) {
 
-    this._format = '<fffffHf';
-    this._id = mavlink20.MAVLINK_MSG_ID_EKF_STATUS_REPORT;
+    this.format = '<fffffHf';
+    this.id = mavlink20.MAVLINK_MSG_ID_EKF_STATUS_REPORT;
     this.order_map = [5, 0, 1, 2, 3, 4, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 71;
-    this._name = 'EKF_STATUS_REPORT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'EKF_STATUS_REPORT';
 
     this.fieldnames = ['flags', 'velocity_variance', 'pos_horiz_variance', 'pos_vert_variance', 'compass_variance', 'terrain_alt_variance', 'airspeed_variance'];
 
-}
 
-mavlink20.messages.ekf_status_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ekf_status_report.prototype = new mavlink20.message();
 mavlink20.messages.ekf_status_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.velocity_variance, this.pos_horiz_variance, this.pos_vert_variance, this.compass_variance, this.terrain_alt_variance, this.flags, this.airspeed_variance];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.velocity_variance, this.pos_horiz_variance, this.pos_vert_variance, this.compass_variance, this.terrain_alt_variance, this.flags, this.airspeed_variance]));
 }
-
 
 /* 
 PID tuning information.
@@ -5460,32 +5118,24 @@ PID tuning information.
                 PDmod                     : P/D oscillation modifier. (float)
 
 */
-    mavlink20.messages.pid_tuning = function( ...moreargs ) {
-    [ this.axis , this.desired , this.achieved , this.FF , this.P , this.I , this.D , this.SRate , this.PDmod ] = moreargs;
+mavlink20.messages.pid_tuning = function(axis, desired, achieved, FF, P, I, D, SRate, PDmod) {
 
-    this._format = '<ffffffBff';
-    this._id = mavlink20.MAVLINK_MSG_ID_PID_TUNING;
+    this.format = '<ffffffBff';
+    this.id = mavlink20.MAVLINK_MSG_ID_PID_TUNING;
     this.order_map = [6, 0, 1, 2, 3, 4, 5, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 98;
-    this._name = 'PID_TUNING';
-
-    this._instance_field = 'axis';
-    this._instance_offset = 24;
+    this.name = 'PID_TUNING';
 
     this.fieldnames = ['axis', 'desired', 'achieved', 'FF', 'P', 'I', 'D', 'SRate', 'PDmod'];
 
-}
 
-mavlink20.messages.pid_tuning.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.pid_tuning.prototype = new mavlink20.message();
 mavlink20.messages.pid_tuning.prototype.pack = function(mav) {
-    var orderedfields = [ this.desired, this.achieved, this.FF, this.P, this.I, this.D, this.axis, this.SRate, this.PDmod];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.desired, this.achieved, this.FF, this.P, this.I, this.D, this.axis, this.SRate, this.PDmod]));
 }
-
 
 /* 
 Deepstall path planning.
@@ -5502,32 +5152,24 @@ Deepstall path planning.
                 stage                     : Deepstall stage. (uint8_t)
 
 */
-    mavlink20.messages.deepstall = function( ...moreargs ) {
-    [ this.landing_lat , this.landing_lon , this.path_lat , this.path_lon , this.arc_entry_lat , this.arc_entry_lon , this.altitude , this.expected_travel_distance , this.cross_track_error , this.stage ] = moreargs;
+mavlink20.messages.deepstall = function(landing_lat, landing_lon, path_lat, path_lon, arc_entry_lat, arc_entry_lon, altitude, expected_travel_distance, cross_track_error, stage) {
 
-    this._format = '<iiiiiifffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEEPSTALL;
+    this.format = '<iiiiiifffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEEPSTALL;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 120;
-    this._name = 'DEEPSTALL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEEPSTALL';
 
     this.fieldnames = ['landing_lat', 'landing_lon', 'path_lat', 'path_lon', 'arc_entry_lat', 'arc_entry_lon', 'altitude', 'expected_travel_distance', 'cross_track_error', 'stage'];
 
-}
 
-mavlink20.messages.deepstall.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.deepstall.prototype = new mavlink20.message();
 mavlink20.messages.deepstall.prototype.pack = function(mav) {
-    var orderedfields = [ this.landing_lat, this.landing_lon, this.path_lat, this.path_lon, this.arc_entry_lat, this.arc_entry_lon, this.altitude, this.expected_travel_distance, this.cross_track_error, this.stage];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.landing_lat, this.landing_lon, this.path_lat, this.path_lon, this.arc_entry_lat, this.arc_entry_lon, this.altitude, this.expected_travel_distance, this.cross_track_error, this.stage]));
 }
-
 
 /* 
 3 axis gimbal measurements.
@@ -5546,32 +5188,24 @@ mavlink20.messages.deepstall.prototype.pack = function(mav) {
                 joint_az                  : Joint AZ. (float)
 
 */
-    mavlink20.messages.gimbal_report = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.delta_time , this.delta_angle_x , this.delta_angle_y , this.delta_angle_z , this.delta_velocity_x , this.delta_velocity_y , this.delta_velocity_z , this.joint_roll , this.joint_el , this.joint_az ] = moreargs;
+mavlink20.messages.gimbal_report = function(target_system, target_component, delta_time, delta_angle_x, delta_angle_y, delta_angle_z, delta_velocity_x, delta_velocity_y, delta_velocity_z, joint_roll, joint_el, joint_az) {
 
-    this._format = '<ffffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_REPORT;
+    this.format = '<ffffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_REPORT;
     this.order_map = [10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 134;
-    this._name = 'GIMBAL_REPORT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_REPORT';
 
     this.fieldnames = ['target_system', 'target_component', 'delta_time', 'delta_angle_x', 'delta_angle_y', 'delta_angle_z', 'delta_velocity_x', 'delta_velocity_y', 'delta_velocity_z', 'joint_roll', 'joint_el', 'joint_az'];
 
-}
 
-mavlink20.messages.gimbal_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_report.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.delta_time, this.delta_angle_x, this.delta_angle_y, this.delta_angle_z, this.delta_velocity_x, this.delta_velocity_y, this.delta_velocity_z, this.joint_roll, this.joint_el, this.joint_az, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.delta_time, this.delta_angle_x, this.delta_angle_y, this.delta_angle_z, this.delta_velocity_x, this.delta_velocity_y, this.delta_velocity_z, this.joint_roll, this.joint_el, this.joint_az, this.target_system, this.target_component]));
 }
-
 
 /* 
 Control message for rate gimbal.
@@ -5583,32 +5217,24 @@ Control message for rate gimbal.
                 demanded_rate_z           : Demanded angular rate Z. (float)
 
 */
-    mavlink20.messages.gimbal_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.demanded_rate_x , this.demanded_rate_y , this.demanded_rate_z ] = moreargs;
+mavlink20.messages.gimbal_control = function(target_system, target_component, demanded_rate_x, demanded_rate_y, demanded_rate_z) {
 
-    this._format = '<fffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_CONTROL;
+    this.format = '<fffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_CONTROL;
     this.order_map = [3, 4, 0, 1, 2];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 205;
-    this._name = 'GIMBAL_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'demanded_rate_x', 'demanded_rate_y', 'demanded_rate_z'];
 
-}
 
-mavlink20.messages.gimbal_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_control.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.demanded_rate_x, this.demanded_rate_y, this.demanded_rate_z, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.demanded_rate_x, this.demanded_rate_y, this.demanded_rate_z, this.target_system, this.target_component]));
 }
-
 
 /* 
 100 Hz gimbal torque command telemetry.
@@ -5620,32 +5246,24 @@ mavlink20.messages.gimbal_control.prototype.pack = function(mav) {
                 az_torque_cmd             : Azimuth Torque Command. (int16_t)
 
 */
-    mavlink20.messages.gimbal_torque_cmd_report = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.rl_torque_cmd , this.el_torque_cmd , this.az_torque_cmd ] = moreargs;
+mavlink20.messages.gimbal_torque_cmd_report = function(target_system, target_component, rl_torque_cmd, el_torque_cmd, az_torque_cmd) {
 
-    this._format = '<hhhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
+    this.format = '<hhhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_TORQUE_CMD_REPORT;
     this.order_map = [3, 4, 0, 1, 2];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 69;
-    this._name = 'GIMBAL_TORQUE_CMD_REPORT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_TORQUE_CMD_REPORT';
 
     this.fieldnames = ['target_system', 'target_component', 'rl_torque_cmd', 'el_torque_cmd', 'az_torque_cmd'];
 
-}
 
-mavlink20.messages.gimbal_torque_cmd_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_torque_cmd_report.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_torque_cmd_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.rl_torque_cmd, this.el_torque_cmd, this.az_torque_cmd, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rl_torque_cmd, this.el_torque_cmd, this.az_torque_cmd, this.target_system, this.target_component]));
 }
-
 
 /* 
 Heartbeat from a HeroBus attached GoPro.
@@ -5655,32 +5273,24 @@ Heartbeat from a HeroBus attached GoPro.
                 flags                     : Additional status bits. (uint8_t)
 
 */
-    mavlink20.messages.gopro_heartbeat = function( ...moreargs ) {
-    [ this.status , this.capture_mode , this.flags ] = moreargs;
+mavlink20.messages.gopro_heartbeat = function(status, capture_mode, flags) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GOPRO_HEARTBEAT;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 101;
-    this._name = 'GOPRO_HEARTBEAT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GOPRO_HEARTBEAT';
 
     this.fieldnames = ['status', 'capture_mode', 'flags'];
 
-}
 
-mavlink20.messages.gopro_heartbeat.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gopro_heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.gopro_heartbeat.prototype.pack = function(mav) {
-    var orderedfields = [ this.status, this.capture_mode, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.capture_mode, this.flags]));
 }
-
 
 /* 
 Request a GOPRO_COMMAND response from the GoPro.
@@ -5690,32 +5300,24 @@ Request a GOPRO_COMMAND response from the GoPro.
                 cmd_id                    : Command ID. (uint8_t)
 
 */
-    mavlink20.messages.gopro_get_request = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.cmd_id ] = moreargs;
+mavlink20.messages.gopro_get_request = function(target_system, target_component, cmd_id) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GOPRO_GET_REQUEST;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 50;
-    this._name = 'GOPRO_GET_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GOPRO_GET_REQUEST';
 
     this.fieldnames = ['target_system', 'target_component', 'cmd_id'];
 
-}
 
-mavlink20.messages.gopro_get_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gopro_get_request.prototype = new mavlink20.message();
 mavlink20.messages.gopro_get_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.cmd_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id]));
 }
-
 
 /* 
 Response from a GOPRO_COMMAND get request.
@@ -5725,32 +5327,24 @@ Response from a GOPRO_COMMAND get request.
                 value                     : Value. (uint8_t)
 
 */
-    mavlink20.messages.gopro_get_response = function( ...moreargs ) {
-    [ this.cmd_id , this.status , this.value ] = moreargs;
+mavlink20.messages.gopro_get_response = function(cmd_id, status, value) {
 
-    this._format = '<BB4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE;
+    this.format = '<BB4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_GOPRO_GET_RESPONSE;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 4];
-    this.array_len_map = [0, 0, 4];
     this.crc_extra = 202;
-    this._name = 'GOPRO_GET_RESPONSE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GOPRO_GET_RESPONSE';
 
     this.fieldnames = ['cmd_id', 'status', 'value'];
 
-}
 
-mavlink20.messages.gopro_get_response.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gopro_get_response.prototype = new mavlink20.message();
 mavlink20.messages.gopro_get_response.prototype.pack = function(mav) {
-    var orderedfields = [ this.cmd_id, this.status, this.value];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.cmd_id, this.status, this.value]));
 }
-
 
 /* 
 Request to set a GOPRO_COMMAND with a desired.
@@ -5761,32 +5355,24 @@ Request to set a GOPRO_COMMAND with a desired.
                 value                     : Value. (uint8_t)
 
 */
-    mavlink20.messages.gopro_set_request = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.cmd_id , this.value ] = moreargs;
+mavlink20.messages.gopro_set_request = function(target_system, target_component, cmd_id, value) {
 
-    this._format = '<BBB4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
+    this.format = '<BBB4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_GOPRO_SET_REQUEST;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 4];
-    this.array_len_map = [0, 0, 0, 4];
     this.crc_extra = 17;
-    this._name = 'GOPRO_SET_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GOPRO_SET_REQUEST';
 
     this.fieldnames = ['target_system', 'target_component', 'cmd_id', 'value'];
 
-}
 
-mavlink20.messages.gopro_set_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gopro_set_request.prototype = new mavlink20.message();
 mavlink20.messages.gopro_set_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.cmd_id, this.value];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id, this.value]));
 }
-
 
 /* 
 Response from a GOPRO_COMMAND set request.
@@ -5795,32 +5381,24 @@ Response from a GOPRO_COMMAND set request.
                 status                    : Status. (uint8_t)
 
 */
-    mavlink20.messages.gopro_set_response = function( ...moreargs ) {
-    [ this.cmd_id , this.status ] = moreargs;
+mavlink20.messages.gopro_set_response = function(cmd_id, status) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GOPRO_SET_RESPONSE;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 162;
-    this._name = 'GOPRO_SET_RESPONSE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GOPRO_SET_RESPONSE';
 
     this.fieldnames = ['cmd_id', 'status'];
 
-}
 
-mavlink20.messages.gopro_set_response.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gopro_set_response.prototype = new mavlink20.message();
 mavlink20.messages.gopro_set_response.prototype.pack = function(mav) {
-    var orderedfields = [ this.cmd_id, this.status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.cmd_id, this.status]));
 }
-
 
 /* 
 RPM sensor output.
@@ -5829,32 +5407,24 @@ RPM sensor output.
                 rpm2                      : RPM Sensor2. (float)
 
 */
-    mavlink20.messages.rpm = function( ...moreargs ) {
-    [ this.rpm1 , this.rpm2 ] = moreargs;
+mavlink20.messages.rpm = function(rpm1, rpm2) {
 
-    this._format = '<ff';
-    this._id = mavlink20.MAVLINK_MSG_ID_RPM;
+    this.format = '<ff';
+    this.id = mavlink20.MAVLINK_MSG_ID_RPM;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 207;
-    this._name = 'RPM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RPM';
 
     this.fieldnames = ['rpm1', 'rpm2'];
 
-}
 
-mavlink20.messages.rpm.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rpm.prototype = new mavlink20.message();
 mavlink20.messages.rpm.prototype.pack = function(mav) {
-    var orderedfields = [ this.rpm1, this.rpm2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rpm1, this.rpm2]));
 }
-
 
 /* 
 Read registers for a device.
@@ -5871,32 +5441,24 @@ Read registers for a device.
                 bank                      : Bank number. (uint8_t)
 
 */
-    mavlink20.messages.device_op_read = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.request_id , this.bustype , this.bus , this.address , this.busname , this.regstart , this.count , this.bank ] = moreargs;
+mavlink20.messages.device_op_read = function(target_system, target_component, request_id, bustype, bus, address, busname, regstart, count, bank) {
 
-    this._format = '<IBBBBB40sBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_READ;
+    this.format = '<IBBBBB40sBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_READ;
     this.order_map = [1, 2, 0, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 40, 0, 0, 0];
     this.crc_extra = 134;
-    this._name = 'DEVICE_OP_READ';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEVICE_OP_READ';
 
     this.fieldnames = ['target_system', 'target_component', 'request_id', 'bustype', 'bus', 'address', 'busname', 'regstart', 'count', 'bank'];
 
-}
 
-mavlink20.messages.device_op_read.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.device_op_read.prototype = new mavlink20.message();
 mavlink20.messages.device_op_read.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.bank];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.bank]));
 }
-
 
 /* 
 Read registers reply.
@@ -5909,32 +5471,24 @@ Read registers reply.
                 bank                      : Bank number. (uint8_t)
 
 */
-    mavlink20.messages.device_op_read_reply = function( ...moreargs ) {
-    [ this.request_id , this.result , this.regstart , this.count , this.data , this.bank ] = moreargs;
+mavlink20.messages.device_op_read_reply = function(request_id, result, regstart, count, data, bank) {
 
-    this._format = '<IBBB128sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY;
+    this.format = '<IBBB128sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_READ_REPLY;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 128, 1];
-    this.array_len_map = [0, 0, 0, 0, 128, 0];
     this.crc_extra = 15;
-    this._name = 'DEVICE_OP_READ_REPLY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEVICE_OP_READ_REPLY';
 
     this.fieldnames = ['request_id', 'result', 'regstart', 'count', 'data', 'bank'];
 
-}
 
-mavlink20.messages.device_op_read_reply.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.device_op_read_reply.prototype = new mavlink20.message();
 mavlink20.messages.device_op_read_reply.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.result, this.regstart, this.count, this.data, this.bank];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result, this.regstart, this.count, this.data, this.bank]));
 }
-
 
 /* 
 Write registers for a device.
@@ -5952,32 +5506,24 @@ Write registers for a device.
                 bank                      : Bank number. (uint8_t)
 
 */
-    mavlink20.messages.device_op_write = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.request_id , this.bustype , this.bus , this.address , this.busname , this.regstart , this.count , this.data , this.bank ] = moreargs;
+mavlink20.messages.device_op_write = function(target_system, target_component, request_id, bustype, bus, address, busname, regstart, count, data, bank) {
 
-    this._format = '<IBBBBB40sBB128sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_WRITE;
+    this.format = '<IBBBBB40sBB128sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_WRITE;
     this.order_map = [1, 2, 0, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 128, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 40, 0, 0, 128, 0];
     this.crc_extra = 234;
-    this._name = 'DEVICE_OP_WRITE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEVICE_OP_WRITE';
 
     this.fieldnames = ['target_system', 'target_component', 'request_id', 'bustype', 'bus', 'address', 'busname', 'regstart', 'count', 'data', 'bank'];
 
-}
 
-mavlink20.messages.device_op_write.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.device_op_write.prototype = new mavlink20.message();
 mavlink20.messages.device_op_write.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.data, this.bank];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.data, this.bank]));
 }
-
 
 /* 
 Write registers reply.
@@ -5986,32 +5532,24 @@ Write registers reply.
                 result                    : 0 for success, anything else is failure code. (uint8_t)
 
 */
-    mavlink20.messages.device_op_write_reply = function( ...moreargs ) {
-    [ this.request_id , this.result ] = moreargs;
+mavlink20.messages.device_op_write_reply = function(request_id, result) {
 
-    this._format = '<IB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_WRITE_REPLY;
+    this.format = '<IB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEVICE_OP_WRITE_REPLY;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 64;
-    this._name = 'DEVICE_OP_WRITE_REPLY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEVICE_OP_WRITE_REPLY';
 
     this.fieldnames = ['request_id', 'result'];
 
-}
 
-mavlink20.messages.device_op_write_reply.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.device_op_write_reply.prototype = new mavlink20.message();
 mavlink20.messages.device_op_write_reply.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.result];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result]));
 }
-
 
 /* 
 Send a secure command. Data should be signed with a private key
@@ -6032,32 +5570,24 @@ The format of the data is command specific.
                 data                      : Signed data. (uint8_t)
 
 */
-    mavlink20.messages.secure_command = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.sequence , this.operation , this.data_length , this.sig_length , this.data ] = moreargs;
+mavlink20.messages.secure_command = function(target_system, target_component, sequence, operation, data_length, sig_length, data) {
 
-    this._format = '<IIBBBB220s';
-    this._id = mavlink20.MAVLINK_MSG_ID_SECURE_COMMAND;
+    this.format = '<IIBBBB220s';
+    this.id = mavlink20.MAVLINK_MSG_ID_SECURE_COMMAND;
     this.order_map = [2, 3, 0, 1, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 220];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 220];
     this.crc_extra = 11;
-    this._name = 'SECURE_COMMAND';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SECURE_COMMAND';
 
     this.fieldnames = ['target_system', 'target_component', 'sequence', 'operation', 'data_length', 'sig_length', 'data'];
 
-}
 
-mavlink20.messages.secure_command.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.secure_command.prototype = new mavlink20.message();
 mavlink20.messages.secure_command.prototype.pack = function(mav) {
-    var orderedfields = [ this.sequence, this.operation, this.target_system, this.target_component, this.data_length, this.sig_length, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.operation, this.target_system, this.target_component, this.data_length, this.sig_length, this.data]));
 }
-
 
 /* 
 Reply from secure command.
@@ -6069,32 +5599,24 @@ Reply from secure command.
                 data                      : Reply data. (uint8_t)
 
 */
-    mavlink20.messages.secure_command_reply = function( ...moreargs ) {
-    [ this.sequence , this.operation , this.result , this.data_length , this.data ] = moreargs;
+mavlink20.messages.secure_command_reply = function(sequence, operation, result, data_length, data) {
 
-    this._format = '<IIBB220s';
-    this._id = mavlink20.MAVLINK_MSG_ID_SECURE_COMMAND_REPLY;
+    this.format = '<IIBB220s';
+    this.id = mavlink20.MAVLINK_MSG_ID_SECURE_COMMAND_REPLY;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 220];
-    this.array_len_map = [0, 0, 0, 0, 220];
     this.crc_extra = 93;
-    this._name = 'SECURE_COMMAND_REPLY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SECURE_COMMAND_REPLY';
 
     this.fieldnames = ['sequence', 'operation', 'result', 'data_length', 'data'];
 
-}
 
-mavlink20.messages.secure_command_reply.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.secure_command_reply.prototype = new mavlink20.message();
 mavlink20.messages.secure_command_reply.prototype.pack = function(mav) {
-    var orderedfields = [ this.sequence, this.operation, this.result, this.data_length, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.operation, this.result, this.data_length, this.data]));
 }
-
 
 /* 
 Adaptive Controller tuning information.
@@ -6114,32 +5636,24 @@ Adaptive Controller tuning information.
                 u                         : u adaptive controlled output command. (float)
 
 */
-    mavlink20.messages.adap_tuning = function( ...moreargs ) {
-    [ this.axis , this.desired , this.achieved , this.error , this.theta , this.omega , this.sigma , this.theta_dot , this.omega_dot , this.sigma_dot , this.f , this.f_dot , this.u ] = moreargs;
+mavlink20.messages.adap_tuning = function(axis, desired, achieved, error, theta, omega, sigma, theta_dot, omega_dot, sigma_dot, f, f_dot, u) {
 
-    this._format = '<ffffffffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ADAP_TUNING;
+    this.format = '<ffffffffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ADAP_TUNING;
     this.order_map = [12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 46;
-    this._name = 'ADAP_TUNING';
-
-    this._instance_field = 'axis';
-    this._instance_offset = 48;
+    this.name = 'ADAP_TUNING';
 
     this.fieldnames = ['axis', 'desired', 'achieved', 'error', 'theta', 'omega', 'sigma', 'theta_dot', 'omega_dot', 'sigma_dot', 'f', 'f_dot', 'u'];
 
-}
 
-mavlink20.messages.adap_tuning.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.adap_tuning.prototype = new mavlink20.message();
 mavlink20.messages.adap_tuning.prototype.pack = function(mav) {
-    var orderedfields = [ this.desired, this.achieved, this.error, this.theta, this.omega, this.sigma, this.theta_dot, this.omega_dot, this.sigma_dot, this.f, this.f_dot, this.u, this.axis];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.desired, this.achieved, this.error, this.theta, this.omega, this.sigma, this.theta_dot, this.omega_dot, this.sigma_dot, this.f, this.f_dot, this.u, this.axis]));
 }
-
 
 /* 
 Camera vision based attitude and position deltas.
@@ -6151,32 +5665,24 @@ Camera vision based attitude and position deltas.
                 confidence                : Normalised confidence value from 0 to 100. (float)
 
 */
-    mavlink20.messages.vision_position_delta = function( ...moreargs ) {
-    [ this.time_usec , this.time_delta_usec , this.angle_delta , this.position_delta , this.confidence ] = moreargs;
+mavlink20.messages.vision_position_delta = function(time_usec, time_delta_usec, angle_delta, position_delta, confidence) {
 
-    this._format = '<QQ3f3ff';
-    this._id = mavlink20.MAVLINK_MSG_ID_VISION_POSITION_DELTA;
+    this.format = '<QQ3f3ff';
+    this.id = mavlink20.MAVLINK_MSG_ID_VISION_POSITION_DELTA;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 3, 3, 1];
-    this.array_len_map = [0, 0, 3, 3, 0];
     this.crc_extra = 106;
-    this._name = 'VISION_POSITION_DELTA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VISION_POSITION_DELTA';
 
     this.fieldnames = ['time_usec', 'time_delta_usec', 'angle_delta', 'position_delta', 'confidence'];
 
-}
 
-mavlink20.messages.vision_position_delta.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vision_position_delta.prototype = new mavlink20.message();
 mavlink20.messages.vision_position_delta.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.time_delta_usec, this.angle_delta, this.position_delta, this.confidence];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.time_delta_usec, this.angle_delta, this.position_delta, this.confidence]));
 }
-
 
 /* 
 Angle of Attack and Side Slip Angle.
@@ -6186,32 +5692,24 @@ Angle of Attack and Side Slip Angle.
                 SSA                       : Side Slip Angle. (float)
 
 */
-    mavlink20.messages.aoa_ssa = function( ...moreargs ) {
-    [ this.time_usec , this.AOA , this.SSA ] = moreargs;
+mavlink20.messages.aoa_ssa = function(time_usec, AOA, SSA) {
 
-    this._format = '<Qff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AOA_SSA;
+    this.format = '<Qff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AOA_SSA;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 205;
-    this._name = 'AOA_SSA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AOA_SSA';
 
     this.fieldnames = ['time_usec', 'AOA', 'SSA'];
 
-}
 
-mavlink20.messages.aoa_ssa.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.aoa_ssa.prototype = new mavlink20.message();
 mavlink20.messages.aoa_ssa.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.AOA, this.SSA];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.AOA, this.SSA]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 1 to 4, matching data sent by BLHeli ESCs.
@@ -6224,32 +5722,24 @@ ESC Telemetry Data for ESCs 1 to 4, matching data sent by BLHeli ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_1_to_4 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_1_to_4 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_1_TO_4;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 144;
-    this._name = 'ESC_TELEMETRY_1_TO_4';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_1_TO_4';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_1_to_4.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_1_to_4.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_1_to_4.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 5 to 8, matching data sent by BLHeli ESCs.
@@ -6262,32 +5752,24 @@ ESC Telemetry Data for ESCs 5 to 8, matching data sent by BLHeli ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_5_to_8 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_5_to_8 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_5_TO_8;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_5_TO_8;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 133;
-    this._name = 'ESC_TELEMETRY_5_TO_8';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_5_TO_8';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_5_to_8.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_5_to_8.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_5_to_8.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 9 to 12, matching data sent by BLHeli
@@ -6301,32 +5783,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_9_to_12 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_9_to_12 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_9_TO_12;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_9_TO_12;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 85;
-    this._name = 'ESC_TELEMETRY_9_TO_12';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_9_TO_12';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_9_to_12.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_9_to_12.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_9_to_12.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 Configure an OSD parameter slot.
@@ -6343,32 +5817,24 @@ Configure an OSD parameter slot.
                 increment                 : OSD parameter increment. (float)
 
 */
-    mavlink20.messages.osd_param_config = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.request_id , this.osd_screen , this.osd_index , this.param_id , this.config_type , this.min_value , this.max_value , this.increment ] = moreargs;
+mavlink20.messages.osd_param_config = function(target_system, target_component, request_id, osd_screen, osd_index, param_id, config_type, min_value, max_value, increment) {
 
-    this._format = '<IfffBBBB16sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_CONFIG;
+    this.format = '<IfffBBBB16sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_CONFIG;
     this.order_map = [4, 5, 0, 6, 7, 8, 9, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 16, 0];
     this.crc_extra = 195;
-    this._name = 'OSD_PARAM_CONFIG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OSD_PARAM_CONFIG';
 
     this.fieldnames = ['target_system', 'target_component', 'request_id', 'osd_screen', 'osd_index', 'param_id', 'config_type', 'min_value', 'max_value', 'increment'];
 
-}
 
-mavlink20.messages.osd_param_config.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.osd_param_config.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_config.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.min_value, this.max_value, this.increment, this.target_system, this.target_component, this.osd_screen, this.osd_index, this.param_id, this.config_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.target_system, this.target_component, this.osd_screen, this.osd_index, this.param_id, this.config_type]));
 }
-
 
 /* 
 Configure OSD parameter reply.
@@ -6377,32 +5843,24 @@ Configure OSD parameter reply.
                 result                    : Config error type. (uint8_t)
 
 */
-    mavlink20.messages.osd_param_config_reply = function( ...moreargs ) {
-    [ this.request_id , this.result ] = moreargs;
+mavlink20.messages.osd_param_config_reply = function(request_id, result) {
 
-    this._format = '<IB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_CONFIG_REPLY;
+    this.format = '<IB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_CONFIG_REPLY;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 79;
-    this._name = 'OSD_PARAM_CONFIG_REPLY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OSD_PARAM_CONFIG_REPLY';
 
     this.fieldnames = ['request_id', 'result'];
 
-}
 
-mavlink20.messages.osd_param_config_reply.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.osd_param_config_reply.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_config_reply.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.result];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result]));
 }
-
 
 /* 
 Read a configured an OSD parameter slot.
@@ -6414,32 +5872,24 @@ Read a configured an OSD parameter slot.
                 osd_index                 : OSD parameter display index. (uint8_t)
 
 */
-    mavlink20.messages.osd_param_show_config = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.request_id , this.osd_screen , this.osd_index ] = moreargs;
+mavlink20.messages.osd_param_show_config = function(target_system, target_component, request_id, osd_screen, osd_index) {
 
-    this._format = '<IBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG;
+    this.format = '<IBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG;
     this.order_map = [1, 2, 0, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 128;
-    this._name = 'OSD_PARAM_SHOW_CONFIG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OSD_PARAM_SHOW_CONFIG';
 
     this.fieldnames = ['target_system', 'target_component', 'request_id', 'osd_screen', 'osd_index'];
 
-}
 
-mavlink20.messages.osd_param_show_config.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.osd_param_show_config.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_show_config.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.target_system, this.target_component, this.osd_screen, this.osd_index];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.osd_screen, this.osd_index]));
 }
-
 
 /* 
 Read configured OSD parameter reply.
@@ -6453,32 +5903,24 @@ Read configured OSD parameter reply.
                 increment                 : OSD parameter increment. (float)
 
 */
-    mavlink20.messages.osd_param_show_config_reply = function( ...moreargs ) {
-    [ this.request_id , this.result , this.param_id , this.config_type , this.min_value , this.max_value , this.increment ] = moreargs;
+mavlink20.messages.osd_param_show_config_reply = function(request_id, result, param_id, config_type, min_value, max_value, increment) {
 
-    this._format = '<IfffB16sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG_REPLY;
+    this.format = '<IfffB16sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OSD_PARAM_SHOW_CONFIG_REPLY;
     this.order_map = [0, 4, 5, 6, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 16, 0];
     this.crc_extra = 177;
-    this._name = 'OSD_PARAM_SHOW_CONFIG_REPLY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OSD_PARAM_SHOW_CONFIG_REPLY';
 
     this.fieldnames = ['request_id', 'result', 'param_id', 'config_type', 'min_value', 'max_value', 'increment'];
 
-}
 
-mavlink20.messages.osd_param_show_config_reply.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.osd_param_show_config_reply.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_show_config_reply.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.min_value, this.max_value, this.increment, this.result, this.param_id, this.config_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.result, this.param_id, this.config_type]));
 }
-
 
 /* 
 Obstacle located as a 3D vector.
@@ -6494,32 +5936,24 @@ Obstacle located as a 3D vector.
                 max_distance              : Maximum distance the sensor can measure. (float)
 
 */
-    mavlink20.messages.obstacle_distance_3d = function( ...moreargs ) {
-    [ this.time_boot_ms , this.sensor_type , this.frame , this.obstacle_id , this.x , this.y , this.z , this.min_distance , this.max_distance ] = moreargs;
+mavlink20.messages.obstacle_distance_3d = function(time_boot_ms, sensor_type, frame, obstacle_id, x, y, z, min_distance, max_distance) {
 
-    this._format = '<IfffffHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OBSTACLE_DISTANCE_3D;
+    this.format = '<IfffffHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OBSTACLE_DISTANCE_3D;
     this.order_map = [0, 7, 8, 6, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 130;
-    this._name = 'OBSTACLE_DISTANCE_3D';
-
-    this._instance_field = 'obstacle_id';
-    this._instance_offset = 24;
+    this.name = 'OBSTACLE_DISTANCE_3D';
 
     this.fieldnames = ['time_boot_ms', 'sensor_type', 'frame', 'obstacle_id', 'x', 'y', 'z', 'min_distance', 'max_distance'];
 
-}
 
-mavlink20.messages.obstacle_distance_3d.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.obstacle_distance_3d.prototype = new mavlink20.message();
 mavlink20.messages.obstacle_distance_3d.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.x, this.y, this.z, this.min_distance, this.max_distance, this.obstacle_id, this.sensor_type, this.frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.min_distance, this.max_distance, this.obstacle_id, this.sensor_type, this.frame]));
 }
-
 
 /* 
 Water depth
@@ -6537,32 +5971,24 @@ Water depth
                 temperature               : Water temperature (float)
 
 */
-    mavlink20.messages.water_depth = function( ...moreargs ) {
-    [ this.time_boot_ms , this.id , this.healthy , this.lat , this.lng , this.alt , this.roll , this.pitch , this.yaw , this.distance , this.temperature ] = moreargs;
+mavlink20.messages.water_depth = function(time_boot_ms, id, healthy, lat, lng, alt, roll, pitch, yaw, distance, temperature) {
 
-    this._format = '<IiiffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_WATER_DEPTH;
+    this.format = '<IiiffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_WATER_DEPTH;
     this.order_map = [0, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 47;
-    this._name = 'WATER_DEPTH';
-
-    this._instance_field = 'id';
-    this._instance_offset = 36;
+    this.name = 'WATER_DEPTH';
 
     this.fieldnames = ['time_boot_ms', 'id', 'healthy', 'lat', 'lng', 'alt', 'roll', 'pitch', 'yaw', 'distance', 'temperature'];
 
-}
 
-mavlink20.messages.water_depth.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.water_depth.prototype = new mavlink20.message();
 mavlink20.messages.water_depth.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat, this.lng, this.alt, this.roll, this.pitch, this.yaw, this.distance, this.temperature, this.id, this.healthy];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lng, this.alt, this.roll, this.pitch, this.yaw, this.distance, this.temperature, this.id, this.healthy]));
 }
-
 
 /* 
 The MCU status, giving MCU temperature and voltage. The min and max
@@ -6575,32 +6001,24 @@ voltages are to allow for detecting power supply instability.
                 MCU_voltage_max           : MCU voltage maximum (uint16_t)
 
 */
-    mavlink20.messages.mcu_status = function( ...moreargs ) {
-    [ this.id , this.MCU_temperature , this.MCU_voltage , this.MCU_voltage_min , this.MCU_voltage_max ] = moreargs;
+mavlink20.messages.mcu_status = function(id, MCU_temperature, MCU_voltage, MCU_voltage_min, MCU_voltage_max) {
 
-    this._format = '<hHHHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MCU_STATUS;
+    this.format = '<hHHHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MCU_STATUS;
     this.order_map = [4, 0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 142;
-    this._name = 'MCU_STATUS';
-
-    this._instance_field = 'id';
-    this._instance_offset = 8;
+    this.name = 'MCU_STATUS';
 
     this.fieldnames = ['id', 'MCU_temperature', 'MCU_voltage', 'MCU_voltage_min', 'MCU_voltage_max'];
 
-}
 
-mavlink20.messages.mcu_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mcu_status.prototype = new mavlink20.message();
 mavlink20.messages.mcu_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.MCU_temperature, this.MCU_voltage, this.MCU_voltage_min, this.MCU_voltage_max, this.id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.MCU_temperature, this.MCU_voltage, this.MCU_voltage_min, this.MCU_voltage_max, this.id]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 13 to 16, matching data sent by BLHeli
@@ -6614,32 +6032,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_13_to_16 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_13_to_16 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_13_TO_16;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_13_TO_16;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 132;
-    this._name = 'ESC_TELEMETRY_13_TO_16';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_13_TO_16';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_13_to_16.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_13_to_16.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_13_to_16.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 17 to 20, matching data sent by BLHeli
@@ -6653,32 +6063,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_17_to_20 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_17_to_20 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_17_TO_20;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_17_TO_20;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 208;
-    this._name = 'ESC_TELEMETRY_17_TO_20';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_17_TO_20';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_17_to_20.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_17_to_20.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_17_to_20.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 21 to 24, matching data sent by BLHeli
@@ -6692,32 +6094,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_21_to_24 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_21_to_24 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_21_TO_24;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_21_TO_24;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 201;
-    this._name = 'ESC_TELEMETRY_21_TO_24';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_21_TO_24';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_21_to_24.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_21_to_24.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_21_to_24.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 25 to 28, matching data sent by BLHeli
@@ -6731,32 +6125,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_25_to_28 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_25_to_28 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_25_TO_28;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_25_TO_28;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 193;
-    this._name = 'ESC_TELEMETRY_25_TO_28';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_25_TO_28';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_25_to_28.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_25_to_28.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_25_to_28.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 ESC Telemetry Data for ESCs 29 to 32, matching data sent by BLHeli
@@ -6770,32 +6156,24 @@ ESCs.
                 count                     : count of telemetry packets received (wraps at 65535). (uint16_t)
 
 */
-    mavlink20.messages.esc_telemetry_29_to_32 = function( ...moreargs ) {
-    [ this.temperature , this.voltage , this.current , this.totalcurrent , this.rpm , this.count ] = moreargs;
+mavlink20.messages.esc_telemetry_29_to_32 = function(temperature, voltage, current, totalcurrent, rpm, count) {
 
-    this._format = '<4H4H4H4H4H4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_29_TO_32;
+    this.format = '<4H4H4H4H4H4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESC_TELEMETRY_29_TO_32;
     this.order_map = [5, 0, 1, 2, 3, 4];
-    this.len_map = [4, 4, 4, 4, 4, 4];
-    this.array_len_map = [4, 4, 4, 4, 4, 4];
     this.crc_extra = 189;
-    this._name = 'ESC_TELEMETRY_29_TO_32';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESC_TELEMETRY_29_TO_32';
 
     this.fieldnames = ['temperature', 'voltage', 'current', 'totalcurrent', 'rpm', 'count'];
 
-}
 
-mavlink20.messages.esc_telemetry_29_to_32.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.esc_telemetry_29_to_32.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_29_to_32.prototype.pack = function(mav) {
-    var orderedfields = [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
-
 
 /* 
 Message encoding a command with parameters as scaled integers and
@@ -6818,32 +6196,24 @@ additional metadata. Scaling depends on the actual command value.
                 z                         : PARAM7 / z position: global: altitude in meters (MSL, WGS84, AGL or relative to home - depending on frame). (float)
 
 */
-    mavlink20.messages.command_int_stamped = function( ...moreargs ) {
-    [ this.utc_time , this.vehicle_timestamp , this.target_system , this.target_component , this.frame , this.command , this.current , this.autocontinue , this.param1 , this.param2 , this.param3 , this.param4 , this.x , this.y , this.z ] = moreargs;
+mavlink20.messages.command_int_stamped = function(utc_time, vehicle_timestamp, target_system, target_component, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z) {
 
-    this._format = '<QIffffiifHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMMAND_INT_STAMPED;
+    this.format = '<QIffffiifHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMMAND_INT_STAMPED;
     this.order_map = [1, 0, 10, 11, 12, 9, 13, 14, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 119;
-    this._name = 'COMMAND_INT_STAMPED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMMAND_INT_STAMPED';
 
     this.fieldnames = ['utc_time', 'vehicle_timestamp', 'target_system', 'target_component', 'frame', 'command', 'current', 'autocontinue', 'param1', 'param2', 'param3', 'param4', 'x', 'y', 'z'];
 
-}
 
-mavlink20.messages.command_int_stamped.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.command_int_stamped.prototype = new mavlink20.message();
 mavlink20.messages.command_int_stamped.prototype.pack = function(mav) {
-    var orderedfields = [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
 }
-
 
 /* 
 Send a command with up to seven parameters to the MAV and additional
@@ -6864,32 +6234,24 @@ metadata
                 param7                    : Parameter 7, as defined by MAV_CMD enum. (float)
 
 */
-    mavlink20.messages.command_long_stamped = function( ...moreargs ) {
-    [ this.utc_time , this.vehicle_timestamp , this.target_system , this.target_component , this.command , this.confirmation , this.param1 , this.param2 , this.param3 , this.param4 , this.param5 , this.param6 , this.param7 ] = moreargs;
+mavlink20.messages.command_long_stamped = function(utc_time, vehicle_timestamp, target_system, target_component, command, confirmation, param1, param2, param3, param4, param5, param6, param7) {
 
-    this._format = '<QIfffffffHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMMAND_LONG_STAMPED;
+    this.format = '<QIfffffffHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMMAND_LONG_STAMPED;
     this.order_map = [1, 0, 10, 11, 9, 12, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 102;
-    this._name = 'COMMAND_LONG_STAMPED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMMAND_LONG_STAMPED';
 
     this.fieldnames = ['utc_time', 'vehicle_timestamp', 'target_system', 'target_component', 'command', 'confirmation', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7'];
 
-}
 
-mavlink20.messages.command_long_stamped.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.command_long_stamped.prototype = new mavlink20.message();
 mavlink20.messages.command_long_stamped.prototype.pack = function(mav) {
-    var orderedfields = [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
 }
-
 
 /* 
 Voltage and current sensor data
@@ -6900,32 +6262,24 @@ Voltage and current sensor data
                 adc121_cs2_amp            : Board current sensor 2 reading (float)
 
 */
-    mavlink20.messages.sens_power = function( ...moreargs ) {
-    [ this.adc121_vspb_volt , this.adc121_cspb_amp , this.adc121_cs1_amp , this.adc121_cs2_amp ] = moreargs;
+mavlink20.messages.sens_power = function(adc121_vspb_volt, adc121_cspb_amp, adc121_cs1_amp, adc121_cs2_amp) {
 
-    this._format = '<ffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENS_POWER;
+    this.format = '<ffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENS_POWER;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 218;
-    this._name = 'SENS_POWER';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENS_POWER';
 
     this.fieldnames = ['adc121_vspb_volt', 'adc121_cspb_amp', 'adc121_cs1_amp', 'adc121_cs2_amp'];
 
-}
 
-mavlink20.messages.sens_power.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sens_power.prototype = new mavlink20.message();
 mavlink20.messages.sens_power.prototype.pack = function(mav) {
-    var orderedfields = [ this.adc121_vspb_volt, this.adc121_cspb_amp, this.adc121_cs1_amp, this.adc121_cs2_amp];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.adc121_vspb_volt, this.adc121_cspb_amp, this.adc121_cs1_amp, this.adc121_cs2_amp]));
 }
-
 
 /* 
 Maximum Power Point Tracker (MPPT) sensor data for solar module power
@@ -6946,32 +6300,24 @@ performance tracking
                 mppt3_status              : MPPT3 status (uint8_t)
 
 */
-    mavlink20.messages.sens_mppt = function( ...moreargs ) {
-    [ this.mppt_timestamp , this.mppt1_volt , this.mppt1_amp , this.mppt1_pwm , this.mppt1_status , this.mppt2_volt , this.mppt2_amp , this.mppt2_pwm , this.mppt2_status , this.mppt3_volt , this.mppt3_amp , this.mppt3_pwm , this.mppt3_status ] = moreargs;
+mavlink20.messages.sens_mppt = function(mppt_timestamp, mppt1_volt, mppt1_amp, mppt1_pwm, mppt1_status, mppt2_volt, mppt2_amp, mppt2_pwm, mppt2_status, mppt3_volt, mppt3_amp, mppt3_pwm, mppt3_status) {
 
-    this._format = '<QffffffHHHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENS_MPPT;
+    this.format = '<QffffffHHHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENS_MPPT;
     this.order_map = [0, 1, 2, 7, 10, 3, 4, 8, 11, 5, 6, 9, 12];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 231;
-    this._name = 'SENS_MPPT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENS_MPPT';
 
     this.fieldnames = ['mppt_timestamp', 'mppt1_volt', 'mppt1_amp', 'mppt1_pwm', 'mppt1_status', 'mppt2_volt', 'mppt2_amp', 'mppt2_pwm', 'mppt2_status', 'mppt3_volt', 'mppt3_amp', 'mppt3_pwm', 'mppt3_status'];
 
-}
 
-mavlink20.messages.sens_mppt.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sens_mppt.prototype = new mavlink20.message();
 mavlink20.messages.sens_mppt.prototype.pack = function(mav) {
-    var orderedfields = [ this.mppt_timestamp, this.mppt1_volt, this.mppt1_amp, this.mppt2_volt, this.mppt2_amp, this.mppt3_volt, this.mppt3_amp, this.mppt1_pwm, this.mppt2_pwm, this.mppt3_pwm, this.mppt1_status, this.mppt2_status, this.mppt3_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mppt_timestamp, this.mppt1_volt, this.mppt1_amp, this.mppt2_volt, this.mppt2_amp, this.mppt3_volt, this.mppt3_amp, this.mppt1_pwm, this.mppt2_pwm, this.mppt3_pwm, this.mppt1_status, this.mppt2_status, this.mppt3_status]));
 }
-
 
 /* 
 ASL-fixed-wing controller data
@@ -7003,32 +6349,24 @@ ASL-fixed-wing controller data
                 uRud                      :  (float)
 
 */
-    mavlink20.messages.aslctrl_data = function( ...moreargs ) {
-    [ this.timestamp , this.aslctrl_mode , this.h , this.hRef , this.hRef_t , this.PitchAngle , this.PitchAngleRef , this.q , this.qRef , this.uElev , this.uThrot , this.uThrot2 , this.nZ , this.AirspeedRef , this.SpoilersEngaged , this.YawAngle , this.YawAngleRef , this.RollAngle , this.RollAngleRef , this.p , this.pRef , this.r , this.rRef , this.uAil , this.uRud ] = moreargs;
+mavlink20.messages.aslctrl_data = function(timestamp, aslctrl_mode, h, hRef, hRef_t, PitchAngle, PitchAngleRef, q, qRef, uElev, uThrot, uThrot2, nZ, AirspeedRef, SpoilersEngaged, YawAngle, YawAngleRef, RollAngle, RollAngleRef, p, pRef, r, rRef, uAil, uRud) {
 
-    this._format = '<QffffffffffffffffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ASLCTRL_DATA;
+    this.format = '<QffffffffffffffffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ASLCTRL_DATA;
     this.order_map = [0, 23, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 24, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 172;
-    this._name = 'ASLCTRL_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ASLCTRL_DATA';
 
     this.fieldnames = ['timestamp', 'aslctrl_mode', 'h', 'hRef', 'hRef_t', 'PitchAngle', 'PitchAngleRef', 'q', 'qRef', 'uElev', 'uThrot', 'uThrot2', 'nZ', 'AirspeedRef', 'SpoilersEngaged', 'YawAngle', 'YawAngleRef', 'RollAngle', 'RollAngleRef', 'p', 'pRef', 'r', 'rRef', 'uAil', 'uRud'];
 
-}
 
-mavlink20.messages.aslctrl_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.aslctrl_data.prototype = new mavlink20.message();
 mavlink20.messages.aslctrl_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.h, this.hRef, this.hRef_t, this.PitchAngle, this.PitchAngleRef, this.q, this.qRef, this.uElev, this.uThrot, this.uThrot2, this.nZ, this.AirspeedRef, this.YawAngle, this.YawAngleRef, this.RollAngle, this.RollAngleRef, this.p, this.pRef, this.r, this.rRef, this.uAil, this.uRud, this.aslctrl_mode, this.SpoilersEngaged];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.h, this.hRef, this.hRef_t, this.PitchAngle, this.PitchAngleRef, this.q, this.qRef, this.uElev, this.uThrot, this.uThrot2, this.nZ, this.AirspeedRef, this.YawAngle, this.YawAngleRef, this.RollAngle, this.RollAngleRef, this.p, this.pRef, this.r, this.rRef, this.uAil, this.uRud, this.aslctrl_mode, this.SpoilersEngaged]));
 }
-
 
 /* 
 ASL-fixed-wing controller debug data
@@ -7046,32 +6384,24 @@ ASL-fixed-wing controller debug data
                 f_8                       : Debug data (float)
 
 */
-    mavlink20.messages.aslctrl_debug = function( ...moreargs ) {
-    [ this.i32_1 , this.i8_1 , this.i8_2 , this.f_1 , this.f_2 , this.f_3 , this.f_4 , this.f_5 , this.f_6 , this.f_7 , this.f_8 ] = moreargs;
+mavlink20.messages.aslctrl_debug = function(i32_1, i8_1, i8_2, f_1, f_2, f_3, f_4, f_5, f_6, f_7, f_8) {
 
-    this._format = '<IffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ASLCTRL_DEBUG;
+    this.format = '<IffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ASLCTRL_DEBUG;
     this.order_map = [0, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 251;
-    this._name = 'ASLCTRL_DEBUG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ASLCTRL_DEBUG';
 
     this.fieldnames = ['i32_1', 'i8_1', 'i8_2', 'f_1', 'f_2', 'f_3', 'f_4', 'f_5', 'f_6', 'f_7', 'f_8'];
 
-}
 
-mavlink20.messages.aslctrl_debug.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.aslctrl_debug.prototype = new mavlink20.message();
 mavlink20.messages.aslctrl_debug.prototype.pack = function(mav) {
-    var orderedfields = [ this.i32_1, this.f_1, this.f_2, this.f_3, this.f_4, this.f_5, this.f_6, this.f_7, this.f_8, this.i8_1, this.i8_2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.i32_1, this.f_1, this.f_2, this.f_3, this.f_4, this.f_5, this.f_6, this.f_7, this.f_8, this.i8_1, this.i8_2]));
 }
-
 
 /* 
 Extended state information for ASLUAVs
@@ -7082,32 +6412,24 @@ Extended state information for ASLUAVs
                 Motor_rpm                 : Motor RPM (float)
 
 */
-    mavlink20.messages.asluav_status = function( ...moreargs ) {
-    [ this.LED_status , this.SATCOM_status , this.Servo_status , this.Motor_rpm ] = moreargs;
+mavlink20.messages.asluav_status = function(LED_status, SATCOM_status, Servo_status, Motor_rpm) {
 
-    this._format = '<fBB8s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ASLUAV_STATUS;
+    this.format = '<fBB8s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ASLUAV_STATUS;
     this.order_map = [1, 2, 3, 0];
-    this.len_map = [1, 1, 1, 8];
-    this.array_len_map = [0, 0, 0, 8];
     this.crc_extra = 97;
-    this._name = 'ASLUAV_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ASLUAV_STATUS';
 
     this.fieldnames = ['LED_status', 'SATCOM_status', 'Servo_status', 'Motor_rpm'];
 
-}
 
-mavlink20.messages.asluav_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.asluav_status.prototype = new mavlink20.message();
 mavlink20.messages.asluav_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.Motor_rpm, this.LED_status, this.SATCOM_status, this.Servo_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Motor_rpm, this.LED_status, this.SATCOM_status, this.Servo_status]));
 }
-
 
 /* 
 Extended EKF state estimates for ASLUAVs
@@ -7121,32 +6443,24 @@ Extended EKF state estimates for ASLUAVs
                 alpha                     : Angle of attack (float)
 
 */
-    mavlink20.messages.ekf_ext = function( ...moreargs ) {
-    [ this.timestamp , this.Windspeed , this.WindDir , this.WindZ , this.Airspeed , this.beta , this.alpha ] = moreargs;
+mavlink20.messages.ekf_ext = function(timestamp, Windspeed, WindDir, WindZ, Airspeed, beta, alpha) {
 
-    this._format = '<Qffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_EKF_EXT;
+    this.format = '<Qffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_EKF_EXT;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 64;
-    this._name = 'EKF_EXT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'EKF_EXT';
 
     this.fieldnames = ['timestamp', 'Windspeed', 'WindDir', 'WindZ', 'Airspeed', 'beta', 'alpha'];
 
-}
 
-mavlink20.messages.ekf_ext.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ekf_ext.prototype = new mavlink20.message();
 mavlink20.messages.ekf_ext.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.Windspeed, this.WindDir, this.WindZ, this.Airspeed, this.beta, this.alpha];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.Windspeed, this.WindDir, this.WindZ, this.Airspeed, this.beta, this.alpha]));
 }
-
 
 /* 
 Off-board controls/commands for ASLUAVs
@@ -7161,32 +6475,24 @@ Off-board controls/commands for ASLUAVs
                 obctrl_status             : Off-board computer status (uint8_t)
 
 */
-    mavlink20.messages.asl_obctrl = function( ...moreargs ) {
-    [ this.timestamp , this.uElev , this.uThrot , this.uThrot2 , this.uAilL , this.uAilR , this.uRud , this.obctrl_status ] = moreargs;
+mavlink20.messages.asl_obctrl = function(timestamp, uElev, uThrot, uThrot2, uAilL, uAilR, uRud, obctrl_status) {
 
-    this._format = '<QffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ASL_OBCTRL;
+    this.format = '<QffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ASL_OBCTRL;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 234;
-    this._name = 'ASL_OBCTRL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ASL_OBCTRL';
 
     this.fieldnames = ['timestamp', 'uElev', 'uThrot', 'uThrot2', 'uAilL', 'uAilR', 'uRud', 'obctrl_status'];
 
-}
 
-mavlink20.messages.asl_obctrl.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.asl_obctrl.prototype = new mavlink20.message();
 mavlink20.messages.asl_obctrl.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.uElev, this.uThrot, this.uThrot2, this.uAilL, this.uAilR, this.uRud, this.obctrl_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.uElev, this.uThrot, this.uThrot2, this.uAilL, this.uAilR, this.uRud, this.obctrl_status]));
 }
-
 
 /* 
 Atmospheric sensors (temperature, humidity, ...)
@@ -7196,32 +6502,24 @@ Atmospheric sensors (temperature, humidity, ...)
                 Humidity                  : Relative humidity (float)
 
 */
-    mavlink20.messages.sens_atmos = function( ...moreargs ) {
-    [ this.timestamp , this.TempAmbient , this.Humidity ] = moreargs;
+mavlink20.messages.sens_atmos = function(timestamp, TempAmbient, Humidity) {
 
-    this._format = '<Qff';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENS_ATMOS;
+    this.format = '<Qff';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENS_ATMOS;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 144;
-    this._name = 'SENS_ATMOS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENS_ATMOS';
 
     this.fieldnames = ['timestamp', 'TempAmbient', 'Humidity'];
 
-}
 
-mavlink20.messages.sens_atmos.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sens_atmos.prototype = new mavlink20.message();
 mavlink20.messages.sens_atmos.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.TempAmbient, this.Humidity];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.TempAmbient, this.Humidity]));
 }
-
 
 /* 
 Battery pack monitoring data for Li-Ion batteries
@@ -7243,32 +6541,24 @@ Battery pack monitoring data for Li-Ion batteries
                 cellvoltage6              : Battery pack cell 6 voltage (uint16_t)
 
 */
-    mavlink20.messages.sens_batmon = function( ...moreargs ) {
-    [ this.batmon_timestamp , this.temperature , this.voltage , this.current , this.SoC , this.batterystatus , this.serialnumber , this.safetystatus , this.operationstatus , this.cellvoltage1 , this.cellvoltage2 , this.cellvoltage3 , this.cellvoltage4 , this.cellvoltage5 , this.cellvoltage6 ] = moreargs;
+mavlink20.messages.sens_batmon = function(batmon_timestamp, temperature, voltage, current, SoC, batterystatus, serialnumber, safetystatus, operationstatus, cellvoltage1, cellvoltage2, cellvoltage3, cellvoltage4, cellvoltage5, cellvoltage6) {
 
-    this._format = '<QfIIHhHHHHHHHHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENS_BATMON;
+    this.format = '<QfIIHhHHHHHHHHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENS_BATMON;
     this.order_map = [0, 1, 4, 5, 14, 6, 7, 2, 3, 8, 9, 10, 11, 12, 13];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 155;
-    this._name = 'SENS_BATMON';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENS_BATMON';
 
     this.fieldnames = ['batmon_timestamp', 'temperature', 'voltage', 'current', 'SoC', 'batterystatus', 'serialnumber', 'safetystatus', 'operationstatus', 'cellvoltage1', 'cellvoltage2', 'cellvoltage3', 'cellvoltage4', 'cellvoltage5', 'cellvoltage6'];
 
-}
 
-mavlink20.messages.sens_batmon.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sens_batmon.prototype = new mavlink20.message();
 mavlink20.messages.sens_batmon.prototype.pack = function(mav) {
-    var orderedfields = [ this.batmon_timestamp, this.temperature, this.safetystatus, this.operationstatus, this.voltage, this.current, this.batterystatus, this.serialnumber, this.cellvoltage1, this.cellvoltage2, this.cellvoltage3, this.cellvoltage4, this.cellvoltage5, this.cellvoltage6, this.SoC];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.batmon_timestamp, this.temperature, this.safetystatus, this.operationstatus, this.voltage, this.current, this.batterystatus, this.serialnumber, this.cellvoltage1, this.cellvoltage2, this.cellvoltage3, this.cellvoltage4, this.cellvoltage5, this.cellvoltage6, this.SoC]));
 }
-
 
 /* 
 Fixed-wing soaring (i.e. thermal seeking) data
@@ -7300,32 +6590,24 @@ Fixed-wing soaring (i.e. thermal seeking) data
                 valid                     : Data valid [-] (uint8_t)
 
 */
-    mavlink20.messages.fw_soaring_data = function( ...moreargs ) {
-    [ this.timestamp , this.timestampModeChanged , this.xW , this.xR , this.xLat , this.xLon , this.VarW , this.VarR , this.VarLat , this.VarLon , this.LoiterRadius , this.LoiterDirection , this.DistToSoarPoint , this.vSinkExp , this.z1_LocalUpdraftSpeed , this.z2_DeltaRoll , this.z1_exp , this.z2_exp , this.ThermalGSNorth , this.ThermalGSEast , this.TSE_dot , this.DebugVar1 , this.DebugVar2 , this.ControlMode , this.valid ] = moreargs;
+mavlink20.messages.fw_soaring_data = function(timestamp, timestampModeChanged, xW, xR, xLat, xLon, VarW, VarR, VarLat, VarLon, LoiterRadius, LoiterDirection, DistToSoarPoint, vSinkExp, z1_LocalUpdraftSpeed, z2_DeltaRoll, z1_exp, z2_exp, ThermalGSNorth, ThermalGSEast, TSE_dot, DebugVar1, DebugVar2, ControlMode, valid) {
 
-    this._format = '<QQfffffffffffffffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_FW_SOARING_DATA;
+    this.format = '<QQfffffffffffffffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_FW_SOARING_DATA;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 20;
-    this._name = 'FW_SOARING_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FW_SOARING_DATA';
 
     this.fieldnames = ['timestamp', 'timestampModeChanged', 'xW', 'xR', 'xLat', 'xLon', 'VarW', 'VarR', 'VarLat', 'VarLon', 'LoiterRadius', 'LoiterDirection', 'DistToSoarPoint', 'vSinkExp', 'z1_LocalUpdraftSpeed', 'z2_DeltaRoll', 'z1_exp', 'z2_exp', 'ThermalGSNorth', 'ThermalGSEast', 'TSE_dot', 'DebugVar1', 'DebugVar2', 'ControlMode', 'valid'];
 
-}
 
-mavlink20.messages.fw_soaring_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.fw_soaring_data.prototype = new mavlink20.message();
 mavlink20.messages.fw_soaring_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.timestampModeChanged, this.xW, this.xR, this.xLat, this.xLon, this.VarW, this.VarR, this.VarLat, this.VarLon, this.LoiterRadius, this.LoiterDirection, this.DistToSoarPoint, this.vSinkExp, this.z1_LocalUpdraftSpeed, this.z2_DeltaRoll, this.z1_exp, this.z2_exp, this.ThermalGSNorth, this.ThermalGSEast, this.TSE_dot, this.DebugVar1, this.DebugVar2, this.ControlMode, this.valid];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.timestampModeChanged, this.xW, this.xR, this.xLat, this.xLon, this.VarW, this.VarR, this.VarLat, this.VarLon, this.LoiterRadius, this.LoiterDirection, this.DistToSoarPoint, this.vSinkExp, this.z1_LocalUpdraftSpeed, this.z2_DeltaRoll, this.z1_exp, this.z2_exp, this.ThermalGSNorth, this.ThermalGSEast, this.TSE_dot, this.DebugVar1, this.DebugVar2, this.ControlMode, this.valid]));
 }
-
 
 /* 
 Monitoring of sensorpod status
@@ -7340,32 +6622,24 @@ Monitoring of sensorpod status
                 free_space                : Free space available in recordings directory in [Gb] * 1e2 (uint16_t)
 
 */
-    mavlink20.messages.sensorpod_status = function( ...moreargs ) {
-    [ this.timestamp , this.visensor_rate_1 , this.visensor_rate_2 , this.visensor_rate_3 , this.visensor_rate_4 , this.recording_nodes_count , this.cpu_temp , this.free_space ] = moreargs;
+mavlink20.messages.sensorpod_status = function(timestamp, visensor_rate_1, visensor_rate_2, visensor_rate_3, visensor_rate_4, recording_nodes_count, cpu_temp, free_space) {
 
-    this._format = '<QHBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENSORPOD_STATUS;
+    this.format = '<QHBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENSORPOD_STATUS;
     this.order_map = [0, 2, 3, 4, 5, 6, 7, 1];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 54;
-    this._name = 'SENSORPOD_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENSORPOD_STATUS';
 
     this.fieldnames = ['timestamp', 'visensor_rate_1', 'visensor_rate_2', 'visensor_rate_3', 'visensor_rate_4', 'recording_nodes_count', 'cpu_temp', 'free_space'];
 
-}
 
-mavlink20.messages.sensorpod_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sensorpod_status.prototype = new mavlink20.message();
 mavlink20.messages.sensorpod_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.free_space, this.visensor_rate_1, this.visensor_rate_2, this.visensor_rate_3, this.visensor_rate_4, this.recording_nodes_count, this.cpu_temp];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.free_space, this.visensor_rate_1, this.visensor_rate_2, this.visensor_rate_3, this.visensor_rate_4, this.recording_nodes_count, this.cpu_temp]));
 }
-
 
 /* 
 Monitoring of power board status
@@ -7384,32 +6658,24 @@ Monitoring of power board status
                 pwr_brd_aux_amp           : Power board aux current sensor (float)
 
 */
-    mavlink20.messages.sens_power_board = function( ...moreargs ) {
-    [ this.timestamp , this.pwr_brd_status , this.pwr_brd_led_status , this.pwr_brd_system_volt , this.pwr_brd_servo_volt , this.pwr_brd_digital_volt , this.pwr_brd_mot_l_amp , this.pwr_brd_mot_r_amp , this.pwr_brd_analog_amp , this.pwr_brd_digital_amp , this.pwr_brd_ext_amp , this.pwr_brd_aux_amp ] = moreargs;
+mavlink20.messages.sens_power_board = function(timestamp, pwr_brd_status, pwr_brd_led_status, pwr_brd_system_volt, pwr_brd_servo_volt, pwr_brd_digital_volt, pwr_brd_mot_l_amp, pwr_brd_mot_r_amp, pwr_brd_analog_amp, pwr_brd_digital_amp, pwr_brd_ext_amp, pwr_brd_aux_amp) {
 
-    this._format = '<QfffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENS_POWER_BOARD;
+    this.format = '<QfffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENS_POWER_BOARD;
     this.order_map = [0, 10, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 222;
-    this._name = 'SENS_POWER_BOARD';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENS_POWER_BOARD';
 
     this.fieldnames = ['timestamp', 'pwr_brd_status', 'pwr_brd_led_status', 'pwr_brd_system_volt', 'pwr_brd_servo_volt', 'pwr_brd_digital_volt', 'pwr_brd_mot_l_amp', 'pwr_brd_mot_r_amp', 'pwr_brd_analog_amp', 'pwr_brd_digital_amp', 'pwr_brd_ext_amp', 'pwr_brd_aux_amp'];
 
-}
 
-mavlink20.messages.sens_power_board.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sens_power_board.prototype = new mavlink20.message();
 mavlink20.messages.sens_power_board.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.pwr_brd_system_volt, this.pwr_brd_servo_volt, this.pwr_brd_digital_volt, this.pwr_brd_mot_l_amp, this.pwr_brd_mot_r_amp, this.pwr_brd_analog_amp, this.pwr_brd_digital_amp, this.pwr_brd_ext_amp, this.pwr_brd_aux_amp, this.pwr_brd_status, this.pwr_brd_led_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.pwr_brd_system_volt, this.pwr_brd_servo_volt, this.pwr_brd_digital_volt, this.pwr_brd_mot_l_amp, this.pwr_brd_mot_r_amp, this.pwr_brd_analog_amp, this.pwr_brd_digital_amp, this.pwr_brd_ext_amp, this.pwr_brd_aux_amp, this.pwr_brd_status, this.pwr_brd_led_status]));
 }
-
 
 /* 
 Status of GSM modem (connected to onboard computer)
@@ -7423,32 +6689,24 @@ Status of GSM modem (connected to onboard computer)
                 rsrq                      : RSRQ (LTE only) as reported by modem (unconverted) (uint8_t)
 
 */
-    mavlink20.messages.gsm_link_status = function( ...moreargs ) {
-    [ this.timestamp , this.gsm_modem_type , this.gsm_link_type , this.rssi , this.rsrp_rscp , this.sinr_ecio , this.rsrq ] = moreargs;
+mavlink20.messages.gsm_link_status = function(timestamp, gsm_modem_type, gsm_link_type, rssi, rsrp_rscp, sinr_ecio, rsrq) {
 
-    this._format = '<QBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GSM_LINK_STATUS;
+    this.format = '<QBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GSM_LINK_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 200;
-    this._name = 'GSM_LINK_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GSM_LINK_STATUS';
 
     this.fieldnames = ['timestamp', 'gsm_modem_type', 'gsm_link_type', 'rssi', 'rsrp_rscp', 'sinr_ecio', 'rsrq'];
 
-}
 
-mavlink20.messages.gsm_link_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gsm_link_status.prototype = new mavlink20.message();
 mavlink20.messages.gsm_link_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.gsm_modem_type, this.gsm_link_type, this.rssi, this.rsrp_rscp, this.sinr_ecio, this.rsrq];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.gsm_modem_type, this.gsm_link_type, this.rssi, this.rsrp_rscp, this.sinr_ecio, this.rsrq]));
 }
-
 
 /* 
 Status of the SatCom link
@@ -7463,32 +6721,24 @@ Status of the SatCom link
                 rx_session_pending        : Receiving session pending (uint8_t)
 
 */
-    mavlink20.messages.satcom_link_status = function( ...moreargs ) {
-    [ this.timestamp , this.last_heartbeat , this.failed_sessions , this.successful_sessions , this.signal_quality , this.ring_pending , this.tx_session_pending , this.rx_session_pending ] = moreargs;
+mavlink20.messages.satcom_link_status = function(timestamp, last_heartbeat, failed_sessions, successful_sessions, signal_quality, ring_pending, tx_session_pending, rx_session_pending) {
 
-    this._format = '<QQHHBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SATCOM_LINK_STATUS;
+    this.format = '<QQHHBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SATCOM_LINK_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 23;
-    this._name = 'SATCOM_LINK_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SATCOM_LINK_STATUS';
 
     this.fieldnames = ['timestamp', 'last_heartbeat', 'failed_sessions', 'successful_sessions', 'signal_quality', 'ring_pending', 'tx_session_pending', 'rx_session_pending'];
 
-}
 
-mavlink20.messages.satcom_link_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.satcom_link_status.prototype = new mavlink20.message();
 mavlink20.messages.satcom_link_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
 }
-
 
 /* 
 Calibrated airflow angle measurements
@@ -7500,32 +6750,24 @@ Calibrated airflow angle measurements
                 sideslip_valid            : Sideslip angle measurement valid (uint8_t)
 
 */
-    mavlink20.messages.sensor_airflow_angles = function( ...moreargs ) {
-    [ this.timestamp , this.angleofattack , this.angleofattack_valid , this.sideslip , this.sideslip_valid ] = moreargs;
+mavlink20.messages.sensor_airflow_angles = function(timestamp, angleofattack, angleofattack_valid, sideslip, sideslip_valid) {
 
-    this._format = '<QffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SENSOR_AIRFLOW_ANGLES;
+    this.format = '<QffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SENSOR_AIRFLOW_ANGLES;
     this.order_map = [0, 1, 3, 2, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 149;
-    this._name = 'SENSOR_AIRFLOW_ANGLES';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SENSOR_AIRFLOW_ANGLES';
 
     this.fieldnames = ['timestamp', 'angleofattack', 'angleofattack_valid', 'sideslip', 'sideslip_valid'];
 
-}
 
-mavlink20.messages.sensor_airflow_angles.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sensor_airflow_angles.prototype = new mavlink20.message();
 mavlink20.messages.sensor_airflow_angles.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.angleofattack, this.sideslip, this.angleofattack_valid, this.sideslip_valid];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.angleofattack, this.sideslip, this.angleofattack_valid, this.sideslip_valid]));
 }
-
 
 /* 
 The general system state. If the system is following the MAVLink
@@ -7559,32 +6801,24 @@ timeout.
                 errors_count4             : Autopilot-specific errors (uint16_t)
 
 */
-    mavlink20.messages.sys_status = function( ...moreargs ) {
-    [ this.onboard_control_sensors_present , this.onboard_control_sensors_enabled , this.onboard_control_sensors_health , this.load , this.voltage_battery , this.current_battery , this.battery_remaining , this.drop_rate_comm , this.errors_comm , this.errors_count1 , this.errors_count2 , this.errors_count3 , this.errors_count4 ] = moreargs;
+mavlink20.messages.sys_status = function(onboard_control_sensors_present, onboard_control_sensors_enabled, onboard_control_sensors_health, load, voltage_battery, current_battery, battery_remaining, drop_rate_comm, errors_comm, errors_count1, errors_count2, errors_count3, errors_count4) {
 
-    this._format = '<IIIHHhHHHHHHb';
-    this._id = mavlink20.MAVLINK_MSG_ID_SYS_STATUS;
+    this.format = '<IIIHHhHHHHHHb';
+    this.id = mavlink20.MAVLINK_MSG_ID_SYS_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 124;
-    this._name = 'SYS_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SYS_STATUS';
 
     this.fieldnames = ['onboard_control_sensors_present', 'onboard_control_sensors_enabled', 'onboard_control_sensors_health', 'load', 'voltage_battery', 'current_battery', 'battery_remaining', 'drop_rate_comm', 'errors_comm', 'errors_count1', 'errors_count2', 'errors_count3', 'errors_count4'];
 
-}
 
-mavlink20.messages.sys_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sys_status.prototype = new mavlink20.message();
 mavlink20.messages.sys_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.onboard_control_sensors_present, this.onboard_control_sensors_enabled, this.onboard_control_sensors_health, this.load, this.voltage_battery, this.current_battery, this.drop_rate_comm, this.errors_comm, this.errors_count1, this.errors_count2, this.errors_count3, this.errors_count4, this.battery_remaining];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.onboard_control_sensors_present, this.onboard_control_sensors_enabled, this.onboard_control_sensors_health, this.load, this.voltage_battery, this.current_battery, this.drop_rate_comm, this.errors_comm, this.errors_count1, this.errors_count2, this.errors_count3, this.errors_count4, this.battery_remaining]));
 }
-
 
 /* 
 The system time is the time of the master clock, typically the
@@ -7594,32 +6828,24 @@ computer clock of the main onboard computer.
                 time_boot_ms              : Timestamp (time since system boot). (uint32_t)
 
 */
-    mavlink20.messages.system_time = function( ...moreargs ) {
-    [ this.time_unix_usec , this.time_boot_ms ] = moreargs;
+mavlink20.messages.system_time = function(time_unix_usec, time_boot_ms) {
 
-    this._format = '<QI';
-    this._id = mavlink20.MAVLINK_MSG_ID_SYSTEM_TIME;
+    this.format = '<QI';
+    this.id = mavlink20.MAVLINK_MSG_ID_SYSTEM_TIME;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 137;
-    this._name = 'SYSTEM_TIME';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SYSTEM_TIME';
 
     this.fieldnames = ['time_unix_usec', 'time_boot_ms'];
 
-}
 
-mavlink20.messages.system_time.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.system_time.prototype = new mavlink20.message();
 mavlink20.messages.system_time.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_unix_usec, this.time_boot_ms];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_unix_usec, this.time_boot_ms]));
 }
-
 
 /* 
 A ping message either requesting or responding to a ping. This allows
@@ -7633,32 +6859,24 @@ https://mavlink.io/en/services/ping.html
                 target_component          : 0: request ping from all receiving components. If greater than 0: message is a ping response and number is the component id of the requesting component. (uint8_t)
 
 */
-    mavlink20.messages.ping = function( ...moreargs ) {
-    [ this.time_usec , this.seq , this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.ping = function(time_usec, seq, target_system, target_component) {
 
-    this._format = '<QIBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PING;
+    this.format = '<QIBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PING;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 237;
-    this._name = 'PING';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PING';
 
     this.fieldnames = ['time_usec', 'seq', 'target_system', 'target_component'];
 
-}
 
-mavlink20.messages.ping.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ping.prototype = new mavlink20.message();
 mavlink20.messages.ping.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.seq, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.seq, this.target_system, this.target_component]));
 }
-
 
 /* 
 Request to control this MAV
@@ -7669,32 +6887,24 @@ Request to control this MAV
                 passkey                   : Password / Key, depending on version plaintext or encrypted. 25 or less characters, NULL terminated. The characters may involve A-Z, a-z, 0-9, and "!?,.-" (char)
 
 */
-    mavlink20.messages.change_operator_control = function( ...moreargs ) {
-    [ this.target_system , this.control_request , this.version , this.passkey ] = moreargs;
+mavlink20.messages.change_operator_control = function(target_system, control_request, version, passkey) {
 
-    this._format = '<BBB25s';
-    this._id = mavlink20.MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
+    this.format = '<BBB25s';
+    this.id = mavlink20.MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 25];
     this.crc_extra = 217;
-    this._name = 'CHANGE_OPERATOR_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CHANGE_OPERATOR_CONTROL';
 
     this.fieldnames = ['target_system', 'control_request', 'version', 'passkey'];
 
-}
 
-mavlink20.messages.change_operator_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.change_operator_control.prototype = new mavlink20.message();
 mavlink20.messages.change_operator_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.control_request, this.version, this.passkey];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.control_request, this.version, this.passkey]));
 }
-
 
 /* 
 Accept / deny control of this MAV
@@ -7704,32 +6914,24 @@ Accept / deny control of this MAV
                 ack                       : 0: ACK, 1: NACK: Wrong passkey, 2: NACK: Unsupported passkey encryption method, 3: NACK: Already under control (uint8_t)
 
 */
-    mavlink20.messages.change_operator_control_ack = function( ...moreargs ) {
-    [ this.gcs_system_id , this.control_request , this.ack ] = moreargs;
+mavlink20.messages.change_operator_control_ack = function(gcs_system_id, control_request, ack) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CHANGE_OPERATOR_CONTROL_ACK;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 104;
-    this._name = 'CHANGE_OPERATOR_CONTROL_ACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CHANGE_OPERATOR_CONTROL_ACK';
 
     this.fieldnames = ['gcs_system_id', 'control_request', 'ack'];
 
-}
 
-mavlink20.messages.change_operator_control_ack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.change_operator_control_ack.prototype = new mavlink20.message();
 mavlink20.messages.change_operator_control_ack.prototype.pack = function(mav) {
-    var orderedfields = [ this.gcs_system_id, this.control_request, this.ack];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.gcs_system_id, this.control_request, this.ack]));
 }
-
 
 /* 
 Emit an encrypted signature / key identifying this system. PLEASE
@@ -7739,32 +6941,24 @@ requires an encrypted channel for true safety.
                 key                       : key (char)
 
 */
-    mavlink20.messages.auth_key = function( ...moreargs ) {
-    [ this.key ] = moreargs;
+mavlink20.messages.auth_key = function(key) {
 
-    this._format = '<32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_AUTH_KEY;
+    this.format = '<32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_AUTH_KEY;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [32];
     this.crc_extra = 119;
-    this._name = 'AUTH_KEY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AUTH_KEY';
 
     this.fieldnames = ['key'];
 
-}
 
-mavlink20.messages.auth_key.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.auth_key.prototype = new mavlink20.message();
 mavlink20.messages.auth_key.prototype.pack = function(mav) {
-    var orderedfields = [ this.key];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.key]));
 }
-
 
 /* 
 Set the system mode, as defined by enum MAV_MODE. There is no target
@@ -7776,32 +6970,24 @@ not only for one component.
                 custom_mode               : The new autopilot-specific mode. This field can be ignored by an autopilot. (uint32_t)
 
 */
-    mavlink20.messages.set_mode = function( ...moreargs ) {
-    [ this.target_system , this.base_mode , this.custom_mode ] = moreargs;
+mavlink20.messages.set_mode = function(target_system, base_mode, custom_mode) {
 
-    this._format = '<IBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_MODE;
+    this.format = '<IBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_MODE;
     this.order_map = [1, 2, 0];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 89;
-    this._name = 'SET_MODE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_MODE';
 
     this.fieldnames = ['target_system', 'base_mode', 'custom_mode'];
 
-}
 
-mavlink20.messages.set_mode.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_mode.prototype = new mavlink20.message();
 mavlink20.messages.set_mode.prototype.pack = function(mav) {
-    var orderedfields = [ this.custom_mode, this.target_system, this.base_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.target_system, this.base_mode]));
 }
-
 
 /* 
 Request to read the onboard parameter with the param_id string id.
@@ -7818,32 +7004,24 @@ a full documentation of QGroundControl and IMU code.
                 param_index               : Parameter index. Send -1 to use the param ID field as identifier (else the param id will be ignored) (int16_t)
 
 */
-    mavlink20.messages.param_request_read = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.param_id , this.param_index ] = moreargs;
+mavlink20.messages.param_request_read = function(target_system, target_component, param_id, param_index) {
 
-    this._format = '<hBB16s';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ;
+    this.format = '<hBB16s';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ;
     this.order_map = [1, 2, 3, 0];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 16];
     this.crc_extra = 214;
-    this._name = 'PARAM_REQUEST_READ';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_REQUEST_READ';
 
     this.fieldnames = ['target_system', 'target_component', 'param_id', 'param_index'];
 
-}
 
-mavlink20.messages.param_request_read.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_request_read.prototype = new mavlink20.message();
 mavlink20.messages.param_request_read.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_index, this.target_system, this.target_component, this.param_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
 }
-
 
 /* 
 Request all parameters of this component. After this request, all
@@ -7854,32 +7032,24 @@ https://mavlink.io/en/services/parameter.html
                 target_component          : Component ID (uint8_t)
 
 */
-    mavlink20.messages.param_request_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.param_request_list = function(target_system, target_component) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_LIST;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_LIST;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 159;
-    this._name = 'PARAM_REQUEST_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_REQUEST_LIST';
 
     this.fieldnames = ['target_system', 'target_component'];
 
-}
 
-mavlink20.messages.param_request_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_request_list.prototype = new mavlink20.message();
 mavlink20.messages.param_request_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
-
 
 /* 
 Emit the value of a onboard parameter. The inclusion of param_count
@@ -7895,32 +7065,24 @@ https://mavlink.io/en/services/parameter.html
                 param_index               : Index of this onboard parameter (uint16_t)
 
 */
-    mavlink20.messages.param_value = function( ...moreargs ) {
-    [ this.param_id , this.param_value , this.param_type , this.param_count , this.param_index ] = moreargs;
+mavlink20.messages.param_value = function(param_id, param_value, param_type, param_count, param_index) {
 
-    this._format = '<fHH16sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_VALUE;
+    this.format = '<fHH16sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_VALUE;
     this.order_map = [3, 0, 4, 1, 2];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 16, 0];
     this.crc_extra = 220;
-    this._name = 'PARAM_VALUE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_VALUE';
 
     this.fieldnames = ['param_id', 'param_value', 'param_type', 'param_count', 'param_index'];
 
-}
 
-mavlink20.messages.param_value.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_value.prototype = new mavlink20.message();
 mavlink20.messages.param_value.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_value, this.param_count, this.param_index, this.param_id, this.param_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value, this.param_count, this.param_index, this.param_id, this.param_type]));
 }
-
 
 /* 
 Set a parameter value (write new value to permanent storage).
@@ -7938,32 +7100,24 @@ at https://mavlink.io/en/services/parameter.html.
                 param_type                : Onboard parameter type. (uint8_t)
 
 */
-    mavlink20.messages.param_set = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.param_id , this.param_value , this.param_type ] = moreargs;
+mavlink20.messages.param_set = function(target_system, target_component, param_id, param_value, param_type) {
 
-    this._format = '<fBB16sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_SET;
+    this.format = '<fBB16sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_SET;
     this.order_map = [1, 2, 3, 0, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 16, 0];
     this.crc_extra = 168;
-    this._name = 'PARAM_SET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_SET';
 
     this.fieldnames = ['target_system', 'target_component', 'param_id', 'param_value', 'param_type'];
 
-}
 
-mavlink20.messages.param_set.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_set.prototype = new mavlink20.message();
 mavlink20.messages.param_set.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_value, this.target_system, this.target_component, this.param_id, this.param_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value, this.target_system, this.target_component, this.param_id, this.param_type]));
 }
-
 
 /* 
 The global position, as returned by the Global Positioning System
@@ -7989,32 +7143,24 @@ the global position estimate.
                 yaw                       : Yaw in earth frame from north. Use 0 if this GPS does not provide yaw. Use 65535 if this GPS is configured to provide yaw and is currently unable to provide it. Use 36000 for north. (uint16_t)
 
 */
-    mavlink20.messages.gps_raw_int = function( ...moreargs ) {
-    [ this.time_usec , this.fix_type , this.lat , this.lon , this.alt , this.eph , this.epv , this.vel , this.cog , this.satellites_visible , this.alt_ellipsoid , this.h_acc , this.v_acc , this.vel_acc , this.hdg_acc , this.yaw ] = moreargs;
+mavlink20.messages.gps_raw_int = function(time_usec, fix_type, lat, lon, alt, eph, epv, vel, cog, satellites_visible, alt_ellipsoid, h_acc, v_acc, vel_acc, hdg_acc, yaw) {
 
-    this._format = '<QiiiHHHHBBiIIIIH';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_RAW_INT;
+    this.format = '<QiiiHHHHBBiIIIIH';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_RAW_INT;
     this.order_map = [0, 8, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 24;
-    this._name = 'GPS_RAW_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_RAW_INT';
 
     this.fieldnames = ['time_usec', 'fix_type', 'lat', 'lon', 'alt', 'eph', 'epv', 'vel', 'cog', 'satellites_visible', 'alt_ellipsoid', 'h_acc', 'v_acc', 'vel_acc', 'hdg_acc', 'yaw'];
 
-}
 
-mavlink20.messages.gps_raw_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_raw_int.prototype = new mavlink20.message();
 mavlink20.messages.gps_raw_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc, this.yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc, this.yaw]));
 }
-
 
 /* 
 The positioning status, as reported by GPS. This message is intended
@@ -8031,32 +7177,24 @@ satellites.
                 satellite_snr             : Signal to noise ratio of satellite (uint8_t)
 
 */
-    mavlink20.messages.gps_status = function( ...moreargs ) {
-    [ this.satellites_visible , this.satellite_prn , this.satellite_used , this.satellite_elevation , this.satellite_azimuth , this.satellite_snr ] = moreargs;
+mavlink20.messages.gps_status = function(satellites_visible, satellite_prn, satellite_used, satellite_elevation, satellite_azimuth, satellite_snr) {
 
-    this._format = '<B20s20s20s20s20s';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_STATUS;
+    this.format = '<B20s20s20s20s20s';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 20, 20, 20, 20, 20];
-    this.array_len_map = [0, 20, 20, 20, 20, 20];
     this.crc_extra = 23;
-    this._name = 'GPS_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_STATUS';
 
     this.fieldnames = ['satellites_visible', 'satellite_prn', 'satellite_used', 'satellite_elevation', 'satellite_azimuth', 'satellite_snr'];
 
-}
 
-mavlink20.messages.gps_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_status.prototype = new mavlink20.message();
 mavlink20.messages.gps_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.satellites_visible, this.satellite_prn, this.satellite_used, this.satellite_elevation, this.satellite_azimuth, this.satellite_snr];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.satellites_visible, this.satellite_prn, this.satellite_used, this.satellite_elevation, this.satellite_azimuth, this.satellite_snr]));
 }
-
 
 /* 
 The RAW IMU readings for the usual 9DOF sensor setup. This message
@@ -8075,32 +7213,24 @@ should contain the scaled values to the described units
                 temperature               : Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C). (int16_t)
 
 */
-    mavlink20.messages.scaled_imu = function( ...moreargs ) {
-    [ this.time_boot_ms , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.temperature ] = moreargs;
+mavlink20.messages.scaled_imu = function(time_boot_ms, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, temperature) {
 
-    this._format = '<Ihhhhhhhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU;
+    this.format = '<Ihhhhhhhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 170;
-    this._name = 'SCALED_IMU';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_IMU';
 
     this.fieldnames = ['time_boot_ms', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'temperature'];
 
-}
 
-mavlink20.messages.scaled_imu.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_imu.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
-
 
 /* 
 The RAW IMU readings for a 9DOF sensor, which is identified by the id
@@ -8121,32 +7251,24 @@ without any scaling to allow data capture and system debugging.
                 temperature               : Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C). (int16_t)
 
 */
-    mavlink20.messages.raw_imu = function( ...moreargs ) {
-    [ this.time_usec , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.id , this.temperature ] = moreargs;
+mavlink20.messages.raw_imu = function(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, id, temperature) {
 
-    this._format = '<QhhhhhhhhhBh';
-    this._id = mavlink20.MAVLINK_MSG_ID_RAW_IMU;
+    this.format = '<QhhhhhhhhhBh';
+    this.id = mavlink20.MAVLINK_MSG_ID_RAW_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 144;
-    this._name = 'RAW_IMU';
-
-    this._instance_field = 'id';
-    this._instance_offset = 26;
+    this.name = 'RAW_IMU';
 
     this.fieldnames = ['time_usec', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'id', 'temperature'];
 
-}
 
-mavlink20.messages.raw_imu.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.raw_imu.prototype = new mavlink20.message();
 mavlink20.messages.raw_imu.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.id, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.id, this.temperature]));
 }
-
 
 /* 
 The RAW pressure readings for the typical setup of one absolute
@@ -8160,32 +7282,24 @@ should be the raw, UNSCALED ADC values.
                 temperature               : Raw Temperature measurement (raw) (int16_t)
 
 */
-    mavlink20.messages.raw_pressure = function( ...moreargs ) {
-    [ this.time_usec , this.press_abs , this.press_diff1 , this.press_diff2 , this.temperature ] = moreargs;
+mavlink20.messages.raw_pressure = function(time_usec, press_abs, press_diff1, press_diff2, temperature) {
 
-    this._format = '<Qhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_RAW_PRESSURE;
+    this.format = '<Qhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_RAW_PRESSURE;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 67;
-    this._name = 'RAW_PRESSURE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RAW_PRESSURE';
 
     this.fieldnames = ['time_usec', 'press_abs', 'press_diff1', 'press_diff2', 'temperature'];
 
-}
 
-mavlink20.messages.raw_pressure.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.raw_pressure.prototype = new mavlink20.message();
 mavlink20.messages.raw_pressure.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.press_abs, this.press_diff1, this.press_diff2, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.press_abs, this.press_diff1, this.press_diff2, this.temperature]));
 }
-
 
 /* 
 The pressure readings for the typical setup of one absolute and
@@ -8199,32 +7313,24 @@ field.
                 temperature_press_diff        : Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC. (int16_t)
 
 */
-    mavlink20.messages.scaled_pressure = function( ...moreargs ) {
-    [ this.time_boot_ms , this.press_abs , this.press_diff , this.temperature , this.temperature_press_diff ] = moreargs;
+mavlink20.messages.scaled_pressure = function(time_boot_ms, press_abs, press_diff, temperature, temperature_press_diff) {
 
-    this._format = '<Iffhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE;
+    this.format = '<Iffhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 115;
-    this._name = 'SCALED_PRESSURE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_PRESSURE';
 
     this.fieldnames = ['time_boot_ms', 'press_abs', 'press_diff', 'temperature', 'temperature_press_diff'];
 
-}
 
-mavlink20.messages.scaled_pressure.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_pressure.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
-
 
 /* 
 The attitude in the aeronautical frame (right-handed, Z-down, X-front,
@@ -8239,32 +7345,24 @@ Y-right).
                 yawspeed                  : Yaw angular speed (float)
 
 */
-    mavlink20.messages.attitude = function( ...moreargs ) {
-    [ this.time_boot_ms , this.roll , this.pitch , this.yaw , this.rollspeed , this.pitchspeed , this.yawspeed ] = moreargs;
+mavlink20.messages.attitude = function(time_boot_ms, roll, pitch, yaw, rollspeed, pitchspeed, yawspeed) {
 
-    this._format = '<Iffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_ATTITUDE;
+    this.format = '<Iffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_ATTITUDE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 39;
-    this._name = 'ATTITUDE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ATTITUDE';
 
     this.fieldnames = ['time_boot_ms', 'roll', 'pitch', 'yaw', 'rollspeed', 'pitchspeed', 'yawspeed'];
 
-}
 
-mavlink20.messages.attitude.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.attitude.prototype = new mavlink20.message();
 mavlink20.messages.attitude.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed]));
 }
-
 
 /* 
 The attitude in the aeronautical frame (right-handed, Z-down, X-front,
@@ -8282,32 +7380,24 @@ a zero rotation would be expressed as (1 0 0 0).
                 repr_offset_q             : Rotation offset by which the attitude quaternion and angular speed vector should be rotated for user display (quaternion with [w, x, y, z] order, zero-rotation is [1, 0, 0, 0], send [0, 0, 0, 0] if field not supported). This field is intended for systems in which the reference attitude may change during flight. For example, tailsitters VTOLs rotate their reference attitude by 90 degrees between hover mode and fixed wing mode, thus repr_offset_q is equal to [1, 0, 0, 0] in hover mode and equal to [0.7071, 0, 0.7071, 0] in fixed wing mode. (float)
 
 */
-    mavlink20.messages.attitude_quaternion = function( ...moreargs ) {
-    [ this.time_boot_ms , this.q1 , this.q2 , this.q3 , this.q4 , this.rollspeed , this.pitchspeed , this.yawspeed , this.repr_offset_q ] = moreargs;
+mavlink20.messages.attitude_quaternion = function(time_boot_ms, q1, q2, q3, q4, rollspeed, pitchspeed, yawspeed, repr_offset_q) {
 
-    this._format = '<Ifffffff4f';
-    this._id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_QUATERNION;
+    this.format = '<Ifffffff4f';
+    this.id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_QUATERNION;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 4];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 4];
     this.crc_extra = 246;
-    this._name = 'ATTITUDE_QUATERNION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ATTITUDE_QUATERNION';
 
     this.fieldnames = ['time_boot_ms', 'q1', 'q2', 'q3', 'q4', 'rollspeed', 'pitchspeed', 'yawspeed', 'repr_offset_q'];
 
-}
 
-mavlink20.messages.attitude_quaternion.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.attitude_quaternion.prototype = new mavlink20.message();
 mavlink20.messages.attitude_quaternion.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.rollspeed, this.pitchspeed, this.yawspeed, this.repr_offset_q];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.rollspeed, this.pitchspeed, this.yawspeed, this.repr_offset_q]));
 }
-
 
 /* 
 The filtered local position (e.g. fused computer vision and
@@ -8323,32 +7413,24 @@ accelerometers). Coordinate frame is right-handed, Z-axis down
                 vz                        : Z Speed (float)
 
 */
-    mavlink20.messages.local_position_ned = function( ...moreargs ) {
-    [ this.time_boot_ms , this.x , this.y , this.z , this.vx , this.vy , this.vz ] = moreargs;
+mavlink20.messages.local_position_ned = function(time_boot_ms, x, y, z, vx, vy, vz) {
 
-    this._format = '<Iffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED;
+    this.format = '<Iffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 185;
-    this._name = 'LOCAL_POSITION_NED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOCAL_POSITION_NED';
 
     this.fieldnames = ['time_boot_ms', 'x', 'y', 'z', 'vx', 'vy', 'vz'];
 
-}
 
-mavlink20.messages.local_position_ned.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.local_position_ned.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz]));
 }
-
 
 /* 
 The filtered global position (e.g. fused GPS and accelerometers). The
@@ -8367,32 +7449,24 @@ not sufficient.
                 hdg                       : Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX (uint16_t)
 
 */
-    mavlink20.messages.global_position_int = function( ...moreargs ) {
-    [ this.time_boot_ms , this.lat , this.lon , this.alt , this.relative_alt , this.vx , this.vy , this.vz , this.hdg ] = moreargs;
+mavlink20.messages.global_position_int = function(time_boot_ms, lat, lon, alt, relative_alt, vx, vy, vz, hdg) {
 
-    this._format = '<IiiiihhhH';
-    this._id = mavlink20.MAVLINK_MSG_ID_GLOBAL_POSITION_INT;
+    this.format = '<IiiiihhhH';
+    this.id = mavlink20.MAVLINK_MSG_ID_GLOBAL_POSITION_INT;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 104;
-    this._name = 'GLOBAL_POSITION_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GLOBAL_POSITION_INT';
 
     this.fieldnames = ['time_boot_ms', 'lat', 'lon', 'alt', 'relative_alt', 'vx', 'vy', 'vz', 'hdg'];
 
-}
 
-mavlink20.messages.global_position_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.global_position_int.prototype = new mavlink20.message();
 mavlink20.messages.global_position_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.hdg];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.hdg]));
 }
-
 
 /* 
 The scaled values of the RC channels received: (-100%) -10000, (0%) 0,
@@ -8411,32 +7485,24 @@ The scaled values of the RC channels received: (-100%) -10000, (0%) 0,
                 rssi                      : Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown. (uint8_t)
 
 */
-    mavlink20.messages.rc_channels_scaled = function( ...moreargs ) {
-    [ this.time_boot_ms , this.port , this.chan1_scaled , this.chan2_scaled , this.chan3_scaled , this.chan4_scaled , this.chan5_scaled , this.chan6_scaled , this.chan7_scaled , this.chan8_scaled , this.rssi ] = moreargs;
+mavlink20.messages.rc_channels_scaled = function(time_boot_ms, port, chan1_scaled, chan2_scaled, chan3_scaled, chan4_scaled, chan5_scaled, chan6_scaled, chan7_scaled, chan8_scaled, rssi) {
 
-    this._format = '<IhhhhhhhhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_SCALED;
+    this.format = '<IhhhhhhhhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_SCALED;
     this.order_map = [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 237;
-    this._name = 'RC_CHANNELS_SCALED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RC_CHANNELS_SCALED';
 
     this.fieldnames = ['time_boot_ms', 'port', 'chan1_scaled', 'chan2_scaled', 'chan3_scaled', 'chan4_scaled', 'chan5_scaled', 'chan6_scaled', 'chan7_scaled', 'chan8_scaled', 'rssi'];
 
-}
 
-mavlink20.messages.rc_channels_scaled.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rc_channels_scaled.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_scaled.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.chan1_scaled, this.chan2_scaled, this.chan3_scaled, this.chan4_scaled, this.chan5_scaled, this.chan6_scaled, this.chan7_scaled, this.chan8_scaled, this.port, this.rssi];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_scaled, this.chan2_scaled, this.chan3_scaled, this.chan4_scaled, this.chan5_scaled, this.chan6_scaled, this.chan7_scaled, this.chan8_scaled, this.port, this.rssi]));
 }
-
 
 /* 
 The RAW values of the RC channels received. The standard PPM
@@ -8457,32 +7523,24 @@ receivers/transmitters might violate this specification.
                 rssi                      : Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown. (uint8_t)
 
 */
-    mavlink20.messages.rc_channels_raw = function( ...moreargs ) {
-    [ this.time_boot_ms , this.port , this.chan1_raw , this.chan2_raw , this.chan3_raw , this.chan4_raw , this.chan5_raw , this.chan6_raw , this.chan7_raw , this.chan8_raw , this.rssi ] = moreargs;
+mavlink20.messages.rc_channels_raw = function(time_boot_ms, port, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, rssi) {
 
-    this._format = '<IHHHHHHHHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_RAW;
+    this.format = '<IHHHHHHHHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_RAW;
     this.order_map = [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 244;
-    this._name = 'RC_CHANNELS_RAW';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RC_CHANNELS_RAW';
 
     this.fieldnames = ['time_boot_ms', 'port', 'chan1_raw', 'chan2_raw', 'chan3_raw', 'chan4_raw', 'chan5_raw', 'chan6_raw', 'chan7_raw', 'chan8_raw', 'rssi'];
 
-}
 
-mavlink20.messages.rc_channels_raw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rc_channels_raw.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_raw.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.port, this.rssi];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.port, this.rssi]));
 }
-
 
 /* 
 Superseded by ACTUATOR_OUTPUT_STATUS. The RAW values of the servo
@@ -8510,32 +7568,24 @@ microseconds: 100%.
                 servo16_raw               : Servo output 16 value (uint16_t)
 
 */
-    mavlink20.messages.servo_output_raw = function( ...moreargs ) {
-    [ this.time_usec , this.port , this.servo1_raw , this.servo2_raw , this.servo3_raw , this.servo4_raw , this.servo5_raw , this.servo6_raw , this.servo7_raw , this.servo8_raw , this.servo9_raw , this.servo10_raw , this.servo11_raw , this.servo12_raw , this.servo13_raw , this.servo14_raw , this.servo15_raw , this.servo16_raw ] = moreargs;
+mavlink20.messages.servo_output_raw = function(time_usec, port, servo1_raw, servo2_raw, servo3_raw, servo4_raw, servo5_raw, servo6_raw, servo7_raw, servo8_raw, servo9_raw, servo10_raw, servo11_raw, servo12_raw, servo13_raw, servo14_raw, servo15_raw, servo16_raw) {
 
-    this._format = '<IHHHHHHHHBHHHHHHHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW;
+    this.format = '<IHHHHHHHHBHHHHHHHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW;
     this.order_map = [0, 9, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 222;
-    this._name = 'SERVO_OUTPUT_RAW';
-
-    this._instance_field = 'port';
-    this._instance_offset = 20;
+    this.name = 'SERVO_OUTPUT_RAW';
 
     this.fieldnames = ['time_usec', 'port', 'servo1_raw', 'servo2_raw', 'servo3_raw', 'servo4_raw', 'servo5_raw', 'servo6_raw', 'servo7_raw', 'servo8_raw', 'servo9_raw', 'servo10_raw', 'servo11_raw', 'servo12_raw', 'servo13_raw', 'servo14_raw', 'servo15_raw', 'servo16_raw'];
 
-}
 
-mavlink20.messages.servo_output_raw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.servo_output_raw.prototype = new mavlink20.message();
 mavlink20.messages.servo_output_raw.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.servo1_raw, this.servo2_raw, this.servo3_raw, this.servo4_raw, this.servo5_raw, this.servo6_raw, this.servo7_raw, this.servo8_raw, this.port, this.servo9_raw, this.servo10_raw, this.servo11_raw, this.servo12_raw, this.servo13_raw, this.servo14_raw, this.servo15_raw, this.servo16_raw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.servo1_raw, this.servo2_raw, this.servo3_raw, this.servo4_raw, this.servo5_raw, this.servo6_raw, this.servo7_raw, this.servo8_raw, this.port, this.servo9_raw, this.servo10_raw, this.servo11_raw, this.servo12_raw, this.servo13_raw, this.servo14_raw, this.servo15_raw, this.servo16_raw]));
 }
-
 
 /* 
 Request a partial list of mission items from the system/component.
@@ -8549,32 +7599,24 @@ are the same, just send one waypoint.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_request_partial_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.start_index , this.end_index , this.mission_type ] = moreargs;
+mavlink20.messages.mission_request_partial_list = function(target_system, target_component, start_index, end_index, mission_type) {
 
-    this._format = '<hhBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
+    this.format = '<hhBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_PARTIAL_LIST;
     this.order_map = [2, 3, 0, 1, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 212;
-    this._name = 'MISSION_REQUEST_PARTIAL_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_REQUEST_PARTIAL_LIST';
 
     this.fieldnames = ['target_system', 'target_component', 'start_index', 'end_index', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_request_partial_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_request_partial_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_partial_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 This message is sent to the MAV to write a partial list. If start
@@ -8589,32 +7631,24 @@ should be REJECTED!
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_write_partial_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.start_index , this.end_index , this.mission_type ] = moreargs;
+mavlink20.messages.mission_write_partial_list = function(target_system, target_component, start_index, end_index, mission_type) {
 
-    this._format = '<hhBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST;
+    this.format = '<hhBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_WRITE_PARTIAL_LIST;
     this.order_map = [2, 3, 0, 1, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 9;
-    this._name = 'MISSION_WRITE_PARTIAL_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_WRITE_PARTIAL_LIST';
 
     this.fieldnames = ['target_system', 'target_component', 'start_index', 'end_index', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_write_partial_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_write_partial_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_write_partial_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 Message encoding a mission item. This message is emitted to announce
@@ -8643,32 +7677,24 @@ https://mavlink.io/en/services/mission.html.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_item = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seq , this.frame , this.command , this.current , this.autocontinue , this.param1 , this.param2 , this.param3 , this.param4 , this.x , this.y , this.z , this.mission_type ] = moreargs;
+mavlink20.messages.mission_item = function(target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z, mission_type) {
 
-    this._format = '<fffffffHHBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM;
+    this.format = '<fffffffHHBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM;
     this.order_map = [9, 10, 7, 11, 8, 12, 13, 0, 1, 2, 3, 4, 5, 6, 14];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 254;
-    this._name = 'MISSION_ITEM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_ITEM';
 
     this.fieldnames = ['target_system', 'target_component', 'seq', 'frame', 'command', 'current', 'autocontinue', 'param1', 'param2', 'param3', 'param4', 'x', 'y', 'z', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_item.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_item.prototype = new mavlink20.message();
 mavlink20.messages.mission_item.prototype.pack = function(mav) {
-    var orderedfields = [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
 }
-
 
 /* 
 Request the information of the mission item with the sequence number
@@ -8681,32 +7707,24 @@ MISSION_ITEM message. https://mavlink.io/en/services/mission.html
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_request = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seq , this.mission_type ] = moreargs;
+mavlink20.messages.mission_request = function(target_system, target_component, seq, mission_type) {
 
-    this._format = '<HBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST;
+    this.format = '<HBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST;
     this.order_map = [1, 2, 0, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 230;
-    this._name = 'MISSION_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_REQUEST';
 
     this.fieldnames = ['target_system', 'target_component', 'seq', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_request.prototype = new mavlink20.message();
 mavlink20.messages.mission_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.seq, this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 Set the mission item with sequence number seq as current item. This
@@ -8718,32 +7736,24 @@ path (not following the mission items in-between).
                 seq                       : Sequence (uint16_t)
 
 */
-    mavlink20.messages.mission_set_current = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seq ] = moreargs;
+mavlink20.messages.mission_set_current = function(target_system, target_component, seq) {
 
-    this._format = '<HBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_SET_CURRENT;
+    this.format = '<HBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_SET_CURRENT;
     this.order_map = [1, 2, 0];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 28;
-    this._name = 'MISSION_SET_CURRENT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_SET_CURRENT';
 
     this.fieldnames = ['target_system', 'target_component', 'seq'];
 
-}
 
-mavlink20.messages.mission_set_current.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_set_current.prototype = new mavlink20.message();
 mavlink20.messages.mission_set_current.prototype.pack = function(mav) {
-    var orderedfields = [ this.seq, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component]));
 }
-
 
 /* 
 Message that announces the sequence number of the current active
@@ -8755,32 +7765,24 @@ mission item. The MAV will fly towards this mission item.
                 mission_mode              : Vehicle is in a mode that can execute mission items or suspended. 0: Unknown, 1: In mission mode, 2: Suspended (not in mission mode). (uint8_t)
 
 */
-    mavlink20.messages.mission_current = function( ...moreargs ) {
-    [ this.seq , this.total , this.mission_state , this.mission_mode ] = moreargs;
+mavlink20.messages.mission_current = function(seq, total, mission_state, mission_mode) {
 
-    this._format = '<HHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_CURRENT;
+    this.format = '<HHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_CURRENT;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 28;
-    this._name = 'MISSION_CURRENT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_CURRENT';
 
     this.fieldnames = ['seq', 'total', 'mission_state', 'mission_mode'];
 
-}
 
-mavlink20.messages.mission_current.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_current.prototype = new mavlink20.message();
 mavlink20.messages.mission_current.prototype.pack = function(mav) {
-    var orderedfields = [ this.seq, this.total, this.mission_state, this.mission_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.total, this.mission_state, this.mission_mode]));
 }
-
 
 /* 
 Request the overall list of mission items from the system/component.
@@ -8790,32 +7792,24 @@ Request the overall list of mission items from the system/component.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_request_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.mission_type ] = moreargs;
+mavlink20.messages.mission_request_list = function(target_system, target_component, mission_type) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_LIST;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_LIST;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 132;
-    this._name = 'MISSION_REQUEST_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_REQUEST_LIST';
 
     this.fieldnames = ['target_system', 'target_component', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_request_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_request_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 This message is emitted as response to MISSION_REQUEST_LIST by the MAV
@@ -8829,32 +7823,24 @@ waypoints.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_count = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.count , this.mission_type ] = moreargs;
+mavlink20.messages.mission_count = function(target_system, target_component, count, mission_type) {
 
-    this._format = '<HBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_COUNT;
+    this.format = '<HBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_COUNT;
     this.order_map = [1, 2, 0, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 221;
-    this._name = 'MISSION_COUNT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_COUNT';
 
     this.fieldnames = ['target_system', 'target_component', 'count', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_count.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_count.prototype = new mavlink20.message();
 mavlink20.messages.mission_count.prototype.pack = function(mav) {
-    var orderedfields = [ this.count, this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.count, this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 Delete all mission items at once.
@@ -8864,32 +7850,24 @@ Delete all mission items at once.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_clear_all = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.mission_type ] = moreargs;
+mavlink20.messages.mission_clear_all = function(target_system, target_component, mission_type) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_CLEAR_ALL;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_CLEAR_ALL;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 232;
-    this._name = 'MISSION_CLEAR_ALL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_CLEAR_ALL';
 
     this.fieldnames = ['target_system', 'target_component', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_clear_all.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_clear_all.prototype = new mavlink20.message();
 mavlink20.messages.mission_clear_all.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 A certain mission item has been reached. The system will either hold
@@ -8899,32 +7877,24 @@ WP was set) continue to the next waypoint.
                 seq                       : Sequence (uint16_t)
 
 */
-    mavlink20.messages.mission_item_reached = function( ...moreargs ) {
-    [ this.seq ] = moreargs;
+mavlink20.messages.mission_item_reached = function(seq) {
 
-    this._format = '<H';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
+    this.format = '<H';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM_REACHED;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [0];
     this.crc_extra = 11;
-    this._name = 'MISSION_ITEM_REACHED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_ITEM_REACHED';
 
     this.fieldnames = ['seq'];
 
-}
 
-mavlink20.messages.mission_item_reached.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_item_reached.prototype = new mavlink20.message();
 mavlink20.messages.mission_item_reached.prototype.pack = function(mav) {
-    var orderedfields = [ this.seq];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq]));
 }
-
 
 /* 
 Acknowledgment message during waypoint handling. The type field states
@@ -8937,32 +7907,24 @@ if this message is a positive ack (type=0) or if an error happened
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_ack = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.type , this.mission_type ] = moreargs;
+mavlink20.messages.mission_ack = function(target_system, target_component, type, mission_type) {
 
-    this._format = '<BBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_ACK;
+    this.format = '<BBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_ACK;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 153;
-    this._name = 'MISSION_ACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_ACK';
 
     this.fieldnames = ['target_system', 'target_component', 'type', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_ack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_ack.prototype = new mavlink20.message();
 mavlink20.messages.mission_ack.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.type, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.type, this.mission_type]));
 }
-
 
 /* 
 Sets the GPS co-ordinates of the vehicle local origin (0,0,0)
@@ -8979,32 +7941,24 @@ connected and the MAV should move from in- to outdoor.
                 time_usec                 : Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number. (uint64_t)
 
 */
-    mavlink20.messages.set_gps_global_origin = function( ...moreargs ) {
-    [ this.target_system , this.latitude , this.longitude , this.altitude , this.time_usec ] = moreargs;
+mavlink20.messages.set_gps_global_origin = function(target_system, latitude, longitude, altitude, time_usec) {
 
-    this._format = '<iiiBQ';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN;
+    this.format = '<iiiBQ';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN;
     this.order_map = [3, 0, 1, 2, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 41;
-    this._name = 'SET_GPS_GLOBAL_ORIGIN';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_GPS_GLOBAL_ORIGIN';
 
     this.fieldnames = ['target_system', 'latitude', 'longitude', 'altitude', 'time_usec'];
 
-}
 
-mavlink20.messages.set_gps_global_origin.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_gps_global_origin.prototype = new mavlink20.message();
 mavlink20.messages.set_gps_global_origin.prototype.pack = function(mav) {
-    var orderedfields = [ this.latitude, this.longitude, this.altitude, this.target_system, this.time_usec];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.target_system, this.time_usec]));
 }
-
 
 /* 
 Publishes the GPS co-ordinates of the vehicle local origin (0,0,0)
@@ -9017,32 +7971,24 @@ requested or set - e.g. following SET_GPS_GLOBAL_ORIGIN message.
                 time_usec                 : Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number. (uint64_t)
 
 */
-    mavlink20.messages.gps_global_origin = function( ...moreargs ) {
-    [ this.latitude , this.longitude , this.altitude , this.time_usec ] = moreargs;
+mavlink20.messages.gps_global_origin = function(latitude, longitude, altitude, time_usec) {
 
-    this._format = '<iiiQ';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN;
+    this.format = '<iiiQ';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 39;
-    this._name = 'GPS_GLOBAL_ORIGIN';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_GLOBAL_ORIGIN';
 
     this.fieldnames = ['latitude', 'longitude', 'altitude', 'time_usec'];
 
-}
 
-mavlink20.messages.gps_global_origin.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_global_origin.prototype = new mavlink20.message();
 mavlink20.messages.gps_global_origin.prototype.pack = function(mav) {
-    var orderedfields = [ this.latitude, this.longitude, this.altitude, this.time_usec];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.time_usec]));
 }
-
 
 /* 
 Bind a RC channel to a parameter. The parameter should change
@@ -9059,32 +8005,24 @@ according to the RC channel value.
                 param_value_max           : Maximum param value. The protocol does not define if this overwrites an onboard maximum value. (Depends on implementation) (float)
 
 */
-    mavlink20.messages.param_map_rc = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.param_id , this.param_index , this.parameter_rc_channel_index , this.param_value0 , this.scale , this.param_value_min , this.param_value_max ] = moreargs;
+mavlink20.messages.param_map_rc = function(target_system, target_component, param_id, param_index, parameter_rc_channel_index, param_value0, scale, param_value_min, param_value_max) {
 
-    this._format = '<ffffhBB16sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_MAP_RC;
+    this.format = '<ffffhBB16sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_MAP_RC;
     this.order_map = [5, 6, 7, 4, 8, 0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 16, 0];
     this.crc_extra = 78;
-    this._name = 'PARAM_MAP_RC';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_MAP_RC';
 
     this.fieldnames = ['target_system', 'target_component', 'param_id', 'param_index', 'parameter_rc_channel_index', 'param_value0', 'scale', 'param_value_min', 'param_value_max'];
 
-}
 
-mavlink20.messages.param_map_rc.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_map_rc.prototype = new mavlink20.message();
 mavlink20.messages.param_map_rc.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_value0, this.scale, this.param_value_min, this.param_value_max, this.param_index, this.target_system, this.target_component, this.param_id, this.parameter_rc_channel_index];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value0, this.scale, this.param_value_min, this.param_value_max, this.param_index, this.target_system, this.target_component, this.param_id, this.parameter_rc_channel_index]));
 }
-
 
 /* 
 Request the information of the mission item with the sequence number
@@ -9097,32 +8035,24 @@ MISSION_ITEM_INT message. https://mavlink.io/en/services/mission.html
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_request_int = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seq , this.mission_type ] = moreargs;
+mavlink20.messages.mission_request_int = function(target_system, target_component, seq, mission_type) {
 
-    this._format = '<HBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_INT;
+    this.format = '<HBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_REQUEST_INT;
     this.order_map = [1, 2, 0, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 196;
-    this._name = 'MISSION_REQUEST_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_REQUEST_INT';
 
     this.fieldnames = ['target_system', 'target_component', 'seq', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_request_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_request_int.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.seq, this.target_system, this.target_component, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
 }
-
 
 /* 
 Set a safety zone (volume), which is defined by two corners of a cube.
@@ -9141,32 +8071,24 @@ national or competition regulations.
                 p2z                       : z position 2 / Altitude 2 (float)
 
 */
-    mavlink20.messages.safety_set_allowed_area = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.frame , this.p1x , this.p1y , this.p1z , this.p2x , this.p2y , this.p2z ] = moreargs;
+mavlink20.messages.safety_set_allowed_area = function(target_system, target_component, frame, p1x, p1y, p1z, p2x, p2y, p2z) {
 
-    this._format = '<ffffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA;
+    this.format = '<ffffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SAFETY_SET_ALLOWED_AREA;
     this.order_map = [6, 7, 8, 0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 15;
-    this._name = 'SAFETY_SET_ALLOWED_AREA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SAFETY_SET_ALLOWED_AREA';
 
     this.fieldnames = ['target_system', 'target_component', 'frame', 'p1x', 'p1y', 'p1z', 'p2x', 'p2y', 'p2z'];
 
-}
 
-mavlink20.messages.safety_set_allowed_area.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.safety_set_allowed_area.prototype = new mavlink20.message();
 mavlink20.messages.safety_set_allowed_area.prototype.pack = function(mav) {
-    var orderedfields = [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.target_system, this.target_component, this.frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.target_system, this.target_component, this.frame]));
 }
-
 
 /* 
 Read out the safety zone the MAV currently assumes.
@@ -9180,32 +8102,24 @@ Read out the safety zone the MAV currently assumes.
                 p2z                       : z position 2 / Altitude 2 (float)
 
 */
-    mavlink20.messages.safety_allowed_area = function( ...moreargs ) {
-    [ this.frame , this.p1x , this.p1y , this.p1z , this.p2x , this.p2y , this.p2z ] = moreargs;
+mavlink20.messages.safety_allowed_area = function(frame, p1x, p1y, p1z, p2x, p2y, p2z) {
 
-    this._format = '<ffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA;
+    this.format = '<ffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SAFETY_ALLOWED_AREA;
     this.order_map = [6, 0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 3;
-    this._name = 'SAFETY_ALLOWED_AREA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SAFETY_ALLOWED_AREA';
 
     this.fieldnames = ['frame', 'p1x', 'p1y', 'p1z', 'p2x', 'p2y', 'p2z'];
 
-}
 
-mavlink20.messages.safety_allowed_area.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.safety_allowed_area.prototype = new mavlink20.message();
 mavlink20.messages.safety_allowed_area.prototype.pack = function(mav) {
-    var orderedfields = [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.frame]));
 }
-
 
 /* 
 The attitude in the aeronautical frame (right-handed, Z-down, X-front,
@@ -9220,32 +8134,24 @@ a zero rotation would be expressed as (1 0 0 0).
                 covariance                : Row-major representation of a 3x3 attitude covariance matrix (states: roll, pitch, yaw; first three entries are the first ROW, next three entries are the second row, etc.). If unknown, assign NaN value to first element in the array. (float)
 
 */
-    mavlink20.messages.attitude_quaternion_cov = function( ...moreargs ) {
-    [ this.time_usec , this.q , this.rollspeed , this.pitchspeed , this.yawspeed , this.covariance ] = moreargs;
+mavlink20.messages.attitude_quaternion_cov = function(time_usec, q, rollspeed, pitchspeed, yawspeed, covariance) {
 
-    this._format = '<Q4ffff9f';
-    this._id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
+    this.format = '<Q4ffff9f';
+    this.id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_QUATERNION_COV;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 4, 1, 1, 1, 9];
-    this.array_len_map = [0, 4, 0, 0, 0, 9];
     this.crc_extra = 167;
-    this._name = 'ATTITUDE_QUATERNION_COV';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ATTITUDE_QUATERNION_COV';
 
     this.fieldnames = ['time_usec', 'q', 'rollspeed', 'pitchspeed', 'yawspeed', 'covariance'];
 
-}
 
-mavlink20.messages.attitude_quaternion_cov.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.attitude_quaternion_cov.prototype = new mavlink20.message();
 mavlink20.messages.attitude_quaternion_cov.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.q, this.rollspeed, this.pitchspeed, this.yawspeed, this.covariance];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.q, this.rollspeed, this.pitchspeed, this.yawspeed, this.covariance]));
 }
-
 
 /* 
 The state of the fixed wing navigation and position controller.
@@ -9260,32 +8166,24 @@ The state of the fixed wing navigation and position controller.
                 xtrack_error              : Current crosstrack error on x-y plane (float)
 
 */
-    mavlink20.messages.nav_controller_output = function( ...moreargs ) {
-    [ this.nav_roll , this.nav_pitch , this.nav_bearing , this.target_bearing , this.wp_dist , this.alt_error , this.aspd_error , this.xtrack_error ] = moreargs;
+mavlink20.messages.nav_controller_output = function(nav_roll, nav_pitch, nav_bearing, target_bearing, wp_dist, alt_error, aspd_error, xtrack_error) {
 
-    this._format = '<fffffhhH';
-    this._id = mavlink20.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT;
+    this.format = '<fffffhhH';
+    this.id = mavlink20.MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT;
     this.order_map = [0, 1, 5, 6, 7, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 183;
-    this._name = 'NAV_CONTROLLER_OUTPUT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'NAV_CONTROLLER_OUTPUT';
 
     this.fieldnames = ['nav_roll', 'nav_pitch', 'nav_bearing', 'target_bearing', 'wp_dist', 'alt_error', 'aspd_error', 'xtrack_error'];
 
-}
 
-mavlink20.messages.nav_controller_output.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.nav_controller_output.prototype = new mavlink20.message();
 mavlink20.messages.nav_controller_output.prototype.pack = function(mav) {
-    var orderedfields = [ this.nav_roll, this.nav_pitch, this.alt_error, this.aspd_error, this.xtrack_error, this.nav_bearing, this.target_bearing, this.wp_dist];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.nav_roll, this.nav_pitch, this.alt_error, this.aspd_error, this.xtrack_error, this.nav_bearing, this.target_bearing, this.wp_dist]));
 }
-
 
 /* 
 The filtered global position (e.g. fused GPS and accelerometers). The
@@ -9308,32 +8206,24 @@ for a minimal subset.
                 covariance                : Row-major representation of a 6x6 position and velocity 6x6 cross-covariance matrix (states: lat, lon, alt, vx, vy, vz; first six entries are the first ROW, next six entries are the second row, etc.). If unknown, assign NaN value to first element in the array. (float)
 
 */
-    mavlink20.messages.global_position_int_cov = function( ...moreargs ) {
-    [ this.time_usec , this.estimator_type , this.lat , this.lon , this.alt , this.relative_alt , this.vx , this.vy , this.vz , this.covariance ] = moreargs;
+mavlink20.messages.global_position_int_cov = function(time_usec, estimator_type, lat, lon, alt, relative_alt, vx, vy, vz, covariance) {
 
-    this._format = '<Qiiiifff36fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GLOBAL_POSITION_INT_COV;
+    this.format = '<Qiiiifff36fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GLOBAL_POSITION_INT_COV;
     this.order_map = [0, 9, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 36, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 36, 0];
     this.crc_extra = 119;
-    this._name = 'GLOBAL_POSITION_INT_COV';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GLOBAL_POSITION_INT_COV';
 
     this.fieldnames = ['time_usec', 'estimator_type', 'lat', 'lon', 'alt', 'relative_alt', 'vx', 'vy', 'vz', 'covariance'];
 
-}
 
-mavlink20.messages.global_position_int_cov.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.global_position_int_cov.prototype = new mavlink20.message();
 mavlink20.messages.global_position_int_cov.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.covariance, this.estimator_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.covariance, this.estimator_type]));
 }
-
 
 /* 
 The filtered local position (e.g. fused computer vision and
@@ -9354,32 +8244,24 @@ accelerometers). Coordinate frame is right-handed, Z-axis down
                 covariance                : Row-major representation of position, velocity and acceleration 9x9 cross-covariance matrix upper right triangle (states: x, y, z, vx, vy, vz, ax, ay, az; first nine entries are the first ROW, next eight entries are the second row, etc.). If unknown, assign NaN value to first element in the array. (float)
 
 */
-    mavlink20.messages.local_position_ned_cov = function( ...moreargs ) {
-    [ this.time_usec , this.estimator_type , this.x , this.y , this.z , this.vx , this.vy , this.vz , this.ax , this.ay , this.az , this.covariance ] = moreargs;
+mavlink20.messages.local_position_ned_cov = function(time_usec, estimator_type, x, y, z, vx, vy, vz, ax, ay, az, covariance) {
 
-    this._format = '<Qfffffffff45fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV;
+    this.format = '<Qfffffffff45fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED_COV;
     this.order_map = [0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 45, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 0];
     this.crc_extra = 191;
-    this._name = 'LOCAL_POSITION_NED_COV';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOCAL_POSITION_NED_COV';
 
     this.fieldnames = ['time_usec', 'estimator_type', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'ax', 'ay', 'az', 'covariance'];
 
-}
 
-mavlink20.messages.local_position_ned_cov.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.local_position_ned_cov.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned_cov.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.covariance, this.estimator_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.covariance, this.estimator_type]));
 }
-
 
 /* 
 The PPM values of the RC channels received. The standard PPM
@@ -9410,32 +8292,24 @@ receivers/transmitters might violate this specification.
                 rssi                      : Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown. (uint8_t)
 
 */
-    mavlink20.messages.rc_channels = function( ...moreargs ) {
-    [ this.time_boot_ms , this.chancount , this.chan1_raw , this.chan2_raw , this.chan3_raw , this.chan4_raw , this.chan5_raw , this.chan6_raw , this.chan7_raw , this.chan8_raw , this.chan9_raw , this.chan10_raw , this.chan11_raw , this.chan12_raw , this.chan13_raw , this.chan14_raw , this.chan15_raw , this.chan16_raw , this.chan17_raw , this.chan18_raw , this.rssi ] = moreargs;
+mavlink20.messages.rc_channels = function(time_boot_ms, chancount, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, chan9_raw, chan10_raw, chan11_raw, chan12_raw, chan13_raw, chan14_raw, chan15_raw, chan16_raw, chan17_raw, chan18_raw, rssi) {
 
-    this._format = '<IHHHHHHHHHHHHHHHHHHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS;
+    this.format = '<IHHHHHHHHHHHHHHHHHHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS;
     this.order_map = [0, 19, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 118;
-    this._name = 'RC_CHANNELS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RC_CHANNELS';
 
     this.fieldnames = ['time_boot_ms', 'chancount', 'chan1_raw', 'chan2_raw', 'chan3_raw', 'chan4_raw', 'chan5_raw', 'chan6_raw', 'chan7_raw', 'chan8_raw', 'chan9_raw', 'chan10_raw', 'chan11_raw', 'chan12_raw', 'chan13_raw', 'chan14_raw', 'chan15_raw', 'chan16_raw', 'chan17_raw', 'chan18_raw', 'rssi'];
 
-}
 
-mavlink20.messages.rc_channels.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rc_channels.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw, this.chancount, this.rssi];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw, this.chancount, this.rssi]));
 }
-
 
 /* 
 Request a data stream.
@@ -9447,32 +8321,24 @@ Request a data stream.
                 start_stop                : 1 to start sending, 0 to stop sending. (uint8_t)
 
 */
-    mavlink20.messages.request_data_stream = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.req_stream_id , this.req_message_rate , this.start_stop ] = moreargs;
+mavlink20.messages.request_data_stream = function(target_system, target_component, req_stream_id, req_message_rate, start_stop) {
 
-    this._format = '<HBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
+    this.format = '<HBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_REQUEST_DATA_STREAM;
     this.order_map = [1, 2, 3, 0, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 148;
-    this._name = 'REQUEST_DATA_STREAM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'REQUEST_DATA_STREAM';
 
     this.fieldnames = ['target_system', 'target_component', 'req_stream_id', 'req_message_rate', 'start_stop'];
 
-}
 
-mavlink20.messages.request_data_stream.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.request_data_stream.prototype = new mavlink20.message();
 mavlink20.messages.request_data_stream.prototype.pack = function(mav) {
-    var orderedfields = [ this.req_message_rate, this.target_system, this.target_component, this.req_stream_id, this.start_stop];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.req_message_rate, this.target_system, this.target_component, this.req_stream_id, this.start_stop]));
 }
-
 
 /* 
 Data stream status information.
@@ -9482,32 +8348,24 @@ Data stream status information.
                 on_off                    : 1 stream is enabled, 0 stream is stopped. (uint8_t)
 
 */
-    mavlink20.messages.data_stream = function( ...moreargs ) {
-    [ this.stream_id , this.message_rate , this.on_off ] = moreargs;
+mavlink20.messages.data_stream = function(stream_id, message_rate, on_off) {
 
-    this._format = '<HBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA_STREAM;
+    this.format = '<HBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA_STREAM;
     this.order_map = [1, 0, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 21;
-    this._name = 'DATA_STREAM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA_STREAM';
 
     this.fieldnames = ['stream_id', 'message_rate', 'on_off'];
 
-}
 
-mavlink20.messages.data_stream.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data_stream.prototype = new mavlink20.message();
 mavlink20.messages.data_stream.prototype.pack = function(mav) {
-    var orderedfields = [ this.message_rate, this.stream_id, this.on_off];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.message_rate, this.stream_id, this.on_off]));
 }
-
 
 /* 
 This message provides an API for manually controlling the vehicle
@@ -9533,32 +8391,24 @@ as boolean values of their
                 aux6                      : Aux continuous input field 6. Normalized in the range [-1000,1000]. Purpose defined by recipient. Valid data if bit 7 of enabled_extensions field is set. 0 if bit 7 is unset. (int16_t)
 
 */
-    mavlink20.messages.manual_control = function( ...moreargs ) {
-    [ this.target , this.x , this.y , this.z , this.r , this.buttons , this.buttons2 , this.enabled_extensions , this.s , this.t , this.aux1 , this.aux2 , this.aux3 , this.aux4 , this.aux5 , this.aux6 ] = moreargs;
+mavlink20.messages.manual_control = function(target, x, y, z, r, buttons, buttons2, enabled_extensions, s, t, aux1, aux2, aux3, aux4, aux5, aux6) {
 
-    this._format = '<hhhhHBHBhhhhhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_MANUAL_CONTROL;
+    this.format = '<hhhhHBHBhhhhhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_MANUAL_CONTROL;
     this.order_map = [5, 0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 243;
-    this._name = 'MANUAL_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MANUAL_CONTROL';
 
     this.fieldnames = ['target', 'x', 'y', 'z', 'r', 'buttons', 'buttons2', 'enabled_extensions', 's', 't', 'aux1', 'aux2', 'aux3', 'aux4', 'aux5', 'aux6'];
 
-}
 
-mavlink20.messages.manual_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.manual_control.prototype = new mavlink20.message();
 mavlink20.messages.manual_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.x, this.y, this.z, this.r, this.buttons, this.target, this.buttons2, this.enabled_extensions, this.s, this.t, this.aux1, this.aux2, this.aux3, this.aux4, this.aux5, this.aux6];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.x, this.y, this.z, this.r, this.buttons, this.target, this.buttons2, this.enabled_extensions, this.s, this.t, this.aux1, this.aux2, this.aux3, this.aux4, this.aux5, this.aux6]));
 }
-
 
 /* 
 The RAW values of the RC channels sent to the MAV to override info
@@ -9590,32 +8440,24 @@ the subsequent channels
                 chan18_raw                : RC channel 18 value. A value of 0 or UINT16_MAX means to ignore this field. A value of UINT16_MAX-1 means to release this channel back to the RC radio. (uint16_t)
 
 */
-    mavlink20.messages.rc_channels_override = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.chan1_raw , this.chan2_raw , this.chan3_raw , this.chan4_raw , this.chan5_raw , this.chan6_raw , this.chan7_raw , this.chan8_raw , this.chan9_raw , this.chan10_raw , this.chan11_raw , this.chan12_raw , this.chan13_raw , this.chan14_raw , this.chan15_raw , this.chan16_raw , this.chan17_raw , this.chan18_raw ] = moreargs;
+mavlink20.messages.rc_channels_override = function(target_system, target_component, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, chan9_raw, chan10_raw, chan11_raw, chan12_raw, chan13_raw, chan14_raw, chan15_raw, chan16_raw, chan17_raw, chan18_raw) {
 
-    this._format = '<HHHHHHHHBBHHHHHHHHHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE;
+    this.format = '<HHHHHHHHBBHHHHHHHHHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE;
     this.order_map = [8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 124;
-    this._name = 'RC_CHANNELS_OVERRIDE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RC_CHANNELS_OVERRIDE';
 
     this.fieldnames = ['target_system', 'target_component', 'chan1_raw', 'chan2_raw', 'chan3_raw', 'chan4_raw', 'chan5_raw', 'chan6_raw', 'chan7_raw', 'chan8_raw', 'chan9_raw', 'chan10_raw', 'chan11_raw', 'chan12_raw', 'chan13_raw', 'chan14_raw', 'chan15_raw', 'chan16_raw', 'chan17_raw', 'chan18_raw'];
 
-}
 
-mavlink20.messages.rc_channels_override.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.rc_channels_override.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_override.prototype.pack = function(mav) {
-    var orderedfields = [ this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.target_system, this.target_component, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.target_system, this.target_component, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw]));
 }
-
 
 /* 
 Message encoding a mission item. This message is emitted to announce
@@ -9645,32 +8487,24 @@ https://mavlink.io/en/services/mission.html.
                 mission_type              : Mission type. (uint8_t)
 
 */
-    mavlink20.messages.mission_item_int = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.seq , this.frame , this.command , this.current , this.autocontinue , this.param1 , this.param2 , this.param3 , this.param4 , this.x , this.y , this.z , this.mission_type ] = moreargs;
+mavlink20.messages.mission_item_int = function(target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z, mission_type) {
 
-    this._format = '<ffffiifHHBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM_INT;
+    this.format = '<ffffiifHHBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_ITEM_INT;
     this.order_map = [9, 10, 7, 11, 8, 12, 13, 0, 1, 2, 3, 4, 5, 6, 14];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 38;
-    this._name = 'MISSION_ITEM_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_ITEM_INT';
 
     this.fieldnames = ['target_system', 'target_component', 'seq', 'frame', 'command', 'current', 'autocontinue', 'param1', 'param2', 'param3', 'param4', 'x', 'y', 'z', 'mission_type'];
 
-}
 
-mavlink20.messages.mission_item_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_item_int.prototype = new mavlink20.message();
 mavlink20.messages.mission_item_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
 }
-
 
 /* 
 Metrics typically displayed on a HUD for fixed wing aircraft.
@@ -9683,32 +8517,24 @@ Metrics typically displayed on a HUD for fixed wing aircraft.
                 climb                     : Current climb rate. (float)
 
 */
-    mavlink20.messages.vfr_hud = function( ...moreargs ) {
-    [ this.airspeed , this.groundspeed , this.heading , this.throttle , this.alt , this.climb ] = moreargs;
+mavlink20.messages.vfr_hud = function(airspeed, groundspeed, heading, throttle, alt, climb) {
 
-    this._format = '<ffffhH';
-    this._id = mavlink20.MAVLINK_MSG_ID_VFR_HUD;
+    this.format = '<ffffhH';
+    this.id = mavlink20.MAVLINK_MSG_ID_VFR_HUD;
     this.order_map = [0, 1, 4, 5, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 20;
-    this._name = 'VFR_HUD';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VFR_HUD';
 
     this.fieldnames = ['airspeed', 'groundspeed', 'heading', 'throttle', 'alt', 'climb'];
 
-}
 
-mavlink20.messages.vfr_hud.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vfr_hud.prototype = new mavlink20.message();
 mavlink20.messages.vfr_hud.prototype.pack = function(mav) {
-    var orderedfields = [ this.airspeed, this.groundspeed, this.alt, this.climb, this.heading, this.throttle];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.airspeed, this.groundspeed, this.alt, this.climb, this.heading, this.throttle]));
 }
-
 
 /* 
 Message encoding a command with parameters as scaled integers. Scaling
@@ -9730,32 +8556,24 @@ documented at https://mavlink.io/en/services/command.html
                 z                         : PARAM7 / z position: global: altitude in meters (relative or absolute, depending on frame). (float)
 
 */
-    mavlink20.messages.command_int = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.frame , this.command , this.current , this.autocontinue , this.param1 , this.param2 , this.param3 , this.param4 , this.x , this.y , this.z ] = moreargs;
+mavlink20.messages.command_int = function(target_system, target_component, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z) {
 
-    this._format = '<ffffiifHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMMAND_INT;
+    this.format = '<ffffiifHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMMAND_INT;
     this.order_map = [8, 9, 10, 7, 11, 12, 0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 158;
-    this._name = 'COMMAND_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMMAND_INT';
 
     this.fieldnames = ['target_system', 'target_component', 'frame', 'command', 'current', 'autocontinue', 'param1', 'param2', 'param3', 'param4', 'x', 'y', 'z'];
 
-}
 
-mavlink20.messages.command_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.command_int.prototype = new mavlink20.message();
 mavlink20.messages.command_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
 }
-
 
 /* 
 Send a command with up to seven parameters to the MAV. The command
@@ -9775,32 +8593,24 @@ https://mavlink.io/en/services/command.html
                 param7                    : Parameter 7 (for the specific command). (float)
 
 */
-    mavlink20.messages.command_long = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.command , this.confirmation , this.param1 , this.param2 , this.param3 , this.param4 , this.param5 , this.param6 , this.param7 ] = moreargs;
+mavlink20.messages.command_long = function(target_system, target_component, command, confirmation, param1, param2, param3, param4, param5, param6, param7) {
 
-    this._format = '<fffffffHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMMAND_LONG;
+    this.format = '<fffffffHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMMAND_LONG;
     this.order_map = [8, 9, 7, 10, 0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 152;
-    this._name = 'COMMAND_LONG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMMAND_LONG';
 
     this.fieldnames = ['target_system', 'target_component', 'command', 'confirmation', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6', 'param7'];
 
-}
 
-mavlink20.messages.command_long.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.command_long.prototype = new mavlink20.message();
 mavlink20.messages.command_long.prototype.pack = function(mav) {
-    var orderedfields = [ this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
 }
-
 
 /* 
 Report status of a command. Includes feedback whether the command was
@@ -9815,32 +8625,24 @@ https://mavlink.io/en/services/command.html
                 target_component          : Component which requested the command to be executed (uint8_t)
 
 */
-    mavlink20.messages.command_ack = function( ...moreargs ) {
-    [ this.command , this.result , this.progress , this.result_param2 , this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.command_ack = function(command, result, progress, result_param2, target_system, target_component) {
 
-    this._format = '<HBBiBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMMAND_ACK;
+    this.format = '<HBBiBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMMAND_ACK;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 143;
-    this._name = 'COMMAND_ACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMMAND_ACK';
 
     this.fieldnames = ['command', 'result', 'progress', 'result_param2', 'target_system', 'target_component'];
 
-}
 
-mavlink20.messages.command_ack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.command_ack.prototype = new mavlink20.message();
 mavlink20.messages.command_ack.prototype.pack = function(mav) {
-    var orderedfields = [ this.command, this.result, this.progress, this.result_param2, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.command, this.result, this.progress, this.result_param2, this.target_system, this.target_component]));
 }
-
 
 /* 
 Setpoint in roll, pitch, yaw and thrust from the operator
@@ -9854,32 +8656,24 @@ Setpoint in roll, pitch, yaw and thrust from the operator
                 manual_override_switch        : Override mode switch position, 0.. 255 (uint8_t)
 
 */
-    mavlink20.messages.manual_setpoint = function( ...moreargs ) {
-    [ this.time_boot_ms , this.roll , this.pitch , this.yaw , this.thrust , this.mode_switch , this.manual_override_switch ] = moreargs;
+mavlink20.messages.manual_setpoint = function(time_boot_ms, roll, pitch, yaw, thrust, mode_switch, manual_override_switch) {
 
-    this._format = '<IffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MANUAL_SETPOINT;
+    this.format = '<IffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MANUAL_SETPOINT;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 106;
-    this._name = 'MANUAL_SETPOINT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MANUAL_SETPOINT';
 
     this.fieldnames = ['time_boot_ms', 'roll', 'pitch', 'yaw', 'thrust', 'mode_switch', 'manual_override_switch'];
 
-}
 
-mavlink20.messages.manual_setpoint.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.manual_setpoint.prototype = new mavlink20.message();
 mavlink20.messages.manual_setpoint.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.thrust, this.mode_switch, this.manual_override_switch];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.thrust, this.mode_switch, this.manual_override_switch]));
 }
-
 
 /* 
 Sets a desired vehicle attitude. Used by an external controller to
@@ -9896,32 +8690,24 @@ command the vehicle (manual controller or other system).
                 thrust                    : Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust) (float)
 
 */
-    mavlink20.messages.set_attitude_target = function( ...moreargs ) {
-    [ this.time_boot_ms , this.target_system , this.target_component , this.type_mask , this.q , this.body_roll_rate , this.body_pitch_rate , this.body_yaw_rate , this.thrust ] = moreargs;
+mavlink20.messages.set_attitude_target = function(time_boot_ms, target_system, target_component, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust) {
 
-    this._format = '<I4fffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_ATTITUDE_TARGET;
+    this.format = '<I4fffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_ATTITUDE_TARGET;
     this.order_map = [0, 6, 7, 8, 1, 2, 3, 4, 5];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 49;
-    this._name = 'SET_ATTITUDE_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_ATTITUDE_TARGET';
 
     this.fieldnames = ['time_boot_ms', 'target_system', 'target_component', 'type_mask', 'q', 'body_roll_rate', 'body_pitch_rate', 'body_yaw_rate', 'thrust'];
 
-}
 
-mavlink20.messages.set_attitude_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_attitude_target.prototype = new mavlink20.message();
 mavlink20.messages.set_attitude_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.target_system, this.target_component, this.type_mask];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.target_system, this.target_component, this.type_mask]));
 }
-
 
 /* 
 Reports the current commanded attitude of the vehicle as specified by
@@ -9938,32 +8724,24 @@ way.
                 thrust                    : Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust) (float)
 
 */
-    mavlink20.messages.attitude_target = function( ...moreargs ) {
-    [ this.time_boot_ms , this.type_mask , this.q , this.body_roll_rate , this.body_pitch_rate , this.body_yaw_rate , this.thrust ] = moreargs;
+mavlink20.messages.attitude_target = function(time_boot_ms, type_mask, q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust) {
 
-    this._format = '<I4fffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_TARGET;
+    this.format = '<I4fffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ATTITUDE_TARGET;
     this.order_map = [0, 6, 1, 2, 3, 4, 5];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0];
     this.crc_extra = 22;
-    this._name = 'ATTITUDE_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ATTITUDE_TARGET';
 
     this.fieldnames = ['time_boot_ms', 'type_mask', 'q', 'body_roll_rate', 'body_pitch_rate', 'body_yaw_rate', 'thrust'];
 
-}
 
-mavlink20.messages.attitude_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.attitude_target.prototype = new mavlink20.message();
 mavlink20.messages.attitude_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.type_mask];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.type_mask]));
 }
-
 
 /* 
 Sets a desired vehicle position in a local north-east-down coordinate
@@ -9988,32 +8766,24 @@ controller or other system).
                 yaw_rate                  : yaw rate setpoint (float)
 
 */
-    mavlink20.messages.set_position_target_local_ned = function( ...moreargs ) {
-    [ this.time_boot_ms , this.target_system , this.target_component , this.coordinate_frame , this.type_mask , this.x , this.y , this.z , this.vx , this.vy , this.vz , this.afx , this.afy , this.afz , this.yaw , this.yaw_rate ] = moreargs;
+mavlink20.messages.set_position_target_local_ned = function(time_boot_ms, target_system, target_component, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate) {
 
-    this._format = '<IfffffffffffHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED;
+    this.format = '<IfffffffffffHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED;
     this.order_map = [0, 13, 14, 15, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 143;
-    this._name = 'SET_POSITION_TARGET_LOCAL_NED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_POSITION_TARGET_LOCAL_NED';
 
     this.fieldnames = ['time_boot_ms', 'target_system', 'target_component', 'coordinate_frame', 'type_mask', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'afx', 'afy', 'afz', 'yaw', 'yaw_rate'];
 
-}
 
-mavlink20.messages.set_position_target_local_ned.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_position_target_local_ned.prototype = new mavlink20.message();
 mavlink20.messages.set_position_target_local_ned.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
 }
-
 
 /* 
 Reports the current commanded vehicle position, velocity, and
@@ -10037,32 +8807,24 @@ controlled this way.
                 yaw_rate                  : yaw rate setpoint (float)
 
 */
-    mavlink20.messages.position_target_local_ned = function( ...moreargs ) {
-    [ this.time_boot_ms , this.coordinate_frame , this.type_mask , this.x , this.y , this.z , this.vx , this.vy , this.vz , this.afx , this.afy , this.afz , this.yaw , this.yaw_rate ] = moreargs;
+mavlink20.messages.position_target_local_ned = function(time_boot_ms, coordinate_frame, type_mask, x, y, z, vx, vy, vz, afx, afy, afz, yaw, yaw_rate) {
 
-    this._format = '<IfffffffffffHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
+    this.format = '<IfffffffffffHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED;
     this.order_map = [0, 13, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 140;
-    this._name = 'POSITION_TARGET_LOCAL_NED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'POSITION_TARGET_LOCAL_NED';
 
     this.fieldnames = ['time_boot_ms', 'coordinate_frame', 'type_mask', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'afx', 'afy', 'afz', 'yaw', 'yaw_rate'];
 
-}
 
-mavlink20.messages.position_target_local_ned.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.position_target_local_ned.prototype = new mavlink20.message();
 mavlink20.messages.position_target_local_ned.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
 }
-
 
 /* 
 Sets a desired vehicle position, velocity, and/or acceleration in a
@@ -10087,32 +8849,24 @@ command the vehicle (manual controller or other system).
                 yaw_rate                  : yaw rate setpoint (float)
 
 */
-    mavlink20.messages.set_position_target_global_int = function( ...moreargs ) {
-    [ this.time_boot_ms , this.target_system , this.target_component , this.coordinate_frame , this.type_mask , this.lat_int , this.lon_int , this.alt , this.vx , this.vy , this.vz , this.afx , this.afy , this.afz , this.yaw , this.yaw_rate ] = moreargs;
+mavlink20.messages.set_position_target_global_int = function(time_boot_ms, target_system, target_component, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate) {
 
-    this._format = '<IiifffffffffHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT;
+    this.format = '<IiifffffffffHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT;
     this.order_map = [0, 13, 14, 15, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 5;
-    this._name = 'SET_POSITION_TARGET_GLOBAL_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_POSITION_TARGET_GLOBAL_INT';
 
     this.fieldnames = ['time_boot_ms', 'target_system', 'target_component', 'coordinate_frame', 'type_mask', 'lat_int', 'lon_int', 'alt', 'vx', 'vy', 'vz', 'afx', 'afy', 'afz', 'yaw', 'yaw_rate'];
 
-}
 
-mavlink20.messages.set_position_target_global_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_position_target_global_int.prototype = new mavlink20.message();
 mavlink20.messages.set_position_target_global_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
 }
-
 
 /* 
 Reports the current commanded vehicle position, velocity, and
@@ -10136,32 +8890,24 @@ being controlled this way.
                 yaw_rate                  : yaw rate setpoint (float)
 
 */
-    mavlink20.messages.position_target_global_int = function( ...moreargs ) {
-    [ this.time_boot_ms , this.coordinate_frame , this.type_mask , this.lat_int , this.lon_int , this.alt , this.vx , this.vy , this.vz , this.afx , this.afy , this.afz , this.yaw , this.yaw_rate ] = moreargs;
+mavlink20.messages.position_target_global_int = function(time_boot_ms, coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate) {
 
-    this._format = '<IiifffffffffHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT;
+    this.format = '<IiifffffffffHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT;
     this.order_map = [0, 13, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 150;
-    this._name = 'POSITION_TARGET_GLOBAL_INT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'POSITION_TARGET_GLOBAL_INT';
 
     this.fieldnames = ['time_boot_ms', 'coordinate_frame', 'type_mask', 'lat_int', 'lon_int', 'alt', 'vx', 'vy', 'vz', 'afx', 'afy', 'afz', 'yaw', 'yaw_rate'];
 
-}
 
-mavlink20.messages.position_target_global_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.position_target_global_int.prototype = new mavlink20.message();
 mavlink20.messages.position_target_global_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
 }
-
 
 /* 
 The offset in X, Y, Z and yaw between the LOCAL_POSITION_NED messages
@@ -10178,32 +8924,24 @@ Coordinate frame is right-handed, Z-axis down (aeronautical frame, NED
                 yaw                       : Yaw (float)
 
 */
-    mavlink20.messages.local_position_ned_system_global_offset = function( ...moreargs ) {
-    [ this.time_boot_ms , this.x , this.y , this.z , this.roll , this.pitch , this.yaw ] = moreargs;
+mavlink20.messages.local_position_ned_system_global_offset = function(time_boot_ms, x, y, z, roll, pitch, yaw) {
 
-    this._format = '<Iffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET;
+    this.format = '<Iffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 231;
-    this._name = 'LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOCAL_POSITION_NED_SYSTEM_GLOBAL_OFFSET';
 
     this.fieldnames = ['time_boot_ms', 'x', 'y', 'z', 'roll', 'pitch', 'yaw'];
 
-}
 
-mavlink20.messages.local_position_ned_system_global_offset.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.local_position_ned_system_global_offset.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned_system_global_offset.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.x, this.y, this.z, this.roll, this.pitch, this.yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.roll, this.pitch, this.yaw]));
 }
-
 
 /* 
 Sent from simulation to autopilot. This packet is useful for high
@@ -10227,32 +8965,24 @@ throughput applications such as hardware in the loop simulations.
                 zacc                      : Z acceleration (int16_t)
 
 */
-    mavlink20.messages.hil_state = function( ...moreargs ) {
-    [ this.time_usec , this.roll , this.pitch , this.yaw , this.rollspeed , this.pitchspeed , this.yawspeed , this.lat , this.lon , this.alt , this.vx , this.vy , this.vz , this.xacc , this.yacc , this.zacc ] = moreargs;
+mavlink20.messages.hil_state = function(time_usec, roll, pitch, yaw, rollspeed, pitchspeed, yawspeed, lat, lon, alt, vx, vy, vz, xacc, yacc, zacc) {
 
-    this._format = '<Qffffffiiihhhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_STATE;
+    this.format = '<Qffffffiiihhhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_STATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 183;
-    this._name = 'HIL_STATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_STATE';
 
     this.fieldnames = ['time_usec', 'roll', 'pitch', 'yaw', 'rollspeed', 'pitchspeed', 'yawspeed', 'lat', 'lon', 'alt', 'vx', 'vy', 'vz', 'xacc', 'yacc', 'zacc'];
 
-}
 
-mavlink20.messages.hil_state.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_state.prototype = new mavlink20.message();
 mavlink20.messages.hil_state.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.xacc, this.yacc, this.zacc];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.xacc, this.yacc, this.zacc]));
 }
-
 
 /* 
 Sent from autopilot to simulation. Hardware in the loop control
@@ -10271,32 +9001,24 @@ outputs
                 nav_mode                  : Navigation mode (MAV_NAV_MODE) (uint8_t)
 
 */
-    mavlink20.messages.hil_controls = function( ...moreargs ) {
-    [ this.time_usec , this.roll_ailerons , this.pitch_elevator , this.yaw_rudder , this.throttle , this.aux1 , this.aux2 , this.aux3 , this.aux4 , this.mode , this.nav_mode ] = moreargs;
+mavlink20.messages.hil_controls = function(time_usec, roll_ailerons, pitch_elevator, yaw_rudder, throttle, aux1, aux2, aux3, aux4, mode, nav_mode) {
 
-    this._format = '<QffffffffBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_CONTROLS;
+    this.format = '<QffffffffBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_CONTROLS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 63;
-    this._name = 'HIL_CONTROLS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_CONTROLS';
 
     this.fieldnames = ['time_usec', 'roll_ailerons', 'pitch_elevator', 'yaw_rudder', 'throttle', 'aux1', 'aux2', 'aux3', 'aux4', 'mode', 'nav_mode'];
 
-}
 
-mavlink20.messages.hil_controls.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_controls.prototype = new mavlink20.message();
 mavlink20.messages.hil_controls.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.roll_ailerons, this.pitch_elevator, this.yaw_rudder, this.throttle, this.aux1, this.aux2, this.aux3, this.aux4, this.mode, this.nav_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.roll_ailerons, this.pitch_elevator, this.yaw_rudder, this.throttle, this.aux1, this.aux2, this.aux3, this.aux4, this.mode, this.nav_mode]));
 }
-
 
 /* 
 Sent from simulation to autopilot. The RAW values of the RC channels
@@ -10320,32 +9042,24 @@ receivers/transmitters might violate this specification.
                 rssi                      : Receive signal strength indicator in device-dependent units/scale. Values: [0-254], 255: invalid/unknown. (uint8_t)
 
 */
-    mavlink20.messages.hil_rc_inputs_raw = function( ...moreargs ) {
-    [ this.time_usec , this.chan1_raw , this.chan2_raw , this.chan3_raw , this.chan4_raw , this.chan5_raw , this.chan6_raw , this.chan7_raw , this.chan8_raw , this.chan9_raw , this.chan10_raw , this.chan11_raw , this.chan12_raw , this.rssi ] = moreargs;
+mavlink20.messages.hil_rc_inputs_raw = function(time_usec, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, chan9_raw, chan10_raw, chan11_raw, chan12_raw, rssi) {
 
-    this._format = '<QHHHHHHHHHHHHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW;
+    this.format = '<QHHHHHHHHHHHHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 54;
-    this._name = 'HIL_RC_INPUTS_RAW';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_RC_INPUTS_RAW';
 
     this.fieldnames = ['time_usec', 'chan1_raw', 'chan2_raw', 'chan3_raw', 'chan4_raw', 'chan5_raw', 'chan6_raw', 'chan7_raw', 'chan8_raw', 'chan9_raw', 'chan10_raw', 'chan11_raw', 'chan12_raw', 'rssi'];
 
-}
 
-mavlink20.messages.hil_rc_inputs_raw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_rc_inputs_raw.prototype = new mavlink20.message();
 mavlink20.messages.hil_rc_inputs_raw.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.rssi];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.rssi]));
 }
-
 
 /* 
 Sent from autopilot to simulation. Hardware in the loop control
@@ -10357,32 +9071,24 @@ outputs (replacement for HIL_CONTROLS)
                 flags                     : Flags as bitfield, 1: indicate simulation using lockstep. (uint64_t)
 
 */
-    mavlink20.messages.hil_actuator_controls = function( ...moreargs ) {
-    [ this.time_usec , this.controls , this.mode , this.flags ] = moreargs;
+mavlink20.messages.hil_actuator_controls = function(time_usec, controls, mode, flags) {
 
-    this._format = '<QQ16fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS;
+    this.format = '<QQ16fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS;
     this.order_map = [0, 2, 3, 1];
-    this.len_map = [1, 1, 16, 1];
-    this.array_len_map = [0, 0, 16, 0];
     this.crc_extra = 47;
-    this._name = 'HIL_ACTUATOR_CONTROLS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_ACTUATOR_CONTROLS';
 
     this.fieldnames = ['time_usec', 'controls', 'mode', 'flags'];
 
-}
 
-mavlink20.messages.hil_actuator_controls.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_actuator_controls.prototype = new mavlink20.message();
 mavlink20.messages.hil_actuator_controls.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.flags, this.controls, this.mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.flags, this.controls, this.mode]));
 }
-
 
 /* 
 Optical flow from a flow sensor (e.g. optical mouse sensor)
@@ -10399,32 +9105,24 @@ Optical flow from a flow sensor (e.g. optical mouse sensor)
                 flow_rate_y               : Flow rate about Y axis (float)
 
 */
-    mavlink20.messages.optical_flow = function( ...moreargs ) {
-    [ this.time_usec , this.sensor_id , this.flow_x , this.flow_y , this.flow_comp_m_x , this.flow_comp_m_y , this.quality , this.ground_distance , this.flow_rate_x , this.flow_rate_y ] = moreargs;
+mavlink20.messages.optical_flow = function(time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance, flow_rate_x, flow_rate_y) {
 
-    this._format = '<QfffhhBBff';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPTICAL_FLOW;
+    this.format = '<QfffhhBBff';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPTICAL_FLOW;
     this.order_map = [0, 6, 4, 5, 1, 2, 7, 3, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 175;
-    this._name = 'OPTICAL_FLOW';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPTICAL_FLOW';
 
     this.fieldnames = ['time_usec', 'sensor_id', 'flow_x', 'flow_y', 'flow_comp_m_x', 'flow_comp_m_y', 'quality', 'ground_distance', 'flow_rate_x', 'flow_rate_y'];
 
-}
 
-mavlink20.messages.optical_flow.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.optical_flow.prototype = new mavlink20.message();
 mavlink20.messages.optical_flow.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.flow_comp_m_x, this.flow_comp_m_y, this.ground_distance, this.flow_x, this.flow_y, this.sensor_id, this.quality, this.flow_rate_x, this.flow_rate_y];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.flow_comp_m_x, this.flow_comp_m_y, this.ground_distance, this.flow_x, this.flow_y, this.sensor_id, this.quality, this.flow_rate_x, this.flow_rate_y]));
 }
-
 
 /* 
 Global position/attitude estimate from a vision source.
@@ -10440,32 +9138,24 @@ Global position/attitude estimate from a vision source.
                 reset_counter             : Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps. (uint8_t)
 
 */
-    mavlink20.messages.global_vision_position_estimate = function( ...moreargs ) {
-    [ this.usec , this.x , this.y , this.z , this.roll , this.pitch , this.yaw , this.covariance , this.reset_counter ] = moreargs;
+mavlink20.messages.global_vision_position_estimate = function(usec, x, y, z, roll, pitch, yaw, covariance, reset_counter) {
 
-    this._format = '<Qffffff21fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE;
+    this.format = '<Qffffff21fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 21, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 21, 0];
     this.crc_extra = 102;
-    this._name = 'GLOBAL_VISION_POSITION_ESTIMATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GLOBAL_VISION_POSITION_ESTIMATE';
 
     this.fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw', 'covariance', 'reset_counter'];
 
-}
 
-mavlink20.messages.global_vision_position_estimate.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.global_vision_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.global_vision_position_estimate.prototype.pack = function(mav) {
-    var orderedfields = [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
 }
-
 
 /* 
 Local position/attitude estimate from a vision source.
@@ -10481,32 +9171,24 @@ Local position/attitude estimate from a vision source.
                 reset_counter             : Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps. (uint8_t)
 
 */
-    mavlink20.messages.vision_position_estimate = function( ...moreargs ) {
-    [ this.usec , this.x , this.y , this.z , this.roll , this.pitch , this.yaw , this.covariance , this.reset_counter ] = moreargs;
+mavlink20.messages.vision_position_estimate = function(usec, x, y, z, roll, pitch, yaw, covariance, reset_counter) {
 
-    this._format = '<Qffffff21fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
+    this.format = '<Qffffff21fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 21, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 21, 0];
     this.crc_extra = 158;
-    this._name = 'VISION_POSITION_ESTIMATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VISION_POSITION_ESTIMATE';
 
     this.fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw', 'covariance', 'reset_counter'];
 
-}
 
-mavlink20.messages.vision_position_estimate.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vision_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vision_position_estimate.prototype.pack = function(mav) {
-    var orderedfields = [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
 }
-
 
 /* 
 Speed estimate from a vision source.
@@ -10519,32 +9201,24 @@ Speed estimate from a vision source.
                 reset_counter             : Estimate reset counter. This should be incremented when the estimate resets in any of the dimensions (position, velocity, attitude, angular speed). This is designed to be used when e.g an external SLAM system detects a loop-closure and the estimate jumps. (uint8_t)
 
 */
-    mavlink20.messages.vision_speed_estimate = function( ...moreargs ) {
-    [ this.usec , this.x , this.y , this.z , this.covariance , this.reset_counter ] = moreargs;
+mavlink20.messages.vision_speed_estimate = function(usec, x, y, z, covariance, reset_counter) {
 
-    this._format = '<Qfff9fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
+    this.format = '<Qfff9fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 9, 1];
-    this.array_len_map = [0, 0, 0, 0, 9, 0];
     this.crc_extra = 208;
-    this._name = 'VISION_SPEED_ESTIMATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VISION_SPEED_ESTIMATE';
 
     this.fieldnames = ['usec', 'x', 'y', 'z', 'covariance', 'reset_counter'];
 
-}
 
-mavlink20.messages.vision_speed_estimate.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vision_speed_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vision_speed_estimate.prototype.pack = function(mav) {
-    var orderedfields = [ this.usec, this.x, this.y, this.z, this.covariance, this.reset_counter];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.covariance, this.reset_counter]));
 }
-
 
 /* 
 Global position estimate from a Vicon motion system source.
@@ -10559,32 +9233,24 @@ Global position estimate from a Vicon motion system source.
                 covariance                : Row-major representation of 6x6 pose cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array. (float)
 
 */
-    mavlink20.messages.vicon_position_estimate = function( ...moreargs ) {
-    [ this.usec , this.x , this.y , this.z , this.roll , this.pitch , this.yaw , this.covariance ] = moreargs;
+mavlink20.messages.vicon_position_estimate = function(usec, x, y, z, roll, pitch, yaw, covariance) {
 
-    this._format = '<Qffffff21f';
-    this._id = mavlink20.MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE;
+    this.format = '<Qffffff21f';
+    this.id = mavlink20.MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 21];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 21];
     this.crc_extra = 56;
-    this._name = 'VICON_POSITION_ESTIMATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VICON_POSITION_ESTIMATE';
 
     this.fieldnames = ['usec', 'x', 'y', 'z', 'roll', 'pitch', 'yaw', 'covariance'];
 
-}
 
-mavlink20.messages.vicon_position_estimate.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vicon_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vicon_position_estimate.prototype.pack = function(mav) {
-    var orderedfields = [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance]));
 }
-
 
 /* 
 The IMU readings in SI units in NED body frame
@@ -10607,32 +9273,24 @@ The IMU readings in SI units in NED body frame
                 id                        : Id. Ids are numbered from 0 and map to IMUs numbered from 1 (e.g. IMU1 will have a message with id=0) (uint8_t)
 
 */
-    mavlink20.messages.highres_imu = function( ...moreargs ) {
-    [ this.time_usec , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.abs_pressure , this.diff_pressure , this.pressure_alt , this.temperature , this.fields_updated , this.id ] = moreargs;
+mavlink20.messages.highres_imu = function(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated, id) {
 
-    this._format = '<QfffffffffffffHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIGHRES_IMU;
+    this.format = '<QfffffffffffffHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIGHRES_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 93;
-    this._name = 'HIGHRES_IMU';
-
-    this._instance_field = 'id';
-    this._instance_offset = 62;
+    this.name = 'HIGHRES_IMU';
 
     this.fieldnames = ['time_usec', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'abs_pressure', 'diff_pressure', 'pressure_alt', 'temperature', 'fields_updated', 'id'];
 
-}
 
-mavlink20.messages.highres_imu.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.highres_imu.prototype = new mavlink20.message();
 mavlink20.messages.highres_imu.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
 }
-
 
 /* 
 Optical flow from an angular rate flow sensor (e.g. PX4FLOW or mouse
@@ -10652,32 +9310,24 @@ sensor)
                 distance                  : Distance to the center of the flow field. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
 */
-    mavlink20.messages.optical_flow_rad = function( ...moreargs ) {
-    [ this.time_usec , this.sensor_id , this.integration_time_us , this.integrated_x , this.integrated_y , this.integrated_xgyro , this.integrated_ygyro , this.integrated_zgyro , this.temperature , this.quality , this.time_delta_distance_us , this.distance ] = moreargs;
+mavlink20.messages.optical_flow_rad = function(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance) {
 
-    this._format = '<QIfffffIfhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
+    this.format = '<QIfffffIfhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPTICAL_FLOW_RAD;
     this.order_map = [0, 10, 1, 2, 3, 4, 5, 6, 9, 11, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 138;
-    this._name = 'OPTICAL_FLOW_RAD';
-
-    this._instance_field = 'sensor_id';
-    this._instance_offset = 42;
+    this.name = 'OPTICAL_FLOW_RAD';
 
     this.fieldnames = ['time_usec', 'sensor_id', 'integration_time_us', 'integrated_x', 'integrated_y', 'integrated_xgyro', 'integrated_ygyro', 'integrated_zgyro', 'temperature', 'quality', 'time_delta_distance_us', 'distance'];
 
-}
 
-mavlink20.messages.optical_flow_rad.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.optical_flow_rad.prototype = new mavlink20.message();
 mavlink20.messages.optical_flow_rad.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
 }
-
 
 /* 
 The IMU readings in SI units in NED body frame
@@ -10700,32 +9350,24 @@ The IMU readings in SI units in NED body frame
                 id                        : Sensor ID (zero indexed). Used for multiple sensor inputs (uint8_t)
 
 */
-    mavlink20.messages.hil_sensor = function( ...moreargs ) {
-    [ this.time_usec , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.abs_pressure , this.diff_pressure , this.pressure_alt , this.temperature , this.fields_updated , this.id ] = moreargs;
+mavlink20.messages.hil_sensor = function(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated, id) {
 
-    this._format = '<QfffffffffffffIB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_SENSOR;
+    this.format = '<QfffffffffffffIB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_SENSOR;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 108;
-    this._name = 'HIL_SENSOR';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_SENSOR';
 
     this.fieldnames = ['time_usec', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'abs_pressure', 'diff_pressure', 'pressure_alt', 'temperature', 'fields_updated', 'id'];
 
-}
 
-mavlink20.messages.hil_sensor.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_sensor.prototype = new mavlink20.message();
 mavlink20.messages.hil_sensor.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
 }
-
 
 /* 
 Status of simulation environment, if used
@@ -10755,32 +9397,24 @@ Status of simulation environment, if used
                 lon_int                   : Longitude (higher precision). If 0, recipients should use the lon field value (otherwise this field is preferred). (int32_t)
 
 */
-    mavlink20.messages.sim_state = function( ...moreargs ) {
-    [ this.q1 , this.q2 , this.q3 , this.q4 , this.roll , this.pitch , this.yaw , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.lat , this.lon , this.alt , this.std_dev_horz , this.std_dev_vert , this.vn , this.ve , this.vd , this.lat_int , this.lon_int ] = moreargs;
+mavlink20.messages.sim_state = function(q1, q2, q3, q4, roll, pitch, yaw, xacc, yacc, zacc, xgyro, ygyro, zgyro, lat, lon, alt, std_dev_horz, std_dev_vert, vn, ve, vd, lat_int, lon_int) {
 
-    this._format = '<fffffffffffffffffffffii';
-    this._id = mavlink20.MAVLINK_MSG_ID_SIM_STATE;
+    this.format = '<fffffffffffffffffffffii';
+    this.id = mavlink20.MAVLINK_MSG_ID_SIM_STATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 32;
-    this._name = 'SIM_STATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SIM_STATE';
 
     this.fieldnames = ['q1', 'q2', 'q3', 'q4', 'roll', 'pitch', 'yaw', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'lat', 'lon', 'alt', 'std_dev_horz', 'std_dev_vert', 'vn', 've', 'vd', 'lat_int', 'lon_int'];
 
-}
 
-mavlink20.messages.sim_state.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.sim_state.prototype = new mavlink20.message();
 mavlink20.messages.sim_state.prototype.pack = function(mav) {
-    var orderedfields = [ this.q1, this.q2, this.q3, this.q4, this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lon, this.alt, this.std_dev_horz, this.std_dev_vert, this.vn, this.ve, this.vd, this.lat_int, this.lon_int];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q1, this.q2, this.q3, this.q4, this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lon, this.alt, this.std_dev_horz, this.std_dev_vert, this.vn, this.ve, this.vd, this.lat_int, this.lon_int]));
 }
-
 
 /* 
 Status generated by radio and injected into MAVLink stream.
@@ -10794,32 +9428,24 @@ Status generated by radio and injected into MAVLink stream.
                 fixed                     : Count of error corrected radio packets (since boot). (uint16_t)
 
 */
-    mavlink20.messages.radio_status = function( ...moreargs ) {
-    [ this.rssi , this.remrssi , this.txbuf , this.noise , this.remnoise , this.rxerrors , this.fixed ] = moreargs;
+mavlink20.messages.radio_status = function(rssi, remrssi, txbuf, noise, remnoise, rxerrors, fixed) {
 
-    this._format = '<HHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RADIO_STATUS;
+    this.format = '<HHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RADIO_STATUS;
     this.order_map = [2, 3, 4, 5, 6, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 185;
-    this._name = 'RADIO_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RADIO_STATUS';
 
     this.fieldnames = ['rssi', 'remrssi', 'txbuf', 'noise', 'remnoise', 'rxerrors', 'fixed'];
 
-}
 
-mavlink20.messages.radio_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.radio_status.prototype = new mavlink20.message();
 mavlink20.messages.radio_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
 }
-
 
 /* 
 File transfer message
@@ -10830,32 +9456,24 @@ File transfer message
                 payload                   : Variable length payload. The length is defined by the remaining message length when subtracting the header and other fields.  The entire content of this block is opaque unless you understand any the encoding message_type.  The particular encoding used can be extension specific and might not always be documented as part of the mavlink specification. (uint8_t)
 
 */
-    mavlink20.messages.file_transfer_protocol = function( ...moreargs ) {
-    [ this.target_network , this.target_system , this.target_component , this.payload ] = moreargs;
+mavlink20.messages.file_transfer_protocol = function(target_network, target_system, target_component, payload) {
 
-    this._format = '<BBB251s';
-    this._id = mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL;
+    this.format = '<BBB251s';
+    this.id = mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 251];
-    this.array_len_map = [0, 0, 0, 251];
     this.crc_extra = 84;
-    this._name = 'FILE_TRANSFER_PROTOCOL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FILE_TRANSFER_PROTOCOL';
 
     this.fieldnames = ['target_network', 'target_system', 'target_component', 'payload'];
 
-}
 
-mavlink20.messages.file_transfer_protocol.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.file_transfer_protocol.prototype = new mavlink20.message();
 mavlink20.messages.file_transfer_protocol.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_network, this.target_system, this.target_component, this.payload];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_network, this.target_system, this.target_component, this.payload]));
 }
-
 
 /* 
 Time synchronization message.
@@ -10864,32 +9482,24 @@ Time synchronization message.
                 ts1                       : Time sync timestamp 2 (int64_t)
 
 */
-    mavlink20.messages.timesync = function( ...moreargs ) {
-    [ this.tc1 , this.ts1 ] = moreargs;
+mavlink20.messages.timesync = function(tc1, ts1) {
 
-    this._format = '<qq';
-    this._id = mavlink20.MAVLINK_MSG_ID_TIMESYNC;
+    this.format = '<qq';
+    this.id = mavlink20.MAVLINK_MSG_ID_TIMESYNC;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 34;
-    this._name = 'TIMESYNC';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TIMESYNC';
 
     this.fieldnames = ['tc1', 'ts1'];
 
-}
 
-mavlink20.messages.timesync.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.timesync.prototype = new mavlink20.message();
 mavlink20.messages.timesync.prototype.pack = function(mav) {
-    var orderedfields = [ this.tc1, this.ts1];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.tc1, this.ts1]));
 }
-
 
 /* 
 Camera-IMU triggering and synchronisation message.
@@ -10898,32 +9508,24 @@ Camera-IMU triggering and synchronisation message.
                 seq                       : Image frame sequence (uint32_t)
 
 */
-    mavlink20.messages.camera_trigger = function( ...moreargs ) {
-    [ this.time_usec , this.seq ] = moreargs;
+mavlink20.messages.camera_trigger = function(time_usec, seq) {
 
-    this._format = '<QI';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRIGGER;
+    this.format = '<QI';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRIGGER;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 174;
-    this._name = 'CAMERA_TRIGGER';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_TRIGGER';
 
     this.fieldnames = ['time_usec', 'seq'];
 
-}
 
-mavlink20.messages.camera_trigger.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_trigger.prototype = new mavlink20.message();
 mavlink20.messages.camera_trigger.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.seq];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.seq]));
 }
-
 
 /* 
 The global position, as returned by the Global Positioning System
@@ -10948,32 +9550,24 @@ for the global position estimate.
                 yaw                       : Yaw of vehicle relative to Earth's North, zero means not available, use 36000 for north (uint16_t)
 
 */
-    mavlink20.messages.hil_gps = function( ...moreargs ) {
-    [ this.time_usec , this.fix_type , this.lat , this.lon , this.alt , this.eph , this.epv , this.vel , this.vn , this.ve , this.vd , this.cog , this.satellites_visible , this.id , this.yaw ] = moreargs;
+mavlink20.messages.hil_gps = function(time_usec, fix_type, lat, lon, alt, eph, epv, vel, vn, ve, vd, cog, satellites_visible, id, yaw) {
 
-    this._format = '<QiiiHHHhhhHBBBH';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_GPS;
+    this.format = '<QiiiHHHhhhHBBBH';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_GPS;
     this.order_map = [0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 124;
-    this._name = 'HIL_GPS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_GPS';
 
     this.fieldnames = ['time_usec', 'fix_type', 'lat', 'lon', 'alt', 'eph', 'epv', 'vel', 'vn', 've', 'vd', 'cog', 'satellites_visible', 'id', 'yaw'];
 
-}
 
-mavlink20.messages.hil_gps.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_gps.prototype = new mavlink20.message();
 mavlink20.messages.hil_gps.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.vn, this.ve, this.vd, this.cog, this.fix_type, this.satellites_visible, this.id, this.yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.vn, this.ve, this.vd, this.cog, this.fix_type, this.satellites_visible, this.id, this.yaw]));
 }
-
 
 /* 
 Simulated optical flow from a flow sensor (e.g. PX4FLOW or optical
@@ -10993,32 +9587,24 @@ mouse sensor)
                 distance                  : Distance to the center of the flow field. Positive value (including zero): distance known. Negative value: Unknown distance. (float)
 
 */
-    mavlink20.messages.hil_optical_flow = function( ...moreargs ) {
-    [ this.time_usec , this.sensor_id , this.integration_time_us , this.integrated_x , this.integrated_y , this.integrated_xgyro , this.integrated_ygyro , this.integrated_zgyro , this.temperature , this.quality , this.time_delta_distance_us , this.distance ] = moreargs;
+mavlink20.messages.hil_optical_flow = function(time_usec, sensor_id, integration_time_us, integrated_x, integrated_y, integrated_xgyro, integrated_ygyro, integrated_zgyro, temperature, quality, time_delta_distance_us, distance) {
 
-    this._format = '<QIfffffIfhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
+    this.format = '<QIfffffIfhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_OPTICAL_FLOW;
     this.order_map = [0, 10, 1, 2, 3, 4, 5, 6, 9, 11, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 237;
-    this._name = 'HIL_OPTICAL_FLOW';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_OPTICAL_FLOW';
 
     this.fieldnames = ['time_usec', 'sensor_id', 'integration_time_us', 'integrated_x', 'integrated_y', 'integrated_xgyro', 'integrated_ygyro', 'integrated_zgyro', 'temperature', 'quality', 'time_delta_distance_us', 'distance'];
 
-}
 
-mavlink20.messages.hil_optical_flow.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_optical_flow.prototype = new mavlink20.message();
 mavlink20.messages.hil_optical_flow.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
 }
-
 
 /* 
 Sent from simulation to autopilot, avoids in contrast to HIL_STATE
@@ -11043,32 +9629,24 @@ such as hardware in the loop simulations.
                 zacc                      : Z acceleration (int16_t)
 
 */
-    mavlink20.messages.hil_state_quaternion = function( ...moreargs ) {
-    [ this.time_usec , this.attitude_quaternion , this.rollspeed , this.pitchspeed , this.yawspeed , this.lat , this.lon , this.alt , this.vx , this.vy , this.vz , this.ind_airspeed , this.true_airspeed , this.xacc , this.yacc , this.zacc ] = moreargs;
+mavlink20.messages.hil_state_quaternion = function(time_usec, attitude_quaternion, rollspeed, pitchspeed, yawspeed, lat, lon, alt, vx, vy, vz, ind_airspeed, true_airspeed, xacc, yacc, zacc) {
 
-    this._format = '<Q4ffffiiihhhHHhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
+    this.format = '<Q4ffffiiihhhHHhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIL_STATE_QUATERNION;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 4;
-    this._name = 'HIL_STATE_QUATERNION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIL_STATE_QUATERNION';
 
     this.fieldnames = ['time_usec', 'attitude_quaternion', 'rollspeed', 'pitchspeed', 'yawspeed', 'lat', 'lon', 'alt', 'vx', 'vy', 'vz', 'ind_airspeed', 'true_airspeed', 'xacc', 'yacc', 'zacc'];
 
-}
 
-mavlink20.messages.hil_state_quaternion.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hil_state_quaternion.prototype = new mavlink20.message();
 mavlink20.messages.hil_state_quaternion.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.attitude_quaternion, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.ind_airspeed, this.true_airspeed, this.xacc, this.yacc, this.zacc];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.attitude_quaternion, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.ind_airspeed, this.true_airspeed, this.xacc, this.yacc, this.zacc]));
 }
-
 
 /* 
 The RAW IMU readings for secondary 9DOF sensor setup. This message
@@ -11087,32 +9665,24 @@ should contain the scaled values to the described units
                 temperature               : Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C). (int16_t)
 
 */
-    mavlink20.messages.scaled_imu2 = function( ...moreargs ) {
-    [ this.time_boot_ms , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.temperature ] = moreargs;
+mavlink20.messages.scaled_imu2 = function(time_boot_ms, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, temperature) {
 
-    this._format = '<Ihhhhhhhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU2;
+    this.format = '<Ihhhhhhhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU2;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 76;
-    this._name = 'SCALED_IMU2';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_IMU2';
 
     this.fieldnames = ['time_boot_ms', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'temperature'];
 
-}
 
-mavlink20.messages.scaled_imu2.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_imu2.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu2.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
-
 
 /* 
 Request a list of available logs. On some systems calling this may
@@ -11126,32 +9696,24 @@ message with id = 0 and num_logs = 0.
                 end                       : Last log id (0xffff for last available) (uint16_t)
 
 */
-    mavlink20.messages.log_request_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.start , this.end ] = moreargs;
+mavlink20.messages.log_request_list = function(target_system, target_component, start, end) {
 
-    this._format = '<HHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_LIST;
+    this.format = '<HHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_LIST;
     this.order_map = [2, 3, 0, 1];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 128;
-    this._name = 'LOG_REQUEST_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_REQUEST_LIST';
 
     this.fieldnames = ['target_system', 'target_component', 'start', 'end'];
 
-}
 
-mavlink20.messages.log_request_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_request_list.prototype = new mavlink20.message();
 mavlink20.messages.log_request_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.start, this.end, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start, this.end, this.target_system, this.target_component]));
 }
-
 
 /* 
 Reply to LOG_REQUEST_LIST
@@ -11163,32 +9725,24 @@ Reply to LOG_REQUEST_LIST
                 size                      : Size of the log (may be approximate) (uint32_t)
 
 */
-    mavlink20.messages.log_entry = function( ...moreargs ) {
-    [ this.id , this.num_logs , this.last_log_num , this.time_utc , this.size ] = moreargs;
+mavlink20.messages.log_entry = function(id, num_logs, last_log_num, time_utc, size) {
 
-    this._format = '<IIHHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_ENTRY;
+    this.format = '<IIHHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_ENTRY;
     this.order_map = [2, 3, 4, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 56;
-    this._name = 'LOG_ENTRY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_ENTRY';
 
     this.fieldnames = ['id', 'num_logs', 'last_log_num', 'time_utc', 'size'];
 
-}
 
-mavlink20.messages.log_entry.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_entry.prototype = new mavlink20.message();
 mavlink20.messages.log_entry.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_utc, this.size, this.id, this.num_logs, this.last_log_num];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_utc, this.size, this.id, this.num_logs, this.last_log_num]));
 }
-
 
 /* 
 Request a chunk of a log
@@ -11200,32 +9754,24 @@ Request a chunk of a log
                 count                     : Number of bytes (uint32_t)
 
 */
-    mavlink20.messages.log_request_data = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id , this.ofs , this.count ] = moreargs;
+mavlink20.messages.log_request_data = function(target_system, target_component, id, ofs, count) {
 
-    this._format = '<IIHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_DATA;
+    this.format = '<IIHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_DATA;
     this.order_map = [3, 4, 2, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 116;
-    this._name = 'LOG_REQUEST_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_REQUEST_DATA';
 
     this.fieldnames = ['target_system', 'target_component', 'id', 'ofs', 'count'];
 
-}
 
-mavlink20.messages.log_request_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_request_data.prototype = new mavlink20.message();
 mavlink20.messages.log_request_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.ofs, this.count, this.id, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ofs, this.count, this.id, this.target_system, this.target_component]));
 }
-
 
 /* 
 Reply to LOG_REQUEST_DATA
@@ -11236,32 +9782,24 @@ Reply to LOG_REQUEST_DATA
                 data                      : log data (uint8_t)
 
 */
-    mavlink20.messages.log_data = function( ...moreargs ) {
-    [ this.id , this.ofs , this.count , this.data ] = moreargs;
+mavlink20.messages.log_data = function(id, ofs, count, data) {
 
-    this._format = '<IHB90s';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_DATA;
+    this.format = '<IHB90s';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_DATA;
     this.order_map = [1, 0, 2, 3];
-    this.len_map = [1, 1, 1, 90];
-    this.array_len_map = [0, 0, 0, 90];
     this.crc_extra = 134;
-    this._name = 'LOG_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_DATA';
 
     this.fieldnames = ['id', 'ofs', 'count', 'data'];
 
-}
 
-mavlink20.messages.log_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_data.prototype = new mavlink20.message();
 mavlink20.messages.log_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.ofs, this.id, this.count, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ofs, this.id, this.count, this.data]));
 }
-
 
 /* 
 Erase all logs
@@ -11270,32 +9808,24 @@ Erase all logs
                 target_component          : Component ID (uint8_t)
 
 */
-    mavlink20.messages.log_erase = function( ...moreargs ) {
-    [ this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.log_erase = function(target_system, target_component) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_ERASE;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_ERASE;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 237;
-    this._name = 'LOG_ERASE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_ERASE';
 
     this.fieldnames = ['target_system', 'target_component'];
 
-}
 
-mavlink20.messages.log_erase.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_erase.prototype = new mavlink20.message();
 mavlink20.messages.log_erase.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
-
 
 /* 
 Stop log transfer and resume normal logging
@@ -11304,32 +9834,24 @@ Stop log transfer and resume normal logging
                 target_component          : Component ID (uint8_t)
 
 */
-    mavlink20.messages.log_request_end = function( ...moreargs ) {
-    [ this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.log_request_end = function(target_system, target_component) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_END;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOG_REQUEST_END;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 203;
-    this._name = 'LOG_REQUEST_END';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOG_REQUEST_END';
 
     this.fieldnames = ['target_system', 'target_component'];
 
-}
 
-mavlink20.messages.log_request_end.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.log_request_end.prototype = new mavlink20.message();
 mavlink20.messages.log_request_end.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
-
 
 /* 
 Data for injecting into the onboard GPS (used for DGPS)
@@ -11340,32 +9862,24 @@ Data for injecting into the onboard GPS (used for DGPS)
                 data                      : Raw data (110 is enough for 12 satellites of RTCMv2) (uint8_t)
 
 */
-    mavlink20.messages.gps_inject_data = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.len , this.data ] = moreargs;
+mavlink20.messages.gps_inject_data = function(target_system, target_component, len, data) {
 
-    this._format = '<BBB110s';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_INJECT_DATA;
+    this.format = '<BBB110s';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_INJECT_DATA;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 110];
-    this.array_len_map = [0, 0, 0, 110];
     this.crc_extra = 250;
-    this._name = 'GPS_INJECT_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_INJECT_DATA';
 
     this.fieldnames = ['target_system', 'target_component', 'len', 'data'];
 
-}
 
-mavlink20.messages.gps_inject_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_inject_data.prototype = new mavlink20.message();
 mavlink20.messages.gps_inject_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.len, this.data]));
 }
-
 
 /* 
 Second GPS data.
@@ -11390,32 +9904,24 @@ Second GPS data.
                 hdg_acc                   : Heading / track uncertainty (uint32_t)
 
 */
-    mavlink20.messages.gps2_raw = function( ...moreargs ) {
-    [ this.time_usec , this.fix_type , this.lat , this.lon , this.alt , this.eph , this.epv , this.vel , this.cog , this.satellites_visible , this.dgps_numch , this.dgps_age , this.yaw , this.alt_ellipsoid , this.h_acc , this.v_acc , this.vel_acc , this.hdg_acc ] = moreargs;
+mavlink20.messages.gps2_raw = function(time_usec, fix_type, lat, lon, alt, eph, epv, vel, cog, satellites_visible, dgps_numch, dgps_age, yaw, alt_ellipsoid, h_acc, v_acc, vel_acc, hdg_acc) {
 
-    this._format = '<QiiiIHHHHBBBHiIIII';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS2_RAW;
+    this.format = '<QiiiIHHHHBBBHiIIII';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS2_RAW;
     this.order_map = [0, 9, 1, 2, 3, 5, 6, 7, 8, 10, 11, 4, 12, 13, 14, 15, 16, 17];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 87;
-    this._name = 'GPS2_RAW';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS2_RAW';
 
     this.fieldnames = ['time_usec', 'fix_type', 'lat', 'lon', 'alt', 'eph', 'epv', 'vel', 'cog', 'satellites_visible', 'dgps_numch', 'dgps_age', 'yaw', 'alt_ellipsoid', 'h_acc', 'v_acc', 'vel_acc', 'hdg_acc'];
 
-}
 
-mavlink20.messages.gps2_raw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps2_raw.prototype = new mavlink20.message();
 mavlink20.messages.gps2_raw.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.lat, this.lon, this.alt, this.dgps_age, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.dgps_numch, this.yaw, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.dgps_age, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.dgps_numch, this.yaw, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc]));
 }
-
 
 /* 
 Power supply status
@@ -11425,32 +9931,24 @@ Power supply status
                 flags                     : Bitmap of power supply status flags. (uint16_t)
 
 */
-    mavlink20.messages.power_status = function( ...moreargs ) {
-    [ this.Vcc , this.Vservo , this.flags ] = moreargs;
+mavlink20.messages.power_status = function(Vcc, Vservo, flags) {
 
-    this._format = '<HHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_POWER_STATUS;
+    this.format = '<HHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_POWER_STATUS;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 203;
-    this._name = 'POWER_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'POWER_STATUS';
 
     this.fieldnames = ['Vcc', 'Vservo', 'flags'];
 
-}
 
-mavlink20.messages.power_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.power_status.prototype = new mavlink20.message();
 mavlink20.messages.power_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.Vcc, this.Vservo, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Vcc, this.Vservo, this.flags]));
 }
-
 
 /* 
 Control a serial port. This can be used for raw access to an onboard
@@ -11467,32 +9965,24 @@ to change just the baudrate.
                 data                      : serial data (uint8_t)
 
 */
-    mavlink20.messages.serial_control = function( ...moreargs ) {
-    [ this.device , this.flags , this.timeout , this.baudrate , this.count , this.data ] = moreargs;
+mavlink20.messages.serial_control = function(device, flags, timeout, baudrate, count, data) {
 
-    this._format = '<IHBBB70s';
-    this._id = mavlink20.MAVLINK_MSG_ID_SERIAL_CONTROL;
+    this.format = '<IHBBB70s';
+    this.id = mavlink20.MAVLINK_MSG_ID_SERIAL_CONTROL;
     this.order_map = [2, 3, 1, 0, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 70];
-    this.array_len_map = [0, 0, 0, 0, 0, 70];
     this.crc_extra = 220;
-    this._name = 'SERIAL_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SERIAL_CONTROL';
 
     this.fieldnames = ['device', 'flags', 'timeout', 'baudrate', 'count', 'data'];
 
-}
 
-mavlink20.messages.serial_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.serial_control.prototype = new mavlink20.message();
 mavlink20.messages.serial_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.baudrate, this.timeout, this.device, this.flags, this.count, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.baudrate, this.timeout, this.device, this.flags, this.count, this.data]));
 }
-
 
 /* 
 RTK GPS data. Gives information on the relative baseline calculation
@@ -11513,32 +10003,24 @@ the GPS is reporting
                 iar_num_hypotheses        : Current number of integer ambiguity hypotheses. (int32_t)
 
 */
-    mavlink20.messages.gps_rtk = function( ...moreargs ) {
-    [ this.time_last_baseline_ms , this.rtk_receiver_id , this.wn , this.tow , this.rtk_health , this.rtk_rate , this.nsats , this.baseline_coords_type , this.baseline_a_mm , this.baseline_b_mm , this.baseline_c_mm , this.accuracy , this.iar_num_hypotheses ] = moreargs;
+mavlink20.messages.gps_rtk = function(time_last_baseline_ms, rtk_receiver_id, wn, tow, rtk_health, rtk_rate, nsats, baseline_coords_type, baseline_a_mm, baseline_b_mm, baseline_c_mm, accuracy, iar_num_hypotheses) {
 
-    this._format = '<IIiiiIiHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_RTK;
+    this.format = '<IIiiiIiHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_RTK;
     this.order_map = [0, 8, 7, 1, 9, 10, 11, 12, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 25;
-    this._name = 'GPS_RTK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_RTK';
 
     this.fieldnames = ['time_last_baseline_ms', 'rtk_receiver_id', 'wn', 'tow', 'rtk_health', 'rtk_rate', 'nsats', 'baseline_coords_type', 'baseline_a_mm', 'baseline_b_mm', 'baseline_c_mm', 'accuracy', 'iar_num_hypotheses'];
 
-}
 
-mavlink20.messages.gps_rtk.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_rtk.prototype = new mavlink20.message();
 mavlink20.messages.gps_rtk.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
 }
-
 
 /* 
 RTK GPS data. Gives information on the relative baseline calculation
@@ -11559,32 +10041,24 @@ the GPS is reporting
                 iar_num_hypotheses        : Current number of integer ambiguity hypotheses. (int32_t)
 
 */
-    mavlink20.messages.gps2_rtk = function( ...moreargs ) {
-    [ this.time_last_baseline_ms , this.rtk_receiver_id , this.wn , this.tow , this.rtk_health , this.rtk_rate , this.nsats , this.baseline_coords_type , this.baseline_a_mm , this.baseline_b_mm , this.baseline_c_mm , this.accuracy , this.iar_num_hypotheses ] = moreargs;
+mavlink20.messages.gps2_rtk = function(time_last_baseline_ms, rtk_receiver_id, wn, tow, rtk_health, rtk_rate, nsats, baseline_coords_type, baseline_a_mm, baseline_b_mm, baseline_c_mm, accuracy, iar_num_hypotheses) {
 
-    this._format = '<IIiiiIiHBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS2_RTK;
+    this.format = '<IIiiiIiHBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS2_RTK;
     this.order_map = [0, 8, 7, 1, 9, 10, 11, 12, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 226;
-    this._name = 'GPS2_RTK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS2_RTK';
 
     this.fieldnames = ['time_last_baseline_ms', 'rtk_receiver_id', 'wn', 'tow', 'rtk_health', 'rtk_rate', 'nsats', 'baseline_coords_type', 'baseline_a_mm', 'baseline_b_mm', 'baseline_c_mm', 'accuracy', 'iar_num_hypotheses'];
 
-}
 
-mavlink20.messages.gps2_rtk.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps2_rtk.prototype = new mavlink20.message();
 mavlink20.messages.gps2_rtk.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
 }
-
 
 /* 
 The RAW IMU readings for 3rd 9DOF sensor setup. This message should
@@ -11603,32 +10077,24 @@ contain the scaled values to the described units
                 temperature               : Temperature, 0: IMU does not provide temperature values. If the IMU is at 0C it must send 1 (0.01C). (int16_t)
 
 */
-    mavlink20.messages.scaled_imu3 = function( ...moreargs ) {
-    [ this.time_boot_ms , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro , this.xmag , this.ymag , this.zmag , this.temperature ] = moreargs;
+mavlink20.messages.scaled_imu3 = function(time_boot_ms, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, temperature) {
 
-    this._format = '<Ihhhhhhhhhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU3;
+    this.format = '<Ihhhhhhhhhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_IMU3;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 46;
-    this._name = 'SCALED_IMU3';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_IMU3';
 
     this.fieldnames = ['time_boot_ms', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro', 'xmag', 'ymag', 'zmag', 'temperature'];
 
-}
 
-mavlink20.messages.scaled_imu3.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_imu3.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu3.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
-
 
 /* 
 Handshake message to initiate, control and stop image streaming when
@@ -11644,32 +10110,24 @@ https://mavlink.io/en/services/image_transmission.html.
                 jpg_quality               : JPEG quality. Values: [1-100]. (uint8_t)
 
 */
-    mavlink20.messages.data_transmission_handshake = function( ...moreargs ) {
-    [ this.type , this.size , this.width , this.height , this.packets , this.payload , this.jpg_quality ] = moreargs;
+mavlink20.messages.data_transmission_handshake = function(type, size, width, height, packets, payload, jpg_quality) {
 
-    this._format = '<IHHHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
+    this.format = '<IHHHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DATA_TRANSMISSION_HANDSHAKE;
     this.order_map = [4, 0, 1, 2, 3, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 29;
-    this._name = 'DATA_TRANSMISSION_HANDSHAKE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DATA_TRANSMISSION_HANDSHAKE';
 
     this.fieldnames = ['type', 'size', 'width', 'height', 'packets', 'payload', 'jpg_quality'];
 
-}
 
-mavlink20.messages.data_transmission_handshake.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.data_transmission_handshake.prototype = new mavlink20.message();
 mavlink20.messages.data_transmission_handshake.prototype.pack = function(mav) {
-    var orderedfields = [ this.size, this.width, this.height, this.packets, this.type, this.payload, this.jpg_quality];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.size, this.width, this.height, this.packets, this.type, this.payload, this.jpg_quality]));
 }
-
 
 /* 
 Data packet for images sent using the Image Transmission Protocol:
@@ -11679,32 +10137,24 @@ https://mavlink.io/en/services/image_transmission.html.
                 data                      : image data bytes (uint8_t)
 
 */
-    mavlink20.messages.encapsulated_data = function( ...moreargs ) {
-    [ this.seqnr , this.data ] = moreargs;
+mavlink20.messages.encapsulated_data = function(seqnr, data) {
 
-    this._format = '<H253s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ENCAPSULATED_DATA;
+    this.format = '<H253s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ENCAPSULATED_DATA;
     this.order_map = [0, 1];
-    this.len_map = [1, 253];
-    this.array_len_map = [0, 253];
     this.crc_extra = 223;
-    this._name = 'ENCAPSULATED_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ENCAPSULATED_DATA';
 
     this.fieldnames = ['seqnr', 'data'];
 
-}
 
-mavlink20.messages.encapsulated_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.encapsulated_data.prototype = new mavlink20.message();
 mavlink20.messages.encapsulated_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.seqnr, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqnr, this.data]));
 }
-
 
 /* 
 Distance sensor information for an onboard rangefinder.
@@ -11723,32 +10173,24 @@ Distance sensor information for an onboard rangefinder.
                 signal_quality            : Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal. (uint8_t)
 
 */
-    mavlink20.messages.distance_sensor = function( ...moreargs ) {
-    [ this.time_boot_ms , this.min_distance , this.max_distance , this.current_distance , this.type , this.id , this.orientation , this.covariance , this.horizontal_fov , this.vertical_fov , this.quaternion , this.signal_quality ] = moreargs;
+mavlink20.messages.distance_sensor = function(time_boot_ms, min_distance, max_distance, current_distance, type, id, orientation, covariance, horizontal_fov, vertical_fov, quaternion, signal_quality) {
 
-    this._format = '<IHHHBBBBff4fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DISTANCE_SENSOR;
+    this.format = '<IHHHBBBBff4fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DISTANCE_SENSOR;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0];
     this.crc_extra = 85;
-    this._name = 'DISTANCE_SENSOR';
-
-    this._instance_field = 'id';
-    this._instance_offset = 11;
+    this.name = 'DISTANCE_SENSOR';
 
     this.fieldnames = ['time_boot_ms', 'min_distance', 'max_distance', 'current_distance', 'type', 'id', 'orientation', 'covariance', 'horizontal_fov', 'vertical_fov', 'quaternion', 'signal_quality'];
 
-}
 
-mavlink20.messages.distance_sensor.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.distance_sensor.prototype = new mavlink20.message();
 mavlink20.messages.distance_sensor.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.min_distance, this.max_distance, this.current_distance, this.type, this.id, this.orientation, this.covariance, this.horizontal_fov, this.vertical_fov, this.quaternion, this.signal_quality];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.min_distance, this.max_distance, this.current_distance, this.type, this.id, this.orientation, this.covariance, this.horizontal_fov, this.vertical_fov, this.quaternion, this.signal_quality]));
 }
-
 
 /* 
 Request for terrain data and terrain status. See terrain protocol
@@ -11760,32 +10202,24 @@ docs: https://mavlink.io/en/services/terrain.html
                 mask                      : Bitmask of requested 4x4 grids (row major 8x7 array of grids, 56 bits) (uint64_t)
 
 */
-    mavlink20.messages.terrain_request = function( ...moreargs ) {
-    [ this.lat , this.lon , this.grid_spacing , this.mask ] = moreargs;
+mavlink20.messages.terrain_request = function(lat, lon, grid_spacing, mask) {
 
-    this._format = '<QiiH';
-    this._id = mavlink20.MAVLINK_MSG_ID_TERRAIN_REQUEST;
+    this.format = '<QiiH';
+    this.id = mavlink20.MAVLINK_MSG_ID_TERRAIN_REQUEST;
     this.order_map = [1, 2, 3, 0];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 6;
-    this._name = 'TERRAIN_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TERRAIN_REQUEST';
 
     this.fieldnames = ['lat', 'lon', 'grid_spacing', 'mask'];
 
-}
 
-mavlink20.messages.terrain_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.terrain_request.prototype = new mavlink20.message();
 mavlink20.messages.terrain_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.mask, this.lat, this.lon, this.grid_spacing];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mask, this.lat, this.lon, this.grid_spacing]));
 }
-
 
 /* 
 Terrain data sent from GCS. The lat/lon and grid_spacing must be the
@@ -11799,32 +10233,24 @@ https://mavlink.io/en/services/terrain.html
                 data                      : Terrain data MSL (int16_t)
 
 */
-    mavlink20.messages.terrain_data = function( ...moreargs ) {
-    [ this.lat , this.lon , this.grid_spacing , this.gridbit , this.data ] = moreargs;
+mavlink20.messages.terrain_data = function(lat, lon, grid_spacing, gridbit, data) {
 
-    this._format = '<iiH16hB';
-    this._id = mavlink20.MAVLINK_MSG_ID_TERRAIN_DATA;
+    this.format = '<iiH16hB';
+    this.id = mavlink20.MAVLINK_MSG_ID_TERRAIN_DATA;
     this.order_map = [0, 1, 2, 4, 3];
-    this.len_map = [1, 1, 1, 16, 1];
-    this.array_len_map = [0, 0, 0, 16, 0];
     this.crc_extra = 229;
-    this._name = 'TERRAIN_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TERRAIN_DATA';
 
     this.fieldnames = ['lat', 'lon', 'grid_spacing', 'gridbit', 'data'];
 
-}
 
-mavlink20.messages.terrain_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.terrain_data.prototype = new mavlink20.message();
 mavlink20.messages.terrain_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lon, this.grid_spacing, this.data, this.gridbit];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.grid_spacing, this.data, this.gridbit]));
 }
-
 
 /* 
 Request that the vehicle report terrain height at the given location
@@ -11835,32 +10261,24 @@ vehicle has all terrain data needed for a mission.
                 lon                       : Longitude (int32_t)
 
 */
-    mavlink20.messages.terrain_check = function( ...moreargs ) {
-    [ this.lat , this.lon ] = moreargs;
+mavlink20.messages.terrain_check = function(lat, lon) {
 
-    this._format = '<ii';
-    this._id = mavlink20.MAVLINK_MSG_ID_TERRAIN_CHECK;
+    this.format = '<ii';
+    this.id = mavlink20.MAVLINK_MSG_ID_TERRAIN_CHECK;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 203;
-    this._name = 'TERRAIN_CHECK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TERRAIN_CHECK';
 
     this.fieldnames = ['lat', 'lon'];
 
-}
 
-mavlink20.messages.terrain_check.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.terrain_check.prototype = new mavlink20.message();
 mavlink20.messages.terrain_check.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lon];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon]));
 }
-
 
 /* 
 Streamed from drone to report progress of terrain map download
@@ -11877,32 +10295,24 @@ https://mavlink.io/en/services/terrain.html
                 loaded                    : Number of 4x4 terrain blocks in memory (uint16_t)
 
 */
-    mavlink20.messages.terrain_report = function( ...moreargs ) {
-    [ this.lat , this.lon , this.spacing , this.terrain_height , this.current_height , this.pending , this.loaded ] = moreargs;
+mavlink20.messages.terrain_report = function(lat, lon, spacing, terrain_height, current_height, pending, loaded) {
 
-    this._format = '<iiffHHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_TERRAIN_REPORT;
+    this.format = '<iiffHHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_TERRAIN_REPORT;
     this.order_map = [0, 1, 4, 2, 3, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 1;
-    this._name = 'TERRAIN_REPORT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TERRAIN_REPORT';
 
     this.fieldnames = ['lat', 'lon', 'spacing', 'terrain_height', 'current_height', 'pending', 'loaded'];
 
-}
 
-mavlink20.messages.terrain_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.terrain_report.prototype = new mavlink20.message();
 mavlink20.messages.terrain_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lon, this.terrain_height, this.current_height, this.spacing, this.pending, this.loaded];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.terrain_height, this.current_height, this.spacing, this.pending, this.loaded]));
 }
-
 
 /* 
 Barometer readings for 2nd barometer
@@ -11914,32 +10324,24 @@ Barometer readings for 2nd barometer
                 temperature_press_diff        : Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC. (int16_t)
 
 */
-    mavlink20.messages.scaled_pressure2 = function( ...moreargs ) {
-    [ this.time_boot_ms , this.press_abs , this.press_diff , this.temperature , this.temperature_press_diff ] = moreargs;
+mavlink20.messages.scaled_pressure2 = function(time_boot_ms, press_abs, press_diff, temperature, temperature_press_diff) {
 
-    this._format = '<Iffhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE2;
+    this.format = '<Iffhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE2;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 195;
-    this._name = 'SCALED_PRESSURE2';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_PRESSURE2';
 
     this.fieldnames = ['time_boot_ms', 'press_abs', 'press_diff', 'temperature', 'temperature_press_diff'];
 
-}
 
-mavlink20.messages.scaled_pressure2.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_pressure2.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure2.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
-
 
 /* 
 Motion capture attitude and position
@@ -11952,32 +10354,24 @@ Motion capture attitude and position
                 covariance                : Row-major representation of a pose 6x6 cross-covariance matrix upper right triangle (states: x, y, z, roll, pitch, yaw; first six entries are the first ROW, next five entries are the second ROW, etc.). If unknown, assign NaN value to first element in the array. (float)
 
 */
-    mavlink20.messages.att_pos_mocap = function( ...moreargs ) {
-    [ this.time_usec , this.q , this.x , this.y , this.z , this.covariance ] = moreargs;
+mavlink20.messages.att_pos_mocap = function(time_usec, q, x, y, z, covariance) {
 
-    this._format = '<Q4ffff21f';
-    this._id = mavlink20.MAVLINK_MSG_ID_ATT_POS_MOCAP;
+    this.format = '<Q4ffff21f';
+    this.id = mavlink20.MAVLINK_MSG_ID_ATT_POS_MOCAP;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 4, 1, 1, 1, 21];
-    this.array_len_map = [0, 4, 0, 0, 0, 21];
     this.crc_extra = 109;
-    this._name = 'ATT_POS_MOCAP';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ATT_POS_MOCAP';
 
     this.fieldnames = ['time_usec', 'q', 'x', 'y', 'z', 'covariance'];
 
-}
 
-mavlink20.messages.att_pos_mocap.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.att_pos_mocap.prototype = new mavlink20.message();
 mavlink20.messages.att_pos_mocap.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.q, this.x, this.y, this.z, this.covariance];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.q, this.x, this.y, this.z, this.covariance]));
 }
-
 
 /* 
 Set the vehicle attitude and body angular rates.
@@ -11989,32 +10383,24 @@ Set the vehicle attitude and body angular rates.
                 controls                  : Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs. (float)
 
 */
-    mavlink20.messages.set_actuator_control_target = function( ...moreargs ) {
-    [ this.time_usec , this.group_mlx , this.target_system , this.target_component , this.controls ] = moreargs;
+mavlink20.messages.set_actuator_control_target = function(time_usec, group_mlx, target_system, target_component, controls) {
 
-    this._format = '<Q8fBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET;
+    this.format = '<Q8fBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_ACTUATOR_CONTROL_TARGET;
     this.order_map = [0, 2, 3, 4, 1];
-    this.len_map = [1, 8, 1, 1, 1];
-    this.array_len_map = [0, 8, 0, 0, 0];
     this.crc_extra = 168;
-    this._name = 'SET_ACTUATOR_CONTROL_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_ACTUATOR_CONTROL_TARGET';
 
     this.fieldnames = ['time_usec', 'group_mlx', 'target_system', 'target_component', 'controls'];
 
-}
 
-mavlink20.messages.set_actuator_control_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_actuator_control_target.prototype = new mavlink20.message();
 mavlink20.messages.set_actuator_control_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.controls, this.group_mlx, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx, this.target_system, this.target_component]));
 }
-
 
 /* 
 Set the vehicle attitude and body angular rates.
@@ -12024,32 +10410,24 @@ Set the vehicle attitude and body angular rates.
                 controls                  : Actuator controls. Normed to -1..+1 where 0 is neutral position. Throttle for single rotation direction motors is 0..1, negative range for reverse direction. Standard mapping for attitude controls (group 0): (index 0-7): roll, pitch, yaw, throttle, flaps, spoilers, airbrakes, landing gear. Load a pass-through mixer to repurpose them as generic outputs. (float)
 
 */
-    mavlink20.messages.actuator_control_target = function( ...moreargs ) {
-    [ this.time_usec , this.group_mlx , this.controls ] = moreargs;
+mavlink20.messages.actuator_control_target = function(time_usec, group_mlx, controls) {
 
-    this._format = '<Q8fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET;
+    this.format = '<Q8fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ACTUATOR_CONTROL_TARGET;
     this.order_map = [0, 2, 1];
-    this.len_map = [1, 8, 1];
-    this.array_len_map = [0, 8, 0];
     this.crc_extra = 181;
-    this._name = 'ACTUATOR_CONTROL_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ACTUATOR_CONTROL_TARGET';
 
     this.fieldnames = ['time_usec', 'group_mlx', 'controls'];
 
-}
 
-mavlink20.messages.actuator_control_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.actuator_control_target.prototype = new mavlink20.message();
 mavlink20.messages.actuator_control_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.controls, this.group_mlx];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx]));
 }
-
 
 /* 
 The current system altitude.
@@ -12063,32 +10441,24 @@ The current system altitude.
                 bottom_clearance          : This is not the altitude, but the clear space below the system according to the fused clearance estimate. It generally should max out at the maximum range of e.g. the laser altimeter. It is generally a moving target. A negative value indicates no measurement available. (float)
 
 */
-    mavlink20.messages.altitude = function( ...moreargs ) {
-    [ this.time_usec , this.altitude_monotonic , this.altitude_amsl , this.altitude_local , this.altitude_relative , this.altitude_terrain , this.bottom_clearance ] = moreargs;
+mavlink20.messages.altitude = function(time_usec, altitude_monotonic, altitude_amsl, altitude_local, altitude_relative, altitude_terrain, bottom_clearance) {
 
-    this._format = '<Qffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_ALTITUDE;
+    this.format = '<Qffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_ALTITUDE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 47;
-    this._name = 'ALTITUDE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ALTITUDE';
 
     this.fieldnames = ['time_usec', 'altitude_monotonic', 'altitude_amsl', 'altitude_local', 'altitude_relative', 'altitude_terrain', 'bottom_clearance'];
 
-}
 
-mavlink20.messages.altitude.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.altitude.prototype = new mavlink20.message();
 mavlink20.messages.altitude.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.altitude_monotonic, this.altitude_amsl, this.altitude_local, this.altitude_relative, this.altitude_terrain, this.bottom_clearance];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.altitude_monotonic, this.altitude_amsl, this.altitude_local, this.altitude_relative, this.altitude_terrain, this.bottom_clearance]));
 }
-
 
 /* 
 The autopilot is requesting a resource (file, binary, other type of
@@ -12101,32 +10471,24 @@ data)
                 storage                   : The storage path the autopilot wants the URI to be stored in. Will only be valid if the transfer_type has a storage associated (e.g. MAVLink FTP). (uint8_t)
 
 */
-    mavlink20.messages.resource_request = function( ...moreargs ) {
-    [ this.request_id , this.uri_type , this.uri , this.transfer_type , this.storage ] = moreargs;
+mavlink20.messages.resource_request = function(request_id, uri_type, uri, transfer_type, storage) {
 
-    this._format = '<BB120sB120s';
-    this._id = mavlink20.MAVLINK_MSG_ID_RESOURCE_REQUEST;
+    this.format = '<BB120sB120s';
+    this.id = mavlink20.MAVLINK_MSG_ID_RESOURCE_REQUEST;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 120, 1, 120];
-    this.array_len_map = [0, 0, 120, 0, 120];
     this.crc_extra = 72;
-    this._name = 'RESOURCE_REQUEST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RESOURCE_REQUEST';
 
     this.fieldnames = ['request_id', 'uri_type', 'uri', 'transfer_type', 'storage'];
 
-}
 
-mavlink20.messages.resource_request.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.resource_request.prototype = new mavlink20.message();
 mavlink20.messages.resource_request.prototype.pack = function(mav) {
-    var orderedfields = [ this.request_id, this.uri_type, this.uri, this.transfer_type, this.storage];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.uri_type, this.uri, this.transfer_type, this.storage]));
 }
-
 
 /* 
 Barometer readings for 3rd barometer
@@ -12138,32 +10500,24 @@ Barometer readings for 3rd barometer
                 temperature_press_diff        : Differential pressure temperature (0, if not available). Report values of 0 (or 1) as 1 cdegC. (int16_t)
 
 */
-    mavlink20.messages.scaled_pressure3 = function( ...moreargs ) {
-    [ this.time_boot_ms , this.press_abs , this.press_diff , this.temperature , this.temperature_press_diff ] = moreargs;
+mavlink20.messages.scaled_pressure3 = function(time_boot_ms, press_abs, press_diff, temperature, temperature_press_diff) {
 
-    this._format = '<Iffhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE3;
+    this.format = '<Iffhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_SCALED_PRESSURE3;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 131;
-    this._name = 'SCALED_PRESSURE3';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SCALED_PRESSURE3';
 
     this.fieldnames = ['time_boot_ms', 'press_abs', 'press_diff', 'temperature', 'temperature_press_diff'];
 
-}
 
-mavlink20.messages.scaled_pressure3.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.scaled_pressure3.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure3.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
-
 
 /* 
 Current motion information from a designated system
@@ -12181,32 +10535,24 @@ Current motion information from a designated system
                 custom_state              : button states or switches of a tracker device (uint64_t)
 
 */
-    mavlink20.messages.follow_target = function( ...moreargs ) {
-    [ this.timestamp , this.est_capabilities , this.lat , this.lon , this.alt , this.vel , this.acc , this.attitude_q , this.rates , this.position_cov , this.custom_state ] = moreargs;
+mavlink20.messages.follow_target = function(timestamp, est_capabilities, lat, lon, alt, vel, acc, attitude_q, rates, position_cov, custom_state) {
 
-    this._format = '<QQiif3f3f4f3f3fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_FOLLOW_TARGET;
+    this.format = '<QQiif3f3f4f3f3fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_FOLLOW_TARGET;
     this.order_map = [0, 10, 2, 3, 4, 5, 6, 7, 8, 9, 1];
-    this.len_map = [1, 1, 1, 1, 1, 3, 3, 4, 3, 3, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 3, 3, 4, 3, 3, 0];
     this.crc_extra = 127;
-    this._name = 'FOLLOW_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FOLLOW_TARGET';
 
     this.fieldnames = ['timestamp', 'est_capabilities', 'lat', 'lon', 'alt', 'vel', 'acc', 'attitude_q', 'rates', 'position_cov', 'custom_state'];
 
-}
 
-mavlink20.messages.follow_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.follow_target.prototype = new mavlink20.message();
 mavlink20.messages.follow_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.custom_state, this.lat, this.lon, this.alt, this.vel, this.acc, this.attitude_q, this.rates, this.position_cov, this.est_capabilities];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.custom_state, this.lat, this.lon, this.alt, this.vel, this.acc, this.attitude_q, this.rates, this.position_cov, this.est_capabilities]));
 }
-
 
 /* 
 The smoothed, monotonic system state used to feed the control loops of
@@ -12231,32 +10577,24 @@ the system.
                 yaw_rate                  : Angular rate in yaw axis (float)
 
 */
-    mavlink20.messages.control_system_state = function( ...moreargs ) {
-    [ this.time_usec , this.x_acc , this.y_acc , this.z_acc , this.x_vel , this.y_vel , this.z_vel , this.x_pos , this.y_pos , this.z_pos , this.airspeed , this.vel_variance , this.pos_variance , this.q , this.roll_rate , this.pitch_rate , this.yaw_rate ] = moreargs;
+mavlink20.messages.control_system_state = function(time_usec, x_acc, y_acc, z_acc, x_vel, y_vel, z_vel, x_pos, y_pos, z_pos, airspeed, vel_variance, pos_variance, q, roll_rate, pitch_rate, yaw_rate) {
 
-    this._format = '<Qffffffffff3f3f4ffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE;
+    this.format = '<Qffffffffff3f3f4ffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_CONTROL_SYSTEM_STATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 4, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 4, 0, 0, 0];
     this.crc_extra = 103;
-    this._name = 'CONTROL_SYSTEM_STATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CONTROL_SYSTEM_STATE';
 
     this.fieldnames = ['time_usec', 'x_acc', 'y_acc', 'z_acc', 'x_vel', 'y_vel', 'z_vel', 'x_pos', 'y_pos', 'z_pos', 'airspeed', 'vel_variance', 'pos_variance', 'q', 'roll_rate', 'pitch_rate', 'yaw_rate'];
 
-}
 
-mavlink20.messages.control_system_state.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.control_system_state.prototype = new mavlink20.message();
 mavlink20.messages.control_system_state.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.x_acc, this.y_acc, this.z_acc, this.x_vel, this.y_vel, this.z_vel, this.x_pos, this.y_pos, this.z_pos, this.airspeed, this.vel_variance, this.pos_variance, this.q, this.roll_rate, this.pitch_rate, this.yaw_rate];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x_acc, this.y_acc, this.z_acc, this.x_vel, this.y_vel, this.z_vel, this.x_pos, this.y_pos, this.z_pos, this.airspeed, this.vel_variance, this.pos_variance, this.q, this.roll_rate, this.pitch_rate, this.yaw_rate]));
 }
-
 
 /* 
 Battery information
@@ -12277,32 +10615,24 @@ Battery information
                 fault_bitmask             : Fault/health indications. These should be set when charge_state is MAV_BATTERY_CHARGE_STATE_FAILED or MAV_BATTERY_CHARGE_STATE_UNHEALTHY (if not, fault reporting is not supported). (uint32_t)
 
 */
-    mavlink20.messages.battery_status = function( ...moreargs ) {
-    [ this.id , this.battery_function , this.type , this.temperature , this.voltages , this.current_battery , this.current_consumed , this.energy_consumed , this.battery_remaining , this.time_remaining , this.charge_state , this.voltages_ext , this.mode , this.fault_bitmask ] = moreargs;
+mavlink20.messages.battery_status = function(id, battery_function, type, temperature, voltages, current_battery, current_consumed, energy_consumed, battery_remaining, time_remaining, charge_state, voltages_ext, mode, fault_bitmask) {
 
-    this._format = '<iih10HhBBBbiB4HBI';
-    this._id = mavlink20.MAVLINK_MSG_ID_BATTERY_STATUS;
+    this.format = '<iih10HhBBBbiB4HBI';
+    this.id = mavlink20.MAVLINK_MSG_ID_BATTERY_STATUS;
     this.order_map = [5, 6, 7, 2, 3, 4, 0, 1, 8, 9, 10, 11, 12, 13];
-    this.len_map = [1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1];
-    this.array_len_map = [0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0];
     this.crc_extra = 154;
-    this._name = 'BATTERY_STATUS';
-
-    this._instance_field = 'id';
-    this._instance_offset = 32;
+    this.name = 'BATTERY_STATUS';
 
     this.fieldnames = ['id', 'battery_function', 'type', 'temperature', 'voltages', 'current_battery', 'current_consumed', 'energy_consumed', 'battery_remaining', 'time_remaining', 'charge_state', 'voltages_ext', 'mode', 'fault_bitmask'];
 
-}
 
-mavlink20.messages.battery_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.battery_status.prototype = new mavlink20.message();
 mavlink20.messages.battery_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.current_consumed, this.energy_consumed, this.temperature, this.voltages, this.current_battery, this.id, this.battery_function, this.type, this.battery_remaining, this.time_remaining, this.charge_state, this.voltages_ext, this.mode, this.fault_bitmask];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.current_consumed, this.energy_consumed, this.temperature, this.voltages, this.current_battery, this.id, this.battery_function, this.type, this.battery_remaining, this.time_remaining, this.charge_state, this.voltages_ext, this.mode, this.fault_bitmask]));
 }
-
 
 /* 
 Version and capability of autopilot software. This should be emitted
@@ -12322,32 +10652,24 @@ in response to a request with MAV_CMD_REQUEST_MESSAGE.
                 uid2                      : UID if provided by hardware (supersedes the uid field. If this is non-zero, use this field, otherwise use uid) (uint8_t)
 
 */
-    mavlink20.messages.autopilot_version = function( ...moreargs ) {
-    [ this.capabilities , this.flight_sw_version , this.middleware_sw_version , this.os_sw_version , this.board_version , this.flight_custom_version , this.middleware_custom_version , this.os_custom_version , this.vendor_id , this.product_id , this.uid , this.uid2 ] = moreargs;
+mavlink20.messages.autopilot_version = function(capabilities, flight_sw_version, middleware_sw_version, os_sw_version, board_version, flight_custom_version, middleware_custom_version, os_custom_version, vendor_id, product_id, uid, uid2) {
 
-    this._format = '<QQIIIIHH8s8s8s18s';
-    this._id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_VERSION;
+    this.format = '<QQIIIIHH8s8s8s18s';
+    this.id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_VERSION;
     this.order_map = [0, 2, 3, 4, 5, 8, 9, 10, 6, 7, 1, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8, 18];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 18];
     this.crc_extra = 178;
-    this._name = 'AUTOPILOT_VERSION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AUTOPILOT_VERSION';
 
     this.fieldnames = ['capabilities', 'flight_sw_version', 'middleware_sw_version', 'os_sw_version', 'board_version', 'flight_custom_version', 'middleware_custom_version', 'os_custom_version', 'vendor_id', 'product_id', 'uid', 'uid2'];
 
-}
 
-mavlink20.messages.autopilot_version.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.autopilot_version.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_version.prototype.pack = function(mav) {
-    var orderedfields = [ this.capabilities, this.uid, this.flight_sw_version, this.middleware_sw_version, this.os_sw_version, this.board_version, this.vendor_id, this.product_id, this.flight_custom_version, this.middleware_custom_version, this.os_custom_version, this.uid2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.capabilities, this.uid, this.flight_sw_version, this.middleware_sw_version, this.os_sw_version, this.board_version, this.vendor_id, this.product_id, this.flight_custom_version, this.middleware_custom_version, this.os_custom_version, this.uid2]));
 }
-
 
 /* 
 The location of a landing target. See:
@@ -12369,32 +10691,24 @@ https://mavlink.io/en/services/landing_target.html
                 position_valid            : Boolean indicating whether the position fields (x, y, z, q, type) contain valid target position information (valid: 1, invalid: 0). Default is 0 (invalid). (uint8_t)
 
 */
-    mavlink20.messages.landing_target = function( ...moreargs ) {
-    [ this.time_usec , this.target_num , this.frame , this.angle_x , this.angle_y , this.distance , this.size_x , this.size_y , this.x , this.y , this.z , this.q , this.type , this.position_valid ] = moreargs;
+mavlink20.messages.landing_target = function(time_usec, target_num, frame, angle_x, angle_y, distance, size_x, size_y, x, y, z, q, type, position_valid) {
 
-    this._format = '<QfffffBBfff4fBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LANDING_TARGET;
+    this.format = '<QfffffBBfff4fBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LANDING_TARGET;
     this.order_map = [0, 6, 7, 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0];
     this.crc_extra = 200;
-    this._name = 'LANDING_TARGET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LANDING_TARGET';
 
     this.fieldnames = ['time_usec', 'target_num', 'frame', 'angle_x', 'angle_y', 'distance', 'size_x', 'size_y', 'x', 'y', 'z', 'q', 'type', 'position_valid'];
 
-}
 
-mavlink20.messages.landing_target.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.landing_target.prototype = new mavlink20.message();
 mavlink20.messages.landing_target.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.angle_x, this.angle_y, this.distance, this.size_x, this.size_y, this.target_num, this.frame, this.x, this.y, this.z, this.q, this.type, this.position_valid];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.angle_x, this.angle_y, this.distance, this.size_x, this.size_y, this.target_num, this.frame, this.x, this.y, this.z, this.q, this.type, this.position_valid]));
 }
-
 
 /* 
 Status of geo-fencing. Sent in extended status stream when fencing
@@ -12407,32 +10721,24 @@ enabled.
                 breach_mitigation         : Active action to prevent fence breach (uint8_t)
 
 */
-    mavlink20.messages.fence_status = function( ...moreargs ) {
-    [ this.breach_status , this.breach_count , this.breach_type , this.breach_time , this.breach_mitigation ] = moreargs;
+mavlink20.messages.fence_status = function(breach_status, breach_count, breach_type, breach_time, breach_mitigation) {
 
-    this._format = '<IHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_FENCE_STATUS;
+    this.format = '<IHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_FENCE_STATUS;
     this.order_map = [2, 1, 3, 0, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 189;
-    this._name = 'FENCE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FENCE_STATUS';
 
     this.fieldnames = ['breach_status', 'breach_count', 'breach_type', 'breach_time', 'breach_mitigation'];
 
-}
 
-mavlink20.messages.fence_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.fence_status.prototype = new mavlink20.message();
 mavlink20.messages.fence_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.breach_time, this.breach_count, this.breach_status, this.breach_type, this.breach_mitigation];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.breach_time, this.breach_count, this.breach_status, this.breach_type, this.breach_mitigation]));
 }
-
 
 /* 
 Reports results of completed compass calibration. Sent until
@@ -12458,32 +10764,24 @@ MAG_CAL_ACK received.
                 scale_factor              : field radius correction factor (float)
 
 */
-    mavlink20.messages.mag_cal_report = function( ...moreargs ) {
-    [ this.compass_id , this.cal_mask , this.cal_status , this.autosaved , this.fitness , this.ofs_x , this.ofs_y , this.ofs_z , this.diag_x , this.diag_y , this.diag_z , this.offdiag_x , this.offdiag_y , this.offdiag_z , this.orientation_confidence , this.old_orientation , this.new_orientation , this.scale_factor ] = moreargs;
+mavlink20.messages.mag_cal_report = function(compass_id, cal_mask, cal_status, autosaved, fitness, ofs_x, ofs_y, ofs_z, diag_x, diag_y, diag_z, offdiag_x, offdiag_y, offdiag_z, orientation_confidence, old_orientation, new_orientation, scale_factor) {
 
-    this._format = '<ffffffffffBBBBfBBf';
-    this._id = mavlink20.MAVLINK_MSG_ID_MAG_CAL_REPORT;
+    this.format = '<ffffffffffBBBBfBBf';
+    this.id = mavlink20.MAVLINK_MSG_ID_MAG_CAL_REPORT;
     this.order_map = [10, 11, 12, 13, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 36;
-    this._name = 'MAG_CAL_REPORT';
-
-    this._instance_field = 'compass_id';
-    this._instance_offset = 40;
+    this.name = 'MAG_CAL_REPORT';
 
     this.fieldnames = ['compass_id', 'cal_mask', 'cal_status', 'autosaved', 'fitness', 'ofs_x', 'ofs_y', 'ofs_z', 'diag_x', 'diag_y', 'diag_z', 'offdiag_x', 'offdiag_y', 'offdiag_z', 'orientation_confidence', 'old_orientation', 'new_orientation', 'scale_factor'];
 
-}
 
-mavlink20.messages.mag_cal_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mag_cal_report.prototype = new mavlink20.message();
 mavlink20.messages.mag_cal_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.fitness, this.ofs_x, this.ofs_y, this.ofs_z, this.diag_x, this.diag_y, this.diag_z, this.offdiag_x, this.offdiag_y, this.offdiag_z, this.compass_id, this.cal_mask, this.cal_status, this.autosaved, this.orientation_confidence, this.old_orientation, this.new_orientation, this.scale_factor];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.fitness, this.ofs_x, this.ofs_y, this.ofs_z, this.diag_x, this.diag_y, this.diag_z, this.offdiag_x, this.offdiag_y, this.offdiag_z, this.compass_id, this.cal_mask, this.cal_status, this.autosaved, this.orientation_confidence, this.old_orientation, this.new_orientation, this.scale_factor]));
 }
-
 
 /* 
 EFI status output
@@ -12509,32 +10807,24 @@ EFI status output
                 fuel_pressure             : Fuel pressure. Zero in this value means "unknown", so if the fuel pressure really is zero kPa use 0.0001 instead. (float)
 
 */
-    mavlink20.messages.efi_status = function( ...moreargs ) {
-    [ this.health , this.ecu_index , this.rpm , this.fuel_consumed , this.fuel_flow , this.engine_load , this.throttle_position , this.spark_dwell_time , this.barometric_pressure , this.intake_manifold_pressure , this.intake_manifold_temperature , this.cylinder_head_temperature , this.ignition_timing , this.injection_time , this.exhaust_gas_temperature , this.throttle_out , this.pt_compensation , this.ignition_voltage , this.fuel_pressure ] = moreargs;
+mavlink20.messages.efi_status = function(health, ecu_index, rpm, fuel_consumed, fuel_flow, engine_load, throttle_position, spark_dwell_time, barometric_pressure, intake_manifold_pressure, intake_manifold_temperature, cylinder_head_temperature, ignition_timing, injection_time, exhaust_gas_temperature, throttle_out, pt_compensation, ignition_voltage, fuel_pressure) {
 
-    this._format = '<ffffffffffffffffBff';
-    this._id = mavlink20.MAVLINK_MSG_ID_EFI_STATUS;
+    this.format = '<ffffffffffffffffBff';
+    this.id = mavlink20.MAVLINK_MSG_ID_EFI_STATUS;
     this.order_map = [16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 208;
-    this._name = 'EFI_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'EFI_STATUS';
 
     this.fieldnames = ['health', 'ecu_index', 'rpm', 'fuel_consumed', 'fuel_flow', 'engine_load', 'throttle_position', 'spark_dwell_time', 'barometric_pressure', 'intake_manifold_pressure', 'intake_manifold_temperature', 'cylinder_head_temperature', 'ignition_timing', 'injection_time', 'exhaust_gas_temperature', 'throttle_out', 'pt_compensation', 'ignition_voltage', 'fuel_pressure'];
 
-}
 
-mavlink20.messages.efi_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.efi_status.prototype = new mavlink20.message();
 mavlink20.messages.efi_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.ecu_index, this.rpm, this.fuel_consumed, this.fuel_flow, this.engine_load, this.throttle_position, this.spark_dwell_time, this.barometric_pressure, this.intake_manifold_pressure, this.intake_manifold_temperature, this.cylinder_head_temperature, this.ignition_timing, this.injection_time, this.exhaust_gas_temperature, this.throttle_out, this.pt_compensation, this.health, this.ignition_voltage, this.fuel_pressure];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ecu_index, this.rpm, this.fuel_consumed, this.fuel_flow, this.engine_load, this.throttle_position, this.spark_dwell_time, this.barometric_pressure, this.intake_manifold_pressure, this.intake_manifold_temperature, this.cylinder_head_temperature, this.ignition_timing, this.injection_time, this.exhaust_gas_temperature, this.throttle_out, this.pt_compensation, this.health, this.ignition_voltage, this.fuel_pressure]));
 }
-
 
 /* 
 Estimator status message including flags, innovation test ratios and
@@ -12562,32 +10852,24 @@ should be optional and controllable by the user.
                 pos_vert_accuracy         : Vertical position 1-STD accuracy relative to the EKF local origin (float)
 
 */
-    mavlink20.messages.estimator_status = function( ...moreargs ) {
-    [ this.time_usec , this.flags , this.vel_ratio , this.pos_horiz_ratio , this.pos_vert_ratio , this.mag_ratio , this.hagl_ratio , this.tas_ratio , this.pos_horiz_accuracy , this.pos_vert_accuracy ] = moreargs;
+mavlink20.messages.estimator_status = function(time_usec, flags, vel_ratio, pos_horiz_ratio, pos_vert_ratio, mag_ratio, hagl_ratio, tas_ratio, pos_horiz_accuracy, pos_vert_accuracy) {
 
-    this._format = '<QffffffffH';
-    this._id = mavlink20.MAVLINK_MSG_ID_ESTIMATOR_STATUS;
+    this.format = '<QffffffffH';
+    this.id = mavlink20.MAVLINK_MSG_ID_ESTIMATOR_STATUS;
     this.order_map = [0, 9, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 163;
-    this._name = 'ESTIMATOR_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ESTIMATOR_STATUS';
 
     this.fieldnames = ['time_usec', 'flags', 'vel_ratio', 'pos_horiz_ratio', 'pos_vert_ratio', 'mag_ratio', 'hagl_ratio', 'tas_ratio', 'pos_horiz_accuracy', 'pos_vert_accuracy'];
 
-}
 
-mavlink20.messages.estimator_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.estimator_status.prototype = new mavlink20.message();
 mavlink20.messages.estimator_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.vel_ratio, this.pos_horiz_ratio, this.pos_vert_ratio, this.mag_ratio, this.hagl_ratio, this.tas_ratio, this.pos_horiz_accuracy, this.pos_vert_accuracy, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.vel_ratio, this.pos_horiz_ratio, this.pos_vert_ratio, this.mag_ratio, this.hagl_ratio, this.tas_ratio, this.pos_horiz_accuracy, this.pos_vert_accuracy, this.flags]));
 }
-
 
 /* 
 Wind covariance estimate from vehicle.
@@ -12603,32 +10885,24 @@ Wind covariance estimate from vehicle.
                 vert_accuracy             : Vertical speed 1-STD accuracy (float)
 
 */
-    mavlink20.messages.wind_cov = function( ...moreargs ) {
-    [ this.time_usec , this.wind_x , this.wind_y , this.wind_z , this.var_horiz , this.var_vert , this.wind_alt , this.horiz_accuracy , this.vert_accuracy ] = moreargs;
+mavlink20.messages.wind_cov = function(time_usec, wind_x, wind_y, wind_z, var_horiz, var_vert, wind_alt, horiz_accuracy, vert_accuracy) {
 
-    this._format = '<Qffffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_WIND_COV;
+    this.format = '<Qffffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_WIND_COV;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 105;
-    this._name = 'WIND_COV';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'WIND_COV';
 
     this.fieldnames = ['time_usec', 'wind_x', 'wind_y', 'wind_z', 'var_horiz', 'var_vert', 'wind_alt', 'horiz_accuracy', 'vert_accuracy'];
 
-}
 
-mavlink20.messages.wind_cov.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.wind_cov.prototype = new mavlink20.message();
 mavlink20.messages.wind_cov.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.wind_x, this.wind_y, this.wind_z, this.var_horiz, this.var_vert, this.wind_alt, this.horiz_accuracy, this.vert_accuracy];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.wind_x, this.wind_y, this.wind_z, this.var_horiz, this.var_vert, this.wind_alt, this.horiz_accuracy, this.vert_accuracy]));
 }
-
 
 /* 
 GPS sensor input message.  This is a raw sensor value sent by the GPS.
@@ -12655,32 +10929,24 @@ This is NOT the global position estimate of the system.
                 yaw                       : Yaw of vehicle relative to Earth's North, zero means not available, use 36000 for north (uint16_t)
 
 */
-    mavlink20.messages.gps_input = function( ...moreargs ) {
-    [ this.time_usec , this.gps_id , this.ignore_flags , this.time_week_ms , this.time_week , this.fix_type , this.lat , this.lon , this.alt , this.hdop , this.vdop , this.vn , this.ve , this.vd , this.speed_accuracy , this.horiz_accuracy , this.vert_accuracy , this.satellites_visible , this.yaw ] = moreargs;
+mavlink20.messages.gps_input = function(time_usec, gps_id, ignore_flags, time_week_ms, time_week, fix_type, lat, lon, alt, hdop, vdop, vn, ve, vd, speed_accuracy, horiz_accuracy, vert_accuracy, satellites_visible, yaw) {
 
-    this._format = '<QIiifffffffffHHBBBH';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_INPUT;
+    this.format = '<QIiifffffffffHHBBBH';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_INPUT;
     this.order_map = [0, 15, 13, 1, 14, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 17, 18];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 151;
-    this._name = 'GPS_INPUT';
-
-    this._instance_field = 'gps_id';
-    this._instance_offset = 60;
+    this.name = 'GPS_INPUT';
 
     this.fieldnames = ['time_usec', 'gps_id', 'ignore_flags', 'time_week_ms', 'time_week', 'fix_type', 'lat', 'lon', 'alt', 'hdop', 'vdop', 'vn', 've', 'vd', 'speed_accuracy', 'horiz_accuracy', 'vert_accuracy', 'satellites_visible', 'yaw'];
 
-}
 
-mavlink20.messages.gps_input.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_input.prototype = new mavlink20.message();
 mavlink20.messages.gps_input.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.time_week_ms, this.lat, this.lon, this.alt, this.hdop, this.vdop, this.vn, this.ve, this.vd, this.speed_accuracy, this.horiz_accuracy, this.vert_accuracy, this.ignore_flags, this.time_week, this.gps_id, this.fix_type, this.satellites_visible, this.yaw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.time_week_ms, this.lat, this.lon, this.alt, this.hdop, this.vdop, this.vn, this.ve, this.vd, this.speed_accuracy, this.horiz_accuracy, this.vert_accuracy, this.ignore_flags, this.time_week, this.gps_id, this.fix_type, this.satellites_visible, this.yaw]));
 }
-
 
 /* 
 RTCM message for injecting into the onboard GPS (used for DGPS)
@@ -12690,32 +10956,24 @@ RTCM message for injecting into the onboard GPS (used for DGPS)
                 data                      : RTCM message (may be fragmented) (uint8_t)
 
 */
-    mavlink20.messages.gps_rtcm_data = function( ...moreargs ) {
-    [ this.flags , this.len , this.data ] = moreargs;
+mavlink20.messages.gps_rtcm_data = function(flags, len, data) {
 
-    this._format = '<BB180s';
-    this._id = mavlink20.MAVLINK_MSG_ID_GPS_RTCM_DATA;
+    this.format = '<BB180s';
+    this.id = mavlink20.MAVLINK_MSG_ID_GPS_RTCM_DATA;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 180];
-    this.array_len_map = [0, 0, 180];
     this.crc_extra = 35;
-    this._name = 'GPS_RTCM_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GPS_RTCM_DATA';
 
     this.fieldnames = ['flags', 'len', 'data'];
 
-}
 
-mavlink20.messages.gps_rtcm_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gps_rtcm_data.prototype = new mavlink20.message();
 mavlink20.messages.gps_rtcm_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.flags, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.len, this.data]));
 }
-
 
 /* 
 Message appropriate for high latency connections like Iridium
@@ -12746,32 +11004,24 @@ Message appropriate for high latency connections like Iridium
                 wp_distance               : distance to target (uint16_t)
 
 */
-    mavlink20.messages.high_latency = function( ...moreargs ) {
-    [ this.base_mode , this.custom_mode , this.landed_state , this.roll , this.pitch , this.heading , this.throttle , this.heading_sp , this.latitude , this.longitude , this.altitude_amsl , this.altitude_sp , this.airspeed , this.airspeed_sp , this.groundspeed , this.climb_rate , this.gps_nsat , this.gps_fix_type , this.battery_remaining , this.temperature , this.temperature_air , this.failsafe , this.wp_num , this.wp_distance ] = moreargs;
+mavlink20.messages.high_latency = function(base_mode, custom_mode, landed_state, roll, pitch, heading, throttle, heading_sp, latitude, longitude, altitude_amsl, altitude_sp, airspeed, airspeed_sp, groundspeed, climb_rate, gps_nsat, gps_fix_type, battery_remaining, temperature, temperature_air, failsafe, wp_num, wp_distance) {
 
-    this._format = '<IiihhHhhhHBBbBBBbBBBbbBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIGH_LATENCY;
+    this.format = '<IiihhHhhhHBBbBBBbBBBbbBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIGH_LATENCY;
     this.order_map = [10, 0, 11, 3, 4, 5, 12, 6, 1, 2, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 150;
-    this._name = 'HIGH_LATENCY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIGH_LATENCY';
 
     this.fieldnames = ['base_mode', 'custom_mode', 'landed_state', 'roll', 'pitch', 'heading', 'throttle', 'heading_sp', 'latitude', 'longitude', 'altitude_amsl', 'altitude_sp', 'airspeed', 'airspeed_sp', 'groundspeed', 'climb_rate', 'gps_nsat', 'gps_fix_type', 'battery_remaining', 'temperature', 'temperature_air', 'failsafe', 'wp_num', 'wp_distance'];
 
-}
 
-mavlink20.messages.high_latency.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.high_latency.prototype = new mavlink20.message();
 mavlink20.messages.high_latency.prototype.pack = function(mav) {
-    var orderedfields = [ this.custom_mode, this.latitude, this.longitude, this.roll, this.pitch, this.heading, this.heading_sp, this.altitude_amsl, this.altitude_sp, this.wp_distance, this.base_mode, this.landed_state, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.climb_rate, this.gps_nsat, this.gps_fix_type, this.battery_remaining, this.temperature, this.temperature_air, this.failsafe, this.wp_num];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.latitude, this.longitude, this.roll, this.pitch, this.heading, this.heading_sp, this.altitude_amsl, this.altitude_sp, this.wp_distance, this.base_mode, this.landed_state, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.climb_rate, this.gps_nsat, this.gps_fix_type, this.battery_remaining, this.temperature, this.temperature_air, this.failsafe, this.wp_num]));
 }
-
 
 /* 
 Message appropriate for high latency connections like Iridium (version
@@ -12806,32 +11056,24 @@ Message appropriate for high latency connections like Iridium (version
                 custom2                   : Field for custom payload. (int8_t)
 
 */
-    mavlink20.messages.high_latency2 = function( ...moreargs ) {
-    [ this.timestamp , this.type , this.autopilot , this.custom_mode , this.latitude , this.longitude , this.altitude , this.target_altitude , this.heading , this.target_heading , this.target_distance , this.throttle , this.airspeed , this.airspeed_sp , this.groundspeed , this.windspeed , this.wind_heading , this.eph , this.epv , this.temperature_air , this.climb_rate , this.battery , this.wp_num , this.failure_flags , this.custom0 , this.custom1 , this.custom2 ] = moreargs;
+mavlink20.messages.high_latency2 = function(timestamp, type, autopilot, custom_mode, latitude, longitude, altitude, target_altitude, heading, target_heading, target_distance, throttle, airspeed, airspeed_sp, groundspeed, windspeed, wind_heading, eph, epv, temperature_air, climb_rate, battery, wp_num, failure_flags, custom0, custom1, custom2) {
 
-    this._format = '<IiiHhhHHHBBBBBBBBBBBBbbbbbb';
-    this._id = mavlink20.MAVLINK_MSG_ID_HIGH_LATENCY2;
+    this.format = '<IiiHhhHHHBBBBBBBBBBBBbbbbbb';
+    this.id = mavlink20.MAVLINK_MSG_ID_HIGH_LATENCY2;
     this.order_map = [0, 9, 10, 3, 1, 2, 4, 5, 11, 12, 6, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 7, 8, 24, 25, 26];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 179;
-    this._name = 'HIGH_LATENCY2';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HIGH_LATENCY2';
 
     this.fieldnames = ['timestamp', 'type', 'autopilot', 'custom_mode', 'latitude', 'longitude', 'altitude', 'target_altitude', 'heading', 'target_heading', 'target_distance', 'throttle', 'airspeed', 'airspeed_sp', 'groundspeed', 'windspeed', 'wind_heading', 'eph', 'epv', 'temperature_air', 'climb_rate', 'battery', 'wp_num', 'failure_flags', 'custom0', 'custom1', 'custom2'];
 
-}
 
-mavlink20.messages.high_latency2.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.high_latency2.prototype = new mavlink20.message();
 mavlink20.messages.high_latency2.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.latitude, this.longitude, this.custom_mode, this.altitude, this.target_altitude, this.target_distance, this.wp_num, this.failure_flags, this.type, this.autopilot, this.heading, this.target_heading, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.windspeed, this.wind_heading, this.eph, this.epv, this.temperature_air, this.climb_rate, this.battery, this.custom0, this.custom1, this.custom2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.latitude, this.longitude, this.custom_mode, this.altitude, this.target_altitude, this.target_distance, this.wp_num, this.failure_flags, this.type, this.autopilot, this.heading, this.target_heading, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.windspeed, this.wind_heading, this.eph, this.epv, this.temperature_air, this.climb_rate, this.battery, this.custom0, this.custom1, this.custom2]));
 }
-
 
 /* 
 Vibration levels and accelerometer clipping
@@ -12845,32 +11087,24 @@ Vibration levels and accelerometer clipping
                 clipping_2                : third accelerometer clipping count (uint32_t)
 
 */
-    mavlink20.messages.vibration = function( ...moreargs ) {
-    [ this.time_usec , this.vibration_x , this.vibration_y , this.vibration_z , this.clipping_0 , this.clipping_1 , this.clipping_2 ] = moreargs;
+mavlink20.messages.vibration = function(time_usec, vibration_x, vibration_y, vibration_z, clipping_0, clipping_1, clipping_2) {
 
-    this._format = '<QfffIII';
-    this._id = mavlink20.MAVLINK_MSG_ID_VIBRATION;
+    this.format = '<QfffIII';
+    this.id = mavlink20.MAVLINK_MSG_ID_VIBRATION;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 90;
-    this._name = 'VIBRATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'VIBRATION';
 
     this.fieldnames = ['time_usec', 'vibration_x', 'vibration_y', 'vibration_z', 'clipping_0', 'clipping_1', 'clipping_2'];
 
-}
 
-mavlink20.messages.vibration.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.vibration.prototype = new mavlink20.message();
 mavlink20.messages.vibration.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.vibration_x, this.vibration_y, this.vibration_z, this.clipping_0, this.clipping_1, this.clipping_2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.vibration_x, this.vibration_y, this.vibration_z, this.clipping_0, this.clipping_1, this.clipping_2]));
 }
-
 
 /* 
 This message can be requested by sending the MAV_CMD_GET_HOME_POSITION
@@ -12897,32 +11131,24 @@ flight mode and then perform a landing sequence along the vector.
                 time_usec                 : Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number. (uint64_t)
 
 */
-    mavlink20.messages.home_position = function( ...moreargs ) {
-    [ this.latitude , this.longitude , this.altitude , this.x , this.y , this.z , this.q , this.approach_x , this.approach_y , this.approach_z , this.time_usec ] = moreargs;
+mavlink20.messages.home_position = function(latitude, longitude, altitude, x, y, z, q, approach_x, approach_y, approach_z, time_usec) {
 
-    this._format = '<iiifff4ffffQ';
-    this._id = mavlink20.MAVLINK_MSG_ID_HOME_POSITION;
+    this.format = '<iiifff4ffffQ';
+    this.id = mavlink20.MAVLINK_MSG_ID_HOME_POSITION;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0];
     this.crc_extra = 104;
-    this._name = 'HOME_POSITION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HOME_POSITION';
 
     this.fieldnames = ['latitude', 'longitude', 'altitude', 'x', 'y', 'z', 'q', 'approach_x', 'approach_y', 'approach_z', 'time_usec'];
 
-}
 
-mavlink20.messages.home_position.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.home_position.prototype = new mavlink20.message();
 mavlink20.messages.home_position.prototype.pack = function(mav) {
-    var orderedfields = [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.time_usec];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.time_usec]));
 }
-
 
 /* 
 The position the system will return to and land on. The position is
@@ -12949,32 +11175,24 @@ flight mode and then perform a landing sequence along the vector.
                 time_usec                 : Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number. (uint64_t)
 
 */
-    mavlink20.messages.set_home_position = function( ...moreargs ) {
-    [ this.target_system , this.latitude , this.longitude , this.altitude , this.x , this.y , this.z , this.q , this.approach_x , this.approach_y , this.approach_z , this.time_usec ] = moreargs;
+mavlink20.messages.set_home_position = function(target_system, latitude, longitude, altitude, x, y, z, q, approach_x, approach_y, approach_z, time_usec) {
 
-    this._format = '<iiifff4ffffBQ';
-    this._id = mavlink20.MAVLINK_MSG_ID_SET_HOME_POSITION;
+    this.format = '<iiifff4ffffBQ';
+    this.id = mavlink20.MAVLINK_MSG_ID_SET_HOME_POSITION;
     this.order_map = [10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0];
     this.crc_extra = 85;
-    this._name = 'SET_HOME_POSITION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SET_HOME_POSITION';
 
     this.fieldnames = ['target_system', 'latitude', 'longitude', 'altitude', 'x', 'y', 'z', 'q', 'approach_x', 'approach_y', 'approach_z', 'time_usec'];
 
-}
 
-mavlink20.messages.set_home_position.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.set_home_position.prototype = new mavlink20.message();
 mavlink20.messages.set_home_position.prototype.pack = function(mav) {
-    var orderedfields = [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.target_system, this.time_usec];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.target_system, this.time_usec]));
 }
-
 
 /* 
 The interval between messages for a particular MAVLink message ID.
@@ -12985,32 +11203,24 @@ command. This interface replaces DATA_STREAM.
                 interval_us               : The interval between two messages. A value of -1 indicates this stream is disabled, 0 indicates it is not available, > 0 indicates the interval at which it is sent. (int32_t)
 
 */
-    mavlink20.messages.message_interval = function( ...moreargs ) {
-    [ this.message_id , this.interval_us ] = moreargs;
+mavlink20.messages.message_interval = function(message_id, interval_us) {
 
-    this._format = '<iH';
-    this._id = mavlink20.MAVLINK_MSG_ID_MESSAGE_INTERVAL;
+    this.format = '<iH';
+    this.id = mavlink20.MAVLINK_MSG_ID_MESSAGE_INTERVAL;
     this.order_map = [1, 0];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 95;
-    this._name = 'MESSAGE_INTERVAL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MESSAGE_INTERVAL';
 
     this.fieldnames = ['message_id', 'interval_us'];
 
-}
 
-mavlink20.messages.message_interval.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.message_interval.prototype = new mavlink20.message();
 mavlink20.messages.message_interval.prototype.pack = function(mav) {
-    var orderedfields = [ this.interval_us, this.message_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.interval_us, this.message_id]));
 }
-
 
 /* 
 Provides state for additional features
@@ -13019,32 +11229,24 @@ Provides state for additional features
                 landed_state              : The landed state. Is set to MAV_LANDED_STATE_UNDEFINED if landed state is unknown. (uint8_t)
 
 */
-    mavlink20.messages.extended_sys_state = function( ...moreargs ) {
-    [ this.vtol_state , this.landed_state ] = moreargs;
+mavlink20.messages.extended_sys_state = function(vtol_state, landed_state) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_EXTENDED_SYS_STATE;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_EXTENDED_SYS_STATE;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 130;
-    this._name = 'EXTENDED_SYS_STATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'EXTENDED_SYS_STATE';
 
     this.fieldnames = ['vtol_state', 'landed_state'];
 
-}
 
-mavlink20.messages.extended_sys_state.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.extended_sys_state.prototype = new mavlink20.message();
 mavlink20.messages.extended_sys_state.prototype.pack = function(mav) {
-    var orderedfields = [ this.vtol_state, this.landed_state];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vtol_state, this.landed_state]));
 }
-
 
 /* 
 The location and information of an ADSB vehicle
@@ -13064,32 +11266,24 @@ The location and information of an ADSB vehicle
                 squawk                    : Squawk code (uint16_t)
 
 */
-    mavlink20.messages.adsb_vehicle = function( ...moreargs ) {
-    [ this.ICAO_address , this.lat , this.lon , this.altitude_type , this.altitude , this.heading , this.hor_velocity , this.ver_velocity , this.callsign , this.emitter_type , this.tslc , this.flags , this.squawk ] = moreargs;
+mavlink20.messages.adsb_vehicle = function(ICAO_address, lat, lon, altitude_type, altitude, heading, hor_velocity, ver_velocity, callsign, emitter_type, tslc, flags, squawk) {
 
-    this._format = '<IiiiHHhHHB9sBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ADSB_VEHICLE;
+    this.format = '<IiiiHHhHHB9sBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ADSB_VEHICLE;
     this.order_map = [0, 1, 2, 9, 3, 4, 5, 6, 10, 11, 12, 7, 8];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0];
     this.crc_extra = 184;
-    this._name = 'ADSB_VEHICLE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ADSB_VEHICLE';
 
     this.fieldnames = ['ICAO_address', 'lat', 'lon', 'altitude_type', 'altitude', 'heading', 'hor_velocity', 'ver_velocity', 'callsign', 'emitter_type', 'tslc', 'flags', 'squawk'];
 
-}
 
-mavlink20.messages.adsb_vehicle.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.adsb_vehicle.prototype = new mavlink20.message();
 mavlink20.messages.adsb_vehicle.prototype.pack = function(mav) {
-    var orderedfields = [ this.ICAO_address, this.lat, this.lon, this.altitude, this.heading, this.hor_velocity, this.ver_velocity, this.flags, this.squawk, this.altitude_type, this.callsign, this.emitter_type, this.tslc];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ICAO_address, this.lat, this.lon, this.altitude, this.heading, this.hor_velocity, this.ver_velocity, this.flags, this.squawk, this.altitude_type, this.callsign, this.emitter_type, this.tslc]));
 }
-
 
 /* 
 Information about a potential collision
@@ -13103,32 +11297,24 @@ Information about a potential collision
                 horizontal_minimum_delta        : Closest horizontal distance between vehicle and object (float)
 
 */
-    mavlink20.messages.collision = function( ...moreargs ) {
-    [ this.src , this.id , this.action , this.threat_level , this.time_to_minimum_delta , this.altitude_minimum_delta , this.horizontal_minimum_delta ] = moreargs;
+mavlink20.messages.collision = function(src, id, action, threat_level, time_to_minimum_delta, altitude_minimum_delta, horizontal_minimum_delta) {
 
-    this._format = '<IfffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COLLISION;
+    this.format = '<IfffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COLLISION;
     this.order_map = [4, 0, 5, 6, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 81;
-    this._name = 'COLLISION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COLLISION';
 
     this.fieldnames = ['src', 'id', 'action', 'threat_level', 'time_to_minimum_delta', 'altitude_minimum_delta', 'horizontal_minimum_delta'];
 
-}
 
-mavlink20.messages.collision.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.collision.prototype = new mavlink20.message();
 mavlink20.messages.collision.prototype.pack = function(mav) {
-    var orderedfields = [ this.id, this.time_to_minimum_delta, this.altitude_minimum_delta, this.horizontal_minimum_delta, this.src, this.action, this.threat_level];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.time_to_minimum_delta, this.altitude_minimum_delta, this.horizontal_minimum_delta, this.src, this.action, this.threat_level]));
 }
-
 
 /* 
 Message implementing parts of the V2 payload specs in V1 frames for
@@ -13141,32 +11327,24 @@ transitional support.
                 payload                   : Variable length payload. The length must be encoded in the payload as part of the message_type protocol, e.g. by including the length as payload data, or by terminating the payload data with a non-zero marker. This is required in order to reconstruct zero-terminated payloads that are (or otherwise would be) trimmed by MAVLink 2 empty-byte truncation. The entire content of the payload block is opaque unless you understand the encoding message_type. The particular encoding used can be extension specific and might not always be documented as part of the MAVLink specification. (uint8_t)
 
 */
-    mavlink20.messages.v2_extension = function( ...moreargs ) {
-    [ this.target_network , this.target_system , this.target_component , this.message_type , this.payload ] = moreargs;
+mavlink20.messages.v2_extension = function(target_network, target_system, target_component, message_type, payload) {
 
-    this._format = '<HBBB249s';
-    this._id = mavlink20.MAVLINK_MSG_ID_V2_EXTENSION;
+    this.format = '<HBBB249s';
+    this.id = mavlink20.MAVLINK_MSG_ID_V2_EXTENSION;
     this.order_map = [1, 2, 3, 0, 4];
-    this.len_map = [1, 1, 1, 1, 249];
-    this.array_len_map = [0, 0, 0, 0, 249];
     this.crc_extra = 8;
-    this._name = 'V2_EXTENSION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'V2_EXTENSION';
 
     this.fieldnames = ['target_network', 'target_system', 'target_component', 'message_type', 'payload'];
 
-}
 
-mavlink20.messages.v2_extension.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.v2_extension.prototype = new mavlink20.message();
 mavlink20.messages.v2_extension.prototype.pack = function(mav) {
-    var orderedfields = [ this.message_type, this.target_network, this.target_system, this.target_component, this.payload];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.message_type, this.target_network, this.target_system, this.target_component, this.payload]));
 }
-
 
 /* 
 Send raw controller memory. The use of this message is discouraged for
@@ -13179,32 +11357,24 @@ getting experimental debug output.
                 value                     : Memory contents at specified address (int8_t)
 
 */
-    mavlink20.messages.memory_vect = function( ...moreargs ) {
-    [ this.address , this.ver , this.type , this.value ] = moreargs;
+mavlink20.messages.memory_vect = function(address, ver, type, value) {
 
-    this._format = '<HBB32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_MEMORY_VECT;
+    this.format = '<HBB32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_MEMORY_VECT;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 32];
-    this.array_len_map = [0, 0, 0, 32];
     this.crc_extra = 204;
-    this._name = 'MEMORY_VECT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MEMORY_VECT';
 
     this.fieldnames = ['address', 'ver', 'type', 'value'];
 
-}
 
-mavlink20.messages.memory_vect.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.memory_vect.prototype = new mavlink20.message();
 mavlink20.messages.memory_vect.prototype.pack = function(mav) {
-    var orderedfields = [ this.address, this.ver, this.type, this.value];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.address, this.ver, this.type, this.value]));
 }
-
 
 /* 
 To debug something using a named 3D vector.
@@ -13216,32 +11386,24 @@ To debug something using a named 3D vector.
                 z                         : z (float)
 
 */
-    mavlink20.messages.debug_vect = function( ...moreargs ) {
-    [ this.name , this.time_usec , this.x , this.y , this.z ] = moreargs;
+mavlink20.messages.debug_vect = function(name, time_usec, x, y, z) {
 
-    this._format = '<Qfff10s';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEBUG_VECT;
+    this.format = '<Qfff10s';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEBUG_VECT;
     this.order_map = [4, 0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 10];
     this.crc_extra = 49;
-    this._name = 'DEBUG_VECT';
-
-    this._instance_field = 'name';
-    this._instance_offset = 20;
+    this.name = 'DEBUG_VECT';
 
     this.fieldnames = ['name', 'time_usec', 'x', 'y', 'z'];
 
-}
 
-mavlink20.messages.debug_vect.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.debug_vect.prototype = new mavlink20.message();
 mavlink20.messages.debug_vect.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.x, this.y, this.z, this.name];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.name]));
 }
-
 
 /* 
 Send a key-value pair as float. The use of this message is discouraged
@@ -13253,32 +11415,24 @@ and getting experimental debug output.
                 value                     : Floating point value (float)
 
 */
-    mavlink20.messages.named_value_float = function( ...moreargs ) {
-    [ this.time_boot_ms , this.name , this.value ] = moreargs;
+mavlink20.messages.named_value_float = function(time_boot_ms, name, value) {
 
-    this._format = '<If10s';
-    this._id = mavlink20.MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
+    this.format = '<If10s';
+    this.id = mavlink20.MAVLINK_MSG_ID_NAMED_VALUE_FLOAT;
     this.order_map = [0, 2, 1];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 10];
     this.crc_extra = 170;
-    this._name = 'NAMED_VALUE_FLOAT';
-
-    this._instance_field = 'name';
-    this._instance_offset = 8;
+    this.name = 'NAMED_VALUE_FLOAT';
 
     this.fieldnames = ['time_boot_ms', 'name', 'value'];
 
-}
 
-mavlink20.messages.named_value_float.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.named_value_float.prototype = new mavlink20.message();
 mavlink20.messages.named_value_float.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.value, this.name];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
 }
-
 
 /* 
 Send a key-value pair as integer. The use of this message is
@@ -13290,32 +11444,24 @@ new messages and getting experimental debug output.
                 value                     : Signed integer value (int32_t)
 
 */
-    mavlink20.messages.named_value_int = function( ...moreargs ) {
-    [ this.time_boot_ms , this.name , this.value ] = moreargs;
+mavlink20.messages.named_value_int = function(time_boot_ms, name, value) {
 
-    this._format = '<Ii10s';
-    this._id = mavlink20.MAVLINK_MSG_ID_NAMED_VALUE_INT;
+    this.format = '<Ii10s';
+    this.id = mavlink20.MAVLINK_MSG_ID_NAMED_VALUE_INT;
     this.order_map = [0, 2, 1];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 10];
     this.crc_extra = 44;
-    this._name = 'NAMED_VALUE_INT';
-
-    this._instance_field = 'name';
-    this._instance_offset = 8;
+    this.name = 'NAMED_VALUE_INT';
 
     this.fieldnames = ['time_boot_ms', 'name', 'value'];
 
-}
 
-mavlink20.messages.named_value_int.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.named_value_int.prototype = new mavlink20.message();
 mavlink20.messages.named_value_int.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.value, this.name];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
 }
-
 
 /* 
 Status text message. These messages are printed in yellow in the COMM
@@ -13330,32 +11476,24 @@ limited rate (e.g. 10 Hz).
                 chunk_seq                 : This chunk's sequence number; indexing is from zero.  Any null character in the text field is taken to mean this was the last chunk. (uint8_t)
 
 */
-    mavlink20.messages.statustext = function( ...moreargs ) {
-    [ this.severity , this.text , this.id , this.chunk_seq ] = moreargs;
+mavlink20.messages.statustext = function(severity, text, id, chunk_seq) {
 
-    this._format = '<B50sHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STATUSTEXT;
+    this.format = '<B50sHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STATUSTEXT;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 50, 0, 0];
     this.crc_extra = 83;
-    this._name = 'STATUSTEXT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'STATUSTEXT';
 
     this.fieldnames = ['severity', 'text', 'id', 'chunk_seq'];
 
-}
 
-mavlink20.messages.statustext.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.statustext.prototype = new mavlink20.message();
 mavlink20.messages.statustext.prototype.pack = function(mav) {
-    var orderedfields = [ this.severity, this.text, this.id, this.chunk_seq];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.severity, this.text, this.id, this.chunk_seq]));
 }
-
 
 /* 
 Send a debug value. The index is used to discriminate between values.
@@ -13366,32 +11504,24 @@ These values show up in the plot of QGroundControl as DEBUG N.
                 value                     : DEBUG value (float)
 
 */
-    mavlink20.messages.debug = function( ...moreargs ) {
-    [ this.time_boot_ms , this.ind , this.value ] = moreargs;
+mavlink20.messages.debug = function(time_boot_ms, ind, value) {
 
-    this._format = '<IfB';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEBUG;
+    this.format = '<IfB';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEBUG;
     this.order_map = [0, 2, 1];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 46;
-    this._name = 'DEBUG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'DEBUG';
 
     this.fieldnames = ['time_boot_ms', 'ind', 'value'];
 
-}
 
-mavlink20.messages.debug.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.debug.prototype = new mavlink20.message();
 mavlink20.messages.debug.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.value, this.ind];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.ind]));
 }
-
 
 /* 
 Setup a MAVLink2 signing key. If called with secret_key of all zero
@@ -13403,32 +11533,24 @@ and zero initial_timestamp will disable signing
                 initial_timestamp         : initial timestamp (uint64_t)
 
 */
-    mavlink20.messages.setup_signing = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.secret_key , this.initial_timestamp ] = moreargs;
+mavlink20.messages.setup_signing = function(target_system, target_component, secret_key, initial_timestamp) {
 
-    this._format = '<QBB32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_SETUP_SIGNING;
+    this.format = '<QBB32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_SETUP_SIGNING;
     this.order_map = [1, 2, 3, 0];
-    this.len_map = [1, 1, 1, 32];
-    this.array_len_map = [0, 0, 0, 32];
     this.crc_extra = 71;
-    this._name = 'SETUP_SIGNING';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'SETUP_SIGNING';
 
     this.fieldnames = ['target_system', 'target_component', 'secret_key', 'initial_timestamp'];
 
-}
 
-mavlink20.messages.setup_signing.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.setup_signing.prototype = new mavlink20.message();
 mavlink20.messages.setup_signing.prototype.pack = function(mav) {
-    var orderedfields = [ this.initial_timestamp, this.target_system, this.target_component, this.secret_key];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.initial_timestamp, this.target_system, this.target_component, this.secret_key]));
 }
-
 
 /* 
 Report button state change.
@@ -13438,32 +11560,24 @@ Report button state change.
                 state                     : Bitmap for state of buttons. (uint8_t)
 
 */
-    mavlink20.messages.button_change = function( ...moreargs ) {
-    [ this.time_boot_ms , this.last_change_ms , this.state ] = moreargs;
+mavlink20.messages.button_change = function(time_boot_ms, last_change_ms, state) {
 
-    this._format = '<IIB';
-    this._id = mavlink20.MAVLINK_MSG_ID_BUTTON_CHANGE;
+    this.format = '<IIB';
+    this.id = mavlink20.MAVLINK_MSG_ID_BUTTON_CHANGE;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 131;
-    this._name = 'BUTTON_CHANGE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'BUTTON_CHANGE';
 
     this.fieldnames = ['time_boot_ms', 'last_change_ms', 'state'];
 
-}
 
-mavlink20.messages.button_change.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.button_change.prototype = new mavlink20.message();
 mavlink20.messages.button_change.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.last_change_ms, this.state];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.last_change_ms, this.state]));
 }
-
 
 /* 
 Control vehicle tone generation (buzzer).
@@ -13474,32 +11588,24 @@ Control vehicle tone generation (buzzer).
                 tune2                     : tune extension (appended to tune) (char)
 
 */
-    mavlink20.messages.play_tune = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.tune , this.tune2 ] = moreargs;
+mavlink20.messages.play_tune = function(target_system, target_component, tune, tune2) {
 
-    this._format = '<BB30s200s';
-    this._id = mavlink20.MAVLINK_MSG_ID_PLAY_TUNE;
+    this.format = '<BB30s200s';
+    this.id = mavlink20.MAVLINK_MSG_ID_PLAY_TUNE;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 30, 200];
     this.crc_extra = 187;
-    this._name = 'PLAY_TUNE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PLAY_TUNE';
 
     this.fieldnames = ['target_system', 'target_component', 'tune', 'tune2'];
 
-}
 
-mavlink20.messages.play_tune.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.play_tune.prototype = new mavlink20.message();
 mavlink20.messages.play_tune.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.tune, this.tune2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.tune, this.tune2]));
 }
-
 
 /* 
 Information about a camera. Can be requested with a
@@ -13521,32 +11627,24 @@ MAV_CMD_REQUEST_MESSAGE command.
                 gimbal_device_id          : Gimbal id of a gimbal associated with this camera. This is the component id of the gimbal device, or 1-6 for non mavlink gimbals. Use 0 if no gimbal is associated with the camera. (uint8_t)
 
 */
-    mavlink20.messages.camera_information = function( ...moreargs ) {
-    [ this.time_boot_ms , this.vendor_name , this.model_name , this.firmware_version , this.focal_length , this.sensor_size_h , this.sensor_size_v , this.resolution_h , this.resolution_v , this.lens_id , this.flags , this.cam_definition_version , this.cam_definition_uri , this.gimbal_device_id ] = moreargs;
+mavlink20.messages.camera_information = function(time_boot_ms, vendor_name, model_name, firmware_version, focal_length, sensor_size_h, sensor_size_v, resolution_h, resolution_v, lens_id, flags, cam_definition_version, cam_definition_uri, gimbal_device_id) {
 
-    this._format = '<IIfffIHHH32s32sB140sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_INFORMATION;
+    this.format = '<IIfffIHHH32s32sB140sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_INFORMATION;
     this.order_map = [0, 9, 10, 1, 2, 3, 4, 6, 7, 11, 5, 8, 12, 13];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 32, 32, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 0, 140, 0];
     this.crc_extra = 92;
-    this._name = 'CAMERA_INFORMATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_INFORMATION';
 
     this.fieldnames = ['time_boot_ms', 'vendor_name', 'model_name', 'firmware_version', 'focal_length', 'sensor_size_h', 'sensor_size_v', 'resolution_h', 'resolution_v', 'lens_id', 'flags', 'cam_definition_version', 'cam_definition_uri', 'gimbal_device_id'];
 
-}
 
-mavlink20.messages.camera_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_information.prototype = new mavlink20.message();
 mavlink20.messages.camera_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.firmware_version, this.focal_length, this.sensor_size_h, this.sensor_size_v, this.flags, this.resolution_h, this.resolution_v, this.cam_definition_version, this.vendor_name, this.model_name, this.lens_id, this.cam_definition_uri, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.firmware_version, this.focal_length, this.sensor_size_h, this.sensor_size_v, this.flags, this.resolution_h, this.resolution_v, this.cam_definition_version, this.vendor_name, this.model_name, this.lens_id, this.cam_definition_uri, this.gimbal_device_id]));
 }
-
 
 /* 
 Settings of a camera. Can be requested with a MAV_CMD_REQUEST_MESSAGE
@@ -13558,32 +11656,24 @@ command.
                 focusLevel                : Current focus level as a percentage of the full range (0.0 to 100.0, NaN if not known) (float)
 
 */
-    mavlink20.messages.camera_settings = function( ...moreargs ) {
-    [ this.time_boot_ms , this.mode_id , this.zoomLevel , this.focusLevel ] = moreargs;
+mavlink20.messages.camera_settings = function(time_boot_ms, mode_id, zoomLevel, focusLevel) {
 
-    this._format = '<IBff';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_SETTINGS;
+    this.format = '<IBff';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_SETTINGS;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 146;
-    this._name = 'CAMERA_SETTINGS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_SETTINGS';
 
     this.fieldnames = ['time_boot_ms', 'mode_id', 'zoomLevel', 'focusLevel'];
 
-}
 
-mavlink20.messages.camera_settings.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_settings.prototype = new mavlink20.message();
 mavlink20.messages.camera_settings.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.mode_id, this.zoomLevel, this.focusLevel];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.mode_id, this.zoomLevel, this.focusLevel]));
 }
-
 
 /* 
 Information about a storage medium. This message is sent in response
@@ -13605,32 +11695,24 @@ storage: 0 for all, 1 for first, 2 for second, etc.
                 name                      : Textual storage name to be used in UI (microSD 1, Internal Memory, etc.) This is a NULL terminated string. If it is exactly 32 characters long, add a terminating NULL. If this string is empty, the generic type is shown to the user. (char)
 
 */
-    mavlink20.messages.storage_information = function( ...moreargs ) {
-    [ this.time_boot_ms , this.storage_id , this.storage_count , this.status , this.total_capacity , this.used_capacity , this.available_capacity , this.read_speed , this.write_speed , this.type , this.name ] = moreargs;
+mavlink20.messages.storage_information = function(time_boot_ms, storage_id, storage_count, status, total_capacity, used_capacity, available_capacity, read_speed, write_speed, type, name) {
 
-    this._format = '<IfffffBBBB32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORAGE_INFORMATION;
+    this.format = '<IfffffBBBB32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORAGE_INFORMATION;
     this.order_map = [0, 6, 7, 8, 1, 2, 3, 4, 5, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32];
     this.crc_extra = 179;
-    this._name = 'STORAGE_INFORMATION';
-
-    this._instance_field = 'storage_id';
-    this._instance_offset = 24;
+    this.name = 'STORAGE_INFORMATION';
 
     this.fieldnames = ['time_boot_ms', 'storage_id', 'storage_count', 'status', 'total_capacity', 'used_capacity', 'available_capacity', 'read_speed', 'write_speed', 'type', 'name'];
 
-}
 
-mavlink20.messages.storage_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storage_information.prototype = new mavlink20.message();
 mavlink20.messages.storage_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.total_capacity, this.used_capacity, this.available_capacity, this.read_speed, this.write_speed, this.storage_id, this.storage_count, this.status, this.type, this.name];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.total_capacity, this.used_capacity, this.available_capacity, this.read_speed, this.write_speed, this.storage_id, this.storage_count, this.status, this.type, this.name]));
 }
-
 
 /* 
 Information about the status of a capture. Can be requested with a
@@ -13645,32 +11727,24 @@ MAV_CMD_REQUEST_MESSAGE command.
                 image_count               : Total number of images captured ('forever', or until reset using MAV_CMD_STORAGE_FORMAT). (int32_t)
 
 */
-    mavlink20.messages.camera_capture_status = function( ...moreargs ) {
-    [ this.time_boot_ms , this.image_status , this.video_status , this.image_interval , this.recording_time_ms , this.available_capacity , this.image_count ] = moreargs;
+mavlink20.messages.camera_capture_status = function(time_boot_ms, image_status, video_status, image_interval, recording_time_ms, available_capacity, image_count) {
 
-    this._format = '<IfIfBBi';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS;
+    this.format = '<IfIfBBi';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_CAPTURE_STATUS;
     this.order_map = [0, 4, 5, 1, 2, 3, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 12;
-    this._name = 'CAMERA_CAPTURE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_CAPTURE_STATUS';
 
     this.fieldnames = ['time_boot_ms', 'image_status', 'video_status', 'image_interval', 'recording_time_ms', 'available_capacity', 'image_count'];
 
-}
 
-mavlink20.messages.camera_capture_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_capture_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_capture_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.image_interval, this.recording_time_ms, this.available_capacity, this.image_status, this.video_status, this.image_count];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.image_interval, this.recording_time_ms, this.available_capacity, this.image_status, this.video_status, this.image_count]));
 }
-
 
 /* 
 Information about a captured image. This is emitted every time a
@@ -13691,32 +11765,24 @@ for the missing image.
                 file_url                  : URL of image taken. Either local storage or http://foo.jpg if camera provides an HTTP interface. (char)
 
 */
-    mavlink20.messages.camera_image_captured = function( ...moreargs ) {
-    [ this.time_boot_ms , this.time_utc , this.camera_id , this.lat , this.lon , this.alt , this.relative_alt , this.q , this.image_index , this.capture_result , this.file_url ] = moreargs;
+mavlink20.messages.camera_image_captured = function(time_boot_ms, time_utc, camera_id, lat, lon, alt, relative_alt, q, image_index, capture_result, file_url) {
 
-    this._format = '<QIiiii4fiBb205s';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_IMAGE_CAPTURED;
+    this.format = '<QIiiii4fiBb205s';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_IMAGE_CAPTURED;
     this.order_map = [1, 0, 8, 2, 3, 4, 5, 6, 7, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 205];
     this.crc_extra = 133;
-    this._name = 'CAMERA_IMAGE_CAPTURED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_IMAGE_CAPTURED';
 
     this.fieldnames = ['time_boot_ms', 'time_utc', 'camera_id', 'lat', 'lon', 'alt', 'relative_alt', 'q', 'image_index', 'capture_result', 'file_url'];
 
-}
 
-mavlink20.messages.camera_image_captured.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_image_captured.prototype = new mavlink20.message();
 mavlink20.messages.camera_image_captured.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_utc, this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.q, this.image_index, this.camera_id, this.capture_result, this.file_url];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_utc, this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.q, this.image_index, this.camera_id, this.capture_result, this.file_url]));
 }
-
 
 /* 
 Information about flight since last arming.
@@ -13727,32 +11793,24 @@ Information about flight since last arming.
                 flight_uuid               : Universally unique identifier (UUID) of flight, should correspond to name of log files (uint64_t)
 
 */
-    mavlink20.messages.flight_information = function( ...moreargs ) {
-    [ this.time_boot_ms , this.arming_time_utc , this.takeoff_time_utc , this.flight_uuid ] = moreargs;
+mavlink20.messages.flight_information = function(time_boot_ms, arming_time_utc, takeoff_time_utc, flight_uuid) {
 
-    this._format = '<QQQI';
-    this._id = mavlink20.MAVLINK_MSG_ID_FLIGHT_INFORMATION;
+    this.format = '<QQQI';
+    this.id = mavlink20.MAVLINK_MSG_ID_FLIGHT_INFORMATION;
     this.order_map = [3, 0, 1, 2];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 49;
-    this._name = 'FLIGHT_INFORMATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'FLIGHT_INFORMATION';
 
     this.fieldnames = ['time_boot_ms', 'arming_time_utc', 'takeoff_time_utc', 'flight_uuid'];
 
-}
 
-mavlink20.messages.flight_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.flight_information.prototype = new mavlink20.message();
 mavlink20.messages.flight_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.arming_time_utc, this.takeoff_time_utc, this.flight_uuid, this.time_boot_ms];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.arming_time_utc, this.takeoff_time_utc, this.flight_uuid, this.time_boot_ms]));
 }
-
 
 /* 
 Orientation of a mount
@@ -13764,32 +11822,24 @@ Orientation of a mount
                 yaw_absolute              : Yaw in absolute frame relative to Earth's North, north is 0 (set to NaN for invalid). (float)
 
 */
-    mavlink20.messages.mount_orientation = function( ...moreargs ) {
-    [ this.time_boot_ms , this.roll , this.pitch , this.yaw , this.yaw_absolute ] = moreargs;
+mavlink20.messages.mount_orientation = function(time_boot_ms, roll, pitch, yaw, yaw_absolute) {
 
-    this._format = '<Iffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_MOUNT_ORIENTATION;
+    this.format = '<Iffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_MOUNT_ORIENTATION;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 26;
-    this._name = 'MOUNT_ORIENTATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MOUNT_ORIENTATION';
 
     this.fieldnames = ['time_boot_ms', 'roll', 'pitch', 'yaw', 'yaw_absolute'];
 
-}
 
-mavlink20.messages.mount_orientation.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mount_orientation.prototype = new mavlink20.message();
 mavlink20.messages.mount_orientation.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.yaw_absolute];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.yaw_absolute]));
 }
-
 
 /* 
 A message containing logged data (see also MAV_CMD_LOGGING_START)
@@ -13802,32 +11852,24 @@ A message containing logged data (see also MAV_CMD_LOGGING_START)
                 data                      : logged data (uint8_t)
 
 */
-    mavlink20.messages.logging_data = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.sequence , this.length , this.first_message_offset , this.data ] = moreargs;
+mavlink20.messages.logging_data = function(target_system, target_component, sequence, length, first_message_offset, data) {
 
-    this._format = '<HBBBB249s';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOGGING_DATA;
+    this.format = '<HBBBB249s';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOGGING_DATA;
     this.order_map = [1, 2, 0, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 249];
-    this.array_len_map = [0, 0, 0, 0, 0, 249];
     this.crc_extra = 193;
-    this._name = 'LOGGING_DATA';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOGGING_DATA';
 
     this.fieldnames = ['target_system', 'target_component', 'sequence', 'length', 'first_message_offset', 'data'];
 
-}
 
-mavlink20.messages.logging_data.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.logging_data.prototype = new mavlink20.message();
 mavlink20.messages.logging_data.prototype.pack = function(mav) {
-    var orderedfields = [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
 }
-
 
 /* 
 A message containing logged data which requires a LOGGING_ACK to be
@@ -13841,32 +11883,24 @@ sent back
                 data                      : logged data (uint8_t)
 
 */
-    mavlink20.messages.logging_data_acked = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.sequence , this.length , this.first_message_offset , this.data ] = moreargs;
+mavlink20.messages.logging_data_acked = function(target_system, target_component, sequence, length, first_message_offset, data) {
 
-    this._format = '<HBBBB249s';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOGGING_DATA_ACKED;
+    this.format = '<HBBBB249s';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOGGING_DATA_ACKED;
     this.order_map = [1, 2, 0, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 249];
-    this.array_len_map = [0, 0, 0, 0, 0, 249];
     this.crc_extra = 35;
-    this._name = 'LOGGING_DATA_ACKED';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOGGING_DATA_ACKED';
 
     this.fieldnames = ['target_system', 'target_component', 'sequence', 'length', 'first_message_offset', 'data'];
 
-}
 
-mavlink20.messages.logging_data_acked.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.logging_data_acked.prototype = new mavlink20.message();
 mavlink20.messages.logging_data_acked.prototype.pack = function(mav) {
-    var orderedfields = [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
 }
-
 
 /* 
 An ack for a LOGGING_DATA_ACKED message
@@ -13876,32 +11910,24 @@ An ack for a LOGGING_DATA_ACKED message
                 sequence                  : sequence number (must match the one in LOGGING_DATA_ACKED) (uint16_t)
 
 */
-    mavlink20.messages.logging_ack = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.sequence ] = moreargs;
+mavlink20.messages.logging_ack = function(target_system, target_component, sequence) {
 
-    this._format = '<HBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOGGING_ACK;
+    this.format = '<HBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOGGING_ACK;
     this.order_map = [1, 2, 0];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 14;
-    this._name = 'LOGGING_ACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'LOGGING_ACK';
 
     this.fieldnames = ['target_system', 'target_component', 'sequence'];
 
-}
 
-mavlink20.messages.logging_ack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.logging_ack.prototype = new mavlink20.message();
 mavlink20.messages.logging_ack.prototype.pack = function(mav) {
-    var orderedfields = [ this.sequence, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component]));
 }
-
 
 /* 
 Information about video stream. It may be requested using
@@ -13922,32 +11948,24 @@ for all streams, 1 for first, 2 for second, etc.
                 uri                       : Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to). (char)
 
 */
-    mavlink20.messages.video_stream_information = function( ...moreargs ) {
-    [ this.stream_id , this.count , this.type , this.flags , this.framerate , this.resolution_h , this.resolution_v , this.bitrate , this.rotation , this.hfov , this.name , this.uri ] = moreargs;
+mavlink20.messages.video_stream_information = function(stream_id, count, type, flags, framerate, resolution_h, resolution_v, bitrate, rotation, hfov, name, uri) {
 
-    this._format = '<fIHHHHHBBB32s160s';
-    this._id = mavlink20.MAVLINK_MSG_ID_VIDEO_STREAM_INFORMATION;
+    this.format = '<fIHHHHHBBB32s160s';
+    this.id = mavlink20.MAVLINK_MSG_ID_VIDEO_STREAM_INFORMATION;
     this.order_map = [7, 8, 9, 2, 0, 3, 4, 1, 5, 6, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 160];
     this.crc_extra = 109;
-    this._name = 'VIDEO_STREAM_INFORMATION';
-
-    this._instance_field = 'stream_id';
-    this._instance_offset = 18;
+    this.name = 'VIDEO_STREAM_INFORMATION';
 
     this.fieldnames = ['stream_id', 'count', 'type', 'flags', 'framerate', 'resolution_h', 'resolution_v', 'bitrate', 'rotation', 'hfov', 'name', 'uri'];
 
-}
 
-mavlink20.messages.video_stream_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.video_stream_information.prototype = new mavlink20.message();
 mavlink20.messages.video_stream_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id, this.count, this.type, this.name, this.uri];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id, this.count, this.type, this.name, this.uri]));
 }
-
 
 /* 
 Information about the status of a video stream. It may be requested
@@ -13963,32 +11981,24 @@ using MAV_CMD_REQUEST_MESSAGE.
                 hfov                      : Horizontal Field of view (uint16_t)
 
 */
-    mavlink20.messages.video_stream_status = function( ...moreargs ) {
-    [ this.stream_id , this.flags , this.framerate , this.resolution_h , this.resolution_v , this.bitrate , this.rotation , this.hfov ] = moreargs;
+mavlink20.messages.video_stream_status = function(stream_id, flags, framerate, resolution_h, resolution_v, bitrate, rotation, hfov) {
 
-    this._format = '<fIHHHHHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_VIDEO_STREAM_STATUS;
+    this.format = '<fIHHHHHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_VIDEO_STREAM_STATUS;
     this.order_map = [7, 2, 0, 3, 4, 1, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 59;
-    this._name = 'VIDEO_STREAM_STATUS';
-
-    this._instance_field = 'stream_id';
-    this._instance_offset = 18;
+    this.name = 'VIDEO_STREAM_STATUS';
 
     this.fieldnames = ['stream_id', 'flags', 'framerate', 'resolution_h', 'resolution_v', 'bitrate', 'rotation', 'hfov'];
 
-}
 
-mavlink20.messages.video_stream_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.video_stream_status.prototype = new mavlink20.message();
 mavlink20.messages.video_stream_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id]));
 }
-
 
 /* 
 Information about the field of view of a camera. Can be requested with
@@ -14006,32 +12016,24 @@ a MAV_CMD_REQUEST_MESSAGE command.
                 vfov                      : Vertical field of view (NaN if unknown). (float)
 
 */
-    mavlink20.messages.camera_fov_status = function( ...moreargs ) {
-    [ this.time_boot_ms , this.lat_camera , this.lon_camera , this.alt_camera , this.lat_image , this.lon_image , this.alt_image , this.q , this.hfov , this.vfov ] = moreargs;
+mavlink20.messages.camera_fov_status = function(time_boot_ms, lat_camera, lon_camera, alt_camera, lat_image, lon_image, alt_image, q, hfov, vfov) {
 
-    this._format = '<Iiiiiii4fff';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_FOV_STATUS;
+    this.format = '<Iiiiiii4fff';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_FOV_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 4, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 4, 0, 0];
     this.crc_extra = 22;
-    this._name = 'CAMERA_FOV_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_FOV_STATUS';
 
     this.fieldnames = ['time_boot_ms', 'lat_camera', 'lon_camera', 'alt_camera', 'lat_image', 'lon_image', 'alt_image', 'q', 'hfov', 'vfov'];
 
-}
 
-mavlink20.messages.camera_fov_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_fov_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_fov_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat_camera, this.lon_camera, this.alt_camera, this.lat_image, this.lon_image, this.alt_image, this.q, this.hfov, this.vfov];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_camera, this.lon_camera, this.alt_camera, this.lat_image, this.lon_image, this.alt_image, this.q, this.hfov, this.vfov]));
 }
-
 
 /* 
 Camera tracking status, sent while in active tracking. Use
@@ -14049,32 +12051,24 @@ MAV_CMD_SET_MESSAGE_INTERVAL to define message interval.
                 rec_bottom_y              : Current tracked rectangle bottom y value if CAMERA_TRACKING_MODE_RECTANGLE (normalized 0..1, 0 is top, 1 is bottom), NAN if unknown (float)
 
 */
-    mavlink20.messages.camera_tracking_image_status = function( ...moreargs ) {
-    [ this.tracking_status , this.tracking_mode , this.target_data , this.point_x , this.point_y , this.radius , this.rec_top_x , this.rec_top_y , this.rec_bottom_x , this.rec_bottom_y ] = moreargs;
+mavlink20.messages.camera_tracking_image_status = function(tracking_status, tracking_mode, target_data, point_x, point_y, radius, rec_top_x, rec_top_y, rec_bottom_x, rec_bottom_y) {
 
-    this._format = '<fffffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRACKING_IMAGE_STATUS;
+    this.format = '<fffffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRACKING_IMAGE_STATUS;
     this.order_map = [7, 8, 9, 0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 126;
-    this._name = 'CAMERA_TRACKING_IMAGE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_TRACKING_IMAGE_STATUS';
 
     this.fieldnames = ['tracking_status', 'tracking_mode', 'target_data', 'point_x', 'point_y', 'radius', 'rec_top_x', 'rec_top_y', 'rec_bottom_x', 'rec_bottom_y'];
 
-}
 
-mavlink20.messages.camera_tracking_image_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_tracking_image_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_tracking_image_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.point_x, this.point_y, this.radius, this.rec_top_x, this.rec_top_y, this.rec_bottom_x, this.rec_bottom_y, this.tracking_status, this.tracking_mode, this.target_data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.point_x, this.point_y, this.radius, this.rec_top_x, this.rec_top_y, this.rec_bottom_x, this.rec_bottom_y, this.tracking_status, this.tracking_mode, this.target_data]));
 }
-
 
 /* 
 Camera tracking status, sent while in active tracking. Use
@@ -14095,32 +12089,24 @@ MAV_CMD_SET_MESSAGE_INTERVAL to define message interval.
                 hdg_acc                   : Accuracy of heading, in NED. NAN if unknown (float)
 
 */
-    mavlink20.messages.camera_tracking_geo_status = function( ...moreargs ) {
-    [ this.tracking_status , this.lat , this.lon , this.alt , this.h_acc , this.v_acc , this.vel_n , this.vel_e , this.vel_d , this.vel_acc , this.dist , this.hdg , this.hdg_acc ] = moreargs;
+mavlink20.messages.camera_tracking_geo_status = function(tracking_status, lat, lon, alt, h_acc, v_acc, vel_n, vel_e, vel_d, vel_acc, dist, hdg, hdg_acc) {
 
-    this._format = '<iiffffffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRACKING_GEO_STATUS;
+    this.format = '<iiffffffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAMERA_TRACKING_GEO_STATUS;
     this.order_map = [12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 18;
-    this._name = 'CAMERA_TRACKING_GEO_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAMERA_TRACKING_GEO_STATUS';
 
     this.fieldnames = ['tracking_status', 'lat', 'lon', 'alt', 'h_acc', 'v_acc', 'vel_n', 'vel_e', 'vel_d', 'vel_acc', 'dist', 'hdg', 'hdg_acc'];
 
-}
 
-mavlink20.messages.camera_tracking_geo_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.camera_tracking_geo_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_tracking_geo_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.lat, this.lon, this.alt, this.h_acc, this.v_acc, this.vel_n, this.vel_e, this.vel_d, this.vel_acc, this.dist, this.hdg, this.hdg_acc, this.tracking_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.alt, this.h_acc, this.v_acc, this.vel_n, this.vel_e, this.vel_d, this.vel_acc, this.dist, this.hdg, this.hdg_acc, this.tracking_status]));
 }
-
 
 /* 
 Information about a high level gimbal manager. This message should be
@@ -14137,32 +12123,24 @@ requested by a ground station using MAV_CMD_REQUEST_MESSAGE.
                 yaw_max                   : Maximum yaw angle (positive: to the right, negative: to the left) (float)
 
 */
-    mavlink20.messages.gimbal_manager_information = function( ...moreargs ) {
-    [ this.time_boot_ms , this.cap_flags , this.gimbal_device_id , this.roll_min , this.roll_max , this.pitch_min , this.pitch_max , this.yaw_min , this.yaw_max ] = moreargs;
+mavlink20.messages.gimbal_manager_information = function(time_boot_ms, cap_flags, gimbal_device_id, roll_min, roll_max, pitch_min, pitch_max, yaw_min, yaw_max) {
 
-    this._format = '<IIffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_INFORMATION;
+    this.format = '<IIffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_INFORMATION;
     this.order_map = [0, 1, 8, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 70;
-    this._name = 'GIMBAL_MANAGER_INFORMATION';
-
-    this._instance_field = 'gimbal_device_id';
-    this._instance_offset = 32;
+    this.name = 'GIMBAL_MANAGER_INFORMATION';
 
     this.fieldnames = ['time_boot_ms', 'cap_flags', 'gimbal_device_id', 'roll_min', 'roll_max', 'pitch_min', 'pitch_max', 'yaw_min', 'yaw_max'];
 
-}
 
-mavlink20.messages.gimbal_manager_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_manager_information.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_device_id]));
 }
-
 
 /* 
 Current status about a high level gimbal manager. This message should
@@ -14177,32 +12155,24 @@ be broadcast at a low regular rate (e.g. 5Hz).
                 secondary_control_compid        : Component ID of MAVLink component with secondary control, 0 for none. (uint8_t)
 
 */
-    mavlink20.messages.gimbal_manager_status = function( ...moreargs ) {
-    [ this.time_boot_ms , this.flags , this.gimbal_device_id , this.primary_control_sysid , this.primary_control_compid , this.secondary_control_sysid , this.secondary_control_compid ] = moreargs;
+mavlink20.messages.gimbal_manager_status = function(time_boot_ms, flags, gimbal_device_id, primary_control_sysid, primary_control_compid, secondary_control_sysid, secondary_control_compid) {
 
-    this._format = '<IIBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_STATUS;
+    this.format = '<IIBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 48;
-    this._name = 'GIMBAL_MANAGER_STATUS';
-
-    this._instance_field = 'gimbal_device_id';
-    this._instance_offset = 8;
+    this.name = 'GIMBAL_MANAGER_STATUS';
 
     this.fieldnames = ['time_boot_ms', 'flags', 'gimbal_device_id', 'primary_control_sysid', 'primary_control_compid', 'secondary_control_sysid', 'secondary_control_compid'];
 
-}
 
-mavlink20.messages.gimbal_manager_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_manager_status.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.flags, this.gimbal_device_id, this.primary_control_sysid, this.primary_control_compid, this.secondary_control_sysid, this.secondary_control_compid];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.flags, this.gimbal_device_id, this.primary_control_sysid, this.primary_control_compid, this.secondary_control_sysid, this.secondary_control_compid]));
 }
-
 
 /* 
 High level message to control a gimbal's attitude. This message is to
@@ -14219,32 +12189,24 @@ rates can be set to NaN according to use case.
                 angular_velocity_z        : Z component of angular velocity, positive is yawing to the right, NaN to be ignored. (float)
 
 */
-    mavlink20.messages.gimbal_manager_set_attitude = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.flags , this.gimbal_device_id , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z ] = moreargs;
+mavlink20.messages.gimbal_manager_set_attitude = function(target_system, target_component, flags, gimbal_device_id, q, angular_velocity_x, angular_velocity_y, angular_velocity_z) {
 
-    this._format = '<I4ffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE;
+    this.format = '<I4ffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_ATTITUDE;
     this.order_map = [5, 6, 0, 7, 1, 2, 3, 4];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 123;
-    this._name = 'GIMBAL_MANAGER_SET_ATTITUDE';
-
-    this._instance_field = 'gimbal_device_id';
-    this._instance_offset = 34;
+    this.name = 'GIMBAL_MANAGER_SET_ATTITUDE';
 
     this.fieldnames = ['target_system', 'target_component', 'flags', 'gimbal_device_id', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z'];
 
-}
 
-mavlink20.messages.gimbal_manager_set_attitude.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_manager_set_attitude.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_attitude.prototype.pack = function(mav) {
-    var orderedfields = [ this.flags, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.target_system, this.target_component, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.target_system, this.target_component, this.gimbal_device_id]));
 }
-
 
 /* 
 Information about a low level gimbal. This message should be requested
@@ -14271,32 +12233,24 @@ different/smaller and dependent on mode/settings/etc..
                 gimbal_device_id          : This field is to be used if the gimbal manager and the gimbal device are the same component and hence have the same component ID. This field is then set to a number between 1-6. If the component ID is separate, this field is not required and must be set to 0. (uint8_t)
 
 */
-    mavlink20.messages.gimbal_device_information = function( ...moreargs ) {
-    [ this.time_boot_ms , this.vendor_name , this.model_name , this.custom_name , this.firmware_version , this.hardware_version , this.uid , this.cap_flags , this.custom_cap_flags , this.roll_min , this.roll_max , this.pitch_min , this.pitch_max , this.yaw_min , this.yaw_max , this.gimbal_device_id ] = moreargs;
+mavlink20.messages.gimbal_device_information = function(time_boot_ms, vendor_name, model_name, custom_name, firmware_version, hardware_version, uid, cap_flags, custom_cap_flags, roll_min, roll_max, pitch_min, pitch_max, yaw_min, yaw_max, gimbal_device_id) {
 
-    this._format = '<QIIIffffffHH32s32s32sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION;
+    this.format = '<QIIIffffffHH32s32s32sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_INFORMATION;
     this.order_map = [1, 12, 13, 14, 2, 3, 0, 10, 11, 4, 5, 6, 7, 8, 9, 15];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 0];
     this.crc_extra = 74;
-    this._name = 'GIMBAL_DEVICE_INFORMATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_DEVICE_INFORMATION';
 
     this.fieldnames = ['time_boot_ms', 'vendor_name', 'model_name', 'custom_name', 'firmware_version', 'hardware_version', 'uid', 'cap_flags', 'custom_cap_flags', 'roll_min', 'roll_max', 'pitch_min', 'pitch_max', 'yaw_min', 'yaw_max', 'gimbal_device_id'];
 
-}
 
-mavlink20.messages.gimbal_device_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_device_information.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.uid, this.time_boot_ms, this.firmware_version, this.hardware_version, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.cap_flags, this.custom_cap_flags, this.vendor_name, this.model_name, this.custom_name, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.uid, this.time_boot_ms, this.firmware_version, this.hardware_version, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.cap_flags, this.custom_cap_flags, this.vendor_name, this.model_name, this.custom_name, this.gimbal_device_id]));
 }
-
 
 /* 
 Low level message to control a gimbal device's attitude.
@@ -14328,32 +12282,24 @@ GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME.
                 angular_velocity_z        : Z component of angular velocity (positive: yawing to the right). The frame is described in the message description. NaN to be ignored. (float)
 
 */
-    mavlink20.messages.gimbal_device_set_attitude = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.flags , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z ] = moreargs;
+mavlink20.messages.gimbal_device_set_attitude = function(target_system, target_component, flags, q, angular_velocity_x, angular_velocity_y, angular_velocity_z) {
 
-    this._format = '<4ffffHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE;
+    this.format = '<4ffffHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_SET_ATTITUDE;
     this.order_map = [5, 6, 4, 0, 1, 2, 3];
-    this.len_map = [4, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [4, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 99;
-    this._name = 'GIMBAL_DEVICE_SET_ATTITUDE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_DEVICE_SET_ATTITUDE';
 
     this.fieldnames = ['target_system', 'target_component', 'flags', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z'];
 
-}
 
-mavlink20.messages.gimbal_device_set_attitude.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_device_set_attitude.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_set_attitude.prototype.pack = function(mav) {
-    var orderedfields = [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
 }
-
 
 /* 
 Message reporting the status of a gimbal device.           This
@@ -14396,32 +12342,24 @@ NaN.
                 gimbal_device_id          : This field is to be used if the gimbal manager and the gimbal device are the same component and hence have the same component ID. This field is then set a number between 1-6. If the component ID is separate, this field is not required and must be set to 0. (uint8_t)
 
 */
-    mavlink20.messages.gimbal_device_attitude_status = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.time_boot_ms , this.flags , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z , this.failure_flags , this.delta_yaw , this.delta_yaw_velocity , this.gimbal_device_id ] = moreargs;
+mavlink20.messages.gimbal_device_attitude_status = function(target_system, target_component, time_boot_ms, flags, q, angular_velocity_x, angular_velocity_y, angular_velocity_z, failure_flags, delta_yaw, delta_yaw_velocity, gimbal_device_id) {
 
-    this._format = '<I4ffffIHBBffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS;
+    this.format = '<I4ffffIHBBffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS;
     this.order_map = [7, 8, 0, 6, 1, 2, 3, 4, 5, 9, 10, 11];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 137;
-    this._name = 'GIMBAL_DEVICE_ATTITUDE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GIMBAL_DEVICE_ATTITUDE_STATUS';
 
     this.fieldnames = ['target_system', 'target_component', 'time_boot_ms', 'flags', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z', 'failure_flags', 'delta_yaw', 'delta_yaw_velocity', 'gimbal_device_id'];
 
-}
 
-mavlink20.messages.gimbal_device_attitude_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_device_attitude_status.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_attitude_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.failure_flags, this.flags, this.target_system, this.target_component, this.delta_yaw, this.delta_yaw_velocity, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.failure_flags, this.flags, this.target_system, this.target_component, this.delta_yaw, this.delta_yaw_velocity, this.gimbal_device_id]));
 }
-
 
 /* 
 Low level message containing autopilot state relevant for a gimbal
@@ -14446,32 +12384,24 @@ control in the z-axis.
                 angular_velocity_z        : Z component of angular velocity in NED (North, East, Down). NaN if unknown. (float)
 
 */
-    mavlink20.messages.autopilot_state_for_gimbal_device = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.time_boot_us , this.q , this.q_estimated_delay_us , this.vx , this.vy , this.vz , this.v_estimated_delay_us , this.feed_forward_angular_velocity_z , this.estimator_status , this.landed_state , this.angular_velocity_z ] = moreargs;
+mavlink20.messages.autopilot_state_for_gimbal_device = function(target_system, target_component, time_boot_us, q, q_estimated_delay_us, vx, vy, vz, v_estimated_delay_us, feed_forward_angular_velocity_z, estimator_status, landed_state, angular_velocity_z) {
 
-    this._format = '<Q4fIfffIfHBBBf';
-    this._id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE;
+    this.format = '<Q4fIfffIfHBBBf';
+    this.id = mavlink20.MAVLINK_MSG_ID_AUTOPILOT_STATE_FOR_GIMBAL_DEVICE;
     this.order_map = [9, 10, 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 210;
-    this._name = 'AUTOPILOT_STATE_FOR_GIMBAL_DEVICE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AUTOPILOT_STATE_FOR_GIMBAL_DEVICE';
 
     this.fieldnames = ['target_system', 'target_component', 'time_boot_us', 'q', 'q_estimated_delay_us', 'vx', 'vy', 'vz', 'v_estimated_delay_us', 'feed_forward_angular_velocity_z', 'estimator_status', 'landed_state', 'angular_velocity_z'];
 
-}
 
-mavlink20.messages.autopilot_state_for_gimbal_device.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.autopilot_state_for_gimbal_device.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_state_for_gimbal_device.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_us, this.q, this.q_estimated_delay_us, this.vx, this.vy, this.vz, this.v_estimated_delay_us, this.feed_forward_angular_velocity_z, this.estimator_status, this.target_system, this.target_component, this.landed_state, this.angular_velocity_z];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_us, this.q, this.q_estimated_delay_us, this.vx, this.vy, this.vz, this.v_estimated_delay_us, this.feed_forward_angular_velocity_z, this.estimator_status, this.target_system, this.target_component, this.landed_state, this.angular_velocity_z]));
 }
-
 
 /* 
 Set gimbal manager pitch and yaw angles (high rate message). This
@@ -14491,32 +12421,24 @@ require confirmation.
                 yaw_rate                  : Yaw angular rate (positive: to the right, negative: to the left, NaN to be ignored). (float)
 
 */
-    mavlink20.messages.gimbal_manager_set_pitchyaw = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.flags , this.gimbal_device_id , this.pitch , this.yaw , this.pitch_rate , this.yaw_rate ] = moreargs;
+mavlink20.messages.gimbal_manager_set_pitchyaw = function(target_system, target_component, flags, gimbal_device_id, pitch, yaw, pitch_rate, yaw_rate) {
 
-    this._format = '<IffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_PITCHYAW;
+    this.format = '<IffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_PITCHYAW;
     this.order_map = [5, 6, 0, 7, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 1;
-    this._name = 'GIMBAL_MANAGER_SET_PITCHYAW';
-
-    this._instance_field = 'gimbal_device_id';
-    this._instance_offset = 22;
+    this.name = 'GIMBAL_MANAGER_SET_PITCHYAW';
 
     this.fieldnames = ['target_system', 'target_component', 'flags', 'gimbal_device_id', 'pitch', 'yaw', 'pitch_rate', 'yaw_rate'];
 
-}
 
-mavlink20.messages.gimbal_manager_set_pitchyaw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_manager_set_pitchyaw.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_pitchyaw.prototype.pack = function(mav) {
-    var orderedfields = [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
 }
-
 
 /* 
 High level message to control a gimbal manually. The angles or angular
@@ -14535,32 +12457,24 @@ Angles and rates can be set to NaN according to use case.
                 yaw_rate                  : Yaw angular rate unitless (-1..1, positive: to the right, negative: to the left, NaN to be ignored). (float)
 
 */
-    mavlink20.messages.gimbal_manager_set_manual_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.flags , this.gimbal_device_id , this.pitch , this.yaw , this.pitch_rate , this.yaw_rate ] = moreargs;
+mavlink20.messages.gimbal_manager_set_manual_control = function(target_system, target_component, flags, gimbal_device_id, pitch, yaw, pitch_rate, yaw_rate) {
 
-    this._format = '<IffffBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_MANUAL_CONTROL;
+    this.format = '<IffffBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_GIMBAL_MANAGER_SET_MANUAL_CONTROL;
     this.order_map = [5, 6, 0, 7, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 20;
-    this._name = 'GIMBAL_MANAGER_SET_MANUAL_CONTROL';
-
-    this._instance_field = 'gimbal_device_id';
-    this._instance_offset = 22;
+    this.name = 'GIMBAL_MANAGER_SET_MANUAL_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'flags', 'gimbal_device_id', 'pitch', 'yaw', 'pitch_rate', 'yaw_rate'];
 
-}
 
-mavlink20.messages.gimbal_manager_set_manual_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.gimbal_manager_set_manual_control.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_manual_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
 }
-
 
 /* 
 Configure WiFi AP SSID, password, and mode. This message is re-emitted
@@ -14571,32 +12485,24 @@ requested using MAV_CMD_REQUEST_MESSAGE
                 password                  : Password. Blank for an open AP. MD5 hash when message is sent back as a response. (char)
 
 */
-    mavlink20.messages.wifi_config_ap = function( ...moreargs ) {
-    [ this.ssid , this.password ] = moreargs;
+mavlink20.messages.wifi_config_ap = function(ssid, password) {
 
-    this._format = '<32s64s';
-    this._id = mavlink20.MAVLINK_MSG_ID_WIFI_CONFIG_AP;
+    this.format = '<32s64s';
+    this.id = mavlink20.MAVLINK_MSG_ID_WIFI_CONFIG_AP;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [32, 64];
     this.crc_extra = 19;
-    this._name = 'WIFI_CONFIG_AP';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'WIFI_CONFIG_AP';
 
     this.fieldnames = ['ssid', 'password'];
 
-}
 
-mavlink20.messages.wifi_config_ap.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.wifi_config_ap.prototype = new mavlink20.message();
 mavlink20.messages.wifi_config_ap.prototype.pack = function(mav) {
-    var orderedfields = [ this.ssid, this.password];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ssid, this.password]));
 }
-
 
 /* 
 The location and information of an AIS vessel
@@ -14620,32 +12526,24 @@ The location and information of an AIS vessel
                 flags                     : Bitmask to indicate various statuses including valid data fields (uint16_t)
 
 */
-    mavlink20.messages.ais_vessel = function( ...moreargs ) {
-    [ this.MMSI , this.lat , this.lon , this.COG , this.heading , this.velocity , this.turn_rate , this.navigational_status , this.type , this.dimension_bow , this.dimension_stern , this.dimension_port , this.dimension_starboard , this.callsign , this.name , this.tslc , this.flags ] = moreargs;
+mavlink20.messages.ais_vessel = function(MMSI, lat, lon, COG, heading, velocity, turn_rate, navigational_status, type, dimension_bow, dimension_stern, dimension_port, dimension_starboard, callsign, name, tslc, flags) {
 
-    this._format = '<IiiHHHHHHHbBBBB7s20s';
-    this._id = mavlink20.MAVLINK_MSG_ID_AIS_VESSEL;
+    this.format = '<IiiHHHHHHHbBBBB7s20s';
+    this.id = mavlink20.MAVLINK_MSG_ID_AIS_VESSEL;
     this.order_map = [0, 1, 2, 3, 4, 5, 10, 11, 12, 6, 7, 13, 14, 15, 16, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 20];
     this.crc_extra = 243;
-    this._name = 'AIS_VESSEL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AIS_VESSEL';
 
     this.fieldnames = ['MMSI', 'lat', 'lon', 'COG', 'heading', 'velocity', 'turn_rate', 'navigational_status', 'type', 'dimension_bow', 'dimension_stern', 'dimension_port', 'dimension_starboard', 'callsign', 'name', 'tslc', 'flags'];
 
-}
 
-mavlink20.messages.ais_vessel.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ais_vessel.prototype = new mavlink20.message();
 mavlink20.messages.ais_vessel.prototype.pack = function(mav) {
-    var orderedfields = [ this.MMSI, this.lat, this.lon, this.COG, this.heading, this.velocity, this.dimension_bow, this.dimension_stern, this.tslc, this.flags, this.turn_rate, this.navigational_status, this.type, this.dimension_port, this.dimension_starboard, this.callsign, this.name];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.MMSI, this.lat, this.lon, this.COG, this.heading, this.velocity, this.dimension_bow, this.dimension_stern, this.tslc, this.flags, this.turn_rate, this.navigational_status, this.type, this.dimension_port, this.dimension_starboard, this.callsign, this.name]));
 }
-
 
 /* 
 General status information of an UAVCAN node. Please refer to the
@@ -14661,32 +12559,24 @@ http://uavcan.org.
                 vendor_specific_status_code        : Vendor-specific status information. (uint16_t)
 
 */
-    mavlink20.messages.uavcan_node_status = function( ...moreargs ) {
-    [ this.time_usec , this.uptime_sec , this.health , this.mode , this.sub_mode , this.vendor_specific_status_code ] = moreargs;
+mavlink20.messages.uavcan_node_status = function(time_usec, uptime_sec, health, mode, sub_mode, vendor_specific_status_code) {
 
-    this._format = '<QIHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVCAN_NODE_STATUS;
+    this.format = '<QIHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVCAN_NODE_STATUS;
     this.order_map = [0, 1, 3, 4, 5, 2];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 28;
-    this._name = 'UAVCAN_NODE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVCAN_NODE_STATUS';
 
     this.fieldnames = ['time_usec', 'uptime_sec', 'health', 'mode', 'sub_mode', 'vendor_specific_status_code'];
 
-}
 
-mavlink20.messages.uavcan_node_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavcan_node_status.prototype = new mavlink20.message();
 mavlink20.messages.uavcan_node_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.uptime_sec, this.vendor_specific_status_code, this.health, this.mode, this.sub_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.vendor_specific_status_code, this.health, this.mode, this.sub_mode]));
 }
-
 
 /* 
 General information describing a particular UAVCAN node. Please refer
@@ -14709,32 +12599,24 @@ frequency. The UAVCAN specification is available at http://uavcan.org.
                 sw_vcs_commit             : Version control system (VCS) revision identifier (e.g. git short commit hash). Zero if unknown. (uint32_t)
 
 */
-    mavlink20.messages.uavcan_node_info = function( ...moreargs ) {
-    [ this.time_usec , this.uptime_sec , this.name , this.hw_version_major , this.hw_version_minor , this.hw_unique_id , this.sw_version_major , this.sw_version_minor , this.sw_vcs_commit ] = moreargs;
+mavlink20.messages.uavcan_node_info = function(time_usec, uptime_sec, name, hw_version_major, hw_version_minor, hw_unique_id, sw_version_major, sw_version_minor, sw_vcs_commit) {
 
-    this._format = '<QII80sBB16sBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVCAN_NODE_INFO;
+    this.format = '<QII80sBB16sBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVCAN_NODE_INFO;
     this.order_map = [0, 1, 3, 4, 5, 6, 7, 8, 2];
-    this.len_map = [1, 1, 1, 1, 1, 1, 16, 1, 1];
-    this.array_len_map = [0, 0, 0, 80, 0, 0, 16, 0, 0];
     this.crc_extra = 95;
-    this._name = 'UAVCAN_NODE_INFO';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVCAN_NODE_INFO';
 
     this.fieldnames = ['time_usec', 'uptime_sec', 'name', 'hw_version_major', 'hw_version_minor', 'hw_unique_id', 'sw_version_major', 'sw_version_minor', 'sw_vcs_commit'];
 
-}
 
-mavlink20.messages.uavcan_node_info.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavcan_node_info.prototype = new mavlink20.message();
 mavlink20.messages.uavcan_node_info.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.uptime_sec, this.sw_vcs_commit, this.name, this.hw_version_major, this.hw_version_minor, this.hw_unique_id, this.sw_version_major, this.sw_version_minor];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.sw_vcs_commit, this.name, this.hw_version_major, this.hw_version_minor, this.hw_unique_id, this.sw_version_major, this.sw_version_minor]));
 }
-
 
 /* 
 Request to read the value of a parameter with either the param_id
@@ -14747,32 +12629,24 @@ response.
                 param_index               : Parameter index. Set to -1 to use the Parameter ID field as identifier (else param_id will be ignored) (int16_t)
 
 */
-    mavlink20.messages.param_ext_request_read = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.param_id , this.param_index ] = moreargs;
+mavlink20.messages.param_ext_request_read = function(target_system, target_component, param_id, param_index) {
 
-    this._format = '<hBB16s';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_REQUEST_READ;
+    this.format = '<hBB16s';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_REQUEST_READ;
     this.order_map = [1, 2, 3, 0];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 16];
     this.crc_extra = 243;
-    this._name = 'PARAM_EXT_REQUEST_READ';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_EXT_REQUEST_READ';
 
     this.fieldnames = ['target_system', 'target_component', 'param_id', 'param_index'];
 
-}
 
-mavlink20.messages.param_ext_request_read.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_ext_request_read.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_request_read.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_index, this.target_system, this.target_component, this.param_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
 }
-
 
 /* 
 Request all parameters of this component. All parameters should be
@@ -14782,32 +12656,24 @@ emitted in response as PARAM_EXT_VALUE.
                 target_component          : Component ID (uint8_t)
 
 */
-    mavlink20.messages.param_ext_request_list = function( ...moreargs ) {
-    [ this.target_system , this.target_component ] = moreargs;
+mavlink20.messages.param_ext_request_list = function(target_system, target_component) {
 
-    this._format = '<BB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_REQUEST_LIST;
+    this.format = '<BB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_REQUEST_LIST;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 88;
-    this._name = 'PARAM_EXT_REQUEST_LIST';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_EXT_REQUEST_LIST';
 
     this.fieldnames = ['target_system', 'target_component'];
 
-}
 
-mavlink20.messages.param_ext_request_list.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_ext_request_list.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_request_list.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
-
 
 /* 
 Emit the value of a parameter. The inclusion of param_count and
@@ -14822,32 +12688,24 @@ after a loss or timeout.
                 param_index               : Index of this parameter (uint16_t)
 
 */
-    mavlink20.messages.param_ext_value = function( ...moreargs ) {
-    [ this.param_id , this.param_value , this.param_type , this.param_count , this.param_index ] = moreargs;
+mavlink20.messages.param_ext_value = function(param_id, param_value, param_type, param_count, param_index) {
 
-    this._format = '<HH16s128sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_VALUE;
+    this.format = '<HH16s128sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_VALUE;
     this.order_map = [2, 3, 4, 0, 1];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 16, 128, 0];
     this.crc_extra = 243;
-    this._name = 'PARAM_EXT_VALUE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_EXT_VALUE';
 
     this.fieldnames = ['param_id', 'param_value', 'param_type', 'param_count', 'param_index'];
 
-}
 
-mavlink20.messages.param_ext_value.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_ext_value.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_value.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_count, this.param_index, this.param_id, this.param_value, this.param_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_count, this.param_index, this.param_id, this.param_value, this.param_type]));
 }
-
 
 /* 
 Set a parameter value. In order to deal with message loss (and
@@ -14864,32 +12722,24 @@ PARAM_ACK_IN_PROGRESS in response.
                 param_type                : Parameter type. (uint8_t)
 
 */
-    mavlink20.messages.param_ext_set = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.param_id , this.param_value , this.param_type ] = moreargs;
+mavlink20.messages.param_ext_set = function(target_system, target_component, param_id, param_value, param_type) {
 
-    this._format = '<BB16s128sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_SET;
+    this.format = '<BB16s128sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_SET;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 16, 128, 0];
     this.crc_extra = 78;
-    this._name = 'PARAM_EXT_SET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_EXT_SET';
 
     this.fieldnames = ['target_system', 'target_component', 'param_id', 'param_value', 'param_type'];
 
-}
 
-mavlink20.messages.param_ext_set.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_ext_set.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_set.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.param_id, this.param_value, this.param_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.param_id, this.param_value, this.param_type]));
 }
-
 
 /* 
 Response from a PARAM_EXT_SET message.
@@ -14900,32 +12750,24 @@ Response from a PARAM_EXT_SET message.
                 param_result              : Result code. (uint8_t)
 
 */
-    mavlink20.messages.param_ext_ack = function( ...moreargs ) {
-    [ this.param_id , this.param_value , this.param_type , this.param_result ] = moreargs;
+mavlink20.messages.param_ext_ack = function(param_id, param_value, param_type, param_result) {
 
-    this._format = '<16s128sBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_ACK;
+    this.format = '<16s128sBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_PARAM_EXT_ACK;
     this.order_map = [0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [16, 128, 0, 0];
     this.crc_extra = 132;
-    this._name = 'PARAM_EXT_ACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'PARAM_EXT_ACK';
 
     this.fieldnames = ['param_id', 'param_value', 'param_type', 'param_result'];
 
-}
 
-mavlink20.messages.param_ext_ack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.param_ext_ack.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_ack.prototype.pack = function(mav) {
-    var orderedfields = [ this.param_id, this.param_value, this.param_type, this.param_result];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_id, this.param_value, this.param_type, this.param_result]));
 }
-
 
 /* 
 Obstacle distances in front of the sensor, starting from the left in
@@ -14942,32 +12784,24 @@ increment degrees to the right
                 frame                     : Coordinate frame of reference for the yaw rotation and offset of the sensor data. Defaults to MAV_FRAME_GLOBAL, which is north aligned. For body-mounted sensors use MAV_FRAME_BODY_FRD, which is vehicle front aligned. (uint8_t)
 
 */
-    mavlink20.messages.obstacle_distance = function( ...moreargs ) {
-    [ this.time_usec , this.sensor_type , this.distances , this.increment , this.min_distance , this.max_distance , this.increment_f , this.angle_offset , this.frame ] = moreargs;
+mavlink20.messages.obstacle_distance = function(time_usec, sensor_type, distances, increment, min_distance, max_distance, increment_f, angle_offset, frame) {
 
-    this._format = '<Q72HHHBBffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OBSTACLE_DISTANCE;
+    this.format = '<Q72HHHBBffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OBSTACLE_DISTANCE;
     this.order_map = [0, 4, 1, 5, 2, 3, 6, 7, 8];
-    this.len_map = [1, 72, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 72, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 23;
-    this._name = 'OBSTACLE_DISTANCE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OBSTACLE_DISTANCE';
 
     this.fieldnames = ['time_usec', 'sensor_type', 'distances', 'increment', 'min_distance', 'max_distance', 'increment_f', 'angle_offset', 'frame'];
 
-}
 
-mavlink20.messages.obstacle_distance.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.obstacle_distance.prototype = new mavlink20.message();
 mavlink20.messages.obstacle_distance.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.distances, this.min_distance, this.max_distance, this.sensor_type, this.increment, this.increment_f, this.angle_offset, this.frame];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.distances, this.min_distance, this.max_distance, this.sensor_type, this.increment, this.increment_f, this.angle_offset, this.frame]));
 }
-
 
 /* 
 Odometry message to communicate odometry information with an external
@@ -14994,32 +12828,24 @@ interface. Fits ROS REP 147 standard for aerial vehicles
                 quality                   : Optional odometry quality metric as a percentage. -1 = odometry has failed, 0 = unknown/unset quality, 1 = worst quality, 100 = best quality (int8_t)
 
 */
-    mavlink20.messages.odometry = function( ...moreargs ) {
-    [ this.time_usec , this.frame_id , this.child_frame_id , this.x , this.y , this.z , this.q , this.vx , this.vy , this.vz , this.rollspeed , this.pitchspeed , this.yawspeed , this.pose_covariance , this.velocity_covariance , this.reset_counter , this.estimator_type , this.quality ] = moreargs;
+mavlink20.messages.odometry = function(time_usec, frame_id, child_frame_id, x, y, z, q, vx, vy, vz, rollspeed, pitchspeed, yawspeed, pose_covariance, velocity_covariance, reset_counter, estimator_type, quality) {
 
-    this._format = '<Qfff4fffffff21f21fBBBBb';
-    this._id = mavlink20.MAVLINK_MSG_ID_ODOMETRY;
+    this.format = '<Qfff4fffffff21f21fBBBBb';
+    this.id = mavlink20.MAVLINK_MSG_ID_ODOMETRY;
     this.order_map = [0, 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17];
-    this.len_map = [1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 21, 21, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 21, 21, 0, 0, 0, 0, 0];
     this.crc_extra = 91;
-    this._name = 'ODOMETRY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ODOMETRY';
 
     this.fieldnames = ['time_usec', 'frame_id', 'child_frame_id', 'x', 'y', 'z', 'q', 'vx', 'vy', 'vz', 'rollspeed', 'pitchspeed', 'yawspeed', 'pose_covariance', 'velocity_covariance', 'reset_counter', 'estimator_type', 'quality'];
 
-}
 
-mavlink20.messages.odometry.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.odometry.prototype = new mavlink20.message();
 mavlink20.messages.odometry.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.x, this.y, this.z, this.q, this.vx, this.vy, this.vz, this.rollspeed, this.pitchspeed, this.yawspeed, this.pose_covariance, this.velocity_covariance, this.frame_id, this.child_frame_id, this.reset_counter, this.estimator_type, this.quality];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.q, this.vx, this.vy, this.vz, this.rollspeed, this.pitchspeed, this.yawspeed, this.pose_covariance, this.velocity_covariance, this.frame_id, this.child_frame_id, this.reset_counter, this.estimator_type, this.quality]));
 }
-
 
 /* 
 Status of the Iridium SBD link.
@@ -15034,32 +12860,24 @@ Status of the Iridium SBD link.
                 rx_session_pending        : 1: Receiving session pending, 0: No receiving session pending. (uint8_t)
 
 */
-    mavlink20.messages.isbd_link_status = function( ...moreargs ) {
-    [ this.timestamp , this.last_heartbeat , this.failed_sessions , this.successful_sessions , this.signal_quality , this.ring_pending , this.tx_session_pending , this.rx_session_pending ] = moreargs;
+mavlink20.messages.isbd_link_status = function(timestamp, last_heartbeat, failed_sessions, successful_sessions, signal_quality, ring_pending, tx_session_pending, rx_session_pending) {
 
-    this._format = '<QQHHBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ISBD_LINK_STATUS;
+    this.format = '<QQHHBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ISBD_LINK_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 225;
-    this._name = 'ISBD_LINK_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ISBD_LINK_STATUS';
 
     this.fieldnames = ['timestamp', 'last_heartbeat', 'failed_sessions', 'successful_sessions', 'signal_quality', 'ring_pending', 'tx_session_pending', 'rx_session_pending'];
 
-}
 
-mavlink20.messages.isbd_link_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.isbd_link_status.prototype = new mavlink20.message();
 mavlink20.messages.isbd_link_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
 }
-
 
 /* 
 RPM sensor data message.
@@ -15068,32 +12886,24 @@ RPM sensor data message.
                 frequency                 : Indicated rate (float)
 
 */
-    mavlink20.messages.raw_rpm = function( ...moreargs ) {
-    [ this.index , this.frequency ] = moreargs;
+mavlink20.messages.raw_rpm = function(index, frequency) {
 
-    this._format = '<fB';
-    this._id = mavlink20.MAVLINK_MSG_ID_RAW_RPM;
+    this.format = '<fB';
+    this.id = mavlink20.MAVLINK_MSG_ID_RAW_RPM;
     this.order_map = [1, 0];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 199;
-    this._name = 'RAW_RPM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RAW_RPM';
 
     this.fieldnames = ['index', 'frequency'];
 
-}
 
-mavlink20.messages.raw_rpm.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.raw_rpm.prototype = new mavlink20.message();
 mavlink20.messages.raw_rpm.prototype.pack = function(mav) {
-    var orderedfields = [ this.frequency, this.index];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.frequency, this.index]));
 }
-
 
 /* 
 The global position resulting from GPS and sensor fusion.
@@ -15118,32 +12928,24 @@ The global position resulting from GPS and sensor fusion.
                 flags                     : Bitwise OR combination of the data available flags. (uint8_t)
 
 */
-    mavlink20.messages.utm_global_position = function( ...moreargs ) {
-    [ this.time , this.uas_id , this.lat , this.lon , this.alt , this.relative_alt , this.vx , this.vy , this.vz , this.h_acc , this.v_acc , this.vel_acc , this.next_lat , this.next_lon , this.next_alt , this.update_rate , this.flight_state , this.flags ] = moreargs;
+mavlink20.messages.utm_global_position = function(time, uas_id, lat, lon, alt, relative_alt, vx, vy, vz, h_acc, v_acc, vel_acc, next_lat, next_lon, next_alt, update_rate, flight_state, flags) {
 
-    this._format = '<QiiiiiiihhhHHHH18sBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UTM_GLOBAL_POSITION;
+    this.format = '<QiiiiiiihhhHHHH18sBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UTM_GLOBAL_POSITION;
     this.order_map = [0, 15, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 5, 6, 7, 14, 16, 17];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 18, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0];
     this.crc_extra = 99;
-    this._name = 'UTM_GLOBAL_POSITION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UTM_GLOBAL_POSITION';
 
     this.fieldnames = ['time', 'uas_id', 'lat', 'lon', 'alt', 'relative_alt', 'vx', 'vy', 'vz', 'h_acc', 'v_acc', 'vel_acc', 'next_lat', 'next_lon', 'next_alt', 'update_rate', 'flight_state', 'flags'];
 
-}
 
-mavlink20.messages.utm_global_position.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.utm_global_position.prototype = new mavlink20.message();
 mavlink20.messages.utm_global_position.prototype.pack = function(mav) {
-    var orderedfields = [ this.time, this.lat, this.lon, this.alt, this.relative_alt, this.next_lat, this.next_lon, this.next_alt, this.vx, this.vy, this.vz, this.h_acc, this.v_acc, this.vel_acc, this.update_rate, this.uas_id, this.flight_state, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time, this.lat, this.lon, this.alt, this.relative_alt, this.next_lat, this.next_lon, this.next_alt, this.vx, this.vy, this.vz, this.h_acc, this.v_acc, this.vel_acc, this.update_rate, this.uas_id, this.flight_state, this.flags]));
 }
-
 
 /* 
 Large debug/prototyping array. The message uses the maximum available
@@ -15157,32 +12959,24 @@ discriminate between messages in code and in user interfaces
                 data                      : data (float)
 
 */
-    mavlink20.messages.debug_float_array = function( ...moreargs ) {
-    [ this.time_usec , this.name , this.array_id , this.data ] = moreargs;
+mavlink20.messages.debug_float_array = function(time_usec, name, array_id, data) {
 
-    this._format = '<QH10s58f';
-    this._id = mavlink20.MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY;
+    this.format = '<QH10s58f';
+    this.id = mavlink20.MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY;
     this.order_map = [0, 2, 1, 3];
-    this.len_map = [1, 1, 1, 58];
-    this.array_len_map = [0, 0, 10, 58];
     this.crc_extra = 232;
-    this._name = 'DEBUG_FLOAT_ARRAY';
-
-    this._instance_field = 'array_id';
-    this._instance_offset = 8;
+    this.name = 'DEBUG_FLOAT_ARRAY';
 
     this.fieldnames = ['time_usec', 'name', 'array_id', 'data'];
 
-}
 
-mavlink20.messages.debug_float_array.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.debug_float_array.prototype = new mavlink20.message();
 mavlink20.messages.debug_float_array.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.array_id, this.name, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.array_id, this.name, this.data]));
 }
-
 
 /* 
 Smart Battery information (static/infrequent update). Use for updates
@@ -15208,32 +13002,24 @@ BATTERY_STATUS for smart battery frequent updates.
                 manufacture_date          : Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided. (char)
 
 */
-    mavlink20.messages.smart_battery_info = function( ...moreargs ) {
-    [ this.id , this.battery_function , this.type , this.capacity_full_specification , this.capacity_full , this.cycle_count , this.serial_number , this.device_name , this.weight , this.discharge_minimum_voltage , this.charging_minimum_voltage , this.resting_minimum_voltage , this.charging_maximum_voltage , this.cells_in_series , this.discharge_maximum_current , this.discharge_maximum_burst_current , this.manufacture_date ] = moreargs;
+mavlink20.messages.smart_battery_info = function(id, battery_function, type, capacity_full_specification, capacity_full, cycle_count, serial_number, device_name, weight, discharge_minimum_voltage, charging_minimum_voltage, resting_minimum_voltage, charging_maximum_voltage, cells_in_series, discharge_maximum_current, discharge_maximum_burst_current, manufacture_date) {
 
-    this._format = '<iiHHHHHBBB16s50sHBII11s';
-    this._id = mavlink20.MAVLINK_MSG_ID_SMART_BATTERY_INFO;
+    this.format = '<iiHHHHHBBB16s50sHBII11s';
+    this.id = mavlink20.MAVLINK_MSG_ID_SMART_BATTERY_INFO;
     this.order_map = [7, 8, 9, 0, 1, 2, 10, 11, 3, 4, 5, 6, 12, 13, 14, 15, 16];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 50, 0, 0, 0, 0, 11];
     this.crc_extra = 75;
-    this._name = 'SMART_BATTERY_INFO';
-
-    this._instance_field = 'id';
-    this._instance_offset = 18;
+    this.name = 'SMART_BATTERY_INFO';
 
     this.fieldnames = ['id', 'battery_function', 'type', 'capacity_full_specification', 'capacity_full', 'cycle_count', 'serial_number', 'device_name', 'weight', 'discharge_minimum_voltage', 'charging_minimum_voltage', 'resting_minimum_voltage', 'charging_maximum_voltage', 'cells_in_series', 'discharge_maximum_current', 'discharge_maximum_burst_current', 'manufacture_date'];
 
-}
 
-mavlink20.messages.smart_battery_info.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.smart_battery_info.prototype = new mavlink20.message();
 mavlink20.messages.smart_battery_info.prototype.pack = function(mav) {
-    var orderedfields = [ this.capacity_full_specification, this.capacity_full, this.cycle_count, this.weight, this.discharge_minimum_voltage, this.charging_minimum_voltage, this.resting_minimum_voltage, this.id, this.battery_function, this.type, this.serial_number, this.device_name, this.charging_maximum_voltage, this.cells_in_series, this.discharge_maximum_current, this.discharge_maximum_burst_current, this.manufacture_date];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.capacity_full_specification, this.capacity_full, this.cycle_count, this.weight, this.discharge_minimum_voltage, this.charging_minimum_voltage, this.resting_minimum_voltage, this.id, this.battery_function, this.type, this.serial_number, this.device_name, this.charging_maximum_voltage, this.cells_in_series, this.discharge_maximum_current, this.discharge_maximum_burst_current, this.manufacture_date]));
 }
-
 
 /* 
 Telemetry of power generation system. Alternator or mechanical
@@ -15252,32 +13038,24 @@ generator.
                 time_until_maintenance        : Seconds until this generator requires maintenance.  A negative value indicates maintenance is past-due. INT32_MAX: field not provided. (int32_t)
 
 */
-    mavlink20.messages.generator_status = function( ...moreargs ) {
-    [ this.status , this.generator_speed , this.battery_current , this.load_current , this.power_generated , this.bus_voltage , this.rectifier_temperature , this.bat_current_setpoint , this.generator_temperature , this.runtime , this.time_until_maintenance ] = moreargs;
+mavlink20.messages.generator_status = function(status, generator_speed, battery_current, load_current, power_generated, bus_voltage, rectifier_temperature, bat_current_setpoint, generator_temperature, runtime, time_until_maintenance) {
 
-    this._format = '<QfffffIiHhh';
-    this._id = mavlink20.MAVLINK_MSG_ID_GENERATOR_STATUS;
+    this.format = '<QfffffIiHhh';
+    this.id = mavlink20.MAVLINK_MSG_ID_GENERATOR_STATUS;
     this.order_map = [0, 8, 1, 2, 3, 4, 9, 5, 10, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 117;
-    this._name = 'GENERATOR_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'GENERATOR_STATUS';
 
     this.fieldnames = ['status', 'generator_speed', 'battery_current', 'load_current', 'power_generated', 'bus_voltage', 'rectifier_temperature', 'bat_current_setpoint', 'generator_temperature', 'runtime', 'time_until_maintenance'];
 
-}
 
-mavlink20.messages.generator_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.generator_status.prototype = new mavlink20.message();
 mavlink20.messages.generator_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.status, this.battery_current, this.load_current, this.power_generated, this.bus_voltage, this.bat_current_setpoint, this.runtime, this.time_until_maintenance, this.generator_speed, this.rectifier_temperature, this.generator_temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.battery_current, this.load_current, this.power_generated, this.bus_voltage, this.bat_current_setpoint, this.runtime, this.time_until_maintenance, this.generator_speed, this.rectifier_temperature, this.generator_temperature]));
 }
-
 
 /* 
 The raw values of the actuator outputs (e.g. on Pixhawk, from MAIN,
@@ -15288,32 +13066,24 @@ AUX ports). This message supersedes SERVO_OUTPUT_RAW.
                 actuator                  : Servo / motor output array values. Zero values indicate unused channels. (float)
 
 */
-    mavlink20.messages.actuator_output_status = function( ...moreargs ) {
-    [ this.time_usec , this.active , this.actuator ] = moreargs;
+mavlink20.messages.actuator_output_status = function(time_usec, active, actuator) {
 
-    this._format = '<QI32f';
-    this._id = mavlink20.MAVLINK_MSG_ID_ACTUATOR_OUTPUT_STATUS;
+    this.format = '<QI32f';
+    this.id = mavlink20.MAVLINK_MSG_ID_ACTUATOR_OUTPUT_STATUS;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 32];
-    this.array_len_map = [0, 0, 32];
     this.crc_extra = 251;
-    this._name = 'ACTUATOR_OUTPUT_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ACTUATOR_OUTPUT_STATUS';
 
     this.fieldnames = ['time_usec', 'active', 'actuator'];
 
-}
 
-mavlink20.messages.actuator_output_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.actuator_output_status.prototype = new mavlink20.message();
 mavlink20.messages.actuator_output_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.active, this.actuator];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.active, this.actuator]));
 }
-
 
 /* 
 Reports the on/off state of relays, as controlled by
@@ -15324,32 +13094,24 @@ MAV_CMD_DO_SET_RELAY.
                 present                   : Relay present.  Relay instance numbers are represented as individual bits in this mask by offset.  Bits will be true if a relay instance is configured. (uint16_t)
 
 */
-    mavlink20.messages.relay_status = function( ...moreargs ) {
-    [ this.time_boot_ms , this.on , this.present ] = moreargs;
+mavlink20.messages.relay_status = function(time_boot_ms, on, present) {
 
-    this._format = '<IHH';
-    this._id = mavlink20.MAVLINK_MSG_ID_RELAY_STATUS;
+    this.format = '<IHH';
+    this.id = mavlink20.MAVLINK_MSG_ID_RELAY_STATUS;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 199;
-    this._name = 'RELAY_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RELAY_STATUS';
 
     this.fieldnames = ['time_boot_ms', 'on', 'present'];
 
-}
 
-mavlink20.messages.relay_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.relay_status.prototype = new mavlink20.message();
 mavlink20.messages.relay_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.on, this.present];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.on, this.present]));
 }
-
 
 /* 
 Message for transporting "arbitrary" variable-length data from one
@@ -15365,32 +13127,24 @@ MAVLink specification.
                 payload                   : Variable length payload. The payload length is defined by payload_length. The entire content of this block is opaque unless you understand the encoding specified by payload_type. (uint8_t)
 
 */
-    mavlink20.messages.tunnel = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.payload_type , this.payload_length , this.payload ] = moreargs;
+mavlink20.messages.tunnel = function(target_system, target_component, payload_type, payload_length, payload) {
 
-    this._format = '<HBBB128s';
-    this._id = mavlink20.MAVLINK_MSG_ID_TUNNEL;
+    this.format = '<HBBB128s';
+    this.id = mavlink20.MAVLINK_MSG_ID_TUNNEL;
     this.order_map = [1, 2, 0, 3, 4];
-    this.len_map = [1, 1, 1, 1, 128];
-    this.array_len_map = [0, 0, 0, 0, 128];
     this.crc_extra = 147;
-    this._name = 'TUNNEL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TUNNEL';
 
     this.fieldnames = ['target_system', 'target_component', 'payload_type', 'payload_length', 'payload'];
 
-}
 
-mavlink20.messages.tunnel.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.tunnel.prototype = new mavlink20.message();
 mavlink20.messages.tunnel.prototype.pack = function(mav) {
-    var orderedfields = [ this.payload_type, this.target_system, this.target_component, this.payload_length, this.payload];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.payload_type, this.target_system, this.target_component, this.payload_length, this.payload]));
 }
-
 
 /* 
 A forwarded CAN frame as requested by MAV_CMD_CAN_FORWARD.
@@ -15403,32 +13157,24 @@ A forwarded CAN frame as requested by MAV_CMD_CAN_FORWARD.
                 data                      : Frame data (uint8_t)
 
 */
-    mavlink20.messages.can_frame = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.bus , this.len , this.id , this.data ] = moreargs;
+mavlink20.messages.can_frame = function(target_system, target_component, bus, len, id, data) {
 
-    this._format = '<IBBBB8s';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAN_FRAME;
+    this.format = '<IBBBB8s';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAN_FRAME;
     this.order_map = [1, 2, 3, 4, 0, 5];
-    this.len_map = [1, 1, 1, 1, 1, 8];
-    this.array_len_map = [0, 0, 0, 0, 0, 8];
     this.crc_extra = 132;
-    this._name = 'CAN_FRAME';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAN_FRAME';
 
     this.fieldnames = ['target_system', 'target_component', 'bus', 'len', 'id', 'data'];
 
-}
 
-mavlink20.messages.can_frame.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.can_frame.prototype = new mavlink20.message();
 mavlink20.messages.can_frame.prototype.pack = function(mav) {
-    var orderedfields = [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
 }
-
 
 /* 
 A forwarded CANFD frame as requested by MAV_CMD_CAN_FORWARD. These are
@@ -15443,32 +13189,24 @@ handling)
                 data                      : Frame data (uint8_t)
 
 */
-    mavlink20.messages.canfd_frame = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.bus , this.len , this.id , this.data ] = moreargs;
+mavlink20.messages.canfd_frame = function(target_system, target_component, bus, len, id, data) {
 
-    this._format = '<IBBBB64s';
-    this._id = mavlink20.MAVLINK_MSG_ID_CANFD_FRAME;
+    this.format = '<IBBBB64s';
+    this.id = mavlink20.MAVLINK_MSG_ID_CANFD_FRAME;
     this.order_map = [1, 2, 3, 4, 0, 5];
-    this.len_map = [1, 1, 1, 1, 1, 64];
-    this.array_len_map = [0, 0, 0, 0, 0, 64];
     this.crc_extra = 4;
-    this._name = 'CANFD_FRAME';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CANFD_FRAME';
 
     this.fieldnames = ['target_system', 'target_component', 'bus', 'len', 'id', 'data'];
 
-}
 
-mavlink20.messages.canfd_frame.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.canfd_frame.prototype = new mavlink20.message();
 mavlink20.messages.canfd_frame.prototype.pack = function(mav) {
-    var orderedfields = [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
 }
-
 
 /* 
 Modify the filter of what CAN messages to forward over the mavlink.
@@ -15486,32 +13224,24 @@ CAN_FILTER_MODIFY messages.
                 ids                       : filter IDs, length num_ids (uint16_t)
 
 */
-    mavlink20.messages.can_filter_modify = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.bus , this.operation , this.num_ids , this.ids ] = moreargs;
+mavlink20.messages.can_filter_modify = function(target_system, target_component, bus, operation, num_ids, ids) {
 
-    this._format = '<16HBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CAN_FILTER_MODIFY;
+    this.format = '<16HBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CAN_FILTER_MODIFY;
     this.order_map = [1, 2, 3, 4, 5, 0];
-    this.len_map = [16, 1, 1, 1, 1, 1];
-    this.array_len_map = [16, 0, 0, 0, 0, 0];
     this.crc_extra = 8;
-    this._name = 'CAN_FILTER_MODIFY';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CAN_FILTER_MODIFY';
 
     this.fieldnames = ['target_system', 'target_component', 'bus', 'operation', 'num_ids', 'ids'];
 
-}
 
-mavlink20.messages.can_filter_modify.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.can_filter_modify.prototype = new mavlink20.message();
 mavlink20.messages.can_filter_modify.prototype.pack = function(mav) {
-    var orderedfields = [ this.ids, this.target_system, this.target_component, this.bus, this.operation, this.num_ids];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ids, this.target_system, this.target_component, this.bus, this.operation, this.num_ids]));
 }
-
 
 /* 
 Cumulative distance traveled for each reported wheel.
@@ -15521,32 +13251,24 @@ Cumulative distance traveled for each reported wheel.
                 distance                  : Distance reported by individual wheel encoders. Forward rotations increase values, reverse rotations decrease them. Not all wheels will necessarily have wheel encoders; the mapping of encoders to wheel positions must be agreed/understood by the endpoints. (double)
 
 */
-    mavlink20.messages.wheel_distance = function( ...moreargs ) {
-    [ this.time_usec , this.count , this.distance ] = moreargs;
+mavlink20.messages.wheel_distance = function(time_usec, count, distance) {
 
-    this._format = '<Q16dB';
-    this._id = mavlink20.MAVLINK_MSG_ID_WHEEL_DISTANCE;
+    this.format = '<Q16dB';
+    this.id = mavlink20.MAVLINK_MSG_ID_WHEEL_DISTANCE;
     this.order_map = [0, 2, 1];
-    this.len_map = [1, 16, 1];
-    this.array_len_map = [0, 16, 0];
     this.crc_extra = 113;
-    this._name = 'WHEEL_DISTANCE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'WHEEL_DISTANCE';
 
     this.fieldnames = ['time_usec', 'count', 'distance'];
 
-}
 
-mavlink20.messages.wheel_distance.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.wheel_distance.prototype = new mavlink20.message();
 mavlink20.messages.wheel_distance.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.distance, this.count];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.distance, this.count]));
 }
-
 
 /* 
 Winch status.
@@ -15561,32 +13283,24 @@ Winch status.
                 status                    : Status flags (uint32_t)
 
 */
-    mavlink20.messages.winch_status = function( ...moreargs ) {
-    [ this.time_usec , this.line_length , this.speed , this.tension , this.voltage , this.current , this.temperature , this.status ] = moreargs;
+mavlink20.messages.winch_status = function(time_usec, line_length, speed, tension, voltage, current, temperature, status) {
 
-    this._format = '<QfffffIh';
-    this._id = mavlink20.MAVLINK_MSG_ID_WINCH_STATUS;
+    this.format = '<QfffffIh';
+    this.id = mavlink20.MAVLINK_MSG_ID_WINCH_STATUS;
     this.order_map = [0, 1, 2, 3, 4, 5, 7, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 117;
-    this._name = 'WINCH_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'WINCH_STATUS';
 
     this.fieldnames = ['time_usec', 'line_length', 'speed', 'tension', 'voltage', 'current', 'temperature', 'status'];
 
-}
 
-mavlink20.messages.winch_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.winch_status.prototype = new mavlink20.message();
 mavlink20.messages.winch_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_usec, this.line_length, this.speed, this.tension, this.voltage, this.current, this.status, this.temperature];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.line_length, this.speed, this.tension, this.voltage, this.current, this.status, this.temperature]));
 }
-
 
 /* 
 Data for filling the OpenDroneID Basic ID message. This and the below
@@ -15605,32 +13319,24 @@ https://mavlink.io/en/services/opendroneid.html.
                 uas_id                    : UAS (Unmanned Aircraft System) ID following the format specified by id_type. Shall be filled with nulls in the unused portion of the field. (uint8_t)
 
 */
-    mavlink20.messages.open_drone_id_basic_id = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.id_type , this.ua_type , this.uas_id ] = moreargs;
+mavlink20.messages.open_drone_id_basic_id = function(target_system, target_component, id_or_mac, id_type, ua_type, uas_id) {
 
-    this._format = '<BB20sBB20s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_BASIC_ID;
+    this.format = '<BB20sBB20s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_BASIC_ID;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 20, 1, 1, 20];
-    this.array_len_map = [0, 0, 20, 0, 0, 20];
     this.crc_extra = 114;
-    this._name = 'OPEN_DRONE_ID_BASIC_ID';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_BASIC_ID';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'id_type', 'ua_type', 'uas_id'];
 
-}
 
-mavlink20.messages.open_drone_id_basic_id.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_basic_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_basic_id.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.id_or_mac, this.id_type, this.ua_type, this.uas_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.id_type, this.ua_type, this.uas_id]));
 }
-
 
 /* 
 Data for filling the OpenDroneID Location message. The float data
@@ -15658,32 +13364,24 @@ altitude, direction and speed of the aircraft.
                 timestamp_accuracy        : The accuracy of the timestamps. (uint8_t)
 
 */
-    mavlink20.messages.open_drone_id_location = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.status , this.direction , this.speed_horizontal , this.speed_vertical , this.latitude , this.longitude , this.altitude_barometric , this.altitude_geodetic , this.height_reference , this.height , this.horizontal_accuracy , this.vertical_accuracy , this.barometer_accuracy , this.speed_accuracy , this.timestamp , this.timestamp_accuracy ] = moreargs;
+mavlink20.messages.open_drone_id_location = function(target_system, target_component, id_or_mac, status, direction, speed_horizontal, speed_vertical, latitude, longitude, altitude_barometric, altitude_geodetic, height_reference, height, horizontal_accuracy, vertical_accuracy, barometer_accuracy, speed_accuracy, timestamp, timestamp_accuracy) {
 
-    this._format = '<iiffffHHhBB20sBBBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_LOCATION;
+    this.format = '<iiffffHHhBB20sBBBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_LOCATION;
     this.order_map = [9, 10, 11, 12, 6, 7, 8, 0, 1, 2, 3, 13, 4, 14, 15, 16, 17, 5, 18];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 254;
-    this._name = 'OPEN_DRONE_ID_LOCATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_LOCATION';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'status', 'direction', 'speed_horizontal', 'speed_vertical', 'latitude', 'longitude', 'altitude_barometric', 'altitude_geodetic', 'height_reference', 'height', 'horizontal_accuracy', 'vertical_accuracy', 'barometer_accuracy', 'speed_accuracy', 'timestamp', 'timestamp_accuracy'];
 
-}
 
-mavlink20.messages.open_drone_id_location.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_location.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_location.prototype.pack = function(mav) {
-    var orderedfields = [ this.latitude, this.longitude, this.altitude_barometric, this.altitude_geodetic, this.height, this.timestamp, this.direction, this.speed_horizontal, this.speed_vertical, this.target_system, this.target_component, this.id_or_mac, this.status, this.height_reference, this.horizontal_accuracy, this.vertical_accuracy, this.barometer_accuracy, this.speed_accuracy, this.timestamp_accuracy];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude_barometric, this.altitude_geodetic, this.height, this.timestamp, this.direction, this.speed_horizontal, this.speed_vertical, this.target_system, this.target_component, this.id_or_mac, this.status, this.height_reference, this.horizontal_accuracy, this.vertical_accuracy, this.barometer_accuracy, this.speed_accuracy, this.timestamp_accuracy]));
 }
-
 
 /* 
 Data for filling the OpenDroneID Authentication message. The
@@ -15706,32 +13404,24 @@ bytes.
                 authentication_data        : Opaque authentication data. For page 0, the size is only 17 bytes. For other pages, the size is 23 bytes. Shall be filled with nulls in the unused portion of the field. (uint8_t)
 
 */
-    mavlink20.messages.open_drone_id_authentication = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.authentication_type , this.data_page , this.last_page_index , this.length , this.timestamp , this.authentication_data ] = moreargs;
+mavlink20.messages.open_drone_id_authentication = function(target_system, target_component, id_or_mac, authentication_type, data_page, last_page_index, length, timestamp, authentication_data) {
 
-    this._format = '<IBB20sBBBB23s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_AUTHENTICATION;
+    this.format = '<IBB20sBBBB23s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_AUTHENTICATION;
     this.order_map = [1, 2, 3, 4, 5, 6, 7, 0, 8];
-    this.len_map = [1, 1, 1, 20, 1, 1, 1, 1, 23];
-    this.array_len_map = [0, 0, 0, 20, 0, 0, 0, 0, 23];
     this.crc_extra = 140;
-    this._name = 'OPEN_DRONE_ID_AUTHENTICATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_AUTHENTICATION';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'authentication_type', 'data_page', 'last_page_index', 'length', 'timestamp', 'authentication_data'];
 
-}
 
-mavlink20.messages.open_drone_id_authentication.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_authentication.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_authentication.prototype.pack = function(mav) {
-    var orderedfields = [ this.timestamp, this.target_system, this.target_component, this.id_or_mac, this.authentication_type, this.data_page, this.last_page_index, this.length, this.authentication_data];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.target_system, this.target_component, this.id_or_mac, this.authentication_type, this.data_page, this.last_page_index, this.length, this.authentication_data]));
 }
-
 
 /* 
 Data for filling the OpenDroneID Self ID message. The Self ID Message
@@ -15749,32 +13439,24 @@ in an emergency/remote ID system failure situation.
                 description               : Text description or numeric value expressed as ASCII characters. Shall be filled with nulls in the unused portion of the field. (char)
 
 */
-    mavlink20.messages.open_drone_id_self_id = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.description_type , this.description ] = moreargs;
+mavlink20.messages.open_drone_id_self_id = function(target_system, target_component, id_or_mac, description_type, description) {
 
-    this._format = '<BB20sB23s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SELF_ID;
+    this.format = '<BB20sB23s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SELF_ID;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 20, 1, 1];
-    this.array_len_map = [0, 0, 20, 0, 23];
     this.crc_extra = 249;
-    this._name = 'OPEN_DRONE_ID_SELF_ID';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_SELF_ID';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'description_type', 'description'];
 
-}
 
-mavlink20.messages.open_drone_id_self_id.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_self_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_self_id.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.id_or_mac, this.description_type, this.description];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.description_type, this.description]));
 }
-
 
 /* 
 Data for filling the OpenDroneID System message. The System Message
@@ -15799,32 +13481,24 @@ information.
                 timestamp                 : 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019. (uint32_t)
 
 */
-    mavlink20.messages.open_drone_id_system = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.operator_location_type , this.classification_type , this.operator_latitude , this.operator_longitude , this.area_count , this.area_radius , this.area_ceiling , this.area_floor , this.category_eu , this.class_eu , this.operator_altitude_geo , this.timestamp ] = moreargs;
+mavlink20.messages.open_drone_id_system = function(target_system, target_component, id_or_mac, operator_location_type, classification_type, operator_latitude, operator_longitude, area_count, area_radius, area_ceiling, area_floor, category_eu, class_eu, operator_altitude_geo, timestamp) {
 
-    this._format = '<iifffIHHBB20sBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM;
+    this.format = '<iifffIHHBB20sBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM;
     this.order_map = [8, 9, 10, 11, 12, 0, 1, 6, 7, 2, 3, 13, 14, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 20, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0];
     this.crc_extra = 77;
-    this._name = 'OPEN_DRONE_ID_SYSTEM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_SYSTEM';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'operator_location_type', 'classification_type', 'operator_latitude', 'operator_longitude', 'area_count', 'area_radius', 'area_ceiling', 'area_floor', 'category_eu', 'class_eu', 'operator_altitude_geo', 'timestamp'];
 
-}
 
-mavlink20.messages.open_drone_id_system.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_system.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_system.prototype.pack = function(mav) {
-    var orderedfields = [ this.operator_latitude, this.operator_longitude, this.area_ceiling, this.area_floor, this.operator_altitude_geo, this.timestamp, this.area_count, this.area_radius, this.target_system, this.target_component, this.id_or_mac, this.operator_location_type, this.classification_type, this.category_eu, this.class_eu];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.area_ceiling, this.area_floor, this.operator_altitude_geo, this.timestamp, this.area_count, this.area_radius, this.target_system, this.target_component, this.id_or_mac, this.operator_location_type, this.classification_type, this.category_eu, this.class_eu]));
 }
-
 
 /* 
 Data for filling the OpenDroneID Operator ID message, which contains
@@ -15837,32 +13511,24 @@ the CAA (Civil Aviation Authority) issued operator ID.
                 operator_id               : Text description or numeric value expressed as ASCII characters. Shall be filled with nulls in the unused portion of the field. (char)
 
 */
-    mavlink20.messages.open_drone_id_operator_id = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.operator_id_type , this.operator_id ] = moreargs;
+mavlink20.messages.open_drone_id_operator_id = function(target_system, target_component, id_or_mac, operator_id_type, operator_id) {
 
-    this._format = '<BB20sB20s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_OPERATOR_ID;
+    this.format = '<BB20sB20s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_OPERATOR_ID;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 20, 1, 1];
-    this.array_len_map = [0, 0, 20, 0, 20];
     this.crc_extra = 49;
-    this._name = 'OPEN_DRONE_ID_OPERATOR_ID';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_OPERATOR_ID';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'operator_id_type', 'operator_id'];
 
-}
 
-mavlink20.messages.open_drone_id_operator_id.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_operator_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_operator_id.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.id_or_mac, this.operator_id_type, this.operator_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.operator_id_type, this.operator_id]));
 }
-
 
 /* 
 Status from the transmitter telling the flight controller if the
@@ -15872,32 +13538,24 @@ remote ID system is ready for arming.
                 error                     : Text error message, should be empty if status is good to arm. Fill with nulls in unused portion. (char)
 
 */
-    mavlink20.messages.open_drone_id_arm_status = function( ...moreargs ) {
-    [ this.status , this.error ] = moreargs;
+mavlink20.messages.open_drone_id_arm_status = function(status, error) {
 
-    this._format = '<B50s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS;
+    this.format = '<B50s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_ARM_STATUS;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 50];
     this.crc_extra = 139;
-    this._name = 'OPEN_DRONE_ID_ARM_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_ARM_STATUS';
 
     this.fieldnames = ['status', 'error'];
 
-}
 
-mavlink20.messages.open_drone_id_arm_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_arm_status.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_arm_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.status, this.error];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.error]));
 }
-
 
 /* 
 An OpenDroneID message pack is a container for multiple encoded
@@ -15915,32 +13573,24 @@ or on WiFi Beacon.
                 messages                  : Concatenation of encoded OpenDroneID messages. Shall be filled with nulls in the unused portion of the field. (uint8_t)
 
 */
-    mavlink20.messages.open_drone_id_message_pack = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.id_or_mac , this.single_message_size , this.msg_pack_size , this.messages ] = moreargs;
+mavlink20.messages.open_drone_id_message_pack = function(target_system, target_component, id_or_mac, single_message_size, msg_pack_size, messages) {
 
-    this._format = '<BB20sBB225s';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_MESSAGE_PACK;
+    this.format = '<BB20sBB225s';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_MESSAGE_PACK;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 20, 1, 1, 225];
-    this.array_len_map = [0, 0, 20, 0, 0, 225];
     this.crc_extra = 94;
-    this._name = 'OPEN_DRONE_ID_MESSAGE_PACK';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_MESSAGE_PACK';
 
     this.fieldnames = ['target_system', 'target_component', 'id_or_mac', 'single_message_size', 'msg_pack_size', 'messages'];
 
-}
 
-mavlink20.messages.open_drone_id_message_pack.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_message_pack.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_message_pack.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.id_or_mac, this.single_message_size, this.msg_pack_size, this.messages];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.single_message_size, this.msg_pack_size, this.messages]));
 }
-
 
 /* 
 Update the data in the OPEN_DRONE_ID_SYSTEM message with new location
@@ -15958,32 +13608,24 @@ update frequency of the operator location.
                 timestamp                 : 32 bit Unix Timestamp in seconds since 00:00:00 01/01/2019. (uint32_t)
 
 */
-    mavlink20.messages.open_drone_id_system_update = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.operator_latitude , this.operator_longitude , this.operator_altitude_geo , this.timestamp ] = moreargs;
+mavlink20.messages.open_drone_id_system_update = function(target_system, target_component, operator_latitude, operator_longitude, operator_altitude_geo, timestamp) {
 
-    this._format = '<iifIBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE;
+    this.format = '<iifIBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_OPEN_DRONE_ID_SYSTEM_UPDATE;
     this.order_map = [4, 5, 0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 7;
-    this._name = 'OPEN_DRONE_ID_SYSTEM_UPDATE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'OPEN_DRONE_ID_SYSTEM_UPDATE';
 
     this.fieldnames = ['target_system', 'target_component', 'operator_latitude', 'operator_longitude', 'operator_altitude_geo', 'timestamp'];
 
-}
 
-mavlink20.messages.open_drone_id_system_update.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.open_drone_id_system_update.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_system_update.prototype.pack = function(mav) {
-    var orderedfields = [ this.operator_latitude, this.operator_longitude, this.operator_altitude_geo, this.timestamp, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.operator_altitude_geo, this.timestamp, this.target_system, this.target_component]));
 }
-
 
 /* 
 Temperature and humidity from hygrometer.
@@ -15993,32 +13635,24 @@ Temperature and humidity from hygrometer.
                 humidity                  : Humidity (uint16_t)
 
 */
-    mavlink20.messages.hygrometer_sensor = function( ...moreargs ) {
-    [ this.id , this.temperature , this.humidity ] = moreargs;
+mavlink20.messages.hygrometer_sensor = function(id, temperature, humidity) {
 
-    this._format = '<hHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HYGROMETER_SENSOR;
+    this.format = '<hHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HYGROMETER_SENSOR;
     this.order_map = [2, 0, 1];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 20;
-    this._name = 'HYGROMETER_SENSOR';
-
-    this._instance_field = 'id';
-    this._instance_offset = 4;
+    this.name = 'HYGROMETER_SENSOR';
 
     this.fieldnames = ['id', 'temperature', 'humidity'];
 
-}
 
-mavlink20.messages.hygrometer_sensor.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.hygrometer_sensor.prototype = new mavlink20.message();
 mavlink20.messages.hygrometer_sensor.prototype.pack = function(mav) {
-    var orderedfields = [ this.temperature, this.humidity, this.id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.temperature, this.humidity, this.id]));
 }
-
 
 /* 
 Checksum for the current mission, rally point or geofence plan, or for
@@ -16045,32 +13679,24 @@ rally point.
                 checksum                  : CRC32 checksum of current plan for specified type. (uint32_t)
 
 */
-    mavlink20.messages.mission_checksum = function( ...moreargs ) {
-    [ this.mission_type , this.checksum ] = moreargs;
+mavlink20.messages.mission_checksum = function(mission_type, checksum) {
 
-    this._format = '<IB';
-    this._id = mavlink20.MAVLINK_MSG_ID_MISSION_CHECKSUM;
+    this.format = '<IB';
+    this.id = mavlink20.MAVLINK_MSG_ID_MISSION_CHECKSUM;
     this.order_map = [1, 0];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 3;
-    this._name = 'MISSION_CHECKSUM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'MISSION_CHECKSUM';
 
     this.fieldnames = ['mission_type', 'checksum'];
 
-}
 
-mavlink20.messages.mission_checksum.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.mission_checksum.prototype = new mavlink20.message();
 mavlink20.messages.mission_checksum.prototype.pack = function(mav) {
-    var orderedfields = [ this.checksum, this.mission_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.checksum, this.mission_type]));
 }
-
 
 /* 
 Airspeed information from a sensor.
@@ -16082,32 +13708,24 @@ Airspeed information from a sensor.
                 flags                     : Airspeed sensor flags. (uint8_t)
 
 */
-    mavlink20.messages.airspeed = function( ...moreargs ) {
-    [ this.id , this.airspeed , this.temperature , this.raw_press , this.flags ] = moreargs;
+mavlink20.messages.airspeed = function(id, airspeed, temperature, raw_press, flags) {
 
-    this._format = '<ffhBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_AIRSPEED;
+    this.format = '<ffhBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_AIRSPEED;
     this.order_map = [3, 0, 2, 1, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 234;
-    this._name = 'AIRSPEED';
-
-    this._instance_field = 'id';
-    this._instance_offset = 10;
+    this.name = 'AIRSPEED';
 
     this.fieldnames = ['id', 'airspeed', 'temperature', 'raw_press', 'flags'];
 
-}
 
-mavlink20.messages.airspeed.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.airspeed.prototype = new mavlink20.message();
 mavlink20.messages.airspeed.prototype.pack = function(mav) {
-    var orderedfields = [ this.airspeed, this.raw_press, this.temperature, this.id, this.flags];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.airspeed, this.raw_press, this.temperature, this.id, this.flags]));
 }
-
 
 /* 
 RC channel outputs from a MAVLink RC receiver for input to a flight
@@ -16150,32 +13768,24 @@ serialized payload and subject to MAVLink's trailing-zero trimming.
         Channels with indexes equal or above count should be set to 0, to benefit from MAVLink's trailing-zero trimming. (int16_t)
 
 */
-    mavlink20.messages.radio_rc_channels = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.time_last_update_ms , this.flags , this.count , this.channels ] = moreargs;
+mavlink20.messages.radio_rc_channels = function(target_system, target_component, time_last_update_ms, flags, count, channels) {
 
-    this._format = '<IHBBB32h';
-    this._id = mavlink20.MAVLINK_MSG_ID_RADIO_RC_CHANNELS;
+    this.format = '<IHBBB32h';
+    this.id = mavlink20.MAVLINK_MSG_ID_RADIO_RC_CHANNELS;
     this.order_map = [2, 3, 0, 1, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 32];
-    this.array_len_map = [0, 0, 0, 0, 0, 32];
     this.crc_extra = 20;
-    this._name = 'RADIO_RC_CHANNELS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RADIO_RC_CHANNELS';
 
     this.fieldnames = ['target_system', 'target_component', 'time_last_update_ms', 'flags', 'count', 'channels'];
 
-}
 
-mavlink20.messages.radio_rc_channels.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.radio_rc_channels.prototype = new mavlink20.message();
 mavlink20.messages.radio_rc_channels.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_last_update_ms, this.flags, this.target_system, this.target_component, this.count, this.channels];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_update_ms, this.flags, this.target_system, this.target_component, this.count, this.channels]));
 }
-
 
 /* 
 ICAROUS heartbeat
@@ -16183,32 +13793,24 @@ ICAROUS heartbeat
                 status                    : See the FMS_STATE enum. (uint8_t)
 
 */
-    mavlink20.messages.icarous_heartbeat = function( ...moreargs ) {
-    [ this.status ] = moreargs;
+mavlink20.messages.icarous_heartbeat = function(status) {
 
-    this._format = '<B';
-    this._id = mavlink20.MAVLINK_MSG_ID_ICAROUS_HEARTBEAT;
+    this.format = '<B';
+    this.id = mavlink20.MAVLINK_MSG_ID_ICAROUS_HEARTBEAT;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [0];
     this.crc_extra = 227;
-    this._name = 'ICAROUS_HEARTBEAT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ICAROUS_HEARTBEAT';
 
     this.fieldnames = ['status'];
 
-}
 
-mavlink20.messages.icarous_heartbeat.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.icarous_heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.icarous_heartbeat.prototype.pack = function(mav) {
-    var orderedfields = [ this.status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status]));
 }
-
 
 /* 
 Kinematic multi bands (track) output from Daidalus
@@ -16231,32 +13833,24 @@ Kinematic multi bands (track) output from Daidalus
                 max5                      : max angle (degrees) (float)
 
 */
-    mavlink20.messages.icarous_kinematic_bands = function( ...moreargs ) {
-    [ this.numBands , this.type1 , this.min1 , this.max1 , this.type2 , this.min2 , this.max2 , this.type3 , this.min3 , this.max3 , this.type4 , this.min4 , this.max4 , this.type5 , this.min5 , this.max5 ] = moreargs;
+mavlink20.messages.icarous_kinematic_bands = function(numBands, type1, min1, max1, type2, min2, max2, type3, min3, max3, type4, min4, max4, type5, min5, max5) {
 
-    this._format = '<ffffffffffbBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ICAROUS_KINEMATIC_BANDS;
+    this.format = '<ffffffffffbBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ICAROUS_KINEMATIC_BANDS;
     this.order_map = [10, 11, 0, 1, 12, 2, 3, 13, 4, 5, 14, 6, 7, 15, 8, 9];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 239;
-    this._name = 'ICAROUS_KINEMATIC_BANDS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ICAROUS_KINEMATIC_BANDS';
 
     this.fieldnames = ['numBands', 'type1', 'min1', 'max1', 'type2', 'min2', 'max2', 'type3', 'min3', 'max3', 'type4', 'min4', 'max4', 'type5', 'min5', 'max5'];
 
-}
 
-mavlink20.messages.icarous_kinematic_bands.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.icarous_kinematic_bands.prototype = new mavlink20.message();
 mavlink20.messages.icarous_kinematic_bands.prototype.pack = function(mav) {
-    var orderedfields = [ this.min1, this.max1, this.min2, this.max2, this.min3, this.max3, this.min4, this.max4, this.min5, this.max5, this.numBands, this.type1, this.type2, this.type3, this.type4, this.type5];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.min1, this.max1, this.min2, this.max2, this.min3, this.max3, this.min4, this.max4, this.min5, this.max5, this.numBands, this.type1, this.type2, this.type3, this.type4, this.type5]));
 }
-
 
 /* 
 The heartbeat message shows that a system or component is present and
@@ -16271,35 +13865,27 @@ https://mavlink.io/en/services/heartbeat.html
                 base_mode                 : System mode bitmap. (uint8_t)
                 custom_mode               : A bitfield for use for autopilot-specific flags (uint32_t)
                 system_status             : System status flag. (uint8_t)
+                mavlink_version           : MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version (uint8_t)
 
 */
-    mavlink20.messages.heartbeat = function( ...moreargs ) {
-    [ this.type , this.autopilot , this.base_mode , this.custom_mode , this.system_status ] = moreargs;
-    this.mavlink_version = 3;
+mavlink20.messages.heartbeat = function(type, autopilot, base_mode, custom_mode, system_status, mavlink_version) {
 
-    this._format = '<IBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HEARTBEAT;
+    this.format = '<IBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HEARTBEAT;
     this.order_map = [1, 2, 3, 0, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 50;
-    this._name = 'HEARTBEAT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HEARTBEAT';
 
     this.fieldnames = ['type', 'autopilot', 'base_mode', 'custom_mode', 'system_status', 'mavlink_version'];
 
-}
 
-mavlink20.messages.heartbeat.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.heartbeat.prototype.pack = function(mav) {
-    var orderedfields = [ this.custom_mode, this.type, this.autopilot, this.base_mode, this.system_status, this.mavlink_version];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.type, this.autopilot, this.base_mode, this.system_status, this.mavlink_version]));
 }
-
 
 /* 
 Array test #0.
@@ -16311,32 +13897,24 @@ Array test #0.
                 ar_u32                    : Value array (uint32_t)
 
 */
-    mavlink20.messages.array_test_0 = function( ...moreargs ) {
-    [ this.v1 , this.ar_i8 , this.ar_u8 , this.ar_u16 , this.ar_u32 ] = moreargs;
+mavlink20.messages.array_test_0 = function(v1, ar_i8, ar_u8, ar_u16, ar_u32) {
 
-    this._format = '<4I4HB4s4s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_0;
+    this.format = '<4I4HB4s4s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_0;
     this.order_map = [2, 3, 4, 1, 0];
-    this.len_map = [4, 4, 1, 4, 4];
-    this.array_len_map = [4, 4, 0, 4, 4];
     this.crc_extra = 26;
-    this._name = 'ARRAY_TEST_0';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_0';
 
     this.fieldnames = ['v1', 'ar_i8', 'ar_u8', 'ar_u16', 'ar_u32'];
 
-}
 
-mavlink20.messages.array_test_0.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_0.prototype = new mavlink20.message();
 mavlink20.messages.array_test_0.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_u32, this.ar_u16, this.v1, this.ar_i8, this.ar_u8];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.ar_u16, this.v1, this.ar_i8, this.ar_u8]));
 }
-
 
 /* 
 Array test #1.
@@ -16344,32 +13922,24 @@ Array test #1.
                 ar_u32                    : Value array (uint32_t)
 
 */
-    mavlink20.messages.array_test_1 = function( ...moreargs ) {
-    [ this.ar_u32 ] = moreargs;
+mavlink20.messages.array_test_1 = function(ar_u32) {
 
-    this._format = '<4I';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_1;
+    this.format = '<4I';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_1;
     this.order_map = [0];
-    this.len_map = [4];
-    this.array_len_map = [4];
     this.crc_extra = 72;
-    this._name = 'ARRAY_TEST_1';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_1';
 
     this.fieldnames = ['ar_u32'];
 
-}
 
-mavlink20.messages.array_test_1.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_1.prototype = new mavlink20.message();
 mavlink20.messages.array_test_1.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_u32];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32]));
 }
-
 
 /* 
 Array test #3.
@@ -16378,32 +13948,24 @@ Array test #3.
                 ar_u32                    : Value array (uint32_t)
 
 */
-    mavlink20.messages.array_test_3 = function( ...moreargs ) {
-    [ this.v , this.ar_u32 ] = moreargs;
+mavlink20.messages.array_test_3 = function(v, ar_u32) {
 
-    this._format = '<4IB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_3;
+    this.format = '<4IB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_3;
     this.order_map = [1, 0];
-    this.len_map = [4, 1];
-    this.array_len_map = [4, 0];
     this.crc_extra = 19;
-    this._name = 'ARRAY_TEST_3';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_3';
 
     this.fieldnames = ['v', 'ar_u32'];
 
-}
 
-mavlink20.messages.array_test_3.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_3.prototype = new mavlink20.message();
 mavlink20.messages.array_test_3.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_u32, this.v];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.v]));
 }
-
 
 /* 
 Array test #4.
@@ -16412,32 +13974,24 @@ Array test #4.
                 v                         : Stub field (uint8_t)
 
 */
-    mavlink20.messages.array_test_4 = function( ...moreargs ) {
-    [ this.ar_u32 , this.v ] = moreargs;
+mavlink20.messages.array_test_4 = function(ar_u32, v) {
 
-    this._format = '<4IB';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_4;
+    this.format = '<4IB';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_4;
     this.order_map = [0, 1];
-    this.len_map = [4, 1];
-    this.array_len_map = [4, 0];
     this.crc_extra = 89;
-    this._name = 'ARRAY_TEST_4';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_4';
 
     this.fieldnames = ['ar_u32', 'v'];
 
-}
 
-mavlink20.messages.array_test_4.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_4.prototype = new mavlink20.message();
 mavlink20.messages.array_test_4.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_u32, this.v];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.v]));
 }
-
 
 /* 
 Array test #5.
@@ -16446,32 +14000,24 @@ Array test #5.
                 c2                        : Value array (char)
 
 */
-    mavlink20.messages.array_test_5 = function( ...moreargs ) {
-    [ this.c1 , this.c2 ] = moreargs;
+mavlink20.messages.array_test_5 = function(c1, c2) {
 
-    this._format = '<5s5s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_5;
+    this.format = '<5s5s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_5;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [5, 5];
     this.crc_extra = 27;
-    this._name = 'ARRAY_TEST_5';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_5';
 
     this.fieldnames = ['c1', 'c2'];
 
-}
 
-mavlink20.messages.array_test_5.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_5.prototype = new mavlink20.message();
 mavlink20.messages.array_test_5.prototype.pack = function(mav) {
-    var orderedfields = [ this.c1, this.c2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.c1, this.c2]));
 }
-
 
 /* 
 Array test #6.
@@ -16490,32 +14036,24 @@ Array test #6.
                 ar_f                      : Value array (float)
 
 */
-    mavlink20.messages.array_test_6 = function( ...moreargs ) {
-    [ this.v1 , this.v2 , this.v3 , this.ar_u32 , this.ar_i32 , this.ar_u16 , this.ar_i16 , this.ar_u8 , this.ar_i8 , this.ar_c , this.ar_d , this.ar_f ] = moreargs;
+mavlink20.messages.array_test_6 = function(v1, v2, v3, ar_u32, ar_i32, ar_u16, ar_i16, ar_u8, ar_i8, ar_c, ar_d, ar_f) {
 
-    this._format = '<2dI2I2i2fH2H2hB2s2s32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_6;
+    this.format = '<2dI2I2i2fH2H2hB2s2s32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_6;
     this.order_map = [8, 5, 1, 2, 3, 6, 7, 9, 10, 11, 0, 4];
-    this.len_map = [2, 1, 2, 2, 2, 1, 2, 2, 1, 2, 2, 1];
-    this.array_len_map = [2, 0, 2, 2, 2, 0, 2, 2, 0, 2, 2, 32];
     this.crc_extra = 14;
-    this._name = 'ARRAY_TEST_6';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_6';
 
     this.fieldnames = ['v1', 'v2', 'v3', 'ar_u32', 'ar_i32', 'ar_u16', 'ar_i16', 'ar_u8', 'ar_i8', 'ar_c', 'ar_d', 'ar_f'];
 
-}
 
-mavlink20.messages.array_test_6.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_6.prototype = new mavlink20.message();
 mavlink20.messages.array_test_6.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_d, this.v3, this.ar_u32, this.ar_i32, this.ar_f, this.v2, this.ar_u16, this.ar_i16, this.v1, this.ar_u8, this.ar_i8, this.ar_c];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u32, this.ar_i32, this.ar_f, this.v2, this.ar_u16, this.ar_i16, this.v1, this.ar_u8, this.ar_i8, this.ar_c]));
 }
-
 
 /* 
 Array test #7.
@@ -16531,32 +14069,24 @@ Array test #7.
                 ar_c                      : Value array (char)
 
 */
-    mavlink20.messages.array_test_7 = function( ...moreargs ) {
-    [ this.ar_d , this.ar_f , this.ar_u32 , this.ar_i32 , this.ar_u16 , this.ar_i16 , this.ar_u8 , this.ar_i8 , this.ar_c ] = moreargs;
+mavlink20.messages.array_test_7 = function(ar_d, ar_f, ar_u32, ar_i32, ar_u16, ar_i16, ar_u8, ar_i8, ar_c) {
 
-    this._format = '<2d2f2I2i2H2h2s2s32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_7;
+    this.format = '<2d2f2I2i2H2h2s2s32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_7;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    this.len_map = [2, 2, 2, 2, 2, 2, 2, 2, 1];
-    this.array_len_map = [2, 2, 2, 2, 2, 2, 2, 2, 32];
     this.crc_extra = 187;
-    this._name = 'ARRAY_TEST_7';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_7';
 
     this.fieldnames = ['ar_d', 'ar_f', 'ar_u32', 'ar_i32', 'ar_u16', 'ar_i16', 'ar_u8', 'ar_i8', 'ar_c'];
 
-}
 
-mavlink20.messages.array_test_7.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_7.prototype = new mavlink20.message();
 mavlink20.messages.array_test_7.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_d, this.ar_f, this.ar_u32, this.ar_i32, this.ar_u16, this.ar_i16, this.ar_u8, this.ar_i8, this.ar_c];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.ar_f, this.ar_u32, this.ar_i32, this.ar_u16, this.ar_i16, this.ar_u8, this.ar_i8, this.ar_c]));
 }
-
 
 /* 
 Array test #8.
@@ -16566,32 +14096,24 @@ Array test #8.
                 ar_u16                    : Value array (uint16_t)
 
 */
-    mavlink20.messages.array_test_8 = function( ...moreargs ) {
-    [ this.v3 , this.ar_d , this.ar_u16 ] = moreargs;
+mavlink20.messages.array_test_8 = function(v3, ar_d, ar_u16) {
 
-    this._format = '<2dI2H';
-    this._id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_8;
+    this.format = '<2dI2H';
+    this.id = mavlink20.MAVLINK_MSG_ID_ARRAY_TEST_8;
     this.order_map = [1, 0, 2];
-    this.len_map = [2, 1, 2];
-    this.array_len_map = [2, 0, 2];
     this.crc_extra = 106;
-    this._name = 'ARRAY_TEST_8';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'ARRAY_TEST_8';
 
     this.fieldnames = ['v3', 'ar_d', 'ar_u16'];
 
-}
 
-mavlink20.messages.array_test_8.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.array_test_8.prototype = new mavlink20.message();
 mavlink20.messages.array_test_8.prototype.pack = function(mav) {
-    var orderedfields = [ this.ar_d, this.v3, this.ar_u16];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u16]));
 }
-
 
 /* 
 Test all field types
@@ -16620,32 +14142,24 @@ Test all field types
                 d_array                   : double_array (double)
 
 */
-    mavlink20.messages.test_types = function( ...moreargs ) {
-    [ this.c , this.s , this.u8 , this.u16 , this.u32 , this.u64 , this.s8 , this.s16 , this.s32 , this.s64 , this.f , this.d , this.u8_array , this.u16_array , this.u32_array , this.u64_array , this.s8_array , this.s16_array , this.s32_array , this.s64_array , this.f_array , this.d_array ] = moreargs;
+mavlink20.messages.test_types = function(c, s, u8, u16, u32, u64, s8, s16, s32, s64, f, d, u8_array, u16_array, u32_array, u64_array, s8_array, s16_array, s32_array, s64_array, f_array, d_array) {
 
-    this._format = '<Qqd3Q3q3dIif3I3i3fHh3H3hc10sBb3s3s';
-    this._id = mavlink20.MAVLINK_MSG_ID_TEST_TYPES;
+    this.format = '<Qqd3Q3q3dIif3I3i3fHh3H3hc10sBb3s3s';
+    this.id = mavlink20.MAVLINK_MSG_ID_TEST_TYPES;
     this.order_map = [16, 17, 18, 12, 6, 0, 19, 13, 7, 1, 8, 2, 20, 14, 9, 3, 21, 15, 10, 4, 11, 5];
-    this.len_map = [1, 1, 1, 3, 3, 3, 1, 1, 1, 3, 3, 3, 1, 1, 3, 3, 1, 1, 1, 1, 3, 3];
-    this.array_len_map = [0, 0, 0, 3, 3, 3, 0, 0, 0, 3, 3, 3, 0, 0, 3, 3, 0, 10, 0, 0, 3, 3];
     this.crc_extra = 103;
-    this._name = 'TEST_TYPES';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'TEST_TYPES';
 
     this.fieldnames = ['c', 's', 'u8', 'u16', 'u32', 'u64', 's8', 's16', 's32', 's64', 'f', 'd', 'u8_array', 'u16_array', 'u32_array', 'u64_array', 's8_array', 's16_array', 's32_array', 's64_array', 'f_array', 'd_array'];
 
-}
 
-mavlink20.messages.test_types.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.test_types.prototype = new mavlink20.message();
 mavlink20.messages.test_types.prototype.pack = function(mav) {
-    var orderedfields = [ this.u64, this.s64, this.d, this.u64_array, this.s64_array, this.d_array, this.u32, this.s32, this.f, this.u32_array, this.s32_array, this.f_array, this.u16, this.s16, this.u16_array, this.s16_array, this.c, this.s, this.u8, this.s8, this.u8_array, this.s8_array];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.u64, this.s64, this.d, this.u64_array, this.s64_array, this.d_array, this.u32, this.s32, this.f, this.u32_array, this.s32_array, this.f_array, this.u16, this.s16, this.u16_array, this.s16_array, this.c, this.s, this.u8, this.s8, this.u8_array, this.s8_array]));
 }
-
 
 /* 
 Accelerometer and Gyro biases from the navigation filter
@@ -16659,32 +14173,24 @@ Accelerometer and Gyro biases from the navigation filter
                 gyro_2                    : b_f[2] (float)
 
 */
-    mavlink20.messages.nav_filter_bias = function( ...moreargs ) {
-    [ this.usec , this.accel_0 , this.accel_1 , this.accel_2 , this.gyro_0 , this.gyro_1 , this.gyro_2 ] = moreargs;
+mavlink20.messages.nav_filter_bias = function(usec, accel_0, accel_1, accel_2, gyro_0, gyro_1, gyro_2) {
 
-    this._format = '<Qffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_NAV_FILTER_BIAS;
+    this.format = '<Qffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_NAV_FILTER_BIAS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 34;
-    this._name = 'NAV_FILTER_BIAS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'NAV_FILTER_BIAS';
 
     this.fieldnames = ['usec', 'accel_0', 'accel_1', 'accel_2', 'gyro_0', 'gyro_1', 'gyro_2'];
 
-}
 
-mavlink20.messages.nav_filter_bias.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.nav_filter_bias.prototype = new mavlink20.message();
 mavlink20.messages.nav_filter_bias.prototype.pack = function(mav) {
-    var orderedfields = [ this.usec, this.accel_0, this.accel_1, this.accel_2, this.gyro_0, this.gyro_1, this.gyro_2];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.accel_0, this.accel_1, this.accel_2, this.gyro_0, this.gyro_1, this.gyro_2]));
 }
-
 
 /* 
 Complete set of calibration parameters for the radio
@@ -16697,32 +14203,24 @@ Complete set of calibration parameters for the radio
                 throttle                  : Throttle curve setpoints (every 25%) (uint16_t)
 
 */
-    mavlink20.messages.radio_calibration = function( ...moreargs ) {
-    [ this.aileron , this.elevator , this.rudder , this.gyro , this.pitch , this.throttle ] = moreargs;
+mavlink20.messages.radio_calibration = function(aileron, elevator, rudder, gyro, pitch, throttle) {
 
-    this._format = '<3H3H3H2H5H5H';
-    this._id = mavlink20.MAVLINK_MSG_ID_RADIO_CALIBRATION;
+    this.format = '<3H3H3H2H5H5H';
+    this.id = mavlink20.MAVLINK_MSG_ID_RADIO_CALIBRATION;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [3, 3, 3, 2, 5, 5];
-    this.array_len_map = [3, 3, 3, 2, 5, 5];
     this.crc_extra = 71;
-    this._name = 'RADIO_CALIBRATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'RADIO_CALIBRATION';
 
     this.fieldnames = ['aileron', 'elevator', 'rudder', 'gyro', 'pitch', 'throttle'];
 
-}
 
-mavlink20.messages.radio_calibration.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.radio_calibration.prototype = new mavlink20.message();
 mavlink20.messages.radio_calibration.prototype.pack = function(mav) {
-    var orderedfields = [ this.aileron, this.elevator, this.rudder, this.gyro, this.pitch, this.throttle];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.aileron, this.elevator, this.rudder, this.gyro, this.pitch, this.throttle]));
 }
-
 
 /* 
 System status specific to ualberta uav
@@ -16732,32 +14230,24 @@ System status specific to ualberta uav
                 pilot                     : Pilot mode, see UALBERTA_PILOT_MODE (uint8_t)
 
 */
-    mavlink20.messages.ualberta_sys_status = function( ...moreargs ) {
-    [ this.mode , this.nav_mode , this.pilot ] = moreargs;
+mavlink20.messages.ualberta_sys_status = function(mode, nav_mode, pilot) {
 
-    this._format = '<BBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UALBERTA_SYS_STATUS;
+    this.format = '<BBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UALBERTA_SYS_STATUS;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 15;
-    this._name = 'UALBERTA_SYS_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UALBERTA_SYS_STATUS';
 
     this.fieldnames = ['mode', 'nav_mode', 'pilot'];
 
-}
 
-mavlink20.messages.ualberta_sys_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.ualberta_sys_status.prototype = new mavlink20.message();
 mavlink20.messages.ualberta_sys_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.mode, this.nav_mode, this.pilot];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mode, this.nav_mode, this.pilot]));
 }
-
 
 /* 
 Static data to configure the ADS-B transponder (send within 10 sec of
@@ -16773,32 +14263,24 @@ a POR and every 10 sec thereafter)
                 rfSelect                  : ADS-B transponder reciever and transmit enable flags (uint8_t)
 
 */
-    mavlink20.messages.uavionix_adsb_out_cfg = function( ...moreargs ) {
-    [ this.ICAO , this.callsign , this.emitterType , this.aircraftSize , this.gpsOffsetLat , this.gpsOffsetLon , this.stallSpeed , this.rfSelect ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_cfg = function(ICAO, callsign, emitterType, aircraftSize, gpsOffsetLat, gpsOffsetLon, stallSpeed, rfSelect) {
 
-    this._format = '<IH9sBBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG;
+    this.format = '<IH9sBBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG;
     this.order_map = [0, 2, 3, 4, 5, 6, 1, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 9, 0, 0, 0, 0, 0];
     this.crc_extra = 209;
-    this._name = 'UAVIONIX_ADSB_OUT_CFG';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_CFG';
 
     this.fieldnames = ['ICAO', 'callsign', 'emitterType', 'aircraftSize', 'gpsOffsetLat', 'gpsOffsetLon', 'stallSpeed', 'rfSelect'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_cfg.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_cfg.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg.prototype.pack = function(mav) {
-    var orderedfields = [ this.ICAO, this.stallSpeed, this.callsign, this.emitterType, this.aircraftSize, this.gpsOffsetLat, this.gpsOffsetLon, this.rfSelect];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ICAO, this.stallSpeed, this.callsign, this.emitterType, this.aircraftSize, this.gpsOffsetLat, this.gpsOffsetLon, this.rfSelect]));
 }
-
 
 /* 
 Dynamic data used to generate ADS-B out transponder data (send at 5Hz)
@@ -16821,32 +14303,24 @@ Dynamic data used to generate ADS-B out transponder data (send at 5Hz)
                 squawk                    : Mode A code (typically 1200 [0x04B0] for VFR) (uint16_t)
 
 */
-    mavlink20.messages.uavionix_adsb_out_dynamic = function( ...moreargs ) {
-    [ this.utcTime , this.gpsLat , this.gpsLon , this.gpsAlt , this.gpsFix , this.numSats , this.baroAltMSL , this.accuracyHor , this.accuracyVert , this.accuracyVel , this.velVert , this.velNS , this.VelEW , this.emergencyStatus , this.state , this.squawk ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_dynamic = function(utcTime, gpsLat, gpsLon, gpsAlt, gpsFix, numSats, baroAltMSL, accuracyHor, accuracyVert, accuracyVel, velVert, velNS, VelEW, emergencyStatus, state, squawk) {
 
-    this._format = '<IiiiiIHHhhhHHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_DYNAMIC;
+    this.format = '<IiiiiIHHhhhHHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_DYNAMIC;
     this.order_map = [0, 1, 2, 3, 13, 14, 4, 5, 6, 7, 8, 9, 10, 15, 11, 12];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 186;
-    this._name = 'UAVIONIX_ADSB_OUT_DYNAMIC';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_DYNAMIC';
 
     this.fieldnames = ['utcTime', 'gpsLat', 'gpsLon', 'gpsAlt', 'gpsFix', 'numSats', 'baroAltMSL', 'accuracyHor', 'accuracyVert', 'accuracyVel', 'velVert', 'velNS', 'VelEW', 'emergencyStatus', 'state', 'squawk'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_dynamic.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_dynamic.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_dynamic.prototype.pack = function(mav) {
-    var orderedfields = [ this.utcTime, this.gpsLat, this.gpsLon, this.gpsAlt, this.baroAltMSL, this.accuracyHor, this.accuracyVert, this.accuracyVel, this.velVert, this.velNS, this.VelEW, this.state, this.squawk, this.gpsFix, this.numSats, this.emergencyStatus];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.utcTime, this.gpsLat, this.gpsLon, this.gpsAlt, this.baroAltMSL, this.accuracyHor, this.accuracyVert, this.accuracyVel, this.velVert, this.velNS, this.VelEW, this.state, this.squawk, this.gpsFix, this.numSats, this.emergencyStatus]));
 }
-
 
 /* 
 Transceiver heartbeat with health report (updated every 10s)
@@ -16854,32 +14328,24 @@ Transceiver heartbeat with health report (updated every 10s)
                 rfHealth                  : ADS-B transponder messages (uint8_t)
 
 */
-    mavlink20.messages.uavionix_adsb_transceiver_health_report = function( ...moreargs ) {
-    [ this.rfHealth ] = moreargs;
+mavlink20.messages.uavionix_adsb_transceiver_health_report = function(rfHealth) {
 
-    this._format = '<B';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT;
+    this.format = '<B';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [0];
     this.crc_extra = 4;
-    this._name = 'UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_TRANSCEIVER_HEALTH_REPORT';
 
     this.fieldnames = ['rfHealth'];
 
-}
 
-mavlink20.messages.uavionix_adsb_transceiver_health_report.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_transceiver_health_report.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_transceiver_health_report.prototype.pack = function(mav) {
-    var orderedfields = [ this.rfHealth];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rfHealth]));
 }
-
 
 /* 
 Aircraft Registration.
@@ -16887,32 +14353,24 @@ Aircraft Registration.
                 registration              : Aircraft Registration (ASCII string A-Z, 0-9 only), e.g. "N8644B ". Trailing spaces (0x20) only. This is null-terminated. (char)
 
 */
-    mavlink20.messages.uavionix_adsb_out_cfg_registration = function( ...moreargs ) {
-    [ this.registration ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_cfg_registration = function(registration) {
 
-    this._format = '<9s';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG_REGISTRATION;
+    this.format = '<9s';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG_REGISTRATION;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [9];
     this.crc_extra = 133;
-    this._name = 'UAVIONIX_ADSB_OUT_CFG_REGISTRATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_CFG_REGISTRATION';
 
     this.fieldnames = ['registration'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_cfg_registration.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_cfg_registration.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg_registration.prototype.pack = function(mav) {
-    var orderedfields = [ this.registration];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.registration]));
 }
-
 
 /* 
 Flight Identification for ADSB-Out vehicles.
@@ -16920,32 +14378,24 @@ Flight Identification for ADSB-Out vehicles.
                 flight_id                 : Flight Identification: 8 ASCII characters, '0' through '9', 'A' through 'Z' or space. Spaces (0x20) used as a trailing pad character, or when call sign is unavailable. Reflects Control message setting. This is null-terminated. (char)
 
 */
-    mavlink20.messages.uavionix_adsb_out_cfg_flightid = function( ...moreargs ) {
-    [ this.flight_id ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_cfg_flightid = function(flight_id) {
 
-    this._format = '<9s';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG_FLIGHTID;
+    this.format = '<9s';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CFG_FLIGHTID;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [9];
     this.crc_extra = 103;
-    this._name = 'UAVIONIX_ADSB_OUT_CFG_FLIGHTID';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_CFG_FLIGHTID';
 
     this.fieldnames = ['flight_id'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_cfg_flightid.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_cfg_flightid.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg_flightid.prototype.pack = function(mav) {
-    var orderedfields = [ this.flight_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flight_id]));
 }
-
 
 /* 
 Request messages.
@@ -16953,32 +14403,24 @@ Request messages.
                 ReqMessageId              : Message ID to request. Supports any message in this 10000-10099 range (uint32_t)
 
 */
-    mavlink20.messages.uavionix_adsb_get = function( ...moreargs ) {
-    [ this.ReqMessageId ] = moreargs;
+mavlink20.messages.uavionix_adsb_get = function(ReqMessageId) {
 
-    this._format = '<I';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_GET;
+    this.format = '<I';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_GET;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [0];
     this.crc_extra = 193;
-    this._name = 'UAVIONIX_ADSB_GET';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_GET';
 
     this.fieldnames = ['ReqMessageId'];
 
-}
 
-mavlink20.messages.uavionix_adsb_get.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_get.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_get.prototype.pack = function(mav) {
-    var orderedfields = [ this.ReqMessageId];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ReqMessageId]));
 }
-
 
 /* 
 Control message with all data sent in UCP control message.
@@ -16991,32 +14433,24 @@ Control message with all data sent in UCP control message.
                 x_bit                     : X-Bit enable (military transponders only) (uint8_t)
 
 */
-    mavlink20.messages.uavionix_adsb_out_control = function( ...moreargs ) {
-    [ this.state , this.baroAltMSL , this.squawk , this.emergencyStatus , this.flight_id , this.x_bit ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_control = function(state, baroAltMSL, squawk, emergencyStatus, flight_id, x_bit) {
 
-    this._format = '<iHBB8sB';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CONTROL;
+    this.format = '<iHBB8sB';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_CONTROL;
     this.order_map = [2, 0, 1, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 8, 0];
     this.crc_extra = 71;
-    this._name = 'UAVIONIX_ADSB_OUT_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_CONTROL';
 
     this.fieldnames = ['state', 'baroAltMSL', 'squawk', 'emergencyStatus', 'flight_id', 'x_bit'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_control.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.baroAltMSL, this.squawk, this.state, this.emergencyStatus, this.flight_id, this.x_bit];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.baroAltMSL, this.squawk, this.state, this.emergencyStatus, this.flight_id, this.x_bit]));
 }
-
 
 /* 
 Status message with information from UCP Heartbeat and Status
@@ -17030,32 +14464,24 @@ messages.
                 flight_id                 : Flight Identification: 8 ASCII characters, '0' through '9', 'A' through 'Z' or space. Spaces (0x20) used as a trailing pad character, or when call sign is unavailable. (char)
 
 */
-    mavlink20.messages.uavionix_adsb_out_status = function( ...moreargs ) {
-    [ this.state , this.squawk , this.NIC_NACp , this.boardTemp , this.fault , this.flight_id ] = moreargs;
+mavlink20.messages.uavionix_adsb_out_status = function(state, squawk, NIC_NACp, boardTemp, fault, flight_id) {
 
-    this._format = '<HBBBB8s';
-    this._id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS;
+    this.format = '<HBBBB8s';
+    this.id = mavlink20.MAVLINK_MSG_ID_UAVIONIX_ADSB_OUT_STATUS;
     this.order_map = [1, 0, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 8];
     this.crc_extra = 240;
-    this._name = 'UAVIONIX_ADSB_OUT_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'UAVIONIX_ADSB_OUT_STATUS';
 
     this.fieldnames = ['state', 'squawk', 'NIC_NACp', 'boardTemp', 'fault', 'flight_id'];
 
-}
 
-mavlink20.messages.uavionix_adsb_out_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.uavionix_adsb_out_status.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.squawk, this.state, this.NIC_NACp, this.boardTemp, this.fault, this.flight_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.squawk, this.state, this.NIC_NACp, this.boardTemp, this.fault, this.flight_id]));
 }
-
 
 /* 
 Composite EFI and Governor data from Loweheiser equipment.  This
@@ -17087,32 +14513,24 @@ received from a governor attached to that EFI unit.
                 efi_status                : EFI status. (uint16_t)
 
 */
-    mavlink20.messages.loweheiser_gov_efi = function( ...moreargs ) {
-    [ this.volt_batt , this.curr_batt , this.curr_gen , this.curr_rot , this.fuel_level , this.throttle , this.runtime , this.until_maintenance , this.rectifier_temp , this.generator_temp , this.efi_batt , this.efi_rpm , this.efi_pw , this.efi_fuel_flow , this.efi_fuel_consumed , this.efi_baro , this.efi_mat , this.efi_clt , this.efi_tps , this.efi_exhaust_gas_temperature , this.efi_index , this.generator_status , this.efi_status ] = moreargs;
+mavlink20.messages.loweheiser_gov_efi = function(volt_batt, curr_batt, curr_gen, curr_rot, fuel_level, throttle, runtime, until_maintenance, rectifier_temp, generator_temp, efi_batt, efi_rpm, efi_pw, efi_fuel_flow, efi_fuel_consumed, efi_baro, efi_mat, efi_clt, efi_tps, efi_exhaust_gas_temperature, efi_index, generator_status, efi_status) {
 
-    this._format = '<ffffffIiffffffffffffHHB';
-    this._id = mavlink20.MAVLINK_MSG_ID_LOWEHEISER_GOV_EFI;
+    this.format = '<ffffffIiffffffffffffHHB';
+    this.id = mavlink20.MAVLINK_MSG_ID_LOWEHEISER_GOV_EFI;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 20, 21];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 195;
-    this._name = 'LOWEHEISER_GOV_EFI';
-
-    this._instance_field = 'efi_index';
-    this._instance_offset = 84;
+    this.name = 'LOWEHEISER_GOV_EFI';
 
     this.fieldnames = ['volt_batt', 'curr_batt', 'curr_gen', 'curr_rot', 'fuel_level', 'throttle', 'runtime', 'until_maintenance', 'rectifier_temp', 'generator_temp', 'efi_batt', 'efi_rpm', 'efi_pw', 'efi_fuel_flow', 'efi_fuel_consumed', 'efi_baro', 'efi_mat', 'efi_clt', 'efi_tps', 'efi_exhaust_gas_temperature', 'efi_index', 'generator_status', 'efi_status'];
 
-}
 
-mavlink20.messages.loweheiser_gov_efi.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.loweheiser_gov_efi.prototype = new mavlink20.message();
 mavlink20.messages.loweheiser_gov_efi.prototype.pack = function(mav) {
-    var orderedfields = [ this.volt_batt, this.curr_batt, this.curr_gen, this.curr_rot, this.fuel_level, this.throttle, this.runtime, this.until_maintenance, this.rectifier_temp, this.generator_temp, this.efi_batt, this.efi_rpm, this.efi_pw, this.efi_fuel_flow, this.efi_fuel_consumed, this.efi_baro, this.efi_mat, this.efi_clt, this.efi_tps, this.efi_exhaust_gas_temperature, this.generator_status, this.efi_status, this.efi_index];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.volt_batt, this.curr_batt, this.curr_gen, this.curr_rot, this.fuel_level, this.throttle, this.runtime, this.until_maintenance, this.rectifier_temp, this.generator_temp, this.efi_batt, this.efi_rpm, this.efi_pw, this.efi_fuel_flow, this.efi_fuel_consumed, this.efi_baro, this.efi_mat, this.efi_clt, this.efi_tps, this.efi_exhaust_gas_temperature, this.generator_status, this.efi_status, this.efi_index]));
 }
-
 
 /* 
 Message reporting the current status of a gimbal device. This message
@@ -17131,32 +14549,24 @@ rate (e.g. 4 Hz). For higher rates it should be emitted with a target.
                 failure_flags             : Failure flags (0 for no failure). (uint16_t)
 
 */
-    mavlink20.messages.storm32_gimbal_device_status = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.time_boot_ms , this.flags , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z , this.yaw_absolute , this.failure_flags ] = moreargs;
+mavlink20.messages.storm32_gimbal_device_status = function(target_system, target_component, time_boot_ms, flags, q, angular_velocity_x, angular_velocity_y, angular_velocity_z, yaw_absolute, failure_flags) {
 
-    this._format = '<I4fffffHHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_DEVICE_STATUS;
+    this.format = '<I4fffffHHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_DEVICE_STATUS;
     this.order_map = [8, 9, 0, 6, 1, 2, 3, 4, 5, 7];
-    this.len_map = [1, 4, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 4, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 186;
-    this._name = 'STORM32_GIMBAL_DEVICE_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'STORM32_GIMBAL_DEVICE_STATUS';
 
     this.fieldnames = ['target_system', 'target_component', 'time_boot_ms', 'flags', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z', 'yaw_absolute', 'failure_flags'];
 
-}
 
-mavlink20.messages.storm32_gimbal_device_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_device_status.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_device_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.yaw_absolute, this.flags, this.failure_flags, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.yaw_absolute, this.flags, this.failure_flags, this.target_system, this.target_component]));
 }
-
 
 /* 
 Message to a gimbal device to control its attitude. This message is to
@@ -17172,32 +14582,24 @@ can be set to NaN according to use case.
                 angular_velocity_z        : Z component of angular velocity (positive: pan to the right, the frame is determined by the STORM32_GIMBAL_DEVICE_FLAGS_YAW_ABSOLUTE flag, NaN to be ignored). (float)
 
 */
-    mavlink20.messages.storm32_gimbal_device_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.flags , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z ] = moreargs;
+mavlink20.messages.storm32_gimbal_device_control = function(target_system, target_component, flags, q, angular_velocity_x, angular_velocity_y, angular_velocity_z) {
 
-    this._format = '<4ffffHBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_DEVICE_CONTROL;
+    this.format = '<4ffffHBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_DEVICE_CONTROL;
     this.order_map = [5, 6, 4, 0, 1, 2, 3];
-    this.len_map = [4, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [4, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 69;
-    this._name = 'STORM32_GIMBAL_DEVICE_CONTROL';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'STORM32_GIMBAL_DEVICE_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'flags', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z'];
 
-}
 
-mavlink20.messages.storm32_gimbal_device_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_device_control.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_device_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
 }
-
 
 /* 
 Information about a gimbal manager. This message should be requested
@@ -17217,32 +14619,24 @@ STORM32_GIMBAL_DEVICE_INFORMATION should be requested.
                 yaw_max                   : Hardware maximum yaw/pan angle (positive: pan to the right, relative to the vehicle/gimbal base, NaN if unknown). (float)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_information = function( ...moreargs ) {
-    [ this.gimbal_id , this.device_cap_flags , this.manager_cap_flags , this.roll_min , this.roll_max , this.pitch_min , this.pitch_max , this.yaw_min , this.yaw_max ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_information = function(gimbal_id, device_cap_flags, manager_cap_flags, roll_min, roll_max, pitch_min, pitch_max, yaw_min, yaw_max) {
 
-    this._format = '<IIffffffB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_INFORMATION;
+    this.format = '<IIffffffB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_INFORMATION;
     this.order_map = [8, 0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 208;
-    this._name = 'STORM32_GIMBAL_MANAGER_INFORMATION';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 32;
+    this.name = 'STORM32_GIMBAL_MANAGER_INFORMATION';
 
     this.fieldnames = ['gimbal_id', 'device_cap_flags', 'manager_cap_flags', 'roll_min', 'roll_max', 'pitch_min', 'pitch_max', 'yaw_min', 'yaw_max'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_information.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.device_cap_flags, this.manager_cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_id];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.device_cap_flags, this.manager_cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_id]));
 }
-
 
 /* 
 Message reporting the current status of a gimbal manager. This message
@@ -17256,32 +14650,24 @@ momentarily to e.g. 5 Hz for a period of 1 sec after a change).
                 profile                   : Profile currently applied (0 = default). (uint8_t)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_status = function( ...moreargs ) {
-    [ this.gimbal_id , this.supervisor , this.device_flags , this.manager_flags , this.profile ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_status = function(gimbal_id, supervisor, device_flags, manager_flags, profile) {
 
-    this._format = '<HHBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_STATUS;
+    this.format = '<HHBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_STATUS;
     this.order_map = [2, 3, 0, 1, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 183;
-    this._name = 'STORM32_GIMBAL_MANAGER_STATUS';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 4;
+    this.name = 'STORM32_GIMBAL_MANAGER_STATUS';
 
     this.fieldnames = ['gimbal_id', 'supervisor', 'device_flags', 'manager_flags', 'profile'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_status.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.device_flags, this.manager_flags, this.gimbal_id, this.supervisor, this.profile];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.device_flags, this.manager_flags, this.gimbal_id, this.supervisor, this.profile]));
 }
-
 
 /* 
 Message to a gimbal manager to control the gimbal attitude. Angles and
@@ -17300,32 +14686,24 @@ never to react to this message.
                 angular_velocity_z        : Z component of angular velocity (positive: pan to the right, the frame is determined by the STORM32_GIMBAL_DEVICE_FLAGS_YAW_ABSOLUTE flag, NaN to be ignored). (float)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_control = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.gimbal_id , this.client , this.device_flags , this.manager_flags , this.q , this.angular_velocity_x , this.angular_velocity_y , this.angular_velocity_z ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_control = function(target_system, target_component, gimbal_id, client, device_flags, manager_flags, q, angular_velocity_x, angular_velocity_y, angular_velocity_z) {
 
-    this._format = '<4ffffHHBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CONTROL;
+    this.format = '<4ffffHHBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CONTROL;
     this.order_map = [6, 7, 8, 9, 4, 5, 0, 1, 2, 3];
-    this.len_map = [4, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [4, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 99;
-    this._name = 'STORM32_GIMBAL_MANAGER_CONTROL';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 34;
+    this.name = 'STORM32_GIMBAL_MANAGER_CONTROL';
 
     this.fieldnames = ['target_system', 'target_component', 'gimbal_id', 'client', 'device_flags', 'manager_flags', 'q', 'angular_velocity_x', 'angular_velocity_y', 'angular_velocity_z'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_control.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_control.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_control.prototype.pack = function(mav) {
-    var orderedfields = [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
-
 
 /* 
 Message to a gimbal manager to control the gimbal tilt and pan angles.
@@ -17344,32 +14722,24 @@ device is never to react to this message.
                 yaw_rate                  : Yaw/pan angular rate (positive: pan to the right, the frame is determined by the STORM32_GIMBAL_DEVICE_FLAGS_YAW_ABSOLUTE flag, NaN to be ignored). (float)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_control_pitchyaw = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.gimbal_id , this.client , this.device_flags , this.manager_flags , this.pitch , this.yaw , this.pitch_rate , this.yaw_rate ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_control_pitchyaw = function(target_system, target_component, gimbal_id, client, device_flags, manager_flags, pitch, yaw, pitch_rate, yaw_rate) {
 
-    this._format = '<ffffHHBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CONTROL_PITCHYAW;
+    this.format = '<ffffHHBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CONTROL_PITCHYAW;
     this.order_map = [6, 7, 8, 9, 4, 5, 0, 1, 2, 3];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 129;
-    this._name = 'STORM32_GIMBAL_MANAGER_CONTROL_PITCHYAW';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 22;
+    this.name = 'STORM32_GIMBAL_MANAGER_CONTROL_PITCHYAW';
 
     this.fieldnames = ['target_system', 'target_component', 'gimbal_id', 'client', 'device_flags', 'manager_flags', 'pitch', 'yaw', 'pitch_rate', 'yaw_rate'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_control_pitchyaw.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_control_pitchyaw.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_control_pitchyaw.prototype.pack = function(mav) {
-    var orderedfields = [ this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
-
 
 /* 
 Message to a gimbal manager to correct the gimbal roll angle. This
@@ -17383,32 +14753,24 @@ operation. A gimbal device is never to react to this message.
                 roll                      : Roll angle (positive to roll to the right). (float)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_correct_roll = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.gimbal_id , this.client , this.roll ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_correct_roll = function(target_system, target_component, gimbal_id, client, roll) {
 
-    this._format = '<fBBBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CORRECT_ROLL;
+    this.format = '<fBBBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_CORRECT_ROLL;
     this.order_map = [1, 2, 3, 4, 0];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 134;
-    this._name = 'STORM32_GIMBAL_MANAGER_CORRECT_ROLL';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 6;
+    this.name = 'STORM32_GIMBAL_MANAGER_CORRECT_ROLL';
 
     this.fieldnames = ['target_system', 'target_component', 'gimbal_id', 'client', 'roll'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_correct_roll.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_correct_roll.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_correct_roll.prototype.pack = function(mav) {
-    var orderedfields = [ this.roll, this.target_system, this.target_component, this.gimbal_id, this.client];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
-
 
 /* 
 Message to set a gimbal manager profile. A gimbal device is never to
@@ -17425,32 +14787,24 @@ STORM32_GIMBAL_MANAGER_STATUS message.
                 timeouts                  : Timeouts for custom profile (0 = infinite, in uints of 100 ms). (uint8_t)
 
 */
-    mavlink20.messages.storm32_gimbal_manager_profile = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.gimbal_id , this.profile , this.priorities , this.profile_flags , this.rc_timeout , this.timeouts ] = moreargs;
+mavlink20.messages.storm32_gimbal_manager_profile = function(target_system, target_component, gimbal_id, profile, priorities, profile_flags, rc_timeout, timeouts) {
 
-    this._format = '<BBBB8sBB8s';
-    this._id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_PROFILE;
+    this.format = '<BBBB8sBB8s';
+    this.id = mavlink20.MAVLINK_MSG_ID_STORM32_GIMBAL_MANAGER_PROFILE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7];
-    this.len_map = [1, 1, 1, 1, 8, 1, 1, 8];
-    this.array_len_map = [0, 0, 0, 0, 8, 0, 0, 8];
     this.crc_extra = 78;
-    this._name = 'STORM32_GIMBAL_MANAGER_PROFILE';
-
-    this._instance_field = 'gimbal_id';
-    this._instance_offset = 2;
+    this.name = 'STORM32_GIMBAL_MANAGER_PROFILE';
 
     this.fieldnames = ['target_system', 'target_component', 'gimbal_id', 'profile', 'priorities', 'profile_flags', 'rc_timeout', 'timeouts'];
 
-}
 
-mavlink20.messages.storm32_gimbal_manager_profile.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.storm32_gimbal_manager_profile.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_profile.prototype.pack = function(mav) {
-    var orderedfields = [ this.target_system, this.target_component, this.gimbal_id, this.profile, this.priorities, this.profile_flags, this.rc_timeout, this.timeouts];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.gimbal_id, this.profile, this.priorities, this.profile_flags, this.rc_timeout, this.timeouts]));
 }
-
 
 /* 
 Information about the shot operation.
@@ -17459,32 +14813,24 @@ Information about the shot operation.
                 shot_state                : Current state in the shot. States are specific to the selected shot mode. (uint16_t)
 
 */
-    mavlink20.messages.qshot_status = function( ...moreargs ) {
-    [ this.mode , this.shot_state ] = moreargs;
+mavlink20.messages.qshot_status = function(mode, shot_state) {
 
-    this._format = '<HH';
-    this._id = mavlink20.MAVLINK_MSG_ID_QSHOT_STATUS;
+    this.format = '<HH';
+    this.id = mavlink20.MAVLINK_MSG_ID_QSHOT_STATUS;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [0, 0];
     this.crc_extra = 202;
-    this._name = 'QSHOT_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'QSHOT_STATUS';
 
     this.fieldnames = ['mode', 'shot_state'];
 
-}
 
-mavlink20.messages.qshot_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.qshot_status.prototype = new mavlink20.message();
 mavlink20.messages.qshot_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.mode, this.shot_state];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mode, this.shot_state]));
 }
-
 
 /* 
 Message reporting the status of the prearm checks. The flags are
@@ -17496,32 +14842,24 @@ component specific.
                 fail_flags                : Currently not passed prearm checks. 0 means all checks have been passed. (uint32_t)
 
 */
-    mavlink20.messages.component_prearm_status = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.enabled_flags , this.fail_flags ] = moreargs;
+mavlink20.messages.component_prearm_status = function(target_system, target_component, enabled_flags, fail_flags) {
 
-    this._format = '<IIBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_COMPONENT_PREARM_STATUS;
+    this.format = '<IIBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_COMPONENT_PREARM_STATUS;
     this.order_map = [2, 3, 0, 1];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 20;
-    this._name = 'COMPONENT_PREARM_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'COMPONENT_PREARM_STATUS';
 
     this.fieldnames = ['target_system', 'target_component', 'enabled_flags', 'fail_flags'];
 
-}
 
-mavlink20.messages.component_prearm_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.component_prearm_status.prototype = new mavlink20.message();
 mavlink20.messages.component_prearm_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.enabled_flags, this.fail_flags, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.enabled_flags, this.fail_flags, this.target_system, this.target_component]));
 }
-
 
 /* 
 AVSS PRS system status.
@@ -17533,32 +14871,24 @@ AVSS PRS system status.
                 charge_status             : PRS battery charge statuses (uint8_t)
 
 */
-    mavlink20.messages.avss_prs_sys_status = function( ...moreargs ) {
-    [ this.time_boot_ms , this.error_status , this.battery_status , this.arm_status , this.charge_status ] = moreargs;
+mavlink20.messages.avss_prs_sys_status = function(time_boot_ms, error_status, battery_status, arm_status, charge_status) {
 
-    this._format = '<IIIBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_AVSS_PRS_SYS_STATUS;
+    this.format = '<IIIBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_AVSS_PRS_SYS_STATUS;
     this.order_map = [0, 1, 2, 3, 4];
-    this.len_map = [1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0];
     this.crc_extra = 220;
-    this._name = 'AVSS_PRS_SYS_STATUS';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AVSS_PRS_SYS_STATUS';
 
     this.fieldnames = ['time_boot_ms', 'error_status', 'battery_status', 'arm_status', 'charge_status'];
 
-}
 
-mavlink20.messages.avss_prs_sys_status.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.avss_prs_sys_status.prototype = new mavlink20.message();
 mavlink20.messages.avss_prs_sys_status.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.error_status, this.battery_status, this.arm_status, this.charge_status];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.error_status, this.battery_status, this.arm_status, this.charge_status]));
 }
-
 
 /* 
 Drone position.
@@ -17571,32 +14901,24 @@ Drone position.
                 barometer_alt             : This altitude is measured by a barometer (float)
 
 */
-    mavlink20.messages.avss_drone_position = function( ...moreargs ) {
-    [ this.time_boot_ms , this.lat , this.lon , this.alt , this.ground_alt , this.barometer_alt ] = moreargs;
+mavlink20.messages.avss_drone_position = function(time_boot_ms, lat, lon, alt, ground_alt, barometer_alt) {
 
-    this._format = '<Iiiiff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_POSITION;
+    this.format = '<Iiiiff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_POSITION;
     this.order_map = [0, 1, 2, 3, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0];
     this.crc_extra = 245;
-    this._name = 'AVSS_DRONE_POSITION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AVSS_DRONE_POSITION';
 
     this.fieldnames = ['time_boot_ms', 'lat', 'lon', 'alt', 'ground_alt', 'barometer_alt'];
 
-}
 
-mavlink20.messages.avss_drone_position.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.avss_drone_position.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_position.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.lat, this.lon, this.alt, this.ground_alt, this.barometer_alt];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.ground_alt, this.barometer_alt]));
 }
-
 
 /* 
 Drone IMU data. Quaternion order is w, x, y, z and a zero rotation
@@ -17615,32 +14937,24 @@ would be expressed as (1 0 0 0).
                 zgyro                     : Angular speed around Z axis (float)
 
 */
-    mavlink20.messages.avss_drone_imu = function( ...moreargs ) {
-    [ this.time_boot_ms , this.q1 , this.q2 , this.q3 , this.q4 , this.xacc , this.yacc , this.zacc , this.xgyro , this.ygyro , this.zgyro ] = moreargs;
+mavlink20.messages.avss_drone_imu = function(time_boot_ms, q1, q2, q3, q4, xacc, yacc, zacc, xgyro, ygyro, zgyro) {
 
-    this._format = '<Iffffffffff';
-    this._id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_IMU;
+    this.format = '<Iffffffffff';
+    this.id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 101;
-    this._name = 'AVSS_DRONE_IMU';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AVSS_DRONE_IMU';
 
     this.fieldnames = ['time_boot_ms', 'q1', 'q2', 'q3', 'q4', 'xacc', 'yacc', 'zacc', 'xgyro', 'ygyro', 'zgyro'];
 
-}
 
-mavlink20.messages.avss_drone_imu.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.avss_drone_imu.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_imu.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro]));
 }
-
 
 /* 
 Drone operation mode.
@@ -17650,32 +14964,24 @@ Drone operation mode.
                 horsefly_operation_mode        : horsefly operation mode (uint8_t)
 
 */
-    mavlink20.messages.avss_drone_operation_mode = function( ...moreargs ) {
-    [ this.time_boot_ms , this.M300_operation_mode , this.horsefly_operation_mode ] = moreargs;
+mavlink20.messages.avss_drone_operation_mode = function(time_boot_ms, M300_operation_mode, horsefly_operation_mode) {
 
-    this._format = '<IBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_OPERATION_MODE;
+    this.format = '<IBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_AVSS_DRONE_OPERATION_MODE;
     this.order_map = [0, 1, 2];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 45;
-    this._name = 'AVSS_DRONE_OPERATION_MODE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AVSS_DRONE_OPERATION_MODE';
 
     this.fieldnames = ['time_boot_ms', 'M300_operation_mode', 'horsefly_operation_mode'];
 
-}
 
-mavlink20.messages.avss_drone_operation_mode.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.avss_drone_operation_mode.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_operation_mode.prototype.pack = function(mav) {
-    var orderedfields = [ this.time_boot_ms, this.M300_operation_mode, this.horsefly_operation_mode];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.M300_operation_mode, this.horsefly_operation_mode]));
 }
-
 
 /* 
 Raw RC Data
@@ -17683,32 +14989,24 @@ Raw RC Data
                 rc_raw                    :  (uint8_t)
 
 */
-    mavlink20.messages.cubepilot_raw_rc = function( ...moreargs ) {
-    [ this.rc_raw ] = moreargs;
+mavlink20.messages.cubepilot_raw_rc = function(rc_raw) {
 
-    this._format = '<32s';
-    this._id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_RAW_RC;
+    this.format = '<32s';
+    this.id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_RAW_RC;
     this.order_map = [0];
-    this.len_map = [32];
-    this.array_len_map = [32];
     this.crc_extra = 246;
-    this._name = 'CUBEPILOT_RAW_RC';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CUBEPILOT_RAW_RC';
 
     this.fieldnames = ['rc_raw'];
 
-}
 
-mavlink20.messages.cubepilot_raw_rc.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.cubepilot_raw_rc.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_raw_rc.prototype.pack = function(mav) {
-    var orderedfields = [ this.rc_raw];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rc_raw]));
 }
-
 
 /* 
 Information about video stream
@@ -17723,32 +15021,24 @@ Information about video stream
                 uri                       : Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to). (char)
 
 */
-    mavlink20.messages.herelink_video_stream_information = function( ...moreargs ) {
-    [ this.camera_id , this.status , this.framerate , this.resolution_h , this.resolution_v , this.bitrate , this.rotation , this.uri ] = moreargs;
+mavlink20.messages.herelink_video_stream_information = function(camera_id, status, framerate, resolution_h, resolution_v, bitrate, rotation, uri) {
 
-    this._format = '<fIHHHBB230s';
-    this._id = mavlink20.MAVLINK_MSG_ID_HERELINK_VIDEO_STREAM_INFORMATION;
+    this.format = '<fIHHHBB230s';
+    this.id = mavlink20.MAVLINK_MSG_ID_HERELINK_VIDEO_STREAM_INFORMATION;
     this.order_map = [5, 6, 0, 2, 3, 1, 4, 7];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0, 230];
     this.crc_extra = 181;
-    this._name = 'HERELINK_VIDEO_STREAM_INFORMATION';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HERELINK_VIDEO_STREAM_INFORMATION';
 
     this.fieldnames = ['camera_id', 'status', 'framerate', 'resolution_h', 'resolution_v', 'bitrate', 'rotation', 'uri'];
 
-}
 
-mavlink20.messages.herelink_video_stream_information.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.herelink_video_stream_information.prototype = new mavlink20.message();
 mavlink20.messages.herelink_video_stream_information.prototype.pack = function(mav) {
-    var orderedfields = [ this.framerate, this.bitrate, this.resolution_h, this.resolution_v, this.rotation, this.camera_id, this.status, this.uri];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.resolution_h, this.resolution_v, this.rotation, this.camera_id, this.status, this.uri]));
 }
-
 
 /* 
 Herelink Telemetry
@@ -17762,32 +15052,24 @@ Herelink Telemetry
                 board_temp                :  (int16_t)
 
 */
-    mavlink20.messages.herelink_telem = function( ...moreargs ) {
-    [ this.rssi , this.snr , this.rf_freq , this.link_bw , this.link_rate , this.cpu_temp , this.board_temp ] = moreargs;
+mavlink20.messages.herelink_telem = function(rssi, snr, rf_freq, link_bw, link_rate, cpu_temp, board_temp) {
 
-    this._format = '<IIIhhhB';
-    this._id = mavlink20.MAVLINK_MSG_ID_HERELINK_TELEM;
+    this.format = '<IIIhhhB';
+    this.id = mavlink20.MAVLINK_MSG_ID_HERELINK_TELEM;
     this.order_map = [6, 3, 0, 1, 2, 4, 5];
-    this.len_map = [1, 1, 1, 1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0, 0, 0, 0];
     this.crc_extra = 62;
-    this._name = 'HERELINK_TELEM';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'HERELINK_TELEM';
 
     this.fieldnames = ['rssi', 'snr', 'rf_freq', 'link_bw', 'link_rate', 'cpu_temp', 'board_temp'];
 
-}
 
-mavlink20.messages.herelink_telem.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.herelink_telem.prototype = new mavlink20.message();
 mavlink20.messages.herelink_telem.prototype.pack = function(mav) {
-    var orderedfields = [ this.rf_freq, this.link_bw, this.link_rate, this.snr, this.cpu_temp, this.board_temp, this.rssi];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rf_freq, this.link_bw, this.link_rate, this.snr, this.cpu_temp, this.board_temp, this.rssi]));
 }
-
 
 /* 
 Start firmware update with encapsulated data.
@@ -17798,32 +15080,24 @@ Start firmware update with encapsulated data.
                 crc                       : FW CRC. (uint32_t)
 
 */
-    mavlink20.messages.cubepilot_firmware_update_start = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.size , this.crc ] = moreargs;
+mavlink20.messages.cubepilot_firmware_update_start = function(target_system, target_component, size, crc) {
 
-    this._format = '<IIBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_FIRMWARE_UPDATE_START;
+    this.format = '<IIBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_FIRMWARE_UPDATE_START;
     this.order_map = [2, 3, 0, 1];
-    this.len_map = [1, 1, 1, 1];
-    this.array_len_map = [0, 0, 0, 0];
     this.crc_extra = 240;
-    this._name = 'CUBEPILOT_FIRMWARE_UPDATE_START';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CUBEPILOT_FIRMWARE_UPDATE_START';
 
     this.fieldnames = ['target_system', 'target_component', 'size', 'crc'];
 
-}
 
-mavlink20.messages.cubepilot_firmware_update_start.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.cubepilot_firmware_update_start.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_firmware_update_start.prototype.pack = function(mav) {
-    var orderedfields = [ this.size, this.crc, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.size, this.crc, this.target_system, this.target_component]));
 }
-
 
 /* 
 offset response to encapsulated data.
@@ -17833,32 +15107,24 @@ offset response to encapsulated data.
                 offset                    : FW Offset. (uint32_t)
 
 */
-    mavlink20.messages.cubepilot_firmware_update_resp = function( ...moreargs ) {
-    [ this.target_system , this.target_component , this.offset ] = moreargs;
+mavlink20.messages.cubepilot_firmware_update_resp = function(target_system, target_component, offset) {
 
-    this._format = '<IBB';
-    this._id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_FIRMWARE_UPDATE_RESP;
+    this.format = '<IBB';
+    this.id = mavlink20.MAVLINK_MSG_ID_CUBEPILOT_FIRMWARE_UPDATE_RESP;
     this.order_map = [1, 2, 0];
-    this.len_map = [1, 1, 1];
-    this.array_len_map = [0, 0, 0];
     this.crc_extra = 152;
-    this._name = 'CUBEPILOT_FIRMWARE_UPDATE_RESP';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'CUBEPILOT_FIRMWARE_UPDATE_RESP';
 
     this.fieldnames = ['target_system', 'target_component', 'offset'];
 
-}
 
-mavlink20.messages.cubepilot_firmware_update_resp.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.cubepilot_firmware_update_resp.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_firmware_update_resp.prototype.pack = function(mav) {
-    var orderedfields = [ this.offset, this.target_system, this.target_component];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.offset, this.target_system, this.target_component]));
 }
-
 
 /* 
 Authorization package
@@ -17867,32 +15133,24 @@ Authorization package
                 password                  : Password (char)
 
 */
-    mavlink20.messages.airlink_auth = function( ...moreargs ) {
-    [ this.login , this.password ] = moreargs;
+mavlink20.messages.airlink_auth = function(login, password) {
 
-    this._format = '<50s50s';
-    this._id = mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH;
+    this.format = '<50s50s';
+    this.id = mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH;
     this.order_map = [0, 1];
-    this.len_map = [1, 1];
-    this.array_len_map = [50, 50];
     this.crc_extra = 13;
-    this._name = 'AIRLINK_AUTH';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AIRLINK_AUTH';
 
     this.fieldnames = ['login', 'password'];
 
-}
 
-mavlink20.messages.airlink_auth.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.airlink_auth.prototype = new mavlink20.message();
 mavlink20.messages.airlink_auth.prototype.pack = function(mav) {
-    var orderedfields = [ this.login, this.password];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.login, this.password]));
 }
-
 
 /* 
 Response to the authorization request
@@ -17900,30 +15158,23 @@ Response to the authorization request
                 resp_type                 : Response type (uint8_t)
 
 */
-    mavlink20.messages.airlink_auth_response = function( ...moreargs ) {
-    [ this.resp_type ] = moreargs;
+mavlink20.messages.airlink_auth_response = function(resp_type) {
 
-    this._format = '<B';
-    this._id = mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH_RESPONSE;
+    this.format = '<B';
+    this.id = mavlink20.MAVLINK_MSG_ID_AIRLINK_AUTH_RESPONSE;
     this.order_map = [0];
-    this.len_map = [1];
-    this.array_len_map = [0];
     this.crc_extra = 239;
-    this._name = 'AIRLINK_AUTH_RESPONSE';
-
-    this._instance_field = undefined;
-    this._instance_offset = -1;
+    this.name = 'AIRLINK_AUTH_RESPONSE';
 
     this.fieldnames = ['resp_type'];
 
-}
 
-mavlink20.messages.airlink_auth_response.prototype = new mavlink20.message;
+    this.set(arguments);
+
+}
+        mavlink20.messages.airlink_auth_response.prototype = new mavlink20.message();
 mavlink20.messages.airlink_auth_response.prototype.pack = function(mav) {
-    var orderedfields = [ this.resp_type];
-    var j = jspack.Pack(this._format, orderedfields);
-    if (j === false ) throw new Error("jspack unable to handle this packet");
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, j );
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.resp_type]));
 }
 
 
@@ -18271,36 +15522,20 @@ mavlink20.map = {
 
 // Special mavlink message to capture malformed data packets for debugging
 mavlink20.messages.bad_data = function(data, reason) {
-    this._id = mavlink20.MAVLINK_MSG_ID_BAD_DATA;
-    this._data = data;
-    this._reason = reason;
-    this._msgbuf = data;
+    this.id = mavlink20.MAVLINK_MSG_ID_BAD_DATA;
+    this.data = data;
+    this.reason = reason;
+    this.msgbuf = data;
 }
-mavlink20.messages.bad_data.prototype = new mavlink20.message;
-
-//  MAVLink signing state class
-MAVLinkSigning = function MAVLinkSigning(object){ 
-        this.secret_key = new Buffer.from([]) ; //new Buffer.from([ 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42 ]) // secret key must be a Buffer obj of 32 length 
-        this.timestamp = 1 
-        this.link_id = 0 
-        this.sign_outgoing = false // todo false this 
-        this.allow_unsigned_callback = undefined 
-        this.stream_timestamps = {} 
-        this.sig_count = 0 
-        this.badsig_count = 0 
-        this.goodsig_count = 0 
-        this.unsigned_count = 0 
-        this.reject_count = 0 
-} 
 
 /* MAVLink protocol handling class */
-MAVLink20Processor = function(logger, srcSystem, srcComponent) {
+export var MAVLink20Processor = function(logger, srcSystem, srcComponent) {
 
     this.logger = logger;
 
     this.seq = 0;
-    this.buf = new Buffer.from([]);
-    this.bufInError = new Buffer.from([]);
+    this.buf = new Uint8Array([]);
+    this.bufInError = new Uint8Array([]);
    
     this.srcSystem = (typeof srcSystem === 'undefined') ? 0 : srcSystem;
     this.srcComponent =  (typeof srcComponent === 'undefined') ? 0 : srcComponent;
@@ -18320,13 +15555,11 @@ MAVLink20Processor = function(logger, srcSystem, srcComponent) {
     this.total_bytes_received = 0;
     this.total_receive_errors = 0;
     this.startup_time = Date.now();
-
-    // optional , but when used we store signing state in this object: 
-    this.signing = new MAVLinkSigning();
+    
 }
 
 // Implements EventEmitter
-util.inherits(MAVLink20Processor, events.EventEmitter);
+//util.inherits(MAVLink20Processor, events.EventEmitter);
 
 // If the logger exists, this function will add a message to it.
 // Assumes the logger is a winston object.
@@ -18343,7 +15576,7 @@ MAVLink20Processor.prototype.log = function(level, message) {
 }
 
 MAVLink20Processor.prototype.send = function(mavmsg) {
-    buf = mavmsg.pack(this);
+    const buf = mavmsg.pack(this);
     this.file.write(buf);
     this.seq = (this.seq + 1) % 256;
     this.total_packets_sent +=1;
@@ -18352,14 +15585,17 @@ MAVLink20Processor.prototype.send = function(mavmsg) {
 
 // return number of bytes needed for next parsing stage
 MAVLink20Processor.prototype.bytes_needed = function() {
-    ret = this.expected_length - this.buf.length;
+    const ret = this.expected_length - this.buf.length;
     return ( ret <= 0 ) ? 1 : ret;
 }
 
 // add data to the local buffer
 MAVLink20Processor.prototype.pushBuffer = function(data) {
     if(data) {
-        this.buf = Buffer.concat([this.buf, data]);   // python calls this self.buf.extend(c) 
+        var c = new Uint8Array (this.buf.length + data.length);
+        c.set (this.buf);
+        c.set (data);
+        this.buf = c;
         this.total_bytes_received += data.length;
     }
 }
@@ -18374,32 +15610,32 @@ MAVLink20Processor.prototype.parsePrefix = function() {
         var badPrefix = this.buf[0];
         this.bufInError = this.buf.slice(0,1);
         this.buf = this.buf.slice(1);
-        this.expected_length = mavlink20.HEADER_LEN; //initially we 'expect' at least the length of the header, later parseLength corrects for this. 
-        throw new Error("Bad prefix ("+badPrefix+")");
+        this.expected_length = mavlink20.HEADER_LEN;
+
+        // TODO: enable subsequent prefix error suppression if robust_parsing is implemented
+        //if(!this.have_prefix_error) {
+        //    this.have_prefix_error = true;
+            throw new Error("Bad prefix ("+badPrefix+")");
+        //}
+
     }
+    //else if( this.buf.length >= 1 && this.buf[0] == this.protocol_marker ) {
+    //    this.have_prefix_error = false;
+    //}
 
 }
 
 // Determine the length.  Leaves buffer untouched.
-// Although the 'len' of a packet is available as of the second byte, the third byte with 'incompat_flags' lets
-//  us know if we have signing enabled, which affects the real-world length by the signature-block length of 13 bytes.
-// once successful, 'this.expected_length' is correctly set for the whole packet.
 MAVLink20Processor.prototype.parseLength = function() {
     
-    if( this.buf.length >= 3 ) { 
-        var unpacked = jspack.Unpack('BBB', this.buf.slice(0, 3)); 
-        var magic = unpacked[0]; // stx ie fd or fe etc 
-        this.expected_length = unpacked[1] + mavlink20.HEADER_LEN + 2 // length of message + header + CRC (ie non-signed length) 
-        this.incompat_flags = unpacked[2];  
-        // mavlink2 only..  in mavlink1, incompat_flags var above is actually the 'seq', but for this test its ok. 
-        if ((magic == mavlink20.PROTOCOL_MARKER_V2 ) && ( this.incompat_flags & mavlink20.MAVLINK_IFLAG_SIGNED )){ 
-            this.expected_length += mavlink20.MAVLINK_SIGNATURE_BLOCK_LEN; 
-        } 
+    if( this.buf.length >= 2 ) {
+        var unpacked = jjspack.Unpack('BB', this.buf.slice(0, 2));
+        this.expected_length = unpacked[1] + mavlink20.HEADER_LEN + 2 // length of message + header + CRC
     }
 
 }
 
-// input some data bytes, possibly returning a new message - python equiv function is called parse_char / __parse_char_legacy 
+// input some data bytes, possibly returning a new message
 MAVLink20Processor.prototype.parseChar = function(c) {
 
     var m = null;
@@ -18416,40 +15652,35 @@ MAVLink20Processor.prototype.parseChar = function(c) {
         this.log('error', e.message);
         this.total_receive_errors += 1;
         m = new mavlink20.messages.bad_data(this.bufInError, e.message);
-        this.bufInError = new Buffer.from([]);
+        this.bufInError = new Uint8Array([]);
         
     }
 
-    // emit a packet-specific message as well as a generic message, user/s can choose to use either or both of these.
     if(null != m) {
-        this.emit(m._name, m);
-        this.emit('message', m);
+        //events.emit(m.name, m); //mhefny
+        //events.emit('message', m); //mhefny
     }
 
     return m;
 
 }
 
-// continuation of python's  __parse_char_legacy 
 MAVLink20Processor.prototype.parsePayload = function() {
 
     var m = null;
 
-    // tip: this.expected_length and this.incompat_flags both already set correctly by parseLength(..) above 
-
-    // If we have enough bytes to try and read it, read it.  
-    //  shortest packet is header+checksum(2) with no payload, so we need at least that many 
-    //  but once we have a longer 'expected length' we have to read all of it. 
-    if(( this.expected_length >= mavlink20.HEADER_LEN+2) && (this.buf.length >= this.expected_length) ) { 
+    // If we have enough bytes to try and read it, read it.
+    if( this.expected_length >= 8 && this.buf.length >= this.expected_length ) {
 
         // Slice off the expected packet length, reset expectation to be to find a header.
         var mbuf = this.buf.slice(0, this.expected_length);
-
         // TODO: slicing off the buffer should depend on the error produced by the decode() function
-        // - if we find a well formed message, cut-off the expected_length 
+        // - if a message we find a well formed message, cut-off the expected_length
         // - if the message is not well formed (correct prefix by accident), cut-off 1 char only
         this.buf = this.buf.slice(this.expected_length);
-        this.expected_length = mavlink20.HEADER_LEN; // after attempting a parse, we'll next expect to find just a header. 
+        this.expected_length = 6;
+
+        // w.info("Attempting to parse packet, message candidate buffer is ["+mbuf.toByteArray()+"]");
 
         try {
             m = this.decode(mbuf);
@@ -18491,122 +15722,14 @@ MAVLink20Processor.prototype.parseBuffer = function(s) {
 
 }
 
-// from Buffer to ArrayBuffer 
-function toArrayBuffer(buf) { 
-    var ab = new ArrayBuffer(buf.length); 
-    var view = new Uint8Array(ab); 
-    for (var i = 0; i < buf.length; ++i) { 
-        view[i] = buf[i]; 
-    } 
-    return ab; 
-} 
-// and back 
-function toBuffer(ab) { 
-    var buf = Buffer.alloc(ab.byteLength); 
-    var view = new Uint8Array(ab); 
-    for (var i = 0; i < buf.length; ++i) { 
-        buf[i] = view[i]; 
-    } 
-    return buf; 
-} 
- 
-//check signature on incoming message , many of the comments in this file come from the python impl
-MAVLink20Processor.prototype.check_signature = function(msgbuf, srcSystem, srcComponent) { 
-
-        //if (isinstance(msgbuf, array.array)){ 
-        //    msgbuf = msgbuf.tostring() 
-        //} 
-        if ( Buffer.isBuffer(msgbuf) ) { 
-            msgbuf = toArrayBuffer(msgbuf); 
-        } 
- 
-        //timestamp_buf = msgbuf[-12:-6] 
-        var timestamp_buf= msgbuf.slice(-12,-6);  
- 
-        //link_id = msgbuf[-13] 
-        var link_id= new Buffer.from(msgbuf.slice(-13,-12)); // just a single byte really, but returned as a buffer 
-        link_id = link_id[0]; // get the first byte.
- 
-        //self.mav_sign_unpacker = jspack.Unpack('<IH') 
-        // (tlow, thigh) = self.mav_sign_unpacker.unpack(timestamp_buf) 
-
-        // I means unsigned 4bytes, H means unsigned 2 bytes
-        var t = jspack.Unpack('<IH',new Buffer.from(timestamp_buf))  
-        const [tlow, thigh]  = t; 
- 
-        // due to js not being able to shift numbers  more than 32, we'll use this instead.. 
-        // js stores all its numbers as a 64bit float with 53 bits of mantissa, so have room for 48 ok. 
-        function shift(number, shift) { 
-            return number * Math.pow(2, shift); 
-        } 
-        var thigh_shifted = shift(thigh,32);  
-        var timestamp = tlow + thigh_shifted 
- 
-        // see if the timestamp is acceptable 
- 
-         // we'll use a STRING containing these three things in it as a unique key eg: '0,1,1' 
-        stream_key = new Array(link_id,srcSystem,srcComponent).toString(); 
- 
-        if (stream_key in this.signing.stream_timestamps){ 
-            if (timestamp <= this.signing.stream_timestamps[stream_key]){ 
-                //# reject old timestamp 
-                //console.log('old timestamp')  
-                return false 
-            } 
-        }else{ 
-            //# a new stream has appeared. Accept the timestamp if it is at most 
-            //# one minute behind our current timestamp 
-            if (timestamp + 6000*1000 < this.signing.timestamp){ 
-                //console.log('bad new stream ', timestamp/(100.0*1000*60*60*24*365), this.signing.timestamp/(100.0*1000*60*60*24*365))  
-                return false 
-            } 
-            this.signing.stream_timestamps[stream_key] = timestamp; 
-            //console.log('new stream',this.signing.stream_timestamps)  
-        } 
- 
-         //   h = hashlib.new('sha256') 
-         //   h.update(this.signing.secret_key) 
-         //   h.update(msgbuf[:-6]) 
-        var crypto= require('crypto'); 
-        var h =  crypto.createHash('sha256'); 
- 
-        // just the last 6 of 13 available are the actual sig . ie excluding the linkid(1) and timestamp(6) 
-        var sigpart = msgbuf.slice(-6); 
-        sigpart = new Buffer.from(sigpart); 
-        // not sig part 0- end-minus-6 
-        var notsigpart = msgbuf.slice(0,-6);  
-        notsigpart = new Buffer.from(notsigpart); 
-
-        h.update(this.signing.secret_key); // secret is already a Buffer 
-        //var tmp = h.copy().digest(); 
-        h.update(notsigpart);  
-        //var tmp2 = h.copy().digest() 
-        var hashDigest = h.digest(); 
-        sig1 = hashDigest.slice(0,6) 
- 
-        //sig1 = str(h.digest())[:6] 
-        //sig2 = str(msgbuf)[-6:] 
-
-        // can't just compare sigs, need a full buffer compare like this... 
-        //if (sig1 != sigpart){  
-        if (Buffer.compare(sig1,sigpart)){  
-            //console.log('sig mismatch',sig1,sigpart)  
-            return false 
-        } 
-        //# the timestamp we next send with is the max of the received timestamp and 
-        //# our current timestamp 
-        this.signing.timestamp = Math.max(this.signing.timestamp, timestamp) 
-        return true
-} 
-
 /* decode a buffer as a MAVLink message */
 MAVLink20Processor.prototype.decode = function(msgbuf) {
 
-    var magic, incompat_flags, compat_flags, mlen, seq, srcSystem, srcComponent, unpacked, msgId, signature_len; 
+    var magic, incompat_flags, compat_flags, mlen, seq, srcSystem, srcComponent, unpacked, msgId;
 
     // decode the header
     try {
-        unpacked = jspack.Unpack('cBBBBBBHB', msgbuf.slice(0, 10));  // the H in here causes msgIDlow to takeup 2 bytes, the rest 1 
+        unpacked = jjspack.Unpack('cBBBBBBHB', msgbuf.slice(0, 10));
         magic = unpacked[0];
         mlen = unpacked[1];
         incompat_flags = unpacked[2];
@@ -18614,159 +15737,63 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         seq = unpacked[4];
         srcSystem = unpacked[5];
         srcComponent = unpacked[6];
-        var msgIDlow = ((unpacked[7] & 0xFF) << 8) | ((unpacked[7] >> 8) & 0xFF); // first-two msgid bytes 
-        var msgIDhigh = unpacked[8];   // the 3rd msgid byte 
-        msgId = msgIDlow | (msgIDhigh<<16);  // combined result. 0 - 16777215  24bit number 
+        var msgIDlow = ((unpacked[7] & 0xFF) << 8) | ((unpacked[7] >> 8) & 0xFF);
+        var msgIDhigh = unpacked[8];
+        msgId = msgIDlow | (msgIDhigh<<16);
         }
     catch(e) {
         throw new Error('Unable to unpack MAVLink header: ' + e.message);
     }
 
-    //  TODO allow full parsing of 1.0 inside the 2.0 parser, this is just a start 
-    if (magic == mavlink20.PROTOCOL_MARKER_V1){ 
-            //headerlen = 6; 
-             
-            // these two are in the same place in both v1 and v2 so no change needed: 
-            //magic = magic; 
-            //mlen = mlen; 
- 
-            // grab mavlink-v1 header position info from v2 unpacked position 
-            seq1 = incompat_flags; 
-            srcSystem1 = compat_flags; 
-            srcComponent1 = seq; 
-            msgId1 = srcSystem; 
-            // override the v1 vs v2 offsets so we get the correct data either way... 
-            seq = seq1; 
-            srcSystem = srcSystem1; 
-            srcComponent = srcComponent1; 
-            msgId = msgId1;  
-            // don't exist in mavlink1, so zero-them 
-            incompat_flags = 0; 
-            compat_flags = 0; 
-            signature_len = 0; 
-            // todo add more v1 here and don't just return 
-            return; 
-    } 
-
     if (magic.charCodeAt(0) != this.protocol_marker) {
         throw new Error("Invalid MAVLink prefix ("+magic.charCodeAt(0)+")");
     }
 
-    // is packet supposed to be signed? 
-    if ( incompat_flags & mavlink20.MAVLINK_IFLAG_SIGNED ){  
-        signature_len = mavlink20.MAVLINK_SIGNATURE_BLOCK_LEN; 
-    } else { 
-        signature_len = 0; 
-    } 
- 
-    // header's declared len compared to packets actual len 
-    var actual_len = (msgbuf.length - (mavlink20.HEADER_LEN + 2 + signature_len)); 
-    var actual_len_nosign = (msgbuf.length - (mavlink20.HEADER_LEN + 2 )); 
- 
-    if ((mlen == actual_len) && (signature_len > 0)){ 
-        var len_if_signed = mlen+signature_len; 
-        //console.log("Packet appears signed && labeled as signed, OK. msgId=" + msgId);     
- 
-    } else  if ((mlen == actual_len_nosign) && (signature_len > 0)){ 
- 
-        var len_if_signed = mlen+signature_len; 
-        throw new Error("Packet appears unsigned when labeled as signed. Got actual_len "+actual_len_nosign+" expected " + len_if_signed + ", msgId=" + msgId);     
- 
-    } else if( mlen != actual_len) {  
-          throw new Error("Invalid MAVLink message length.  Got " + (msgbuf.length - (mavlink20.HEADER_LEN + 2)) + " expected " + mlen + ", msgId=" + msgId); 
+    if( mlen != msgbuf.length - (mavlink20.HEADER_LEN + 2)) {
+        throw new Error("Invalid MAVLink message length.  Got " + (msgbuf.length - (mavlink20.HEADER_LEN + 2)) + " expected " + mlen + ", msgId=" + msgId);
+    }
 
-    }  
- 
     if( false === _.has(mavlink20.map, msgId) ) {
         throw new Error("Unknown MAVLink message ID (" + msgId + ")");
     }
-
-    // here's the common chunks of packet we want to work with below.. 
-    var headerBuf= msgbuf.slice(mavlink20.HEADER_LEN); // first10 
-    var sigBuf = msgbuf.slice(-signature_len); // last 13 or nothing 
-    var crcBuf1 = msgbuf.slice(-2); // either last-2 or last-2-prior-to-signature 
-    var crcBuf2 = msgbuf.slice(-15,-13); // either last-2 or last-2-prior-to-signature 
-    var payloadBuf = msgbuf.slice(mavlink20.HEADER_LEN, -(signature_len+2)); // the remaining bit between the header and the crc 
-    var crcCheckBuf = msgbuf.slice(1, -(signature_len+2)); // the part uses to calculate the crc - ie between the magic and signature, 
 
     // decode the payload
     // refs: (fmt, type, order_map, crc_extra) = mavlink20.map[msgId]
     var decoder = mavlink20.map[msgId];
 
     // decode the checksum
-    var receivedChecksum = undefined; 
-    if ( signature_len == 0 ) { // unsigned 
-        try { 
-            receivedChecksum = jspack.Unpack('<H', crcBuf1); 
-        } catch (e) { 
-            throw new Error("Unable to unpack MAVLink unsigned CRC: " + e.message); 
-        } 
-    } else { // signed 
-        try { 
-            receivedChecksum = jspack.Unpack('<H', crcBuf2); 
-        } catch (e) { 
-            throw new Error("Unable to unpack MAVLink signed CRC: " + e.message); 
-        } 
+    try {
+        var receivedChecksum = jjspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2));
+    } catch (e) {
+        throw new Error("Unable to unpack MAVLink CRC: " + e.message);
     }
-    receivedChecksum = receivedChecksum[0]; 
 
-    // make our own chksum of the relevant part of the packet... 
-    var messageChecksum = mavlink20.x25Crc(crcCheckBuf);  
-    var messageChecksum2 = mavlink20.x25Crc([decoder.crc_extra], messageChecksum); 
- 
-    if ( receivedChecksum != messageChecksum2 ) { 
-        throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum2 );
+    var messageChecksum = mavlink20.x25Crc(msgbuf.slice(1, msgbuf.length - 2));
+
+    // Assuming using crc_extra = True.  See the message.prototype.pack() function.
+    messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
+    
+    if ( receivedChecksum != messageChecksum ) {
+        throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
     }
- 
-    // now check the signature... 
-    var sig_ok = false 
-    if (signature_len == mavlink20.MAVLINK_SIGNATURE_BLOCK_LEN){ 
-        this.signing.sig_count += 1  
-    } 
 
-    // it's a Buffer, zero-length means unused 
-    if (this.signing.secret_key.length != 0 ){ 
-        var accept_signature = false; 
-        if (signature_len == mavlink20.MAVLINK_SIGNATURE_BLOCK_LEN){  
-            sig_ok = this.check_signature(msgbuf, srcSystem, srcComponent); 
-            accept_signature = sig_ok; 
-            if (sig_ok){ 
-                this.signing.goodsig_count += 1 
-            }else{ 
-                this.signing.badsig_count += 1 
-            } 
-            if ( (! accept_signature) && (this.signing.allow_unsigned_callback != undefined) ){ 
-                accept_signature = this.signing.allow_unsigned_callback(this, msgId); 
-                if (accept_signature){ 
-                    this.signing.unsigned_count += 1 
-                }else{ 
-                    this.signing.reject_count += 1 
-                } 
-            } 
-        }else if (this.signing.allow_unsigned_callback != undefined){ 
-            accept_signature = this.signing.allow_unsigned_callback(this, msgId); 
-            if (accept_signature){ 
-                this.signing.unsigned_count += 1 
-            }else{ 
-                this.signing.reject_count += 1 
-            } 
-        } 
-        if (!accept_signature) throw new Error('Invalid signature'); 
-    } 
+    var paylen = jjspack.CalcLength(decoder.format);
+    var payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);
 
-    // now look at the specifics of the payload... 
-    var paylen = jspack.CalcLength(decoder.format);
-
-    //put any truncated 0's back in (ie zero-pad ) 
-    if (paylen > payloadBuf.length) {
-        payloadBuf =  Buffer.concat([payloadBuf, Buffer.alloc(paylen - payloadBuf.length)]);
+    //put any truncated 0's back in
+    if (paylen > payload.length) {
+        var zeros = new Uint8Array(paylen - payload.length)
+        var c = new Uint8Array(payload.length + zeros.length);
+        c.set(payload);
+        c.set(zeros, payload.length);
+        payload =  c;
     }
     // Decode the payload and reorder the fields to match the order map.
     try {
-        var t = jspack.Unpack(decoder.format, payloadBuf); 
+        var t = jjspack.Unpack(decoder.format, payload);
     }
     catch (e) {
-        throw new Error('Unable to unpack MAVLink payload type='+decoder.type+' format='+decoder.format+' payloadLength='+ payloadBuf +': '+ e.message); 
+        throw new Error('Unable to unpack MAVLink payload type='+decoder.type+' format='+decoder.format+' payloadLength='+ payload +': '+ e.message);
     }
 
     // Need to check if the message contains arrays
@@ -18825,32 +15852,22 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         });
     }
 
-    
-
     // construct the message object
     try {
-        // args at this point might look like:  { '0': 6, '1': 8, '2': 0, '3': 0, '4': 3, '5': 3 }
-        var m = new decoder.type();   // make a new 'empty' instance of the right class,
-        m.set(args,false); // associate ordered-field-numbers to names, after construction not during.
+        var m = new decoder.type(args);
+        m.set.call(m, args);
     }
     catch (e) {
         throw new Error('Unable to instantiate MAVLink message of type '+decoder.type+' : ' + e.message);
     }
-
-    m._signed = sig_ok; 
-    if (m._signed) { m._link_id = msgbuf[-13]; } 
- 
-    m._msgbuf = msgbuf;
-    m._payload = payloadBuf 
+    m.msgbuf = msgbuf;
+    m.payload = payload
     m.crc = receivedChecksum;
-    m._header = new mavlink20.header(msgId, mlen, seq, srcSystem, srcComponent, incompat_flags, compat_flags);
+    m.header = new mavlink20.header(msgId, mlen, seq, srcSystem, srcComponent, incompat_flags, compat_flags);
     this.log(m);
     return m;
 }
 
 
-// allow loading as both common.js (Node), and/or vanilla javascript in-browser
-if(typeof module === "object" && module.exports) {
-    module.exports = {mavlink20, MAVLink20Processor};
-}
-
+// Expose this code as a module
+//module.exports = {mavlink20, MAVLink20Processor};

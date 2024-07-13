@@ -4,6 +4,9 @@
 *   2 Aug 2016
 *
 *********************************************************************************** */
+import $ from 'jquery'; 
+import * as  js_siteConfig from './js_siteConfig.js'
+import * as js_andruavMessages from './js_andruavMessages'
 
 
 const EE_Auth_Logined      		 	 = "_EA_96A4ED6B1E1_";
@@ -30,17 +33,20 @@ const CONST_PERMISSION_PARAMETER            = 'prm';
 
 class CAndruavAuth {
     constructor() {
+        
+        this.m_username = '';
+        
         window._localserverIP = "127.0.0.1";
         window._localserverPort = 9211;
 
         this._m_ver = '5.0.0';
-        if (CONST_TEST_MODE === true)
+        if (js_siteConfig.CONST_TEST_MODE === true)
         {
-            this.m_auth_ip = CONST_TEST_MODE_IP; 
+            this.m_auth_ip = js_siteConfig.CONST_TEST_MODE_IP; 
         }
         else
         {
-            this.m_auth_ip = CONST_PROD_MODE_IP;
+            this.m_auth_ip = js_siteConfig.CONST_PROD_MODE_IP;
         }
         this._m_auth_port = '19408';
         this._m_auth_ports = '19408'; 
@@ -53,10 +59,12 @@ class CAndruavAuth {
     }
 
     static getInstance() {
+        // Check if the instance is null, and create a new one if it is
         if (!CAndruavAuth.instance) {
             CAndruavAuth.instance = new CAndruavAuth();
         }
         return CAndruavAuth.instance;
+    
     }
 
     fn_getSessionID()
@@ -74,24 +82,24 @@ class CAndruavAuth {
     }
 
     fn_do_canGCS() {
-        return ((this._m_perm & CONST_ALLOW_GCS) === CONST_ALLOW_GCS);
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS) === js_andruavMessages.CONST_ALLOW_GCS);
     }
 
     fn_do_canControl() {
-        return ((this._m_perm & CONST_ALLOW_GCS_FULL_CONTROL) === CONST_ALLOW_GCS_FULL_CONTROL);
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_FULL_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_FULL_CONTROL);
     }
 
     fn_do_canControlWP() {
-        return ((this._m_perm & CONST_ALLOW_GCS_WP_CONTROL) === CONST_ALLOW_GCS_WP_CONTROL);
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL);
     }
     
     
     fn_do_canControlModes() {
-        return ((this._m_perm & CONST_ALLOW_GCS_MODES_CONTROL) === CONST_ALLOW_GCS_MODES_CONTROL);
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL);
     }
     
     fn_do_canVideo() {
-        return ((this._m_perm & CONST_ALLOW_GCS_VIDEO) === CONST_ALLOW_GCS_VIDEO);
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_VIDEO) === js_andruavMessages.CONST_ALLOW_GCS_VIDEO);
     }
 
 
@@ -103,7 +111,7 @@ class CAndruavAuth {
     }
 
     var _url;
-    if (location.protocol == 'https:') {
+    if (window.location.protocol == 'https:') {
 	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		
 	}
@@ -177,7 +185,7 @@ class CAndruavAuth {
 
 
 		var _url;
-		if (location.protocol ==  'https:') {
+		if (window.location.protocol ==  'https:') {
 			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		} else {
 			_url = 'http://'  + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
@@ -233,7 +241,7 @@ class CAndruavAuth {
 
 
         var _url;
-        if (location.protocol == 'https:') {
+        if (window.location.protocol == 'https:') {
             _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
         } else {
             _url = 'http://' + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());

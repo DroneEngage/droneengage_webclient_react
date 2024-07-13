@@ -240,6 +240,15 @@ export const CONST_TELEMETRY_REQUEST_RESUME    = 3;
 export const CONST_TELEMETRY_ADJUST_RATE       = 4;
 export const CONST_TELEMETRY_REQUEST_PAUSE     = 5;
 
+// ENUM_TelemetryProtocol
+export const CONST_No_Telemetry				= 0;
+export const CONST_Andruav_Telemetry		= 1;
+export const CONST_Mavlink_Telemetry		= 2;
+export const CONST_MW_Telemetry				= 3;
+export const CONST_Unknown_Telemetry		= 999;	
+
+
+
 export const CONST_TELEMETRY_SOURCE_UNKNOWN = 0;
 export const CONST_TELEMETRY_SOURCE_FCB = 1;
 export const CONST_TELEMETRY_SOURCE_GCS = 2;

@@ -16,24 +16,24 @@
 /*jshint esversion: 6 */
 
 import * as js_globals from './js_globals'
-import * as js_andruavMessage from './js_andruavMessages'
+import * as js_andruavMessages from './js_andruavMessages'
 import * as js_circularBuffer from './js_circularBuffer'
-import { mavlink20, MAVLink20Processor } from './js_mavlink_v2';
+import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';
 
 // Vehicle Types
-const VEHICLE_UNKNOWN 						= 0;
-const VEHICLE_TRI 							= 1;
-const VEHICLE_QUAD 							= 2;
-const VEHICLE_PLANE 						= 3;
-const VEHICLE_ROVER 						= 4;
-const VEHICLE_HELI 							= 5;
-const VEHICLE_BOAT 							= 6;
+export const VEHICLE_UNKNOWN 				= 0;
+export const VEHICLE_TRI 					= 1;
+export const VEHICLE_QUAD 					= 2;
+export const VEHICLE_PLANE 					= 3;
+export const VEHICLE_ROVER 					= 4;
+export const VEHICLE_HELI 					= 5;
+export const VEHICLE_BOAT 					= 6;
 
-const VEHICLE_SUBMARINE    					= 12;
+export const VEHICLE_SUBMARINE    			= 12;
 
-const VEHICLE_GIMBAL 						= 15;
-const VEHICLE_BUS 							= 997;
-const VEHICLE_PERSON 						= 998;
+export const VEHICLE_GIMBAL 				= 15;
+export const VEHICLE_BUS 					= 997;
+export const VEHICLE_PERSON 				= 998;
 export const CONST_VEHICLE_GCS 				= 999;
 
 
@@ -49,13 +49,6 @@ export const CONST_VIDEOSTREAMING_OFF 		= 0;
 export const CONST_VIDEOSTREAMING_ON 		= 1;
 
 
-
-// ENUM_TelemetryProtocol
-export const CONST_No_Telemetry				= 0;
-export const CONST_Andruav_Telemetry		= 1;
-export const CONST_Mavlink_Telemetry		= 2;
-export const CONST_MW_Telemetry				= 3;
-export const CONST_Unknown_Telemetry		= 999;	
 
 
 
@@ -132,7 +125,7 @@ export const CONST_FLIGHT_CONTROL_UNKNOWN            			= 999;
 export const CONST_TYPE_UNKNOWN								= 0;
 export const CONST_TYPE_ESP32_MESH								= 1;
 
-function fn_getFullName(m_groupName, p_partyID)
+export function fn_getFullName(m_groupName, p_partyID)
 	{
 		//return m_groupName.replace(" ","_") + "_X_" + partyID.replace(" ","_");
 		
@@ -180,7 +173,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_FLASHING)
+			return (track.s & js_andruavMessages.CONST_CAMERA_SUPPORT_FLASHING)
 		}
 		if (track.hasOwnProperty("f")===true)
 		{
@@ -198,7 +191,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_DUAL_CAM)
+			return (track.s & js_andruavMessages.CONST_CAMERA_SUPPORT_DUAL_CAM)
 		}
 		if (track.hasOwnProperty("f")===true)
 		{	// both flashing & dual camera uses f field om Andruav
@@ -215,7 +208,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_ZOOMING)
+			return (track.s & js_andruavMessages.CONST_CAMERA_SUPPORT_ZOOMING)
 		}
 		if (track.hasOwnProperty("z")===true)
 		{
@@ -232,7 +225,7 @@ class C_Video
 		if (track.hasOwnProperty("s")=== true)
 		{
 			// new format
-			return (track.s & js_andruavMessage.CONST_CAMERA_SUPPORT_ROTATION)
+			return (track.s & js_andruavMessages.CONST_CAMERA_SUPPORT_ROTATION)
 		}
 		if (track.hasOwnProperty("z")===true)
 		{
@@ -392,8 +385,8 @@ class C_Swarm
 	{
 		this.m_parent = p_parent;
 		this.m_isLeader = false;
-		this.m_formation_as_leader = js_andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
-		this.m_formation_as_follower = js_andruavMessage.CONST_TASHKEEL_SERB_NO_SWARM;
+		this.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
+		this.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
 		this.m_following = null;
 	};
 }
@@ -516,7 +509,7 @@ class C_Telemetry
 	fn_updateTelemetry (p_manualTXBlockedSubAction)
 	{
 		this.manualTXBlockedSubAction = p_manualTXBlockedSubAction;
-		// if (manualTXBlockedSubAction == CONST_RC_SUB_ACTION_RELEASED)
+		// if (manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED)
 		// {   // release rx if engaged
 											// 	//this.m_rxEngaged = false;
 		// }
@@ -535,7 +528,7 @@ class C_GPS
 	}
 }
 
-class C_TerrainEntry
+export class C_TerrainEntry
 {
 	constructor (lat =null, lon =null, spacing=null, terrain_height, current_height)
 	{	
@@ -657,15 +650,15 @@ class C_Modules
 			var module = jsonmodules[i];
 			switch (module.c.toLowerCase())
 			{
-				case js_andruavMessage.TYPE_MODULE_CLASS_FCB:
+				case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
 					this.has_fcb = true;	
 				break;
 
-				case js_andruavMessage.TYPE_MODULE_CLASS_GPIO:
+				case js_andruavMessages.TYPE_MODULE_CLASS_GPIO:
 					this.has_gpio = true;	
 				break;
 				
-				case js_andruavMessage.TYPE_MODULE_CLASS_SOUND:
+				case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
 					this.has_sound = true;	
 				break;
 			}
@@ -756,7 +749,7 @@ class C_Messages
 }
 
 
-class CAndruavUnitObject 
+export class CAndruavUnitObject 
 {
 	
 	constructor()
@@ -780,7 +773,7 @@ class CAndruavUnitObject
 		this.m_isArmed					= false;
 		this.m_useFCBIMU				= false;
 		this.m_VehicleType 				= VEHICLE_UNKNOWN;
-		this.m_telemetry_protocol 		= CONST_No_Telemetry;
+		this.m_telemetry_protocol 		= js_andruavMessages.CONST_No_Telemetry;
 		this.m_enum_userStatus 			= 0;	
 		this.m_version 					= "null";
 		this.m_delayedTimeout			= null; // used for delayed actions.
@@ -874,7 +867,7 @@ class CAndruavUnitObject
 
 
 
-class CAndruavUnitList 
+export class CAndruavUnitList 
 {
 
 	constructor ()

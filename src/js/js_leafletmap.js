@@ -6,9 +6,14 @@
 *********************************************************************************** */
 "use strict";
 
-/*jshint esversion: 6 */
+import $ from 'jquery'; 
+import L from 'leaflet';
 
+import * as js_siteConfig from './js_siteConfig'
+import * as js_globals from './js_globals'
+import * as js_eventEmitter from './js_eventEmitter'
 
+import {fn_contextMenu} from './js_main'
 class CLeafLetAndruavMap {
 
     constructor() {
@@ -55,14 +60,14 @@ class CLeafLetAndruavMap {
     */
     fn_initMap(p_mapelement) {
         var v_site_copyright;
-        v_site_copyright = '&copy; <a href="' + CONST_HOME_URL + '">' + CONST_TITLE + '</a>';
+        v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
 
 
         this.m_Map = L.map(p_mapelement).setView([
             51.505, -0.09
         ], 13);
         
-        if (CONST_MAP_GOOLE_PLUGIN === true)
+        if (js_globals.CONST_MAP_GOOLE_PLUGIN === true)
         {
             var ggl = new L.Google('SATELLITE'); // Possible types: SATELLITE, ROADMAP, HYBRID, TERRAIN
 
@@ -72,7 +77,7 @@ class CLeafLetAndruavMap {
         }
         else
         {
-            L.tileLayer(VAR_MAP_LEAFLET_URL, {
+            L.tileLayer(js_globals.VAR_MAP_LEAFLET_URL, {
                 maxZoom: 22,
                 attribution: v_site_copyright,
                 id: 'mapbox.streets'
@@ -103,7 +108,7 @@ class CLeafLetAndruavMap {
         // stateChangingButton.addTo(this.m_Map );
 
         
-        if (CONST_MAP_EDITOR === true) {
+        if (js_globals.CONST_MAP_EDITOR === true) {
             this.m_Map.pm.addControls({
                 position: 'topleft',
                 drawMarker: false,
@@ -118,22 +123,22 @@ class CLeafLetAndruavMap {
 
 
             this.m_Map.on('pm:create' , (x) => {
-                window.AndruavLibs.EventEmitter.fn_dispatch(EE_onShapeCreated, x.layer)
+                js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
-                v_map_shapes.push(x.layer);
+                js_globals.v_map_shapes.push(x.layer);
 
                 x.layer.on('click', function (p_event) {
-                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_onShapeSelected, p_event);
+                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
                 });
 
                 x.layer.on('pm:edit', (x) => {
 
-                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_onShapeEdited, x.layer);
+                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeEdited, x.layer);
                 });
 
                 x.layer.on('pm:remove', (x) => {
 
-                    window.AndruavLibs.EventEmitter.fn_dispatch(EE_onShapeDeleted, x.layer);
+                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
                 });
 
             });
@@ -156,7 +161,7 @@ class CLeafLetAndruavMap {
 
         var update_timeout = null;
         this.m_Map.on('click', function (event) {
-            if (CONST_MAP_EDITOR!==true)
+            if (js_globals.CONST_MAP_EDITOR!==true)
 			{
                 update_timeout = setTimeout(function () { // if (dontexecute) return ;
                     $('.contextmenu').remove();
@@ -165,7 +170,7 @@ class CLeafLetAndruavMap {
         });
 
         this.m_Map.on('dblclick', function (event) {
-            if (CONST_MAP_EDITOR!==true)
+            if (js_globals.CONST_MAP_EDITOR!==true)
 			{
                 clearTimeout(update_timeout);
                 fn_contextMenu(event.latlng)
@@ -680,7 +685,7 @@ class CLeafLetAndruavMap {
 // };
 
 
-// if ((typeof(CONST_MAP_GOOLE) != "undefined") && (CONST_MAP_GOOLE === false)) {
+// if ((typeof(js_globals.CONST_MAP_GOOLE) != "undefined") && (js_globals.CONST_MAP_GOOLE === false)) {
 //     (function (lib) {
 //         "use strict";
 //         if (typeof module === "undefined" || typeof module.exports === "undefined") {

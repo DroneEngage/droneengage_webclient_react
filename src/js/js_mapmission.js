@@ -3,6 +3,12 @@
 	30 Jul 2016
 
 *****************************************************/
+import * as js_helpers from './js_helpers'
+import * as js_globals from './js_globals'
+import * as js_andruavMessages from './js_andruavMessages'
+
+import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';
+
 
 export class CLSS_AndruavFencePlan
 {
@@ -17,11 +23,18 @@ export class CLSS_AndruavFencePlan
 		this.v_highLight = false;
 		this.m_hidden = false;
 	}
+	
+	static getInstance() {
+        if (!CLSS_AndruavFencePlan.instance) {
+            CLSS_AndruavFencePlan.instance = new CLSS_AndruavFencePlan();
+        }
+        return CLSS_AndruavFencePlan.instance;
+    }
 
-	fn_generateAndruavFenceData(shapes)
+    fn_generateAndruavFenceData(shapes)
 	{
 		var shapesData = [];
-		const len = v_map_shapes.length;
+		const len = js_globals.v_map_shapes.length;
 			
 		for (var i=0; i< len; ++i)
 		{
@@ -43,7 +56,7 @@ export class CLSS_AndruavFencePlan
 					
 				case 'Polygon':
 				{
-					cmd.t = FENCETYPE_PolygonFence;
+					cmd.t = js_andruavMessages.FENCETYPE_PolygonFence;
 					const c_lnglats = c_shape.getLatLngs()[0];
 
 					const len_lnglat = c_lnglats.length;
@@ -62,7 +75,7 @@ export class CLSS_AndruavFencePlan
 
 				case 'Rectangle':
 				{
-					cmd.t = FENCETYPE_PolygonFence;
+					cmd.t = js_andruavMessages.FENCETYPE_PolygonFence;
 					const c_boundary = c_shape.getBounds();
 
 					var lnglat = {};
@@ -92,7 +105,7 @@ export class CLSS_AndruavFencePlan
 
 				case 'Circle':
 				{
-					cmd.t = FENCETYPE_CylindersFence;
+					cmd.t = js_andruavMessages.FENCETYPE_CylindersFence;
 					const c_center = c_shape.getLatLng();
 					
 					var lnglat = {};
@@ -105,7 +118,7 @@ export class CLSS_AndruavFencePlan
 				
 				case 'Line':
 				{
-					cmd.t = FENCETYPE_LinearFence;
+					cmd.t = js_andruavMessages.FENCETYPE_LinearFence;
 					const c_lnglats = c_shape.getLatLngs();
 
 					const len_lnglat = c_lnglats.length;
@@ -280,7 +293,7 @@ class CLSS_AndruavMissionPlan
 							'to_pos': this.v_markers[i+1].getLatLng()	
 				};
 
-				var distance = fn_calcDistance(arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
+				var distance = js_helpers.fn_calcDistance(arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
 					arrowCoordinates.to_pos.lat, arrowCoordinates.to_pos.lng);
 						
 				marker.distance = distance;
@@ -324,7 +337,7 @@ class CLSS_AndruavMissionPlan
 		p_marker.order = 99;
 		p_marker.m_missionItem = {
 			alt:30,
-			m_missionType:CONST_WayPoint_TYPE_WAYPOINTSTEP,
+			m_missionType:js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP,
 			m_frameType: mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT,
 			m_speedRequired: false,
 			speed: 5,  // m/s
@@ -338,7 +351,7 @@ class CLSS_AndruavMissionPlan
 		this.fn_updatePath();
 
 		   
-        window.AndruavLibs.EventEmitter.fn_dispatch(EE_mapMissionUpdate,{mission:this});
+        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 				
 	};
 
@@ -369,7 +382,7 @@ class CLSS_AndruavMissionPlan
 			}
         }
                 
-        window.AndruavLibs.EventEmitter.fn_dispatch(EE_mapMissionUpdate,{mission:this});
+        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 	};
 
 			
@@ -395,7 +408,7 @@ class CLSS_AndruavMissionPlan
 
         this.v_markers = [];
                 
-        window.AndruavLibs.EventEmitter.fn_dispatch(EE_mapMissionUpdate,{mission:this});
+        window.AndruavLibs.EventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate,{mission:this});
 	};
 
 	/**
@@ -440,11 +453,11 @@ class CLSS_AndruavMissionPlan
 		// Delete Old Shapes
 		if (p_missionV110 != null)
 		{
-			if ((v_andruavClient != null) && (v_andruavClient.fn_isRegistered()==true))
+			if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()==true))
 			{
-				v_andruavClient.API_requestDeleteWayPoint(p_PartyID,null); // deattach drones from all fences in the group
-				v_andruavClient.API_disableWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
-				v_andruavClient.API_saveWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,v_andruavClient.m_groupName,p_PartyID,'_drone_',1,p_missionV110);
+				js_globals.v_andruavClient.API_requestDeleteWayPoint(p_PartyID,null); // deattach drones from all fences in the group
+				js_globals.v_andruavClient.API_disableWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
+				js_globals.v_andruavClient.API_saveWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1,p_missionV110);
 			}
 		}
 	};
@@ -475,7 +488,7 @@ class CLSS_AndruavMissionPlan
 			var nextstep = {};
 			switch (marker.m_missionItem.m_missionType)
 			{
-				case CONST_WayPoint_TYPE_WAYPOINTSTEP:
+				case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
 					/*step.id = missionCounter;
 						step.cmd = 16;
@@ -489,7 +502,7 @@ class CLSS_AndruavMissionPlan
 						step.param7 = marker.m_missionItem.alt;
 					*/
 					break;
-				case CONST_WayPoint_TYPE_TAKEOFF:
+				case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
 					fn_addMissionItem(marker,22,[0.0,0.0,0.0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
 					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
 							
@@ -505,7 +518,7 @@ class CLSS_AndruavMissionPlan
 						step.param7 = marker.m_missionItem.alt;
 					*/
 					break;
-				case CONST_WayPoint_TYPE_LANDING:
+				case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 					fn_addMissionItem(marker,21,[0.0,0.0,0.0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
 					
 					/*step.id = missionCounter;
@@ -520,7 +533,7 @@ class CLSS_AndruavMissionPlan
 						step.param7 = marker.m_missionItem.alt;
 					*/
 					break;
-				case CONST_WayPoint_TYPE_RTL:
+				case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
 					fn_addMissionItem(marker,20,[0,0,0.0,0.0,0.0,0.0,0.0]);
 							
@@ -546,7 +559,7 @@ class CLSS_AndruavMissionPlan
 						nextstep.param7 = 0.0; 							
 					*/
 					break;
-				case CONST_WayPoint_TYPE_CIRCLE:
+				case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
 					break;
 				
 				default:
@@ -711,7 +724,7 @@ class CLSS_AndruavMissionPlanManager
 
 	fn_createNewMission ()
 	{
-		const c_initColor = v_colorDrawPathes[this.m_missionCounter%v_colorDrawPathes.length];
+		const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter%js_globals.v_colorDrawPathes.length];
 		var v_missionPlan = new CLSS_AndruavMissionPlan (this.m_missionCounter, c_initColor);
 		this.m_missionPlans[this.m_missionCounter] = v_missionPlan;
 		this.m_missionCounter = this.m_missionCounter + 1;
@@ -791,4 +804,4 @@ class CLSS_AndruavMissionPlanManager
 }
 
 
-window.AndruavLibs.MapMission  = new  CLSS_AndruavMissionPlanManager();
+export default CLSS_AndruavFencePlan.getInstance();

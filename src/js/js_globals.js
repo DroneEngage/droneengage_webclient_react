@@ -9,14 +9,59 @@ export const build_number = "20240703-01";
 export var v_connectState 	 = false;  	
 export var v_connectRetries  = 5;  	
 
+export var v_map_shapes = [];
+
+export var v_vehicle_gui = {};
+
+export var planes_icon = [ './images/planetracker_r_0d_.png',
+					'./images/planetracker_y_0d_.png',
+					'./images/planetracker_g_0d_.png',
+					'./images/planetracker_b_0d_.png'];
+					
+
+export var quad_icon   = [ './images/drone_qq_1_0d.png',
+					'./images/drone_qq_2_0d.png',
+					'./images/drone_qq_3_0d.png',
+					'./images/drone_qq_4_0d.png'];
+
+
+export var rover_icon  = [ './images/car1.png',
+					'./images/car2.png',
+					'./images/car3.png',
+					'./images/car4.png'];
+
+
+export var boat_icon  = [ './images/boat1.png',
+					'./images/boat2.png',
+					'./images/boat3.png',
+					'./images/boat4.png'];
+
+
+export var flightPath_colors = [
+							'#75A4D3',
+							'#75D3A4',
+							'#A475D3',
+							'#A4D375',
+							'#D3A475',
+							'#D375A4'
+					];
+
+
+export var swarm_location_icon = [
+				'./images/drone_q1_32x32.png',
+				'./images/drone_q2_32x32.png',
+				'./images/drone_q3_32x32.png',
+				'./images/drone_q4_32x32.png',
+				];
+
 
 
 export const CONST_DFM_FAR                 = 3000; // more than 10 Km is far.
 export const CONST_DFM_SAFE                = 1000; // less than 1 Km is safe.
 export const CONST_MAX_MESSAGE_LOG         = 100; 
 
-var v_displayMode                   = 0;
-var active_gamepad_index            = 0;
+export var v_displayMode                   = 0;
+export var active_gamepad_index            = 0;
 
 // Metric System        
 export var v_useMetricSystem               = true;
@@ -130,11 +175,11 @@ export const EE_adsbExpiredUpdate           = "_E_XXAZQD6B3E4_";
 
 
 
-var v_smart_Telemetry_Level     = -1;
-var v_security_key              = "dynamic_event";
+export var v_smart_Telemetry_Level     = -1;
+export var v_security_key              = "dynamic_event";
 
 
-var CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and keep it unchanged
+export var CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and keep it unchanged
 
 
 

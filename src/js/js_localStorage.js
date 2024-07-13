@@ -1,14 +1,15 @@
 /*jshint esversion: 6 */
+import * as js_globals from './js_globals'
 
 
 class CLocalStorage {
 
     constructor() {
         if (this.isSupported()) { // reset defaults with saved values if exist
-            v_useMetricSystem = this.fn_getMetricSystem();
-            v_gamePadMode = this.fn_getGamePadMode();
-            CONST_DEFAULT_ALTITUDE = this.fn_getDefaultAltitude();
-            CONST_DEFAULT_RADIUS = this.fn_getDefaultRadius();
+            js_globals.v_useMetricSystem = this.fn_getMetricSystem();
+            js_globals.v_gamePadMode = this.fn_getGamePadMode();
+            js_globals.CONST_DEFAULT_ALTITUDE = this.fn_getDefaultAltitude();
+            js_globals.CONST_DEFAULT_RADIUS = this.fn_getDefaultRadius();
         }
     }
 
@@ -93,7 +94,7 @@ class CLocalStorage {
     }
 
     fn_getMetricSystem = function () {
-        return(this.getDefaultAttribute('_vv_useMetricSystem', v_useMetricSystem) == 'true');
+        return(this.getDefaultAttribute('_vv_useMetricSystem', js_globals.v_useMetricSystem) == 'true');
     }
 
     fn_getGamePadMode = function () {
@@ -106,13 +107,13 @@ class CLocalStorage {
 
     fn_setDefaultAltitude = function (value) {
         if (!this.isSupported) {
-            CONST_DEFAULT_ALTITUDE = value;
+            js_globals.CONST_DEFAULT_ALTITUDE = value;
         }
         localStorage._vDefaultAltitude = value;
     }
 
     fn_getDefaultAltitude = function (value) {
-        return parseInt(this.getDefaultAttribute('_vDefaultAltitude', CONST_DEFAULT_ALTITUDE));
+        return parseInt(this.getDefaultAttribute('_vDefaultAltitude', js_globals.CONST_DEFAULT_ALTITUDE));
     }
 
     fn_setDefaultRadius = function (value) {
@@ -120,7 +121,7 @@ class CLocalStorage {
     }
 
     fn_getDefaultRadius = function (value) {
-        return parseInt(this.getDefaultAttribute('_vDefaultRadius', CONST_DEFAULT_RADIUS));
+        return parseInt(this.getDefaultAttribute('_vDefaultRadius', js_globals.CONST_DEFAULT_RADIUS));
     }
 
 
@@ -137,7 +138,7 @@ class CLocalStorage {
     }
 
     fn_getVolume = function () {
-        return parseInt(this.getDefaultAttribute('_vDefaultVolume', CONST_DEFAULT_VOLUME));
+        return parseInt(this.getDefaultAttribute('_vDefaultVolume', js_globals.CONST_DEFAULT_VOLUME));
     }
 
     fn_setTabsDisplayEnabled = function (value) {
@@ -184,19 +185,5 @@ class CLocalStorage {
     
 }
 
-
-// window.AndruavLibs = window.AndruavLibs || {
-//     REVISION: 'BETA'
-// };
-
-
-// (function (lib) {
-//     "use strict";
-//     if (typeof module === "undefined" || typeof module.exports === "undefined") {
-//         window.AndruavLibs.LocalStorage = lib; // in ordinary browser attach library to window
-//     } else {
-//         module.exports = lib; // in nodejs
-//     }
-// })(new CLocalStorage());
 
 export default CLocalStorage.getInstance();

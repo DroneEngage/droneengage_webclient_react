@@ -5,10 +5,10 @@ import $ from 'jquery';
 
 import * as js_globals from '../js/js_globals'
 import * as js_helpers from '../js/js_helpers';
-import * as  js_siteConfig from './js_siteConfigs';
+import * as  js_siteConfig from '../js/js_siteConfig'
 import {QueryString, fn_connect} from '../js/js_main';
-import * as js_andruavclient2 from '../js/js_andruavclient2';
-import * as js_andruavMessage from '../js/js_andruavMessages';
+import * as js_andruavMessages from '../js/js_andruavMessages';
+import * as js_localStorage from '../js/js_localStorage'
 import {v_SpeakEngine}  from '../js/js_speak';
 
 const res_CLSS_LoginControl =
@@ -37,7 +37,7 @@ export class CLSS_LoginControl extends React.Component {
 		super();
 		this.state = {
 			is_connected: false,
-			btnConnectText: res_CLSS_LoginControl[window.AndruavLibs.LocalStorage.fn_getLanguage()]['1'],
+			btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['1'],
 		};
 		this._isMounted = false;
     	// window.AndruavLibs.EventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -48,9 +48,9 @@ export class CLSS_LoginControl extends React.Component {
 		js_globals.fn_console_log('REACT:' + JSON.stringify(params));
 
 		if (me._isMounted!==true) return ;
-    	if (params.status == js_andruavMessage.CONST_SOCKET_STATUS_REGISTERED) {
+    	if (params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[window.AndruavLibs.LocalStorage.fn_getLanguage()]['2'] });
+			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['2'] });
 			me.state.username = $('#txtUnitID').val();
 			v_SpeakEngine.fn_speak('Connected');
 
@@ -59,15 +59,15 @@ export class CLSS_LoginControl extends React.Component {
 		else {
 
 			me.state.is_connected = false;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[window.AndruavLibs.LocalStorage.fn_getLanguage()]['1'] });
+			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['1'] });
 
-			window.AndruavLibs.LocalStorage.fn_setEmail($('#txtEmail').val());
-			window.AndruavLibs.LocalStorage.fn_setAccessCode($('#txtAccessCode').val());
+			js_localStorage.default.fn_setEmail($('#txtEmail').val());
+			js_localStorage.default.fn_setAccessCode($('#txtAccessCode').val());
 			var s = $('#txtUnitID').val();
 			if (s != null) {
-				window.AndruavLibs.LocalStorage.fn_setUnitID(s);
+				js_localStorage.default.fn_setUnitID(s);
 			}
-			window.AndruavLibs.LocalStorage.fn_setGroupName($('#txtGroupName').val());
+			js_localStorage.default.fn_setGroupName($('#txtGroupName').val());
 
 		}
 	}
@@ -103,10 +103,10 @@ export class CLSS_LoginControl extends React.Component {
 		}
 		else {
 
-			$('#txtEmail').val(window.AndruavLibs.LocalStorage.fn_getEmail());
-			$('#txtAccessCode').val(window.AndruavLibs.LocalStorage.fn_getAccessCode());
-			$('#txtGroupName').val(window.AndruavLibs.LocalStorage.fn_getGroupName());
-			$('#txtUnitID').val(window.AndruavLibs.LocalStorage.fn_getUnitID());
+			$('#txtEmail').val(js_localStorage.default.fn_getEmail());
+			$('#txtAccessCode').val(js_localStorage.default.fn_getAccessCode());
+			$('#txtGroupName').val(js_localStorage.default.fn_getGroupName());
+			$('#txtUnitID').val(js_localStorage.default.fn_getUnitID());
 
 		}
 
@@ -134,15 +134,15 @@ export class CLSS_LoginControl extends React.Component {
 					<div className="card-header  text-center"> <strong>{login}</strong></div>
 					<div id='login_form' className="card-body">
 						<div className={this.state.is_connected == true ? "hidden" : " "} >
-							<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : window.AndruavLibs.LocalStorage.fn_getEmail()} /></div>
-							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white">Access Code</label><input type="password" id="txtAccessCode" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : window.AndruavLibs.LocalStorage.fn_getAccessCode()} /></div>
+							<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.default.fn_getEmail()} /></div>
+							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white">Access Code</label><input type="password" id="txtAccessCode" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.default.fn_getAccessCode()} /></div>
 							<div className="form-group al_l hidden">
 								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : window.AndruavLibs.LocalStorage.fn_getGroupName()} />
+								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.default.fn_getGroupName()} />
 							</div>
 							<div className="form-group al_l">
 								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
-								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : window.AndruavLibs.LocalStorage.fn_getUnitID()} />
+								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.default.fn_getUnitID()} />
 								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/></div>
 							<br />
 						</div>
@@ -170,15 +170,15 @@ export class CLSS_LoginControl extends React.Component {
 					<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
 						<div id='login_form' className="card-body">
 							<div className={this.state.is_connected == true ? "hidden" : " "} >
-								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : window.AndruavLibs.LocalStorage.fn_getEmail()} /></div>
-								<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : window.AndruavLibs.LocalStorage.fn_getAccessCode()} /></div>
+								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.default.fn_getEmail()} /></div>
+								<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.default.fn_getAccessCode()} /></div>
 								<div className="form-group al_l hidden">
 									<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-									<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : window.AndruavLibs.LocalStorage.fn_getGroupName()} />
+									<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.default.fn_getGroupName()} />
 								</div>
 								<div className="form-group al_l">
 									<label htmlFor="txtUnitID"  id="unitID" className="text-muted">GCS ID</label>
-									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : window.AndruavLibs.LocalStorage.fn_getUnitID()} />
+									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.default.fn_getUnitID()} />
 									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/>
 								</div>
 								<br />
@@ -186,11 +186,11 @@ export class CLSS_LoginControl extends React.Component {
 							<div id='login_btn mb-2 ' className='text-center'>
 							<div className={this.state.is_connected == false ? "hidden" : " "} >
 								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-muted">Email</label>
-									<p>  {window.AndruavLibs.LocalStorage.fn_getEmail()} </p>
+									<p>  {js_localStorage.default.fn_getEmail()} </p>
 								</div>
 								<div className="form-group al_l">
 									<label  id="unitID" className="text-muted">GCS ID</label>
-									<p > {window.AndruavLibs.LocalStorage.fn_getUnitID()} </p>
+									<p > {js_localStorage.default.fn_getUnitID()} </p>
 								</div>
 							</div>
 							<button className={"button  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected == false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>

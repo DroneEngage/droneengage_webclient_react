@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import {CLSS_LoginControl} from './jsc_login.jsx'
 import {CLSS_CTRL_Layout} from './jsc_ctrl_layoutControl.jsx'
-import * as  js_siteConfig from './js_siteConfig.js'
+import * as  js_siteConfig from '../js/js_siteConfig'
 
 
 class CLSS_HeaderControl extends React.Component {
