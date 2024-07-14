@@ -1,0 +1,76 @@
+.gp_inputs {
+    display: flex;
+    width: 400px;
+  }
+  
+.gp_axes {
+    text-align: center;
+}
+
+.gp_buttons {
+    text-align: center;
+    cursor: default;
+}
+
+.svg text {
+    color: #CCC;
+    font-family: monospace;
+}
+
+.gp_axes svg text {
+    font-size: 0.4px;
+    cursor: default;
+}
+
+.gp_buttons svg text {
+    font-size: 1.2px;
+    cursor: default;
+}
+  
+.gp_axes>div, .gp_buttons>div {
+    display: inline-block;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+}
+
+.gp_axes>div {
+    margin: 2px 5px 0 0;
+}
+
+.gp_buttons>div {
+    margin: 2px 2px 0 0;
+    background: rgba(0, 0, 0, 0.151);
+    border-radius: 6px;
+}
+
+
+#gamepads>* {
+    background: #333;
+    padding: 1em;
+    margin: 10px 5px 0 0;
+}
+#gamepads pre {
+    white-space: pre-wrap;
+}
+
+.css_axis_x_div
+{
+    position: relative !important;
+    right: -40px;
+    top:    -60px;
+}
+
+.css_axis_x_div>text
+{
+    font-size: 10px !important;
+}
+
+.info .label {
+  width: 7em;
+  display: inline-block;
+}
+.info>div {
+  padding: 0.25em;
+  background: #222;
+  margin: 0.25em 0.25em 0 0;
+}

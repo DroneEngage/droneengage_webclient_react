@@ -6,7 +6,7 @@
 *********************************************************************************** */
 
 
-class CLSS_CustomCircularBuffer 
+export class CLSS_CustomCircularBuffer 
 {
 
     constructor (p_length)

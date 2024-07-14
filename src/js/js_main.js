@@ -2968,29 +2968,29 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.m_server_port_ss = js_andruavAuth.default.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
 				js_globals.v_andruavClient.server_AuthKey = js_andruavAuth.default.server_AuthKey;
 				js_globals.v_andruavClient._permissions_ = js_andruavAuth.default.fn_getPermission();
-				js_eventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,this.EVT_onOpen);
-				js_eventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,this.EVT_onClose);
-				js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,this.fn_onSocketStatus);
-				js_eventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,this.EVT_onDeleted);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
-				js_eventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,this.EVT_HomePointChanged);
-				js_eventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,this.EVT_andruavUnitError);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,EVT_onOpen);
+				js_eventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,EVT_onClose);
+				js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,fn_onSocketStatus);
+				js_eventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,EVT_onDeleted);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,EVT_msgFromUnit_GPS);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,EVT_msgFromUnit_IMG);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,EVT_andruavUnitAdded);
+				js_eventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,EVT_HomePointChanged);
+				js_eventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,EVT_DistinationPointChanged);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,EVT_andruavUnitError);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,EVT_andruavUnitGeoFenceUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,EVT_andruavUnitGeoFenceHit);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,EVT_msgFromUnit_WayPoints);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,EVT_msgFromUnit_WayPointsUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,EVT_andruavUnitArmedUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,EVT_andruavUnitGeoFenceBeforeDelete);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,EVT_andruavUnitFCBUpdated);
 				
 				
 				
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,EVT_andruavUnitFlyingUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,EVT_andruavUnitFightModeUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,EVT_andruavUnitVehicleTypeUpdated);
 				
 				
 				

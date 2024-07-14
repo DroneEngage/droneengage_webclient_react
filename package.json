@@ -7,6 +7,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
+    "https": "^1.0.0",
     "is-number": "^7.0.0",
     "jquery": "^3.7.1",
     "jquery-ui-dist": "^1.13.3",
@@ -20,7 +21,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "start2": "export SET NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_2/ssl/localssl.crt SSL_KEY_FILE=/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_2/ssl/localssl.key react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

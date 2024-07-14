@@ -1,4 +1,5 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+//import 'bootstrap/dist/css/bootstrap.min.css';
+import '../css/bootstrap.min.css';
 import 'leaflet/dist/leaflet.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
@@ -32,19 +33,19 @@ class CLSS_HeaderControl extends React.Component {
                                     <a className="nav-link" href={js_siteConfig.CONST_HOME_URL}>Home </a>
                                 </li>
                                 <li key="Geo" className="nav-item">
-                                    <a className="nav-link" id='mapeditor' href="./mapeditor.html" target='_blank'>Geo Fence</a>
+                                    <a className="nav-link" id='mapeditor' href="./mapeditor.html" target='_blank' rel="noopener noreferrer">Geo Fence</a>
                                 </li>
                                 <li key="Manual" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' >Manual</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Manual</a>
                                 </li>
                                 <li key="FAQ" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' >FAQ</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
                                 </li>
                                 <li key="Contact" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' >Contact</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">Contact</a>
                                 </li>
                                 <li key="Account" className="nav-item">
-                                    <a className="nav-link" href="accounts.html" target='_blank' >Account</a>
+                                    <a className="nav-link" href="accounts.html" target='_blank' rel="noopener noreferrer">Account</a>
                                 </li>
                             </ul>
                         </div>
