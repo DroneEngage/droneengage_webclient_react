@@ -12,8 +12,9 @@ import * as js_helpers from '../js/js_helpers';
 import * as  js_siteConfig from '../js/js_siteConfig'
 import {QueryString, fn_connect} from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
-import * as js_localStorage from '../js/js_localStorage'
-import {v_SpeakEngine}  from '../js/js_speak';
+import {js_localStorage} from '../js/js_localStorage'
+import {js_speak} from '../js/js_speak'
+
 
 const res_CLSS_LoginControl =
 {
@@ -41,7 +42,7 @@ export class CLSS_LoginControl extends React.Component {
 		super();
 		this.state = {
 			is_connected: false,
-			btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['1'],
+			btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['1'],
 		};
 		this._isMounted = false;
     	// js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -52,26 +53,26 @@ export class CLSS_LoginControl extends React.Component {
 		js_globals.fn_console_log('REACT:' + JSON.stringify(params));
 
 		if (me._isMounted!==true) return ;
-    	if (params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
+    	if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['2'] });
+			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['2'] });
 			me.state.username = $('#txtUnitID').val();
-			v_SpeakEngine.fn_speak('Connected');
+			js_speak.fn_speak('Connected');
 
 
 		}
 		else {
 
 			me.state.is_connected = false;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.default.fn_getLanguage()]['1'] });
+			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['1'] });
 
-			js_localStorage.default.fn_setEmail($('#txtEmail').val());
-			js_localStorage.default.fn_setAccessCode($('#txtAccessCode').val());
+			js_localStorage.fn_setEmail($('#txtEmail').val());
+			js_localStorage.fn_setAccessCode($('#txtAccessCode').val());
 			var s = $('#txtUnitID').val();
-			if (s != null) {
-				js_localStorage.default.fn_setUnitID(s);
+			if (s !== null) {
+				js_localStorage.fn_setUnitID(s);
 			}
-			js_localStorage.default.fn_setGroupName($('#txtGroupName').val());
+			js_localStorage.fn_setGroupName($('#txtGroupName').val());
 
 		}
 	}
@@ -79,7 +80,7 @@ export class CLSS_LoginControl extends React.Component {
 	clickConnect(e) {
 		// Getting an array of DOM elements
 		// Then finding which element was clicked
-		if (js_globals.v_connectState == true) {
+		if (js_globals.v_connectState === true) {
 			js_globals.v_connectState = false;
 			js_globals.v_connectRetries = 0;
 		}
@@ -97,7 +98,7 @@ export class CLSS_LoginControl extends React.Component {
 		//EventEmitter.fn_dispatch(EE_updateLogin,{});
 		this._isMounted = true;
 
-		if (QueryString.accesscode != null) {
+		if (QueryString.accesscode !== null) {
 
 			$('#account').val(QueryString.accesscode);
 			$('#email').val(QueryString.email);
@@ -107,14 +108,14 @@ export class CLSS_LoginControl extends React.Component {
 		}
 		else {
 
-			$('#txtEmail').val(js_localStorage.default.fn_getEmail());
-			$('#txtAccessCode').val(js_localStorage.default.fn_getAccessCode());
-			$('#txtGroupName').val(js_localStorage.default.fn_getGroupName());
-			$('#txtUnitID').val(js_localStorage.default.fn_getUnitID());
+			$('#txtEmail').val(js_localStorage.fn_getEmail());
+			$('#txtAccessCode').val(js_localStorage.fn_getAccessCode());
+			$('#txtGroupName').val(js_localStorage.fn_getGroupName());
+			$('#txtUnitID').val(js_localStorage.fn_getUnitID());
 
 		}
 
-		if (QueryString.connect != undefined) {
+		if (QueryString.connect !== undefined) {
 
 			this.clickConnect(null);
 		}
@@ -129,29 +130,29 @@ export class CLSS_LoginControl extends React.Component {
 
 
 		var login = "Login";
-		if (this.state.is_connected == true) {
+		if (this.state.is_connected === true) {
 			login += " - " + $('#txtUnitID').val();
 		}
-		if (this.props.simple == null) {
+		if (this.props.simple === null) {
 			return (
 				<div key={'CLSS_LoginControl_simple'}  className="card text-white border-light mb-3" >
 					<div className="card-header  text-center"> <strong>{login}</strong></div>
 					<div id='login_form' className="card-body">
-						<div className={this.state.is_connected == true ? "hidden" : " "} >
-							<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.default.fn_getEmail()} /></div>
-							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white">Access Code</label><input type="password" id="txtAccessCode" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.default.fn_getAccessCode()} /></div>
+						<div className={this.state.is_connected === true ? "hidden" : " "} >
+							<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
+							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white">Access Code</label><input type="password" id="txtAccessCode" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
 							<div className="form-group al_l hidden">
 								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.default.fn_getGroupName()} />
+								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
 							</div>
 							<div className="form-group al_l">
 								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
-								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.default.fn_getUnitID()} />
+								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
 								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/></div>
 							<br />
 						</div>
 						<div id='login_btn mb-2 ' className='text-center'>
-							<button className={"button  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected == false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
+							<button className={"btn  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
 
 						</div>
 					</div>
@@ -162,7 +163,7 @@ export class CLSS_LoginControl extends React.Component {
 			var control = [];
 			var title = "Login";
 			var css = "bg-success";
-			if (this.state.is_connected == true) {
+			if (this.state.is_connected === true) {
 				title = "Logout";
 				css = "bg-danger";
 			}
@@ -173,31 +174,31 @@ export class CLSS_LoginControl extends React.Component {
 					</button>
 					<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
 						<div id='login_form' className="card-body">
-							<div className={this.state.is_connected == true ? "hidden" : " "} >
-								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.default.fn_getEmail()} /></div>
-								<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.default.fn_getAccessCode()} /></div>
+							<div className={this.state.is_connected === true ? "hidden" : " "} >
+								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
+								<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
 								<div className="form-group al_l hidden">
 									<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-									<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.default.fn_getGroupName()} />
+									<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
 								</div>
 								<div className="form-group al_l">
 									<label htmlFor="txtUnitID"  id="unitID" className="text-muted">GCS ID</label>
-									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.default.fn_getUnitID()} />
+									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
 									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/>
 								</div>
 								<br />
 							</div>
 							<div id='login_btn mb-2 ' className='text-center'>
-							<div className={this.state.is_connected == false ? "hidden" : " "} >
+							<div className={this.state.is_connected === false ? "hidden" : " "} >
 								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-muted">Email</label>
-									<p>  {js_localStorage.default.fn_getEmail()} </p>
+									<p>  {js_localStorage.fn_getEmail()} </p>
 								</div>
 								<div className="form-group al_l">
 									<label  id="unitID" className="text-muted">GCS ID</label>
-									<p > {js_localStorage.default.fn_getUnitID()} </p>
+									<p > {js_localStorage.fn_getUnitID()} </p>
 								</div>
 							</div>
-							<button className={"button  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected == false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
+							<button className={"button  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
 							</div>
 						</div>
 					</div>
@@ -212,28 +213,4 @@ export class CLSS_LoginControl extends React.Component {
 
 }
 
-
-
-
-if ($('#login_div').length != 0) {
-
-	if (js_siteConfig.CONST_TEST_MODE === true)
-	{
-		ReactDOM.render(
-			<React.StrictMode>
-			<CLSS_LoginControl />
-			</React.StrictMode>,
-			
-			window.document.getElementById('login_div')
-		);
-	}
-	else
-	{
-		ReactDOM.render(
-			<CLSS_LoginControl />,
-			
-			window.document.getElementById('login_div')
-		);
-	}
-}
 

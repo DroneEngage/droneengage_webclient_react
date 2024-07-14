@@ -21,7 +21,7 @@ import * as js_siteConfig from './js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
-import * as js_localStorage from './js_localStorage'
+import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 
 import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js'
@@ -86,12 +86,21 @@ class CAndruavClient {
         //this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
     }
 
+    static getInstance() {
+        if (!CAndruavClient.instance) {
+            CAndruavClient.instance = new CAndruavClient();
+        }
+        return CAndruavClient.instance;
+    }
+
+    
+
     _fn_checkStatus() {
 
         
         const now = Date.now();
         const units = this.m_andruavUnitList.fn_getUnitValues();
-        if (units==null) return ;
+        if (units===null) return ;
         units.forEach((unit) => {
             if (!unit.m_IsMe) {
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
@@ -119,7 +128,7 @@ class CAndruavClient {
         
 
         p_me.v_sendAxes = false;
-        if (this.v_axes!=null) p_me.API_sendRXChannels(this.v_axes);
+        if (this.v_axes!==null) p_me.API_sendRXChannels(this.v_axes);
     }
 
 
@@ -175,14 +184,14 @@ class CAndruavClient {
         this.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
         var Me = this;
-        if (this.fn_timerID_checkStatus == null) {
+        if (this.fn_timerID_checkStatus === null) {
 
             this.fn_timerID_checkStatus = setInterval(function () {
                 Me._fn_checkStatus()
             }, js_andruavMessages.CONST_checkStatus_Interverl0);
         }
 
-        if (this.fn_timerID_sendRXChannels == null) {
+        if (this.fn_timerID_sendRXChannels === null) {
             this.fn_timerID_sendRXChannels = setInterval(function () {
                 Me._fn_sendRXChannels(Me)
             }, js_andruavMessages.CONST_sendRXChannels_Interval);
@@ -199,12 +208,12 @@ class CAndruavClient {
 
     // receives event from gamepad and store it for sending.
     fn_sendAxes(p_me) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit == null) 
+        if (p_me.m_gamePadUnit === null) 
             return;
         
 
         const c_controller = window.AndruavLibs.AndruavGamePad.fn_getGamePad(js_globals.active_gamepad_index);
-        if (c_controller == null) 
+        if (c_controller === null) 
             return;
         
         // read gamepad values
@@ -215,7 +224,7 @@ class CAndruavClient {
     }
 
     fn_sendButtons(p_me, p_packet) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit == null) 
+        if (p_me.m_gamePadUnit === null) 
             return;
         
 
@@ -234,7 +243,7 @@ class CAndruavClient {
                 // }
                 // }
 
-                if (p_packet.p_buttonIndex == 2) { // BLUE
+                if (p_packet.p_buttonIndex === 2) { // BLUE
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[2] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                             p_me.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
@@ -245,7 +254,7 @@ class CAndruavClient {
                     }
                 }
 
-                if (p_packet.p_buttonIndex == 0) { // Green
+                if (p_packet.p_buttonIndex === 0) { // Green
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[0] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                             p_me.API_do_Land(p_me.m_gamePadUnit);
@@ -255,7 +264,7 @@ class CAndruavClient {
                     }
                 }
 
-                if (p_packet.p_buttonIndex == 1) { // RED
+                if (p_packet.p_buttonIndex === 1) { // RED
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[1] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                             p_me.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
@@ -265,7 +274,7 @@ class CAndruavClient {
                     }
                 }
 
-                if (p_packet.p_buttonIndex == 3) { // Yellow
+                if (p_packet.p_buttonIndex === 3) { // Yellow
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[3] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                             p_me.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
@@ -283,7 +292,7 @@ class CAndruavClient {
             return;
         }
 
-        if (p_packet.p_buttonIndex == 5) { // RB
+        if (p_packet.p_buttonIndex === 5) { // RB
             if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {} else { // when unpress
                 if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed === false) {
                     p_me.API_SendTrackPoint(p_me.m_gamePadUnit, 0.5, 0.5, 30);
@@ -292,7 +301,7 @@ class CAndruavClient {
         }
 
 
-        if (p_packet.p_buttonIndex == 4) { // LB
+        if (p_packet.p_buttonIndex === 4) { // LB
             if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {} else {
                 if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed) {
                     p_me.API_do_ServoChannel(p_me.m_gamePadUnit.partyID, "9", 9999);
@@ -314,7 +323,7 @@ class CAndruavClient {
 
 
     fn_isRegistered() {
-        return(this.socketStatus == CONST_SOCKET_STATUS_REGISTERED);
+        return(this.socketStatus === CONST_SOCKET_STATUS_REGISTERED);
 
     }
 
@@ -336,7 +345,7 @@ class CAndruavClient {
     }
 
     API_addMe2() {
-        if ((this.partyID == null) || (this.m_groupName == null)) 
+        if ((this.partyID === null) || (this.m_groupName == null)) 
             return;
         
 
@@ -364,7 +373,7 @@ class CAndruavClient {
         if (p_target != null) {
             v_rountingMsg = CMD_COMM_INDIVIDUAL;
         } else { // if you want to prevent GCS to GCS.
-            if ((p_target == null) && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true)) {
+            if ((p_target === null) && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true)) {
                 p_target = CONST_TARGETS_DRONES;
                 v_rountingMsg = CMD_COMM_INDIVIDUAL;
             } else {
@@ -372,7 +381,7 @@ class CAndruavClient {
             }
         }
 
-        if (this.ws != null) {
+        if (this.ws !== null) {
             this.ws.sendex(this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg));
         } else { // send a warning
         }
@@ -381,7 +390,7 @@ class CAndruavClient {
 
     API_sendBinCMD(targetName, msgType, data) {
         var v_msgRouting;
-        if (targetName != null) {
+        if (targetName !== null) {
             v_msgRouting = CMD_COMM_INDIVIDUAL;
         } else {
             v_msgRouting = CMD_COMM_GROUP;
@@ -396,17 +405,17 @@ class CAndruavClient {
 
 
     _API_sendSYSCMD(p_msgID, p_msg) {
-        if (this.ws != null) {
+        if (this.ws !== null) {
             this.ws.sendex(this.fn_generateJSONMessage(this.partyID, null, CMDTYPE_SYS, p_msgID, p_msg));
         }
     };
 
 
     API_saveGeoFenceTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent, m_geofenceInfo) {
-        if (p_partyID == null) 
+        if (p_partyID === null) 
             p_partyID = '_any_';
         
-        if (m_groupName == null) 
+        if (m_groupName === null) 
             m_groupName = '_any_';
         
         const c_msg = {
@@ -425,10 +434,10 @@ class CAndruavClient {
 
 
     API_loadGeoFence(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent) {
-        if (p_partyID == null) 
+        if (p_partyID === null) 
             p_partyID = '_any_';
         
-        if (m_groupName == null) 
+        if (m_groupName === null) 
             m_groupName = '_any_';
         
         const c_msg = {
@@ -445,10 +454,10 @@ class CAndruavClient {
     }
 
     API_disableGeoFenceTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent) {
-        if (p_partyID == null) 
+        if (p_partyID === null) 
             p_partyID = '_any_';
         
-        if (m_groupName == null) 
+        if (m_groupName === null) 
             m_groupName = '_any_';
         
 
@@ -470,7 +479,7 @@ class CAndruavClient {
 
     API_setUnitName (p_andruavUnit, p_name, p_description)
     {
-        if ((p_name==null) || (p_name=="") || (p_description==null) || (p_description=="")) return ;
+        if ((p_name===null) || (p_name==="") || (p_description===null) || (p_description==="")) return ;
         
         var msg = {
             UN:p_name,
@@ -868,7 +877,7 @@ class CAndruavClient {
             return;
         
 
-        switch (js_localStorage.default.fn_getGamePadMode()) {
+        switch (js_localStorage.fn_getGamePadMode()) {
             case 1: v_axis = [0, 3, 2, 1]; // PITCH3  _ RUDD0        #    THR1    _  ROLL2
                 break;
             case 2: v_axis = [0, 1, 2, 3]; // THR1    _ RUDD0        #    PITCH3  _  ROLL2
@@ -939,7 +948,7 @@ class CAndruavClient {
 
 
     API_do_SetHomeLocation(p_partyID, p_lat, p_lng, p_alt) {
-        if (p_partyID == null) return ;
+        if (p_partyID === null) return ;
         if (p_alt == null) {
             p_alt = 0;
         }
@@ -1366,7 +1375,7 @@ class CAndruavClient {
         * Disable Geo Fence info to Offline Tasks
         * */
     API_disableWayPointTasks(p_accountID, p_groupName, p_partyID, p_receiver, p_isPermanent) {
-        if (p_partyID == null) 
+        if (p_partyID === null) 
             p_partyID = '_any_';
         
         if (p_groupName == null) 
@@ -1834,7 +1843,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
 
-                    if ((p_unit != null) && (p_unit.m_defined === true)){
+                    if ((p_unit !== null) && (p_unit.m_defined === true)){
                         p_unit.m_IsMe = false;
                         p_unit.m_IsGCS = p_jmsg.GS;
                         p_unit.m_unitName = p_jmsg.UD;
@@ -1898,19 +1907,19 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('FM') !== true) {
                             p_jmsg.FM = false;
                         }
-                        v_trigger_on_flightMode = (p_unit.m_flightMode != p_jmsg.FM);
+                        v_trigger_on_flightMode = (p_unit.m_flightMode !== p_jmsg.FM);
                         p_unit.m_flightMode = p_jmsg.FM;
 
                         if (p_jmsg.hasOwnProperty('AR') !== true) {
                             p_jmsg.AR = false;
                         }
-                        v_trigger_on_armed = (p_unit.m_isArmed != p_jmsg.AR);
+                        v_trigger_on_armed = (p_unit.m_isArmed !== p_jmsg.AR);
                         p_unit.m_isArmed = p_jmsg.AR;
 
                         if (p_jmsg.hasOwnProperty('FL') !== true) {
                             p_jmsg.FL = false;
                         }
-                        v_trigger_on_flying = (p_unit.m_isFlying != p_jmsg.FL);
+                        v_trigger_on_flying = (p_unit.m_isFlying !== p_jmsg.FL);
                         p_unit.m_isFlying = p_jmsg.FL;
 
                         if (p_jmsg.hasOwnProperty('z') === true) {
@@ -1929,12 +1938,12 @@ class CAndruavClient {
                             p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
                         }
 
-                        if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o != js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
-                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader != true);
+                        if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
+                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== true);
                             p_unit.m_Swarm.m_isLeader = true;
                             p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
                         } else {
-                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader != false);
+                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== false);
                             p_unit.m_Swarm.m_isLeader = false;
                             p_unit.m_Swarm.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
                         }
@@ -1981,32 +1990,32 @@ class CAndruavClient {
                             }, 1000);
                         }
                         
-                        if (p_jmsg.hasOwnProperty('B') == true) {
+                        if (p_jmsg.hasOwnProperty('B') === true) {
                             p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
                         }
                         
-                        if (p_jmsg.hasOwnProperty('SD') == true) {
+                        if (p_jmsg.hasOwnProperty('SD') === true) {
                             p_unit.m_IsShutdown = p_jmsg.SD;
                         }
-                        if (p_jmsg.hasOwnProperty('FM') == true) {
+                        if (p_jmsg.hasOwnProperty('FM') === true) {
                             v_trigger_on_flightMode = (p_unit.m_flightMode != p_jmsg.FM);
                             p_unit.m_flightMode = p_jmsg.FM;
                         }
                         if (p_jmsg.hasOwnProperty('AP') === true) {
                             p_unit.m_autoPilot = p_jmsg.AP;
                         }
-                        if (p_jmsg.hasOwnProperty('AR') == true) {
+                        if (p_jmsg.hasOwnProperty('AR') === true) {
                             v_trigger_on_armed = (p_unit.m_isArmed != p_jmsg.AR);
                             p_unit.m_isArmed = p_jmsg.AR;
                         }
-                        if (p_jmsg.hasOwnProperty('FL') == true) {
+                        if (p_jmsg.hasOwnProperty('FL') === true) {
                             v_trigger_on_flying = (p_unit.m_isFlying != p_jmsg.FL);
                             p_unit.m_isFlying = p_jmsg.FL;
                         }
-                        if (p_jmsg.hasOwnProperty('z') == true) {
+                        if (p_jmsg.hasOwnProperty('z') === true) {
                             p_unit.m_FlyingLastStartTime = p_jmsg.z;
                         }
-                        if (p_jmsg.hasOwnProperty('a') == true) {
+                        if (p_jmsg.hasOwnProperty('a') === true) {
                             p_unit.m_FlyingTotalDuration = p_jmsg.a;
                         }
 
@@ -2016,7 +2025,7 @@ class CAndruavClient {
                             p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
                         }
                         
-                        if ((p_jmsg.hasOwnProperty('o') == true) && (p_jmsg.o != 0)) { // SwarmMemberLeaderFormation
+                        if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== 0)) { // SwarmMemberLeaderFormation
                             p_unit.m_Swarm.m_isLeader = true;
                             p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
                         } else {
@@ -2025,7 +2034,7 @@ class CAndruavClient {
 
                         }
 
-                        if ((p_jmsg.hasOwnProperty('q') == true) && (p_jmsg.q != "")){
+                        if ((p_jmsg.hasOwnProperty('q') === true) && (p_jmsg.q !== "")){
                             p_unit.m_Swarm.m_following = p_jmsg.q;
                         } else {
                             p_unit.m_Swarm.m_following = null;
@@ -2039,7 +2048,7 @@ class CAndruavClient {
 
                     }
                     
-                    if ((p_jmsg.hasOwnProperty('p2') === true) && (p_unit.m_P2P.m_initialized==false))
+                    if ((p_jmsg.hasOwnProperty('p2') === true) && (p_unit.m_P2P.m_initialized===false))
                     {
                         // retrieve p2p data if exists.
                         if (p_unit.m_delayedTimeout!= null)
@@ -2090,7 +2099,7 @@ class CAndruavClient {
                 break;
             
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO: {
-                if (p_unit == null) { // p_unit not defined here ... send a request for ID
+                if (p_unit === null) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);
                     return;
                 }
@@ -2108,7 +2117,7 @@ class CAndruavClient {
                 p_unit.m_P2P.m_firmware                 = p_jmsg.f;
                 p_unit.m_P2P.m_driver_connected         = p_jmsg.a;
                 p_unit.m_P2P.m_p2p_connected            = p_jmsg.o;
-                if (p_jmsg.d!= null)
+                if (p_jmsg.d!== null)
                 { // remove the if in release and keep the m_p2p_disabled field.
                     p_unit.m_P2P.m_p2p_disabled             = p_jmsg.d;
                 }
@@ -2123,7 +2132,7 @@ class CAndruavClient {
             break;
             case js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute: 
             {
-                if (p_unit == null) { // p_unit not defined here ... send a request for ID
+                if (p_unit === null) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);
                     return;
                 }
@@ -3256,16 +3265,7 @@ class CAndruavClient {
 };
 
 
-/*jshint esversion: 6 */
-window.AndruavLibs = window.AndruavLibs || {
-    REVISION: 'BETA'
-};
 
-(function (lib) {
-    "use strict";
-    if (typeof module === "undefined" || typeof module.exports === "undefined") {
-        window.AndruavLibs.AndruavClient = lib; // in ordinary browser attach library to window
-    } else {
-        module.exports = lib; // in nodejs
-    }
-})(new CAndruavClient());
+
+
+export var AndruavClient =  CAndruavClient.getInstance();

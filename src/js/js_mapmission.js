@@ -6,6 +6,7 @@
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
 import {js_eventEmitter} from './js_eventEmitter'
+import {js_leafletmap} from './js_leafletmap'
 
 import * as js_andruavMessages from './js_andruavMessages'
 
@@ -189,11 +190,11 @@ class CLSS_AndruavMissionPlan
 		for (let i=0;i<v_len;++i)
 		{
 			let p_m = this.v_markers[i];
-			window.AndruavLibs.AndruavMap.fn_showItem(p_m);
+			js_leafletmap.fn_showItem(p_m);
 
 			if (p_m.m_next != null)
 			{
-				window.AndruavLibs.AndruavMap.fn_showItem(p_m.m_next);
+				js_leafletmap.fn_showItem(p_m.m_next);
 			}
 		}
 
@@ -215,11 +216,11 @@ class CLSS_AndruavMissionPlan
 			
 			let p_m = this.v_markers[i];
 			// delete marker
-			window.AndruavLibs.AndruavMap.fn_hideItem(p_m);
+			js_leafletmap.fn_hideItem(p_m);
 
 			if (p_m.m_next != null)
 			{	// delete line
-				window.AndruavLibs.AndruavMap.fn_hideItem(p_m.m_next);
+				js_leafletmap.fn_hideItem(p_m.m_next);
 			}
 
 		}
@@ -232,7 +233,7 @@ class CLSS_AndruavMissionPlan
 	{
 		if (marker.m_next != null)
 		{
-			window.AndruavLibs.AndruavMap.fn_hideItem(marker.m_next);
+			js_leafletmap.fn_hideItem(marker.m_next);
 		}
 		marker.m_next 	= undefined;
 		marker.distance = undefined;
@@ -296,7 +297,7 @@ class CLSS_AndruavMissionPlan
 					arrowCoordinates.to_pos.lat, arrowCoordinates.to_pos.lng);
 						
 				marker.distance = distance;
-				marker.m_next = window.AndruavLibs.AndruavMap.fn_DrawPath (arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
+				marker.m_next = js_leafletmap.fn_DrawPath (arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
 					arrowCoordinates.to_pos.lat, arrowCoordinates.to_pos.lng,
 					{
 						color: this.m_pathColor,
@@ -366,10 +367,10 @@ class CLSS_AndruavMissionPlan
 			if (this.v_markers[i].id === marker.id)
 			{
 				this.v_markers.splice(i,1);
-				window.AndruavLibs.AndruavMap.fn_hideItem(marker);
+				js_leafletmap.fn_hideItem(marker);
 				if (marker.m_next != null)
 				{	
-					window.AndruavLibs.AndruavMap.fn_hideItem(marker.m_next);
+					js_leafletmap.fn_hideItem(marker.m_next);
 					marker.m_next = undefined;
 					marker.distance = undefined;
 				}
@@ -398,10 +399,10 @@ class CLSS_AndruavMissionPlan
 			marker.m_mission = null;
 			if (marker.m_next != null)
 			{
-				window.AndruavLibs.AndruavMap.fn_hideItem(marker.m_next);
+				js_leafletmap.fn_hideItem(marker.m_next);
 			}
 			
-			window.AndruavLibs.AndruavMap.fn_hideItem(marker);
+			js_leafletmap.fn_hideItem(marker);
 			//marker.EVT_onShapeDeleted(marker);
 		}
 

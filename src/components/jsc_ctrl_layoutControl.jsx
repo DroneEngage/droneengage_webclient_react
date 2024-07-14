@@ -1,5 +1,5 @@
 import React    from 'react';
-import * as js_localStorage from '../js/js_localStorage'
+import {js_localStorage} from '../js/js_localStorage'
 
 import {fn_applyControl, fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';
 
@@ -7,13 +7,13 @@ export class CLSS_CTRL_Layout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
-        js_localStorage.default.fn_getDisplayMode();
+        js_localStorage.fn_getDisplayMode();
 
         //fn_applyControl();
     }
 
     render() {
-        const v_display_mode = js_localStorage.default.fn_getDisplayMode()%5+1;
+        const v_display_mode = js_localStorage.fn_getDisplayMode()%5+1;
         return (
             <div id="main_btn_group"  role="group" aria-label="Basic example">
                 <button type="button" id="btn_showSettings" className="btn btn-success btn-sm ctrlbtn" title='Show/Hide Settings Section' onClick={(e) => fn_showSettings()}><strong>SETTINGS</strong></button>

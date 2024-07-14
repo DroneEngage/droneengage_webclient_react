@@ -290,19 +290,5 @@ class CAndruavAuth {
     }
 }
 
-
-/*jshint esversion: 6 */
-// window.AndruavLibs = window.AndruavLibs || {REVISION: 'BETA' };
-
-// (function(lib) {
-// 	"use strict";
-// 	if (typeof module === "undefined" || typeof module.exports === "undefined") {
-// 	  window.AndruavLibs.AndruavAuth = lib; // in ordinary browser attach library to window
-// 	} else {
-// 	  module.exports = lib; // in nodejs
-// 	}
-//   })(new CAndruavAuth());
   
-  
-export default CAndruavAuth.getInstance();
-
+export var js_andruavAuth =  CAndruavAuth.getInstance();

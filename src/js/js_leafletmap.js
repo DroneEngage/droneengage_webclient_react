@@ -683,22 +683,4 @@ class CLeafLetAndruavMap {
 }
 
 
-// /*jshint esversion: 6 */
-// window.AndruavLibs = window.AndruavLibs || {
-//     REVISION: 'BETA'
-// };
-
-
-// if ((typeof(js_globals.CONST_MAP_GOOLE) != "undefined") && (js_globals.CONST_MAP_GOOLE === false)) {
-//     (function (lib) {
-//         "use strict";
-//         if (typeof module === "undefined" || typeof module.exports === "undefined") {
-//             window.AndruavLibs.AndruavMap = lib; // in ordinary browser attach library to window
-//         } else {
-//             module.exports = lib; // in nodejs
-//         }
-//     })(new CLeafLetAndruavMap);
-// }
-
-
-export default CLeafLetAndruavMap.getInstance();
+export var js_leafletmap =  CLeafLetAndruavMap.getInstance();

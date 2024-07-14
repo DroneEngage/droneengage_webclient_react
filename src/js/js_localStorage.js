@@ -186,4 +186,4 @@ class CLocalStorage {
 }
 
 
-export default CLocalStorage.getInstance();
+export var js_localStorage= CLocalStorage.getInstance();

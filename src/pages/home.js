@@ -7,8 +7,10 @@ import '../css/css_styles2.css';
 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+import {js_globals} from '../js/js_globals.js';
 import React , { useEffect } from 'react';
 import CLSS_HeaderControl from '../components/jsc_header'
+import CLSS_GlobalSettings from '../components/jsc_globalSettings'
 
 import {fn_on_ready} from '../js/js_main'
 
@@ -60,7 +62,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div id="modal_fpv_img" className="form-group text-center">
-                    <img id='unitImg' className="img-rounded" src='images/camera_img.png' />
+                    <img id='unitImg' className="img-rounded" alt='camera' src='images/camera_img.png' />
                   </div>
                   
                   <div id="modal_fpv_footer" className="form-group text-center localcontainer">
@@ -109,7 +111,9 @@ const Home = () => {
             <div id="row_2" className="col-4 ">
 				      <div id='andruavUnits' className='col-sm-12 padding_zero'>
 						    <div id="andruavUnits_in" className=''>
-							    <p className="bg-warning  text-center"><strong>Global Settings</strong></p>
+                <CLSS_GlobalSettings/>
+                
+							    
 							  
                   <div id='andruavUnitGlobals'></div>
 							

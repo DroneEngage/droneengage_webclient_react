@@ -18,7 +18,7 @@
 import { js_globals } from "./js_globals.js";
 import * as js_andruavMessages from "./js_andruavMessages";
 import * as js_circularBuffer from "./js_circularBuffer";
-import { mavlink20, MAVLink20Processor } from "./js_mavlink_v2.js";
+import { mavlink20 } from "./js_mavlink_v2.js";
 
 // Vehicle Types
 export const VEHICLE_UNKNOWN = 0;
