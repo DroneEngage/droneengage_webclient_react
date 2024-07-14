@@ -1,4 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'leaflet/dist/leaflet.css';
+import '../css/css_styles.css';
+import '../css/css_styles2.css';
 
 import React from 'react';
 import ReactDOM from "react-dom/client";
@@ -60,16 +63,6 @@ class CLSS_HeaderControl extends React.Component {
 
 
 
+export default CLSS_HeaderControl;
 
-    if (js_siteConfig.CONST_TEST_MODE === true)
-	{
-        const root = ReactDOM.createRoot(document.getElementById('header_div'));
-        root.render(<React.StrictMode><CLSS_HeaderControl /></React.StrictMode>);
-    
-    }
-    else
-    {
-        const root = ReactDOM.createRoot(document.getElementById('header_div'));
-        root.render(<CLSS_HeaderControl />);
-    }
 

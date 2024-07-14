@@ -1,4 +1,4 @@
-import React from 'react';
+import React  , { useEffect }  from 'react';
 import * as js_localStorage from '../js/js_localStorage'
 
 import {fn_applyControl, fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';
@@ -9,7 +9,7 @@ export class CLSS_CTRL_Layout extends React.Component {
         this.state = {};
         js_localStorage.default.fn_getDisplayMode();
 
-        fn_applyControl();
+        //fn_applyControl();
     }
 
     render() {

@@ -1,10 +1,27 @@
-import React from 'react';
-import '../js/js_main.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'leaflet/dist/leaflet.css';
+import '../css/css_styles.css';
+import '../css/css_styles2.css';
+
+import React , { useEffect } from 'react';
+import CLSS_HeaderControl from '../components/jsc_header'
+
+import {fn_on_ready} from '../js/js_main'
+
+
+
+
 const Home = () => {
+
+  useEffect(() => {
+    fn_on_ready();
+  }
+  );
+  
     return (
     <div>
           <div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
-            <div id="header_div"></div>
+          <CLSS_HeaderControl />
           </div>
 
           <div id='mainBody' className='row css_mainbody' >
@@ -12,10 +29,11 @@ const Home = () => {
               <div id="row_1_1" className="row margin_zero">
                 
                 <div id="displays" className="container-fluid text-center">
-                  <div className="monitorview " id="message_notification" style='display:none;'>&nbsp;</div>
+                  <div className="monitorview " id="message_notification" style={{ display: 'none' }}>&nbsp;</div>
                   <div id="div_cmp_hud"></div>
                   <div className="monitorview " id="div_map_view">
-                    <div id='mapid' className="org_border fullscreen"></div>
+                    <div id='mapid' className="org_border fullscreen">
+                    </div>
                   </div>
                   <div className="cameraview" id="div_video_control"></div>
                   <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array"></div>

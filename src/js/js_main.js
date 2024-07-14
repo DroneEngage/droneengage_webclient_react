@@ -37,7 +37,6 @@ $.fn.append = function($el){
 var v_contextMenuOpen = false;
 
 
-var isMapInit = false;
 var myposition = null;
 var elevator;
 var m_markGuided = null;
@@ -1668,7 +1667,7 @@ function fn_handleKeyBoard() {
 		var infowindow = null;
 		function initMap() {
 			
-			//js_leafletmap.default.fn_initMap('mapid');
+			js_leafletmap.default.fn_initMap('mapid');
 			fn_setLapout();
 			fn_gps_getLocation();
 
@@ -3241,4 +3240,5 @@ function fn_handleKeyBoard() {
 			}
 		};  // end of onReady
 
-		$(document).ready(fn_on_ready);
+		
+		//$(document).ready(fn_on_ready);
