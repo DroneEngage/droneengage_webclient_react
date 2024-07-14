@@ -9,7 +9,7 @@ import {js_eventEmitter} from './js_eventEmitter'
 
 import * as js_andruavMessages from './js_andruavMessages'
 
-import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';
+import { mavlink20 } from './js_mavlink_v2.js';
 
 
 export class CLSS_AndruavFencePlan
@@ -50,7 +50,7 @@ export class CLSS_AndruavFencePlan
 			cmd.a = c_shape.m_geofenceInfo.isHardFence;
 			cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
 			cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
-	
+			var lnglat = {};
 			switch (c_shape.pm.getShape())
 			{
 				case 'Marker':
@@ -63,9 +63,9 @@ export class CLSS_AndruavFencePlan
 
 					const len_lnglat = c_lnglats.length;
 
-					for (var j=0; j<len_lnglat; ++j)
+					for (let j=0; j<len_lnglat; ++j)
 					{
-						var lnglat = {};
+						
 						lnglat.a = c_lnglats[j].lat * 10000000;
 						lnglat.g = c_lnglats[j].lng * 10000000;
 						cmd[j] = lnglat;
@@ -80,7 +80,6 @@ export class CLSS_AndruavFencePlan
 					cmd.t = js_andruavMessages.FENCETYPE_PolygonFence;
 					const c_boundary = c_shape.getBounds();
 
-					var lnglat = {};
 					lnglat.a = c_boundary._northEast.lat;
 					lnglat.g = c_boundary._northEast.lng;
 					cmd[0] = lnglat;
@@ -110,7 +109,6 @@ export class CLSS_AndruavFencePlan
 					cmd.t = js_andruavMessages.FENCETYPE_CylindersFence;
 					const c_center = c_shape.getLatLng();
 					
-					var lnglat = {};
 					lnglat.a = c_center.lat;
 					lnglat.g = c_center.lng;
 					cmd["0"] = lnglat;
@@ -125,9 +123,8 @@ export class CLSS_AndruavFencePlan
 
 					const len_lnglat = c_lnglats.length;
 
-					for (var j=0; j<len_lnglat;++j)
+					for (let j=0; j<len_lnglat;++j)
 					{
-						var lnglat = {};
 						lnglat.a = c_lnglats[j].lat;
 						lnglat.g = c_lnglats[j].lng;
 						cmd[j] = lnglat;

@@ -1,4 +1,4 @@
-import React  , { useEffect }  from 'react';
+import React    from 'react';
 import * as js_localStorage from '../js/js_localStorage'
 
 import {fn_applyControl, fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';

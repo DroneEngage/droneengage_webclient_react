@@ -3,6 +3,8 @@ import 'leaflet/dist/leaflet.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 import React , { useEffect } from 'react';
 import CLSS_HeaderControl from '../components/jsc_header'
 
@@ -79,7 +81,7 @@ const Home = () => {
                   <div className="card-body">
                     <div id="yaw_knob_out" className="form-group text-centermodal_dialog_style">
                       <input id="yaw_knob" className=" input-sm dial" data-width="180" data-height="180" data-min="0"
-                        data-max="360" value="0" />
+                        data-max="360" defaultValue="0" />
                     </div>
                   </div>
                   <div id="modal_yaw_knob_footer" className="form-group text-center ">
