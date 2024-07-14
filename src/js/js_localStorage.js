@@ -94,7 +94,7 @@ class CLocalStorage {
     }
 
     fn_getMetricSystem = function () {
-        return(this.getDefaultAttribute('_vv_useMetricSystem', js_globals.v_useMetricSystem) == 'true');
+        return(this.getDefaultAttribute('_vv_useMetricSystem', js_globals.v_useMetricSystem) === 'true');
     }
 
     fn_getGamePadMode = function () {

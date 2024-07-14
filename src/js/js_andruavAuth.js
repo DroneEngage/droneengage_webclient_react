@@ -106,13 +106,13 @@ class CAndruavAuth {
 
 
 	fn_do_loginAccount (p_userName, p_accessCode) {
-    if ((p_userName == null) || (p_userName.length == 0) || (p_accessCode == null) || (p_userName.accessCode == 0)) {
+    if ((p_userName === null) || (p_userName.length === 0) || (p_accessCode === null) || (p_userName.accessCode === 0)) {
         this._m_logined = false;
         return;
     }
 
     var _url;
-    if (window.location.protocol == 'https:') {
+    if (window.location.protocol === 'https:') {
 	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		
 	}
@@ -142,7 +142,7 @@ class CAndruavAuth {
         success: function (v__res) {
             v_res = JSON.parse(v__res);
 
-            if (v_res.e == 0) {
+            if (v_res.e === 0) {
                 Me._m_logined = true;
                 Me._m_session_ID = v_res.sid;
                 Me.m_server_port = v_res.cs.h;
@@ -175,18 +175,18 @@ class CAndruavAuth {
 
 	fn_generateAccessCode (p_accountName, p_permission) 
 	{
-		if ((p_accountName == null) || (p_accountName.length == 0)) {
+		if ((p_accountName === null) || (p_accountName.length === 0)) {
 			return;
 		}
 
-        if ((p_permission == null) || (typeof(p_permission) != 'string'))
+        if ((p_permission === null) || (typeof(p_permission) !== 'string'))
         {
             return ;
         }
 
 
 		var _url;
-		if (window.location.protocol ==  'https:') {
+		if (window.location.protocol ===  'https:') {
 			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		} else {
 			_url = 'http://'  + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
@@ -210,7 +210,7 @@ class CAndruavAuth {
 			success: function (v__res) {
 				v_res = JSON.parse(v__res);
 
-				if (v_res.e == 0) {
+				if (v_res.e === 0) {
 					js_eventEmitter.fn_dispatch(EE_Auth_Account_Created, v_res);
 				} else {
 					js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
@@ -230,19 +230,19 @@ class CAndruavAuth {
 
 	fn_regenerateAccessCode = function (p_accountName, p_permission)  
 	{
-        if ((p_accountName == null) || (p_accountName.length == 0)) {
+        if ((p_accountName === null) || (p_accountName.length === 0)) {
             return;
         }
 
 
-        if ((p_permission == null) || (typeof(p_permission) != 'string'))
+        if ((p_permission === null) || (typeof(p_permission) !== 'string'))
             {
                 return ;
             }
 
 
         var _url;
-        if (window.location.protocol == 'https:') {
+        if (window.location.protocol === 'https:') {
             _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
         } else {
             _url = 'http://' + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
@@ -266,7 +266,7 @@ class CAndruavAuth {
             success: function (v__res) {
                 v_res = JSON.parse(v__res);
 
-                if (v_res.e == 0) {
+                if (v_res.e === 0) {
                     js_eventEmitter.fn_dispatch(EE_Auth_Account_Regenerated, v_res);
                 } else {
                     js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);

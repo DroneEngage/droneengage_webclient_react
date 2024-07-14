@@ -19,7 +19,7 @@ class CLSS_CustomCircularBuffer
 
     fn_add (p_toAdd, p_forgetOld,fn_onDeleteCallBack) 
     {
-            if ((p_forgetOld == true) || (this.m_unitCount < this.m_buffer.length))
+            if ((p_forgetOld === true) || (this.m_unitCount < this.m_buffer.length))
             {
                  if (this.m_buffer[this.m_head]!= null)
                  {
@@ -34,7 +34,7 @@ class CLSS_CustomCircularBuffer
             else
             {
                 // invalid call
-                throw "Buffer Overflow";
+                throw Error("Buffer Overflow");
                 
             }
             this.m_head = this.m_head % this.m_buffer.length;
@@ -43,7 +43,7 @@ class CLSS_CustomCircularBuffer
     fn_get (p_ignoreUnderFlow)
     {
         var t = null;
-        if (this.m_unitCount ==0) return null;
+        if (this.m_unitCount === 0) return null;
         if (this.m_unitCount < this.m_buffer.length)
         {
             t = this.m_buffer[this.m_tail];
@@ -54,7 +54,7 @@ class CLSS_CustomCircularBuffer
         else
         {
              if (p_ignoreUnderFlow === false) {
-                throw "Buffer Underflow";
+                throw Error("Buffer Underflow");
                
             }
         }

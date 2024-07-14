@@ -65,9 +65,9 @@ const Home = () => {
                     </div>
                   </div>
                   <div id="modal_yaw_knob_footer" className="form-group text-center ">
-                    <div class = "row">
+                    <div className= "row">
                       <div className="btn-group">
-                        <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">opaque</button>
+                        <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                         <button id="btnGoto" type="button" className="btn btn-sm btn-success">Goto</button>
                         <button id="btnYaw" type="button" className="btn btn-sm btn-danger">YAW</button>
                         <button id="btnResetYaw" type="button" className="btn btn-sm btn-warning">reset YAW</button>

@@ -1,15 +1,15 @@
 
 
 
-export const CONST_MeterToKnot 		= 0.539957;
-export const CONST_KNOT_TO_KM_HOUR     = 1.852; 
+export const CONST_MeterToKnot 		    = 0.539957;
+export const CONST_KNOT_TO_KM_HOUR      = 1.852; 
 export const CONST_FEET_TO_METER 		= 0.30479999;
 export const CONST_METER_TO_FEET 		= 3.28084;
-export const CONST_METER_TO_MILE       = 2.23694;  //m/s to mph
-export const CONST_MILE_TO_METER       = 0.44704;  //m/s to mph
+export const CONST_METER_TO_MILE        = 2.23694;  //m/s to mph
+export const CONST_MILE_TO_METER        = 0.44704;  //m/s to mph
 export const CONST_RADIUS_TO_DEGREE 	= 180 / Math.PI;
 export const CONST_DEGREE_TO_RADIUS 	= Math.PI / 180;
-export const CONST_PTx2				= Math.PI * 2;
+export const CONST_PTx2				    = Math.PI * 2;
 
 
 export const CONST_NETWORK_TYPE_UNKNOWN 	= 0;
@@ -17,18 +17,18 @@ export const CONST_NETWORK_TYPE_GPRS 	    = 1;
 export const CONST_NETWORK_TYPE_EDGE 	    = 2;
 export const CONST_NETWORK_TYPE_UMTS 	    = 3; 
 export const CONST_NETWORK_TYPE_CDMA 	    = 4; 
-export const CONST_NETWORK_TYPE_EVDO_0 	= 5;
-export const CONST_NETWORK_TYPE_EVDO_A 	= 6;
+export const CONST_NETWORK_TYPE_EVDO_0 	    = 5;
+export const CONST_NETWORK_TYPE_EVDO_A 	    = 6;
 export const CONST_NETWORK_TYPE_1xRTT 	    = 7; 
 export const CONST_NETWORK_TYPE_HSDPA 	    = 8;  
 export const CONST_NETWORK_TYPE_HSUPA 	    = 9;  
 export const CONST_NETWORK_TYPE_HSPA 	    = 10; 
-export const CONST_NETWORK_TYPE_EVDO_B 	= 12;
+export const CONST_NETWORK_TYPE_EVDO_B 	    = 12;
 export const CONST_NETWORK_TYPE_IDEN 	    = 11;
 export const CONST_NETWORK_TYPE_LTE 		= 13;
 export const CONST_NETWORK_TYPE_EHRPD 	    = 14;
 export const CONST_NETWORK_TYPE_HSPAP 	    = 15;
-var v_NETWORK_TYPE = ['Unknown','GPRS','EDGE','UTMS','CDMA','U+','U+','Unknown','U+','H','H','H+','H+','LTE','EHRPD','HSPAP'];
+export var v_NETWORK_TYPE = ['Unknown','GPRS','EDGE','UTMS','CDMA','U+','U+','Unknown','U+','H','H','H+','H+','LTE','EHRPD','HSPAP'];
 
 
 export const CONST_TELEPHONE_NOTFOUND    = 0;
@@ -68,7 +68,7 @@ export function  fn_getTimeSpanDetails (delta)
 
 export function  fn_getTimeSpanDetails_Shortest (date_future, date_now)
 {
-    if (date_now ==0)
+    if (date_now ===0)
     return "";
     // get total seconds between the times
     var delta = Math.abs(date_future - date_now) / 1000;
@@ -99,27 +99,27 @@ export function  fn_getStringOfTimeDiff_Shortest (dif)
 {
     var str = "";
     var displayLowerDigits = false;
-    if (!isNaN(dif.days) && (dif.days !=0))
+    if (!isNaN(dif.days) && (dif.days !==0))
     {
         str = str + dif.days + 'd:' ;
         displayLowerDigits = true;
     }
-    if (displayLowerDigits || (!isNaN(dif.hours) && (dif.hours !=0)))
+    if (displayLowerDigits || (!isNaN(dif.hours) && (dif.hours !==0)))
     {
         str = str + dif.hours + 'h:' ;
         displayLowerDigits = true;
     }
-    if (displayLowerDigits || (!isNaN(dif.minutes) && (dif.minutes !=0)))
+    if (displayLowerDigits || (!isNaN(dif.minutes) && (dif.minutes !==0)))
     {
         str = str+ dif.minutes + 'm:' ;
         displayLowerDigits = true;
     }
-    if (displayLowerDigits || (!isNaN(dif.seconds) && (dif.seconds !=0)))
+    if (displayLowerDigits || (!isNaN(dif.seconds) && (dif.seconds !==0)))
     {
         str = str + dif.seconds.toFixed(0)+ 's' ;
     }
 
-    if (str=='') str='0s';
+    if (str==='') str='0s';
     return str;
 }
 
@@ -230,7 +230,7 @@ export function  fn_str2ByteArray (str)
 export function  fn_concatTypedArrays(a, b, addzero) { // a, b TypedArray of same type
     var c = new (a.constructor)(a.length + b.length + 1);
     c.set(a, 0);
-    if (addzero == true)
+    if (addzero === true)
     {
         c[a.length]=0;
         c.set(b, a.length + 1 );
@@ -258,7 +258,7 @@ export function  prv_extractString(data,startIndex,endIndex)
         while ( i < endIndex && data[i] !== 0) {
             i++;
         }
-        if (i == endIndex) 
+        if (i === endIndex) 
         {
             return  {'text':"", 'nextIndex': startIndex};
         }
@@ -296,7 +296,7 @@ Image.prototype.rotate = function(angle) {
 }
 
 
-String.prototype._fn_hexEncode = function(){
+export const _fn_hexEncode = function(){
     var hex, i,v;
 
     var result = "";
@@ -310,7 +310,7 @@ String.prototype._fn_hexEncode = function(){
     return result
 }
 
-String.prototype._fn_hexDecode = function(){
+export const _fn_hexDecode = function(){
     var j,v;
     var hexes = this.match(/.{1,4}/g) || [];
     var back = "";

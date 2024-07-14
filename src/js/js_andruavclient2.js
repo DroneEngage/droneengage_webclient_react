@@ -15,7 +15,6 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-"use strict";
 import {js_globals} from './js_globals.js';
 import * as js_helpers from './js_helpers.js';
 import * as js_siteConfig from './js_siteConfig.js';

@@ -4,7 +4,6 @@
 *   31 Aug 2020
 *
 *********************************************************************************** */
-"use strict";
 
 import $ from 'jquery'; 
 import L from 'leaflet';
@@ -349,7 +348,7 @@ class CLeafLetAndruavMap {
         // return v_geoFence;
 
         return L.polyline(p_lnglatFromTo, {
-            color: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493',
+            color: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
             opacity: 0.9,
             weight: 2
         }).addTo(this.m_Map);
@@ -372,7 +371,7 @@ class CLeafLetAndruavMap {
 
         return L.polygon(p_lnglatFromTo, {
             fill: true,
-            fillColor: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493',
+            fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
             fillOpacity: 0.45,
             opacity: 0.9,
             weight: 0
@@ -397,7 +396,7 @@ class CLeafLetAndruavMap {
         return L.circle(p_center, {
             radius: parseInt(p_radius),
             fill: true,
-            fillColor: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493',
+            fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
             opacity: 1.0,
             weight: 0,
             fillOpacity: 0.45
@@ -416,7 +415,7 @@ class CLeafLetAndruavMap {
         // v_missionLine.setMap(this.m_Map);
 
         // return v_missionLine;
-        var v_color = (p_color == null)?'#75A4D3':p_color;
+        var v_color = (p_color === '')?'#75A4D3':p_color;
 
         return L.polyline(p_lnglatFromTo, {
             color: v_color,
@@ -490,23 +489,23 @@ class CLeafLetAndruavMap {
     };
 
     fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
-        if ((p_image==null) || (p_image==""))
+        if ((p_image===null) || (p_image===""))
         {
             p_image = './images/destination_g_32x32.png';
         }
         var v_image;
-        if (p_iconsize==null) {
+        if (p_iconsize===null) {
             p_iconsize = [32,32];
         }
         
         var v_iconAnchor = [p_iconsize[0]/2,p_iconsize[1]/2];
-        if (anchor!=null)
+        if (anchor!==null)
         {
             v_iconAnchor = anchor;
         }
         
         var v_popupAnchor = [-p_iconsize[0]/2,-p_iconsize[0]/2];
-        if (p_htmlTitle == null) {
+        if ((p_htmlTitle === null) || (p_htmlTitle === '')) {
             v_image = L.icon({
                 iconUrl: p_image,
                 iconSize: p_iconsize,
@@ -574,12 +573,12 @@ class CLeafLetAndruavMap {
          */
     fn_deleteAllEditShapes() {
         const v_editLayers = this.m_Map.pm.getGeomanDrawLayers();
-        if ((v_editLayers == null) || (v_editLayers.length == 0)) 
+        if ((v_editLayers === null) || (v_editLayers.length === 0)) 
             return;
         
 
         v_editLayers.forEach(function (e) {
-            if (e.m_next!=null) e.m_next.remove(); // delete attached markers
+            if (e.m_next!==null) e.m_next.remove(); // delete attached markers
             e.remove()
         })
 

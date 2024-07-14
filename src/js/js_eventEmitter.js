@@ -74,22 +74,12 @@ class CEventEmitter {
         while (true)
         {
             let index = this.fn_getIndex(p_event, p_listner);
-            if (index ==-1) return ;
+            if (index ===-1) return ;
             this.m_v_events[p_event].splice(index, 1);
         }
     }
 };
 
-// window.AndruavLibs = window.AndruavLibs || {REVISION: 'BETA' };
 
-
-// (function(lib) {
-// 	"use strict";
-// 	if (typeof module === "undefined" || typeof module.exports === "undefined") {
-// 	  window.AndruavLibs.EventEmitter = lib; // in ordinary browser attach library to window
-// 	} else {
-// 	  module.exports = lib; // in nodejs
-// 	}
-//   })(new CEventEmitter());
   
   export var js_eventEmitter =  CEventEmitter.getInstance();

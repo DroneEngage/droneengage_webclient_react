@@ -221,7 +221,7 @@ class GLOBALS {
 	fn_console_log(p_txt)
 	{
 		//CODEBLOCK_START
-		if ((js_siteConfig.CONST_TEST_MODE == true)  && (js_siteConfig.CONST_TEST_MODE_ENABLE_LOG == true))
+		if ((js_siteConfig.CONST_TEST_MODE === true)  && (js_siteConfig.CONST_TEST_MODE_ENABLE_LOG === true))
 		{
 			console.log (p_txt);
 		}

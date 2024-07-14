@@ -103,7 +103,7 @@ mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
     var plen = this.payload.length;
         //in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
         // variable length arrays and smaller packets
-        while (plen > 1 && this.payload[plen-1] == 0) {
+        while (plen > 1 && this.payload[plen-1] === 0) {
                 plen = plen - 1;
         }
         this.payload = this.payload.slice(0, plen);
@@ -15604,7 +15604,7 @@ MAVLink20Processor.prototype.pushBuffer = function(data) {
 MAVLink20Processor.prototype.parsePrefix = function() {
 
     // Test for a message prefix.
-    if( this.buf.length >= 1 && this.buf[0] != this.protocol_marker ) {
+    if( this.buf.length >= 1 && this.buf[0] !== this.protocol_marker ) {
 
         // Strip the offending initial byte and throw an error.
         var badPrefix = this.buf[0];
@@ -15745,11 +15745,11 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         throw new Error('Unable to unpack MAVLink header: ' + e.message);
     }
 
-    if (magic.charCodeAt(0) != this.protocol_marker) {
+    if (magic.charCodeAt(0) !== this.protocol_marker) {
         throw new Error("Invalid MAVLink prefix ("+magic.charCodeAt(0)+")");
     }
 
-    if( mlen != msgbuf.length - (mavlink20.HEADER_LEN + 2)) {
+    if( mlen !== msgbuf.length - (mavlink20.HEADER_LEN + 2)) {
         throw new Error("Invalid MAVLink message length.  Got " + (msgbuf.length - (mavlink20.HEADER_LEN + 2)) + " expected " + mlen + ", msgId=" + msgId);
     }
 
@@ -15773,7 +15773,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     // Assuming using crc_extra = True.  See the message.prototype.pack() function.
     messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
     
-    if ( receivedChecksum != messageChecksum ) {
+    if ( receivedChecksum !== messageChecksum ) {
         throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
     }
 
@@ -15801,7 +15801,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     const elementsInMsg = decoder.order_map.length;
     const actualElementsInMsg = JSON.parse(JSON.stringify(t)).length;
 
-    if (elementsInMsg == actualElementsInMsg) {
+    if (elementsInMsg === actualElementsInMsg) {
         // Reorder the fields to match the order map
         _.each(t, function(e, i, l) {
             args[i] = t[decoder.order_map[i]]
@@ -15832,7 +15832,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
                 }
 
                 // Now that we know how long the array is, create an array with the values
-                for(var j = 0, size = parseInt(arraySize); j < size; ++j){
+                for(var j = 0, size2 = parseInt(arraySize); j < size2; ++j){
                     newArray.push(t[j+orderIndex]);
                     memberIndex++;
                 }

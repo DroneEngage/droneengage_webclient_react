@@ -16,7 +16,7 @@ export class CLSS_AndruavFencePlan
 {
 	constructor (p_id/*, p_initColor*/)
 	{
-		if (p_id == null) throw new Error('Error Bad ID');
+		if (p_id === null) throw new Error('Error Bad ID');
 		this.m_id = p_id;
 		this.v_markers = [];
 
@@ -154,7 +154,7 @@ class CLSS_AndruavMissionPlan
 
 	constructor (p_id, p_initColor)
 	{
-		if (p_id == null) throw new Error('Error Bad ID');
+		if (p_id === null) throw new Error('Error Bad ID');
 		this.m_id = p_id;
 		this.v_markers = [];
 
@@ -174,7 +174,7 @@ class CLSS_AndruavMissionPlan
 
 	fn_togglePath ()
 	{
-		if (this.m_hidden == true)
+		if (this.m_hidden === true)
 		{
 			this.fn_showMarkers();
 		}
@@ -187,9 +187,9 @@ class CLSS_AndruavMissionPlan
 	fn_showMarkers ()
 	{
 		const v_len =this.v_markers.length;
-		if (v_len ==0) return ;
+		if (v_len ===0) return ;
 
-		for (let i =0;i<v_len;++i)
+		for (let i=0;i<v_len;++i)
 		{
 			let p_m = this.v_markers[i];
 			window.AndruavLibs.AndruavMap.fn_showItem(p_m);
@@ -211,9 +211,9 @@ class CLSS_AndruavMissionPlan
 	{
 		const v_len = this.v_markers.length;
 		
-		if (v_len ==0) return ;
+		if (v_len === 0) return ;
 
-		for (let i =0;i<v_len;++i)
+		for (let i=0;i<v_len;++i)
 		{
 			
 			let p_m = this.v_markers[i];
@@ -261,12 +261,12 @@ class CLSS_AndruavMissionPlan
 		if (this.m_hidden) return ;
 		
 		var len = this.v_markers.length;
-		if (len == 0)
+		if (len === 0)
 		{
 			return ;
 		}
 
-		if (len == 1)
+		if (len === 1)
 		{
 			this.fn_disconnectMissionItem (this.v_markers[0]);
 			return ;
@@ -283,7 +283,7 @@ class CLSS_AndruavMissionPlan
 		for (var i=0; i<len; ++i)
 		{
 			marker = this.v_markers[i];
-			if ((v_enforceRedraw == true))
+			if ((v_enforceRedraw === true))
 			{
 				this.fn_disconnectMissionItem (marker);
 			}
@@ -366,7 +366,7 @@ class CLSS_AndruavMissionPlan
 		var len = this.v_markers.length;
 		for (var i =0;i<len;++i)
 		{
-			if (this.v_markers[i].id == marker.id)
+			if (this.v_markers[i].id === marker.id)
 			{
 				this.v_markers.splice(i,1);
 				window.AndruavLibs.AndruavMap.fn_hideItem(marker);
@@ -448,14 +448,14 @@ class CLSS_AndruavMissionPlan
 
 	fn_exportToJSONAndruav (p_missionV110, p_PartyID)
 	{
-		if (this.v_markers.length ==0)	 return;
+		if (this.v_markers.length ===0)	 return;
 		
 		// var v_cmd = CLSS_AndruavResala_WayPoints.fn_toJSON(this.v_markers);
 		
 		// Delete Old Shapes
 		if (p_missionV110 != null)
 		{
-			if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()==true))
+			if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()===true))
 			{
 				js_globals.v_andruavClient.API_requestDeleteWayPoint(p_PartyID,null); // deattach drones from all fences in the group
 				js_globals.v_andruavClient.API_disableWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
@@ -569,10 +569,10 @@ class CLSS_AndruavMissionPlan
 					break;
 			}
 			
-			if (skip == true) continue;
+			if (skip === true) continue;
                     
 
-			if (marker.m_missionItem.m_speedRequired == true)
+			if (marker.m_missionItem.m_speedRequired === true)
 			{
 				// add speed command
 				/*
@@ -597,7 +597,7 @@ class CLSS_AndruavMissionPlan
 						
 			}
 
-			if (marker.m_missionItem.m_yawRequired == true)
+			if (marker.m_missionItem.m_yawRequired === true)
 			{
 				// add speed command
 				/*
@@ -622,7 +622,7 @@ class CLSS_AndruavMissionPlan
 							
 			}
 
-			if (marker.m_missionItem.eventFireRequired == true)
+			if (marker.m_missionItem.eventFireRequired === true)
 			{
 				// fire event will use servo (16) as default or other suitable servo channel.
 				/*
@@ -646,7 +646,7 @@ class CLSS_AndruavMissionPlan
 							
 			}
 
-			if (marker.m_missionItem.eventWaitRequired == true)
+			if (marker.m_missionItem.eventWaitRequired === true)
 			{
 				// wait event will use servo (15) as default or other suitable servo channel.
 				/*
@@ -737,7 +737,7 @@ class CLSS_AndruavMissionPlanManager
 
 	fn_deleteMission (v_id2)
 	{
-		if (this.m_missionPlans.hasOwnProperty(v_id2) == false)
+		if (this.m_missionPlans.hasOwnProperty(v_id2) === false)
 		{
 			return ;
 		}
@@ -756,7 +756,7 @@ class CLSS_AndruavMissionPlanManager
 	fn_activateNextMission (v_id2)
 	{
 		var p_keys = Object.keys(this.m_missionPlans);
-		if ((p_keys ==null) || (p_keys.length ==0))
+		if ((p_keys === undefined) || (p_keys ===null) || (p_keys.length ===0))
 		{
 			return null;
 		}
@@ -766,7 +766,7 @@ class CLSS_AndruavMissionPlanManager
 		
 		for (var i=0;i<p_len;++i)
 		{
-			if (p_keys[i] == v_id2)
+			if (p_keys[i] === v_id2)
 			{
 				p_index = (i + 1) % p_keys.length;
 				var v_mission = this.m_missionPlans[p_keys[p_index]];

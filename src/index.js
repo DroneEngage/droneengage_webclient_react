@@ -8,9 +8,9 @@ import Planning from "./pages/Planning";
 import NoPage from "./pages/NoPage";
 import {fn_on_ready} from './js/js_main'
 
-import $ from 'jquery';
 
 import './css/css_styles.css';
+import './css/css_styles2.css';
 
 
 

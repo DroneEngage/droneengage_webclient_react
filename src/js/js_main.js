@@ -2,7 +2,7 @@
 
 import $ from 'jquery'; 
 
-
+import 'jquery-ui-dist/jquery-ui';
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
@@ -18,7 +18,7 @@ import {js_eventEmitter} from './js_eventEmitter'
 import * as js_localStorage from './js_localStorage'
 import * as js_mapmission from './js_mapmission'
 
-import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js';
+import { mavlink20 } from './js_mavlink_v2.js';
 
 
 const isNumber = require('is-number');
@@ -27,7 +27,7 @@ var oldAppend = $.fn.append;
 
 $.fn.append = function($el){
     var dom = ($el instanceof $) ? $el[0] : $el
-    if(dom && dom.tagName=='SCRIPT'){
+    if(dom && dom.tagName==='SCRIPT'){
         this[0].appendChild(dom)
         return this
     }
@@ -71,18 +71,19 @@ function enableDragging() {
 		$.fn.drags = function (opt) {
 
 			opt = $.extend({ handle: "", cursor: "move" }, opt);
-
+			var $el;
 			if (opt.handle === "") {
-				var $el = this;
+				$el = this;
 			} else {
-				var $el = this.find(opt.handle);
+				$el = this.find(opt.handle);
 			}
 
 			return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
+				var $drag;
 				if (opt.handle === "") {
-					var $drag = $(this).addClass('draggable');
+					$drag = $(this).addClass('draggable');
 				} else {
-					var $drag = $(this).addClass('active-handle').parent().addClass('draggable');
+					$drag = $(this).addClass('active-handle').parent().addClass('draggable');
 				}
 				var z_idx = $drag.css('z-index'),
 				drg_h = $drag.outerHeight(),
@@ -109,8 +110,8 @@ function enableDragging() {
 	})($);
 
 
-	$("[data-toggle=tooltip]").tooltip();
-	$("[data-toggle=tooltip]").drags();
+	//$("[data-toggle=tooltip]").tooltip(); REACT2
+	//$("[data-toggle=tooltip]").drags();  REACT2
 }
         
 
@@ -134,13 +135,13 @@ function fn_handleKeyBoard() {
             }
         }
 		
-		if (p_event.target.type != 'textarea')
+		if (p_event.target.type !== 'textarea')
 		{
-			if (p_event.key.toLowerCase() == 'm') {
+			if (p_event.key.toLowerCase() === 'm') {
 				fn_showMap();
 			}
 			
-			if (p_event.key.toLowerCase() == 'r') {
+			if (p_event.key.toLowerCase() === 'r') {
 				fn_showVideoMainTab();
 			}
 		}
@@ -233,7 +234,7 @@ function fn_handleKeyBoard() {
 			mmRTC.isStoppedRecording = false;
 
 			v_talk.VideoRecording = true;
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
+			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
 
 		}
 
@@ -481,8 +482,8 @@ function fn_handleKeyBoard() {
 		function onWEBRTCSessionStarted(c_talk) {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 			//js_globals.v_andruavClient.pub_streamOnOff = p;
 		}
 
@@ -490,15 +491,15 @@ function fn_handleKeyBoard() {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
 			
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 		}
 
 
 		function onWEBRTCSessionOrphanEnded(c_number) {
 			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 		}
 
 
@@ -532,7 +533,7 @@ function fn_handleKeyBoard() {
 			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
 			for (var i=0;i<len;++i)
 			{
-				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id == v_trackId)
+				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id === v_trackId)
 				{
 					switch (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].p)
 					{
@@ -560,7 +561,7 @@ function fn_handleKeyBoard() {
 			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
 			for (var i=0;i<len;++i)
 			{
-				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id == v_trackId)
+				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id === v_trackId)
 				{
 					js_globals.v_andruavClient.API_CONST_RemoteCommand_recordVideo (v_andruavVideo.m_unit.partyID, v_trackId, p_Start);
 				}
@@ -585,39 +586,29 @@ function fn_handleKeyBoard() {
 					case 15:
 					case 0:
 						return './images/blure/adrone_gr_32x32.png';
-						break;
 					case 1:
 					case 2:
 						return './images/blure/adrone_gr_32x32x45d.png';
-						break;
 					case 3:
 					case 4:
 						return './images/blure/adrone_gr_32x32x90d.png';
-						break;
 					case 5:
 					case 6:
 						return './images/blure/adrone_gr_32x32x135d.png';
-						break;
 					case 7:
 					case 8:
 						return './images/blure/adrone_gr_32x32x180d.png';
-						break;
 					case 9:
 					case 10:
 						return './images/blure/adrone_gr_32x32x225d.png';
-						break;
 					case 11:
 					case 12:
 						return './images/blure/adrone_gr_32x32x270d.png';
-						break;
 					case 13:
 					case 14:
 						return './images/blure/adrone_gr_32x32x315d.png';
-						break;
 					default: // NAN if Heading is null
 						return './images/blure/adrone_gr_32x32.png';
-						break;
-
 				}
 				return;
 			}
@@ -846,18 +837,19 @@ function fn_handleKeyBoard() {
 		};
 
 		function gui_initGlobalSection() {
-			$("#yaw_knob").dial({
-				fgColor: "#3671AB"
-				, bgColor: "#36AB36"
-				, thickness: .3
-				, cursor: 10
-				, displayPrevious: true
-			})
-				.css({ display: 'inline', padding: '0px 10px' });
+			// REACT
+			// $("#yaw_knob").dial({
+			// 	fgColor: "#3671AB"
+			// 	, bgColor: "#36AB36"
+			// 	, thickness: .3
+			// 	, cursor: 10
+			// 	, displayPrevious: true
+			// })
+			// 	.css({ display: 'inline', padding: '0px 10px' });
 
-			$("#yaw_knob").knob({
-				'change': function (v) { }
-			});
+			// $("#yaw_knob").knob({
+			// 	'change': function (v) { }
+			// });
 
 
 
@@ -1268,7 +1260,7 @@ function fn_handleKeyBoard() {
 						}
 						else
 						{
-							js_eventEmitter.default.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+							js_eventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
 						}
 					}
 				}
@@ -1295,7 +1287,7 @@ function fn_handleKeyBoard() {
 					}
 					else
 					{
-						js_eventEmitter.default.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+						js_eventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
 					}
 				}
         	}
@@ -1677,8 +1669,8 @@ function fn_handleKeyBoard() {
 		function initMap() {
 			
 			//js_leafletmap.default.fn_initMap('mapid');
-			this.fn_setLapout();
-			this.fn_gps_getLocation();
+			fn_setLapout();
+			fn_gps_getLocation();
 
 		};
 
@@ -1724,7 +1716,7 @@ function fn_handleKeyBoard() {
 		function fn_onSocketStatus(me,event) {
 			const name = event.name;
 			const status = event.status;
-			js_eventEmitter.default.fn_dispatch( js_globals.EE_onSocketStatus, event);
+			js_eventEmitter.fn_dispatch( js_globals.EE_onSocketStatus, event);
 			
 			if (status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 				js_speak.v_SpeakEngine.fn_speak('Connected');
@@ -1780,13 +1772,13 @@ function fn_handleKeyBoard() {
 		};
 
 		var EVT_GCSDataOpen = function (data) {
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_onGUIMessageHide);
+			js_eventEmitter.fn_dispatch(js_globals.EE_onGUIMessageHide);
 		};
 
 
 		var EVT_BadMavlink = function () {
 			//gui_alert('Web Telemetry', 'Please make sure that you use MAVLINK <b>version 2</b>.', 'danger');
-			js_eventEmitter.default.fn_dispatch(js_globals.EE_onGUIMessage, {
+			js_eventEmitter.fn_dispatch(js_globals.EE_onGUIMessage, {
 				p_title:'Web Telemetry',
 				p_msg:'Please make sure that you use MAVLINK <b>version 2</b>.',
 				p_level:'danger'
@@ -2028,7 +2020,7 @@ function fn_handleKeyBoard() {
 				js_speak.v_SpeakEngine.fn_speak('Disarmed');
 			}
 
-			js_eventEmitter.default.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -2235,7 +2227,7 @@ function fn_handleKeyBoard() {
 				}
 				js_leafletmap.default.fn_setIcon(p_andruavUnit.m_gui.m_marker, v_image);
 				js_leafletmap.default.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
-				js_eventEmitter.default.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+				js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 			}
 			else {
 
@@ -2315,7 +2307,7 @@ function fn_handleKeyBoard() {
 			
 			js_speak.v_SpeakEngine.fn_speak(p_andruavUnit.m_unitName + " unit added");
 
-			js_eventEmitter.default.fn_dispatch( js_globals.EE_unitAdded, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_globals.EE_unitAdded, p_andruavUnit);
 			js_globals.v_andruavClient.API_requestIMU (p_andruavUnit,true);
 		}	
 
@@ -2447,7 +2439,7 @@ function fn_handleKeyBoard() {
 			c_msg.m_notification_Type = v_notification_Type;
 			c_msg.m_cssclass = v_cssclass;
 			c_msg.m_error = p_error;
-			js_eventEmitter.default.fn_dispatch( js_globals.EE_onMessage, c_msg);
+			js_eventEmitter.fn_dispatch( js_globals.EE_onMessage, c_msg);
 		
 			
 
@@ -2542,7 +2534,7 @@ function fn_handleKeyBoard() {
 
 			var vAlt = p_andruavUnit.m_Nav_Info.p_Location.alt;
 			var vAlt_abs = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
-			if (vAlt == undefined)
+			if (vAlt === undefined)
 			{
 				vAlt='?';
 			}
@@ -2561,7 +2553,7 @@ function fn_handleKeyBoard() {
 			vAlt = vAlt + vAlt_abs;
 			
 			var vSpeed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-			if (vSpeed == null)
+			if (vSpeed === null)
 			{
 				vSpeed='?';
 			}
@@ -2570,7 +2562,7 @@ function fn_handleKeyBoard() {
 				vSpeed = vSpeed.toFixed(1);
 			}
 			var vAirSpeed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
-			if (vAirSpeed == null)
+			if (vAirSpeed === null)
 			{
 				vAirSpeed='?';
 			}
@@ -2663,7 +2655,7 @@ function fn_handleKeyBoard() {
 
 		function showGeoFenceInfo(p_lat, p_lng, geoFenceInfo) {
 			var _style, _icon;
-			if (geoFenceInfo.m_shouldKeepOutside == true) {
+			if (geoFenceInfo.m_shouldKeepOutside === true) {
 				_style = "bg-danger";
 				_icon = "&nbsp;<span class='glyphicon glyphicon-ban-circle text-danger css_float_right'></span>";
 			}
@@ -2682,7 +2674,7 @@ function fn_handleKeyBoard() {
 
 		function EVT_andruavUnitGeoFenceBeforeDelete(me, geoFenceInfo) {
 			if (geoFenceInfo != null) {
-				if (geoFenceInfo.flightPath != null) {
+				if (geoFenceInfo.flightPath !== null) {
 					js_leafletmap.default.fn_hideItem(geoFenceInfo.flightPath);
 				}
 			}
@@ -2693,7 +2685,7 @@ function fn_handleKeyBoard() {
 				var size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
 
 				for (var i = 0; i < size; ++i) {
-					var geoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
+					geoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
 
 					if (geoFenceInfo.flightPath != null) {
 						js_leafletmap.default.fn_hideItem(geoFenceInfo.flightPath);
@@ -2711,7 +2703,7 @@ function fn_handleKeyBoard() {
 
 			var geoFenceCoordinates = geoFenceInfo.LngLatPoints;
 
-			if (js_leafletmap.default.m_isMapInit == false) { // in case map is not loaded
+			if (js_leafletmap.default.m_isMapInit === false) { // in case map is not loaded
 				setTimeout(function () {
 					EVT_andruavUnitGeoFenceUpdated(me, data);
 
@@ -2724,7 +2716,7 @@ function fn_handleKeyBoard() {
 					v_geoFence = js_leafletmap.default.fn_drawPolyline(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 					geoFenceInfo.flightPath = v_geoFence;
 					
-					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) === false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
@@ -2741,12 +2733,12 @@ function fn_handleKeyBoard() {
 
 				case js_andruavMessages.CONST_TYPE_PolygonFence:
 
-					var v_geoFence = js_leafletmap.default.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
+					v_geoFence = js_leafletmap.default.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
 					
 
-					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) === false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
@@ -2763,11 +2755,11 @@ function fn_handleKeyBoard() {
 
 				case js_andruavMessages.CONST_TYPE_CylinderFence:
 
-					var v_geoFence = js_leafletmap.default.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
+					v_geoFence = js_leafletmap.default.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
 					
 					geoFenceInfo.flightPath = v_geoFence;
 					
-					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) == false) {
+					if ( js_globals.v_andruavClient.andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName) === false) {
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName] = geoFenceInfo;
 						js_globals.v_andruavClient.andruavGeoFences[geoFenceInfo.m_geoFenceName].Units = {};
 					}
@@ -2829,11 +2821,11 @@ function fn_handleKeyBoard() {
 			const geoFenceHitInfo = data.fenceHit;
 
 			var fence = js_globals.v_andruavClient.andruavGeoFences[geoFenceHitInfo.fenceName];
-			if ((fence == undefined) || (fence == null)) {
+			if ((fence === undefined) || (fence === null)) {
 				js_globals.v_andruavClient.API_requestGeoFences(p_andruavUnit, geoFenceHitInfo.fenceName);
 				return;
 			}
-			if (fence.Units[p_andruavUnit.partyID] == undefined) fence.Units[p_andruavUnit.partyID] = {};
+			if (fence.Units[p_andruavUnit.partyID] === undefined) fence.Units[p_andruavUnit.partyID] = {};
 			fence.Units[p_andruavUnit.partyID].geoFenceHitInfo = geoFenceHitInfo;
 			if (p_andruavUnit.m_gui.m_marker == null) return;   // will be updated later when GPS message is recieved from that drone.
 			var typeMsg = "info"; var msg = "OK";
@@ -2844,14 +2836,14 @@ function fn_handleKeyBoard() {
 			// 	type: typeMsg,
 			// 	message: p_andruavUnit.m_unitName + ":" + "GeoFenceHit: " + msg
 			// });
-			if (msg == "OK") {
+			if (msg === "OK") {
 
 			}
 			else {
 				js_speak.v_SpeakEngine.fn_speak("unit " + p_andruavUnit.m_unitName + " " + msg);
 			}
 
-			js_eventEmitter.default.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -2955,7 +2947,7 @@ function fn_handleKeyBoard() {
 				// 	message: js_andruavAuth.m_errorMessage
 				// });
 
-				if (js_globals.v_connectState == true) {
+				if (js_globals.v_connectState === true) {
 					setTimeout(fn_connect, 4000);
 				}
 
@@ -2965,7 +2957,7 @@ function fn_handleKeyBoard() {
 			// create a group object
 			if ( js_globals.v_andruavClient == null) {
 
-				if (js_andruavAuth.default.fn_logined() == false) return;
+				if (js_andruavAuth.default.fn_logined() === false) return;
 				js_globals.v_andruavClient = window.AndruavLibs.AndruavClient; //Object.create(AndruavClientSocket.prototype);
 
 				js_globals.v_andruavClient.partyID = ($('#txtUnitID').val()+$('#txtUnitID_ext').val()).replace('#','_');
@@ -2977,29 +2969,29 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.m_server_port_ss = js_andruavAuth.default.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
 				js_globals.v_andruavClient.server_AuthKey = js_andruavAuth.default.server_AuthKey;
 				js_globals.v_andruavClient._permissions_ = js_andruavAuth.default.fn_getPermission();
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_WS_OPEN,this,this.EVT_onOpen);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_WS_CLOSE,this,this.EVT_onClose);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_onSocketStatus2,this,this.fn_onSocketStatus);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_onDeleted,this,this.EVT_onDeleted);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_HomePointChanged,this,this.EVT_HomePointChanged);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitError,this,this.EVT_andruavUnitError);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,this.EVT_onOpen);
+				js_eventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,this.EVT_onClose);
+				js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,this.fn_onSocketStatus);
+				js_eventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,this.EVT_onDeleted);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,this.EVT_msgFromUnit_GPS);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,this.EVT_msgFromUnit_IMG);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,this.EVT_andruavUnitAdded);
+				js_eventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,this.EVT_HomePointChanged);
+				js_eventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,this.EVT_DistinationPointChanged);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,this.EVT_andruavUnitError);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,this.EVT_andruavUnitGeoFenceUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,this.EVT_andruavUnitGeoFenceHit);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,this.EVT_msgFromUnit_WayPoints);
+				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,this.EVT_msgFromUnit_WayPointsUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.EVT_andruavUnitArmedUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,this.EVT_andruavUnitGeoFenceBeforeDelete);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.EVT_andruavUnitFCBUpdated);
 				
 				
 				
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
-				js_eventEmitter.default.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,this.EVT_andruavUnitFlyingUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,this.EVT_andruavUnitFightModeUpdated);
+				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,this.EVT_andruavUnitVehicleTypeUpdated);
 				
 				
 				
@@ -3036,10 +3028,8 @@ function fn_handleKeyBoard() {
 		{
 			const len = js_globals.v_map_shapes.length;
 
-			for (var i=0; i< len; ++i)
+			for (let i=0; i< len; ++i)
 			{
-				
-
 				if (
 				((js_globals.v_map_shapes[i].m_geofenceInfo.m_valid !== true)
 				&& (js_globals.v_map_shapes[i].m_geofenceInfo.m_deleted !== true))
@@ -3061,9 +3051,9 @@ function fn_handleKeyBoard() {
 
 			const res = fence_plan.fn_generateAndruavFenceData(js_globals.v_map_shapes);
 			const len_res = res.length;
-			for (var i=0; i< len_res; ++i)
+			for (let i=0; i< len_res; ++i)
 			{
-				if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()==true))
+				if ((js_globals.v_andruavClient !== null) && (js_globals.v_andruavClient.fn_isRegistered()===true))
 				{
 					js_globals.v_andruavClient.API_saveGeoFenceTasks(js_andruavAuth.default.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1,res[i]);
 				}
@@ -3137,8 +3127,8 @@ function fn_handleKeyBoard() {
 				initMap();
 			}
 
-			js_eventEmitter.default.fn_subscribe(js_globals.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
-			js_eventEmitter.default.fn_subscribe(js_globals.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+			js_eventEmitter.fn_subscribe(js_globals.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
+			js_eventEmitter.fn_subscribe(js_globals.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
 			
 
 
@@ -3217,13 +3207,13 @@ function fn_handleKeyBoard() {
 				);
 			}
 			
-			if ((QueryString.test != undefined) && (QueryString.test != null)) {
+			if ((QueryString.test !== undefined) && (QueryString.test !== null)) {
 				$('.subblock#command').show();
 				$('div#debugpanel').show();
 			}
 
 			// LOGIN		
-			if ((QueryString.email == null) || (QueryString.accesscode == null)) {
+			if ((QueryString.email === null) || (QueryString.accesscode === null)) {
 				// window.location.href = "http://example.com";
 				$('#txtUnitID').val('GCSMAP_' + js_helpers.fn_generateRandomString(3));
 
@@ -3232,11 +3222,11 @@ function fn_handleKeyBoard() {
 				//http://127.0.0.1:9980/globalarclight.html?accesscode=myown&email=myown@myown.com&m_groupName=1&m_unitName=GCSWeb1
 
 			}
-			if (js_globals.CONST_MAP_EDITOR !== true) 
-            {
-				window.AndruavLibs.LocalTelemetry.fn_onPacketReceived = EVT_GCSDataReceived;
-				window.AndruavLibs.LocalTelemetry.fn_onWebSocketOpened = EVT_GCSDataOpen;
-			}
+			// if (js_globals.CONST_MAP_EDITOR !== true) 
+            // {
+			// 	window.AndruavLibs.LocalTelemetry.fn_onPacketReceived = EVT_GCSDataReceived;
+			// 	window.AndruavLibs.LocalTelemetry.fn_onWebSocketOpened = EVT_GCSDataOpen;
+			// }
 			
 			$("#alert .close").click(function (e) {
 				$("#alert").hide();
@@ -3246,7 +3236,7 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
-			if (js_globals.CONST_MAP_EDITOR ===true){
+			if (js_globals.CONST_MAP_EDITOR === true){
 				fn_missionTab();
 			}
 		};  // end of onReady
