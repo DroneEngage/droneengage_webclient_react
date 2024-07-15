@@ -17,7 +17,6 @@ export class CADSBObjectList
 	{
 		this.List = {};
 		this.count = 0;
-        window.AndruavLibs.ADSBObjectList = this;
 	}
 
 

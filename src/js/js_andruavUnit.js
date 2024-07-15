@@ -642,7 +642,7 @@ class C_Messages {
    */
   fn_sendMessageAllowed(message_id) {
     const data = this.m_messages_repeat[message_id];
-    if (data === null) return true;
+    if (data === null  || data === undefined) return true;
 
     const can_send = new Date() - data.from_time > data.interval_ms;
     return can_send;

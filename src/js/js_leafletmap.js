@@ -505,7 +505,7 @@ class CLeafLetAndruavMap {
         }
         
         var v_popupAnchor = [-p_iconsize[0]/2,-p_iconsize[0]/2];
-        if ((p_htmlTitle === null) || (p_htmlTitle === '')) {
+        if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
             v_image = L.icon({
                 iconUrl: p_image,
                 iconSize: p_iconsize,
@@ -573,7 +573,7 @@ class CLeafLetAndruavMap {
          */
     fn_deleteAllEditShapes() {
         const v_editLayers = this.m_Map.pm.getGeomanDrawLayers();
-        if ((v_editLayers === null) || (v_editLayers.length === 0)) 
+        if ((v_editLayers === null || v_editLayers === undefined) || (v_editLayers.length === 0)) 
             return;
         
 

@@ -6,15 +6,12 @@
 *********************************************************************************** */
 import $ from 'jquery'; 
 import * as  js_siteConfig from './js_siteConfig.js'
+import {js_globals} from './js_globals.js';
 import * as js_andruavMessages from './js_andruavMessages'
 import {js_eventEmitter} from './js_eventEmitter'
 
 
-const EE_Auth_Logined      		 	 = "_EA_96A4ED6B1E1_";
-const EE_Auth_BAD_Logined      		 = "_EA_96A4ED6B1E2_";
-const EE_Auth_Account_Created		 = "_EA_96A4ED6B1E3_";
-const EE_Auth_Account_Regenerated	 = "_EA_96A4ED6B1E4_";
-const EE_Auth_Account_BAD_Operation	 = "_EA_96A4ED6B1E5_";
+
 
 
 const CONST_WEB_FUNCTION					= '/w';
@@ -91,6 +88,7 @@ class CAndruavAuth {
     }
 
     fn_do_canControlWP() {
+        console.log (this._m_perm);
         return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL);
     }
     
@@ -106,7 +104,7 @@ class CAndruavAuth {
 
 
 	fn_do_loginAccount (p_userName, p_accessCode) {
-    if ((p_userName === null) || (p_userName.length === 0) || (p_accessCode === null) || (p_userName.accessCode === 0)) {
+    if ((p_userName === null || p_userName === undefined) || (p_userName.length === 0) || (p_accessCode === null || p_accessCode === undefined) || (p_userName.accessCode === 0)) {
         this._m_logined = false;
         return;
     }
@@ -152,12 +150,12 @@ class CAndruavAuth {
                 Me._m_permissions_ = v_res.per;
                 if (v_res.prm==null) v_res.prm = 0xffffffff;  // auth server does not support permission (backward compatibility)
                 Me._m_perm = v_res.prm;
-                js_eventEmitter.fn_dispatch(EE_Auth_Logined, v_res);
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Logined, v_res);
             } else {
                 Me._m_logined = false;
                 Me.m_error = v_res.e;
                 Me.m_errorMessage = 'Cannot Login .. ' + v_res.em;
-                js_eventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, v_res);
 
             }
         },
@@ -165,7 +163,7 @@ class CAndruavAuth {
             Me._m_logined = false;
             Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
             Me.m_errorMessage = 'Cannot Login .. Bad Connection';
-            js_eventEmitter.fn_dispatch(EE_Auth_BAD_Logined, v_res);
+            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, v_res);
 
         },
         async: false // remove it later when you SYNC with 2eN
@@ -175,11 +173,11 @@ class CAndruavAuth {
 
 	fn_generateAccessCode (p_accountName, p_permission) 
 	{
-		if ((p_accountName === null) || (p_accountName.length === 0)) {
+		if ((p_accountName === null || p_accountName === undefined) || (p_accountName.length === 0)) {
 			return;
 		}
 
-        if ((p_permission === null) || (typeof(p_permission) !== 'string'))
+        if ((p_permission === null || p_permission === undefined) || (typeof(p_permission) !== 'string'))
         {
             return ;
         }
@@ -211,15 +209,15 @@ class CAndruavAuth {
 				v_res = JSON.parse(v__res);
 
 				if (v_res.e === 0) {
-					js_eventEmitter.fn_dispatch(EE_Auth_Account_Created, v_res);
+					js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Created, v_res);
 				} else {
-					js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+					js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
 				}
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				Me._m_logined = false;
 				Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-				js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+				js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
 			},
 			async: false // remove it later when you SYNC with 2eN
 		});
@@ -230,12 +228,12 @@ class CAndruavAuth {
 
 	fn_regenerateAccessCode = function (p_accountName, p_permission)  
 	{
-        if ((p_accountName === null) || (p_accountName.length === 0)) {
+        if ((p_accountName === null || p_accountName === undefined) || (p_accountName.length === 0)) {
             return;
         }
 
 
-        if ((p_permission === null) || (typeof(p_permission) !== 'string'))
+        if ((p_permission === null || p_permission === undefined) || (typeof(p_permission) !== 'string'))
             {
                 return ;
             }
@@ -267,15 +265,15 @@ class CAndruavAuth {
                 v_res = JSON.parse(v__res);
 
                 if (v_res.e === 0) {
-                    js_eventEmitter.fn_dispatch(EE_Auth_Account_Regenerated, v_res);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Regenerated, v_res);
                 } else {
-                    js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 Me._m_logined = false;
                 Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-                js_eventEmitter.fn_dispatch(EE_Auth_Account_BAD_Operation, v_res);
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
             },
             async: false // remove it later when you SYNC with 2eN
         });

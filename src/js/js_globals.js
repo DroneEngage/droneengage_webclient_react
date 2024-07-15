@@ -171,7 +171,12 @@ class GLOBALS {
 		this.EE_adsbExpiredUpdate           = "_E_XXAZQD6B3E4_";
 
 
-
+		this.EE_Auth_Logined      		 	 = "_EA_96A4ED6B1E1_";
+		this.EE_Auth_BAD_Logined      		 = "_EA_96A4ED6B1E2_";
+		this.EE_Auth_Account_Created		 = "_EA_96A4ED6B1E3_";
+		this.EE_Auth_Account_Regenerated	 = "_EA_96A4ED6B1E4_";
+		this.EE_Auth_Account_BAD_Operation	 = "_EA_96A4ED6B1E5_";
+		
 
 		// EOF LOCAL EVENTS
 

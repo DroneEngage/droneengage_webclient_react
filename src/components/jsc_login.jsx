@@ -14,7 +14,7 @@ import {QueryString, fn_connect} from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
 import {js_localStorage} from '../js/js_localStorage'
 import {js_speak} from '../js/js_speak'
-
+import {js_eventEmitter} from '../js/js_eventEmitter'
 
 const res_CLSS_LoginControl =
 {
@@ -42,10 +42,10 @@ export class CLSS_LoginControl extends React.Component {
 		super();
 		this.state = {
 			is_connected: false,
-			btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['1'],
+			btnConnectText: 'Login',
 		};
 		this._isMounted = false;
-    	// js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
+    	js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
 	}
 
 	
@@ -55,7 +55,7 @@ export class CLSS_LoginControl extends React.Component {
 		if (me._isMounted!==true) return ;
     	if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['2'] });
+			me.setState({ btnConnectText: 'Logout' });
 			me.state.username = $('#txtUnitID').val();
 			js_speak.fn_speak('Connected');
 
@@ -64,7 +64,7 @@ export class CLSS_LoginControl extends React.Component {
 		else {
 
 			me.state.is_connected = false;
-			me.setState({ btnConnectText: res_CLSS_LoginControl[js_localStorage.fn_getLanguage()]['1'] });
+			me.setState({ btnConnectText: 'Login' });
 
 			js_localStorage.fn_setEmail($('#txtEmail').val());
 			js_localStorage.fn_setAccessCode($('#txtAccessCode').val());
@@ -86,16 +86,14 @@ export class CLSS_LoginControl extends React.Component {
 		}
 
 		fn_connect();
-		// EventEmitter.fn_unsubscribe ('Oppa',this.state.Me);
 	}
 
 	componentWillUnmount() {
 		this._isMounted = false;
-		// js_eventEmitter.fn_unsubscribe(EE_onSocketStatus, this);
+		js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
 	}
 
 	componentDidMount() {
-		//EventEmitter.fn_dispatch(EE_updateLogin,{});
 		this._isMounted = true;
 
 		if (QueryString.accesscode !== null) {
@@ -133,7 +131,7 @@ export class CLSS_LoginControl extends React.Component {
 		if (this.state.is_connected === true) {
 			login += " - " + $('#txtUnitID').val();
 		}
-		if (this.props.simple === null) {
+		if (this.props.simple === null || this.props.simple === undefined) {
 			return (
 				<div key={'CLSS_LoginControl_simple'}  className="card text-white border-light mb-3" >
 					<div className="card-header  text-center"> <strong>{login}</strong></div>

@@ -83,8 +83,8 @@ class CSpeakEngine
 	fn_speak (text)
 	{
 		if (this._v_enable_speak === false) return ;
-		if (this._v_speakmsg === null) return ; // not defined
-		if ((text === null) || (text === '')) return ;
+		if (this._v_speakmsg === null  || this._v_speakmsg === undefined) return ; // not defined
+		if ((text === null  || text === undefined) || (text === '')) return ;
 		this._v_speakmsg.text = text;
 		if (speechSynthesis.speaking === true)
 		{

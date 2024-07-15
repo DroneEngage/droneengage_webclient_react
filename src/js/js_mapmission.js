@@ -17,7 +17,7 @@ export class CLSS_AndruavFencePlan
 {
 	constructor (p_id/*, p_initColor*/)
 	{
-		if (p_id === null) throw new Error('Error Bad ID');
+		if (p_id === null  || p_id === undefined) throw new Error('Error Bad ID');
 		this.m_id = p_id;
 		this.v_markers = [];
 
@@ -152,7 +152,7 @@ class CLSS_AndruavMissionPlan
 
 	constructor (p_id, p_initColor)
 	{
-		if (p_id === null) throw new Error('Error Bad ID');
+		if (p_id === null  || p_id === undefined) throw new Error('Error Bad ID');
 		this.m_id = p_id;
 		this.v_markers = [];
 

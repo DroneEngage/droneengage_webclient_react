@@ -11,6 +11,13 @@ import $ from 'jquery';
 
         }
 
+        static getInstance() {
+            if (!v_adsbObject.instance) {
+                v_adsbObject.instance = new v_adsbObject();
+            }
+            return v_adsbObject.instance;
+        }
+
         update (_obj)
         {
             if (_obj.PosTime !== this.PosTime)
@@ -121,11 +128,18 @@ import $ from 'jquery';
             var Me = this;
             setInterval(function () {
                 // dont call 
-                if ((Me.lat=== null) || (Me.radius ===0)) return ;
+                if ((Me.lat=== null || Me.lat === undefined) || (Me.radius ===0)) return ;
     
                 Me.fn_getADSBData(Me.lat,Me.lng,undefined,Me.radius);
                 
              }, Me.ADSB_RefreshRate);
+        }
+
+        static getInstance() {
+            if (!v_adsbObject.instance) {
+                v_adsbObject.instance = new v_adsbObject();
+            }
+            return v_adsbObject.instance;
         }
 
         parseData (_data,_droneAlt)
@@ -191,7 +205,7 @@ import $ from 'jquery';
                 
 				success: function(p_res) {
                     this.parseData (p_res,p_alt);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_adsbExchangeReady,window.AndruavLibs.ADSB_Exchange.adsbObjectList);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_adsbExchangeReady,v_adsbObject.getInstance());
                 },
                 error: function ( jqXHR, textStatus, errorThrown)
 				{
@@ -212,3 +226,5 @@ import $ from 'jquery';
         
         
     };
+
+export var ADSBObjectList =  v_ADSB_Exchange.getInstance();

@@ -17,7 +17,7 @@ import {js_leafletmap} from './js_leafletmap'
 import {js_eventEmitter} from './js_eventEmitter'
 import {js_localStorage} from './js_localStorage'
 import * as js_mapmission from './js_mapmission'
-import {v_ADSB_Exchange} from './js_adsB_Exchange'
+import {ADSBObjectList} from './js_adsB_Exchange'
 import { mavlink20 } from './js_mavlink_v2.js';
 
 
@@ -704,13 +704,13 @@ function fn_handleKeyBoard() {
 		function fn_adsbExpiredUpdate(me)
 		{
 			const ADSB_OBJECT_TIMEOUT = 13000;
-			const count = window.AndruavLibs.ADSBObjectList.count;
+			const count = ADSBObjectList.count;
 			const now = new Date();
-			const p_keys = Object.keys(window.AndruavLibs.ADSBObjectList.List);
+			const p_keys = Object.keys(ADSBObjectList.List);
 		
 			for (var i=0; i< count; ++i)
 			{
-				var adsb_obj  = window.AndruavLibs.ADSBObjectList.List[p_keys[i]];
+				var adsb_obj  = ADSBObjectList.List[p_keys[i]];
 
 				if ((now - adsb_obj.m_last_access) > ADSB_OBJECT_TIMEOUT)
 				{
@@ -876,8 +876,8 @@ function fn_handleKeyBoard() {
 			function setPosition(position) {
 
 				myposition = position;
-				if (js_globals.CONST_DISABLE_ADSG == false) {
-					v_ADSB_Exchange.fn_changeDefaultLocation(
+				if (js_globals.CONST_DISABLE_ADSG === false) {
+					ADSBObjectList.fn_changeDefaultLocation(
 						myposition.coords.latitude,
 						myposition.coords.longitude, 1000);
 				}
@@ -2135,8 +2135,8 @@ function fn_handleKeyBoard() {
 				
 				var marker = p_andruavUnit.m_gui.m_marker;
 
-				if (js_globals.CONST_DISABLE_ADSG == false) {
-					v_ADSB_Exchange.fn_getADSBDataForUnit(p_andruavUnit);
+				if (js_globals.CONST_DISABLE_ADSG === false) {
+					ADSBObjectList.fn_getADSBDataForUnit(p_andruavUnit);
 				}
 				
 				var v_image =  getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
@@ -2552,7 +2552,7 @@ function fn_handleKeyBoard() {
 			vAlt = vAlt + vAlt_abs;
 			
 			var vSpeed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-			if (vSpeed === null)
+			if (vSpeed === null || vSpeed === undefined)
 			{
 				vSpeed='?';
 			}
@@ -2561,7 +2561,7 @@ function fn_handleKeyBoard() {
 				vSpeed = vSpeed.toFixed(1);
 			}
 			var vAirSpeed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
-			if (vAirSpeed === null)
+			if (vAirSpeed === null || vAirSpeed === undefined)
 			{
 				vAirSpeed='?';
 			}
@@ -2957,7 +2957,7 @@ function fn_handleKeyBoard() {
 			if ( js_globals.v_andruavClient == null) {
 
 				if (js_andruavAuth.fn_logined() === false) return;
-				js_globals.v_andruavClient = window.AndruavLibs.AndruavClient; //Object.create(AndruavClientSocket.prototype);
+				js_globals.v_andruavClient = js_andruavclient2.AndruavClient;
 
 				js_globals.v_andruavClient.partyID = ($('#txtUnitID').val()+$('#txtUnitID_ext').val()).replace('#','_');
 				js_globals.v_andruavClient.unitID = $('#txtUnitID').val();
@@ -3212,7 +3212,7 @@ function fn_handleKeyBoard() {
 			}
 
 			// LOGIN		
-			if ((QueryString.email === null) || (QueryString.accesscode === null)) {
+			if ((QueryString.email === null || QueryString.email === undefined) || (QueryString.accesscode === null || QueryString.accesscode === undefined)) {
 				// window.location.href = "http://example.com";
 				$('#txtUnitID').val('GCSMAP_' + js_helpers.fn_generateRandomString(3));
 

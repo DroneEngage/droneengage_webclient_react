@@ -100,7 +100,7 @@ class CAndruavClient {
         
         const now = Date.now();
         const units = this.m_andruavUnitList.fn_getUnitValues();
-        if (units===null) return ;
+        if (units===null || units === undefined) return ;
         units.forEach((unit) => {
             if (!unit.m_IsMe) {
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
@@ -184,14 +184,14 @@ class CAndruavClient {
         this.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
         var Me = this;
-        if (this.fn_timerID_checkStatus === null) {
+        if (this.fn_timerID_checkStatus === null || this.fn_timerID_checkStatus  === undefined) {
 
             this.fn_timerID_checkStatus = setInterval(function () {
                 Me._fn_checkStatus()
             }, js_andruavMessages.CONST_checkStatus_Interverl0);
         }
 
-        if (this.fn_timerID_sendRXChannels === null) {
+        if (this.fn_timerID_sendRXChannels === null || this.fn_timerID_sendRXChannels === undefined) {
             this.fn_timerID_sendRXChannels = setInterval(function () {
                 Me._fn_sendRXChannels(Me)
             }, js_andruavMessages.CONST_sendRXChannels_Interval);
@@ -208,12 +208,12 @@ class CAndruavClient {
 
     // receives event from gamepad and store it for sending.
     fn_sendAxes(p_me) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit === null) 
+        if (p_me.m_gamePadUnit === null || p_me.m_gamePadUnit === undefined) 
             return;
         
 
         const c_controller = window.AndruavLibs.AndruavGamePad.fn_getGamePad(js_globals.active_gamepad_index);
-        if (c_controller === null) 
+        if (c_controller === null || c_controller === undefined) 
             return;
         
         // read gamepad values
@@ -224,7 +224,7 @@ class CAndruavClient {
     }
 
     fn_sendButtons(p_me, p_packet) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit === null) 
+        if (p_me.m_gamePadUnit === null || p_me.m_gamePadUnit === undefined) 
             return;
         
 
@@ -345,7 +345,7 @@ class CAndruavClient {
     }
 
     API_addMe2() {
-        if ((this.partyID === null) || (this.m_groupName == null)) 
+        if ((this.partyID === null || this.partyID === undefined) || (this.m_groupName === null || this.m_groupName === undefined)) 
             return;
         
 
@@ -373,7 +373,7 @@ class CAndruavClient {
         if (p_target != null) {
             v_rountingMsg = CMD_COMM_INDIVIDUAL;
         } else { // if you want to prevent GCS to GCS.
-            if ((p_target === null) && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true)) {
+            if ((p_target === null || p_target === undefined) && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true)) {
                 p_target = CONST_TARGETS_DRONES;
                 v_rountingMsg = CMD_COMM_INDIVIDUAL;
             } else {
@@ -412,10 +412,10 @@ class CAndruavClient {
 
 
     API_saveGeoFenceTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent, m_geofenceInfo) {
-        if (p_partyID === null) 
+        if (p_partyID === null  || p_partyID === undefined) 
             p_partyID = '_any_';
         
-        if (m_groupName === null) 
+        if (m_groupName === null  || m_groupName === undefined) 
             m_groupName = '_any_';
         
         const c_msg = {
@@ -434,10 +434,10 @@ class CAndruavClient {
 
 
     API_loadGeoFence(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent) {
-        if (p_partyID === null) 
+        if (p_partyID === null  || p_partyID === undefined) 
             p_partyID = '_any_';
         
-        if (m_groupName === null) 
+        if (m_groupName === null  || m_groupName === undefined) 
             m_groupName = '_any_';
         
         const c_msg = {
@@ -454,10 +454,10 @@ class CAndruavClient {
     }
 
     API_disableGeoFenceTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent) {
-        if (p_partyID === null) 
+        if (p_partyID === null  || p_partyID === undefined) 
             p_partyID = '_any_';
         
-        if (m_groupName === null) 
+        if (m_groupName === null  || m_groupName === undefined) 
             m_groupName = '_any_';
         
 
@@ -948,7 +948,7 @@ class CAndruavClient {
 
 
     API_do_SetHomeLocation(p_partyID, p_lat, p_lng, p_alt) {
-        if (p_partyID === null) return ;
+        if (p_partyID === null  || p_partyID === undefined) return ;
         if (p_alt == null) {
             p_alt = 0;
         }
@@ -1375,7 +1375,7 @@ class CAndruavClient {
         * Disable Geo Fence info to Offline Tasks
         * */
     API_disableWayPointTasks(p_accountID, p_groupName, p_partyID, p_receiver, p_isPermanent) {
-        if (p_partyID === null) 
+        if (p_partyID === null  || p_partyID === undefined) 
             p_partyID = '_any_';
         
         if (p_groupName == null) 
@@ -2099,7 +2099,7 @@ class CAndruavClient {
                 break;
             
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO: {
-                if (p_unit === null) { // p_unit not defined here ... send a request for ID
+                if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);
                     return;
                 }
@@ -2132,7 +2132,7 @@ class CAndruavClient {
             break;
             case js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute: 
             {
-                if (p_unit === null) { // p_unit not defined here ... send a request for ID
+                if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);
                     return;
                 }
