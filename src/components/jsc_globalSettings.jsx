@@ -381,16 +381,7 @@ export default class CLSS_GlobalSettings extends React.Component {
 
   render() {
 
-     var m_unitText= "";
-
-     if (js_localStorage.fn_getMetricSystem()===true)
-      {
-        m_unitText = 'm';
-      }
-      else
-      {
-        m_unitText = 'ft';
-      }
+     
 
   //  js_globals.fn_console_log ("REACT:RENDER CLSS_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
   var v_gadgets = [];

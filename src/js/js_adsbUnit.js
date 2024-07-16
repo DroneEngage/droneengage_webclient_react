@@ -49,7 +49,7 @@ class CADSBObjectList
 
     fn_getADSBObject (icao_address)
 	{
-        if (icao_address == null) return null;
+        if (icao_address=== null || icao_address === undefined) return null;
 			
         const key = icao_address.toString();
 		if (this.List.hasOwnProperty(key))

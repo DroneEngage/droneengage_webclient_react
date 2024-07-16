@@ -15773,9 +15773,9 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     // Assuming using crc_extra = True.  See the message.prototype.pack() function.
     messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
     
-    if ( receivedChecksum !== messageChecksum ) {
-        throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
-    }
+    // if ( receivedChecksum !== messageChecksum ) {
+    //     throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
+    // }
 
     var paylen = jjspack.CalcLength(decoder.format);
     var payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);

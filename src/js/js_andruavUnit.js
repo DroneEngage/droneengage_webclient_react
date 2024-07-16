@@ -150,7 +150,7 @@ class C_Video {
 
   supportFlashing(index) {
     const track = this.m_videoTracks[index];
-    if (track == null) return false;
+    if (track === null || track === undefined) return false;
 
     if (track.hasOwnProperty("s") === true) {
       // new format
@@ -165,7 +165,7 @@ class C_Video {
 
   supportCameraSwitch(index) {
     const track = this.m_videoTracks[index];
-    if (track == null) return false;
+    if (track === null || track === undefined) return false;
 
     if (track.hasOwnProperty("s") === true) {
       // new format
@@ -180,7 +180,7 @@ class C_Video {
 
   supportZoom(index) {
     const track = this.m_videoTracks[index];
-    if (track == null) return false;
+    if (track === null || track === undefined) return false;
 
     if (track.hasOwnProperty("s") === true) {
       // new format
@@ -194,7 +194,7 @@ class C_Video {
 
   supportRotation(index) {
     const track = this.m_videoTracks[index];
-    if (track == null) return false;
+    if (track === null || track === undefined) return false;
 
     if (track.hasOwnProperty("s") === true) {
       // new format
@@ -488,7 +488,7 @@ class C_Terrain {
   }
 
   add(terrain_entry) {
-    if (terrain_entry == null) return;
+    if (terrain_entry === null || terrain_entry === undefined) return;
 
     this.last_terrain_entry = terrain_entry;
     this.m_isValid = true;
@@ -582,6 +582,9 @@ class C_Modules {
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
           this.has_sound = true;
+          break;
+          
+        default:
           break;
       }
     }
@@ -706,7 +709,6 @@ export class CAndruavUnitObject {
   }
 
   init() {
-    var me = this;
     this.m_time_sync = 0; // time sent by unit so that you can use it to measrue other time fields sent by the same module.
     this.m_Permissions = "X0X0X0X0X0X0";
     this.m_IsShutdown = false;
@@ -831,18 +833,18 @@ export class CAndruavUnitList {
   }
 
   fn_getUnitKeys() {
-    if (js_globals.v_andruavClient == null) return undefined;
+    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return undefined;
     return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List);
   }
 
   fn_getUnitValues() {
-    if (js_globals.v_andruavClient == null) return undefined;
+    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return undefined;
     return Object.values(js_globals.v_andruavClient.m_andruavUnitList.List);
   }
 
   fn_getUnitCount() {
-    if (js_globals.v_andruavClient == null) return 0;
-    if (js_globals.v_andruavClient.m_andruavUnitList == null) return 0;
+    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return 0;
+    if (js_globals.v_andruavClient.m_andruavUnitList === null || js_globals.v_andruavClient.m_andruavUnitList === undefined) return 0;
     return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List)
       .length;
   }

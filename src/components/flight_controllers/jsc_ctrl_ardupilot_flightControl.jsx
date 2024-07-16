@@ -51,7 +51,7 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
         
         res.btn_servo_class         = " btn-success ";
 
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED == false )
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false )
         {
             res.btn_servo_class = " disabled hidden ";
         }
@@ -80,8 +80,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class	    = " btn-warning "; // used in boat only
                     res.btn_rtl_class 		    = " btn-primary  rounded-1 ";
                     res.btn_srtl_class 		    = " btn-primary  ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " btn-primary disabled hidden ";
                     res.btn_fbwa_class 	 	    = " btn-primary disabled hidden ";
                     res.btn_yaw_class 	 	    = " disabled hidden ";
@@ -108,8 +108,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class 	    = " btn-danger  ";
                     res.btn_rtl_class 		    = " btn-primary rounded-1 ";
                     res.btn_srtl_class 		    = " btn-primary  ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " disabled hidden ";
                     res.btn_fbwa_class 	 	    = " disabled hidden ";
                     res.btn_yaw_class 	 	    = " btn-success  ";
@@ -136,8 +136,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class 	    = " disabled hidden ";
                     res.btn_rtl_class 		    = " disabled hidden ";
                     res.btn_srtl_class 		    = " disabled hidden ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_yaw_class 	 	    = " btn-success  ";
                     res.btn_speed_class 	    = " btn-success  ";
                 break;
@@ -159,8 +159,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class 	    = " btn-danger  ";
                     res.btn_rtl_class 		    = " btn-primary rounded-1 ";
                     res.btn_srtl_class 		    = " btn-primary ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " btn-primary  ";
                     res.btn_fbwa_class 	 	    = " btn-primary  ";
                     res.btn_yaw_class 	 	    = " disabled hidden   ";
@@ -240,8 +240,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class 	    = " disabled hidden ";
                     res.btn_rtl_class 		    = " disabled hidden ";
                     res.btn_srtl_class 		    = " disabled hidden ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_yaw_class 	 	    = " btn-outline-light ";
                     res.btn_speed_class 	    = " btn-outline-light ";
                     break;
@@ -261,8 +261,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class	    = " btn-outline-light "; // used in boat only
                     res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
                     res.btn_srtl_class 		    = " btn-outline-light ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " btn-primary disabled hidden ";
                     res.btn_fbwa_class 	 	    = " btn-primary disabled hidden ";
                     res.btn_yaw_class 	 	    = " disabled hidden ";
@@ -288,8 +288,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                         res.btn_loiter_class 	    = " btn-outline-light ";
                         res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
                         res.btn_srtl_class 		    = " btn-outline-light ";
-                        res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                        res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                        res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                        res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                         res.btn_cruise_class  	    = " disabled hidden ";
                         res.btn_fbwa_class 	 	    = " disabled hidden ";
                         res.btn_yaw_class 	 	    = " btn-outline-light ";
@@ -312,8 +312,8 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
                     res.btn_loiter_class 	    = " btn-outline-light ";
                     res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
                     res.btn_srtl_class 		    = " btn-outline-light ";
-                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+                    res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
+                    res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " btn-outline-light ";
                     res.btn_fbwa_class 	 	    = " btn-outline-light ";
                     res.btn_yaw_class 	 	    = " disabled hidden   ";
@@ -403,7 +403,7 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
     }
 
     fn_doRTL(v_andruavUnit, smart) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, smart == true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
     }
 
 

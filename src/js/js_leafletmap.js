@@ -7,6 +7,8 @@
 
 import $ from 'jquery'; 
 import L from 'leaflet';
+import 'leaflet-rotatedmarker';
+
 
 import * as js_siteConfig from './js_siteConfig'
 import {js_globals} from './js_globals.js';
@@ -489,17 +491,17 @@ class CLeafLetAndruavMap {
     };
 
     fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
-        if ((p_image===null) || (p_image===""))
+        if ((p_image === null || p_image === undefined || p_image===""))
         {
             p_image = './images/destination_g_32x32.png';
         }
         var v_image;
-        if (p_iconsize===null) {
+        if (p_iconsize === null || p_iconsize === undefined) {
             p_iconsize = [32,32];
         }
         
         var v_iconAnchor = [p_iconsize[0]/2,p_iconsize[1]/2];
-        if (anchor!==null)
+        if (anchor !== null && anchor !== undefined)
         {
             v_iconAnchor = anchor;
         }
@@ -632,6 +634,14 @@ class CLeafLetAndruavMap {
         // p_infoWindow.open(this.m_Map);
 
         // return p_infoWindow;
+        this.fn_hideInfoWindow(p_infoWindow);
+
+        p_infoWindow = L.popup().setLatLng(new L.LatLng(p_lat, p_lng)).setContent(p_content).openOn(this.m_Map);
+
+        return p_infoWindow;
+    }
+
+    fn_showInfoWindow2(p_infoWindow, p_content, p_lat, p_lng) {
         this.fn_hideInfoWindow(p_infoWindow);
 
         p_infoWindow = L.popup().setLatLng(new L.LatLng(p_lat, p_lng)).setContent(p_content).openOn(this.m_Map);

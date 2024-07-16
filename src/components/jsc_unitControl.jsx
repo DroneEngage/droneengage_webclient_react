@@ -64,7 +64,7 @@ class CLSS_AndruavUnit extends React.Component {
 
       
 
-        if (p_andruavUnit.m_IsGCS != me.props.m_unit.m_IsGCS)
+        if (p_andruavUnit.m_IsGCS !== me.props.m_unit.m_IsGCS)
         {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
           // js_globals.fn_console_log ('err: Convert Me ' + p_andruavUnit.partyID);
@@ -101,7 +101,7 @@ class CLSS_AndruavUnit extends React.Component {
     fn_unitTelemetryOn (me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID != me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
           //  js_globals.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
@@ -113,7 +113,7 @@ class CLSS_AndruavUnit extends React.Component {
     fn_unitTelemetryOFF(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID != me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
           //  js_globals.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
@@ -292,7 +292,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID != me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
            // someone else wanta GamePad, I will release it if I have it.
             return ; // not me
@@ -568,14 +568,14 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
 		if (p_andruavUnit.m_isArmed==true) 
 		{
             res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-            res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+            res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
 		}
 		else
 		{
             // NOT ARMED
 
 			res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-            res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction != js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
+            res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
 		}
 
 
@@ -584,8 +584,8 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
             res.btn_sendParameters_class = " btn-primary  ";
         }
         
-        if ((p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() != js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS)
-        && (p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() != js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED))
+        if ((p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() !== js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS)
+        && (p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() !== js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED))
         {   
             res.btn_rx_class          = " btn-primary ";
             res.btn_rx_text           = "R/C Off";
@@ -638,7 +638,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
 
     componentDidUpdate() {
         var cam = $(".dropdown-menu li a");
-        if (cam != null) 
+        if (cam !== null && cam !== undefined) 
         {
             cam.click(function(){
                 var selText = $(this).attr('data-value');
@@ -686,7 +686,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         
         if (v_andruavUnit.m_isFlying === true) 
         {
-            if ((v_andruavUnit.m_FlyingLastStartTime != undefined) || (v_andruavUnit.m_FlyingLastStartTime === 0))
+            if ((v_andruavUnit.m_FlyingLastStartTime !== null && v_andruavUnit.m_FlyingLastStartTime !== undefined) || (v_andruavUnit.m_FlyingLastStartTime === 0))
             {
                 /**
                  * You need to depend on board. cannot assume that board Local Time is the same so you neeed to rely
@@ -957,7 +957,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
 		var res = fn_isBadFencing (v_andruavUnit);
 		v_andruavUnit.m_fencestatus = res;
 
-        if (v_andruavUnit.m_fencestatus!= null)
+        if (v_andruavUnit.m_fencestatus !== null && v_andruavUnit.m_fencestatus !== undefined)
 		{
 		    var status;
 			if ((v_andruavUnit.m_fencestatus & 0b010) === 0b010) //bad
@@ -1269,7 +1269,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
                         
             
 
-            if ( v_andruavUnit.m_IsShutdown != true) 
+            if ( v_andruavUnit.m_IsShutdown !== true) 
             {
                 if ((v_andruavUnit.m_SignalStatus.mobile === true))
                 {
@@ -1556,8 +1556,8 @@ export default class CLSS_AndruavUnitList extends React.Component {
     getHeaderInfo(v_andruavUnit)
     {
         var bad_fcb = ((v_andruavUnit.m_useFCBIMU === false) 
-        ||((v_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
-            && (v_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)));
+        ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
+            && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)));
 
         var classes = "";
         var text = v_andruavUnit.m_unitName;

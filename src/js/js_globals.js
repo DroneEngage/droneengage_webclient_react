@@ -14,6 +14,7 @@ class GLOBALS {
 		this.v_map_shapes = [];
 
 		this.v_vehicle_gui = {};
+		this.m_markGuided = null;
 
 		this.planes_icon = [ './images/planetracker_r_0d_.png',
 							'./images/planetracker_y_0d_.png',
