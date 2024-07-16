@@ -46,15 +46,6 @@ const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
 const CONST_TARGETS_GCS = '_GCS_';
 const CONST_TARGETS_DRONES = '_AGN_';
 
-// SOCKET STATUS
-const CONST_SOCKET_STATUS_FREASH = 1; // socket is new
-const CONST_SOCKET_STATUS_CONNECTING = 2; // connecting to WS
-const CONST_SOCKET_STATUS_DISCONNECTING = 3; // disconnecting from WS
-const CONST_SOCKET_STATUS_DISCONNECTED = 4; // disconnected  from WS
-const CONST_SOCKET_STATUS_CONNECTED = 5; // connected to WS
-const CONST_SOCKET_STATUS_REGISTERED = 6; // connected and executed AddMe
-const CONST_SOCKET_STATUS_UNREGISTERED = 7; // connected but not registred
-const CONST_SOCKET_STATUS_ERROR = 8; // Error
 
 export const c_SOCKET_STATUS = [
     'Fresh',
@@ -144,7 +135,7 @@ class CAndruavClient {
         this.v_sendAxes_skip = 0;
         this.andruavGeoFences = {};
         this.videoFrameCount = 0;
-        this.socketStatus = CONST_SOCKET_STATUS_FREASH;
+        this.socketStatus = js_andruavMessages.CONST_SOCKET_STATUS_FREASH;
         
         
         
@@ -323,7 +314,7 @@ class CAndruavClient {
 
 
     fn_isRegistered() {
-        return(this.socketStatus === CONST_SOCKET_STATUS_REGISTERED);
+        return(this.socketStatus === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
 
     }
 
@@ -2598,11 +2589,11 @@ class CAndruavClient {
     setSocketStatus(status) {
         this.socketStatus = status;
 
-        if (status == CONST_SOCKET_STATUS_CONNECTED) {
+        if (status == js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED) {
             this.API_addMe2(); // (v_andruavClient.groupname,v_andruavClient.unitID);
         }
 
-        if (status == CONST_SOCKET_STATUS_REGISTERED) {
+        if (status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 
 
             this.API_sendID(); // send now important
@@ -2625,8 +2616,8 @@ class CAndruavClient {
     prv_parseSystemMessage(Me, msg) {
         if (msg.messageType == js_andruavMessages.CONST_TYPE_AndruavSystem_ConnectedCommServer) {
             if (msg.msgPayload.s.indexOf('OK:connected') != -1) {
-                Me.setSocketStatus(CONST_SOCKET_STATUS_CONNECTED);
-                Me.setSocketStatus(CONST_SOCKET_STATUS_REGISTERED);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
 
             } else { /*Me.onLog ("connection refused");*/
             }
@@ -2636,7 +2627,7 @@ class CAndruavClient {
 
         if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer) {
             if (msg.msgPayload.s.indexOf('OK:del') != -1) {
-                Me.setSocketStatus(CONST_SOCKET_STATUS_FREASH);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_FREASH);
                 //Me.EVT_onDeleted();
                 js_eventEmitter.fn_dispatch(js_globals.EE_onDeleted);
 
@@ -3250,12 +3241,12 @@ class CAndruavClient {
 
             // OnClose callback of websocket
             this.ws.onclose = function () {
-                Me.setSocketStatus(CONST_SOCKET_STATUS_DISCONNECTED);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_DISCONNECTED);
                 js_eventEmitter.fn_dispatch(js_globals.EE_WS_CLOSE, null);
             };
 
             this.ws.onerror = function (err) {
-                Me.setSocketStatus(CONST_SOCKET_STATUS_ERROR);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);
             };
         } else { // The browser doesn't support WebSocket
             alert("WebSocket NOT supported by your Browser!");

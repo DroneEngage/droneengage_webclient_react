@@ -21,7 +21,7 @@ export class CLSS_CustomCircularBuffer
     {
             if ((p_forgetOld === true) || (this.m_unitCount < this.m_buffer.length))
             {
-                 if (this.m_buffer[this.m_head]!= null)
+                 if (this.m_buffer[this.m_head] !== null && this.m_buffer[this.m_head] !== undefined)
                  {
                     fn_onDeleteCallBack (this.m_buffer[this.m_head]);
                  }

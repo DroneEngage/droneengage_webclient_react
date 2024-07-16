@@ -1,5 +1,3 @@
-//import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/bootstrap.min.css';
 
 
 import React from 'react';

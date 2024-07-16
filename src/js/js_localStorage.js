@@ -30,7 +30,7 @@ class CLocalStorage {
             return defaultValue;
         
 
-        if (localStorage[name] != null) {
+        if (localStorage[name] !== null && localStorage[name] !== undefined) {
             return localStorage[name];
         } else {
             return defaultValue;

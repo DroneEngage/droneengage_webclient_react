@@ -1,11 +1,5 @@
-//import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/bootstrap.min.css';
-import 'leaflet/dist/leaflet.css';
-import '../css/css_styles.css';
-import '../css/css_styles2.css';
 
 import React from 'react';
-import ReactDOM from "react-dom/client";
 
 import {CLSS_LoginControl} from './jsc_login.jsx'
 import {CLSS_CTRL_Layout} from './jsc_ctrl_layoutControl.jsx'

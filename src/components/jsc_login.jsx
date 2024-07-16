@@ -1,15 +1,11 @@
-//import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/bootstrap.min.css';
 
 
 import React from 'react';
-import ReactDOM from "react-dom/client";
 
 import $ from 'jquery'; 
 
 import {js_globals} from '../js/js_globals.js';
 import * as js_helpers from '../js/js_helpers';
-import * as  js_siteConfig from '../js/js_siteConfig'
 import {QueryString, fn_connect} from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
 import {js_localStorage} from '../js/js_localStorage'
@@ -192,7 +188,7 @@ export class CLSS_LoginControl extends React.Component {
 									<p>  {js_localStorage.fn_getEmail()} </p>
 								</div>
 								<div className="form-group al_l">
-									<label  id="unitID" className="text-muted">GCS ID</label>
+									<p className="text-muted">GCS ID</p>
 									<p > {js_localStorage.fn_getUnitID()} </p>
 								</div>
 							</div>

@@ -227,4 +227,3 @@ import $ from 'jquery';
         
     };
 
-export var ADSBObjectList =  v_ADSB_Exchange.getInstance();

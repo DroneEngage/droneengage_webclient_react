@@ -11,7 +11,7 @@ export class CADSBObject
     
 };
 
-export class CADSBObjectList
+class CADSBObjectList
 {
     constructor ()
 	{
@@ -19,6 +19,15 @@ export class CADSBObjectList
 		this.count = 0;
 	}
 
+
+    static getInstance() {
+        // Check if the instance is null, and create a new one if it is
+        if (!CADSBObjectList.instance) {
+            CADSBObjectList.instance = new CADSBObjectList();
+        }
+        return CADSBObjectList.instance;
+    
+    }
 
     Add (icao_address,adsb_object)
 	{
@@ -50,3 +59,6 @@ export class CADSBObjectList
 		return null;
 	};
 }
+
+
+export var js_adsbUnit =  CADSBObjectList.getInstance();

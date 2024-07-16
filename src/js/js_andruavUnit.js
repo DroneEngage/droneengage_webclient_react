@@ -112,9 +112,7 @@ export const CONST_FLIGHT_PX4_POSCTL_POSCTL = 214;
 export const CONST_FLIGHT_PX4_POSCTL_ORBIT = 215;
 export const CONST_FLIGHT_CONTROL_UNKNOWN = 999;
 
-// P2P Connection Type
-export const CONST_TYPE_UNKNOWN = 0;
-export const CONST_TYPE_ESP32_MESH = 1;
+
 
 export function fn_getFullName(m_groupName, p_partyID) {
   //return m_groupName.replace(" ","_") + "_X_" + partyID.replace(" ","_");
@@ -371,7 +369,7 @@ class C_P2P {
     this.m_wifi_channel = 0;
     this.m_wifi_password = "";
     this.m_firmware = "";
-    this.m_connection_type = CONST_TYPE_UNKNOWN;
+    this.m_connection_type = js_andruavMessages.CONST_TYPE_UNKNOWN;
     this.m_parent_address = "";
     this.m_parent_connected = false;
     this.m_logical_parent_address = "";
@@ -812,7 +810,7 @@ export class CAndruavUnitList {
   }
 
   Add(partyID, andruavUnit) {
-    if (this.List[partyID] != null) return;
+    if (this.List[partyID] !== null && this.List[partyID] !== undefined) return;
     andruavUnit.m_index = this.count;
     this.List[partyID] = andruavUnit;
     this.count = this.count + 1;

@@ -1,10 +1,9 @@
 import $ from 'jquery'; 
-
 import React    from 'react';
-import ReactDOM from "react-dom/client";
 
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
+
 import {js_localStorage} from '../js/js_localStorage'
 import {js_speak} from '../js/js_speak'
 import {gui_toggleUnits} from '../js/js_main'
@@ -393,7 +392,7 @@ export default class CLSS_GlobalSettings extends React.Component {
         m_unitText = 'ft';
       }
 
-  //  fn_console_log ("REACT:RENDER CLSS_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
+  //  js_globals.fn_console_log ("REACT:RENDER CLSS_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
   var v_gadgets = [];
   var v_uploadFile = [];
   var v_telemetryModes = [];

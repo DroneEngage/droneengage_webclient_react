@@ -40,7 +40,7 @@ export const CONST_TELEPHONE_350G        = 5;
 export const CONST_TELEPHONE_375G        = 6;
 export const CONST_TELEPHONE_390G        = 7;
 export const CONST_TELEPHONE_400G        = 8;
-var v_NETWORK_G_TYPE = ['NA','2','2.5','2.75','3','3.5','3.75','3.9','4.0'];
+export const v_NETWORK_G_TYPE = ['NA','2','2.5','2.75','3','3.5','3.75','3.9','4.0'];
 
 export function  fn_getTimeSpanDetails (delta)
 {

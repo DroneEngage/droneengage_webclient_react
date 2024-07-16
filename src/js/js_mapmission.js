@@ -9,6 +9,7 @@ import {js_eventEmitter} from './js_eventEmitter'
 import {js_leafletmap} from './js_leafletmap'
 
 import * as js_andruavMessages from './js_andruavMessages'
+import {js_andruavAuth} from './js_andruavAuth'
 
 import { mavlink20 } from './js_mavlink_v2.js';
 
@@ -192,7 +193,7 @@ class CLSS_AndruavMissionPlan
 			let p_m = this.v_markers[i];
 			js_leafletmap.fn_showItem(p_m);
 
-			if (p_m.m_next != null)
+			if (p_m.m_next !== null && p_m.m_next !== undefined)
 			{
 				js_leafletmap.fn_showItem(p_m.m_next);
 			}
@@ -218,7 +219,7 @@ class CLSS_AndruavMissionPlan
 			// delete marker
 			js_leafletmap.fn_hideItem(p_m);
 
-			if (p_m.m_next != null)
+			if (p_m.m_next !== null && p_m.m_next !== undefined)
 			{	// delete line
 				js_leafletmap.fn_hideItem(p_m.m_next);
 			}
@@ -231,7 +232,7 @@ class CLSS_AndruavMissionPlan
 
 	fn_disconnectMissionItem (marker)
 	{
-		if (marker.m_next != null)
+		if (marker.m_next !== null && marker.m_next !== undefined)
 		{
 			js_leafletmap.fn_hideItem(marker.m_next);
 		}
@@ -318,7 +319,7 @@ class CLSS_AndruavMissionPlan
 		for (var i=0; i<len; ++i)
 		{
 			var marker = this.v_markers[i];
-			if (marker.distance != null)
+			if (marker.distance !== null && marker.distance !== undefined)
 			{
 				distance  += marker.distance;
 			}
@@ -368,7 +369,7 @@ class CLSS_AndruavMissionPlan
 			{
 				this.v_markers.splice(i,1);
 				js_leafletmap.fn_hideItem(marker);
-				if (marker.m_next != null)
+				if (marker.m_next !== null && marker.m_next  !== undefined)
 				{	
 					js_leafletmap.fn_hideItem(marker.m_next);
 					marker.m_next = undefined;
@@ -397,7 +398,7 @@ class CLSS_AndruavMissionPlan
 		{
 			var marker = this.v_markers[i];
 			marker.m_mission = null;
-			if (marker.m_next != null)
+			if (marker.m_next !== null && marker.m_next !== undefined)
 			{
 				js_leafletmap.fn_hideItem(marker.m_next);
 			}
@@ -434,7 +435,7 @@ class CLSS_AndruavMissionPlan
 			}
 			
 			smallest_item.order = i;
-			if (smallest_item.EVT_onShapeUpdated != null)
+			if (smallest_item.EVT_onShapeUpdated !== null && smallest_item.EVT_onShapeUpdated !== undefined)
 			{
 				smallest_item.EVT_onShapeUpdated(smallest_item);
 			}
@@ -451,13 +452,13 @@ class CLSS_AndruavMissionPlan
 		// var v_cmd = CLSS_AndruavResala_WayPoints.fn_toJSON(this.v_markers);
 		
 		// Delete Old Shapes
-		if (p_missionV110 != null)
+		if (p_missionV110 !== null && p_missionV110 !== undefined)
 		{
-			if ((js_globals.v_andruavClient != null) && (js_globals.v_andruavClient.fn_isRegistered()===true))
+			if ((js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined) && (js_globals.v_andruavClient.fn_isRegistered()===true))
 			{
 				js_globals.v_andruavClient.API_requestDeleteWayPoint(p_PartyID,null); // deattach drones from all fences in the group
-				js_globals.v_andruavClient.API_disableWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
-				js_globals.v_andruavClient.API_saveWayPointTasks(window.AndruavLibs.AndruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1,p_missionV110);
+				js_globals.v_andruavClient.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
+				js_globals.v_andruavClient.API_saveWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1,p_missionV110);
 			}
 		}
 	};
@@ -782,7 +783,7 @@ class CLSS_AndruavMissionPlanManager
 			return ;
 		}
 		
-		if (this.m_activePlan != null)
+		if (this.m_activePlan !== null && this.m_activePlan !== undefined)
 		{
 			// unselect the old one.
 			this.m_activePlan.fn_highlight (false);

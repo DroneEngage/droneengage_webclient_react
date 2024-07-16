@@ -4,7 +4,7 @@ class GLOBALS {
 
 	constructor () 
 	{
-
+		this.myposition = null;
 		this.v_andruavClient = null;
  		this.build_number = "20240703-01";
 		// auto connect variables
@@ -208,7 +208,7 @@ class GLOBALS {
 
 		this.CONST_PRO_VERSION = false;
 		this.CONST_DISABLE_ADSG = true;
-
+		
 	}
 
 	static getInstance() {

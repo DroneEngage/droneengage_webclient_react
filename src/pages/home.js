@@ -1,16 +1,17 @@
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/bootstrap.min.css';
 
+import '../css/bootstrap.min.css';  // my theme
 import 'leaflet/dist/leaflet.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
+import '../css/bootstrap-icons/font/bootstrap-icons.css'
 
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import {js_globals} from '../js/js_globals.js';
+
 import React , { useEffect } from 'react';
 import CLSS_HeaderControl from '../components/jsc_header'
 import CLSS_GlobalSettings from '../components/jsc_globalSettings'
+import CLSS_AndruavUnitList from '../components/jsc_unitControl.jsx'
 
 import {fn_on_ready} from '../js/js_main'
 
@@ -123,12 +124,104 @@ const Home = () => {
 						    
                 <div id="guiMessageCtrl" className='row'></div>
 						
-						    <div id='andruavUnitList' className='row'></div>
-						
+						    <div id='andruavUnitList' className='row'>
+                <CLSS_AndruavUnitList></CLSS_AndruavUnitList>
+                </div>
 					    </div>
 				
 			      </div>
           </div>
+
+
+          <div className="modal fade" id="altitude_modal">
+			<div className="modal-dialog">
+				<div className="modal-content">
+					<div className="modal-header">
+						<button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h4 className="modal-title text-primary">Change Altitude</h4>
+					</div>
+					<div className="container"></div>
+					<div className="modal-body">
+						<div className="input-group">
+							<input id="txtAltitude" type="text" className="form-control" placeholder="Altitude in meters"
+								aria-describedby="basic-addon2"/>
+							<span className="input-group-addon">meters</span>
+						</div>
+					</div>
+					<div className="modal-footer">
+						<button id="btnCancel" type="button" data-dismiss="modal" className="btn btn-muted">Cancel</button>
+						<button id="btnOK" type="button" data-dismiss="modal" className="btn btn-success">GO</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="changespeed_modal"  className="modal fade"  role="dialog">
+			<div className="modal-dialog">
+				<div className="modal-content">
+					<div className="modal-header">
+						<h4 id='title' className="modal-title bg-warning rounded_10px p-1 text-white">Change Speed</h4>
+						<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div className="modal-body">
+					<div className="container"></div>
+						<div className="input-group">
+							<input id="txtSpeed" type="text" className="form-control rounded-3 me-3" placeholder=""
+								aria-describedby="basic-addon2"/>
+							<span id="txtSpeedUnit" className="input-group-addon">meters</span>
+						</div>
+					</div>
+					<div className="modal-footer">
+						<button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">Cancel</button>
+						<button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning">GO</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="modal_changeUnitInfo"  className="modal fade"  role="dialog">
+			<div className="modal-dialog">
+				<div className="modal-content">
+					<div className="modal-header">
+						<h4 id='title' className="modal-title bg-warning rounded_10px p-1 text-white">Change Speed</h4>
+						<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div className="modal-body">
+					<div className="container"></div>
+						<div className="input-group align-items-center">
+							<span id="txtNamelbl" className="input-group-addon  me-2">Name</span>
+							<input id="txtUnitName" type="text" className="form-control rounded-3 me-3" placeholder=""
+								aria-describedby="basic-addon2"/>
+								
+						</div>
+						<div className="input-group mt-2 align-items-center">
+							<span id="txtDescriptionlbl" className="input-group-addon me-2">Description</span>
+							<input id="txtDescription" type="text" className="form-control rounded-3 me-3" placeholder=""
+								aria-describedby="basic-addon2"/>
+						</div>
+					</div>
+					<div className="modal-footer">
+						<button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">Cancel</button>
+						<button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning">GO</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="modal_saveConfirmation" className="modal fade"  role="dialog">
+			<div className="modal-dialog">
+				<div className="modal-content">
+					<div className="modal-header">
+						<h4 id="title" className="modal-title bg-success p-1 text-white"><strong>Attention:</strong> Delete Operation.</h4>
+						<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div className="modal-body text-white">
+						<p>Are you sure you want to delete current active Geo-Fence and replace it with new ones ?</p>
+					</div>
+					<div className="modal-footer">
+						<button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-secondary" >Cancel</button>
+						<button id="modal_btn_confirm" type="button" data-bs-dismiss="modal" className="btn btn-danger">Submit</button>
+					</div>
+				</div>
+			</div>
+		</div>
     </div>
     
     );

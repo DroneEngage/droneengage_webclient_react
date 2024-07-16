@@ -88,7 +88,6 @@ class CAndruavAuth {
     }
 
     fn_do_canControlWP() {
-        console.log (this._m_perm);
         return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL);
     }
     

@@ -1,14 +1,18 @@
 
 
-import $ from 'jquery'; 
-
+import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Modal from 'bootstrap/js/dist/modal';
+
+
+
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
+import {js_globals} from './js_globals.js';
 import * as recordrtc from './js_recordrtc'
 import {js_speak} from './js_speak'
-import {js_globals} from './js_globals.js';
 
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruavclient2 from './js_andruavclient2'
@@ -17,7 +21,7 @@ import {js_leafletmap} from './js_leafletmap'
 import {js_eventEmitter} from './js_eventEmitter'
 import {js_localStorage} from './js_localStorage'
 import * as js_mapmission from './js_mapmission'
-import {ADSBObjectList} from './js_adsB_Exchange'
+import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js';
 
 
@@ -37,7 +41,7 @@ $.fn.append = function($el){
 var v_contextMenuOpen = false;
 
 
-var myposition = null;
+
 var elevator;
 var m_markGuided = null;
 
@@ -118,7 +122,7 @@ function fn_handleKeyBoard() {
 
 	$('body').keydown(function (p_event) {
 		p_event = p_event || window.event;
-	if (p_event.key == null) return ;
+	if (p_event.key === null || p_event.key === undefined) return ;
 
 	if (p_event.type === "keydown")
 	{
@@ -152,8 +156,8 @@ function fn_handleKeyBoard() {
 
         
 
-		function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption) {
-			if (p_style == null) {
+		export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption) {
+			if (p_style === null || p_style === undefined) {
 				p_style = "bg-success";
 			}
 			p_style += " p-1 rounded_10px ";
@@ -167,19 +171,23 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').click(function () 
 			{
 				callback(true);
-				$('#modal_saveConfirmation').modal('hide');
+				//$('#modal_saveConfirmation').modal('hide');
+				const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
+				modal.hide();
 			});
 			$('#modal_saveConfirmation').children().find('button#btnCancel').unbind('click');
 			$('#modal_saveConfirmation').children().find('button#btnCancel').click(function () 
 			{
 				callback(false);
-				$('#modal_saveConfirmation').modal('hide');
+				//$('#modal_saveConfirmation').modal('hide');
+				const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
+				modal.hide()
 			});
-			if (p_yesCaption == null)
+			if (p_yesCaption === null || p_yesCaption === undefined)
 			{
 				p_yesCaption = "Yes";
 			} 
-			if (p_noCaption == null)
+			if (p_noCaption === null || p_noCaption === undefined)
 			{
 				p_noCaption = "Cancel"
 			}
@@ -187,7 +195,9 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').html(p_yesCaption);
 			$('#modal_saveConfirmation').children().find('button#btnCancel').html(p_noCaption);
 			
-			$('#modal_saveConfirmation').modal('show');
+			const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
+			modal.show();
+			//$('#modal_saveConfirmation').modal('show');
 		}
 
 
@@ -555,7 +565,7 @@ function fn_handleKeyBoard() {
 		*/
 		function fn_VIDEO_Record(v_andruavVideo, v_trackId, p_Start) {
 
-			if (v_andruavVideo == null) return ;
+			if (v_andruavVideo === null || v_andruavVideo === undefined) return ;
 
 			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
 			for (var i=0;i<len;++i)
@@ -704,17 +714,17 @@ function fn_handleKeyBoard() {
 		function fn_adsbExpiredUpdate(me)
 		{
 			const ADSB_OBJECT_TIMEOUT = 13000;
-			const count = ADSBObjectList.count;
+			const count = js_adsbUnit.count;
 			const now = new Date();
-			const p_keys = Object.keys(ADSBObjectList.List);
+			const p_keys = Object.keys(js_adsbUnit.List);
 		
 			for (var i=0; i< count; ++i)
 			{
-				var adsb_obj  = ADSBObjectList.List[p_keys[i]];
+				var adsb_obj  = js_adsbUnit.List[p_keys[i]];
 
 				if ((now - adsb_obj.m_last_access) > ADSB_OBJECT_TIMEOUT)
 				{
-					if (adsb_obj.p_marker != null)
+					if (adsb_obj.p_marker !== null && adsb_obj.p_marker !== undefined)
 					{
 						js_leafletmap.fn_hideItem(adsb_obj.p_marker);
 					}
@@ -725,7 +735,7 @@ function fn_handleKeyBoard() {
 		function fn_adsbObjectUpdate(me, p_adsbObject)
 		{
 			var v_marker = p_adsbObject.p_marker;
-			if (v_marker== null)
+			if (v_marker === null || v_marker === undefined)
 			{
 				var icon;
 				switch (parseInt(p_adsbObject.m_emitter_type))
@@ -799,7 +809,7 @@ function fn_handleKeyBoard() {
 			// the browser instead of changing the units the latter will take the values of the first one.
 			js_localStorage.fn_setMetricSystem(js_globals.v_useMetricSystem);
             
-			if (js_localStorage.fn_getMetricSystem() == true) {
+			if (js_localStorage.fn_getMetricSystem() === true) {
 				if (dontflip != true) js_globals.v_useMetricSystem = false;
 
 				js_localStorage.fn_setMetricSystem(false);
@@ -825,9 +835,9 @@ function fn_handleKeyBoard() {
 			js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
 		};
 
-		function fn_convertToMeter(value) {
+		export function fn_convertToMeter(value) {
 			if (isNaN(value)) return 0;
-			if (js_localStorage.fn_getMetricSystem() == true) {
+			if (js_localStorage.fn_getMetricSystem() === true) {
 				return value;
 			}
 			else {
@@ -875,20 +885,20 @@ function fn_handleKeyBoard() {
 
 			function setPosition(position) {
 
-				myposition = position;
+				js_globals.myposition = position;
 				if (js_globals.CONST_DISABLE_ADSG === false) {
-					ADSBObjectList.fn_changeDefaultLocation(
-						myposition.coords.latitude,
-						myposition.coords.longitude, 1000);
+					js_adsbUnit.fn_changeDefaultLocation(
+						js_globals.myposition.coords.latitude,
+						js_globals.myposition.coords.longitude, 1000);
 				}
 				js_leafletmap.fn_PanTo_latlng(
-					myposition.coords.latitude,
-					myposition.coords.longitude);
+					js_globals.myposition.coords.latitude,
+					js_globals.myposition.coords.longitude);
 
 				js_leafletmap.fn_setZoom (8);
 			}
 
-			if (QueryString.lat != null)
+			if (QueryString.lat !== null && QueryString.lat !== undefined)
 			{
 				js_leafletmap.fn_PanTo_latlng(
 					QueryString.lat,
@@ -952,9 +962,9 @@ function fn_handleKeyBoard() {
 
 
 		
-		function fn_openFenceManager(p_partyID) {
+		export function fn_openFenceManager(p_partyID) {
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
-			if (p_andruavUnit == null) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
 
@@ -962,8 +972,8 @@ function fn_handleKeyBoard() {
 			return false;
 		}
 
-		function fn_switchGPS(p_andruavUnit) {
-			if (p_andruavUnit == null) {
+		export function fn_switchGPS(p_andruavUnit) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
 
@@ -984,9 +994,9 @@ function fn_handleKeyBoard() {
 
 		}
 
-		function gui_doYAW(p_partyID) {
+		export function gui_doYAW(p_partyID) {
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
-			if (p_andruavUnit == null) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
 
@@ -1023,7 +1033,7 @@ function fn_handleKeyBoard() {
 		function fn_doCircle2(p_partyID, latitude, longitude, altitude, radius, turns) {
 
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			if ((p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_ROVER)
 			|| (p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_BOAT)) return;
 
@@ -1071,18 +1081,18 @@ function fn_handleKeyBoard() {
 		/**
 		   Goto Unit on map
 		**/
-		function fn_gotoUnit_byPartyID(p_partyID) {
+		export function fn_gotoUnit_byPartyID(p_partyID) {
 			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			fn_gotoUnit(p_andruavUnit);
 		}
 		
 		function fn_gotoUnit(p_andruavUnit) {
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			var marker = p_andruavUnit.m_gui.m_marker;
-			if (marker != null) {
+			if (marker !== null && marker !== undefined) {
 				js_leafletmap.fn_PanTo(p_andruavUnit.m_gui.m_marker);
 				// commented because zoom need to be after pan is completed otherwise map pans to wrong location.
 				// if (js_leafletmap.fn_getZoom() < 16) {
@@ -1096,9 +1106,9 @@ function fn_handleKeyBoard() {
 			window.open(p_url,'_blank');
 		}
 
-		function fn_changeUnitInfo (p_andruavUnit)
+		export function fn_changeUnitInfo (p_andruavUnit)
 		{
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			
 			$('#modal_changeUnitInfo').find('#title').html('Change Unit Name of ' + p_andruavUnit.m_unitName);
 			$('#modal_changeUnitInfo').find('#txtUnitName').val(p_andruavUnit.m_unitName);
@@ -1113,12 +1123,14 @@ function fn_handleKeyBoard() {
 				
 				js_globals.v_andruavClient.API_setUnitName(p_andruavUnit, v_unitName, v_unitDescription);
 			});
-			$('#modal_changeUnitInfo').modal('show');
+			//$('#modal_changeUnitInfo').modal('show');
+			const modal = new Modal($('#modal_changeUnitInfo')); // Instantiates your modal
+			modal.show();
 		}
 
-		function fn_changeAltitude (p_andruavUnit) {
+		export function fn_changeAltitude (p_andruavUnit) {
 
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 
 			var v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt!=null?(p_andruavUnit.m_Nav_Info.p_Location.alt).toFixed(1):0;
@@ -1143,7 +1155,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').click(function () {
 				var v_alt = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_alt == '' || isNaN(v_alt)) return;
-				if (js_globals.v_useMetricSystem == false) {
+				if (js_globals.v_useMetricSystem === false) {
 					// the GUI in feet and FCB in meters
 					v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 				}
@@ -1157,17 +1169,19 @@ function fn_handleKeyBoard() {
 					js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, v_alt);
 				}
 			});
-			$('#changespeed_modal').modal('show');
+			//$('#changespeed_modal').modal('show');
+			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			modal.show();
 		}
 
 		/**
 		 Open Change Speed Modal 
 		**/
-		function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
-			if (p_andruavUnit == null) return;
+		export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			var v_speed_val = p_initSpeed;
-			if (v_speed_val == null) 
+			if (v_speed_val === null || v_speed_val === undefined) 
 			{
 				if (p_andruavUnit.m_Nav_Info.p_Location.ground_speed!= null)
 				{
@@ -1180,12 +1194,12 @@ function fn_handleKeyBoard() {
 			}
 			
 			var v_speed_unit;
-			if (v_speed_val == null) {
+			if (v_speed_val === null || v_speed_val === undefined) {
 				return;
 			} else {
 				
 				
-				if (js_globals.v_useMetricSystem == true) {
+				if (js_globals.v_useMetricSystem === true) {
 					v_speed_val = v_speed_val.toFixed(1);
 					v_speed_unit = 'm/s';
 				}
@@ -1203,7 +1217,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').click(function () {
 				var v_speed = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_speed == '' || isNaN(v_speed)) return;
-				if (js_globals.v_useMetricSystem == false) {
+				if (js_globals.v_useMetricSystem === false) {
 					// the GUI in miles and the FCB is meters
 					v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
 				}
@@ -1215,11 +1229,11 @@ function fn_handleKeyBoard() {
 
 		}
 
-		function fn_changeUDPPort(p_andruavUnit, init_pot) {
-			if (p_andruavUnit == null) return;
+		export function fn_changeUDPPort(p_andruavUnit, init_pot) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			var v_port_val = init_pot;
-			if (v_port_val == null) 
+			if (v_port_val === null || v_port_val === undefined) 
 			{	
 				v_port_val = p_andruavUnit.m_Telemetry.m_udpProxy_port;
 			}
@@ -1233,21 +1247,23 @@ function fn_handleKeyBoard() {
 				if (v_port_val == '' || isNaN(v_port_val) || v_port_val >= 0xffff) return;
 				js_globals.v_andruavClient.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
 			});
-			$('#changespeed_modal').modal('show');
-
+			
+			//$('#changespeed_modal').modal('show');
+			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			modal.show();
 		}
 
 		/**
 		   Switch Video OnOff
 		*/
-		function toggleVideo(p_andruavUnit) {
-			if (p_andruavUnit == null) return;
+		export function toggleVideo(p_andruavUnit) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			fn_retreiveCamerasList(p_andruavUnit);
 		}
 
 
 		function fn_retreiveCamerasList(p_andruavUnit) {
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 				function fn_callback (p_session)
 				{
@@ -1271,9 +1287,9 @@ function fn_handleKeyBoard() {
 		/**
 		   Switch Video OnOff
 		*/
-		function toggleRecrodingVideo(p_andruavUnit) {
+		export function toggleRecrodingVideo(p_andruavUnit) {
 
-			if (p_andruavUnit == null) return;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			function fn_callback (p_session)
         	{
@@ -1298,7 +1314,7 @@ function fn_handleKeyBoard() {
 		/**
 		   return should be good & bad in the same time for different fences.
 		*/
-		function fn_isBadFencing(p_andruavUnit) {
+		export function fn_isBadFencing(p_andruavUnit) {
 
 			var keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
 			var size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
@@ -1316,7 +1332,7 @@ function fn_handleKeyBoard() {
 					var geoFenceHitInfo = fence.Units[p_andruavUnit.partyID].geoFenceHitInfo;
 					if (geoFenceHitInfo != null) {
 
-						if (geoFenceHitInfo.hasValue == true) {
+						if (geoFenceHitInfo.hasValue === true) {
 							if (geoFenceHitInfo.m_inZone && geoFenceHitInfo.m_shouldKeepOutside) {
 								// violation
 								v_res = v_res | 0b010; //bad
@@ -1332,7 +1348,7 @@ function fn_handleKeyBoard() {
 						}
 						else {
 
-							if (geoFenceHitInfo.m_shouldKeepOutside == true) {
+							if (geoFenceHitInfo.m_shouldKeepOutside === true) {
 								// because no HIT Event is sent when Drone is away of a Restricted Area.
 								// it is only send when it cross it in or out or being in at first.
 								// for green area a hit command is sent when being out for every green area.
@@ -1350,9 +1366,9 @@ function fn_handleKeyBoard() {
 		* Hide but does not delete 
 		***/
 		function hlp_deleteOldWayPointOfDrone(p_andruavUnit) {
-			if (p_andruavUnit.m_wayPoint == null) return;
+			if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) return;
 			var markers = p_andruavUnit.m_gui.m_wayPoint_markers;
-			if (markers == null) return;
+			if (markers === null || markers === undefined) return;
 
 			var count = markers.length;
 			for (var i = 0; i < count; i++) {
@@ -1394,7 +1410,7 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function hlp_getFlightMode(p_andruavUnit) {
+		export function hlp_getFlightMode(p_andruavUnit) {
 			//These are Andruav flight modes not Ardupilot flight modes. They are mapped in mavlink plugin
 			var text = "undefined";
 			if (p_andruavUnit.m_flightMode != null) {
@@ -1545,7 +1561,7 @@ function fn_handleKeyBoard() {
 
 		function hlp_generateFlyHereMenu(p_lat, p_lng) {
 
-			if (js_globals.v_andruavClient == null) {
+			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) {
 				return "";
 			}
 
@@ -1644,7 +1660,7 @@ function fn_handleKeyBoard() {
 			// use event.pixel.x and event.pixel.y 
 			// to position menu at mouse position
 
-			if (this.m_markGuided != null) {
+			if (this.m_markGuided !== null && this.m_markGuided !== undefined) {
 				js_leafletmap.fn_hideItem(this.m_markGuided);
 				this.m_markGuided = null;
 			}
@@ -1697,7 +1713,7 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient = null;
 			}
 
-			if (js_globals.v_connectState == true) {
+			if (js_globals.v_connectState === true) {
 
 				js_globals.v_connectRetries += 1;
 				if (js_globals.v_connectRetries >= 5) {
@@ -1731,10 +1747,10 @@ function fn_handleKeyBoard() {
 		};
 
 
-		function fn_putWayPoints(p_andruavUnit, p_eraseFirst) {
+		export function fn_putWayPoints(p_andruavUnit, p_eraseFirst) {
 
 			var files = window.document.getElementById('btn_filesWP').files;
-			if (p_andruavUnit == null) return ;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 
 			if (!files.length) {
 				alert('Please select a file!');
@@ -1752,7 +1768,7 @@ function fn_handleKeyBoard() {
 				}
 			};
 
-			if (js_globals.v_andruavClient == null) return;
+			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
 
 			reader.readAsBinaryString(file);
 		}
@@ -1764,7 +1780,7 @@ function fn_handleKeyBoard() {
 		
 
 		var EVT_GCSDataReceived = function (data) {
-			if ((js_globals.v_andruavClient == null) || (js_globals.v_andruavClient.currentTelemetryUnit == null)) {
+			if ((js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) || (js_globals.v_andruavClient.currentTelemetryUnit === null || js_globals.v_andruavClient.currentTelemetryUnit === undefined)) {
 				return;
 			}
 			js_globals.v_andruavClient.API_SendTelemetryData(js_globals.v_andruavClient.currentTelemetryUnit, data);
@@ -1801,17 +1817,17 @@ function fn_handleKeyBoard() {
 			const missionIndexReached = data.mir;
 			const status = data.status;
 
-			if (p_andruavUnit.m_wayPoint == null) {
+			if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) {
 				//no waypoint attached ... send asking for update
 				js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit);
 
 				return;
 			}
 
-			if (p_andruavUnit.m_gui.m_wayPoint_markers != null) {
+			if (p_andruavUnit.m_gui.m_wayPoint_markers !== null && p_andruavUnit.m_gui.m_wayPoint_markers !== undefined) {
 				const c_mission_index = missionIndexReached;
 				var v_marker = p_andruavUnit.m_gui.m_wayPoint_markers[c_mission_index];
-				if (v_marker != null) {
+				if (v_marker !== null && v_marker !== undefined) {
 					v_marker.waypoint_status = status;
 					if ((p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index]==js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_TRIGGER)
 					|| (p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index]==js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL)) {
@@ -1957,7 +1973,7 @@ function fn_handleKeyBoard() {
 
 		
 		function EVT_andruavUnitFCBUpdated(me, p_andruavUnit) {
-			if (p_andruavUnit.m_useFCBIMU == true) {
+			if (p_andruavUnit.m_useFCBIMU === true) {
 				js_speak.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
 				js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
 			}
@@ -1967,7 +1983,7 @@ function fn_handleKeyBoard() {
 		}
 
 		function EVT_andruavUnitFlyingUpdated(me, p_andruavUnit) {
-			if (p_andruavUnit.m_isFlying == true) {
+			if (p_andruavUnit.m_isFlying === true) {
 				js_speak.fn_speak(p_andruavUnit.m_unitName + ' is Flying');
 			}
 			else {
@@ -2077,10 +2093,10 @@ function fn_handleKeyBoard() {
 			}
 		}
 
-		function getVehicleIcon(p_andruavUnit, applyBearing) {
+		export function getVehicleIcon(p_andruavUnit, applyBearing) {
 
 
-			if (p_andruavUnit.m_IsGCS == true) {
+			if (p_andruavUnit.m_IsGCS === true) {
 				return './images/map_gcs_3_32x32.png';
 			}
 			else {
@@ -2125,7 +2141,7 @@ function fn_handleKeyBoard() {
 			
 			if ((p_andruavUnit.m_defined ===true) && (p_andruavUnit.m_Nav_Info.p_Location.lat != null)) {
 				
-				if (p_andruavUnit.m_gui.m_marker == null)
+				if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined)
 				{
 					if (js_globals.v_vehicle_gui[p_andruavUnit.partyID]!= null)
 					{
@@ -2136,12 +2152,12 @@ function fn_handleKeyBoard() {
 				var marker = p_andruavUnit.m_gui.m_marker;
 
 				if (js_globals.CONST_DISABLE_ADSG === false) {
-					ADSBObjectList.fn_getADSBDataForUnit(p_andruavUnit);
+					js_adsbUnit.fn_getADSBDataForUnit(p_andruavUnit);
 				}
 				
 				var v_image =  getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
 
-				if (marker == null) {
+				if (marker === null || marker === undefined) {
 					// create a buffer for flight path
 					p_andruavUnit.m_gui.m_gui_flightPath.fn_flush();
 					p_andruavUnit.m_gui.m_flightPath_style = {
@@ -2298,7 +2314,7 @@ function fn_handleKeyBoard() {
 		  Called when a new unit joins the system.
 		*/
 		var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
-			if (p_andruavUnit.m_IsGCS == false) {
+			if (p_andruavUnit.m_IsGCS === false) {
 				p_andruavUnit.m_gui.m_mapObj = map;
 				p_andruavUnit.m_gui.defaultHight = js_globals.CONST_DEFAULT_ALTITUDE;
 				p_andruavUnit.m_gui.defaultCircleRadius = js_globals.CONST_DEFAULT_RADIUS;
@@ -2314,7 +2330,7 @@ function fn_handleKeyBoard() {
 		var EVT_HomePointChanged = function (me, p_andruavUnit) {
 			var v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat, p_andruavUnit.m_Geo_Tags.p_HomePoint.lng);
 
-			if (p_andruavUnit.m_gui.m_marker_home == null) {
+			if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
 				const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 				var v_home = js_leafletmap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,24], false, false, v_html, [32,32]);
 				js_leafletmap.fn_setPosition(v_home,v_latlng)
@@ -2350,7 +2366,7 @@ function fn_handleKeyBoard() {
 			}
 			var v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
-			if (p_andruavUnit.m_gui.m_marker_destination == null) {
+			if (p_andruavUnit.m_gui.m_marker_destination === null || p_andruavUnit.m_gui.m_marker_destination === undefined) {
 				p_andruavUnit.m_gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
 			}
 			
@@ -2477,7 +2493,7 @@ function fn_handleKeyBoard() {
 			// markerContent += "<p> <span class='text-success'>Speed: " + Number(_adsb.Speed.toFixed(0)).toLocaleString() + " Km/hr </span> </p>";
 
 			// var alt;
-			// if (v_useMetricSystem == true) {
+			// if (js_globals.v_useMetricSystem === true) {
 			// 	alt = Number(_adsb.Altitude.toFixed(0)).toLocaleString() + ' m';
 			// }
 			// else {
@@ -2524,7 +2540,7 @@ function fn_handleKeyBoard() {
 			var markerContent = "<p class='img-rounded bg-primary text-white'><strong class='css_padding_5'>" + p_andruavUnit.m_unitName + "</strong> <span>" + sys_id + "</span></p>\
 			  	<style class='img-rounded help-block'>" + p_andruavUnit.Description + "</style>";
 
-			if (p_andruavUnit.m_IsGCS == false) {
+			if (p_andruavUnit.m_IsGCS === false) {
 				markerContent += "<span>" + armedBadge + " <span class='text-success'><strong>" + hlp_getFlightMode(p_andruavUnit) + "</strong></span> </span>";
 			}
 			else {
@@ -2571,9 +2587,9 @@ function fn_handleKeyBoard() {
 			}
 			js_leafletmap.fn_getElevationForLocation(p_lat, p_lng
 				, function (p_elevation, p_lat, p_lng) {
-				if (p_elevation!= null) {
+				if (p_elevation !== null && p_elevation !== undefined) {
 
-					if (js_localStorage.fn_getMetricSystem() == false) {
+					if (js_localStorage.fn_getMetricSystem() === false) {
 						p_elevation = js_helpers.CONST_METER_TO_FEET * p_elevation;
 					}
 
@@ -2774,7 +2790,7 @@ function fn_handleKeyBoard() {
 					break;
 			}
 
-			if (v_geoFence != null)
+			if (v_geoFence !== null && v_geoFence !== undefined)
 			{
 				var _dblClickTimer;
 				js_leafletmap.fn_addListenerOnDblClickMarker(v_geoFence, 
@@ -2826,7 +2842,7 @@ function fn_handleKeyBoard() {
 			}
 			if (fence.Units[p_andruavUnit.partyID] === undefined) fence.Units[p_andruavUnit.partyID] = {};
 			fence.Units[p_andruavUnit.partyID].geoFenceHitInfo = geoFenceHitInfo;
-			if (p_andruavUnit.m_gui.m_marker == null) return;   // will be updated later when GPS message is recieved from that drone.
+			if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) return;   // will be updated later when GPS message is recieved from that drone.
 			var typeMsg = "info"; var msg = "OK";
 			if (geoFenceHitInfo.m_inZone && geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be Out fence " + geoFenceHitInfo.fenceName; }
 			else if (!geoFenceHitInfo.m_inZone && !geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be In fence " + geoFenceHitInfo.fenceName; }
@@ -2954,7 +2970,7 @@ function fn_handleKeyBoard() {
 			}
 
 			// create a group object
-			if ( js_globals.v_andruavClient == null) {
+			if ( js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) {
 
 				if (js_andruavAuth.fn_logined() === false) return;
 				js_globals.v_andruavClient = js_andruavclient2.AndruavClient;
