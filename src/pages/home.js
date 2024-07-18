@@ -2,9 +2,10 @@
 
 import '../css/bootstrap.min.css';  // my theme
 import 'leaflet/dist/leaflet.css';
+import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
-import '../css/bootstrap-icons/font/bootstrap-icons.css'
+
 
 
 
@@ -12,7 +13,9 @@ import React , { useEffect } from 'react';
 import CLSS_HeaderControl from '../components/jsc_header'
 import CLSS_GlobalSettings from '../components/jsc_globalSettings'
 import CLSS_AndruavUnitList from '../components/jsc_unitControl.jsx'
-
+import CLSS_CameraDialog from '../components/jsc_cameraDialogControl.jsx'
+import CLSS_StreamDialog from '../components/jsc_streamDialogControl.jsx'
+import {CLSS_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
 
@@ -42,8 +45,10 @@ const Home = () => {
                     <div id='mapid' className="org_border fullscreen">
                     </div>
                   </div>
-                  <div className="cameraview" id="div_video_control"></div>
-                  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array"></div>
+                  <div className="cameraview" id="div_video_control">
+				  	<CLSS_CVideoControl />
+				  </div>
+				  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array"></div>
 					      </div>
                 
                 <div id="andruav_unit_list_array_float" className="css_ontop  andruav_unit_list_array_float">
@@ -102,11 +107,14 @@ const Home = () => {
               </div>
 
 
-              <div id='CTRL_cameraCtrl'></div>
+              {/* <div id='CTRL_cameraCtrl'></div> */}
+			  <CLSS_CameraDialog/>
               <div id='servoCtrl'></div>
               <div id='modal_uplCtrl'></div>
               <div id='gamepadCtrl'></div>
-              <div id='CTRL_streamCtrl' > </div>
+              <div id='CTRL_streamCtrl' > 
+			  <CLSS_StreamDialog/>
+			  </div> 
             </div>
 
             <div id="row_2" className="col-4 ">

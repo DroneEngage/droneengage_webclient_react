@@ -1,10 +1,15 @@
+import $ from 'jquery';
+
 import React    from 'react';
 
 
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_helpers from '../js/js_helpers'
 import * as js_andruavUnit from '../js/js_andruavUnit'
-import {fn_showMap, fn_gotoUnit_byPartyID} from '../js/js_main'
+import * as js_andruavMessages from '../js/js_andruavMessages'
+
+import {fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab} from '../js/js_main'
 
 
 class CLSS_CVideoScreen extends React.Component {
@@ -13,7 +18,7 @@ class CLSS_CVideoScreen extends React.Component {
 	{
         super ();
             this.state = {
-                m_flash: CONST_FLASH_DISABLED,
+                m_flash: js_andruavMessages.CONST_FLASH_DISABLED,
                 m_zoom: 0.0,
                 intervalId: null
                 
@@ -53,7 +58,7 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_takeLocalImage (e)
     {
-        const c_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null)
         {
             return ;
@@ -62,26 +67,27 @@ class CLSS_CVideoScreen extends React.Component {
         
         if ((c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track].mmRTC != null))
         {
-            fn_takeLocalImage(c_andruavUnit,this.props.obj.v_track,id);
+            fn_takeLocalImage(c_andruavUnit,this.props.obj.v_track);
         }
         else
         {
-            fn_takeLocalImage(c_andruavUnit,this.props.obj.v_track,id);
+            fn_takeLocalImage(c_andruavUnit,this.props.obj.v_track);
         }
 
     }
 
 
-    fnl_stoprecord (p_andruavUnit,p_activeTrack,p_blob,id)
+    fnl_stoprecord (p_andruavUnit,p_activeTrack)
     {
 
         var filename = 'video_';
-        if (p_andruavUnit!=null)
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
         {
             filename = filename + p_andruavUnit.m_unitName;
         }
 
-        invokeSaveAsDialog (p_blob,filename);
+        // TODO implement
+        // invokeSaveAsDialog (p_blob,filename); REACT2 
         var talk = p_andruavUnit.m_Video.m_videoactiveTracks[p_activeTrack];
         talk.VideoRecording = false;
         js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw,{'andruavUnit': p_andruavUnit,'v_track':p_activeTrack});
@@ -90,26 +96,26 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_recordVideo (v_e)
     {
-        var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-        if (v_andruavUnit == null)
+        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (v_andruavUnit === null || v_andruavUnit === undefined)
         {
             return ;
         }
         
         var v_me = this;
         var v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        if ((v_activeTrack.mmRTC != null) && (v_activeTrack.mmRTC.isStoppedRecording==false))
+        if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
         {
             //window.recordRTC.stopRecording ( function (blob) {
                 v_activeTrack.mmRTC.stop (function (p_blob) {
-                    v_me.fnl_stoprecord (v_andruavUnit,v_me.props.obj.v_track,p_blob,id);
+                    v_me.fnl_stoprecord (v_andruavUnit,v_me.props.obj.v_track,p_blob);
                     v_activeTrack.mmRTC = undefined;
                    
             });
         }
         else
         {
-            fn_console_log ("start recording");
+            js_globals.fn_console_log ("start recording");
             fn_startrecord (v_andruavUnit,this.props.obj.v_track);
                     
         }
@@ -119,14 +125,12 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_stopVideo (v_e)
     {
-        var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-		if ((v_andruavUnit==undefined) || (v_andruavUnit == null)) return ;
+        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+		if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 		const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         v_talk.hangup(true);
 		js_globals.v_andruavClient.API_CONST_RemoteCommand_streamVideo(v_andruavUnit,false,v_talk.number,this.props.obj.v_track);
-        v_andruavUnit.m_Video.VideoStreaming = CONST_VIDEOSTREAMING_OFF;
-        // mark stream as closes
-        //v_talk = CONST_VIDEOSTREAMING_OFF;
+        v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         this.forceUpdate();
     }
 
@@ -134,11 +138,11 @@ class CLSS_CVideoScreen extends React.Component {
 
     fn_videoRedraw(p_me,p_obj)
     {
-        if (p_me.props.obj.v_unit != p_obj.andruavUnit.partyID)
+        if (p_me.props.obj.v_unit !== p_obj.andruavUnit.partyID)
         {
             return ;
         }
-        if (p_me.props.obj.v_track != p_obj.v_track)
+        if (p_me.props.obj.v_track !== p_obj.v_track)
         {
             return ;
         }
@@ -150,13 +154,13 @@ class CLSS_CVideoScreen extends React.Component {
     fn_targetDetected (p_me,p_unit)
     {
         //CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
         {   
             // used to test behavior after removing code and as double check
             return ;
         }
         
-        if (p_me.props.obj.v_unit != p_unit.partyID)
+        if (p_me.props.obj.v_unit !== p_unit.partyID)
         {
             return ;
         }
@@ -167,7 +171,7 @@ class CLSS_CVideoScreen extends React.Component {
 
     fn_flashChanged(p_me, p_obj)
     {
-        if (p_me.props.obj.v_unit != p_obj.p_unit.partyID)
+        if (p_me.props.obj.v_unit !== p_obj.p_unit.partyID)
         {
             return ;
         }
@@ -177,13 +181,13 @@ class CLSS_CVideoScreen extends React.Component {
         && (typeof p_obj.p_jmsg['f'] !== 'number')) return ;
         
         p_me.state.m_flash = p_obj.p_jmsg['f'];
-        fn_console_log ("Flash Updated" , p_me.state.m_flash);
+        js_globals.fn_console_log ("Flash Updated" , p_me.state.m_flash);
         p_me.forceUpdate();
     }
 
     fn_zoomChanged(p_me, p_obj)
     {
-        if (p_me.props.obj.v_unit != p_obj.p_unit.partyID)
+        if (p_me.props.obj.v_unit !== p_obj.p_unit.partyID)
         {
             return ;
         }
@@ -192,8 +196,8 @@ class CLSS_CVideoScreen extends React.Component {
         if ((!p_obj.p_jmsg.hasOwnProperty('b'))
         && (typeof p_obj.p_jmsg['b'] !== 'number')) return ;
         
-        p_me.state.m_zoom = (p_obj.p_jmsg['b'] != 0.0);
-        fn_console_log ("Zoom Updated" , p_me.state.m_zoom);
+        p_me.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
+        js_globals.fn_console_log ("Zoom Updated" , p_me.state.m_zoom);
         p_me.forceUpdate();
     }
 
@@ -212,17 +216,17 @@ class CLSS_CVideoScreen extends React.Component {
     
     fn_lnkVideo()
     {
-        const c_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         var v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
-        if (v_video == null) return ;
+        if (v_video === null || v_video === undefined) return ;
         v_video.srcObject = c_talk.stream;
     }
 
     fnl_canvas(p_targets)
     {
         //CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
         {   
             // used to test behavior after removing code and as double check
             return ;
@@ -232,7 +236,7 @@ class CLSS_CVideoScreen extends React.Component {
         {
             clearTimeout(this.m_timerID);
         }
-        const c_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const c_canvas=$('canvas#canvasoObject'+c_talk.targetVideoTrack)[0];
         if (c_canvas == null) return ;
@@ -241,7 +245,6 @@ class CLSS_CVideoScreen extends React.Component {
         c_ctx.textAlign = "center";
         c_ctx.fillStyle = "yellow";
 
-        const c_boundry = c_canvas.getBoundingClientRect();
         c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
 
         this.m_timerID = setTimeout (function () {
@@ -282,7 +285,7 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_requestPIP(e)
     {
-        const v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         
         if (v_andruavUnit == null)
         {
@@ -292,11 +295,11 @@ class CLSS_CVideoScreen extends React.Component {
         
         if ((v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track].mmRTC != null))
         {
-            this.fnl_requestPictureInPicture(v_andruavUnit,this.props.obj.v_track,id);
+            this.fnl_requestPictureInPicture(v_andruavUnit,this.props.obj.v_track);
         }
         else
         {
-            this.fnl_requestPictureInPicture(v_andruavUnit,this.props.obj.v_track,id);
+            this.fnl_requestPictureInPicture(v_andruavUnit,this.props.obj.v_track);
                     
         }
     }
@@ -305,13 +308,16 @@ class CLSS_CVideoScreen extends React.Component {
     fnl_isFullScreen()
     {
         
-        return (window.innerHeight == screen.height) || (!window.screenTop && !window.screenY);
+        return (
+            window.innerHeight === window.screen.height ||
+            (window.screenTop === 0 && window.screenY === 0)
+          );
     }
 
     fnl_requestFullScreen (e)
     {
         const c_ele = window.document.getElementById("div_video_control");
-        fn_console_log ("fnl_requestFullScreen");
+        js_globals.fn_console_log ("fnl_requestFullScreen");
         if (this.fnl_isFullScreen())
         {
             if (document.exitFullscreen) {
@@ -348,27 +354,27 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_zoomInOut (e, p_zoomIn, p_obj)
     {
-        fn_console_log ("p_cameraIndex: " + JSON.stringify(p_obj));
+        js_globals.fn_console_log ("p_cameraIndex: " + JSON.stringify(p_obj));
         js_globals.v_andruavClient.API_CONST_RemoteCommand_zoomCamera (p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
     }
 
 
     fnl_flashOnOff (e, p_obj)
     {
-        var v_flashValue = CONST_FLASH_OFF
-        if (this.state.m_flash == CONST_FLASH_OFF)
+        var v_flashValue = js_andruavMessages.CONST_FLASH_OFF
+        if (this.state.m_flash === js_andruavMessages.CONST_FLASH_OFF)
         {   
-            v_flashValue = CONST_FLASH_ON;
-        }else if (this.state.m_flash == CONST_FLASH_ON)
+            v_flashValue = js_andruavMessages.CONST_FLASH_ON;
+        }else if (this.state.m_flash === js_andruavMessages.CONST_FLASH_ON)
         {   
-            v_flashValue = CONST_FLASH_OFF;
+            v_flashValue = js_andruavMessages.CONST_FLASH_OFF;
         }
         else
         {
             // disabled.
             return ; 
         }
-        fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
+        js_globals.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
         js_globals.v_andruavClient.API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
 
         this.state.m_flash = v_flashValue;
@@ -376,15 +382,14 @@ class CLSS_CVideoScreen extends React.Component {
 
     fnl_rotate(v_e)
     {
-        var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-		if ((v_andruavUnit==undefined) || (v_andruavUnit == null)) return ;
+        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+		if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 		this.m_rotation = (this.m_rotation + 1) %4;
         js_globals.v_andruavClient.API_CONST_RemoteCommand_rotateVideo(v_andruavUnit,this.m_rotations[this.m_rotation], this.props.obj.v_track);
     }
 
     fnl_mirror_local(v_e)
     {
-        var x = 1;
         if (this.m_mirrored === true)
         {
             this.m_mirrored = false;
@@ -419,8 +424,8 @@ class CLSS_CVideoScreen extends React.Component {
             return ;
         }
         
-        fn_console_log ("x:" + e.nativeEvent.offsetX + "y:" + e.nativeEvent.offsetY);
-        const c_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        js_globals.fn_console_log ("x:" + e.nativeEvent.offsetX + "y:" + e.nativeEvent.offsetY);
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null)
         {
             return ;
@@ -458,7 +463,7 @@ class CLSS_CVideoScreen extends React.Component {
 
         $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e)    
         {
-            fn_console_log ("I AM CALLED");
+            js_globals.fn_console_log ("I AM CALLED");
             me.forceUpdate();
         });
 
@@ -471,17 +476,15 @@ class CLSS_CVideoScreen extends React.Component {
     componentDidUpdate() {
         this.fn_lnkVideo();
         this.fn_opacity();
-        fn_console_log ("componentDidUpdate");
+        js_globals.fn_console_log ("componentDidUpdate");
     }
     
     render ()
     {
-        var unit = [];
-        //fn_console_log (JSON.stringify(this.props));
-        var andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        var andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         var talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         var divID = "cam_" + andruavUnit.partyID +  this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
-        if (talk.VideoStreaming == CONST_VIDEOSTREAMING_OFF)
+        if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF)
         {
             return (
                 <div id={divID} className={"tab-pane fade in " + this.props.first}>
@@ -493,7 +496,6 @@ class CLSS_CVideoScreen extends React.Component {
         
         var css_switchCam;
         const c_trackAttributes = andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index];
-        //if ((c_trackAttributes.hasOwnProperty("f")) && (c_trackAttributes.f===true))
         if (andruavUnit.m_Video.supportCameraSwitch(this.props.obj.v_index))
         {
             css_switchCam = "cursor_hand css_camera_switch";
@@ -524,24 +526,22 @@ class CLSS_CVideoScreen extends React.Component {
             css_rotateCam = 'hidden';
         }
     
-        //CODEBLOCK_START
         var css_trackingBtn = "cursor_hand css_tracking_on";
-        //CODEBLOCK_END
 
         if (andruavUnit.m_Video.supportFlashing(this.props.obj.v_index))
         {
-            if (this.state.m_flash === CONST_FLASH_ON)
+            if (this.state.m_flash === js_andruavMessages.CONST_FLASH_ON)
             {
                 css_flashCam = "cursor_hand css_camera_flash_on";
             }
-            else if (this.state.m_flash === CONST_FLASH_OFF)
+            else if (this.state.m_flash === js_andruavMessages.CONST_FLASH_OFF)
             {
                 css_flashCam = "cursor_hand css_camera_flash_off";
             }
             else
             {
                 // state was initialized disabled and this is the first tie to setup it.
-                this.state.m_flash = CONST_FLASH_OFF;
+                this.state.m_flash = js_andruavMessages.CONST_FLASH_OFF;
                 css_flashCam = "cursor_hand css_camera_flash_off";
             }
         }
@@ -552,7 +552,7 @@ class CLSS_CVideoScreen extends React.Component {
 
         var btn_videorecordClass ;
 
-        if (talk.VideoRecording != true)
+        if (talk.VideoRecording !== true)
         {
             btn_videorecordClass = "cursor_hand  css_recvideo_ready";
         } 
@@ -580,7 +580,7 @@ class CLSS_CVideoScreen extends React.Component {
           };
           
         var v_btns=[];
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
 		{   
         
             v_btns.push (<div key="btn" id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
@@ -604,18 +604,18 @@ class CLSS_CVideoScreen extends React.Component {
         else
         {
             v_btns.push (<div id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
-            <div key="1" className="col-1"><img id="btnclose" className="cursor_hand css_video_close" title="Close Camera" onClick={ (e) => this.fnl_stopVideo(e)}/></div>
-            <div key="2" className="col-1"><img id="btnGoto" className="cursor_hand css_goto_drone" title="Goto Agent" onClick={ (e) => this.fn_gotoUnit_byPartyID(e)}/></div>
+            <div key="1" className="col-1"><img id="btnclose" className="cursor_hand css_video_close" alt="Close Camera" title="Close Camera" onClick={ (e) => this.fnl_stopVideo(e)}/></div>
+            <div key="2" className="col-1"><img id="btnGoto" className="cursor_hand css_goto_drone" alt="Goto Agent" title="Goto Agent" onClick={ (e) => this.fn_gotoUnit_byPartyID(e)}/></div>
             <div key="3" className="col-1"></div>
-            <div key="4" className="col-1"><img id="btnPIP" className="cursor_hand css_video_pip" title="Picture in Picture" onClick={ (e) => this.fnl_requestPIP(e)}/></div>
-            <div key="5" className="col-1"><img id="btn_fullscreen" className={btn_fullscreen} title={btn_fullscreen_txt} onClick={ (e) => this.fnl_requestFullScreen(e)}/></div>
-            <div key="6" className="col-1"><img id="btnSwitchCam" className={ css_switchCam } title="Switch between Front & Back Cameras" onClick={ (e) => this.fnl_switchcam(e, this.props.obj)}/></div>
-            <div key="7" className="col-1"><img id="btn_videorecord" className={btn_videorecordClass} title="Record Web" onClick={ (e) => this.fnl_recordVideo(e)}/></div>
-            <div key="8" className="col-1"><img id="btn_takeimage" className="cursor_hand css_camera_ready" title="Take Snapshot" onClick={ (e) => this.fnl_takeLocalImage(e)}/></div>
-            <div key="9" className="col-1"><img id="btn_zoom_in" className={css_zoomCam + " css_camera_zoom_in"} title="Zoom In" onClick={ (e) => this.fnl_zoomInOut(e, true,this.props.obj)}/></div>
+            <div key="4" className="col-1"><img id="btnPIP" className="cursor_hand css_video_pip" alt="Picture in Picture" title="Picture in Picture" onClick={ (e) => this.fnl_requestPIP(e)}/></div>
+            <div key="5" className="col-1"><img id="btn_fullscreen" className={btn_fullscreen} alt={btn_fullscreen_txt} title={btn_fullscreen_txt} onClick={ (e) => this.fnl_requestFullScreen(e)}/></div>
+            <div key="6" className="col-1"><img id="btnSwitchCam" className={ css_switchCam } alt="Switch between Front & Back Cameras" title="Switch between Front & Back Cameras" onClick={ (e) => this.fnl_switchcam(e, this.props.obj)}/></div>
+            <div key="7" className="col-1"><img id="btn_videorecord" className={btn_videorecordClass} alt="Record Web" title="Record Web" onClick={ (e) => this.fnl_recordVideo(e)}/></div>
+            <div key="8" className="col-1"><img id="btn_takeimage" className="cursor_hand css_camera_ready" alt="Take Snapshot" title="Take Snapshot" onClick={ (e) => this.fnl_takeLocalImage(e)}/></div>
+            <div key="9" className="col-1"><img id="btn_zoom_in" className={css_zoomCam + " css_camera_zoom_in"} alt="Zoom In" title="Zoom In" onClick={ (e) => this.fnl_zoomInOut(e, true,this.props.obj)}/></div>
             <div key="10" className="col-1"><img id="btn_rotate" className={css_rotateCam + " css_camera_rotate"} alt="Rotate" title="Rotate" onClick={ (e) => this.fnl_rotate_local(e)}/></div>
-            <div key="11" className="col-1"><img id="btn_flash" className={ css_flashCam } title="Flash (Tourch)" onClick={ (e) => this.fnl_flashOnOff(e, this.props.obj)}/></div>
-            <div key="12" className="col-1"><img id="btn_track" className={ css_trackingBtn } title="Track" onClick={ (e) => this.fnl_TrackingOnOff(e, this.props.obj)}/></div>
+            <div key="11" className="col-1"><img id="btn_flash" className={ css_flashCam } alt='Flash (Tourch)' title="Flash (Tourch)" onClick={ (e) => this.fnl_flashOnOff(e, this.props.obj)}/></div>
+            <div key="12" className="col-1"><img id="btn_track" className={ css_trackingBtn } alt='Track' title="Track" onClick={ (e) => this.fnl_TrackingOnOff(e, this.props.obj)}/></div>
             
             </div>);
         }
@@ -648,7 +648,7 @@ class CLSS_CVideoScreen extends React.Component {
 }
 
 
-class CLSS_CVideoControl extends React.Component {
+export class CLSS_CVideoControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -667,13 +667,13 @@ class CLSS_CVideoControl extends React.Component {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
         var vid = p_obj.andruavUnit.partyID + p_obj.talk.targetVideoTrack;
-        if (me.state.m_videoScreens.hasOwnProperty(vid)==false)
+        if (me.state.m_videoScreens.hasOwnProperty(vid) === false)
         {
             me.state.m_videoScreens[vid] = {};
             const c_screen = me.state.m_videoScreens[vid];
             c_screen.v_unit = p_obj.andruavUnit.partyID;
             c_screen.v_track = p_obj.talk.targetVideoTrack;
-            c_screen.v_index = fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks,"id", p_obj.talk.targetVideoTrack);	
+            c_screen.v_index = js_helpers.fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks,"id", p_obj.talk.targetVideoTrack);	
             me.state.lastadded = vid;
         }
         
@@ -688,16 +688,17 @@ class CLSS_CVideoControl extends React.Component {
         $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
         
         // simulate click
-        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]')[0].click();
+        //$('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]')[0].click();
         
 
     }
     
+
     fn_videoStopped (me,obj)
     {
         
-        obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = CONST_VIDEOSTREAMING_OFF;
-        if (me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.partyID)==false)
+        obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+        if (me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.partyID) === false)
         {
            me.state.m_videoScreens[obj.andruavUnit.partyID] = undefined;
         }
@@ -718,7 +719,7 @@ render() {
     
     var len = arr.length;
 
-    if (len==0)
+    if (len === 0)
     {
         return (
             <div> Please press camera icon to start streaming to see video.</div>
@@ -733,12 +734,12 @@ render() {
         var _first = "";
         const v_key = arr[i];
         var v_obj = this.state.m_videoScreens[v_key];
-        if (v_obj != undefined)
+        if (v_obj !== null && v_obj !== undefined)
         {
-            var andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
+            var andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
         
        
-            if (this.state.lastadded == v_key)
+            if (this.state.lastadded === v_key)
             {
                 _first ="active show";
             }
@@ -770,9 +771,3 @@ render() {
 
 }
 
-
-
-ReactDOM.render(
-    <CLSS_CVideoControl />,
-    window.document.getElementById('div_video_control')
-);

@@ -240,7 +240,7 @@ class CLSS_AndruavUnit extends React.Component {
         {
             if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
             {
-                js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePaddisplayCameraDlgForm, p_session);
+                js_eventEmitter.fn_dispatch(js_globals.EE_displayCameraDlgForm, p_session);
             }
         }
         
@@ -1616,12 +1616,12 @@ export default class CLSS_AndruavUnitList extends React.Component {
             {
                 // Sort the array alphabetically
                 // returns array
-                sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+                sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
             }
             else
             {
                 // returns list
-                sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
+                sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
             }
             
             sortedPartyIDs.map(function (object)

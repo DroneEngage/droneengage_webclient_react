@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 
 
 import $ from 'jquery';
-import 'jquery-ui-dist/jquery-ui';
+import 'jquery-ui-dist/jquery-ui.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
 
@@ -23,6 +23,7 @@ import {js_andruavAuth} from './js_andruavAuth'
 import {js_leafletmap} from './js_leafletmap'
 import {js_eventEmitter} from './js_eventEmitter'
 import {js_localStorage} from './js_localStorage'
+import {js_webrtcstream} from './js_webrtcthin2.js'
 import * as js_mapmission from './js_mapmission'
 import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js'
@@ -206,8 +207,7 @@ function fn_handleKeyBoard() {
 
 
 
-		function fn_takeLocalImage(p_andruavUnit, videoTrackID, id) {
-			var v_talk = p_andruavUnit.m_Video.m_videoactiveTracks[videoTrackID];
+		export function fn_takeLocalImage(p_andruavUnit, videoTrackID) {
 			var v_videoctrl = '#videoObject' + videoTrackID;
 			var v_video = $(v_videoctrl)[0];
 			var v_canvas = document.createElement('canvas');
@@ -224,7 +224,7 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_startrecord(v_andruavUnit, v_videoTrackID) {
+		export function fn_startrecord(v_andruavUnit, v_videoTrackID) {
 
 			var options = {
 				type: 'video',
@@ -493,7 +493,7 @@ function fn_handleKeyBoard() {
 		}
 
 		function onWEBRTCSessionStarted(c_talk) {
-			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
+			var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
 			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
 			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
@@ -501,7 +501,7 @@ function fn_handleKeyBoard() {
 		}
 
 		function onWEBRTCSessionEnded(c_talk) {
-			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_talk.number);
+			var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
 			
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
 			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
@@ -510,7 +510,7 @@ function fn_handleKeyBoard() {
 
 
 		function onWEBRTCSessionOrphanEnded(c_number) {
-			var v_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(c_number);
+			var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
 			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
 		}
@@ -522,9 +522,9 @@ function fn_handleKeyBoard() {
 
 		function fn_WEBRTC_login(v_partyID,v_trackID) {
 		
-			window.AndruavLibs.AndruavStream.onOrphanDisconnect = onWEBRTCSessionOrphanEnded;
+			js_webrtcstream.onOrphanDisconnect = onWEBRTCSessionOrphanEnded;
 
-			window.AndruavLibs.AndruavStream.joinStream(
+			js_webrtcstream.joinStream(
 				{
 
 					'number': v_partyID,
@@ -541,7 +541,7 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_VIDEO_login(v_andruavVideo, v_trackId) {
+		export function fn_VIDEO_login(v_andruavVideo, v_trackId) {
 
 			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
 			for (var i=0;i<len;++i)
@@ -567,7 +567,7 @@ function fn_handleKeyBoard() {
 		/*
 			Video Recording
 		*/
-		function fn_VIDEO_Record(v_andruavVideo, v_trackId, p_Start) {
+		export function fn_VIDEO_Record(v_andruavVideo, v_trackId, p_Start) {
 
 			if (v_andruavVideo === null || v_andruavVideo === undefined) return ;
 
@@ -967,7 +967,7 @@ function fn_handleKeyBoard() {
 
 		
 		export function fn_openFenceManager(p_partyID) {
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
@@ -987,7 +987,7 @@ function fn_handleKeyBoard() {
 		
 
 		function gui_camCtrl(p_partyID) {
-			// var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			// var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			// if (p_andruavUnit === null || p_andruavUnit === undefined) {
 			// 	return;
 			// }
@@ -999,7 +999,7 @@ function fn_handleKeyBoard() {
 		}
 
 		export function gui_doYAW(p_partyID) {
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
@@ -1036,7 +1036,7 @@ function fn_handleKeyBoard() {
 		
 		export function fn_doCircle2(p_partyID, latitude, longitude, altitude, radius, turns) {
 
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			if ((p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_ROVER)
 			|| (p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_BOAT)) return;
@@ -1054,7 +1054,7 @@ function fn_handleKeyBoard() {
 
 		export function fn_doSetHome(p_partyID, p_latitude, p_longitude, p_altitude) {
 
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 				fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT, "Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
 					if (p_approved === false) return;
@@ -1066,7 +1066,7 @@ function fn_handleKeyBoard() {
 		}
 
 		export function fn_doFlyHere(p_partyID, p_latitude, p_longitude, altitude) {
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 				js_speak.fn_speak('point recieved');
 				js_globals.v_andruavClient.API_do_FlyHere(p_partyID, p_latitude, p_longitude, altitude);
@@ -1075,7 +1075,7 @@ function fn_handleKeyBoard() {
 
 
 		function fn_doStartMissionFrom(p_partyID, p_missionNumber) {
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 				js_speak.fn_speak(String(p_missionNumber) + ' is a start point');
 				js_globals.v_andruavClient.API_do_StartMissionFrom(p_andruavUnit, p_missionNumber );
@@ -1086,7 +1086,7 @@ function fn_handleKeyBoard() {
 		   Goto Unit on map
 		**/
 		export function fn_gotoUnit_byPartyID(p_partyID) {
-			var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_partyID);
+			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			fn_gotoUnit(p_andruavUnit);
@@ -1396,12 +1396,12 @@ function fn_handleKeyBoard() {
 			}
 		}
 		function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
-			var keys = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitKeys();
+			var keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
 			var size = keys.length;
 
 			for (var i = 0; i < size; ++i) {
 
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(keys[i]);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 				if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 					if (p_andruavUnit.m_VehicleType == vehicleType) {
 						var marker = p_andruavUnit.m_gui.m_marker;
@@ -1563,7 +1563,7 @@ function fn_handleKeyBoard() {
 
 		function hlp_generateFlyHereMenu( lat, lng ) {
 
-			return "<div id='gamepadCtrlxxx'/>";
+			return "<div id='gamepadCtrlxxx' class='margin_zero padding_zero' style='display: inline-block '/>";
 		}
 
 		// function hlp_generateFlyHereMenu( lat, lng ) {
@@ -1574,7 +1574,7 @@ function fn_handleKeyBoard() {
 		  
 		// 	window.v_contextMenuOpen = true;
 		  
-		// 	const keys = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitKeys();
+		// 	const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
 		// 	const size = keys.length;
 		// 	let v_contextHTML = (
 		// 	  <div className="test-justified">
@@ -1610,13 +1610,13 @@ function fn_handleKeyBoard() {
 		// 	  let sortedPartyIDs;
 		// 	  if (js_localStorage.fn_getUnitSortEnabled()) {
 		// 		// Sort the array alphabetically
-		// 		sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+		// 		sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
 		// 	  } else {
-		// 		sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
+		// 		sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
 		// 	  }
 		  
 		// 	  sortedPartyIDs.forEach(([partyID]) => {
-		// 		const p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(partyID);
+		// 		const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(partyID);
 		// 		if (
 		// 		  p_andruavUnit &&
 		// 		  !p_andruavUnit.m_IsGCS &&
@@ -2721,7 +2721,7 @@ function fn_handleKeyBoard() {
 					}
 					if (p_andruavUnit.m_Swarm.m_following !== null && p_andruavUnit.m_Swarm.m_following !== undefined)
 					{
-						var v_andruavUnitLeader = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
+						var v_andruavUnitLeader = js_globals.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
 						if (v_andruavUnitLeader!=null)
 						{
 							markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">'+ v_andruavUnitLeader.m_unitName +'</span>'
@@ -3290,35 +3290,35 @@ function fn_handleKeyBoard() {
 
 			$('#gimbaldiv').find('#btnpitchm').click(function () {
 				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, -2, 0, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollp').click(function () {
 				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, +2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollm').click(function () {
 				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, -2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawp').click(function () {
 				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, +2);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawm').click(function () {
 				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p);
+				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, -2);
 			});
 
@@ -3369,6 +3369,8 @@ function fn_handleKeyBoard() {
 			if (js_globals.CONST_MAP_EDITOR === true){
 				fn_missionTab();
 			}
+
+			
 		};  // end of onReady
 
 		

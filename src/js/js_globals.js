@@ -6,6 +6,7 @@ class GLOBALS {
 	{
 		this.myposition = null;
 		this.v_andruavClient = null;
+		this.m_andruavUnitList = null;
  		this.build_number = "20240703-01";
 		// auto connect variables
 		this.v_connectState 	 = false;  	

@@ -1,4 +1,11 @@
+import $ from 'jquery'; 
 import React    from 'react';
+
+import {js_globals} from '../js/js_globals.js';
+import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_andruavMessages from '../js/js_andruavMessages'
+
+import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../js/js_main';
 
 class CLSS_CameraDevice extends React.Component {
 
@@ -30,7 +37,7 @@ class CLSS_CameraDevice extends React.Component {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {
-            camera_index = CONST_CAMERA_SOURCE_MOBILE;
+            camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
 
@@ -49,7 +56,7 @@ class CLSS_CameraDevice extends React.Component {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {
-            camera_index = CONST_CAMERA_SOURCE_MOBILE;
+            camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
         js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.partyID, 
@@ -100,7 +107,7 @@ class CLSS_CameraDevice extends React.Component {
     };
 };
 
-class CLSS_CameraDialog extends React.Component
+export default class CLSS_CameraDialog extends React.Component
 {
     constructor()
     {
@@ -120,7 +127,7 @@ class CLSS_CameraDialog extends React.Component
 
     fn_displayDialog (p_me, p_session)
     {
-        var p_andruavUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
+        var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
 		if (p_andruavUnit == null) {
 		    return;
 		}
@@ -164,7 +171,7 @@ class CLSS_CameraDialog extends React.Component
         
         $('#modal_ctrl_cam').find('#btnShot').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
+            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
         });
         $('#modal_ctrl_cam').find('#btnSwitchCam').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
@@ -173,11 +180,11 @@ class CLSS_CameraDialog extends React.Component
         });
         $('#modal_ctrl_cam').find('#btnTakeImage').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
+            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
         $('#modal_ctrl_cam').find('#btnFCBTakeImage').click(function () {
             // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
+            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
 
         $('#modal_ctrl_cam').find('#txt_TotalImages').bind("mousedown", function () {
@@ -237,10 +244,10 @@ class CLSS_CameraDialog extends React.Component
         {
             p_session = this.state.p_session;
             
-            fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
+            js_globals.fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
 
             for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
-                v_streanms.push(<CLSS_CameraDevice prop_session={p_session} prop_track_number={i} prop_parent={this} />);
+                v_streanms.push(<CLSS_CameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id+'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} />);
             }
             v_unitName = p_session.m_unit.m_unitName
         }
@@ -262,7 +269,7 @@ class CLSS_CameraDialog extends React.Component
 						</div>
 				</div>
                       
-                <div key='camera_body'  id="card-body" className="card-body">
+                <div key='camera_body'  id="camera-card-body" className="card-body">
                     <div key='camera_v_streanms'  className='row'>
                                 {v_streanms}
                     </div>
@@ -307,10 +314,4 @@ class CLSS_CameraDialog extends React.Component
 }
 
 
-
-
        
-ReactDOM.render(
-    <CLSS_CameraDialog />,
-    window.document.getElementById('CTRL_cameraCtrl')
-);

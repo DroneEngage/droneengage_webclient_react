@@ -64,7 +64,7 @@ export class CLSS_CTRL_SWARM extends React.Component {
     {
         if (this.props.m_unit.m_Swarm.m_following != null)
         {
-            var leaderUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.m_unit.m_Swarm.m_following);
+            var leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_unit.m_Swarm.m_following);
             if (leaderUnit != null)
             {
                 $("#" + this.props.m_unit.partyID + "dldrselsel").val(leaderUnit.partyID);
@@ -95,7 +95,7 @@ export class CLSS_CTRL_SWARM extends React.Component {
             
                 
         //CODEBLOCK_START
-        var v_units = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitValues();
+        var v_units = js_globals.m_andruavUnitList.fn_getUnitValues();
         var len = v_units.length;
         const c_items = [];
         
@@ -116,7 +116,7 @@ export class CLSS_CTRL_SWARM extends React.Component {
             v_follower_class = "bg-danger";
             //v_leader_class = "btn-success"; // this state can be overwritten if it is a leader. 
             v_leader_dropdown_class = "bg-success text-white";
-            var v_leaderUnit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(this.props.m_unit.m_Swarm.m_following);
+            var v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_unit.m_Swarm.m_following);
             
             if (v_leaderUnit!=null) 
             {   // display name of party_id as a temp solution untill name is available.

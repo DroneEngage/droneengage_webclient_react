@@ -1,4 +1,11 @@
+import $ from 'jquery'; 
 import React    from 'react';
+
+import {js_globals} from '../js/js_globals.js';
+import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_andruavUnit from '../js/js_andruavUnit'
+
+import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../js/js_main';
 
 class CLSS_StreamChannel extends React.Component {
 
@@ -46,11 +53,14 @@ class CLSS_StreamChannel extends React.Component {
             var v_stream_class = 'btn-primary';
             var v_record_class = 'btn-primary';
             var v_startRecord = true;
-            if ((v_unit.m_Video.m_videoactiveTracks[v_track.id] != null) && (v_unit.m_Video.m_videoactiveTracks[v_track.id].VideoStreaming != CONST_VIDEOSTREAMING_OFF))
+            const active_track_id  = v_unit.m_Video.m_videoactiveTracks[v_track.id];
+            if ((active_track_id !== null && active_track_id !== undefined) && (active_track_id.VideoStreaming !== js_andruavUnit.CONST_VIDEOSTREAMING_OFF))
             {
                 v_stream_class = 'btn-danger';
             }
-            if ((v_unit.m_Video.m_videoTracks[this.props.prop_track_number].r != null) && (v_unit.m_Video.m_videoTracks[this.props.prop_track_number].r == true))
+            const track_id  = v_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+            if ((track_id.r !== null && track_id.r !== undefined) 
+                && (track_id.r === true))
             { // recording
                 v_record_class = 'btn-danger';
                 v_startRecord = false;
@@ -73,7 +83,7 @@ class CLSS_StreamChannel extends React.Component {
 };
 
 
-class CLSS_StreamDialog extends React.Component
+export default class CLSS_StreamDialog extends React.Component
 {
     
     constructor()
@@ -153,12 +163,12 @@ class CLSS_StreamDialog extends React.Component
         var p_andruavUnit = null;
         if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session != null))
         {
-            p_andruavUnit = AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.partyID);
+            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.partyID);
         }
 
         if (p_andruavUnit == null)
         {
-            fn_console_log ("stream:  NULL")
+            js_globals.fn_console_log ("stream:  NULL")
             
             return (
                 <div id="modal_ctrl_stream_dlg" title="Streaming Video" className="card width_fit_max css_ontop border-light p-2" >
@@ -173,7 +183,7 @@ class CLSS_StreamDialog extends React.Component
 						   </div>
 						</div>
 				    </div>
-                    <div id="card-body"  id="modal_ctrl_stream_footer" className="card-body ">
+                    <div key='stream-card-body' id="stream-card-body"   className="card-body ">
                         {/* <div className = "row">
                             <div className = "col-md-4">
                                 <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
@@ -237,11 +247,4 @@ class CLSS_StreamDialog extends React.Component
     }
 }
 
-
-
-       
-ReactDOM.render(
-    <CLSS_StreamDialog />,
-    window.document.getElementById('CTRL_streamCtrl')
-);
 

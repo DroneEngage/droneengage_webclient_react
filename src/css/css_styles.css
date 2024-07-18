@@ -923,6 +923,13 @@ tr.IsShutdown_false td.camera.m_IsGCS_false
 	cursor: pointer;
 }
 
+
+.one_line
+{
+	display: inline-block;
+	white-space:nowrap
+}
+
 .contextmenu{
   visibility:hidden;
   background:#ffffff;

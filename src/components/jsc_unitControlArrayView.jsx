@@ -923,11 +923,11 @@ class CLSS_AndruavUnitListArray extends React.Component {
                 if (js_localStorage.fn_getUnitSortEnabled()===true)
                 {
                     // Sort the array alphabetically
-                    sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+                    sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
                 }
                 else
                 {
-                    sortedPartyIDs = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitsSorted();
+                    sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
                 }
                 sortedPartyIDs.map(function (object)
                 {

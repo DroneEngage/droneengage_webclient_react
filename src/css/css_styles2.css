@@ -1020,3 +1020,12 @@ div#displays
 	margin: 1px 5px 5px 5px !important;
 	padding: 1px 5px 5px 5px !important;
 }
+
+
+/*
+	Update Leaflet
+*/
+.leaflet-popup-content
+{
+	width: fit-content !important;
+}

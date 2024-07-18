@@ -758,105 +758,76 @@ export class CAndruavUnitObject {
 
 export class CAndruavUnitList {
   constructor() {
-    this.List = {};
+    this.List = new Map();
     this.count = 0;
   }
 
+  fn_resetList() {
+    this.List.clear();
+  }
+
   fn_getUnitsArray() {
-    return Object.entries(this.List);
+    return Array.from(this.List.entries());
   }
 
   fn_getUnitsSorted() {
-    var sorted = Object.entries(this.List).sort(function (a, b) {
+    return Array.from(this.List.entries()).sort((a, b) => {
       const name_a = a[1].m_unitName ? a[1].m_unitName : "";
       const name_b = b[1].m_unitName ? b[1].m_unitName : "";
-      if (name_a < name_b) {
-        return -1;
-      }
-      if (name_a > name_b) {
-        return 1;
-      }
+      if (name_a < name_b) return -1;
+      if (name_a > name_b) return 1;
       return 0;
     });
-
-    return sorted;
   }
 
   fn_getUnitsSortedBy_APID() {
-    var sorted = Object.entries(this.List).sort(function (a, b) {
-      const name_a = a[1].m_FCBParameters.m_systemID
-        ? a[1].m_FCBParameters.m_systemID
-        : "";
-      const name_b = b[1].m_FCBParameters.m_systemID
-        ? b[1].m_FCBParameters.m_systemID
-        : "";
-      if (name_a < name_b) {
-        return -1;
-      }
-      if (name_a > name_b) {
-        return 1;
-      }
+    return Array.from(this.List).sort(([, a], [, b]) => {
+      const name_a = a.m_FCBParameters.m_systemID || "";
+      const name_b = b.m_FCBParameters.m_systemID || "";
+      if (name_a < name_b) return -1;
+      if (name_a > name_b) return 1;
       return 0;
     });
-
-    return sorted;
   }
 
   fn_getUnitByP2PMac(mac) {
-    for (var name in this.List) {
-      const unit = this.List[name];
-      if (unit.m_P2P.fn_isMyMac(mac)) return unit;
-    }
-
-    return null;
+    return Array.from(this.List.values()).find(unit => unit.m_P2P.fn_isMyMac(mac));
   }
 
   Add(partyID, andruavUnit) {
-    if (this.List[partyID] !== null && this.List[partyID] !== undefined) return;
+    if (this.List.has(partyID)) return;
     andruavUnit.m_index = this.count;
-    this.List[partyID] = andruavUnit;
-    this.count = this.count + 1;
+    this.List.set(partyID, andruavUnit);
+    this.count++;
   }
 
   Del(partyID) {
-    if (this.hasOwnProperty(partyID)) {
-      delete this.List[partyID];
-      this.count = this.count - 1;
+    if (this.List.has(partyID)) {
+      this.List.delete(partyID);
+      this.count--;
     }
   }
 
   fn_getUnit(partyID) {
-    if (this.List.hasOwnProperty(partyID)) {
-      return this.List[partyID];
-    }
-    return null;
+    return this.List.get(partyID) || null;
   }
 
   fn_getUnitKeys() {
-    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return undefined;
-    return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List);
+    if (!js_globals.v_andruavClient) return undefined;
+    return Array.from(this.List.keys());
   }
 
   fn_getUnitValues() {
-    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return undefined;
-    return Object.values(js_globals.v_andruavClient.m_andruavUnitList.List);
+    if (!js_globals.v_andruavClient) return undefined;
+    return Array.from(this.List.values());
   }
 
   fn_getUnitCount() {
-    if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return 0;
-    if (js_globals.v_andruavClient.m_andruavUnitList === null || js_globals.v_andruavClient.m_andruavUnitList === undefined) return 0;
-    return Object.keys(js_globals.v_andruavClient.m_andruavUnitList.List)
-      .length;
+    if (!js_globals.v_andruavClient || !this.List) return 0;
+    return this.List.size;
   }
 
   putUnit(unitFullName, andruavUnit) {
-    for (var name in this.List) {
-      if (name === unitFullName) {
-        this.List[name] = andruavUnit;
-        return;
-      }
-    }
-
-    this.List[name] = andruavUnit;
+    this.List.set(unitFullName, andruavUnit);
   }
 }

@@ -90,7 +90,7 @@ class CAndruavClient {
 
         
         const now = Date.now();
-        const units = this.m_andruavUnitList.fn_getUnitValues();
+        const units = js_globals.m_andruavUnitList.fn_getUnitValues();
         if (units===null || units === undefined) return ;
         units.forEach((unit) => {
             if (!unit.m_IsMe) {
@@ -171,8 +171,8 @@ class CAndruavClient {
         this.EVT_andruavUnitGeoFenceDeleted = function () {};
         
         
-
-        this.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
+        js_globals.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
+        js_globals.m_andruavUnitList.fn_resetList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
         var Me = this;
         if (this.fn_timerID_checkStatus === null || this.fn_timerID_checkStatus  === undefined) {
@@ -1457,7 +1457,7 @@ class CAndruavClient {
 
 
     API_CONST_RemoteCommand_recordVideo(p_target, p_trackId, p_OnOff) {
-        var v_unit = this.m_andruavUnitList.fn_getUnit(p_target);
+        var v_unit = js_globals.m_andruavUnitList.fn_getUnit(p_target);
         if (v_unit === null || v_unit === undefined) { // you may declare an error message or send for ID Request
             return;
         }
@@ -1588,7 +1588,7 @@ class CAndruavClient {
     prv_parseCommunicationMessage(Me, msg, evt) {
 
         var p_jmsg;
-        var p_unit = this.m_andruavUnitList.fn_getUnit(msg.senderName);
+        var p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 
         if (p_unit === null || p_unit === undefined)
         {
@@ -1598,8 +1598,8 @@ class CAndruavClient {
             p_unit.m_IsMe = false;
             p_unit.m_defined = false;
             p_unit.partyID = msg.senderName;
-            p_unit.m_index = Me.m_andruavUnitList.count;
-            Me.m_andruavUnitList.Add(p_unit.partyID, p_unit);
+            p_unit.m_index = js_globals.m_andruavUnitList.count;
+            js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
             if (msg.messageType != js_andruavMessages.CONST_TYPE_AndruavMessage_ID) 
             {
                 if (p_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID) === true)
@@ -1947,7 +1947,7 @@ class CAndruavClient {
                             p_unit.m_Swarm.m_following = null;
                         } 
 
-                        this.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
+                        js_globals.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
                         js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_unit);
                     } else {
                         p_unit.m_defined = true;
@@ -2032,7 +2032,7 @@ class CAndruavClient {
                         }
 
                         
-                        this.m_andruavUnitList.Add(p_unit.partyID, p_unit);
+                        js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
                         this._fn_onNewUnitAdded(p_unit);
 
                         js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitAdded, p_unit);
@@ -3126,15 +3126,15 @@ class CAndruavClient {
             // extract command:
             andruavCMD = JSON.parse(out.text);
             p_jmsg = Me.fn_parseJSONMessage(out.text);
-            v_unit = Me.m_andruavUnitList.fn_getUnit(js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName));
+            v_unit = js_globals.m_andruavUnitList.fn_getUnit(js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName));
             if (v_unit === null || v_unit === undefined) {
                 v_unit = new js_andruavUnit.CAndruavUnitObject();
                 // p_unit.m_defined = false; define it as incomplete
                 v_unit.m_IsMe = false;
                 v_unit.m_defined = false;
                 v_unit.partyID = p_jmsg.senderName;
-                v_unit.m_index = Me.m_andruavUnitList.count;
-                Me.m_andruavUnitList.Add(v_unit.partyID, v_unit);
+                v_unit.m_index = js_globals.m_andruavUnitList.count;
+                js_globals.m_andruavUnitList.Add(v_unit.partyID, v_unit);
                         
                 if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID) === true)
                 {
