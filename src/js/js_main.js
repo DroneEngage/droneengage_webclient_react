@@ -136,7 +136,7 @@ function fn_handleKeyBoard() {
 
 		if (p_event.ctrlKey) {
             var c = p_event.which || p_event.keyCode;
-            if (c == 82) {
+            if (c === 82) {
                 p_event.preventDefault();
                 p_event.stopPropagation();
             }
@@ -438,6 +438,9 @@ function fn_handleKeyBoard() {
 						fn_activateVehicleCardOnly();
 						$('#btn_showControl').html("<strong>DISPLAY-4</strong>");
 					break;
+
+					default:
+					break;
 				}
 			}
 			else
@@ -475,8 +478,9 @@ function fn_handleKeyBoard() {
 						fn_activateAllViews();
 						$('#btn_showControl').html("<strong>DISPLAY-6</strong>");
 					break;
-					
-					
+
+					default:
+					break;
 				}
 			}
 
@@ -571,6 +575,9 @@ function fn_handleKeyBoard() {
 
 						case js_andruavMessages.CONST_EXTERNAL_CAMERA_TYPE_FFMPEGWEBCAM:
 							//NOT USED
+						break;
+						
+						default:
 						break;
 					}
 					break;
@@ -810,7 +817,7 @@ function fn_handleKeyBoard() {
 			js_localStorage.fn_setMetricSystem(js_globals.v_useMetricSystem);
             
 			if (js_localStorage.fn_getMetricSystem() === true) {
-				if (dontflip != true) js_globals.v_useMetricSystem = false;
+				if (dontflip !== true) js_globals.v_useMetricSystem = false;
 
 				js_localStorage.fn_setMetricSystem(false);
 				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
@@ -821,7 +828,7 @@ function fn_handleKeyBoard() {
 
 			}
 			else {
-				if (dontflip != true) js_globals.v_useMetricSystem = true;
+				if (dontflip !== true) js_globals.v_useMetricSystem = true;
 
 				js_localStorage.fn_setMetricSystem(true);
 				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
@@ -1036,8 +1043,8 @@ function fn_handleKeyBoard() {
 
 			var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-			if ((p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_ROVER)
-			|| (p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_BOAT)) return;
+			if ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER)
+			|| (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) return;
 
 			function fn_doCircle2_prv() {
 				js_speak.fn_speak('point recieved');
@@ -1118,10 +1125,10 @@ function fn_handleKeyBoard() {
 			$('#modal_changeUnitInfo').find('#btnOK').unbind("click");
 			$('#modal_changeUnitInfo').find('#btnOK').on('click', function () {
 				var v_unitName = $('#modal_changeUnitInfo').find('#txtUnitName').val();
-				if (v_unitName == '') return;
+				if (v_unitName === '' || v_unitName === undefined ) return;
 				
 				var v_unitDescription = $('#modal_changeUnitInfo').find('#txtDescription').val();
-				if (v_unitDescription == '') return;
+				if (v_unitDescription === '' ||  v_unitDescription === undefined) return;
 				
 				js_globals.v_andruavClient.API_setUnitName(p_andruavUnit, v_unitName, v_unitDescription);
 			});
@@ -1153,16 +1160,16 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#title').html('Change Altitude of ' + p_andruavUnit.m_unitName);
 			$('#changespeed_modal').find('#txtSpeed').val(v_altitude_val);
 			$('#changespeed_modal').find('#txtSpeedUnit').html(v_altitude_unit);
-			$('#changespeed_modal').find('#btnOK').unbind("click");
+			$('#changespeed_modal').find('#btnOK').unbind('click');
 			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_alt = $('#changespeed_modal').find('#txtSpeed').val();
-				if (v_alt == '' || isNaN(v_alt)) return;
+				if (v_alt === '' ||  v_alt === undefined || isNaN(v_alt)) return;
 				if (js_globals.v_useMetricSystem === false) {
 					// the GUI in feet and FCB in meters
 					v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 				}
 				// save target speed as indication.
-				if (p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_SUBMARINE)
+				if (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE)
 				{
 					js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, -v_alt);
 				}
@@ -1218,7 +1225,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#txtSpeedUnit').html(v_speed_unit);
 			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_speed = $('#changespeed_modal').find('#txtSpeed').val();
-				if (v_speed == '' || isNaN(v_speed)) return;
+				if (v_speed === '' || v_speed === undefined || isNaN(v_speed)) return;
 				if (js_globals.v_useMetricSystem === false) {
 					// the GUI in miles and the FCB is meters
 					v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
@@ -1248,7 +1255,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#txtSpeedUnit').html("");
 			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_port_val = $('#changespeed_modal').find('#txtSpeed').val();
-				if (v_port_val == '' || isNaN(v_port_val) || v_port_val >= 0xffff) return;
+				if (v_port_val === '' || v_port_val === undefined || isNaN(v_port_val) || v_port_val >= 0xffff) return;
 				js_globals.v_andruavClient.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
 			});
 			
@@ -1271,7 +1278,7 @@ function fn_handleKeyBoard() {
 
 				function fn_callback (p_session)
 				{
-					if ((p_session !== null && p_session !== undefined) && (p_session.status == 'connected')) 
+					if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
 					{
 						if (p_session.m_unit.m_Video.m_videoTracks.length < 2) {
 							fn_VIDEO_login(p_session, p_session.m_unit.m_Video.m_videoTracks[0].id);
@@ -1297,7 +1304,7 @@ function fn_handleKeyBoard() {
 
 			function fn_callback (p_session)
         	{
-				if ((p_session !== null && p_session !== undefined) && (p_session.status == 'connected')) {
+				if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) {
 					
 					if (p_session.m_unit.m_Video.m_videoTracks.length < 2) {
 						// backward compatibility ANdruav style.
@@ -1403,7 +1410,7 @@ function fn_handleKeyBoard() {
 
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 				if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
-					if (p_andruavUnit.m_VehicleType == vehicleType) {
+					if (p_andruavUnit.m_VehicleType === vehicleType) {
 						var marker = p_andruavUnit.m_gui.m_marker;
 						if (marker !== null && marker !== undefined) {
 							marker.setVisible(visible);
@@ -1563,7 +1570,7 @@ function fn_handleKeyBoard() {
 
 		function hlp_generateFlyHereMenu( lat, lng ) {
 
-			return "<div id='context_menu_here' class='margin_zero padding_zero' style='display: inline-block '/>";
+			return "<div id='context_menu_here' class='margin_zero padding_zero row'/>";
 		}
 
 		// function hlp_generateFlyHereMenu( lat, lng ) {
@@ -1844,7 +1851,7 @@ function fn_handleKeyBoard() {
 			const status = event.status;
 			js_eventEmitter.fn_dispatch( js_globals.EE_onSocketStatus, event);
 			
-			if (status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
+			if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 				js_speak.fn_speak('Connected');
 
 				if (js_globals.CONST_MAP_EDITOR===true)
@@ -1874,7 +1881,7 @@ function fn_handleKeyBoard() {
 
 			// If we use onloadend, we need to check the readyState.
 			reader.onloadend = function (evt) {
-				if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
 					js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, evt.target.result);
 				}
 			};
@@ -1987,7 +1994,7 @@ function fn_handleKeyBoard() {
 			p_andruavUnit.m_gui.m_wayPoint_markers = [];
 			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
 
-			if (wayPointArray.length == 0) return;
+			if (wayPointArray.length === 0) return;
 			var latlng = null;
 			for (var i = 0; i < wayPointArray.length; ++i) {
 				var subIcon = false;	
@@ -2106,7 +2113,7 @@ function fn_handleKeyBoard() {
 
 
 		function EVT_andruavUnitFightModeUpdated(me, p_andruavUnit) {
-			if (p_andruavUnit.m_IsGCS != true) {
+			if (p_andruavUnit.m_IsGCS !== true) {
 				var text = hlp_getFlightMode(p_andruavUnit);
 				js_speak.fn_speak(p_andruavUnit.m_unitName + ' flight mode is ' + text);
 			}
@@ -2572,7 +2579,7 @@ function fn_handleKeyBoard() {
 
 			$('#message_notification').append("<div class='" + v_cssclass + "'>" + p_andruavUnit.m_unitName + ": " + p_error.Description + "</div>");
 
-			if (p_error.infoType != js_andruavMessages.CONST_INFOTYPE_GEOFENCE) {
+			if (p_error.infoType !== js_andruavMessages.CONST_INFOTYPE_GEOFENCE) {
 				if (p_error.v_notification_Type <=3)
 				{ 
 					//http://github.hubspot.com/messenger/docs/welcome/
@@ -3250,7 +3257,7 @@ function fn_handleKeyBoard() {
 				window.document.body.append(v_script);
 			}
 			else
-			if ((typeof(js_globals.CONST_MAP_GOOLE) != "undefined") && (js_globals.CONST_MAP_GOOLE === false))
+			if ((typeof(js_globals.CONST_MAP_GOOLE) !== "undefined") && (js_globals.CONST_MAP_GOOLE === false))
 			{
 				initMap();
 			}

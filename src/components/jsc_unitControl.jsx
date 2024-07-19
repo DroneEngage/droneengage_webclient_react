@@ -1093,8 +1093,8 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
     {
 
         if (p_andruavUnit.m_useFCBIMU !== true) 
-        // ||((p_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
-        //     && (p_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
+        // ||((p_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
+        //     && (p_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
         {
             return (
                 <div id='ctrl_k' className='text-center'>

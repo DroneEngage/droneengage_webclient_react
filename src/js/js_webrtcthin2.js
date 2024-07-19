@@ -134,7 +134,7 @@ class AndruavStream {
   // Add/Get Conversation - Creates a new PC or Returns Existing PC
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   get_conversation(p_number, p_targetVideoTrack) {
-    if (p_targetVideoTrack == null) {
+    if (p_targetVideoTrack === null || p_targetVideoTrack === undefined) {
       p_targetVideoTrack = "default";
     }
     var v_talk = new CTalk(p_number, p_targetVideoTrack, this);
@@ -149,7 +149,7 @@ class AndruavStream {
   // Remove Conversation
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   close_conversation(talkId) {
-    if (this.conversations[talkId] == null) return;
+    if (this.conversations[talkId] === null || this.conversations[talkId] === undefined) return;
     const talk = this.conversations[talkId];
     talk.closed = true;
     talk.onDisconnected(talk);
@@ -249,7 +249,7 @@ class AndruavStream {
     }
     if (this.conversations[vid] != null) {
       talk = this.conversations[vid];
-      if (talk.status == "connecting") {
+      if (talk.status === "connecting") {
         // this could be a faulty connection hat didnt start
         talk.fn_set_status("cancelled");
         this.conversations[talk.targetVideoTrack] = undefined;
@@ -317,7 +317,7 @@ class AndruavStream {
     // Get Call Reference
     var talk = this.conversations[p_signal.channel];
     var pc = talk.pc;
-    var type = p_signal.packet.type == "offer" ? "offer" : "answer";
+    var type = p_signal.packet.type === "offer" ? "offer" : "answer";
 
     // Deduplicate SDP Offerings/Answers
     //if (type in talk) return;

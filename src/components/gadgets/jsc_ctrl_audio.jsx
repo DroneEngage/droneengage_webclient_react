@@ -48,14 +48,14 @@ export class Clss_CTRL_AUDIO extends React.Component {
         var v_speech_disabled = false;
         const  v_andruavUnit = this.props.p_unit;
         var v_vol_disabled;
-        if (v_andruavUnit.m_isDE == false)
+        if (v_andruavUnit.m_isDE === false)
             v_vol_disabled = 'true';
         var v_pitch_disabled;
-        if (v_andruavUnit.m_isDE == false)
+        if (v_andruavUnit.m_isDE === false)
             v_pitch_disabled = 'true';
         
         var v_language_disabled;
-        if (v_andruavUnit.m_isDE == false)
+        if (v_andruavUnit.m_isDE === false)
             v_language_disabled = 'true';
         
         return (

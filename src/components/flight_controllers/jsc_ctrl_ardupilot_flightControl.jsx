@@ -336,7 +336,7 @@ export class Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
 	}
 
     fn_ToggleArm(v_andruavUnit) {
-        if (this.props.v_andruavUnit != null) {
+        if (this.props.v_andruavUnit !== null && this.props.v_andruavUnit  !== undefined) {
             if (this.props.v_andruavUnit.m_isArmed) {
                 this.fn_doDisarm(v_andruavUnit);
             }
@@ -347,7 +347,7 @@ export class Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
     }
 
     fn_doArm(v_andruavUnit) {
-        if (v_andruavUnit != null) {
+        if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
             fn_do_modal_confirmation("DANGEROUS: FORCE ADMING  " + v_andruavUnit.m_unitName + "   " + v_andruavUnit.m_VehicleType_TXT,
                 "OVERRIDE ARM .. Are You SURE?", function (p_approved) {
                     if (p_approved === false) 
@@ -366,7 +366,7 @@ export class Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
     }
 
     fn_doDisarm(v_andruavUnit) {
-        if (v_andruavUnit != null) {
+        if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
             fn_do_modal_confirmation("DANGEROUS: EMERGENCY DISARM  " + v_andruavUnit.m_unitName + "   " + v_andruavUnit.m_VehicleType_TXT,
                 "STOP all MOTORS and if vehicle in air will CRASH. Are You SURE?", function (p_approved) {
                     if (p_approved === false) return;

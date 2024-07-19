@@ -135,7 +135,7 @@ export default class Clss_StreamDialog extends React.Component
     {
         $('#modal_ctrl_stream_dlg').hide();
         $('#modal_ctrl_stream_dlg').attr('opacity', null);
-        if ((this.state != null) && (this.state.hasOwnProperty('p_session') === true))
+        if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
             this.state.p_session = null;            
         }
@@ -169,12 +169,12 @@ export default class Clss_StreamDialog extends React.Component
     render ()
     {
         var p_andruavUnit = null;
-        if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session != null))
+        if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
         {
             p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.partyID);
         }
 
-        if (p_andruavUnit == null)
+        if (p_andruavUnit === null || p_andruavUnit === undefined)
         {
             js_globals.fn_console_log ("stream:  NULL")
             
@@ -213,7 +213,7 @@ export default class Clss_StreamDialog extends React.Component
             var v_streanms = [];
             var v_unitName;
 
-            if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session != null))
+            if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
             {
                 p_session = this.state.p_session;
 

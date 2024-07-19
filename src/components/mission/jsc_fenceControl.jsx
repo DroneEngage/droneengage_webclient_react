@@ -406,7 +406,7 @@ class Clss_FenceClss_ShapeControl extends React.Component {
 
     fn_onSocketStatus (me,p_params) {
 
-        if (p_params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
+        if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
             me.setState({is_connected:true});
         }
@@ -497,15 +497,15 @@ class Clss_FenceClss_ShapeControl extends React.Component {
         var v_unit = [];
         
 
-        if ((this.state.m_shape == null) 
-        || ((this.state.m_shape.m_geofenceInfo != null) && (this.state.m_shape.m_geofenceInfo.m_deleted===true))
+        if ((this.state.m_shape === null || this.state.m_shape === undefined) 
+        || ((this.state.m_shape.m_geofenceInfo !== null && this.state.m_shape.m_geofenceInfo !== undefined) && (this.state.m_shape.m_geofenceInfo.m_deleted === true))
         )
         {
             v_unit.push (<h4 key="h4">Please Select A Shape</h4>);
         }
         else
         {
-            if (this.state.is_connected == true)
+            if (this.state.is_connected === true)
             {
                 this._renderswitch(v_unit);
             }

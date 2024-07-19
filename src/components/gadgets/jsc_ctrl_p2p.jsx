@@ -62,8 +62,8 @@ export class Clss_CTRL_P2P extends React.Component {
     {
         if (p_me._isMounted !== true) return ;
 
-        if (p_me.props.p_unit.partyID != p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -76,16 +76,16 @@ export class Clss_CTRL_P2P extends React.Component {
         var txt_address = ': OFF';
         var css_txt_address = 'text-disabled';
 
-        if (v_andruavUnit.m_P2P.m_driver_connected===true)
+        if (v_andruavUnit.m_P2P.m_driver_connected === true)
         {
-            if (v_andruavUnit.m_P2P.m_p2p_disabled===true)
+            if (v_andruavUnit.m_P2P.m_p2p_disabled === true)
             {
                 css_txt_address='text-error';
                 txt_address = ': DISABLED';
             }
             else
             {
-                if (v_andruavUnit.m_P2P.m_p2p_connected===true)
+                if (v_andruavUnit.m_P2P.m_p2p_connected === true)
                 {
                     css_txt_address='text-success';
                     txt_address = ': CONNECTED';
@@ -106,6 +106,9 @@ export class Clss_CTRL_P2P extends React.Component {
             case js_andruavMessages.CONST_TYPE_ESP32_MESH:
                 txt_connection_type='ep32-mesh fw:' + v_andruavUnit.m_P2P.m_firmware;
                 css_connection_type='text-success';
+                break;
+
+            default:
                 break;
         }
 
@@ -131,16 +134,16 @@ export class Clss_CTRL_P2P extends React.Component {
         var txt_channel_ws_offline = 'WSDC';
         var css_txt_channel_p2p_offline = ' text-white bg-danger ';
         var css_txt_channel_ws_offline = ' text-white bg-danger ';
-        if (v_andruavUnit.m_P2P.m_p2p_disabled===true)
+        if (v_andruavUnit.m_P2P.m_p2p_disabled === true)
         {
             txt_channel_p2p_offline = 'P2PC';
             css_txt_channel_p2p_offline = ' text-white bg-primary ';
         }
-        if (v_andruavUnit.m_P2P.m_parent_address!="")
+        if (v_andruavUnit.m_P2P.m_parent_address !== "")
         {
             const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
             txt_parent_mac = v_andruavUnit.m_P2P.m_parent_address;
-            if (unit!=null)
+            if (unit !== null && unit !== undefined)
             {
                 txt_parent_name = "  " + unit.m_unitName;
             }
@@ -152,7 +155,7 @@ export class Clss_CTRL_P2P extends React.Component {
         {
             const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_logical_parent_address);
             txt_logical_parent_mac = v_andruavUnit.m_P2P.m_logical_parent_address;
-            if (unit!=null)
+            if (unit !== null && unit !== undefined)
             {
                 txt_logical_parent_name = "  " + unit.m_unitName;
             }

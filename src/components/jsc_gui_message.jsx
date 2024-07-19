@@ -48,7 +48,7 @@ class Clss_GUIMessage extends React.Component {
 
     render () 
     {
-        if (this.state.m_hidden == true) 
+        if (this.state.m_hidden === true) 
         {
             return (
                 <div  display="none" >

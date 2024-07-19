@@ -73,10 +73,16 @@ export class Clss_MainContextMenu extends React.Component {
                                 <div className='col-12 mt-1 padding_zero'>
                                     <p className='bg-primary text-white si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT}</p>
                                 </div>
-                                <div className='col-4 padding_zero'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doCircle2(p_andruavUnit.partyID, p_lat, p_lng, fn_convertToMeter(js_globals.CONST_DEFAULT_ALTITUDE), fn_convertToMeter(js_globals.CONST_DEFAULT_RADIUS), 10)}>Circle</p></div>
-                                <div className='col-4 padding_zero'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt)}>Goto Here</p></div>
-                                <div className='col-4 padding_zero'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
+                            </div>
+                            );
+
+                            v_contextMenu.push(
+                                <div key={'cmc2' + p_andruavUnit.partyID} className='row '>                           
+                                <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doCircle2(p_andruavUnit.partyID, p_lat, p_lng, fn_convertToMeter(js_globals.CONST_DEFAULT_ALTITUDE), fn_convertToMeter(js_globals.CONST_DEFAULT_RADIUS), 10)}>Circle</p></div>
+                                <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt)}>Goto Here</p></div>
+                                <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
                             </div>);
+
                     }
                 }
             }
@@ -89,7 +95,7 @@ export class Clss_MainContextMenu extends React.Component {
     render() {
         const listUnitsElement = this.listUnits();
         return (
-            <div className="text-justified one_line row">
+            <div className="text-justified one_line col-12">
                 <p className="bg-success text-white mb-1 padding_zero">
                     <span className="text-success margin_zero text-white si-09x" >
                         lat:<span className='si-09x'>{this.props.p_lat.toFixed(6)}</span> lng:<span className='si-09x'>{this.props.p_lng.toFixed(6)}</span>

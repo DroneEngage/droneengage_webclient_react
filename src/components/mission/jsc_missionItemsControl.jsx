@@ -47,7 +47,7 @@ class CMissionStep extends React.Component {
     
     render ()
     {
-        if ((this.props.p_shape == null)  || (this.props.p_isCurrent == false))
+        if ((this.props.p_shape === null || this.props.p_shape === undefined)  || (this.props.p_isCurrent === false))
         {
             return (<div/>);
         }
@@ -92,7 +92,7 @@ class MissionControlPanel extends React.Component {
 
     fn_onSocketStatus (me,params) {
         
-        if (params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
+        if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
             me.setState({is_connected:true});
         }
@@ -150,7 +150,7 @@ class MissionControlPanel extends React.Component {
      */
     fn_collabseMe (e)
     {
-        if ((this.props.p_ParentCtrl.props.p_missionPlan.m_hidden == true) && (this.props.p_ParentCtrl.props.p_isCurrent == false))
+        if ((this.props.p_ParentCtrl.props.p_missionPlan.m_hidden === true) && (this.props.p_ParentCtrl.props.p_isCurrent === false))
         {
             // display path if group is going to be activated and was hidden.
             this.fn_togglePath(e);
@@ -168,7 +168,7 @@ class MissionControlPanel extends React.Component {
     {
         js_globals.fn_console_log (e);
         this.props.p_ParentCtrl.props.p_missionPlan.fn_togglePath();
-        if (this.props.p_ParentCtrl.props.p_missionPlan.m_hidden == true)
+        if (this.props.p_ParentCtrl.props.p_missionPlan.m_hidden === true)
         {
             $('#ph_' + this.props.p_mission.m_id).addClass('text-muted');
             $('#ph_' + this.props.p_mission.m_id).removeClass('text-success');
@@ -207,7 +207,7 @@ class MissionControlPanel extends React.Component {
 
     componentDidUpdate ()
     {
-        if ((this.props.p_ParentCtrl.props.p_missionPlan.m_hidden == true) && (this.props.p_ParentCtrl.props.p_isCurrent == true))
+        if ((this.props.p_ParentCtrl.props.p_missionPlan.m_hidden === true) && (this.props.p_ParentCtrl.props.p_isCurrent === true))
         {
             // display path if group is ACVTIE NOW and was hidden.
             this.fn_togglePath(e);
@@ -217,9 +217,9 @@ class MissionControlPanel extends React.Component {
     render ()
     {
 
-        if (this.state.m_deleted == true) return (<div className = " margin_zero "/>);
+        if (this.state.m_deleted === true) return (<div className = " margin_zero "/>);
 
-        if (this.props.p_mission == null)
+        if (this.props.p_mission === null || this.props.p_mission === undefined)
         {
             return (<div className = " margin_zero "/>);
         }
@@ -238,7 +238,7 @@ class MissionControlPanel extends React.Component {
         //CODEBLOCK_END
 
 
-        if (this.props.p_isCurrent == true)
+        if (this.props.p_isCurrent === true)
         {
             v_item2.push (
 
@@ -317,19 +317,19 @@ class UnitMissionContainer extends React.Component {
     displayGeoForm (me,p_event)
     {
         // not a marker
-        if (p_event.target.m_mission == null) 
+        if (p_event.target.m_mission === null || p_event.target.m_mission === undefined) 
         {
             js_globals.fn_console_log ("MISSION:NULL HERE");
             return ; 
         }
         
-        if (me.props.p_missionPlan.m_id != p_event.target.m_mission.m_id)
+        if (me.props.p_missionPlan.m_id !== p_event.target.m_mission.m_id)
         {
             js_globals.fn_console_log ("Not Me");
             return ;
         } 
 
-        if (me.props.p_isCurrent == false)
+        if (me.props.p_isCurrent === false)
         {
             js_eventEmitter.fn_dispatch(js_globals.EE_onMissionItemToggle,{p_isCurrent:me.props.p_isCurrent, p_mission:me.props.p_missionPlan});
         }
@@ -436,7 +436,7 @@ class CMissionsContainer extends React.Component {
 
     fn_onSocketStatus (me,p_params) {
         
-        if (p_params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
+        if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
             me.setState({is_connected:true});
         }
@@ -449,7 +449,7 @@ class CMissionsContainer extends React.Component {
     fn_onMissionItemToggle (me,p_params)
     {
        
-        if (p_params.p_isCurrent == true)
+        if (p_params.p_isCurrent === true)
         {
             // switch to next
             window.AndruavLibs.MapMission.fn_activateNextMission(p_params.p_mission.m_id);
@@ -529,7 +529,7 @@ class CMissionsContainer extends React.Component {
 
         let v_mission1 = window.AndruavLibs.MapMission.fn_getCurrentMission();
 				
-        if ((this.state.is_connected == false) || (this.state.p_plans == null) || (this.state.p_plans.length ==0))
+        if ((this.state.is_connected === false) || (this.state.p_plans === null || this.state.p_plans === undefined) || (this.state.p_plans.length ==0))
         {
             item.push (<h4 key="mi"></h4>);
         }
@@ -549,7 +549,7 @@ class CMissionsContainer extends React.Component {
         
         let v_ctrl = [];
 
-        if (this.state.is_connected == true)
+        if (this.state.is_connected === true)
         {
             v_ctrl.push(
                 <div key='fsc' className="width_100">

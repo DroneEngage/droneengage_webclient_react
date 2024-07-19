@@ -60,13 +60,13 @@ class Clss_CVideoScreen extends React.Component {
     fnl_takeLocalImage (e)
     {
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-        if (c_andruavUnit == null)
+        if (c_andruavUnit === null || c_andruavUnit === undefined)
         {
             return ;
         }
 
         
-        if ((c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track].mmRTC != null))
+        if ((c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track].mmRTC !== null))
         {
             fn_takeLocalImage(c_andruavUnit,this.props.obj.v_track);
         }
@@ -234,7 +234,7 @@ class Clss_CVideoScreen extends React.Component {
             return ;
         }
         
-        if (this.m_timerID != null)
+        if (this.m_timerID !== null && this.m_timerID !== undefined)
         {
             clearTimeout(this.m_timerID);
         }
@@ -276,7 +276,7 @@ class Clss_CVideoScreen extends React.Component {
         const c_talk = p_andruavUnit.m_Video.m_videoactiveTracks[videoTrackID];
         const c_videoctrl = '#videoObject'+c_talk.targetVideoTrack;
         const c_video=$(c_videoctrl)[0];
-        if (c_video == null)
+        if (c_video === null || c_video === undefined)
         {
             return ;
         }
@@ -289,7 +289,7 @@ class Clss_CVideoScreen extends React.Component {
     {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         
-        if (v_andruavUnit == null)
+        if (v_andruavUnit === null || v_andruavUnit === undefined)
         {
             return ;
         }

@@ -73,7 +73,7 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
     fn_onSocketStatus (me,p_params) {
         js_globals.fn_console_log ('REACT:' + JSON.stringify(p_params));
 
-        if (p_params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
+        if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
                     me.setState({is_connected:true});
                     //$('#andruavUnits').show();
@@ -140,7 +140,7 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
         var v_unit = [];
         
 
-        if (this.state.is_connected == false)
+        if (this.state.is_connected === false)
         {
           
         }

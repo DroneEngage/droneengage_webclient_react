@@ -446,7 +446,7 @@ class C_Telemetry {
 
   fn_updateTelemetry(p_manualTXBlockedSubAction) {
     this.manualTXBlockedSubAction = p_manualTXBlockedSubAction;
-    // if (manualTXBlockedSubAction == js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED)
+    // if (manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED)
     // {   // release rx if engaged
     // 	//this.m_rxEngaged = false;
     // }

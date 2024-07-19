@@ -96,7 +96,7 @@ class Clss_LoginControl extends React.Component {
 
     componentDidMount () {
 	
-			 if (this.state.initialized == true) 
+			 if (this.state.initialized === true) 
 			 {
 				 return;
 			 }
@@ -113,7 +113,7 @@ class Clss_LoginControl extends React.Component {
 	render() {
 
 			var login = "Access Code Generator";
-			if (this.state.is_connected == true)
+			if (this.state.is_connected === true)
 			{
 				login += "ed - As " + $('#txtEmail').val();
 			}

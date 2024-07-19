@@ -28,7 +28,7 @@ export class CFieldChecked extends React.Component {
             }
         });
 
-        if ((this.props.required === false) || (this.props.required == 'false'))
+        if ((this.props.required === false) || (this.props.required === 'false'))
         {
             $(n + " :text").attr('disabled', 'disabled');
         }
@@ -44,7 +44,7 @@ export class CFieldChecked extends React.Component {
     {
         var n = '#txt'+ this.props.itemid ;
         
-        if ((this.props.required == false) || (this.props.required == 'false'))
+        if ((this.props.required === false) || (this.props.required === 'false'))
         {
             $(n + " :text").attr('disabled', 'disabled');
             $(n + " :checkbox").prop('checked', false);
@@ -58,7 +58,7 @@ export class CFieldChecked extends React.Component {
 
     fn_getValue ()
     {
-        if ($('#chk' + this.props.itemid ).prop('checked') == false)
+        if ($('#chk' + this.props.itemid ).prop('checked') === false)
         {
             return null;
         }

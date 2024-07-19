@@ -30,9 +30,9 @@ export  class Clss_CTRL_UDP_PROXY_TELEMETRY   extends React.Component {
     {
         try
         {
-        if (p_me.props.p_unit.partyID != p_andruavUnit.partyID) return ;
+        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
 
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         //p_me.forceUpdate();
         }

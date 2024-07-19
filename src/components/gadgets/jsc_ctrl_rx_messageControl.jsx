@@ -27,8 +27,8 @@ export  class Clss_RX_MESSAGE  extends React.Component {
 
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID != p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
     

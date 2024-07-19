@@ -32,8 +32,8 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
 
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID != p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -46,7 +46,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
 
     fn_resetMsgCounter(p_andruavUnit)
     {
-        if (p_andruavUnit==null) return;
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         
         
         p_andruavUnit.m_Messages.fn_reset();
@@ -62,7 +62,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
         var module_version = [];
 
         const v_andruavUnit = this.props.p_unit;
-        if (v_andruavUnit.m_isDE==false)
+        if (v_andruavUnit.m_isDE === false)
         {
             module_version.push(<span key={v_andruavUnit.partyID + 'set_andruav'} >Andruav</span>);
         }
@@ -70,7 +70,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
         {
             module_version.push(<span key={v_andruavUnit.partyID + 'set_dev'} className=''>DE&nbsp;version:&nbsp;{v_andruavUnit.m_version}</span>);
             const len = v_andruavUnit.m_modules.m_list.length;
-            if (len==0)
+            if (len === 0)
             {
                 module_version.push(<span key={v_andruavUnit.partyID + 'set_nm'}  className='text-warning'>&nbsp;( no modules connected ) </span>);
             }
@@ -80,7 +80,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
                 {
                     const module = v_andruavUnit.m_modules.m_list[i];
                     
-                    if (module.d == true)
+                    if (module.d === true)
                     {
                         module_version.push(<span key={v_andruavUnit.partyID + 'set_mod_d' + module.i}  >&nbsp;-&nbsp;<span className='text-danger'>{module.i}&nbsp;{module.v}</span> <span className='blink_alert animate_iteration_5s'>OFFLINE</span></span>);
                     }
@@ -112,7 +112,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
         }
         
         var cmd_data = [];
-        if (this.state.m_traffic_monitor===true)
+        if (this.state.m_traffic_monitor === true)
         {
             cmd_data.push(<div key={v_andruavUnit.partyID + 'settings_cd1'} className='row css_margin_zero padding_zero border-top border-secondary'>
                             <div key={v_andruavUnit.partyID + 'settings_cd11'}className="col-12 mt-1">

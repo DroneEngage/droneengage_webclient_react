@@ -173,8 +173,8 @@ class Clss_UnitParametersList extends React.Component {
 
     fn_updateParameters(p_me, p_andruavUnit)
     {
-        if (p_me.state.p_unit == null) return ;
-        if (p_andruavUnit.partyID != p_me.state.p_unit.partyID) return ;
+        if (p_me.state.p_unit === null || p_me.state.p_unit === undefined) return ;
+        if (p_andruavUnit.partyID !== p_me.state.p_unit.partyID) return ;
         
         p_me.forceUpdate();
     }
@@ -196,7 +196,7 @@ class Clss_UnitParametersList extends React.Component {
     fn_doResetParameters()
     {
         const  p_andruavUnit = this.state.p_unit ;
-        if (p_andruavUnit == null) return ;
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 
         const c_list = p_andruavUnit.m_FCBParameters.m_list_by_index_shadow;
         const c_keys = Object.keys(c_list);
@@ -218,7 +218,7 @@ class Clss_UnitParametersList extends React.Component {
 
     fn_resetAll()
     {
-        if (this.state.p_unit == null) return ;
+        if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
         
         var me = this;
         fn_do_modal_confirmation("Confirmation", "Undo all modified values?", function (p_approved) {
@@ -230,7 +230,7 @@ class Clss_UnitParametersList extends React.Component {
 
     fn_reloadAll()
     {
-        if (this.state.p_unit == null) return ;
+        if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
 
         var me = this;
         fn_do_modal_confirmation("Confirmation", "Release all parameters from FCB?", function (p_approved) {
@@ -241,7 +241,7 @@ class Clss_UnitParametersList extends React.Component {
 
     fn_saveAll()
     {
-        if (this.state.p_unit == null) return ;
+        if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
         var me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;

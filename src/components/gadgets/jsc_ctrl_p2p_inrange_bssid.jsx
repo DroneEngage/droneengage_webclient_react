@@ -144,8 +144,8 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
     {
         if (p_me._isMounted !== true) return ;
 
-        if (p_me.props.p_unit.partyID != p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 

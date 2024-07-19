@@ -24,7 +24,7 @@ class CLeafLetAndruavMap {
         this.m_elevator = null;
         this.m_markGuided = null;
 
-        // if ((typeof(js_globals.CONST_MAP_GOOLE) != "undefined") && (js_globals.CONST_MAP_GOOLE === false))
+        // if ((typeof(js_globals.CONST_MAP_GOOLE) !== "undefined") && (js_globals.CONST_MAP_GOOLE === false))
 		// {
 		//     this.fn_initMap('mapid');
 		// }
@@ -341,7 +341,7 @@ class CLeafLetAndruavMap {
         // var v_geoFence = new google.maps.Polyline({
         //     path: p_lnglatFromTo,
         //     geodesic: true,
-        //     strokeColor: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
+        //     strokeColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
         //     strokeOpacity: 0.9,
         //     strokeWeight: 2
         // });
@@ -361,7 +361,7 @@ class CLeafLetAndruavMap {
         // var v_geoFence = new google.maps.Polygon({
         //     path: p_lnglatFromTo,
         //     geodesic: true,
-        //     fillColor: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
+        //     fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
         //     //strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
         //     strokeOpacity: 1.0,
         //     fillOpacity: 0.45,
@@ -382,7 +382,7 @@ class CLeafLetAndruavMap {
 
     fn_drawCircle(p_center, p_radius, p_shouldKeepOutside) {
         // var v_geoFence = new google.maps.Circle({
-        //     fillColor: p_shouldKeepOutside == false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
+        //     fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
         //     //strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
         //     strokeOpacity: 1.0,
         //     strokeWeight: 0,

@@ -12,9 +12,8 @@ import { mavlink20 } from '../js/js_mavlink_v2';
 
 
 
-import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
+import C_GUI_READING_VALUE from '../js/js_gui_helper.js'
 
-import {Clss_AndruavUnit} from './jsc_andruav_unit.jsx' // add extension to allow encryptor to see it as same as file name.
 import {Clss_CTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
 import {Clss_CTRL_DIRECTIONS} from './gadgets/jsc_ctrl_directionsControl.jsx'
 import {Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
@@ -65,32 +64,32 @@ class Clss_AndruavUnit_Drone_Header extends React.Component{
         var css_ws_enabled = '';
         var css_wp_enabled = '';
         
-        if (this.props.prop_speed != true)
+        if (this.props.prop_speed !== true)
         {
             css_speed_enabled = 'd-none';
         }
         
-        if (this.props.prop_battery != true)
+        if (this.props.prop_battery !== true)
         {
             css_battery_enabled = 'd-none';
         }
         
-        if (this.props.prob_ekf != true)
+        if (this.props.prob_ekf !== true)
         {
             css_ekf_enabled = 'd-none';
         }
         
-        if (this.props.prob_alt != true)
+        if (this.props.prob_alt !== true)
         {
             css_alt_enabled = 'd-none';
         }
 
-        if (this.props.prob_ws != true)
+        if (this.props.prob_ws !== true)
         {
             css_ws_enabled = 'd-none';
         }
         
-        if (this.props.prob_wp != true)
+        if (this.props.prob_wp !== true)
         {
             css_wp_enabled = 'd-none';
         }
@@ -156,8 +155,8 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
     {
         if (p_me._isMounted !== true) return ;
 
-        if (p_andruavUnit.partyID != p_me.props.m_unit.partyID) return ;
-        if (p_me.state.m_update == 0) return ;
+        if (p_andruavUnit.partyID !== p_me.props.m_unit.partyID) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         
         //me.forceUpdate();
@@ -169,7 +168,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         var v_flight_mode_text = "NC";
         var v_flight_mode_class= " text-warning";
         var v_flight_mode_title= 'flight board is NOT CONNECTED';
-        if (v_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry)
+        if (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry)
         {
             v_flight_mode_text = hlp_getFlightMode(v_andruavUnit);
             v_flight_mode_class= " text-white";
@@ -209,7 +208,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         var gps = new C_GUI_READING_VALUE();
         
         gps.css = "bg-danger text-white text-center";
-        if (gps_Info.m_isValid == true)
+        if (gps_Info.m_isValid === true)
         {
             switch (gps_Info.GPS3DFix)
             {
@@ -456,31 +455,31 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
 
         res.AS.value = 'na';
         res.GS.value = 'na';
-
-        if (p_andruavUnit.m_Nav_Info.p_Location.ground_speed != null)
+        const ground_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+        if ( ground_speed !== null && ground_speed !== undefined)
         {
             if (js_globals.v_useMetricSystem==true)
             {
-                res.GS.value = p_andruavUnit.m_Nav_Info.p_Location.ground_speed.toFixed(0);
+                res.GS.value = ground_speed.toFixed(0);
                 res.GS.unit = ' m/s';
             }
             else
             {
-                res.GS.value = (p_andruavUnit.m_Nav_Info.p_Location.ground_speed * js_helpers.CONST_METER_TO_FEET).toFixed(0);
+                res.GS.value = (ground_speed * js_helpers.CONST_METER_TO_FEET).toFixed(0);
                 res.GS.unit = ' ft/s';
             }
         }
-
-        if (p_andruavUnit.m_Nav_Info.p_Location.air_speed != null)
+        const air_speed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
+        if (air_speed !== null && air_speed !== undefined)
         {
             if (js_globals.v_useMetricSystem==true)
             {
-                res.AS.value = p_andruavUnit.m_Nav_Info.p_Location.air_speed.toFixed(0);
+                res.AS.value = air_speed.toFixed(0);
                 res.AS.unit = ' m/s';
             }
             else
             {
-                res.AS.value = (p_andruavUnit.m_Nav_Info.p_Location.air_speed * js_helpers.CONST_METER_TO_FEET).toFixed(0);
+                res.AS.value = (air_speed * js_helpers.CONST_METER_TO_FEET).toFixed(0);
                 res.AS.unit = ' ft/s';
             }
         }
@@ -498,7 +497,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         };
 
 
-        if (p_andruavUnit.m_WindSpeed != null)
+        if (p_andruavUnit.m_WindSpeed !== null && p_andruavUnit.m_WindSpeed !== undefined)
         {
             if (js_globals.v_useMetricSystem==true)
             {
@@ -519,7 +518,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
             res.WS.css = ' text-muted ';
         }
 
-        if (p_andruavUnit.m_WindSpeed_z != null)
+        if (p_andruavUnit.m_WindSpeed_z !== null && p_andruavUnit.m_WindSpeed_z !== undefined)
         {
             if (js_globals.v_useMetricSystem==true)
             {
@@ -542,7 +541,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
 
         // wind direction
         res.WD.value = p_andruavUnit.m_WindDirection;
-        if (res.WD.value!= null) res.WD.value = res.WD.value.toFixed(0);
+        if (res.WD.value!== null && res.WD.value !== undefined) res.WD.value = res.WD.value.toFixed(0);
         res.WD.css = res.WS.css;
         res.WD.unit = ' º';
         
@@ -640,8 +639,8 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
                 v_id_class = " bg-success text-white ";
             }
             if ((v_andruavUnit.m_useFCBIMU === false) 
-                ||((v_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
-                && (v_andruavUnit.m_telemetry_protocol != js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
+                ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
+                && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
             {
                 v_id_icon = " bi bi-exclamation-diamond";
                 v_id_text = ' ' + v_id_text;
@@ -673,32 +672,32 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         var css_ws_enabled = '';
         var css_wp_enabled = '';
 
-        if (this.props.prop_speed != true)
+        if (this.props.prop_speed !== true)
         {
             css_speed_enabled = 'd-none';
         }
         
-        if (this.props.prop_battery != true)
+        if (this.props.prop_battery !== true)
         {
             css_battery_enabled = 'd-none';
         }
         
-        if (this.props.prob_ekf != true)
+        if (this.props.prob_ekf !== true)
         {
             css_ekf_enabled = 'd-none';
         }
         
-        if (this.props.prob_alt != true)
+        if (this.props.prob_alt !== true)
         {
             css_alt_enabled = 'd-none';
         }
         
-        if (this.props.prob_ws != true)
+        if (this.props.prob_ws !== true)
         {
             css_ws_enabled = 'd-none';
         }
         
-        if (this.props.prob_wp != true)
+        if (this.props.prob_wp !== true)
         {
             css_wp_enabled = 'd-none';
         }
@@ -846,13 +845,13 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 
     fn_updateMapStatus(p_andruavUnit)
     {
-        if (p_andruavUnit.hasOwnProperty("p_marker") == false) return;
+        if (p_andruavUnit.hasOwnProperty("p_marker") === false) return;
         if (
                 ((js_globals.v_en_GCS === true ) && (p_andruavUnit.m_IsGCS === true))
              || ((js_globals.v_en_Drone === true ) && (p_andruavUnit.m_IsGCS ===false))
             )
         {
-            // if (p_andruavUnit.m_gui != null)
+            // if (p_andruavUnit.m_gui !== null && p_andruavUnit.m_gui !== undefined)
             // {
             //     //p_andruavUnit.m_gui.m_marker.setMap(p_andruavUnit.m_gui.m_mapObj);
             //     js_leafletmap.setMap(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_gui.m_mapObj);
@@ -869,7 +868,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
     fn_onSocketStatus (me,params) {
        
         if (me._isMounted!==true) return ;
-        if (params.status == js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
+        if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
                 $('#andruavUnits').show();
         }
@@ -983,7 +982,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 
 // if (CONST_TEST_MODE === true)
 // {
-//     if ($('#andruav_unit_list_array_float').length != 0) {
+//     if ($('#andruav_unit_list_array_float').length !== 0) {
 
 //          ReactDOM.render(
 //              <React.StrictMode>
@@ -993,7 +992,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 //          );
 //     }
     
-//     if ($('#andruav_unit_list_array_fixed').length != 0) {
+//     if ($('#andruav_unit_list_array_fixed').length !== 0) {
     
 //          ReactDOM.render(
 //              <React.StrictMode>
@@ -1006,7 +1005,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 // else
 // {
 //     // comments
-//     if ($('#andruav_unit_list_array_float').length != 0) {
+//     if ($('#andruav_unit_list_array_float').length !== 0) {
 
 //          ReactDOM.render(
 //              <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
@@ -1014,7 +1013,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 //          );
 //      }
 
-//      if ($('#andruav_unit_list_array_fixed').length != 0) {
+//      if ($('#andruav_unit_list_array_fixed').length !== 0) {
 
 //          ReactDOM.render(
 //              <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,

@@ -2,7 +2,7 @@ import React    from 'react';
 
 
 import {js_globals} from '../../js/js_globals.js';
-import {js_eventEmitter} from '../..js/js_eventEmitter'
+import {js_eventEmitter} from '../../js/js_eventEmitter'
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 
 export class Clss_CTRL_VIBRATION extends React.Component {
@@ -48,7 +48,7 @@ export class Clss_CTRL_VIBRATION extends React.Component {
             value = value.toFixed(2);
         }
         ret.value = value;
-        if ((value == null) || (value==0.0))
+        if ((value == null) || (value===0.0))
         { 
             ret.css = 'bg-none text-muted';
         }else
@@ -110,7 +110,7 @@ export class Clss_CTRL_VIBRATION extends React.Component {
         if ((this.state.warning_level & 0x8) !== 0) return 'bg-warning';
         if ((this.state.warning_level & 0x4) !== 0) return 'bg-info';
         if ((this.state.warning_level & 0x2) !== 0) return 'bg-success';
-        if (this.state.warning_level == 0) return 'bg-none';
+        if (this.state.warning_level === 0) return 'bg-none';
     }
 
     render ()

@@ -180,10 +180,11 @@ class Clss_UserEntryList extends  React.Component {
     render () {
         var p_params=[];
         
-        if (this.props.prop_users != null)
+        const c_list = this.props.prop_users;
+        
+        if (c_list !== null && c_list !== undefined)
         {
         
-            const c_list = this.props.prop_users;
             const c_keys = Object.keys(c_list);
             const c_len = c_keys.length;
             

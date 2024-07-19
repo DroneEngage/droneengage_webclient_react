@@ -20,7 +20,7 @@ export class Clss_CTRL_SWARM extends React.Component {
 
     fn_toggleMakeSwarm (p_formationID)
     {
-        if (this.props.m_unit.m_Swarm.m_isLeader == true)
+        if (this.props.m_unit.m_Swarm.m_isLeader === true)
         {   // make not a leader
             js_globals.v_andruavClient.API_makeSwarm (this.props.m_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
         }
@@ -35,7 +35,7 @@ export class Clss_CTRL_SWARM extends React.Component {
         js_globals.fn_console_log (p_unit);
         var v_partyID = null;
         var v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
-        if (p_unit != null)
+        if (p_unit !== null && p_unit !== undefined)
         {
             v_partyID = p_unit.partyID;
             v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_FOLLOW;
@@ -48,7 +48,7 @@ export class Clss_CTRL_SWARM extends React.Component {
     {
        if (e.target.value)
        {
-          if (e.target.value == "NA")
+          if (e.target.value === "NA")
           {
               // do not follow
             js_globals.v_andruavClient.API_requestFromDroneToFollowAnother(this.props.m_unit, -1, null);
@@ -62,10 +62,10 @@ export class Clss_CTRL_SWARM extends React.Component {
     
     componentDidUpdate() 
     {
-        if (this.props.m_unit.m_Swarm.m_following != null)
+        if (this.props.m_unit.m_Swarm.m_following !== null && this.props.m_unit.m_Swarm.m_following !== undefined)
         {
             var leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_unit.m_Swarm.m_following);
-            if (leaderUnit != null)
+            if (leaderUnit !== null && leaderUnit !== undefined)
             {
                 $("#" + this.props.m_unit.partyID + "dldrselsel").val(leaderUnit.partyID);
             }
@@ -157,9 +157,9 @@ export class Clss_CTRL_SWARM extends React.Component {
                 It is not following me. -as leaders can be followers but should not be following me-.
                 Notice: deeper circulaar error can be made and not handled here.
             */
-            if ((this.props.m_unit.partyID != v_unit.partyID) 
+            if ((this.props.m_unit.partyID !== v_unit.partyID) 
             && (v_unit.m_Swarm.m_isLeader === true)  
-            && (this.props.m_unit.m_Swarm.m_following != v_unit.partyID ))
+            && (this.props.m_unit.m_Swarm.m_following !== v_unit.partyID ))
             {
                 var v_out = v_unit; // need a local copy 
                 // list drones that are not me and are leaders.

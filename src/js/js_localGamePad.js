@@ -195,7 +195,7 @@ class CAndruavGamePad {
         
         me.v_controllers[p_gamepad.index] = v_padStatus;
         v_padStatus.p_connected = true;
-        v_padStatus.p_vibration = (p_gamepad.vibrationActuator != null);
+        v_padStatus.p_vibration = (p_gamepad.vibrationActuator !== null && p_gamepad.vibrationActuator !== undefined);
         window.requestAnimationFrame(me.fn_updateStatus);
     }
 
@@ -299,7 +299,7 @@ class CAndruavGamePad {
 
             for (var i = 0; i <= 5; ++ i) {
                 const c_pressed = p_gamepad.buttons[i].pressed;
-                if (c_padStatus.p_buttons[i].m_pressed != c_pressed) {
+                if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
                     v_buttonChanged = true;
                     c_padStatus.p_buttons[i].m_pressed = p_gamepad.buttons[i].pressed;
                     c_padStatus.p_buttons[i].m_timestamp = Date.now();
@@ -351,7 +351,7 @@ class CAndruavGamePad {
 
             for (var i = 0; i <= 5; ++ i) {
                 const c_pressed = p_gamepad.buttons[i].pressed;
-                if (c_padStatus.p_buttons[i].m_pressed != c_pressed) {
+                if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
                     v_buttonChanged = true;
                     c_padStatus.p_buttons[i].m_pressed = p_gamepad.buttons[i].pressed;
                     c_padStatus.p_buttons[i].m_timestamp = Date.now();
