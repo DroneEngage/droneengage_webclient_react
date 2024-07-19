@@ -260,7 +260,7 @@ export default class Clss_CameraDialog extends React.Component
         
 
         return (
-            <div key='modal_ctrl_cam' id="modal_ctrl_cam" title="Camera Control" data-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 ">
+            <div key='modal_ctrl_cam' id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 ">
                 <div key='camera_hdr' className="card-header text-center">
 					<div className="row">
 				        <div className="col-10">
@@ -300,7 +300,7 @@ export default class Clss_CameraDialog extends React.Component
                     <div id="modal_ctrl_cam_footer" className="form-group text-center localcontainer css_ontop">
                         <div className= "row">
                             <div className= "col-md-6">
-                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
+                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
                             </div>
                             <div className= "col-md-6">
                                 <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>

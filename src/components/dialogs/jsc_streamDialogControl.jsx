@@ -194,7 +194,7 @@ export default class Clss_StreamDialog extends React.Component
                     <div key='stream-card-body' id="stream-card-body"   className="card-body ">
                         {/* <div className = "row">
                             <div className = "col-md-4">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                             </div>    
                             <div className = "col-md-4">
                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>
@@ -224,7 +224,7 @@ export default class Clss_StreamDialog extends React.Component
             }
 
             return (
-                <div key="modal_ctrl_stream_dlg" id="modal_ctrl_stream_dlg" title="Streaming Video" data-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2" >
+                <div key="modal_ctrl_stream_dlg" id="modal_ctrl_stream_dlg" title="Streaming Video" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2" >
                             
                 <div key='stream_dlg_hdr' className="card-header text-center">
                     <div className="row">
@@ -243,7 +243,7 @@ export default class Clss_StreamDialog extends React.Component
                             </div>
                             <div id="modal_ctrl_stream_footer" className="form-group text-center localcontainer">
                                 <div className = "btn-group">
-                                        <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e)=>this.fn_opacityDialog()}>opaque</button>
+                                        <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e)=>this.fn_opacityDialog()}>opaque</button>
                                         <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={(e)=>this.fn_gotoUnitPressed()}>Goto</button>
                                         <button id="btnHelp" type="button" className="btn  btn-sm btn-primary">Help</button>
                                     

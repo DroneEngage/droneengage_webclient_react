@@ -128,13 +128,13 @@ class Clss_DisplayItems extends React.Component {
       v_check_btns.push (
         <div key="check_btns" className="btn-group css_margin_top_small" role="group" >
           <label className="checkbox-inline text-white">
-          <input id="toggle_GCS"    type="checkbox"  data-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
+          <input id="toggle_GCS"    type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
           </label>
           <label className="checkbox-inline text-white">
-          <input id="toggle_DRONE"  type="checkbox"  data-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
+          <input id="toggle_DRONE"  type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
           </label>
           <label className="checkbox-inline text-white">
-          <input id="toggle_ADSB"   type="checkbox" data-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> ADSB
+          <input id="toggle_ADSB"   type="checkbox" data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> ADSB
           </label> 
         </div>
         );
@@ -143,10 +143,10 @@ class Clss_DisplayItems extends React.Component {
     v_check_btns.push (
         <div key="check_btns" className="btn-group css_margin_top_small" role="group" >
           <label className="checkbox-inline text-white me-3">
-          <input id="toggle_GCS"    type="checkbox"  data-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
+          <input id="toggle_GCS"    type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
           </label>
           <label className="checkbox-inline text-white me-3">
-          <input id="toggle_DRONE"  type="checkbox"  data-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
+          <input id="toggle_DRONE"  type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
           </label>
         </div>
       );

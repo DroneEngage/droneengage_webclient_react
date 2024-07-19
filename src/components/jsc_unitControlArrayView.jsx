@@ -1,14 +1,18 @@
+import $ from 'jquery'; 
 import React    from 'react';
+
 
 import * as js_helpers from '../js/js_helpers'
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
+import {js_localStorage} from '../js/js_localStorage'
 import {js_leafletmap} from '../js/js_leafletmap'
 import * as js_andruavMessages from '../js/js_andruavMessages'
 import { mavlink20 } from '../js/js_mavlink_v2';
 
 
-import {hlp_getFlightMode} from '../js/js_main'
+
+import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 
 import {Clss_AndruavUnit} from './jsc_andruav_unit.jsx' // add extension to allow encryptor to see it as same as file name.
 import {Clss_CTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
@@ -18,6 +22,8 @@ import {Clss_CTRL_PX4_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_px4_fl
 import {Clss_CTRL_ARDUPILOT_EKF} from './gadgets/jsc_ctrl_ardupilot_ekf.jsx'
 import {Clss_CTRL_VIBRATION} from './gadgets/jsc_ctrl_vibration.jsx'
 import {Clss_CTRL_BATTERY} from './gadgets/jsc_ctrl_battery.jsx'
+
+import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../js/js_main'
 
 class Clss_AndruavUnit_Drone_Header extends React.Component{
 
@@ -537,7 +543,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         // wind direction
         res.WD.value = p_andruavUnit.m_WindDirection;
         if (res.WD.value!= null) res.WD.value = res.WD.value.toFixed(0);
-        res.WD.css == res.WS.css;
+        res.WD.css = res.WS.css;
         res.WD.unit = ' º';
         
         return res;
@@ -565,7 +571,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
             {
                 res.wp_dist.css = ' bg-danger text-white ';
             }
-            else if (target.wp_dist > CONST_DFM_SAFE)
+            else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
             {
                 res.wp_dist.css = ' bg-info  text-white ';
             }
@@ -787,7 +793,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
     }
 }
 
-class Clss_AndruavUnitListArray extends React.Component {
+export default class Clss_AndruavUnitListArray extends React.Component {
   
     constructor()
 	{
@@ -975,45 +981,45 @@ class Clss_AndruavUnitListArray extends React.Component {
 };
 
 
-if (CONST_TEST_MODE === true)
-{
-    if ($('#andruav_unit_list_array_float').length != 0) {
+// if (CONST_TEST_MODE === true)
+// {
+//     if ($('#andruav_unit_list_array_float').length != 0) {
 
-         ReactDOM.render(
-             <React.StrictMode>
-             <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
-             </React.StrictMode>,
-	 		window.document.getElementById('andruav_unit_list_array_float')
-         );
-    }
+//          ReactDOM.render(
+//              <React.StrictMode>
+//              <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
+//              </React.StrictMode>,
+// 	 		window.document.getElementById('andruav_unit_list_array_float')
+//          );
+//     }
     
-    if ($('#andruav_unit_list_array_fixed').length != 0) {
+//     if ($('#andruav_unit_list_array_fixed').length != 0) {
     
-         ReactDOM.render(
-             <React.StrictMode>
-             <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
-             </React.StrictMode>,
-	 		window.document.getElementById('andruav_unit_list_array_fixed')
-         );
-    }
-}
-else
-{
-    // comments
-    if ($('#andruav_unit_list_array_float').length != 0) {
+//          ReactDOM.render(
+//              <React.StrictMode>
+//              <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
+//              </React.StrictMode>,
+// 	 		window.document.getElementById('andruav_unit_list_array_fixed')
+//          );
+//     }
+// }
+// else
+// {
+//     // comments
+//     if ($('#andruav_unit_list_array_float').length != 0) {
 
-         ReactDOM.render(
-             <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
-             window.document.getElementById('andruav_unit_list_array_float')
-         );
-     }
+//          ReactDOM.render(
+//              <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
+//              window.document.getElementById('andruav_unit_list_array_float')
+//          );
+//      }
 
-     if ($('#andruav_unit_list_array_fixed').length != 0) {
+//      if ($('#andruav_unit_list_array_fixed').length != 0) {
 
-         ReactDOM.render(
-             <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
-             window.document.getElementById('andruav_unit_list_array_fixed')
-         );
-    }
+//          ReactDOM.render(
+//              <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
+//              window.document.getElementById('andruav_unit_list_array_fixed')
+//          );
+//     }
 
-}
+// }

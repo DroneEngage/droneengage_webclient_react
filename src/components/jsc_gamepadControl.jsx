@@ -325,7 +325,7 @@ export default class Clss_GamePadControl extends React.Component {
 					<div id="modal_gamepad_footer" className="form-group text-center localcontainer bg-dark">
                         <div className = "row">
                             <div className = "col-2">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                             </div>    
                             <div className = "col-2">
                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>

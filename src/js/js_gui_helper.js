@@ -1,4 +1,4 @@
-class C_GUI_READING_VALUE
+export default class C_GUI_READING_VALUE
 {
     constructor()
     {

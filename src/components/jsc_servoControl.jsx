@@ -147,7 +147,7 @@ class Clss_ServoControl extends React.Component {
                     <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer">
                         <div className = "row">
                             <div className = "col-md-4">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                             </div>    
                             <div className = "col-md-4">
                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>
@@ -186,7 +186,7 @@ class Clss_ServoControl extends React.Component {
                             <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer">
                                 <div className = "row">
                                     <div className = "col-md-4">
-                                        <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                                        <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                                     </div>    
                                     <div className = "col-md-4">
                                         <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>

@@ -4,9 +4,9 @@ import ReactDOM from "react-dom/client";
 
 
 import $ from 'jquery';
-import 'jquery-ui-dist/jquery-ui.min.js';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
+import Dialog from 'bootstrap/js/dist/modal';
 
 import RecordRTC from 'recordrtc';
 
@@ -29,7 +29,6 @@ import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
 import {Clss_MainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
-
 
 const isNumber = require('is-number');
 
@@ -118,8 +117,8 @@ function enableDragging() {
 	})($);
 
 
-	//$("[data-toggle=tooltip]").tooltip(); REACT2
-	//$("[data-toggle=tooltip]").drags();  REACT2
+	//$("[data-bs-toggle=tooltip]").tooltip(); REACT2
+	//$("[data-bs-toggle=tooltip]").drags();  REACT2
 }
         
 
@@ -200,9 +199,10 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').html(p_yesCaption);
 			$('#modal_saveConfirmation').children().find('button#btnCancel').html(p_noCaption);
 			
+			//$('#modal_saveConfirmation').modal('show');
 			const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
 			modal.show();
-			//$('#modal_saveConfirmation').modal('show');
+			
 		}
 
 
@@ -847,18 +847,18 @@ function fn_handleKeyBoard() {
 
 		function gui_initGlobalSection() {
 			// REACT
-			// $("#yaw_knob").dial({
-			// 	fgColor: "#3671AB"
-			// 	, bgColor: "#36AB36"
-			// 	, thickness: .3
-			// 	, cursor: 10
-			// 	, displayPrevious: true
-			// })
-			// 	.css({ display: 'inline', padding: '0px 10px' });
+			$("#yaw_knob").dial({
+				fgColor: "#3671AB"
+				, bgColor: "#36AB36"
+				, thickness: .3
+				, cursor: 10
+				, displayPrevious: true
+			})
+				.css({ display: 'inline', padding: '0px 10px' });
 
-			// $("#yaw_knob").knob({
-			// 	'change': function (v) { }
-			// });
+			$("#yaw_knob").knob({
+				'change': function (v) { }
+			});
 
 
 
@@ -1022,7 +1022,9 @@ function fn_handleKeyBoard() {
 			$('#yaw_knob').trigger('change');
 			$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
 			$('#modal_ctrl_yaw').attr('partyID', p_partyID);
-			$('#modal_ctrl_yaw').show(p_partyID);
+			//$('#modal_ctrl_yaw').show(p_partyID);
+			const non_modal = new Dialog($('#modal_ctrl_yaw')); // Instantiates your modal
+			non_modal.show(p_partyID);
 		}
 
 
@@ -1225,7 +1227,9 @@ function fn_handleKeyBoard() {
 				p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
 				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
 			});
-			$('#changespeed_modal').modal('show');
+			//$('#changespeed_modal').modal('show');
+			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			modal.show();
 
 		}
 
@@ -2286,7 +2290,8 @@ function fn_handleKeyBoard() {
 					js_leafletmap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
 							var id = '#h'+p_andruavUnit.partyID +' a';
-							$(id).tab('show');
+							var tabTrigger = new bootstrap.Tab(id);
+							bootstrap.Tab.getInstance(id).show()
 							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
 							infowindow2.m_ignoreMouseOut = true;
 						});

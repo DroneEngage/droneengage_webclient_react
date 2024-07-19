@@ -7,8 +7,11 @@ import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_gamepad.css';
 
+import $ from 'jquery';
+import 'jquery-ui-dist/jquery-ui.min.js';
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-
+import 'jquery-knob/dist/jquery.knob.min.js';
 
 import React , { useEffect } from 'react';
 
@@ -20,6 +23,7 @@ import Clss_AndruavUnitList from '../components/jsc_unitControl.jsx'
 import Clss_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
 import Clss_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import Clss_GamePadControl from '../components/jsc_gamepadControl.jsx'
+import Clss_AndruavUnitListArray from '../components/jsc_unitControlArrayView.jsx'
 import {Clss_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
@@ -53,11 +57,13 @@ const Home = () => {
                   <div className="cameraview" id="div_video_control">
 				  	<Clss_CVideoControl />
 				  </div>
-				  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array"></div>
-					      </div>
+				  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array">
+				  <Clss_AndruavUnitListArray/>
+				  </div>
+				</div>
                 
                 <div id="andruav_unit_list_array_float" className="css_ontop  andruav_unit_list_array_float">
-
+				<Clss_AndruavUnitListArray/>
                 </div>
               </div>
 
@@ -83,7 +89,7 @@ const Home = () => {
               </div>
                 
               <div id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2">
-                  <div className="card-header text-center">
+				<div className="card-header text-center">
                     <div className="row">
                     <div className="col-10">
                       <h3 className="text-success text-start">YAW</h3>
@@ -97,12 +103,12 @@ const Home = () => {
                     <div id="yaw_knob_out" className="form-group text-centermodal_dialog_style">
                       <input id="yaw_knob" className=" input-sm dial" data-width="180" data-height="180" data-min="0"
                         data-max="360" defaultValue="0" />
-                    </div>
+                    </div> 
                   </div>
                   <div id="modal_yaw_knob_footer" className="form-group text-center ">
                     <div className= "row">
                       <div className="btn-group">
-                        <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                        <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                         <button id="btnGoto" type="button" className="btn btn-sm btn-success">Goto</button>
                         <button id="btnYaw" type="button" className="btn btn-sm btn-danger">YAW</button>
                         <button id="btnResetYaw" type="button" className="btn btn-sm btn-warning">reset YAW</button>

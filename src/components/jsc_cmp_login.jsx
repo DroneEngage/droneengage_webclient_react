@@ -145,7 +145,7 @@ class Clss_LoginControl extends React.Component {
 				<a href="#" id='login_btn' className="btn btn-primary" onClick={ (e) => this.fn_clickConnect(e) }><span className="glyphicon glyphicon-download-alt"  ></span> AccessCode</a>
 				</div>
 				<div className="col-6 al_l">
-				<a className="btn btn-danger" data-toggle="modal" href="#regeneratemodal" onClick={ (e) => this.fn_clickRegenerate(e) }><span className="glyphicon glyphicon-retweet"></span> Regenerate</a>
+				<a className="btn btn-danger" data-bs-toggle="modal" href="#regeneratemodal" onClick={ (e) => this.fn_clickRegenerate(e) }><span className="glyphicon glyphicon-retweet"></span> Regenerate</a>
 				</div>
 				</div>
       </div>
