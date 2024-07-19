@@ -2,7 +2,7 @@ import React    from 'react';
 
 import {fn_do_modal_confirmation} from '../js/js_main'
 
-class CLSS_UserEntry extends  React.Component {
+class Clss_UserEntry extends  React.Component {
 
     constructor()
     {
@@ -175,7 +175,7 @@ class CLSS_UserEntry extends  React.Component {
 /**
  * Create a table of parameters
  */
-class CLSS_UserEntryList extends  React.Component {
+class Clss_UserEntryList extends  React.Component {
 
     render () {
         var p_params=[];
@@ -187,7 +187,7 @@ class CLSS_UserEntryList extends  React.Component {
             const c_keys = Object.keys(c_list);
             const c_len = c_keys.length;
             
-            p_params.push(<CLSS_UserEntry prop_add_new={true} prop_single_item={{}}/>);
+            p_params.push(<Clss_UserEntry prop_add_new={true} prop_single_item={{}}/>);
 
             
                 for (var i =0; i<c_len; ++i) 
@@ -195,7 +195,7 @@ class CLSS_UserEntryList extends  React.Component {
                     const single_item = c_list[c_keys[i]];
                     if ((this.props.prop_search =="" ) || (single_item.acc.toUpperCase().includes(this.props.prop_search)))
                     {
-                        p_params.push(<CLSS_UserEntry prop_add_new={false} prop_single_item={single_item}/>);
+                        p_params.push(<Clss_UserEntry prop_add_new={false} prop_single_item={single_item}/>);
                     }
                 }
             
@@ -224,7 +224,7 @@ class CLSS_UserEntryList extends  React.Component {
 }
 
 
-class CLSS_UserList extends React.Component {
+class Clss_UserList extends React.Component {
 
     constructor() 
     {
@@ -241,7 +241,7 @@ class CLSS_UserList extends React.Component {
     fn_displayForm (p_me, p_res)
     {
         p_me.setState({'users':p_res.users});
-        fn_console_log (p_res.users);
+        js_globals.fn_console_log (p_res.users);
     }
 
     fn_onSearch (e)
@@ -288,7 +288,7 @@ class CLSS_UserList extends React.Component {
                         
                 <div key='params' id="parameters_sublist">
                     
-                    <CLSS_UserEntryList prop_search={this.state.m_search}  prop_users={this.state.users} />
+                    <Clss_UserEntryList prop_search={this.state.m_search}  prop_users={this.state.users} />
                     
                 </div>
             </div>
@@ -321,7 +321,7 @@ class CLSS_UserList extends React.Component {
 
 
 ReactDOM.render(
-    <CLSS_UserList />,
+    <Clss_UserList />,
     window.document.getElementById('user_list')
 );
 

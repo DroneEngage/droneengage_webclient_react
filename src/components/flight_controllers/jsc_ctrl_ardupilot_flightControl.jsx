@@ -6,7 +6,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit'
 import {js_speak} from '../../js/js_speak'
 import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, gui_doYAW} from '../../js/js_main'
 
-export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
+export class Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
     constructor()
 	{
 		super ();
@@ -60,7 +60,7 @@ export class CLSS_CTRL_ARDUPILOT_FLIGHT_CONTROL extends React.Component {
         const  c_manualTXBlockedSubAction = p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction();
             
 
-		if (p_andruavUnit.m_isArmed==true) 
+		if (p_andruavUnit.m_isArmed === true) 
 		{
             switch (p_andruavUnit.m_VehicleType)
             {

@@ -166,7 +166,7 @@ class MissionControlPanel extends React.Component {
      */
     fn_togglePath (e)
     {
-        fn_console_log (e);
+        js_globals.fn_console_log (e);
         this.props.p_ParentCtrl.props.p_missionPlan.fn_togglePath();
         if (this.props.p_ParentCtrl.props.p_missionPlan.m_hidden == true)
         {
@@ -319,13 +319,13 @@ class UnitMissionContainer extends React.Component {
         // not a marker
         if (p_event.target.m_mission == null) 
         {
-            fn_console_log ("MISSION:NULL HERE");
+            js_globals.fn_console_log ("MISSION:NULL HERE");
             return ; 
         }
         
         if (me.props.p_missionPlan.m_id != p_event.target.m_mission.m_id)
         {
-            fn_console_log ("Not Me");
+            js_globals.fn_console_log ("Not Me");
             return ;
         } 
 
@@ -337,7 +337,7 @@ class UnitMissionContainer extends React.Component {
         me.setState({s_shape:p_event.target});
 
 
-        fn_console_log ("REACT:displayGeoForm" );
+        js_globals.fn_console_log ("REACT:displayGeoForm" );
 
         me.forceUpdate();
 		
@@ -346,7 +346,7 @@ class UnitMissionContainer extends React.Component {
 
     fn_onMissionItemToggle (me,p_params)
     {
-        fn_console_log (p_params);
+        js_globals.fn_console_log (p_params);
         
         
         me.forceUpdate();
@@ -465,7 +465,7 @@ class CMissionsContainer extends React.Component {
 
     fn_onShapeCreated (me, p_shape) 
     {
-        fn_console_log ("fn_onShapeCreated: " + p_shape);
+        js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
         
         if (p_shape.pm.getShape()!='Marker') return ;
 
@@ -576,7 +576,7 @@ class CMissionsContainer extends React.Component {
 
         
     return (
-        <div key='CLSS_CMissionsContainer' className="width_100">{v_ctrl}</div>
+        <div key='Clss_CMissionsContainer' className="width_100">{v_ctrl}</div>
             );
     }
 };

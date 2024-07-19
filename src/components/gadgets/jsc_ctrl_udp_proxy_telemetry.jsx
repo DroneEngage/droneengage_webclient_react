@@ -3,7 +3,7 @@ import {js_globals} from '../../js/js_globals';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_andruavAuth} from '../../js/js_andruavAuth'
 
-export  class CLSS_CTRL_UDP_PROXY_TELEMETRY   extends React.Component {
+export  class Clss_CTRL_UDP_PROXY_TELEMETRY   extends React.Component {
 
     constructor(props)
     {

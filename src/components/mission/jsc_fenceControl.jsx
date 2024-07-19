@@ -1,7 +1,10 @@
 import React    from 'react';
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter'
+
 
 const DEFAULT_DISTANCE = 10;
-class CLSS_FenceAction extends React.Component {
+class Clss_FenceAction extends React.Component {
 
 
     
@@ -18,7 +21,7 @@ class CLSS_FenceAction extends React.Component {
 
     fn_update ()
     {
-        	//(this.props.hardCLSS_FenceAction==null)?$('#geo #sel').val(0):$('#geo #sel').val(this.props.hardCLSS_FenceAction);
+        	//(this.props.hardClss_FenceAction==null)?$('#geo #sel').val(0):$('#geo #sel').val(this.props.hardClss_FenceAction);
 	
     }
     
@@ -52,7 +55,7 @@ class CLSS_FenceAction extends React.Component {
 
 }
 
-class CLSS_ShapeControl extends React.Component {
+class Clss_ShapeControl extends React.Component {
     constructor()
 	{
 		super ();
@@ -136,7 +139,7 @@ class CLSS_ShapeControl extends React.Component {
 }
 
 
-class CLSS_PolygonControl extends CLSS_ShapeControl {
+class Clss_PolygonControl extends Clss_ShapeControl {
     constructor()
 	{
 		super ();
@@ -159,13 +162,13 @@ class CLSS_PolygonControl extends CLSS_ShapeControl {
 
 
     componentDidUpdate () {
-        fn_console_log ("componentWillUpdate");
+        js_globals.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         fn_console_log ("componentDidMount");
+         js_globals.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -188,7 +191,7 @@ class CLSS_PolygonControl extends CLSS_ShapeControl {
                 <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-                <CLSS_FenceAction shape={this.props.shape} hardCLSS_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+                <Clss_FenceAction shape={this.props.shape} hardClss_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
                 <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div> 
             </div> 
@@ -199,7 +202,7 @@ class CLSS_PolygonControl extends CLSS_ShapeControl {
 
 
 
-class CLSS_PolylineControl extends CLSS_ShapeControl {
+class Clss_PolylineControl extends Clss_ShapeControl {
     
     
     constructor()
@@ -226,13 +229,13 @@ class CLSS_PolylineControl extends CLSS_ShapeControl {
 
 
     componentDidUpdate () {
-        fn_console_log ("componentWillUpdate");
+        js_globals.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         fn_console_log ("componentDidMount");
+         js_globals.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -254,7 +257,7 @@ class CLSS_PolylineControl extends CLSS_ShapeControl {
                     <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                     <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-                <CLSS_FenceAction shape={this.props.shape} hardCLSS_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+                <Clss_FenceAction shape={this.props.shape} hardClss_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
                 <div className="form-group text-left"><label className="control-label">Minimum Distance</label> <div className="form-inline text-left"><input type='number' 		id='distance' className="form-control" /> &nbsp; meters</div></div>
 		        <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div> 
@@ -265,7 +268,7 @@ class CLSS_PolylineControl extends CLSS_ShapeControl {
 }
 
 
-class CLSS_CircleControl extends CLSS_ShapeControl {
+class Clss_CircleControl extends Clss_ShapeControl {
     constructor()
 	{
 		super ();
@@ -290,13 +293,13 @@ class CLSS_CircleControl extends CLSS_ShapeControl {
    
 
     componentDidUpdate () {
-        fn_console_log ("componentWillUpdate");
+        js_globals.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         fn_console_log ("componentDidMount");
+         js_globals.fn_console_log ("componentDidMount");
 		 this.fn_displayShapeData();
     }
     
@@ -318,7 +321,7 @@ class CLSS_CircleControl extends CLSS_ShapeControl {
                 <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-		        <CLSS_FenceAction shape={this.props.shape} hardCLSS_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+		        <Clss_FenceAction shape={this.props.shape} hardClss_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
                 <div className="form-group text-left">
                         <label className="control-label">Radius</label> 
                         <div className="form-inline text-left">
@@ -333,7 +336,7 @@ class CLSS_CircleControl extends CLSS_ShapeControl {
      }
 }
 
-class CLSS_RectangleControl extends CLSS_ShapeControl {
+class Clss_RectangleControl extends Clss_ShapeControl {
 
     constructor()
 	{
@@ -343,13 +346,13 @@ class CLSS_RectangleControl extends CLSS_ShapeControl {
 
    
     componentDidUpdate () {
-        fn_console_log ("componentWillUpdate");
+        js_globals.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         fn_console_log ("componentDidMount");
+         js_globals.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -370,7 +373,7 @@ class CLSS_RectangleControl extends CLSS_ShapeControl {
                 <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-		        <CLSS_FenceAction shape={this.props.shape} hardCLSS_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+		        <Clss_FenceAction shape={this.props.shape} hardClss_FenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
                 <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div>
             </div>
@@ -382,7 +385,7 @@ class CLSS_RectangleControl extends CLSS_ShapeControl {
 
 
 
-class CLSS_FenceCLSS_ShapeControl extends React.Component {
+class Clss_FenceClss_ShapeControl extends React.Component {
   
     constructor()
 	{
@@ -416,7 +419,7 @@ class CLSS_FenceCLSS_ShapeControl extends React.Component {
 
     fn_onShapeCreated (me, p_shape) 
     {
-        fn_console_log ("fn_onShapeCreated: " + p_shape);
+        js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
         me.setState({m_shape: p_shape});
     }
 
@@ -467,19 +470,19 @@ class CLSS_FenceCLSS_ShapeControl extends React.Component {
             break;
             
             case 'Rectangle':
-                v_unit.push (<CLSS_RectangleControl key={this.state.m_shape} shape = {this.state.m_shape}></CLSS_RectangleControl>);
+                v_unit.push (<Clss_RectangleControl key={this.state.m_shape} shape = {this.state.m_shape}></Clss_RectangleControl>);
             break;   
 
             case 'Circle':
-                v_unit.push (<CLSS_CircleControl key={this.state.m_shape} shape = {this.state.m_shape}></CLSS_CircleControl>);
+                v_unit.push (<Clss_CircleControl key={this.state.m_shape} shape = {this.state.m_shape}></Clss_CircleControl>);
             break;
 
             case 'Polygon':
-                v_unit.push (<CLSS_PolygonControl key={this.state.m_shape} shape = {this.state.m_shape}></CLSS_PolygonControl>);
+                v_unit.push (<Clss_PolygonControl key={this.state.m_shape} shape = {this.state.m_shape}></Clss_PolygonControl>);
             break;
         
             case 'Line':
-                v_unit.push (<CLSS_PolylineControl key={this.state.m_shape} shape = {this.state.m_shape}></CLSS_PolylineControl>);
+                v_unit.push (<Clss_PolylineControl key={this.state.m_shape} shape = {this.state.m_shape}></Clss_PolylineControl>);
             break;
 
             default:
@@ -517,13 +520,13 @@ class CLSS_FenceCLSS_ShapeControl extends React.Component {
 
     return (
 
-                <div key='CLSS_FenceCLSS_ShapeControl'>{v_unit}</div>
+                <div key='Clss_FenceClss_ShapeControl'>{v_unit}</div>
             );
     }
 };
 
 
 ReactDOM.render(
-			<CLSS_FenceCLSS_ShapeControl  />,
+			<Clss_FenceClss_ShapeControl  />,
 			window.document.getElementById('fenceControl')
 		);

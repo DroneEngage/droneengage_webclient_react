@@ -15,7 +15,6 @@ import * as js_andruavMessages from './js_andruavMessages'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
-//import {MultiStreamRecorder} from './js_recordrtc2.js'
 import {js_speak} from './js_speak'
 
 import * as js_andruavUnit from './js_andruavUnit'
@@ -29,7 +28,7 @@ import * as js_mapmission from './js_mapmission'
 import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
-import {CLSS_MainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
+import {Clss_MainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
 
 
 const isNumber = require('is-number');
@@ -650,39 +649,29 @@ function fn_handleKeyBoard() {
 					case 15:
 					case 0:
 						return './images/blure/adrone_br_32x32.png';
-						break;
 					case 1:
 					case 2:
 						return './images/blure/adrone_br_32x32x45d.png';
-						break;
 					case 3:
 					case 4:
 						return './images/blure/adrone_br_32x32x90d.png';
-						break;
 					case 5:
 					case 6:
 						return './images/blure/adrone_br_32x32x135d.png';
-						break;
 					case 7:
 					case 8:
 						return './images/blure/adrone_br_32x32x180d.png';
-						break;
 					case 9:
 					case 10:
 						return './images/blure/adrone_br_32x32x225d.png';
-						break;
 					case 11:
 					case 12:
 						return './images/blure/adrone_br_32x32x270d.png';
-						break;
 					case 13:
 					case 14:
 						return './images/blure/adrone_br_32x32x315d.png';
-						break;
 					default: // NAN if Heading is null
 						return './images/blure/adrone_br_32x32.png';
-						break;
-
 				}
 			}
 			else {
@@ -690,11 +679,9 @@ function fn_handleKeyBoard() {
 					case 15:
 					case 0:
 						return './images/blure/adrone_bk_32x32.png';
-						break;
 					case 1:
 					case 2:
 						return './images/blure/adrone_bk_32x32x45d.png';
-						break;
 					case 3:
 					case 4:
 						return './images/blure/adrone_bk_32x32x90d.png';
@@ -702,27 +689,20 @@ function fn_handleKeyBoard() {
 					case 5:
 					case 6:
 						return './images/blure/adrone_bk_32x32x135d.png';
-						break;
 					case 7:
 					case 8:
 						return './images/blure/adrone_bk_32x32x180d.png';
-						break;
 					case 9:
 					case 10:
 						return './images/blure/adrone_bk_32x32x225d.png';
-						break;
 					case 11:
 					case 12:
 						return './images/blure/adrone_bk_32x32x270d.png';
-						break;
 					case 13:
 					case 14:
 						return './images/blure/adrone_bk_32x32x315d.png';
-						break;
 					default: // NAN if Heading is null
 						return './images/blure/adrone_bk_32x32.png';
-						break;
-
 				}
 			}
 		}
@@ -1579,7 +1559,7 @@ function fn_handleKeyBoard() {
 
 		function hlp_generateFlyHereMenu( lat, lng ) {
 
-			return "<div id='gamepadCtrlxxx' class='margin_zero padding_zero' style='display: inline-block '/>";
+			return "<div id='context_menu_here' class='margin_zero padding_zero' style='display: inline-block '/>";
 		}
 
 		// function hlp_generateFlyHereMenu( lat, lng ) {
@@ -1778,8 +1758,8 @@ function fn_handleKeyBoard() {
 			}
 
 			js_leafletmap.fn_showInfoWindow2(null,  hlp_generateFlyHereMenu(v_lat, v_lng),v_lat, v_lng);
-			const root = ReactDOM.createRoot(window.document.getElementById('gamepadCtrlxxx'));
-			root.render(<CLSS_MainContextMenu p_lat={v_lat} p_lng={v_lng} />);
+			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
+			root.render(<Clss_MainContextMenu p_lat={v_lat} p_lng={v_lng} />);
 		}
 
 		export function fn_contextMenu( p_position) {
@@ -3190,7 +3170,7 @@ function fn_handleKeyBoard() {
 			js_globals.v_andruavClient.API_disableGeoFenceTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
 
 			// new instance
-			const fence_plan = new js_mapmission.CLSS_AndruavFencePlan(1);
+			const fence_plan = new js_mapmission.Clss_AndruavFencePlan(1);
 
 			const res = fence_plan.fn_generateAndruavFenceData(js_globals.v_map_shapes);
 			const len_res = res.length;

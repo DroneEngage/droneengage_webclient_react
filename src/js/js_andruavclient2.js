@@ -19,6 +19,7 @@ import {js_globals} from './js_globals.js';
 import * as js_helpers from './js_helpers.js';
 import * as js_siteConfig from './js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
+import {js_localGamePad} from './js_localGamePad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
 import {js_localStorage} from './js_localStorage'
@@ -203,7 +204,7 @@ class CAndruavClient {
             return;
         
 
-        const c_controller = window.AndruavLibs.AndruavGamePad.fn_getGamePad(js_globals.active_gamepad_index);
+        const c_controller = js_localGamePad.fn_getGamePad(js_globals.active_gamepad_index);
         if (c_controller === null || c_controller === undefined) 
             return;
         

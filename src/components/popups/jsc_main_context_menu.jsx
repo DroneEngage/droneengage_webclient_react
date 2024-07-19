@@ -1,6 +1,5 @@
 import React from 'react';
 
-import * as js_helpers from '../../js/js_helpers'
 import { js_globals } from '../../js/js_globals.js'
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_leafletmap } from '../../js/js_leafletmap'
@@ -8,7 +7,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit'
 import { fn_doFlyHere, fn_doCircle2, fn_doSetHome, fn_convertToMeter } from '../../js/js_main'
 
 // Registration and Regeneration Control
-export class CLSS_MainContextMenu extends React.Component {
+export class Clss_MainContextMenu extends React.Component {
     constructor() {
         super();
         this.state = {
@@ -26,7 +25,7 @@ export class CLSS_MainContextMenu extends React.Component {
 
     componentDidMount() {
 
-        if (this.state.initialized == true) {
+        if (this.state.initialized === true) {
             return;
         }
 
@@ -51,11 +50,12 @@ export class CLSS_MainContextMenu extends React.Component {
         sortedPartyIDs.map(function (object) {
 
             let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(object[0]);
-            if ((p_andruavUnit != null) && (p_andruavUnit.m_IsGCS != true)) {
-                if ((p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_ROVER)
-                    || (p_andruavUnit.m_VehicleType == js_andruavUnit.VEHICLE_BOAT)) {
-                    if ((p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) || (p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
-                        || (p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
+            if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (p_andruavUnit.m_IsGCS !== true)) {
+                if ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER)
+                    || (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) {
+                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) 
+                        || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
+                        || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.partyID}  className='row'>";
                                 <div className='col-sm-12'><p className='bg-primary text-white  si-07x'>" + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT + "</p></div>";
@@ -65,8 +65,9 @@ export class CLSS_MainContextMenu extends React.Component {
                     }
                 }
                 else {
-                    if ((p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) || (p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
-                        || (p_andruavUnit.m_flightMode == js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
+                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) 
+                        || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
+                        || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.partyID} className='row css_txt_center'>
                                 <div className='col-12 mt-1 padding_zero'>

@@ -1,6 +1,6 @@
 import React    from 'react';
 
-class CLSS_ServoUnit extends React.Component {
+class Clss_ServoUnit extends React.Component {
 
     render ()
     {
@@ -57,7 +57,7 @@ class CLSS_ServoUnit extends React.Component {
 };
 
 
-class CLSS_ServoControl extends React.Component {
+class Clss_ServoControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -170,16 +170,16 @@ class CLSS_ServoControl extends React.Component {
                             <div id="ctrl_main" className="form-group text-center container modal_dialog_style" >
                             <div className='row'>
                                 <div className='col-md-3 margi'>
-                                    <CLSS_ServoUnit prop_partyid={c_partyID} prop_channel = '9' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo1} prop_name='Key 1'></CLSS_ServoUnit>
+                                    <Clss_ServoUnit prop_partyid={c_partyID} prop_channel = '9' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo1} prop_name='Key 1'></Clss_ServoUnit>
                                 </div>
                                 <div className='col-md-3'>
-                                    <CLSS_ServoUnit prop_partyid={c_partyID} prop_channel = '10' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo2} prop_name='Key 2'></CLSS_ServoUnit>
+                                    <Clss_ServoUnit prop_partyid={c_partyID} prop_channel = '10' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo2} prop_name='Key 2'></Clss_ServoUnit>
                                 </div>
                                 <div className='col-md-3'>
-                                    <CLSS_ServoUnit prop_partyid={c_partyID} prop_channel = '11' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo3} prop_name='Key 3'></CLSS_ServoUnit>
+                                    <Clss_ServoUnit prop_partyid={c_partyID} prop_channel = '11' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo3} prop_name='Key 3'></Clss_ServoUnit>
                                 </div>
                                 <div className='col-md-3'>
-                                    <CLSS_ServoUnit prop_partyid={c_partyID} prop_channel = '12' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo4} prop_name='Key 4'></CLSS_ServoUnit>
+                                    <Clss_ServoUnit prop_partyid={c_partyID} prop_channel = '12' prop_value ={p_andruavUnit.m_Servo.m_values.m_servo4} prop_name='Key 4'></Clss_ServoUnit>
                                 </div>
                             </div>
                             </div>
@@ -205,7 +205,7 @@ class CLSS_ServoControl extends React.Component {
 //CODEBLOCK_START
        
 ReactDOM.render(
-    <CLSS_ServoControl />,
+    <Clss_ServoControl />,
     window.document.getElementById('servoCtrl')
 );
 

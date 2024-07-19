@@ -4,7 +4,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
-export class CLSS_CTRL_AUDIO extends React.Component {
+export class Clss_CTRL_AUDIO extends React.Component {
     
     constructor()
 	{

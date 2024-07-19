@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import fs from 'fs';
 import FileSaver from 'file-saver';
 
 import {js_globals} from '../js/js_globals.js';
@@ -14,7 +13,7 @@ import * as js_andruavMessages from '../js/js_andruavMessages'
 import {fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab} from '../js/js_main'
 
 
-class CLSS_CVideoScreen extends React.Component {
+class Clss_CVideoScreen extends React.Component {
 
     constructor()
 	{
@@ -651,7 +650,7 @@ class CLSS_CVideoScreen extends React.Component {
 }
 
 
-export class CLSS_CVideoControl extends React.Component {
+export class Clss_CVideoControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -754,7 +753,7 @@ render() {
             out_h.push (<li key ={'h'+v_key} className="nav-item">
                     <a className={"nav-link user-select-none  " + _first} data-bs-toggle="tab"  href={'#cam_' + andruavUnit.partyID + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
                 </li>);
-            out_b.push (<CLSS_CVideoScreen key ={v_key}  first={_first}  obj={v_obj}/>);
+            out_b.push (<Clss_CVideoScreen key ={v_key}  first={_first}  obj={v_obj}/>);
         }
     }
 

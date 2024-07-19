@@ -3,7 +3,7 @@ import React    from 'react';
 import {fn_do_modal_confirmation} from '../js/js_main'
 
 
-class CLSS_ParameterItem extends  React.Component {
+class Clss_ParameterItem extends  React.Component {
 
     constructor()
     {
@@ -20,7 +20,7 @@ class CLSS_ParameterItem extends  React.Component {
          * Reset value if currently modified.
          */
         this.setState({param_value:this.props.prop_param.param_value});
-        fn_console_log("PARAM:" + this.props.prop_param.param_value + " componentWillUpdate");
+        js_globals.fn_console_log("PARAM:" + this.props.prop_param.param_value + " componentWillUpdate");
     }
 
     componentWillUpdate()
@@ -67,7 +67,7 @@ class CLSS_ParameterItem extends  React.Component {
 
     render () {
         var cls_color = " bg-white text-black-50";
-        fn_console_log ("PARAM_:" + this.props.prop_param.param_id + ":" + this.props.prop_param.param_value + ":" + String(this.state.param_value));
+        js_globals.fn_console_log ("PARAM_:" + this.props.prop_param.param_id + ":" + this.props.prop_param.param_value + ":" + String(this.state.param_value));
         if (this.props.prop_param.is_dirty === true) 
         {
             if (this.props.prop_param.is_valid === false)
@@ -96,7 +96,7 @@ class CLSS_ParameterItem extends  React.Component {
 /**
  * Create a table of parameters
  */
-class CLSS_ParametersList extends  React.Component {
+class Clss_ParametersList extends  React.Component {
 
     render () {
         var p_params=[];
@@ -117,7 +117,7 @@ class CLSS_ParametersList extends  React.Component {
                     const c_parameter_message = c_list[c_keys[i]];
                     if ((this.props.prop_search =="" ) || (c_parameter_message.param_id.toUpperCase().includes(this.props.prop_search)))
                     {
-                        p_params.push(<CLSS_ParameterItem prop_unit={this.props.prob_unit} prop_param_value={c_parameter_message.param_value} prop_param={c_parameter_message} key={c_parameter_message.param_index}/>);
+                        p_params.push(<Clss_ParameterItem prop_unit={this.props.prob_unit} prop_param_value={c_parameter_message.param_value} prop_param={c_parameter_message} key={c_parameter_message.param_index}/>);
                     }
                 }
             }
@@ -151,7 +151,7 @@ class CLSS_ParametersList extends  React.Component {
 }
 
 
-class CLSS_UnitParametersList extends React.Component {
+class Clss_UnitParametersList extends React.Component {
 
     constructor() 
     {
@@ -283,7 +283,7 @@ class CLSS_UnitParametersList extends React.Component {
                             <button type="button" className="btn btn-success btn-sm ctrlbtn"  title='Reload parameter from FCB' onClick={(e) => this.fn_reloadAll(e)}>RELOAD</button>
                         </div>
                     </div>
-                    <CLSS_ParametersList prop_search={this.state.m_search} prob_unit={p_andruavUnit} />
+                    <Clss_ParametersList prop_search={this.state.m_search} prob_unit={p_andruavUnit} />
                     
                 </div>
             </div>
@@ -338,7 +338,7 @@ if (CONST_TEST_MODE === true)
 {
    ReactDOM.render(
             <React.StrictMode>
-                <CLSS_UnitParametersList />
+                <Clss_UnitParametersList />
             </React.StrictMode>,
             window.document.getElementById('modal_uplCtrl')
     );
@@ -346,7 +346,7 @@ if (CONST_TEST_MODE === true)
 else
 {
     ReactDOM.render(
-        <CLSS_UnitParametersList key={'AUL'} />,
+        <Clss_UnitParametersList key={'AUL'} />,
         window.document.getElementById('modal_uplCtrl')
     );
 }   

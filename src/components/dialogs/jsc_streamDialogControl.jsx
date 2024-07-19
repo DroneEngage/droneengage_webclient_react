@@ -9,7 +9,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
-class CLSS_StreamChannel extends React.Component {
+class Clss_StreamChannel extends React.Component {
 
     constructor ()
     {
@@ -85,7 +85,7 @@ class CLSS_StreamChannel extends React.Component {
 };
 
 
-export default class CLSS_StreamDialog extends React.Component
+export default class Clss_StreamDialog extends React.Component
 {
     
     constructor()
@@ -218,7 +218,7 @@ export default class CLSS_StreamDialog extends React.Component
                 p_session = this.state.p_session;
 
                 for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
-                    v_streanms.push(<CLSS_StreamChannel key={i} prop_session={p_session} prop_track_number={i} />);
+                    v_streanms.push(<Clss_StreamChannel key={i} prop_session={p_session} prop_track_number={i} />);
                 }
                 v_unitName = p_session.m_unit.m_unitName;
             }

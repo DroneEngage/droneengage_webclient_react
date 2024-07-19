@@ -10,7 +10,7 @@ import {gui_toggleUnits} from '../js/js_main'
 import * as js_andruavclient2 from '../js/js_andruavclient2'
 import {js_andruavAuth} from '../js/js_andruavAuth'
 
-class CLSS_FireEvent extends React.Component {
+class Clss_FireEvent extends React.Component {
 
 
   constructor()
@@ -62,7 +62,7 @@ class CLSS_FireEvent extends React.Component {
 }
 
 
-class CLSS_DisplayItems extends React.Component {
+class Clss_DisplayItems extends React.Component {
 
   constructor()
 	{
@@ -158,7 +158,7 @@ class CLSS_DisplayItems extends React.Component {
 
   
 }
-class CLSS_Preferences extends React.Component {
+class Clss_Preferences extends React.Component {
   constructor()
 	{
       super ();
@@ -274,7 +274,7 @@ class CLSS_Preferences extends React.Component {
     }
 
 }
-export default class CLSS_GlobalSettings extends React.Component {
+export default class Clss_GlobalSettings extends React.Component {
   
   constructor()
 	{
@@ -383,7 +383,7 @@ export default class CLSS_GlobalSettings extends React.Component {
 
      
 
-  //  js_globals.fn_console_log ("REACT:RENDER CLSS_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
+  //  js_globals.fn_console_log ("REACT:RENDER Clss_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
   var v_gadgets = [];
   var v_uploadFile = [];
   var v_telemetryModes = [];
@@ -465,10 +465,10 @@ export default class CLSS_GlobalSettings extends React.Component {
                     </div>
                     <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
                     {v_uploadFile} 
-                    <CLSS_FireEvent/>
+                    <Clss_FireEvent/>
                     </div>
                     <div className="tab-pane fade" id={"settings_preference"}>
-                      <CLSS_Preferences/>
+                      <Clss_Preferences/>
                     </div>
                 </div>
             

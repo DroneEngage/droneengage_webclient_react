@@ -1,12 +1,12 @@
 
 import React from 'react';
 
-import {CLSS_LoginControl} from './jsc_login.jsx'
-import {CLSS_CTRL_Layout} from './jsc_ctrl_layoutControl.jsx'
+import {Clss_LoginControl} from './jsc_login.jsx'
+import {Clss_CTRL_Layout} from './jsc_ctrl_layoutControl.jsx'
 import * as  js_siteConfig from '../js/js_siteConfig'
 
 
-class CLSS_HeaderControl extends React.Component {
+class Clss_HeaderControl extends React.Component {
     constructor() {
         super ();
 		this.state = {};
@@ -14,7 +14,7 @@ class CLSS_HeaderControl extends React.Component {
 
     render() {
         return (
-            <div key='CLSS_HeaderControl' className = 'row  css_padding_zero bg-dark fixed-top ps-3'>
+            <div key='Clss_HeaderControl' className = 'row  css_padding_zero bg-dark fixed-top ps-3'>
                 <div className = 'col-7  css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                         <a className="navbar-brand fs-3" href=".">
@@ -46,10 +46,10 @@ class CLSS_HeaderControl extends React.Component {
                     </nav>
                 </div>
                 <div className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
-                    <CLSS_CTRL_Layout/>     
+                    <Clss_CTRL_Layout/>     
                 </div>
                 <div className=' col-2 col-lg-1    css_margin_zero  al_r'>
-                    <CLSS_LoginControl simple='true'/>
+                    <Clss_LoginControl simple='true'/>
                 </div>
             </div>
         );
@@ -58,6 +58,6 @@ class CLSS_HeaderControl extends React.Component {
 
 
 
-export default CLSS_HeaderControl;
+export default Clss_HeaderControl;
 
 

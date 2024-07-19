@@ -4,7 +4,7 @@ import {fn_do_modal_confirmation} from '../../js/js_main'
 import {js_andruavAuth} from '../../js/js_andruavAuth'
 
 // Registration and Regeneration Control
-class CLSS_LoginControl extends React.Component {
+class Clss_LoginControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -160,7 +160,7 @@ class CLSS_LoginControl extends React.Component {
 
 
 ReactDOM.render(
-			<CLSS_LoginControl />,
+			<Clss_LoginControl />,
 			window.document.getElementById('loginCtrl')
 		);
 

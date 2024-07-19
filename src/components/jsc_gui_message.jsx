@@ -1,7 +1,7 @@
 import React    from 'react';
 
 
-class CLSS_GUIMessage extends React.Component {
+class Clss_GUIMessage extends React.Component {
 	constructor()
 	{
 		super ();
@@ -79,7 +79,7 @@ class CLSS_GUIMessage extends React.Component {
 
 
 ReactDOM.render(
-    <CLSS_GUIMessage p_index='0' />,
+    <Clss_GUIMessage p_index='0' />,
     window.document.getElementById('guiMessageCtrl')
 );
 

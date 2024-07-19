@@ -9,7 +9,7 @@ import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
-class CLSS_CameraDevice extends React.Component {
+class Clss_CameraDevice extends React.Component {
 
     constructor ()
     {
@@ -109,7 +109,7 @@ class CLSS_CameraDevice extends React.Component {
     };
 };
 
-export default class CLSS_CameraDialog extends React.Component
+export default class Clss_CameraDialog extends React.Component
 {
     constructor()
     {
@@ -250,7 +250,7 @@ export default class CLSS_CameraDialog extends React.Component
             js_globals.fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
 
             for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
-                v_streanms.push(<CLSS_CameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id+'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} />);
+                v_streanms.push(<Clss_CameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id+'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} />);
             }
             v_unitName = p_session.m_unit.m_unitName
         }

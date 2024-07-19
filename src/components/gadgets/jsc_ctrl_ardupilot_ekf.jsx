@@ -1,6 +1,6 @@
 import React    from 'react';
 
-export class CLSS_CTRL_ARDUPILOT_EKF extends React.Component {
+export class Clss_CTRL_ARDUPILOT_EKF extends React.Component {
     constructor()
 	{
 		super ();

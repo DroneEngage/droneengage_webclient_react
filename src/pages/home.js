@@ -5,17 +5,22 @@ import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
+import '../css/css_gamepad.css';
 
 
 
 
 import React , { useEffect } from 'react';
-import CLSS_HeaderControl from '../components/jsc_header'
-import CLSS_GlobalSettings from '../components/jsc_globalSettings'
-import CLSS_AndruavUnitList from '../components/jsc_unitControl.jsx'
-import CLSS_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
-import CLSS_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
-import {CLSS_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
+
+import {js_globals} from '../js/js_globals.js'
+
+import Clss_HeaderControl from '../components/jsc_header'
+import Clss_GlobalSettings from '../components/jsc_globalSettings'
+import Clss_AndruavUnitList from '../components/jsc_unitControl.jsx'
+import Clss_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
+import Clss_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
+import Clss_GamePadControl from '../components/jsc_gamepadControl.jsx'
+import {Clss_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
 
@@ -31,7 +36,7 @@ const Home = () => {
     return (
     <div>
           <div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
-          <CLSS_HeaderControl />
+          <Clss_HeaderControl />
           </div>
 
           <div id='mainBody' className='row css_mainbody' >
@@ -46,7 +51,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="cameraview" id="div_video_control">
-				  	<CLSS_CVideoControl />
+				  	<Clss_CVideoControl />
 				  </div>
 				  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array"></div>
 					      </div>
@@ -107,18 +112,18 @@ const Home = () => {
               </div>
 
 
-              <CLSS_CameraDialog/>
+              <Clss_CameraDialog/>
 			  <div id='servoCtrl'></div>
               <div id='modal_uplCtrl'></div>
-              <div id='gamepadCtrl'></div>
-              <CLSS_StreamDialog/>
+              <Clss_GamePadControl p_index={js_globals.active_gamepad_index} />
+			  <Clss_StreamDialog/>
 
             </div>
 
             <div id="row_2" className="col-4 ">
 				      <div id='andruavUnits' className='col-sm-12 padding_zero'>
 						    <div id="andruavUnits_in" className=''>
-                <CLSS_GlobalSettings/>
+                <Clss_GlobalSettings/>
                 
 							    
 							  
@@ -131,7 +136,7 @@ const Home = () => {
                 <div id="guiMessageCtrl" className='row'></div>
 						
 						    <div id='andruavUnitList' className='row'>
-                <CLSS_AndruavUnitList></CLSS_AndruavUnitList>
+                <Clss_AndruavUnitList></Clss_AndruavUnitList>
                 </div>
 					    </div>
 				

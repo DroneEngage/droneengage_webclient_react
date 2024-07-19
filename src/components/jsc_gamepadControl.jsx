@@ -1,8 +1,16 @@
+import $ from 'jquery'; 
 import React    from 'react';
 
+import {js_globals} from '../js/js_globals.js';
 import {js_localStorage} from '../js/js_localStorage'
+import {js_eventEmitter} from '../js/js_eventEmitter'
+import {js_localGamePad} from '../js/js_localGamePad.js'
+import {js_speak} from '../js/js_speak'
 
-class CLSS_GamePadAxisControl extends React.Component {
+import {fn_gotoUnit_byPartyID} from '../js/js_main'
+
+
+class Clss_GamePadAxisControl extends React.Component {
 
     render()
     {
@@ -20,11 +28,11 @@ class CLSS_GamePadAxisControl extends React.Component {
 }
 
 
-class CLSS_GamePadButton extends React.Component {
+class Clss_GamePadButton extends React.Component {
     render()
     {
-        const c_color = this.props.pressed==true?this.props.color_active:this.props.color_inactive;
-        fn_console_log ("buttion " + this.props.color_active);
+        const c_color = this.props.pressed===true?this.props.color_active:this.props.color_inactive;
+        js_globals.fn_console_log ("buttion " + this.props.color_active);
         return (
             <div>
                 <svg viewBox="-2.2 -2.2 4.4 4.4" width="48" height="48">
@@ -38,7 +46,7 @@ class CLSS_GamePadButton extends React.Component {
 }
 
 
-class CLSS_GamePadAxesControl extends React.Component {
+class Clss_GamePadAxesControl extends React.Component {
 
     constructor(props)
 	{
@@ -60,7 +68,7 @@ class CLSS_GamePadAxesControl extends React.Component {
 
     render()
     {
-        const c_padStatus = window.AndruavLibs.AndruavGamePad.fn_getGamePad(this.props.p_index);
+        const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
         if (c_padStatus== null)
         {
             return (
@@ -92,15 +100,15 @@ class CLSS_GamePadAxesControl extends React.Component {
 
         return (
             <div className='gp_axes'>
-                <CLSS_GamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></CLSS_GamePadAxisControl>
-                <CLSS_GamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]}></CLSS_GamePadAxisControl>
+                <Clss_GamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></Clss_GamePadAxisControl>
+                <Clss_GamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]}></Clss_GamePadAxisControl>
             </div>
                 
         );
     }
 }
 
-class CLSS_GamePadButtonControl extends React.Component {
+class Clss_GamePadButtonControl extends React.Component {
     
     
     constructor()
@@ -124,7 +132,7 @@ class CLSS_GamePadButtonControl extends React.Component {
 
     render()
     {
-        const c_padStatus = window.AndruavLibs.AndruavGamePad.fn_getGamePad(this.props.p_index);
+        const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
         if (c_padStatus== null)
         {
             return (<div className='gp_buttons'></div>);
@@ -133,19 +141,19 @@ class CLSS_GamePadButtonControl extends React.Component {
 
         return (
             <div className='gp_buttons'>
-                <CLSS_GamePadButton id='btn4' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></CLSS_GamePadButton>
-                <CLSS_GamePadButton id='btn0' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></CLSS_GamePadButton>
-                <CLSS_GamePadButton id='btn1' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></CLSS_GamePadButton>
-                <CLSS_GamePadButton id='btn2' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></CLSS_GamePadButton>
-                <CLSS_GamePadButton id='btn3' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></CLSS_GamePadButton>
-                <CLSS_GamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></CLSS_GamePadButton>
+                <Clss_GamePadButton id='btn4' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></Clss_GamePadButton>
+                <Clss_GamePadButton id='btn0' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></Clss_GamePadButton>
+                <Clss_GamePadButton id='btn1' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></Clss_GamePadButton>
+                <Clss_GamePadButton id='btn2' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></Clss_GamePadButton>
+                <Clss_GamePadButton id='btn3' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></Clss_GamePadButton>
+                <Clss_GamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></Clss_GamePadButton>
             </div>
         );
     }
 }
 
 
-class CLSS_GamePadControl extends React.Component {
+export default class Clss_GamePadControl extends React.Component {
 
     constructor(props)
 	{
@@ -172,10 +180,10 @@ class CLSS_GamePadControl extends React.Component {
                 <div className='gp_input'>
                     <div className="row  margin_2px css_padding_zero">
                         <div className='col-12'>
-                            <CLSS_GamePadAxesControl p_index={active_gamepad_index}></CLSS_GamePadAxesControl>
+                            <Clss_GamePadAxesControl p_index={js_globals.active_gamepad_index}></Clss_GamePadAxesControl>
                         </div>
                         <div className='col-12'>
-                            <CLSS_GamePadButtonControl p_index={active_gamepad_index}></CLSS_GamePadButtonControl>
+                            <Clss_GamePadButtonControl p_index={js_globals.active_gamepad_index}></Clss_GamePadButtonControl>
                         </div>
                     </div>
                 </div>
@@ -208,11 +216,11 @@ class CLSS_GamePadControl extends React.Component {
 
     fn_changeGamePad(p_index)
     {
-        if ((p_index==null) || (p_index<0) && (p_index>=4)) return ;
+        if ((p_index==null || p_index === undefined) || ((p_index<0) || (p_index>=4))) return ;
         
-        active_gamepad_index = p_index;
+        js_globals.active_gamepad_index = p_index;
         
-        if (this.state.m_update == 0) return ;
+        if (this.state.m_update === 0) return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 
@@ -221,7 +229,7 @@ class CLSS_GamePadControl extends React.Component {
      */
     fn_requestGamePad(p_me,p_andruavUnit)
     {
-        if (p_andruavUnit=== null || p_andruavUnit === undefined) return ;
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         p_me.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
         $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
@@ -283,29 +291,29 @@ class CLSS_GamePadControl extends React.Component {
     {
         const c_mode = js_localStorage.fn_getGamePadMode();
     
-        this.fn_renderMainOutput (window.AndruavLibs.AndruavGamePad.fn_isGamePadDefined() === true);
+        this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
         
-        fn_console_log (this.m_output);
+        js_globals.fn_console_log (this.m_output);
         var v_title = (this.state.m_andruavUnit !== null && this.state.m_andruavUnit !== undefined )?this.state.m_andruavUnit.m_unitName:'NA';
         var gamepads = [];
         
         
         for (var i=0; i<4;++i)
         { // 4 gamepads can be connected to computer.
-            const gamepad = window.AndruavLibs.AndruavGamePad.v_controllers[i];
+            const gamepad = js_localGamePad.v_controllers[i];
             if (gamepad !== null && gamepad !== undefined)
             {
                 function add (Me,p_index)
                 {
                     gamepads.push(
-                        <a className="dropdown-item" href="#" onClick={ (e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</a>
+                        <a key={'gppu'+gamepad.id} className="dropdown-item" href="#" onClick={ (e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</a>
                     );
                 };
                 add (this,i);
             }
         }
         var gamepad_title = "Select an active Game Pad"; 
-        const v_controller = window.AndruavLibs.AndruavGamePad.v_controllers[active_gamepad_index];
+        const v_controller = js_localGamePad.v_controllers[js_globals.active_gamepad_index];
         if (v_controller !== null && v_controller !== undefined)
         {
             gamepad_title = v_controller.id.toString();
@@ -337,9 +345,9 @@ class CLSS_GamePadControl extends React.Component {
                             </div>
 
                             <div className="col-4 " role="group" aria-label="Button group with nested dropdown">
-                                {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {active_gamepad_index} </button> */}
+                                {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
                                 <div className="" role="group">
-                                    <button id="btnGamePadDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">GamePad {active_gamepad_index}</button>
+                                    <button id="btnGamePadDrop" key={js_globals.active_gamepad_index} type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">GamePad {js_globals.active_gamepad_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnGamePadDrop">
                                         {gamepads}
                                     </div>
@@ -351,12 +359,6 @@ class CLSS_GamePadControl extends React.Component {
     }
 }
 
-
-
-ReactDOM.render(
-    <CLSS_GamePadControl p_index={active_gamepad_index} />,
-    window.document.getElementById('gamepadCtrl')
-);
 
 
 

@@ -14,7 +14,7 @@ import {js_andruavAuth} from './js_andruavAuth'
 import { mavlink20 } from './js_mavlink_v2.js';
 
 
-export class CLSS_AndruavFencePlan
+export class Clss_AndruavFencePlan
 {
 	constructor (p_id/*, p_initColor*/)
 	{
@@ -29,10 +29,10 @@ export class CLSS_AndruavFencePlan
 	}
 	
 	static getInstance() {
-        if (!CLSS_AndruavFencePlan.instance) {
-            CLSS_AndruavFencePlan.instance = new CLSS_AndruavFencePlan(1);
+        if (!Clss_AndruavFencePlan.instance) {
+            Clss_AndruavFencePlan.instance = new Clss_AndruavFencePlan(1);
         }
-        return CLSS_AndruavFencePlan.instance;
+        return Clss_AndruavFencePlan.instance;
     }
 
     fn_generateAndruavFenceData(shapes)
@@ -148,7 +148,7 @@ export class CLSS_AndruavFencePlan
 	}
 }
 
-class CLSS_AndruavMissionPlan 
+class Clss_AndruavMissionPlan 
 {
 
 	constructor (p_id, p_initColor)
@@ -449,7 +449,7 @@ class CLSS_AndruavMissionPlan
 	{
 		if (this.v_markers.length ===0)	 return;
 		
-		// var v_cmd = CLSS_AndruavResala_WayPoints.fn_toJSON(this.v_markers);
+		// var v_cmd = Clss_AndruavResala_WayPoints.fn_toJSON(this.v_markers);
 		
 		// Delete Old Shapes
 		if (p_missionV110 !== null && p_missionV110 !== undefined)
@@ -486,7 +486,6 @@ class CLSS_AndruavMissionPlan
 			skip = false;
 			var marker = this.v_markers[i];
 			var step={};
-			var nextstep = {};
 			switch (marker.m_missionItem.m_missionType)
 			{
 				case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
@@ -714,7 +713,7 @@ class CLSS_AndruavMissionPlan
 }
 
 
-class CLSS_AndruavMissionPlanManager 
+class Clss_AndruavMissionPlanManager 
 {
 	constructor ()
 	{
@@ -726,7 +725,7 @@ class CLSS_AndruavMissionPlanManager
 	fn_createNewMission ()
 	{
 		const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter%js_globals.v_colorDrawPathes.length];
-		var v_missionPlan = new CLSS_AndruavMissionPlan (this.m_missionCounter, c_initColor);
+		var v_missionPlan = new Clss_AndruavMissionPlan (this.m_missionCounter, c_initColor);
 		this.m_missionPlans[this.m_missionCounter] = v_missionPlan;
 		this.m_missionCounter = this.m_missionCounter + 1;
 
@@ -778,7 +777,7 @@ class CLSS_AndruavMissionPlanManager
 
 	fn_setCurrentMission (v_id1)
 	{
-		if (this.m_missionPlans.hasOwnProperty(v_id1) == false)
+		if (this.m_missionPlans.hasOwnProperty(v_id1) === false)
 		{
 			return ;
 		}
@@ -805,4 +804,4 @@ class CLSS_AndruavMissionPlanManager
 }
 
 
-export default CLSS_AndruavFencePlan.getInstance();
+export default Clss_AndruavFencePlan.getInstance();

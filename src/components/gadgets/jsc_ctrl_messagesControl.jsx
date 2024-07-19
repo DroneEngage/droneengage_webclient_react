@@ -3,7 +3,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
-class CLSS_AndruavMessageItem extends React.Component {
+class Clss_AndruavMessageItem extends React.Component {
 
     constructor(props) {
         super(props);
@@ -46,7 +46,7 @@ class CLSS_AndruavMessageItem extends React.Component {
     }
 }
 
-export  class CLSS_MESSAGE_LOG  extends React.Component {
+export  class Clss_MESSAGE_LOG  extends React.Component {
 
     constructor(props)
     {
@@ -108,7 +108,7 @@ export  class CLSS_MESSAGE_LOG  extends React.Component {
         let min = Math.max(len - js_globals.CONST_MAX_MESSAGE_LOG,0);
         for (let i=len-1; i>=min; --i) 
         {
-            v_messages.push(<CLSS_AndruavMessageItem key={this.props.p_unit.partyID + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
+            v_messages.push(<Clss_AndruavMessageItem key={this.props.p_unit.partyID + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
         }
         
         return (

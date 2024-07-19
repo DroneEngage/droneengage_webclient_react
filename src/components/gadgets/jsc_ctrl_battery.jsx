@@ -1,6 +1,6 @@
 import React    from 'react';
 
-export class CLSS_CTRL_BATTERY extends React.Component {
+export class Clss_CTRL_BATTERY extends React.Component {
     constructor()
 	{
 		super ();

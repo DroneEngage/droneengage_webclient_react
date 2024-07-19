@@ -6,7 +6,7 @@
 *********************************************************************************** */
 
 
-export class CLSS_CustomCircularBuffer 
+export class Clss_CustomCircularBuffer 
 {
 
     constructor (p_length)
@@ -71,7 +71,7 @@ export class CLSS_CustomCircularBuffer
 
     toString  ()
     {
-         return "CLSS_CustomCircularBuffer(size=" + this.m_buffer.length + ", head=" + this.m_head + ", tail=" + this.m_tail + ")";
+         return "Clss_CustomCircularBuffer(size=" + this.m_buffer.length + ", head=" + this.m_head + ", tail=" + this.m_tail + ")";
     }
 
 

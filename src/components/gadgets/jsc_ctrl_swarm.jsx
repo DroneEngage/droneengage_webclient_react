@@ -7,7 +7,7 @@ import {js_localStorage} from '../../js/js_localStorage'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
-export class CLSS_CTRL_SWARM extends React.Component {
+export class Clss_CTRL_SWARM extends React.Component {
 
     constructor(props)
 	{

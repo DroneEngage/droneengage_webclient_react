@@ -174,19 +174,19 @@ class AndruavStream {
     var len = stream.getVideoTracks().length;
     var p = [];
 
-    if (window.chrome == true) {
+    if (window.chrome === true) {
       // Multiple tracks per stream can be implemented in Chrome.
       // As in FireFox TrackID & Label are overwritten by new values so I cannot track them.
       // A proposed solution is in this link https://stackoverflow.com/questions/65408744/in-webrtc-how-do-i-label-a-local-mediastream-so-that-a-remote-peer-can-identify
       // which is to add extra data in the communication packet next to the offer.
-      for (var i = 0; i < len; ++i) {
-        if (stream.getVideoTracks()[i].id.toLowerCase() != targetVideoTrack) {
+      for (let i = 0; i < len; ++i) {
+        if (stream.getVideoTracks()[i].id.toLowerCase() !== targetVideoTrack) {
           p.push(stream.getVideoTracks()[i].id);
         }
       }
 
       // remove tracks that are not equal to target track.
-      for (var i = 0; i < p.length; ++i) {
+      for (let i = 0; i < p.length; ++i) {
         stream.removeTrack(stream.getTrackById(p[i]));
       }
     }

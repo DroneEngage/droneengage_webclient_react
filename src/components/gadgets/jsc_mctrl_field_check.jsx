@@ -18,7 +18,7 @@ export class CFieldChecked extends React.Component {
         $(n + ' :checkbox').change(function() {
 
             // this will contain a reference to the checkbox   
-            fn_console_log ("HELP");
+            js_globals.fn_console_log ("HELP");
             if (this.checked) {
                 this.props = true;
                 $(n + " :text").removeAttr('disabled', true);
