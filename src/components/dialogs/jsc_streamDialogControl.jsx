@@ -1,11 +1,13 @@
 import $ from 'jquery'; 
+import 'jquery-ui-dist/jquery-ui.min.js';
+
 import React    from 'react';
 
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter'
-import * as js_andruavUnit from '../js/js_andruavUnit'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../js/js_main';
+import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
 class CLSS_StreamChannel extends React.Component {
 
@@ -93,6 +95,8 @@ export default class CLSS_StreamDialog extends React.Component
 			
 		};
     
+        this._isMounted = false;
+        
         js_eventEmitter.fn_subscribe(js_globals.EE_displayStreamDlgForm,this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_globals.EE_hideStreamDlgForm,this, this.fn_closeDialog);
     }
@@ -100,6 +104,8 @@ export default class CLSS_StreamDialog extends React.Component
 
     fn_displayDialog (p_me, p_session)
     {
+        if (p_me._isMounted!==true) return ;
+        
         p_me.setState({'p_session':p_session});
         p_me.forceUpdate();
         $('#modal_ctrl_stream_dlg').show();
@@ -107,16 +113,16 @@ export default class CLSS_StreamDialog extends React.Component
 
     fn_initDialog()
     {
-        $('#modal_ctrl_stream_dlg').hide();
         $('#modal_ctrl_stream_dlg').draggable();
-        $('#modal_ctrl_stream_dlg').mouseover(function () {
+        $('#modal_ctrl_stream_dlg').on("mouseover", function () {
             $('#modal_ctrl_stream_dlg').css('opacity', '1.0');
         });
-        $('#modal_ctrl_stream_dlg').mouseout(function () {
+        $('#modal_ctrl_stream_dlg').on("mouseout", function () {
             if ($('#modal_ctrl_stream_dlg').attr('opacity') == null) {
                 $('#modal_ctrl_stream_dlg').css('opacity', '0.4');
             }
         });
+        $('#modal_ctrl_stream_dlg').hide();
     }
 
     fn_gotoUnitPressed()
@@ -150,11 +156,13 @@ export default class CLSS_StreamDialog extends React.Component
     
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayStreamDlgForm,this);
+        this._isMounted = false;
+		js_eventEmitter.fn_unsubscribe(js_globals.EE_displayStreamDlgForm,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_hideStreamDlgForm,this);
     } 
 
     componentDidMount () {
+        this._isMounted = true;
         this.fn_initDialog();
     }
 
@@ -176,7 +184,7 @@ export default class CLSS_StreamDialog extends React.Component
                     <div className="card-header text-center">
 						<div className="row">
 						  <div className="col-10">
-							<h4 className="text-success text-start">Streams of' {v_unitName} </h4>
+							<h4 className="text-success text-start">No Streams </h4>
 						  </div>
 						  <div className="col-2 float-right">
 						  <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
@@ -212,20 +220,20 @@ export default class CLSS_StreamDialog extends React.Component
                 for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
                     v_streanms.push(<CLSS_StreamChannel key={i} prop_session={p_session} prop_track_number={i} />);
                 }
-                v_unitName = p_session.m_unit.m_unitName
+                v_unitName = p_session.m_unit.m_unitName;
             }
 
             return (
-                <div id="modal_ctrl_stream_dlg" title="Streaming Video" className="card width_fit_max css_ontop border-light p-2" >
+                <div key="modal_ctrl_stream_dlg" id="modal_ctrl_stream_dlg" title="Streaming Video" data-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2" >
                             
-                <div className="card-header text-center">
+                <div key='stream_dlg_hdr' className="card-header text-center">
                     <div className="row">
-                      <div className="col-10">
-                        <h4 className="text-success text-start">Streams of' {v_unitName} </h4>
-                      </div>
-                      <div className="col-2 float-right">
-                      <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
-                       </div>
+                        <div className="col-10">
+                            <h4 className="text-success text-start">Streams of' {v_unitName} </h4>
+                        </div>
+                        <div className="col-2 float-right">
+                            <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
+                        </div>
                     </div>
                 </div>    
                 <div id="modal_ctrl_stream_footer" className="card-body ">

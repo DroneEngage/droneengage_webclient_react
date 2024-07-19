@@ -8,13 +8,14 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
 
+import RecordRTC from 'recordrtc';
 
 
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
-import * as recordrtc from './js_recordrtc'
+//import {MultiStreamRecorder} from './js_recordrtc2.js'
 import {js_speak} from './js_speak'
 
 import * as js_andruavUnit from './js_andruavUnit'
@@ -173,7 +174,7 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('div.modal-body').html(p_message);
 			//$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').off('click');
 			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').unbind('click');
-			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').click(function () 
+			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').on('click', function () 
 			{
 				callback(true);
 				//$('#modal_saveConfirmation').modal('hide');
@@ -181,7 +182,7 @@ function fn_handleKeyBoard() {
 				modal.hide();
 			});
 			$('#modal_saveConfirmation').children().find('button#btnCancel').unbind('click');
-			$('#modal_saveConfirmation').children().find('button#btnCancel').click(function () 
+			$('#modal_saveConfirmation').children().find('button#btnCancel').on('click', function () 
 			{
 				callback(false);
 				//$('#modal_saveConfirmation').modal('hide');
@@ -226,27 +227,42 @@ function fn_handleKeyBoard() {
 
 		export function fn_startrecord(v_andruavUnit, v_videoTrackID) {
 
-			var options = {
-				type: 'video',
-				frameInterval: 30,
-				dontFireOnDataAvailableEvent: true,
-				canvas: { // this line works only in Chrome
-					width: 1280,
-					height: 720
-				},
-				video: { // this line works only in Chrome
-					width: 1280,
-					height: 720
-				}
-			};
+			// var options = {
+			// 	type: 'video',
+			// 	frameInterval: 30,
+			// 	dontFireOnDataAvailableEvent: true,
+			// 	canvas: { // this line works only in Chrome
+			// 		width: 1280,
+			// 		height: 720
+			// 	},
+			// 	video: { // this line works only in Chrome
+			// 		width: 1280,
+			// 		height: 720
+			// 	}
+			// };
 
 
 			var v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[v_videoTrackID];
-			var mmRTC = v_talk.mmRTC = new recordrtc.MultiStreamRecorder([v_talk.stream], options);
-			mmRTC.record();
-			mmRTC.isStoppedRecording = false;
+			const recorder = RecordRTC(v_talk.stream, {
+				type: 'video'
+			  });
+			
+			  // Start recording
+			  recorder.startRecording();
+			
+			//   // Stop recording after 10 seconds
+			//   setTimeout(() => {
+			// 	recorder.stopRecording(() => {
+			// 	  // Get the recorded video blob
+			// 	  const videoBlob = recorder.getBlob();
+			
+			// 	  // Do something with the recorded video, e.g., upload it to a server
+			// 	  console.log('Recorded video blob:', videoBlob);
+			// 	});
+			//   }, 10000);
 
-			v_talk.VideoRecording = true;
+			v_talk.videoRecording = true;
+			v_talk.recorderObject = recorder;
 			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
 
 		}
@@ -1006,7 +1022,7 @@ function fn_handleKeyBoard() {
 
 			var ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
 			ctrl_yaw.unbind("click");
-			ctrl_yaw.click(function () {
+			ctrl_yaw.on('click', function () {
 				const target_angle_deg = $('#yaw_knob').val();
 				const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
 				let direction = js_helpers.isClockwiseAngle (current_angle_deg, target_angle_deg);
@@ -1015,7 +1031,7 @@ function fn_handleKeyBoard() {
 
 			var ctrl_yaw = $('#modal_ctrl_yaw').find('#btnResetYaw');
 			ctrl_yaw.unbind("click");
-			ctrl_yaw.click(function () {
+			ctrl_yaw.on('click', function () {
 				$('#yaw_knob').val(0);
 				$('#yaw_knob').trigger('change');
 				fn_doYAW(p_andruavUnit, -1, 0, true, false);
@@ -1118,7 +1134,7 @@ function fn_handleKeyBoard() {
 			$('#modal_changeUnitInfo').find('#txtUnitName').val(p_andruavUnit.m_unitName);
 			$('#modal_changeUnitInfo').find('#txtDescription').val(p_andruavUnit.Description);
 			$('#modal_changeUnitInfo').find('#btnOK').unbind("click");
-			$('#modal_changeUnitInfo').find('#btnOK').click(function () {
+			$('#modal_changeUnitInfo').find('#btnOK').on('click', function () {
 				var v_unitName = $('#modal_changeUnitInfo').find('#txtUnitName').val();
 				if (v_unitName == '') return;
 				
@@ -1156,7 +1172,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#txtSpeed').val(v_altitude_val);
 			$('#changespeed_modal').find('#txtSpeedUnit').html(v_altitude_unit);
 			$('#changespeed_modal').find('#btnOK').unbind("click");
-			$('#changespeed_modal').find('#btnOK').click(function () {
+			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_alt = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_alt == '' || isNaN(v_alt)) return;
 				if (js_globals.v_useMetricSystem === false) {
@@ -1218,7 +1234,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').unbind("click");
 			$('#changespeed_modal').find('#txtSpeed').val(v_speed_val);
 			$('#changespeed_modal').find('#txtSpeedUnit').html(v_speed_unit);
-			$('#changespeed_modal').find('#btnOK').click(function () {
+			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_speed = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_speed == '' || isNaN(v_speed)) return;
 				if (js_globals.v_useMetricSystem === false) {
@@ -1246,7 +1262,7 @@ function fn_handleKeyBoard() {
 			$('#changespeed_modal').find('#btnOK').unbind("click");
 			$('#changespeed_modal').find('#txtSpeed').val(v_port_val);
 			$('#changespeed_modal').find('#txtSpeedUnit').html("");
-			$('#changespeed_modal').find('#btnOK').click(function () {
+			$('#changespeed_modal').find('#btnOK').on('click', function () {
 				var v_port_val = $('#changespeed_modal').find('#txtSpeed').val();
 				if (v_port_val == '' || isNaN(v_port_val) || v_port_val >= 0xffff) return;
 				js_globals.v_andruavClient.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
@@ -2981,16 +2997,16 @@ function fn_handleKeyBoard() {
 			//CTRL YAW	
 			$('#modal_ctrl_yaw').hide();
 			$('#modal_ctrl_yaw').draggable();
-			$('#modal_ctrl_yaw').mouseover(function () {
+			$('#modal_ctrl_yaw').on("mouseover", function () {
 				$('#modal_ctrl_yaw').css('opacity', '1.0');
 			});
-			$('#modal_ctrl_yaw').mouseout(function () {
+			$('#modal_ctrl_yaw').on("mouseout", function () {
 				const opacity = $('#modal_ctrl_yaw').attr('opacity')
 				if (opacity === null || opacity === undefined) {
 					$('#modal_ctrl_yaw').css('opacity', '0.4');
 				}
 			});
-			$('#modal_ctrl_yaw').find('#opaque_btn').click(function () {
+			$('#modal_ctrl_yaw').find('#opaque_btn').on('click', function () {
 				const opacity = $('#modal_ctrl_yaw').attr('opacity')
 				if ( opacity === null || opacity === undefined) {
 					$('#modal_ctrl_yaw').attr('opacity', '1.0');
@@ -3000,11 +3016,11 @@ function fn_handleKeyBoard() {
 					$('#modal_ctrl_yaw').attr('opacity', null);
 				}
 			});
-			$('#modal_ctrl_yaw').find('#btnGoto').click(function () {
+			$('#modal_ctrl_yaw').find('#btnGoto').on('click', function () {
 				// assume what there is attribute partyID in the control used to pass parameter
 				fn_gotoUnit_byPartyID($('#modal_ctrl_yaw').attr('partyID'));
 			});
-			$('#modal_ctrl_yaw').find('#btnclose').click(function () {
+			$('#modal_ctrl_yaw').find('#btnclose').on('click', function () {
 				$('#modal_ctrl_yaw').attr('opacity', null);
 				$('#modal_ctrl_yaw').attr('partyID', null);
 				$('#modal_ctrl_yaw').hide();
@@ -3012,7 +3028,7 @@ function fn_handleKeyBoard() {
 				$('#modal_ctrl_yaw').find('#btnResetYaw').unbind("click");
 			});
 
-			$('#modal_ctrl_yaw').find('#yaw_knob_out').click(function (e) {
+			$('#modal_ctrl_yaw').find('#yaw_knob_out').on('click', function (e) {
 				e.stopPropagation();
 			});
 			$('#modal_ctrl_yaw').find('#yaw_knob_out').mousemove(function (e) {
@@ -3023,10 +3039,10 @@ function fn_handleKeyBoard() {
 		function fn_gui_init_unitList ()
 		{
 			$('#andruav_unit_list_array_float').draggable();
-			$('#andruav_unit_list_array_float').mouseover(function () {
+			$('#andruav_unit_list_array_float').on("mouseover", function () {
 				$('#andruav_unit_list_array_float').css('opacity', '1.0');
 			});
-			$('#andruav_unit_list_array_float').mouseout(function () {
+			$('#andruav_unit_list_array_float').on("mouseout", function () {
 				$('#andruav_unit_list_array_float').css('opacity', '0.8');
 			});
 			
@@ -3036,13 +3052,13 @@ function fn_handleKeyBoard() {
 		{
 			$('#modal_fpv').hide();
 			$('#modal_fpv').draggable();
-			$('#modal_fpv').mouseover(function () {
+			$('#modal_fpv').on('mouseover', function () {
 				$('#modal_fpv').css('opacity', '1.0');
 			});
-			$('#modal_fpv').mouseout(function () {
+			$('#modal_fpv').on('mouseout', function () {
 				$('#modal_fpv').css('opacity', '0.4');
 			});
-			$('#modal_fpv').find('#btnclose').click(function () {
+			$('#modal_fpv').find('#btnclose').on('click', function () {
 				$('#modal_fpv').hide();
 			});
 			//http://www.bootply.com/XyZeggFcK7
@@ -3288,35 +3304,35 @@ function fn_handleKeyBoard() {
 			);
 
 
-			$('#gimbaldiv').find('#btnpitchm').click(function () {
+			$('#gimbaldiv').find('#btnpitchm').on('click', function () {
 				var p = $('#div_video_view').attr('partyID');
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, -2, 0, 0);
 
 			});
 
-			$('#gimbaldiv').find('#btnrollp').click(function () {
+			$('#gimbaldiv').find('#btnrollp').on('click', function () {
 				var p = $('#div_video_view').attr('partyID');
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, +2, 0);
 
 			});
 
-			$('#gimbaldiv').find('#btnrollm').click(function () {
+			$('#gimbaldiv').find('#btnrollm').on('click', function () {
 				var p = $('#div_video_view').attr('partyID');
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, -2, 0);
 
 			});
 
-			$('#gimbaldiv').find('#btnyawp').click(function () {
+			$('#gimbaldiv').find('#btnyawp').on('click', function () {
 				var p = $('#div_video_view').attr('partyID');
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, +2);
 
 			});
 
-			$('#gimbaldiv').find('#btnyawm').click(function () {
+			$('#gimbaldiv').find('#btnyawm').on('click', function () {
 				var p = $('#div_video_view').attr('partyID');
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, -2);
@@ -3358,7 +3374,7 @@ function fn_handleKeyBoard() {
 			// 	window.AndruavLibs.LocalTelemetry.fn_onWebSocketOpened = EVT_GCSDataOpen;
 			// }
 			
-			$("#alert .close").click(function (e) {
+			$("#alert .close").on('click', function (e) {
 				$("#alert").hide();
 			});
 

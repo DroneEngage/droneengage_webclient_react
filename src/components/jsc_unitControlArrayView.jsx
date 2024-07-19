@@ -893,7 +893,7 @@ class CLSS_AndruavUnitListArray extends React.Component {
             }
             else {
                 $('#andruav_unit_list_array_float').attr('opacity', null);
-                $('#andruav_unit_list_array_float').mouseout(function () {
+                $('#andruav_unit_list_array_float').on("mouseout", function () {
                     $('#andruav_unit_list_array_float').css('opacity', '0.8');
                 });
                 $('#andruav_unit_list_array_float #obaq').removeClass('bi-x-diamond-fill');

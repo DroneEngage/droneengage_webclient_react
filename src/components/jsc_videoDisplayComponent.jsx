@@ -2,6 +2,8 @@ import $ from 'jquery';
 
 import React    from 'react';
 
+import fs from 'fs';
+import FileSaver from 'file-saver';
 
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
@@ -77,7 +79,7 @@ class CLSS_CVideoScreen extends React.Component {
     }
 
 
-    fnl_stoprecord (p_andruavUnit,p_activeTrack)
+    fnl_stoprecord (p_andruavUnit,p_activeTrack,p_blob)
     {
 
         var filename = 'video_';
@@ -87,9 +89,9 @@ class CLSS_CVideoScreen extends React.Component {
         }
 
         // TODO implement
-        // invokeSaveAsDialog (p_blob,filename); REACT2 
+        FileSaver.saveAs(p_blob, filename);
         var talk = p_andruavUnit.m_Video.m_videoactiveTracks[p_activeTrack];
-        talk.VideoRecording = false;
+        talk.videoRecording = false;
         js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw,{'andruavUnit': p_andruavUnit,'v_track':p_activeTrack});
     }
 
@@ -104,13 +106,14 @@ class CLSS_CVideoScreen extends React.Component {
         
         var v_me = this;
         var v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
+        //if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
+        if ((v_activeTrack.videoRecording===true) && (v_activeTrack.recorderObject !== null || v_activeTrack.recorderObject !== undefined))
         {
-            //window.recordRTC.stopRecording ( function (blob) {
-                v_activeTrack.mmRTC.stop (function (p_blob) {
-                    v_me.fnl_stoprecord (v_andruavUnit,v_me.props.obj.v_track,p_blob);
-                    v_activeTrack.mmRTC = undefined;
-                   
+            const recorder = v_activeTrack.recorderObject;
+            recorder.stopRecording(() => {
+                const videoBlob = recorder.getBlob();
+                v_me.fnl_stoprecord (v_andruavUnit,v_me.props.obj.v_track,videoBlob);
+                v_activeTrack.recorderObject = null;
             });
         }
         else
@@ -203,7 +206,7 @@ class CLSS_CVideoScreen extends React.Component {
 
     fn_opacity()
     {
-        $('#css_video_ctrl_panel').mouseover ( function ()
+        $('#css_video_ctrl_panel').on("mouseover", function ()
         {
             $('#css_video_ctrl_panel').css('opacity', '1.0');
         });
@@ -552,7 +555,7 @@ class CLSS_CVideoScreen extends React.Component {
 
         var btn_videorecordClass ;
 
-        if (talk.VideoRecording !== true)
+        if (talk.videoRecording !== true)
         {
             btn_videorecordClass = "cursor_hand  css_recvideo_ready";
         } 

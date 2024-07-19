@@ -13,8 +13,8 @@ import React , { useEffect } from 'react';
 import CLSS_HeaderControl from '../components/jsc_header'
 import CLSS_GlobalSettings from '../components/jsc_globalSettings'
 import CLSS_AndruavUnitList from '../components/jsc_unitControl.jsx'
-import CLSS_CameraDialog from '../components/jsc_cameraDialogControl.jsx'
-import CLSS_StreamDialog from '../components/jsc_streamDialogControl.jsx'
+import CLSS_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
+import CLSS_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import {CLSS_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
@@ -107,14 +107,12 @@ const Home = () => {
               </div>
 
 
-              {/* <div id='CTRL_cameraCtrl'></div> */}
-			  <CLSS_CameraDialog/>
-              <div id='servoCtrl'></div>
+              <CLSS_CameraDialog/>
+			  <div id='servoCtrl'></div>
               <div id='modal_uplCtrl'></div>
               <div id='gamepadCtrl'></div>
-              <div id='CTRL_streamCtrl' > 
-			  <CLSS_StreamDialog/>
-			  </div> 
+              <CLSS_StreamDialog/>
+
             </div>
 
             <div id="row_2" className="col-4 ">

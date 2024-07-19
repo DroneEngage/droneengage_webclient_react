@@ -224,7 +224,7 @@ class CLSS_GamePadControl extends React.Component {
         if (p_andruavUnit=== null || p_andruavUnit === undefined) return ;
         p_me.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
-        $('#modal_ctrl_gamepad').find('#btnGoto').click(function () {
+        $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
             fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.partyID));
         });
         $('#modal_ctrl_gamepad').show();
@@ -253,16 +253,16 @@ class CLSS_GamePadControl extends React.Component {
     componentDidMount () {
         $('#modal_ctrl_gamepad').hide();
         $('#modal_ctrl_gamepad').draggable();
-        $('#modal_ctrl_gamepad').mouseover(function () {
+        $('#modal_ctrl_gamepad').on("mouseover", function () {
             $('#modal_ctrl_gamepad').css('opacity', '1.0');
         });
-        $('#modal_ctrl_gamepad').mouseout(function () {
+        $('#modal_ctrl_gamepad').on("mouseout", function () {
             const opacity = $('#modal_ctrl_gamepad').attr('opacity') ;
             if ( opacity === null || opacity  === undefined) {
                 $('#modal_ctrl_gamepad').css('opacity', '0.4');
             }
         });
-        $('#modal_ctrl_gamepad').find('#opaque_btn').click(function () {
+        $('#modal_ctrl_gamepad').find('#opaque_btn').on('click', function () {
             const opacity = $('#modal_ctrl_gamepad').attr('opacity') ;
             if (opacity === null || opacity === undefined) {
                 $('#modal_ctrl_gamepad').attr('opacity', '1.0');
@@ -272,7 +272,7 @@ class CLSS_GamePadControl extends React.Component {
                 $('#modal_ctrl_gamepad').attr('opacity', null);
             }
         });
-        $('#modal_ctrl_gamepad').find('#btnGoto').click(function () {
+        $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
             fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr('partyID'));
         });
         this.state.m_update = 1;

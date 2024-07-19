@@ -549,7 +549,7 @@ div#modal_ctrl_yaw
 	position: absolute;
 	top: 200px;
 	left:100px;
-	min-width: 500px !important;
+	min-width: 400px !important;
 	opacity:0.85;
 	float:left;
  }
@@ -564,19 +564,13 @@ div#modal_ctrl_yaw
 	float:left;
  }
  
- div#CTRL_cameraCtrl
- {
-	 position: absolute;
-	 top:100px;
- }
 
- div#CTRL_streamCtrl
-{
-	position: absolute;
-	top:100px;
-}
+
  div#modal_ctrl_stream_dlg
  {
+	position: absolute;
+	top: 200px;
+	left:100px;
 	min-width: 400px !important;
 	opacity:0.85;
 	float:left;

@@ -32,11 +32,15 @@ class CLSS_AndruavMessageItem extends React.Component {
                 break;
         }
 
+        const m_time = this.props.p_msg.time;
+        const m_notification_Type = this.props.p_msg.m_msg.m_notification_Type;
+        const m_description = this.props.p_msg.m_msg.m_error.Description;
+        const m_index = this.props.p_index;
         return (
-        <tr className = {v_text_color}>
-            <td key={this.props.p_index} scope="row">{this.props.p_msg.time}</td>
-            <td scope="row">{this.props.p_msg.m_msg.m_notification_Type}</td>
-            <td scope="row">{this.props.p_msg.m_msg.m_error.Description}</td>
+        <tr key={m_index} className = {v_text_color}>
+            <td  scope="row">{m_time}</td>
+            <td scope="row">{m_notification_Type}</td>
+            <td scope="row">{m_description}</td>
         </tr>
         );
     }

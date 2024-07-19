@@ -10,7 +10,7 @@ import {jspack} from 'jspack'
 import _, { map } from 'underscore'
 
 
-var jjspack = jspack; // mhefny
+
 //var events = new EventEmitter(); // mhefny
 
 
@@ -81,7 +81,7 @@ mavlink20.header = function(msgId, mlen, seq, srcSystem, srcComponent, incompat_
 
 }
 mavlink20.header.prototype.pack = function() {
-    return jjspack.Pack('BBBBBBBHB', [253, this.mlen, this.incompat_flags, this.compat_flags, this.seq, this.srcSystem, this.srcComponent, ((this.msgId & 0xFF) << 8) | ((this.msgId >> 8) & 0xFF), this.msgId>>16]);
+    return jspack.Pack('BBBBBBBHB', [253, this.mlen, this.incompat_flags, this.compat_flags, this.seq, this.srcSystem, this.srcComponent, ((this.msgId & 0xFF) << 8) | ((this.msgId >> 8) & 0xFF), this.msgId>>16]);
 }
         
 // Base class declaration: mavlink.message will be the parent class for each
@@ -114,7 +114,7 @@ mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
 
     // For now, assume always using crc_extra = True.  TODO: check/fix this.
     crc = mavlink20.x25Crc([crc_extra], crc);
-    this.msgbuf = this.msgbuf.concat(jjspack.Pack('<H', [crc] ) );
+    this.msgbuf = this.msgbuf.concat(jspack.Pack('<H', [crc] ) );
     return this.msgbuf;
 
 }
@@ -4012,7 +4012,7 @@ mavlink20.messages.sensor_offsets = function(mag_ofs_x, mag_ofs_y, mag_ofs_z, ma
 }
         mavlink20.messages.sensor_offsets.prototype = new mavlink20.message();
 mavlink20.messages.sensor_offsets.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mag_declination, this.raw_press, this.raw_temp, this.gyro_cal_x, this.gyro_cal_y, this.gyro_cal_z, this.accel_cal_x, this.accel_cal_y, this.accel_cal_z, this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mag_declination, this.raw_press, this.raw_temp, this.gyro_cal_x, this.gyro_cal_y, this.gyro_cal_z, this.accel_cal_x, this.accel_cal_y, this.accel_cal_z, this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z]));
 }
 
 /* 
@@ -4041,7 +4041,7 @@ mavlink20.messages.set_mag_offsets = function(target_system, target_component, m
 }
         mavlink20.messages.set_mag_offsets.prototype = new mavlink20.message();
 mavlink20.messages.set_mag_offsets.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mag_ofs_x, this.mag_ofs_y, this.mag_ofs_z, this.target_system, this.target_component]));
 }
 
 /* 
@@ -4068,7 +4068,7 @@ mavlink20.messages.meminfo = function(brkval, freemem, freemem32) {
 }
         mavlink20.messages.meminfo.prototype = new mavlink20.message();
 mavlink20.messages.meminfo.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.brkval, this.freemem, this.freemem32]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.brkval, this.freemem, this.freemem32]));
 }
 
 /* 
@@ -4098,7 +4098,7 @@ mavlink20.messages.ap_adc = function(adc1, adc2, adc3, adc4, adc5, adc6) {
 }
         mavlink20.messages.ap_adc.prototype = new mavlink20.message();
 mavlink20.messages.ap_adc.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.adc1, this.adc2, this.adc3, this.adc4, this.adc5, this.adc6]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.adc1, this.adc2, this.adc3, this.adc4, this.adc5, this.adc6]));
 }
 
 /* 
@@ -4133,7 +4133,7 @@ mavlink20.messages.digicam_configure = function(target_system, target_component,
 }
         mavlink20.messages.digicam_configure.prototype = new mavlink20.message();
 mavlink20.messages.digicam_configure.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.extra_value, this.shutter_speed, this.target_system, this.target_component, this.mode, this.aperture, this.iso, this.exposure_type, this.command_id, this.engine_cut_off, this.extra_param]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.extra_value, this.shutter_speed, this.target_system, this.target_component, this.mode, this.aperture, this.iso, this.exposure_type, this.command_id, this.engine_cut_off, this.extra_param]));
 }
 
 /* 
@@ -4167,7 +4167,7 @@ mavlink20.messages.digicam_control = function(target_system, target_component, s
 }
         mavlink20.messages.digicam_control.prototype = new mavlink20.message();
 mavlink20.messages.digicam_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.extra_value, this.target_system, this.target_component, this.session, this.zoom_pos, this.zoom_step, this.focus_lock, this.shot, this.command_id, this.extra_param]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.extra_value, this.target_system, this.target_component, this.session, this.zoom_pos, this.zoom_step, this.focus_lock, this.shot, this.command_id, this.extra_param]));
 }
 
 /* 
@@ -4197,7 +4197,7 @@ mavlink20.messages.mount_configure = function(target_system, target_component, m
 }
         mavlink20.messages.mount_configure.prototype = new mavlink20.message();
 mavlink20.messages.mount_configure.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mount_mode, this.stab_roll, this.stab_pitch, this.stab_yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.mount_mode, this.stab_roll, this.stab_pitch, this.stab_yaw]));
 }
 
 /* 
@@ -4227,7 +4227,7 @@ mavlink20.messages.mount_control = function(target_system, target_component, inp
 }
         mavlink20.messages.mount_control.prototype = new mavlink20.message();
 mavlink20.messages.mount_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.input_a, this.input_b, this.input_c, this.target_system, this.target_component, this.save_position]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.input_a, this.input_b, this.input_c, this.target_system, this.target_component, this.save_position]));
 }
 
 /* 
@@ -4258,7 +4258,7 @@ mavlink20.messages.mount_status = function(target_system, target_component, poin
 }
         mavlink20.messages.mount_status.prototype = new mavlink20.message();
 mavlink20.messages.mount_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.pointing_a, this.pointing_b, this.pointing_c, this.target_system, this.target_component, this.mount_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.pointing_a, this.pointing_b, this.pointing_c, this.target_system, this.target_component, this.mount_mode]));
 }
 
 /* 
@@ -4289,7 +4289,7 @@ mavlink20.messages.fence_point = function(target_system, target_component, idx, 
 }
         mavlink20.messages.fence_point.prototype = new mavlink20.message();
 mavlink20.messages.fence_point.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lng, this.target_system, this.target_component, this.idx, this.count]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lng, this.target_system, this.target_component, this.idx, this.count]));
 }
 
 /* 
@@ -4316,7 +4316,7 @@ mavlink20.messages.fence_fetch_point = function(target_system, target_component,
 }
         mavlink20.messages.fence_fetch_point.prototype = new mavlink20.message();
 mavlink20.messages.fence_fetch_point.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
 }
 
 /* 
@@ -4347,7 +4347,7 @@ mavlink20.messages.ahrs = function(omegaIx, omegaIy, omegaIz, accel_weight, reno
 }
         mavlink20.messages.ahrs.prototype = new mavlink20.message();
 mavlink20.messages.ahrs.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.omegaIx, this.omegaIy, this.omegaIz, this.accel_weight, this.renorm_val, this.error_rp, this.error_yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.omegaIx, this.omegaIy, this.omegaIz, this.accel_weight, this.renorm_val, this.error_rp, this.error_yaw]));
 }
 
 /* 
@@ -4382,7 +4382,7 @@ mavlink20.messages.simstate = function(roll, pitch, yaw, xacc, yacc, zacc, xgyro
 }
         mavlink20.messages.simstate.prototype = new mavlink20.message();
 mavlink20.messages.simstate.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lng]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lng]));
 }
 
 /* 
@@ -4408,7 +4408,7 @@ mavlink20.messages.hwstatus = function(Vcc, I2Cerr) {
 }
         mavlink20.messages.hwstatus.prototype = new mavlink20.message();
 mavlink20.messages.hwstatus.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Vcc, this.I2Cerr]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.Vcc, this.I2Cerr]));
 }
 
 /* 
@@ -4439,7 +4439,7 @@ mavlink20.messages.radio = function(rssi, remrssi, txbuf, noise, remnoise, rxerr
 }
         mavlink20.messages.radio.prototype = new mavlink20.message();
 mavlink20.messages.radio.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
 }
 
 /* 
@@ -4473,7 +4473,7 @@ mavlink20.messages.limits_status = function(limits_state, last_trigger, last_act
 }
         mavlink20.messages.limits_status.prototype = new mavlink20.message();
 mavlink20.messages.limits_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.last_trigger, this.last_action, this.last_recovery, this.last_clear, this.breach_count, this.limits_state, this.mods_enabled, this.mods_required, this.mods_triggered]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.last_trigger, this.last_action, this.last_recovery, this.last_clear, this.breach_count, this.limits_state, this.mods_enabled, this.mods_required, this.mods_triggered]));
 }
 
 /* 
@@ -4500,7 +4500,7 @@ mavlink20.messages.wind = function(direction, speed, speed_z) {
 }
         mavlink20.messages.wind.prototype = new mavlink20.message();
 mavlink20.messages.wind.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.direction, this.speed, this.speed_z]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.direction, this.speed, this.speed_z]));
 }
 
 /* 
@@ -4527,7 +4527,7 @@ mavlink20.messages.data16 = function(type, len, data) {
 }
         mavlink20.messages.data16.prototype = new mavlink20.message();
 mavlink20.messages.data16.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
 
 /* 
@@ -4554,7 +4554,7 @@ mavlink20.messages.data32 = function(type, len, data) {
 }
         mavlink20.messages.data32.prototype = new mavlink20.message();
 mavlink20.messages.data32.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
 
 /* 
@@ -4581,7 +4581,7 @@ mavlink20.messages.data64 = function(type, len, data) {
 }
         mavlink20.messages.data64.prototype = new mavlink20.message();
 mavlink20.messages.data64.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
 
 /* 
@@ -4608,7 +4608,7 @@ mavlink20.messages.data96 = function(type, len, data) {
 }
         mavlink20.messages.data96.prototype = new mavlink20.message();
 mavlink20.messages.data96.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.type, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.type, this.len, this.data]));
 }
 
 /* 
@@ -4634,7 +4634,7 @@ mavlink20.messages.rangefinder = function(distance, voltage) {
 }
         mavlink20.messages.rangefinder.prototype = new mavlink20.message();
 mavlink20.messages.rangefinder.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.distance, this.voltage]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.distance, this.voltage]));
 }
 
 /* 
@@ -4670,7 +4670,7 @@ mavlink20.messages.airspeed_autocal = function(vx, vy, vz, diff_pressure, EAS2TA
 }
         mavlink20.messages.airspeed_autocal.prototype = new mavlink20.message();
 mavlink20.messages.airspeed_autocal.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vx, this.vy, this.vz, this.diff_pressure, this.EAS2TAS, this.ratio, this.state_x, this.state_y, this.state_z, this.Pax, this.Pby, this.Pcz]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.vx, this.vy, this.vz, this.diff_pressure, this.EAS2TAS, this.ratio, this.state_x, this.state_y, this.state_z, this.Pax, this.Pby, this.Pcz]));
 }
 
 /* 
@@ -4705,7 +4705,7 @@ mavlink20.messages.rally_point = function(target_system, target_component, idx, 
 }
         mavlink20.messages.rally_point.prototype = new mavlink20.message();
 mavlink20.messages.rally_point.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lng, this.alt, this.break_alt, this.land_dir, this.target_system, this.target_component, this.idx, this.count, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lng, this.alt, this.break_alt, this.land_dir, this.target_system, this.target_component, this.idx, this.count, this.flags]));
 }
 
 /* 
@@ -4733,7 +4733,7 @@ mavlink20.messages.rally_fetch_point = function(target_system, target_component,
 }
         mavlink20.messages.rally_fetch_point.prototype = new mavlink20.message();
 mavlink20.messages.rally_fetch_point.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.idx]));
 }
 
 /* 
@@ -4763,7 +4763,7 @@ mavlink20.messages.compassmot_status = function(throttle, current, interference,
 }
         mavlink20.messages.compassmot_status.prototype = new mavlink20.message();
 mavlink20.messages.compassmot_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.current, this.CompensationX, this.CompensationY, this.CompensationZ, this.throttle, this.interference]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.current, this.CompensationX, this.CompensationY, this.CompensationZ, this.throttle, this.interference]));
 }
 
 /* 
@@ -4793,7 +4793,7 @@ mavlink20.messages.ahrs2 = function(roll, pitch, yaw, altitude, lat, lng) {
 }
         mavlink20.messages.ahrs2.prototype = new mavlink20.message();
 mavlink20.messages.ahrs2.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng]));
 }
 
 /* 
@@ -4826,7 +4826,7 @@ mavlink20.messages.camera_status = function(time_usec, target_system, cam_idx, i
 }
         mavlink20.messages.camera_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.p1, this.p2, this.p3, this.p4, this.img_idx, this.target_system, this.cam_idx, this.event_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.p1, this.p2, this.p3, this.p4, this.img_idx, this.target_system, this.cam_idx, this.event_id]));
 }
 
 /* 
@@ -4864,7 +4864,7 @@ mavlink20.messages.camera_feedback = function(time_usec, target_system, cam_idx,
 }
         mavlink20.messages.camera_feedback.prototype = new mavlink20.message();
 mavlink20.messages.camera_feedback.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lng, this.alt_msl, this.alt_rel, this.roll, this.pitch, this.yaw, this.foc_len, this.img_idx, this.target_system, this.cam_idx, this.flags, this.completed_captures]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.lat, this.lng, this.alt_msl, this.alt_rel, this.roll, this.pitch, this.yaw, this.foc_len, this.img_idx, this.target_system, this.cam_idx, this.flags, this.completed_captures]));
 }
 
 /* 
@@ -4890,7 +4890,7 @@ mavlink20.messages.battery2 = function(voltage, current_battery) {
 }
         mavlink20.messages.battery2.prototype = new mavlink20.message();
 mavlink20.messages.battery2.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current_battery]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current_battery]));
 }
 
 /* 
@@ -4925,7 +4925,7 @@ mavlink20.messages.ahrs3 = function(roll, pitch, yaw, altitude, lat, lng, v1, v2
 }
         mavlink20.messages.ahrs3.prototype = new mavlink20.message();
 mavlink20.messages.ahrs3.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng, this.v1, this.v2, this.v3, this.v4]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.roll, this.pitch, this.yaw, this.altitude, this.lat, this.lng, this.v1, this.v2, this.v3, this.v4]));
 }
 
 /* 
@@ -4951,7 +4951,7 @@ mavlink20.messages.autopilot_version_request = function(target_system, target_co
 }
         mavlink20.messages.autopilot_version_request.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_version_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
 
 /* 
@@ -4979,7 +4979,7 @@ mavlink20.messages.remote_log_data_block = function(target_system, target_compon
 }
         mavlink20.messages.remote_log_data_block.prototype = new mavlink20.message();
 mavlink20.messages.remote_log_data_block.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.data]));
 }
 
 /* 
@@ -5007,7 +5007,7 @@ mavlink20.messages.remote_log_block_status = function(target_system, target_comp
 }
         mavlink20.messages.remote_log_block_status.prototype = new mavlink20.message();
 mavlink20.messages.remote_log_block_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seqno, this.target_system, this.target_component, this.status]));
 }
 
 /* 
@@ -5037,7 +5037,7 @@ mavlink20.messages.led_control = function(target_system, target_component, insta
 }
         mavlink20.messages.led_control.prototype = new mavlink20.message();
 mavlink20.messages.led_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.instance, this.pattern, this.custom_len, this.custom_bytes]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.instance, this.pattern, this.custom_len, this.custom_bytes]));
 }
 
 /* 
@@ -5070,7 +5070,7 @@ mavlink20.messages.mag_cal_progress = function(compass_id, cal_mask, cal_status,
 }
         mavlink20.messages.mag_cal_progress.prototype = new mavlink20.message();
 mavlink20.messages.mag_cal_progress.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.direction_x, this.direction_y, this.direction_z, this.compass_id, this.cal_mask, this.cal_status, this.attempt, this.completion_pct, this.completion_mask]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.direction_x, this.direction_y, this.direction_z, this.compass_id, this.cal_mask, this.cal_status, this.attempt, this.completion_pct, this.completion_mask]));
 }
 
 /* 
@@ -5101,7 +5101,7 @@ mavlink20.messages.ekf_status_report = function(flags, velocity_variance, pos_ho
 }
         mavlink20.messages.ekf_status_report.prototype = new mavlink20.message();
 mavlink20.messages.ekf_status_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.velocity_variance, this.pos_horiz_variance, this.pos_vert_variance, this.compass_variance, this.terrain_alt_variance, this.flags, this.airspeed_variance]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.velocity_variance, this.pos_horiz_variance, this.pos_vert_variance, this.compass_variance, this.terrain_alt_variance, this.flags, this.airspeed_variance]));
 }
 
 /* 
@@ -5134,7 +5134,7 @@ mavlink20.messages.pid_tuning = function(axis, desired, achieved, FF, P, I, D, S
 }
         mavlink20.messages.pid_tuning.prototype = new mavlink20.message();
 mavlink20.messages.pid_tuning.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.desired, this.achieved, this.FF, this.P, this.I, this.D, this.axis, this.SRate, this.PDmod]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.desired, this.achieved, this.FF, this.P, this.I, this.D, this.axis, this.SRate, this.PDmod]));
 }
 
 /* 
@@ -5168,7 +5168,7 @@ mavlink20.messages.deepstall = function(landing_lat, landing_lon, path_lat, path
 }
         mavlink20.messages.deepstall.prototype = new mavlink20.message();
 mavlink20.messages.deepstall.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.landing_lat, this.landing_lon, this.path_lat, this.path_lon, this.arc_entry_lat, this.arc_entry_lon, this.altitude, this.expected_travel_distance, this.cross_track_error, this.stage]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.landing_lat, this.landing_lon, this.path_lat, this.path_lon, this.arc_entry_lat, this.arc_entry_lon, this.altitude, this.expected_travel_distance, this.cross_track_error, this.stage]));
 }
 
 /* 
@@ -5204,7 +5204,7 @@ mavlink20.messages.gimbal_report = function(target_system, target_component, del
 }
         mavlink20.messages.gimbal_report.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.delta_time, this.delta_angle_x, this.delta_angle_y, this.delta_angle_z, this.delta_velocity_x, this.delta_velocity_y, this.delta_velocity_z, this.joint_roll, this.joint_el, this.joint_az, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.delta_time, this.delta_angle_x, this.delta_angle_y, this.delta_angle_z, this.delta_velocity_x, this.delta_velocity_y, this.delta_velocity_z, this.joint_roll, this.joint_el, this.joint_az, this.target_system, this.target_component]));
 }
 
 /* 
@@ -5233,7 +5233,7 @@ mavlink20.messages.gimbal_control = function(target_system, target_component, de
 }
         mavlink20.messages.gimbal_control.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.demanded_rate_x, this.demanded_rate_y, this.demanded_rate_z, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.demanded_rate_x, this.demanded_rate_y, this.demanded_rate_z, this.target_system, this.target_component]));
 }
 
 /* 
@@ -5262,7 +5262,7 @@ mavlink20.messages.gimbal_torque_cmd_report = function(target_system, target_com
 }
         mavlink20.messages.gimbal_torque_cmd_report.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_torque_cmd_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rl_torque_cmd, this.el_torque_cmd, this.az_torque_cmd, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rl_torque_cmd, this.el_torque_cmd, this.az_torque_cmd, this.target_system, this.target_component]));
 }
 
 /* 
@@ -5289,7 +5289,7 @@ mavlink20.messages.gopro_heartbeat = function(status, capture_mode, flags) {
 }
         mavlink20.messages.gopro_heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.gopro_heartbeat.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.capture_mode, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.status, this.capture_mode, this.flags]));
 }
 
 /* 
@@ -5316,7 +5316,7 @@ mavlink20.messages.gopro_get_request = function(target_system, target_component,
 }
         mavlink20.messages.gopro_get_request.prototype = new mavlink20.message();
 mavlink20.messages.gopro_get_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id]));
 }
 
 /* 
@@ -5343,7 +5343,7 @@ mavlink20.messages.gopro_get_response = function(cmd_id, status, value) {
 }
         mavlink20.messages.gopro_get_response.prototype = new mavlink20.message();
 mavlink20.messages.gopro_get_response.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.cmd_id, this.status, this.value]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.cmd_id, this.status, this.value]));
 }
 
 /* 
@@ -5371,7 +5371,7 @@ mavlink20.messages.gopro_set_request = function(target_system, target_component,
 }
         mavlink20.messages.gopro_set_request.prototype = new mavlink20.message();
 mavlink20.messages.gopro_set_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id, this.value]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.cmd_id, this.value]));
 }
 
 /* 
@@ -5397,7 +5397,7 @@ mavlink20.messages.gopro_set_response = function(cmd_id, status) {
 }
         mavlink20.messages.gopro_set_response.prototype = new mavlink20.message();
 mavlink20.messages.gopro_set_response.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.cmd_id, this.status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.cmd_id, this.status]));
 }
 
 /* 
@@ -5423,7 +5423,7 @@ mavlink20.messages.rpm = function(rpm1, rpm2) {
 }
         mavlink20.messages.rpm.prototype = new mavlink20.message();
 mavlink20.messages.rpm.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rpm1, this.rpm2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rpm1, this.rpm2]));
 }
 
 /* 
@@ -5457,7 +5457,7 @@ mavlink20.messages.device_op_read = function(target_system, target_component, re
 }
         mavlink20.messages.device_op_read.prototype = new mavlink20.message();
 mavlink20.messages.device_op_read.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.bank]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.bank]));
 }
 
 /* 
@@ -5487,7 +5487,7 @@ mavlink20.messages.device_op_read_reply = function(request_id, result, regstart,
 }
         mavlink20.messages.device_op_read_reply.prototype = new mavlink20.message();
 mavlink20.messages.device_op_read_reply.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result, this.regstart, this.count, this.data, this.bank]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.result, this.regstart, this.count, this.data, this.bank]));
 }
 
 /* 
@@ -5522,7 +5522,7 @@ mavlink20.messages.device_op_write = function(target_system, target_component, r
 }
         mavlink20.messages.device_op_write.prototype = new mavlink20.message();
 mavlink20.messages.device_op_write.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.data, this.bank]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.bustype, this.bus, this.address, this.busname, this.regstart, this.count, this.data, this.bank]));
 }
 
 /* 
@@ -5548,7 +5548,7 @@ mavlink20.messages.device_op_write_reply = function(request_id, result) {
 }
         mavlink20.messages.device_op_write_reply.prototype = new mavlink20.message();
 mavlink20.messages.device_op_write_reply.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.result]));
 }
 
 /* 
@@ -5586,7 +5586,7 @@ mavlink20.messages.secure_command = function(target_system, target_component, se
 }
         mavlink20.messages.secure_command.prototype = new mavlink20.message();
 mavlink20.messages.secure_command.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.operation, this.target_system, this.target_component, this.data_length, this.sig_length, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.sequence, this.operation, this.target_system, this.target_component, this.data_length, this.sig_length, this.data]));
 }
 
 /* 
@@ -5615,7 +5615,7 @@ mavlink20.messages.secure_command_reply = function(sequence, operation, result, 
 }
         mavlink20.messages.secure_command_reply.prototype = new mavlink20.message();
 mavlink20.messages.secure_command_reply.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.operation, this.result, this.data_length, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.sequence, this.operation, this.result, this.data_length, this.data]));
 }
 
 /* 
@@ -5652,7 +5652,7 @@ mavlink20.messages.adap_tuning = function(axis, desired, achieved, error, theta,
 }
         mavlink20.messages.adap_tuning.prototype = new mavlink20.message();
 mavlink20.messages.adap_tuning.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.desired, this.achieved, this.error, this.theta, this.omega, this.sigma, this.theta_dot, this.omega_dot, this.sigma_dot, this.f, this.f_dot, this.u, this.axis]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.desired, this.achieved, this.error, this.theta, this.omega, this.sigma, this.theta_dot, this.omega_dot, this.sigma_dot, this.f, this.f_dot, this.u, this.axis]));
 }
 
 /* 
@@ -5681,7 +5681,7 @@ mavlink20.messages.vision_position_delta = function(time_usec, time_delta_usec, 
 }
         mavlink20.messages.vision_position_delta.prototype = new mavlink20.message();
 mavlink20.messages.vision_position_delta.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.time_delta_usec, this.angle_delta, this.position_delta, this.confidence]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.time_delta_usec, this.angle_delta, this.position_delta, this.confidence]));
 }
 
 /* 
@@ -5708,7 +5708,7 @@ mavlink20.messages.aoa_ssa = function(time_usec, AOA, SSA) {
 }
         mavlink20.messages.aoa_ssa.prototype = new mavlink20.message();
 mavlink20.messages.aoa_ssa.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.AOA, this.SSA]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.AOA, this.SSA]));
 }
 
 /* 
@@ -5738,7 +5738,7 @@ mavlink20.messages.esc_telemetry_1_to_4 = function(temperature, voltage, current
 }
         mavlink20.messages.esc_telemetry_1_to_4.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_1_to_4.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -5768,7 +5768,7 @@ mavlink20.messages.esc_telemetry_5_to_8 = function(temperature, voltage, current
 }
         mavlink20.messages.esc_telemetry_5_to_8.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_5_to_8.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -5799,7 +5799,7 @@ mavlink20.messages.esc_telemetry_9_to_12 = function(temperature, voltage, curren
 }
         mavlink20.messages.esc_telemetry_9_to_12.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_9_to_12.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -5833,7 +5833,7 @@ mavlink20.messages.osd_param_config = function(target_system, target_component, 
 }
         mavlink20.messages.osd_param_config.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_config.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.target_system, this.target_component, this.osd_screen, this.osd_index, this.param_id, this.config_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.target_system, this.target_component, this.osd_screen, this.osd_index, this.param_id, this.config_type]));
 }
 
 /* 
@@ -5859,7 +5859,7 @@ mavlink20.messages.osd_param_config_reply = function(request_id, result) {
 }
         mavlink20.messages.osd_param_config_reply.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_config_reply.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.result]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.result]));
 }
 
 /* 
@@ -5888,7 +5888,7 @@ mavlink20.messages.osd_param_show_config = function(target_system, target_compon
 }
         mavlink20.messages.osd_param_show_config.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_show_config.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.osd_screen, this.osd_index]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.target_system, this.target_component, this.osd_screen, this.osd_index]));
 }
 
 /* 
@@ -5919,7 +5919,7 @@ mavlink20.messages.osd_param_show_config_reply = function(request_id, result, pa
 }
         mavlink20.messages.osd_param_show_config_reply.prototype = new mavlink20.message();
 mavlink20.messages.osd_param_show_config_reply.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.result, this.param_id, this.config_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.min_value, this.max_value, this.increment, this.result, this.param_id, this.config_type]));
 }
 
 /* 
@@ -5952,7 +5952,7 @@ mavlink20.messages.obstacle_distance_3d = function(time_boot_ms, sensor_type, fr
 }
         mavlink20.messages.obstacle_distance_3d.prototype = new mavlink20.message();
 mavlink20.messages.obstacle_distance_3d.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.min_distance, this.max_distance, this.obstacle_id, this.sensor_type, this.frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.min_distance, this.max_distance, this.obstacle_id, this.sensor_type, this.frame]));
 }
 
 /* 
@@ -5987,7 +5987,7 @@ mavlink20.messages.water_depth = function(time_boot_ms, id, healthy, lat, lng, a
 }
         mavlink20.messages.water_depth.prototype = new mavlink20.message();
 mavlink20.messages.water_depth.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lng, this.alt, this.roll, this.pitch, this.yaw, this.distance, this.temperature, this.id, this.healthy]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lng, this.alt, this.roll, this.pitch, this.yaw, this.distance, this.temperature, this.id, this.healthy]));
 }
 
 /* 
@@ -6017,7 +6017,7 @@ mavlink20.messages.mcu_status = function(id, MCU_temperature, MCU_voltage, MCU_v
 }
         mavlink20.messages.mcu_status.prototype = new mavlink20.message();
 mavlink20.messages.mcu_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.MCU_temperature, this.MCU_voltage, this.MCU_voltage_min, this.MCU_voltage_max, this.id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.MCU_temperature, this.MCU_voltage, this.MCU_voltage_min, this.MCU_voltage_max, this.id]));
 }
 
 /* 
@@ -6048,7 +6048,7 @@ mavlink20.messages.esc_telemetry_13_to_16 = function(temperature, voltage, curre
 }
         mavlink20.messages.esc_telemetry_13_to_16.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_13_to_16.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -6079,7 +6079,7 @@ mavlink20.messages.esc_telemetry_17_to_20 = function(temperature, voltage, curre
 }
         mavlink20.messages.esc_telemetry_17_to_20.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_17_to_20.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -6110,7 +6110,7 @@ mavlink20.messages.esc_telemetry_21_to_24 = function(temperature, voltage, curre
 }
         mavlink20.messages.esc_telemetry_21_to_24.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_21_to_24.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -6141,7 +6141,7 @@ mavlink20.messages.esc_telemetry_25_to_28 = function(temperature, voltage, curre
 }
         mavlink20.messages.esc_telemetry_25_to_28.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_25_to_28.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -6172,7 +6172,7 @@ mavlink20.messages.esc_telemetry_29_to_32 = function(temperature, voltage, curre
 }
         mavlink20.messages.esc_telemetry_29_to_32.prototype = new mavlink20.message();
 mavlink20.messages.esc_telemetry_29_to_32.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.voltage, this.current, this.totalcurrent, this.rpm, this.count, this.temperature]));
 }
 
 /* 
@@ -6212,7 +6212,7 @@ mavlink20.messages.command_int_stamped = function(utc_time, vehicle_timestamp, t
 }
         mavlink20.messages.command_int_stamped.prototype = new mavlink20.message();
 mavlink20.messages.command_int_stamped.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
 }
 
 /* 
@@ -6250,7 +6250,7 @@ mavlink20.messages.command_long_stamped = function(utc_time, vehicle_timestamp, 
 }
         mavlink20.messages.command_long_stamped.prototype = new mavlink20.message();
 mavlink20.messages.command_long_stamped.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.vehicle_timestamp, this.utc_time, this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
 }
 
 /* 
@@ -6278,7 +6278,7 @@ mavlink20.messages.sens_power = function(adc121_vspb_volt, adc121_cspb_amp, adc1
 }
         mavlink20.messages.sens_power.prototype = new mavlink20.message();
 mavlink20.messages.sens_power.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.adc121_vspb_volt, this.adc121_cspb_amp, this.adc121_cs1_amp, this.adc121_cs2_amp]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.adc121_vspb_volt, this.adc121_cspb_amp, this.adc121_cs1_amp, this.adc121_cs2_amp]));
 }
 
 /* 
@@ -6316,7 +6316,7 @@ mavlink20.messages.sens_mppt = function(mppt_timestamp, mppt1_volt, mppt1_amp, m
 }
         mavlink20.messages.sens_mppt.prototype = new mavlink20.message();
 mavlink20.messages.sens_mppt.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mppt_timestamp, this.mppt1_volt, this.mppt1_amp, this.mppt2_volt, this.mppt2_amp, this.mppt3_volt, this.mppt3_amp, this.mppt1_pwm, this.mppt2_pwm, this.mppt3_pwm, this.mppt1_status, this.mppt2_status, this.mppt3_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mppt_timestamp, this.mppt1_volt, this.mppt1_amp, this.mppt2_volt, this.mppt2_amp, this.mppt3_volt, this.mppt3_amp, this.mppt1_pwm, this.mppt2_pwm, this.mppt3_pwm, this.mppt1_status, this.mppt2_status, this.mppt3_status]));
 }
 
 /* 
@@ -6365,7 +6365,7 @@ mavlink20.messages.aslctrl_data = function(timestamp, aslctrl_mode, h, hRef, hRe
 }
         mavlink20.messages.aslctrl_data.prototype = new mavlink20.message();
 mavlink20.messages.aslctrl_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.h, this.hRef, this.hRef_t, this.PitchAngle, this.PitchAngleRef, this.q, this.qRef, this.uElev, this.uThrot, this.uThrot2, this.nZ, this.AirspeedRef, this.YawAngle, this.YawAngleRef, this.RollAngle, this.RollAngleRef, this.p, this.pRef, this.r, this.rRef, this.uAil, this.uRud, this.aslctrl_mode, this.SpoilersEngaged]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.h, this.hRef, this.hRef_t, this.PitchAngle, this.PitchAngleRef, this.q, this.qRef, this.uElev, this.uThrot, this.uThrot2, this.nZ, this.AirspeedRef, this.YawAngle, this.YawAngleRef, this.RollAngle, this.RollAngleRef, this.p, this.pRef, this.r, this.rRef, this.uAil, this.uRud, this.aslctrl_mode, this.SpoilersEngaged]));
 }
 
 /* 
@@ -6400,7 +6400,7 @@ mavlink20.messages.aslctrl_debug = function(i32_1, i8_1, i8_2, f_1, f_2, f_3, f_
 }
         mavlink20.messages.aslctrl_debug.prototype = new mavlink20.message();
 mavlink20.messages.aslctrl_debug.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.i32_1, this.f_1, this.f_2, this.f_3, this.f_4, this.f_5, this.f_6, this.f_7, this.f_8, this.i8_1, this.i8_2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.i32_1, this.f_1, this.f_2, this.f_3, this.f_4, this.f_5, this.f_6, this.f_7, this.f_8, this.i8_1, this.i8_2]));
 }
 
 /* 
@@ -6428,7 +6428,7 @@ mavlink20.messages.asluav_status = function(LED_status, SATCOM_status, Servo_sta
 }
         mavlink20.messages.asluav_status.prototype = new mavlink20.message();
 mavlink20.messages.asluav_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Motor_rpm, this.LED_status, this.SATCOM_status, this.Servo_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.Motor_rpm, this.LED_status, this.SATCOM_status, this.Servo_status]));
 }
 
 /* 
@@ -6459,7 +6459,7 @@ mavlink20.messages.ekf_ext = function(timestamp, Windspeed, WindDir, WindZ, Airs
 }
         mavlink20.messages.ekf_ext.prototype = new mavlink20.message();
 mavlink20.messages.ekf_ext.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.Windspeed, this.WindDir, this.WindZ, this.Airspeed, this.beta, this.alpha]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.Windspeed, this.WindDir, this.WindZ, this.Airspeed, this.beta, this.alpha]));
 }
 
 /* 
@@ -6491,7 +6491,7 @@ mavlink20.messages.asl_obctrl = function(timestamp, uElev, uThrot, uThrot2, uAil
 }
         mavlink20.messages.asl_obctrl.prototype = new mavlink20.message();
 mavlink20.messages.asl_obctrl.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.uElev, this.uThrot, this.uThrot2, this.uAilL, this.uAilR, this.uRud, this.obctrl_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.uElev, this.uThrot, this.uThrot2, this.uAilL, this.uAilR, this.uRud, this.obctrl_status]));
 }
 
 /* 
@@ -6518,7 +6518,7 @@ mavlink20.messages.sens_atmos = function(timestamp, TempAmbient, Humidity) {
 }
         mavlink20.messages.sens_atmos.prototype = new mavlink20.message();
 mavlink20.messages.sens_atmos.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.TempAmbient, this.Humidity]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.TempAmbient, this.Humidity]));
 }
 
 /* 
@@ -6557,7 +6557,7 @@ mavlink20.messages.sens_batmon = function(batmon_timestamp, temperature, voltage
 }
         mavlink20.messages.sens_batmon.prototype = new mavlink20.message();
 mavlink20.messages.sens_batmon.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.batmon_timestamp, this.temperature, this.safetystatus, this.operationstatus, this.voltage, this.current, this.batterystatus, this.serialnumber, this.cellvoltage1, this.cellvoltage2, this.cellvoltage3, this.cellvoltage4, this.cellvoltage5, this.cellvoltage6, this.SoC]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.batmon_timestamp, this.temperature, this.safetystatus, this.operationstatus, this.voltage, this.current, this.batterystatus, this.serialnumber, this.cellvoltage1, this.cellvoltage2, this.cellvoltage3, this.cellvoltage4, this.cellvoltage5, this.cellvoltage6, this.SoC]));
 }
 
 /* 
@@ -6606,7 +6606,7 @@ mavlink20.messages.fw_soaring_data = function(timestamp, timestampModeChanged, x
 }
         mavlink20.messages.fw_soaring_data.prototype = new mavlink20.message();
 mavlink20.messages.fw_soaring_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.timestampModeChanged, this.xW, this.xR, this.xLat, this.xLon, this.VarW, this.VarR, this.VarLat, this.VarLon, this.LoiterRadius, this.LoiterDirection, this.DistToSoarPoint, this.vSinkExp, this.z1_LocalUpdraftSpeed, this.z2_DeltaRoll, this.z1_exp, this.z2_exp, this.ThermalGSNorth, this.ThermalGSEast, this.TSE_dot, this.DebugVar1, this.DebugVar2, this.ControlMode, this.valid]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.timestampModeChanged, this.xW, this.xR, this.xLat, this.xLon, this.VarW, this.VarR, this.VarLat, this.VarLon, this.LoiterRadius, this.LoiterDirection, this.DistToSoarPoint, this.vSinkExp, this.z1_LocalUpdraftSpeed, this.z2_DeltaRoll, this.z1_exp, this.z2_exp, this.ThermalGSNorth, this.ThermalGSEast, this.TSE_dot, this.DebugVar1, this.DebugVar2, this.ControlMode, this.valid]));
 }
 
 /* 
@@ -6638,7 +6638,7 @@ mavlink20.messages.sensorpod_status = function(timestamp, visensor_rate_1, visen
 }
         mavlink20.messages.sensorpod_status.prototype = new mavlink20.message();
 mavlink20.messages.sensorpod_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.free_space, this.visensor_rate_1, this.visensor_rate_2, this.visensor_rate_3, this.visensor_rate_4, this.recording_nodes_count, this.cpu_temp]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.free_space, this.visensor_rate_1, this.visensor_rate_2, this.visensor_rate_3, this.visensor_rate_4, this.recording_nodes_count, this.cpu_temp]));
 }
 
 /* 
@@ -6674,7 +6674,7 @@ mavlink20.messages.sens_power_board = function(timestamp, pwr_brd_status, pwr_br
 }
         mavlink20.messages.sens_power_board.prototype = new mavlink20.message();
 mavlink20.messages.sens_power_board.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.pwr_brd_system_volt, this.pwr_brd_servo_volt, this.pwr_brd_digital_volt, this.pwr_brd_mot_l_amp, this.pwr_brd_mot_r_amp, this.pwr_brd_analog_amp, this.pwr_brd_digital_amp, this.pwr_brd_ext_amp, this.pwr_brd_aux_amp, this.pwr_brd_status, this.pwr_brd_led_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.pwr_brd_system_volt, this.pwr_brd_servo_volt, this.pwr_brd_digital_volt, this.pwr_brd_mot_l_amp, this.pwr_brd_mot_r_amp, this.pwr_brd_analog_amp, this.pwr_brd_digital_amp, this.pwr_brd_ext_amp, this.pwr_brd_aux_amp, this.pwr_brd_status, this.pwr_brd_led_status]));
 }
 
 /* 
@@ -6705,7 +6705,7 @@ mavlink20.messages.gsm_link_status = function(timestamp, gsm_modem_type, gsm_lin
 }
         mavlink20.messages.gsm_link_status.prototype = new mavlink20.message();
 mavlink20.messages.gsm_link_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.gsm_modem_type, this.gsm_link_type, this.rssi, this.rsrp_rscp, this.sinr_ecio, this.rsrq]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.gsm_modem_type, this.gsm_link_type, this.rssi, this.rsrp_rscp, this.sinr_ecio, this.rsrq]));
 }
 
 /* 
@@ -6737,7 +6737,7 @@ mavlink20.messages.satcom_link_status = function(timestamp, last_heartbeat, fail
 }
         mavlink20.messages.satcom_link_status.prototype = new mavlink20.message();
 mavlink20.messages.satcom_link_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
 }
 
 /* 
@@ -6766,7 +6766,7 @@ mavlink20.messages.sensor_airflow_angles = function(timestamp, angleofattack, an
 }
         mavlink20.messages.sensor_airflow_angles.prototype = new mavlink20.message();
 mavlink20.messages.sensor_airflow_angles.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.angleofattack, this.sideslip, this.angleofattack_valid, this.sideslip_valid]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.angleofattack, this.sideslip, this.angleofattack_valid, this.sideslip_valid]));
 }
 
 /* 
@@ -6817,7 +6817,7 @@ mavlink20.messages.sys_status = function(onboard_control_sensors_present, onboar
 }
         mavlink20.messages.sys_status.prototype = new mavlink20.message();
 mavlink20.messages.sys_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.onboard_control_sensors_present, this.onboard_control_sensors_enabled, this.onboard_control_sensors_health, this.load, this.voltage_battery, this.current_battery, this.drop_rate_comm, this.errors_comm, this.errors_count1, this.errors_count2, this.errors_count3, this.errors_count4, this.battery_remaining]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.onboard_control_sensors_present, this.onboard_control_sensors_enabled, this.onboard_control_sensors_health, this.load, this.voltage_battery, this.current_battery, this.drop_rate_comm, this.errors_comm, this.errors_count1, this.errors_count2, this.errors_count3, this.errors_count4, this.battery_remaining]));
 }
 
 /* 
@@ -6844,7 +6844,7 @@ mavlink20.messages.system_time = function(time_unix_usec, time_boot_ms) {
 }
         mavlink20.messages.system_time.prototype = new mavlink20.message();
 mavlink20.messages.system_time.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_unix_usec, this.time_boot_ms]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_unix_usec, this.time_boot_ms]));
 }
 
 /* 
@@ -6875,7 +6875,7 @@ mavlink20.messages.ping = function(time_usec, seq, target_system, target_compone
 }
         mavlink20.messages.ping.prototype = new mavlink20.message();
 mavlink20.messages.ping.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.seq, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.seq, this.target_system, this.target_component]));
 }
 
 /* 
@@ -6903,7 +6903,7 @@ mavlink20.messages.change_operator_control = function(target_system, control_req
 }
         mavlink20.messages.change_operator_control.prototype = new mavlink20.message();
 mavlink20.messages.change_operator_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.control_request, this.version, this.passkey]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.control_request, this.version, this.passkey]));
 }
 
 /* 
@@ -6930,7 +6930,7 @@ mavlink20.messages.change_operator_control_ack = function(gcs_system_id, control
 }
         mavlink20.messages.change_operator_control_ack.prototype = new mavlink20.message();
 mavlink20.messages.change_operator_control_ack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.gcs_system_id, this.control_request, this.ack]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.gcs_system_id, this.control_request, this.ack]));
 }
 
 /* 
@@ -6957,7 +6957,7 @@ mavlink20.messages.auth_key = function(key) {
 }
         mavlink20.messages.auth_key.prototype = new mavlink20.message();
 mavlink20.messages.auth_key.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.key]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.key]));
 }
 
 /* 
@@ -6986,7 +6986,7 @@ mavlink20.messages.set_mode = function(target_system, base_mode, custom_mode) {
 }
         mavlink20.messages.set_mode.prototype = new mavlink20.message();
 mavlink20.messages.set_mode.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.target_system, this.base_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.custom_mode, this.target_system, this.base_mode]));
 }
 
 /* 
@@ -7020,7 +7020,7 @@ mavlink20.messages.param_request_read = function(target_system, target_component
 }
         mavlink20.messages.param_request_read.prototype = new mavlink20.message();
 mavlink20.messages.param_request_read.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
 }
 
 /* 
@@ -7048,7 +7048,7 @@ mavlink20.messages.param_request_list = function(target_system, target_component
 }
         mavlink20.messages.param_request_list.prototype = new mavlink20.message();
 mavlink20.messages.param_request_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
 
 /* 
@@ -7081,7 +7081,7 @@ mavlink20.messages.param_value = function(param_id, param_value, param_type, par
 }
         mavlink20.messages.param_value.prototype = new mavlink20.message();
 mavlink20.messages.param_value.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value, this.param_count, this.param_index, this.param_id, this.param_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_value, this.param_count, this.param_index, this.param_id, this.param_type]));
 }
 
 /* 
@@ -7116,7 +7116,7 @@ mavlink20.messages.param_set = function(target_system, target_component, param_i
 }
         mavlink20.messages.param_set.prototype = new mavlink20.message();
 mavlink20.messages.param_set.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value, this.target_system, this.target_component, this.param_id, this.param_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_value, this.target_system, this.target_component, this.param_id, this.param_type]));
 }
 
 /* 
@@ -7159,7 +7159,7 @@ mavlink20.messages.gps_raw_int = function(time_usec, fix_type, lat, lon, alt, ep
 }
         mavlink20.messages.gps_raw_int.prototype = new mavlink20.message();
 mavlink20.messages.gps_raw_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc, this.yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc, this.yaw]));
 }
 
 /* 
@@ -7193,7 +7193,7 @@ mavlink20.messages.gps_status = function(satellites_visible, satellite_prn, sate
 }
         mavlink20.messages.gps_status.prototype = new mavlink20.message();
 mavlink20.messages.gps_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.satellites_visible, this.satellite_prn, this.satellite_used, this.satellite_elevation, this.satellite_azimuth, this.satellite_snr]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.satellites_visible, this.satellite_prn, this.satellite_used, this.satellite_elevation, this.satellite_azimuth, this.satellite_snr]));
 }
 
 /* 
@@ -7229,7 +7229,7 @@ mavlink20.messages.scaled_imu = function(time_boot_ms, xacc, yacc, zacc, xgyro, 
 }
         mavlink20.messages.scaled_imu.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
 
 /* 
@@ -7267,7 +7267,7 @@ mavlink20.messages.raw_imu = function(time_usec, xacc, yacc, zacc, xgyro, ygyro,
 }
         mavlink20.messages.raw_imu.prototype = new mavlink20.message();
 mavlink20.messages.raw_imu.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.id, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.id, this.temperature]));
 }
 
 /* 
@@ -7298,7 +7298,7 @@ mavlink20.messages.raw_pressure = function(time_usec, press_abs, press_diff1, pr
 }
         mavlink20.messages.raw_pressure.prototype = new mavlink20.message();
 mavlink20.messages.raw_pressure.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.press_abs, this.press_diff1, this.press_diff2, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.press_abs, this.press_diff1, this.press_diff2, this.temperature]));
 }
 
 /* 
@@ -7329,7 +7329,7 @@ mavlink20.messages.scaled_pressure = function(time_boot_ms, press_abs, press_dif
 }
         mavlink20.messages.scaled_pressure.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
 
 /* 
@@ -7361,7 +7361,7 @@ mavlink20.messages.attitude = function(time_boot_ms, roll, pitch, yaw, rollspeed
 }
         mavlink20.messages.attitude.prototype = new mavlink20.message();
 mavlink20.messages.attitude.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed]));
 }
 
 /* 
@@ -7396,7 +7396,7 @@ mavlink20.messages.attitude_quaternion = function(time_boot_ms, q1, q2, q3, q4, 
 }
         mavlink20.messages.attitude_quaternion.prototype = new mavlink20.message();
 mavlink20.messages.attitude_quaternion.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.rollspeed, this.pitchspeed, this.yawspeed, this.repr_offset_q]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.rollspeed, this.pitchspeed, this.yawspeed, this.repr_offset_q]));
 }
 
 /* 
@@ -7429,7 +7429,7 @@ mavlink20.messages.local_position_ned = function(time_boot_ms, x, y, z, vx, vy, 
 }
         mavlink20.messages.local_position_ned.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz]));
 }
 
 /* 
@@ -7465,7 +7465,7 @@ mavlink20.messages.global_position_int = function(time_boot_ms, lat, lon, alt, r
 }
         mavlink20.messages.global_position_int.prototype = new mavlink20.message();
 mavlink20.messages.global_position_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.hdg]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.hdg]));
 }
 
 /* 
@@ -7501,7 +7501,7 @@ mavlink20.messages.rc_channels_scaled = function(time_boot_ms, port, chan1_scale
 }
         mavlink20.messages.rc_channels_scaled.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_scaled.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_scaled, this.chan2_scaled, this.chan3_scaled, this.chan4_scaled, this.chan5_scaled, this.chan6_scaled, this.chan7_scaled, this.chan8_scaled, this.port, this.rssi]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.chan1_scaled, this.chan2_scaled, this.chan3_scaled, this.chan4_scaled, this.chan5_scaled, this.chan6_scaled, this.chan7_scaled, this.chan8_scaled, this.port, this.rssi]));
 }
 
 /* 
@@ -7539,7 +7539,7 @@ mavlink20.messages.rc_channels_raw = function(time_boot_ms, port, chan1_raw, cha
 }
         mavlink20.messages.rc_channels_raw.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_raw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.port, this.rssi]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.port, this.rssi]));
 }
 
 /* 
@@ -7584,7 +7584,7 @@ mavlink20.messages.servo_output_raw = function(time_usec, port, servo1_raw, serv
 }
         mavlink20.messages.servo_output_raw.prototype = new mavlink20.message();
 mavlink20.messages.servo_output_raw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.servo1_raw, this.servo2_raw, this.servo3_raw, this.servo4_raw, this.servo5_raw, this.servo6_raw, this.servo7_raw, this.servo8_raw, this.port, this.servo9_raw, this.servo10_raw, this.servo11_raw, this.servo12_raw, this.servo13_raw, this.servo14_raw, this.servo15_raw, this.servo16_raw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.servo1_raw, this.servo2_raw, this.servo3_raw, this.servo4_raw, this.servo5_raw, this.servo6_raw, this.servo7_raw, this.servo8_raw, this.port, this.servo9_raw, this.servo10_raw, this.servo11_raw, this.servo12_raw, this.servo13_raw, this.servo14_raw, this.servo15_raw, this.servo16_raw]));
 }
 
 /* 
@@ -7615,7 +7615,7 @@ mavlink20.messages.mission_request_partial_list = function(target_system, target
 }
         mavlink20.messages.mission_request_partial_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_partial_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7647,7 +7647,7 @@ mavlink20.messages.mission_write_partial_list = function(target_system, target_c
 }
         mavlink20.messages.mission_write_partial_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_write_partial_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.start_index, this.end_index, this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7693,7 +7693,7 @@ mavlink20.messages.mission_item = function(target_system, target_component, seq,
 }
         mavlink20.messages.mission_item.prototype = new mavlink20.message();
 mavlink20.messages.mission_item.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
 }
 
 /* 
@@ -7723,7 +7723,7 @@ mavlink20.messages.mission_request = function(target_system, target_component, s
 }
         mavlink20.messages.mission_request.prototype = new mavlink20.message();
 mavlink20.messages.mission_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7752,7 +7752,7 @@ mavlink20.messages.mission_set_current = function(target_system, target_componen
 }
         mavlink20.messages.mission_set_current.prototype = new mavlink20.message();
 mavlink20.messages.mission_set_current.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seq, this.target_system, this.target_component]));
 }
 
 /* 
@@ -7781,7 +7781,7 @@ mavlink20.messages.mission_current = function(seq, total, mission_state, mission
 }
         mavlink20.messages.mission_current.prototype = new mavlink20.message();
 mavlink20.messages.mission_current.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.total, this.mission_state, this.mission_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seq, this.total, this.mission_state, this.mission_mode]));
 }
 
 /* 
@@ -7808,7 +7808,7 @@ mavlink20.messages.mission_request_list = function(target_system, target_compone
 }
         mavlink20.messages.mission_request_list.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7839,7 +7839,7 @@ mavlink20.messages.mission_count = function(target_system, target_component, cou
 }
         mavlink20.messages.mission_count.prototype = new mavlink20.message();
 mavlink20.messages.mission_count.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.count, this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.count, this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7866,7 +7866,7 @@ mavlink20.messages.mission_clear_all = function(target_system, target_component,
 }
         mavlink20.messages.mission_clear_all.prototype = new mavlink20.message();
 mavlink20.messages.mission_clear_all.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -7893,7 +7893,7 @@ mavlink20.messages.mission_item_reached = function(seq) {
 }
         mavlink20.messages.mission_item_reached.prototype = new mavlink20.message();
 mavlink20.messages.mission_item_reached.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seq]));
 }
 
 /* 
@@ -7923,7 +7923,7 @@ mavlink20.messages.mission_ack = function(target_system, target_component, type,
 }
         mavlink20.messages.mission_ack.prototype = new mavlink20.message();
 mavlink20.messages.mission_ack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.type, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.type, this.mission_type]));
 }
 
 /* 
@@ -7957,7 +7957,7 @@ mavlink20.messages.set_gps_global_origin = function(target_system, latitude, lon
 }
         mavlink20.messages.set_gps_global_origin.prototype = new mavlink20.message();
 mavlink20.messages.set_gps_global_origin.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.target_system, this.time_usec]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.target_system, this.time_usec]));
 }
 
 /* 
@@ -7987,7 +7987,7 @@ mavlink20.messages.gps_global_origin = function(latitude, longitude, altitude, t
 }
         mavlink20.messages.gps_global_origin.prototype = new mavlink20.message();
 mavlink20.messages.gps_global_origin.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.time_usec]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.time_usec]));
 }
 
 /* 
@@ -8021,7 +8021,7 @@ mavlink20.messages.param_map_rc = function(target_system, target_component, para
 }
         mavlink20.messages.param_map_rc.prototype = new mavlink20.message();
 mavlink20.messages.param_map_rc.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_value0, this.scale, this.param_value_min, this.param_value_max, this.param_index, this.target_system, this.target_component, this.param_id, this.parameter_rc_channel_index]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_value0, this.scale, this.param_value_min, this.param_value_max, this.param_index, this.target_system, this.target_component, this.param_id, this.parameter_rc_channel_index]));
 }
 
 /* 
@@ -8051,7 +8051,7 @@ mavlink20.messages.mission_request_int = function(target_system, target_componen
 }
         mavlink20.messages.mission_request_int.prototype = new mavlink20.message();
 mavlink20.messages.mission_request_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seq, this.target_system, this.target_component, this.mission_type]));
 }
 
 /* 
@@ -8087,7 +8087,7 @@ mavlink20.messages.safety_set_allowed_area = function(target_system, target_comp
 }
         mavlink20.messages.safety_set_allowed_area.prototype = new mavlink20.message();
 mavlink20.messages.safety_set_allowed_area.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.target_system, this.target_component, this.frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.target_system, this.target_component, this.frame]));
 }
 
 /* 
@@ -8118,7 +8118,7 @@ mavlink20.messages.safety_allowed_area = function(frame, p1x, p1y, p1z, p2x, p2y
 }
         mavlink20.messages.safety_allowed_area.prototype = new mavlink20.message();
 mavlink20.messages.safety_allowed_area.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.p1x, this.p1y, this.p1z, this.p2x, this.p2y, this.p2z, this.frame]));
 }
 
 /* 
@@ -8150,7 +8150,7 @@ mavlink20.messages.attitude_quaternion_cov = function(time_usec, q, rollspeed, p
 }
         mavlink20.messages.attitude_quaternion_cov.prototype = new mavlink20.message();
 mavlink20.messages.attitude_quaternion_cov.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.q, this.rollspeed, this.pitchspeed, this.yawspeed, this.covariance]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.q, this.rollspeed, this.pitchspeed, this.yawspeed, this.covariance]));
 }
 
 /* 
@@ -8182,7 +8182,7 @@ mavlink20.messages.nav_controller_output = function(nav_roll, nav_pitch, nav_bea
 }
         mavlink20.messages.nav_controller_output.prototype = new mavlink20.message();
 mavlink20.messages.nav_controller_output.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.nav_roll, this.nav_pitch, this.alt_error, this.aspd_error, this.xtrack_error, this.nav_bearing, this.target_bearing, this.wp_dist]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.nav_roll, this.nav_pitch, this.alt_error, this.aspd_error, this.xtrack_error, this.nav_bearing, this.target_bearing, this.wp_dist]));
 }
 
 /* 
@@ -8222,7 +8222,7 @@ mavlink20.messages.global_position_int_cov = function(time_usec, estimator_type,
 }
         mavlink20.messages.global_position_int_cov.prototype = new mavlink20.message();
 mavlink20.messages.global_position_int_cov.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.covariance, this.estimator_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.relative_alt, this.vx, this.vy, this.vz, this.covariance, this.estimator_type]));
 }
 
 /* 
@@ -8260,7 +8260,7 @@ mavlink20.messages.local_position_ned_cov = function(time_usec, estimator_type, 
 }
         mavlink20.messages.local_position_ned_cov.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned_cov.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.covariance, this.estimator_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.ax, this.ay, this.az, this.covariance, this.estimator_type]));
 }
 
 /* 
@@ -8308,7 +8308,7 @@ mavlink20.messages.rc_channels = function(time_boot_ms, chancount, chan1_raw, ch
 }
         mavlink20.messages.rc_channels.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw, this.chancount, this.rssi]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw, this.chancount, this.rssi]));
 }
 
 /* 
@@ -8337,7 +8337,7 @@ mavlink20.messages.request_data_stream = function(target_system, target_componen
 }
         mavlink20.messages.request_data_stream.prototype = new mavlink20.message();
 mavlink20.messages.request_data_stream.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.req_message_rate, this.target_system, this.target_component, this.req_stream_id, this.start_stop]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.req_message_rate, this.target_system, this.target_component, this.req_stream_id, this.start_stop]));
 }
 
 /* 
@@ -8364,7 +8364,7 @@ mavlink20.messages.data_stream = function(stream_id, message_rate, on_off) {
 }
         mavlink20.messages.data_stream.prototype = new mavlink20.message();
 mavlink20.messages.data_stream.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.message_rate, this.stream_id, this.on_off]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.message_rate, this.stream_id, this.on_off]));
 }
 
 /* 
@@ -8407,7 +8407,7 @@ mavlink20.messages.manual_control = function(target, x, y, z, r, buttons, button
 }
         mavlink20.messages.manual_control.prototype = new mavlink20.message();
 mavlink20.messages.manual_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.x, this.y, this.z, this.r, this.buttons, this.target, this.buttons2, this.enabled_extensions, this.s, this.t, this.aux1, this.aux2, this.aux3, this.aux4, this.aux5, this.aux6]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.x, this.y, this.z, this.r, this.buttons, this.target, this.buttons2, this.enabled_extensions, this.s, this.t, this.aux1, this.aux2, this.aux3, this.aux4, this.aux5, this.aux6]));
 }
 
 /* 
@@ -8456,7 +8456,7 @@ mavlink20.messages.rc_channels_override = function(target_system, target_compone
 }
         mavlink20.messages.rc_channels_override.prototype = new mavlink20.message();
 mavlink20.messages.rc_channels_override.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.target_system, this.target_component, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.target_system, this.target_component, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.chan13_raw, this.chan14_raw, this.chan15_raw, this.chan16_raw, this.chan17_raw, this.chan18_raw]));
 }
 
 /* 
@@ -8503,7 +8503,7 @@ mavlink20.messages.mission_item_int = function(target_system, target_component, 
 }
         mavlink20.messages.mission_item_int.prototype = new mavlink20.message();
 mavlink20.messages.mission_item_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.seq, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue, this.mission_type]));
 }
 
 /* 
@@ -8533,7 +8533,7 @@ mavlink20.messages.vfr_hud = function(airspeed, groundspeed, heading, throttle, 
 }
         mavlink20.messages.vfr_hud.prototype = new mavlink20.message();
 mavlink20.messages.vfr_hud.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.airspeed, this.groundspeed, this.alt, this.climb, this.heading, this.throttle]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.airspeed, this.groundspeed, this.alt, this.climb, this.heading, this.throttle]));
 }
 
 /* 
@@ -8572,7 +8572,7 @@ mavlink20.messages.command_int = function(target_system, target_component, frame
 }
         mavlink20.messages.command_int.prototype = new mavlink20.message();
 mavlink20.messages.command_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.x, this.y, this.z, this.command, this.target_system, this.target_component, this.frame, this.current, this.autocontinue]));
 }
 
 /* 
@@ -8609,7 +8609,7 @@ mavlink20.messages.command_long = function(target_system, target_component, comm
 }
         mavlink20.messages.command_long.prototype = new mavlink20.message();
 mavlink20.messages.command_long.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param1, this.param2, this.param3, this.param4, this.param5, this.param6, this.param7, this.command, this.target_system, this.target_component, this.confirmation]));
 }
 
 /* 
@@ -8641,7 +8641,7 @@ mavlink20.messages.command_ack = function(command, result, progress, result_para
 }
         mavlink20.messages.command_ack.prototype = new mavlink20.message();
 mavlink20.messages.command_ack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.command, this.result, this.progress, this.result_param2, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.command, this.result, this.progress, this.result_param2, this.target_system, this.target_component]));
 }
 
 /* 
@@ -8672,7 +8672,7 @@ mavlink20.messages.manual_setpoint = function(time_boot_ms, roll, pitch, yaw, th
 }
         mavlink20.messages.manual_setpoint.prototype = new mavlink20.message();
 mavlink20.messages.manual_setpoint.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.thrust, this.mode_switch, this.manual_override_switch]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.thrust, this.mode_switch, this.manual_override_switch]));
 }
 
 /* 
@@ -8706,7 +8706,7 @@ mavlink20.messages.set_attitude_target = function(time_boot_ms, target_system, t
 }
         mavlink20.messages.set_attitude_target.prototype = new mavlink20.message();
 mavlink20.messages.set_attitude_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.target_system, this.target_component, this.type_mask]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.target_system, this.target_component, this.type_mask]));
 }
 
 /* 
@@ -8740,7 +8740,7 @@ mavlink20.messages.attitude_target = function(time_boot_ms, type_mask, q, body_r
 }
         mavlink20.messages.attitude_target.prototype = new mavlink20.message();
 mavlink20.messages.attitude_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.type_mask]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q, this.body_roll_rate, this.body_pitch_rate, this.body_yaw_rate, this.thrust, this.type_mask]));
 }
 
 /* 
@@ -8782,7 +8782,7 @@ mavlink20.messages.set_position_target_local_ned = function(time_boot_ms, target
 }
         mavlink20.messages.set_position_target_local_ned.prototype = new mavlink20.message();
 mavlink20.messages.set_position_target_local_ned.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
 }
 
 /* 
@@ -8823,7 +8823,7 @@ mavlink20.messages.position_target_local_ned = function(time_boot_ms, coordinate
 }
         mavlink20.messages.position_target_local_ned.prototype = new mavlink20.message();
 mavlink20.messages.position_target_local_ned.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
 }
 
 /* 
@@ -8865,7 +8865,7 @@ mavlink20.messages.set_position_target_global_int = function(time_boot_ms, targe
 }
         mavlink20.messages.set_position_target_global_int.prototype = new mavlink20.message();
 mavlink20.messages.set_position_target_global_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.target_system, this.target_component, this.coordinate_frame]));
 }
 
 /* 
@@ -8906,7 +8906,7 @@ mavlink20.messages.position_target_global_int = function(time_boot_ms, coordinat
 }
         mavlink20.messages.position_target_global_int.prototype = new mavlink20.message();
 mavlink20.messages.position_target_global_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat_int, this.lon_int, this.alt, this.vx, this.vy, this.vz, this.afx, this.afy, this.afz, this.yaw, this.yaw_rate, this.type_mask, this.coordinate_frame]));
 }
 
 /* 
@@ -8940,7 +8940,7 @@ mavlink20.messages.local_position_ned_system_global_offset = function(time_boot_
 }
         mavlink20.messages.local_position_ned_system_global_offset.prototype = new mavlink20.message();
 mavlink20.messages.local_position_ned_system_global_offset.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.roll, this.pitch, this.yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.x, this.y, this.z, this.roll, this.pitch, this.yaw]));
 }
 
 /* 
@@ -8981,7 +8981,7 @@ mavlink20.messages.hil_state = function(time_usec, roll, pitch, yaw, rollspeed, 
 }
         mavlink20.messages.hil_state.prototype = new mavlink20.message();
 mavlink20.messages.hil_state.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.xacc, this.yacc, this.zacc]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.roll, this.pitch, this.yaw, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.xacc, this.yacc, this.zacc]));
 }
 
 /* 
@@ -9017,7 +9017,7 @@ mavlink20.messages.hil_controls = function(time_usec, roll_ailerons, pitch_eleva
 }
         mavlink20.messages.hil_controls.prototype = new mavlink20.message();
 mavlink20.messages.hil_controls.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.roll_ailerons, this.pitch_elevator, this.yaw_rudder, this.throttle, this.aux1, this.aux2, this.aux3, this.aux4, this.mode, this.nav_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.roll_ailerons, this.pitch_elevator, this.yaw_rudder, this.throttle, this.aux1, this.aux2, this.aux3, this.aux4, this.mode, this.nav_mode]));
 }
 
 /* 
@@ -9058,7 +9058,7 @@ mavlink20.messages.hil_rc_inputs_raw = function(time_usec, chan1_raw, chan2_raw,
 }
         mavlink20.messages.hil_rc_inputs_raw.prototype = new mavlink20.message();
 mavlink20.messages.hil_rc_inputs_raw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.rssi]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.chan1_raw, this.chan2_raw, this.chan3_raw, this.chan4_raw, this.chan5_raw, this.chan6_raw, this.chan7_raw, this.chan8_raw, this.chan9_raw, this.chan10_raw, this.chan11_raw, this.chan12_raw, this.rssi]));
 }
 
 /* 
@@ -9087,7 +9087,7 @@ mavlink20.messages.hil_actuator_controls = function(time_usec, controls, mode, f
 }
         mavlink20.messages.hil_actuator_controls.prototype = new mavlink20.message();
 mavlink20.messages.hil_actuator_controls.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.flags, this.controls, this.mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.flags, this.controls, this.mode]));
 }
 
 /* 
@@ -9121,7 +9121,7 @@ mavlink20.messages.optical_flow = function(time_usec, sensor_id, flow_x, flow_y,
 }
         mavlink20.messages.optical_flow.prototype = new mavlink20.message();
 mavlink20.messages.optical_flow.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.flow_comp_m_x, this.flow_comp_m_y, this.ground_distance, this.flow_x, this.flow_y, this.sensor_id, this.quality, this.flow_rate_x, this.flow_rate_y]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.flow_comp_m_x, this.flow_comp_m_y, this.ground_distance, this.flow_x, this.flow_y, this.sensor_id, this.quality, this.flow_rate_x, this.flow_rate_y]));
 }
 
 /* 
@@ -9154,7 +9154,7 @@ mavlink20.messages.global_vision_position_estimate = function(usec, x, y, z, rol
 }
         mavlink20.messages.global_vision_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.global_vision_position_estimate.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
 }
 
 /* 
@@ -9187,7 +9187,7 @@ mavlink20.messages.vision_position_estimate = function(usec, x, y, z, roll, pitc
 }
         mavlink20.messages.vision_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vision_position_estimate.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance, this.reset_counter]));
 }
 
 /* 
@@ -9217,7 +9217,7 @@ mavlink20.messages.vision_speed_estimate = function(usec, x, y, z, covariance, r
 }
         mavlink20.messages.vision_speed_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vision_speed_estimate.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.covariance, this.reset_counter]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.covariance, this.reset_counter]));
 }
 
 /* 
@@ -9249,7 +9249,7 @@ mavlink20.messages.vicon_position_estimate = function(usec, x, y, z, roll, pitch
 }
         mavlink20.messages.vicon_position_estimate.prototype = new mavlink20.message();
 mavlink20.messages.vicon_position_estimate.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.usec, this.x, this.y, this.z, this.roll, this.pitch, this.yaw, this.covariance]));
 }
 
 /* 
@@ -9289,7 +9289,7 @@ mavlink20.messages.highres_imu = function(time_usec, xacc, yacc, zacc, xgyro, yg
 }
         mavlink20.messages.highres_imu.prototype = new mavlink20.message();
 mavlink20.messages.highres_imu.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
 }
 
 /* 
@@ -9326,7 +9326,7 @@ mavlink20.messages.optical_flow_rad = function(time_usec, sensor_id, integration
 }
         mavlink20.messages.optical_flow_rad.prototype = new mavlink20.message();
 mavlink20.messages.optical_flow_rad.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
 }
 
 /* 
@@ -9366,7 +9366,7 @@ mavlink20.messages.hil_sensor = function(time_usec, xacc, yacc, zacc, xgyro, ygy
 }
         mavlink20.messages.hil_sensor.prototype = new mavlink20.message();
 mavlink20.messages.hil_sensor.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.abs_pressure, this.diff_pressure, this.pressure_alt, this.temperature, this.fields_updated, this.id]));
 }
 
 /* 
@@ -9413,7 +9413,7 @@ mavlink20.messages.sim_state = function(q1, q2, q3, q4, roll, pitch, yaw, xacc, 
 }
         mavlink20.messages.sim_state.prototype = new mavlink20.message();
 mavlink20.messages.sim_state.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q1, this.q2, this.q3, this.q4, this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lon, this.alt, this.std_dev_horz, this.std_dev_vert, this.vn, this.ve, this.vd, this.lat_int, this.lon_int]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.q1, this.q2, this.q3, this.q4, this.roll, this.pitch, this.yaw, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.lat, this.lon, this.alt, this.std_dev_horz, this.std_dev_vert, this.vn, this.ve, this.vd, this.lat_int, this.lon_int]));
 }
 
 /* 
@@ -9444,7 +9444,7 @@ mavlink20.messages.radio_status = function(rssi, remrssi, txbuf, noise, remnoise
 }
         mavlink20.messages.radio_status.prototype = new mavlink20.message();
 mavlink20.messages.radio_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rxerrors, this.fixed, this.rssi, this.remrssi, this.txbuf, this.noise, this.remnoise]));
 }
 
 /* 
@@ -9472,7 +9472,7 @@ mavlink20.messages.file_transfer_protocol = function(target_network, target_syst
 }
         mavlink20.messages.file_transfer_protocol.prototype = new mavlink20.message();
 mavlink20.messages.file_transfer_protocol.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_network, this.target_system, this.target_component, this.payload]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_network, this.target_system, this.target_component, this.payload]));
 }
 
 /* 
@@ -9498,7 +9498,7 @@ mavlink20.messages.timesync = function(tc1, ts1) {
 }
         mavlink20.messages.timesync.prototype = new mavlink20.message();
 mavlink20.messages.timesync.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.tc1, this.ts1]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.tc1, this.ts1]));
 }
 
 /* 
@@ -9524,7 +9524,7 @@ mavlink20.messages.camera_trigger = function(time_usec, seq) {
 }
         mavlink20.messages.camera_trigger.prototype = new mavlink20.message();
 mavlink20.messages.camera_trigger.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.seq]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.seq]));
 }
 
 /* 
@@ -9566,7 +9566,7 @@ mavlink20.messages.hil_gps = function(time_usec, fix_type, lat, lon, alt, eph, e
 }
         mavlink20.messages.hil_gps.prototype = new mavlink20.message();
 mavlink20.messages.hil_gps.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.vn, this.ve, this.vd, this.cog, this.fix_type, this.satellites_visible, this.id, this.yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.eph, this.epv, this.vel, this.vn, this.ve, this.vd, this.cog, this.fix_type, this.satellites_visible, this.id, this.yaw]));
 }
 
 /* 
@@ -9603,7 +9603,7 @@ mavlink20.messages.hil_optical_flow = function(time_usec, sensor_id, integration
 }
         mavlink20.messages.hil_optical_flow.prototype = new mavlink20.message();
 mavlink20.messages.hil_optical_flow.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.integration_time_us, this.integrated_x, this.integrated_y, this.integrated_xgyro, this.integrated_ygyro, this.integrated_zgyro, this.time_delta_distance_us, this.distance, this.temperature, this.sensor_id, this.quality]));
 }
 
 /* 
@@ -9645,7 +9645,7 @@ mavlink20.messages.hil_state_quaternion = function(time_usec, attitude_quaternio
 }
         mavlink20.messages.hil_state_quaternion.prototype = new mavlink20.message();
 mavlink20.messages.hil_state_quaternion.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.attitude_quaternion, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.ind_airspeed, this.true_airspeed, this.xacc, this.yacc, this.zacc]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.attitude_quaternion, this.rollspeed, this.pitchspeed, this.yawspeed, this.lat, this.lon, this.alt, this.vx, this.vy, this.vz, this.ind_airspeed, this.true_airspeed, this.xacc, this.yacc, this.zacc]));
 }
 
 /* 
@@ -9681,7 +9681,7 @@ mavlink20.messages.scaled_imu2 = function(time_boot_ms, xacc, yacc, zacc, xgyro,
 }
         mavlink20.messages.scaled_imu2.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu2.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
 
 /* 
@@ -9712,7 +9712,7 @@ mavlink20.messages.log_request_list = function(target_system, target_component, 
 }
         mavlink20.messages.log_request_list.prototype = new mavlink20.message();
 mavlink20.messages.log_request_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.start, this.end, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.start, this.end, this.target_system, this.target_component]));
 }
 
 /* 
@@ -9741,7 +9741,7 @@ mavlink20.messages.log_entry = function(id, num_logs, last_log_num, time_utc, si
 }
         mavlink20.messages.log_entry.prototype = new mavlink20.message();
 mavlink20.messages.log_entry.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_utc, this.size, this.id, this.num_logs, this.last_log_num]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_utc, this.size, this.id, this.num_logs, this.last_log_num]));
 }
 
 /* 
@@ -9770,7 +9770,7 @@ mavlink20.messages.log_request_data = function(target_system, target_component, 
 }
         mavlink20.messages.log_request_data.prototype = new mavlink20.message();
 mavlink20.messages.log_request_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ofs, this.count, this.id, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ofs, this.count, this.id, this.target_system, this.target_component]));
 }
 
 /* 
@@ -9798,7 +9798,7 @@ mavlink20.messages.log_data = function(id, ofs, count, data) {
 }
         mavlink20.messages.log_data.prototype = new mavlink20.message();
 mavlink20.messages.log_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ofs, this.id, this.count, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ofs, this.id, this.count, this.data]));
 }
 
 /* 
@@ -9824,7 +9824,7 @@ mavlink20.messages.log_erase = function(target_system, target_component) {
 }
         mavlink20.messages.log_erase.prototype = new mavlink20.message();
 mavlink20.messages.log_erase.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
 
 /* 
@@ -9850,7 +9850,7 @@ mavlink20.messages.log_request_end = function(target_system, target_component) {
 }
         mavlink20.messages.log_request_end.prototype = new mavlink20.message();
 mavlink20.messages.log_request_end.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
 
 /* 
@@ -9878,7 +9878,7 @@ mavlink20.messages.gps_inject_data = function(target_system, target_component, l
 }
         mavlink20.messages.gps_inject_data.prototype = new mavlink20.message();
 mavlink20.messages.gps_inject_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.len, this.data]));
 }
 
 /* 
@@ -9920,7 +9920,7 @@ mavlink20.messages.gps2_raw = function(time_usec, fix_type, lat, lon, alt, eph, 
 }
         mavlink20.messages.gps2_raw.prototype = new mavlink20.message();
 mavlink20.messages.gps2_raw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.dgps_age, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.dgps_numch, this.yaw, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.lat, this.lon, this.alt, this.dgps_age, this.eph, this.epv, this.vel, this.cog, this.fix_type, this.satellites_visible, this.dgps_numch, this.yaw, this.alt_ellipsoid, this.h_acc, this.v_acc, this.vel_acc, this.hdg_acc]));
 }
 
 /* 
@@ -9947,7 +9947,7 @@ mavlink20.messages.power_status = function(Vcc, Vservo, flags) {
 }
         mavlink20.messages.power_status.prototype = new mavlink20.message();
 mavlink20.messages.power_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.Vcc, this.Vservo, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.Vcc, this.Vservo, this.flags]));
 }
 
 /* 
@@ -9981,7 +9981,7 @@ mavlink20.messages.serial_control = function(device, flags, timeout, baudrate, c
 }
         mavlink20.messages.serial_control.prototype = new mavlink20.message();
 mavlink20.messages.serial_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.baudrate, this.timeout, this.device, this.flags, this.count, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.baudrate, this.timeout, this.device, this.flags, this.count, this.data]));
 }
 
 /* 
@@ -10019,7 +10019,7 @@ mavlink20.messages.gps_rtk = function(time_last_baseline_ms, rtk_receiver_id, wn
 }
         mavlink20.messages.gps_rtk.prototype = new mavlink20.message();
 mavlink20.messages.gps_rtk.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
 }
 
 /* 
@@ -10057,7 +10057,7 @@ mavlink20.messages.gps2_rtk = function(time_last_baseline_ms, rtk_receiver_id, w
 }
         mavlink20.messages.gps2_rtk.prototype = new mavlink20.message();
 mavlink20.messages.gps2_rtk.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_last_baseline_ms, this.tow, this.baseline_a_mm, this.baseline_b_mm, this.baseline_c_mm, this.accuracy, this.iar_num_hypotheses, this.wn, this.rtk_receiver_id, this.rtk_health, this.rtk_rate, this.nsats, this.baseline_coords_type]));
 }
 
 /* 
@@ -10093,7 +10093,7 @@ mavlink20.messages.scaled_imu3 = function(time_boot_ms, xacc, yacc, zacc, xgyro,
 }
         mavlink20.messages.scaled_imu3.prototype = new mavlink20.message();
 mavlink20.messages.scaled_imu3.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro, this.xmag, this.ymag, this.zmag, this.temperature]));
 }
 
 /* 
@@ -10126,7 +10126,7 @@ mavlink20.messages.data_transmission_handshake = function(type, size, width, hei
 }
         mavlink20.messages.data_transmission_handshake.prototype = new mavlink20.message();
 mavlink20.messages.data_transmission_handshake.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.size, this.width, this.height, this.packets, this.type, this.payload, this.jpg_quality]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.size, this.width, this.height, this.packets, this.type, this.payload, this.jpg_quality]));
 }
 
 /* 
@@ -10153,7 +10153,7 @@ mavlink20.messages.encapsulated_data = function(seqnr, data) {
 }
         mavlink20.messages.encapsulated_data.prototype = new mavlink20.message();
 mavlink20.messages.encapsulated_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.seqnr, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.seqnr, this.data]));
 }
 
 /* 
@@ -10189,7 +10189,7 @@ mavlink20.messages.distance_sensor = function(time_boot_ms, min_distance, max_di
 }
         mavlink20.messages.distance_sensor.prototype = new mavlink20.message();
 mavlink20.messages.distance_sensor.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.min_distance, this.max_distance, this.current_distance, this.type, this.id, this.orientation, this.covariance, this.horizontal_fov, this.vertical_fov, this.quaternion, this.signal_quality]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.min_distance, this.max_distance, this.current_distance, this.type, this.id, this.orientation, this.covariance, this.horizontal_fov, this.vertical_fov, this.quaternion, this.signal_quality]));
 }
 
 /* 
@@ -10218,7 +10218,7 @@ mavlink20.messages.terrain_request = function(lat, lon, grid_spacing, mask) {
 }
         mavlink20.messages.terrain_request.prototype = new mavlink20.message();
 mavlink20.messages.terrain_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mask, this.lat, this.lon, this.grid_spacing]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mask, this.lat, this.lon, this.grid_spacing]));
 }
 
 /* 
@@ -10249,7 +10249,7 @@ mavlink20.messages.terrain_data = function(lat, lon, grid_spacing, gridbit, data
 }
         mavlink20.messages.terrain_data.prototype = new mavlink20.message();
 mavlink20.messages.terrain_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.grid_spacing, this.data, this.gridbit]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lon, this.grid_spacing, this.data, this.gridbit]));
 }
 
 /* 
@@ -10277,7 +10277,7 @@ mavlink20.messages.terrain_check = function(lat, lon) {
 }
         mavlink20.messages.terrain_check.prototype = new mavlink20.message();
 mavlink20.messages.terrain_check.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lon]));
 }
 
 /* 
@@ -10311,7 +10311,7 @@ mavlink20.messages.terrain_report = function(lat, lon, spacing, terrain_height, 
 }
         mavlink20.messages.terrain_report.prototype = new mavlink20.message();
 mavlink20.messages.terrain_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.terrain_height, this.current_height, this.spacing, this.pending, this.loaded]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lon, this.terrain_height, this.current_height, this.spacing, this.pending, this.loaded]));
 }
 
 /* 
@@ -10340,7 +10340,7 @@ mavlink20.messages.scaled_pressure2 = function(time_boot_ms, press_abs, press_di
 }
         mavlink20.messages.scaled_pressure2.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure2.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
 
 /* 
@@ -10370,7 +10370,7 @@ mavlink20.messages.att_pos_mocap = function(time_usec, q, x, y, z, covariance) {
 }
         mavlink20.messages.att_pos_mocap.prototype = new mavlink20.message();
 mavlink20.messages.att_pos_mocap.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.q, this.x, this.y, this.z, this.covariance]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.q, this.x, this.y, this.z, this.covariance]));
 }
 
 /* 
@@ -10399,7 +10399,7 @@ mavlink20.messages.set_actuator_control_target = function(time_usec, group_mlx, 
 }
         mavlink20.messages.set_actuator_control_target.prototype = new mavlink20.message();
 mavlink20.messages.set_actuator_control_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx, this.target_system, this.target_component]));
 }
 
 /* 
@@ -10426,7 +10426,7 @@ mavlink20.messages.actuator_control_target = function(time_usec, group_mlx, cont
 }
         mavlink20.messages.actuator_control_target.prototype = new mavlink20.message();
 mavlink20.messages.actuator_control_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.controls, this.group_mlx]));
 }
 
 /* 
@@ -10457,7 +10457,7 @@ mavlink20.messages.altitude = function(time_usec, altitude_monotonic, altitude_a
 }
         mavlink20.messages.altitude.prototype = new mavlink20.message();
 mavlink20.messages.altitude.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.altitude_monotonic, this.altitude_amsl, this.altitude_local, this.altitude_relative, this.altitude_terrain, this.bottom_clearance]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.altitude_monotonic, this.altitude_amsl, this.altitude_local, this.altitude_relative, this.altitude_terrain, this.bottom_clearance]));
 }
 
 /* 
@@ -10487,7 +10487,7 @@ mavlink20.messages.resource_request = function(request_id, uri_type, uri, transf
 }
         mavlink20.messages.resource_request.prototype = new mavlink20.message();
 mavlink20.messages.resource_request.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.request_id, this.uri_type, this.uri, this.transfer_type, this.storage]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.request_id, this.uri_type, this.uri, this.transfer_type, this.storage]));
 }
 
 /* 
@@ -10516,7 +10516,7 @@ mavlink20.messages.scaled_pressure3 = function(time_boot_ms, press_abs, press_di
 }
         mavlink20.messages.scaled_pressure3.prototype = new mavlink20.message();
 mavlink20.messages.scaled_pressure3.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.press_abs, this.press_diff, this.temperature, this.temperature_press_diff]));
 }
 
 /* 
@@ -10551,7 +10551,7 @@ mavlink20.messages.follow_target = function(timestamp, est_capabilities, lat, lo
 }
         mavlink20.messages.follow_target.prototype = new mavlink20.message();
 mavlink20.messages.follow_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.custom_state, this.lat, this.lon, this.alt, this.vel, this.acc, this.attitude_q, this.rates, this.position_cov, this.est_capabilities]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.custom_state, this.lat, this.lon, this.alt, this.vel, this.acc, this.attitude_q, this.rates, this.position_cov, this.est_capabilities]));
 }
 
 /* 
@@ -10593,7 +10593,7 @@ mavlink20.messages.control_system_state = function(time_usec, x_acc, y_acc, z_ac
 }
         mavlink20.messages.control_system_state.prototype = new mavlink20.message();
 mavlink20.messages.control_system_state.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x_acc, this.y_acc, this.z_acc, this.x_vel, this.y_vel, this.z_vel, this.x_pos, this.y_pos, this.z_pos, this.airspeed, this.vel_variance, this.pos_variance, this.q, this.roll_rate, this.pitch_rate, this.yaw_rate]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.x_acc, this.y_acc, this.z_acc, this.x_vel, this.y_vel, this.z_vel, this.x_pos, this.y_pos, this.z_pos, this.airspeed, this.vel_variance, this.pos_variance, this.q, this.roll_rate, this.pitch_rate, this.yaw_rate]));
 }
 
 /* 
@@ -10631,7 +10631,7 @@ mavlink20.messages.battery_status = function(id, battery_function, type, tempera
 }
         mavlink20.messages.battery_status.prototype = new mavlink20.message();
 mavlink20.messages.battery_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.current_consumed, this.energy_consumed, this.temperature, this.voltages, this.current_battery, this.id, this.battery_function, this.type, this.battery_remaining, this.time_remaining, this.charge_state, this.voltages_ext, this.mode, this.fault_bitmask]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.current_consumed, this.energy_consumed, this.temperature, this.voltages, this.current_battery, this.id, this.battery_function, this.type, this.battery_remaining, this.time_remaining, this.charge_state, this.voltages_ext, this.mode, this.fault_bitmask]));
 }
 
 /* 
@@ -10668,7 +10668,7 @@ mavlink20.messages.autopilot_version = function(capabilities, flight_sw_version,
 }
         mavlink20.messages.autopilot_version.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_version.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.capabilities, this.uid, this.flight_sw_version, this.middleware_sw_version, this.os_sw_version, this.board_version, this.vendor_id, this.product_id, this.flight_custom_version, this.middleware_custom_version, this.os_custom_version, this.uid2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.capabilities, this.uid, this.flight_sw_version, this.middleware_sw_version, this.os_sw_version, this.board_version, this.vendor_id, this.product_id, this.flight_custom_version, this.middleware_custom_version, this.os_custom_version, this.uid2]));
 }
 
 /* 
@@ -10707,7 +10707,7 @@ mavlink20.messages.landing_target = function(time_usec, target_num, frame, angle
 }
         mavlink20.messages.landing_target.prototype = new mavlink20.message();
 mavlink20.messages.landing_target.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.angle_x, this.angle_y, this.distance, this.size_x, this.size_y, this.target_num, this.frame, this.x, this.y, this.z, this.q, this.type, this.position_valid]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.angle_x, this.angle_y, this.distance, this.size_x, this.size_y, this.target_num, this.frame, this.x, this.y, this.z, this.q, this.type, this.position_valid]));
 }
 
 /* 
@@ -10737,7 +10737,7 @@ mavlink20.messages.fence_status = function(breach_status, breach_count, breach_t
 }
         mavlink20.messages.fence_status.prototype = new mavlink20.message();
 mavlink20.messages.fence_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.breach_time, this.breach_count, this.breach_status, this.breach_type, this.breach_mitigation]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.breach_time, this.breach_count, this.breach_status, this.breach_type, this.breach_mitigation]));
 }
 
 /* 
@@ -10780,7 +10780,7 @@ mavlink20.messages.mag_cal_report = function(compass_id, cal_mask, cal_status, a
 }
         mavlink20.messages.mag_cal_report.prototype = new mavlink20.message();
 mavlink20.messages.mag_cal_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.fitness, this.ofs_x, this.ofs_y, this.ofs_z, this.diag_x, this.diag_y, this.diag_z, this.offdiag_x, this.offdiag_y, this.offdiag_z, this.compass_id, this.cal_mask, this.cal_status, this.autosaved, this.orientation_confidence, this.old_orientation, this.new_orientation, this.scale_factor]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.fitness, this.ofs_x, this.ofs_y, this.ofs_z, this.diag_x, this.diag_y, this.diag_z, this.offdiag_x, this.offdiag_y, this.offdiag_z, this.compass_id, this.cal_mask, this.cal_status, this.autosaved, this.orientation_confidence, this.old_orientation, this.new_orientation, this.scale_factor]));
 }
 
 /* 
@@ -10823,7 +10823,7 @@ mavlink20.messages.efi_status = function(health, ecu_index, rpm, fuel_consumed, 
 }
         mavlink20.messages.efi_status.prototype = new mavlink20.message();
 mavlink20.messages.efi_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ecu_index, this.rpm, this.fuel_consumed, this.fuel_flow, this.engine_load, this.throttle_position, this.spark_dwell_time, this.barometric_pressure, this.intake_manifold_pressure, this.intake_manifold_temperature, this.cylinder_head_temperature, this.ignition_timing, this.injection_time, this.exhaust_gas_temperature, this.throttle_out, this.pt_compensation, this.health, this.ignition_voltage, this.fuel_pressure]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ecu_index, this.rpm, this.fuel_consumed, this.fuel_flow, this.engine_load, this.throttle_position, this.spark_dwell_time, this.barometric_pressure, this.intake_manifold_pressure, this.intake_manifold_temperature, this.cylinder_head_temperature, this.ignition_timing, this.injection_time, this.exhaust_gas_temperature, this.throttle_out, this.pt_compensation, this.health, this.ignition_voltage, this.fuel_pressure]));
 }
 
 /* 
@@ -10868,7 +10868,7 @@ mavlink20.messages.estimator_status = function(time_usec, flags, vel_ratio, pos_
 }
         mavlink20.messages.estimator_status.prototype = new mavlink20.message();
 mavlink20.messages.estimator_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.vel_ratio, this.pos_horiz_ratio, this.pos_vert_ratio, this.mag_ratio, this.hagl_ratio, this.tas_ratio, this.pos_horiz_accuracy, this.pos_vert_accuracy, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.vel_ratio, this.pos_horiz_ratio, this.pos_vert_ratio, this.mag_ratio, this.hagl_ratio, this.tas_ratio, this.pos_horiz_accuracy, this.pos_vert_accuracy, this.flags]));
 }
 
 /* 
@@ -10901,7 +10901,7 @@ mavlink20.messages.wind_cov = function(time_usec, wind_x, wind_y, wind_z, var_ho
 }
         mavlink20.messages.wind_cov.prototype = new mavlink20.message();
 mavlink20.messages.wind_cov.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.wind_x, this.wind_y, this.wind_z, this.var_horiz, this.var_vert, this.wind_alt, this.horiz_accuracy, this.vert_accuracy]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.wind_x, this.wind_y, this.wind_z, this.var_horiz, this.var_vert, this.wind_alt, this.horiz_accuracy, this.vert_accuracy]));
 }
 
 /* 
@@ -10945,7 +10945,7 @@ mavlink20.messages.gps_input = function(time_usec, gps_id, ignore_flags, time_we
 }
         mavlink20.messages.gps_input.prototype = new mavlink20.message();
 mavlink20.messages.gps_input.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.time_week_ms, this.lat, this.lon, this.alt, this.hdop, this.vdop, this.vn, this.ve, this.vd, this.speed_accuracy, this.horiz_accuracy, this.vert_accuracy, this.ignore_flags, this.time_week, this.gps_id, this.fix_type, this.satellites_visible, this.yaw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.time_week_ms, this.lat, this.lon, this.alt, this.hdop, this.vdop, this.vn, this.ve, this.vd, this.speed_accuracy, this.horiz_accuracy, this.vert_accuracy, this.ignore_flags, this.time_week, this.gps_id, this.fix_type, this.satellites_visible, this.yaw]));
 }
 
 /* 
@@ -10972,7 +10972,7 @@ mavlink20.messages.gps_rtcm_data = function(flags, len, data) {
 }
         mavlink20.messages.gps_rtcm_data.prototype = new mavlink20.message();
 mavlink20.messages.gps_rtcm_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.flags, this.len, this.data]));
 }
 
 /* 
@@ -11020,7 +11020,7 @@ mavlink20.messages.high_latency = function(base_mode, custom_mode, landed_state,
 }
         mavlink20.messages.high_latency.prototype = new mavlink20.message();
 mavlink20.messages.high_latency.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.latitude, this.longitude, this.roll, this.pitch, this.heading, this.heading_sp, this.altitude_amsl, this.altitude_sp, this.wp_distance, this.base_mode, this.landed_state, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.climb_rate, this.gps_nsat, this.gps_fix_type, this.battery_remaining, this.temperature, this.temperature_air, this.failsafe, this.wp_num]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.custom_mode, this.latitude, this.longitude, this.roll, this.pitch, this.heading, this.heading_sp, this.altitude_amsl, this.altitude_sp, this.wp_distance, this.base_mode, this.landed_state, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.climb_rate, this.gps_nsat, this.gps_fix_type, this.battery_remaining, this.temperature, this.temperature_air, this.failsafe, this.wp_num]));
 }
 
 /* 
@@ -11072,7 +11072,7 @@ mavlink20.messages.high_latency2 = function(timestamp, type, autopilot, custom_m
 }
         mavlink20.messages.high_latency2.prototype = new mavlink20.message();
 mavlink20.messages.high_latency2.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.latitude, this.longitude, this.custom_mode, this.altitude, this.target_altitude, this.target_distance, this.wp_num, this.failure_flags, this.type, this.autopilot, this.heading, this.target_heading, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.windspeed, this.wind_heading, this.eph, this.epv, this.temperature_air, this.climb_rate, this.battery, this.custom0, this.custom1, this.custom2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.latitude, this.longitude, this.custom_mode, this.altitude, this.target_altitude, this.target_distance, this.wp_num, this.failure_flags, this.type, this.autopilot, this.heading, this.target_heading, this.throttle, this.airspeed, this.airspeed_sp, this.groundspeed, this.windspeed, this.wind_heading, this.eph, this.epv, this.temperature_air, this.climb_rate, this.battery, this.custom0, this.custom1, this.custom2]));
 }
 
 /* 
@@ -11103,7 +11103,7 @@ mavlink20.messages.vibration = function(time_usec, vibration_x, vibration_y, vib
 }
         mavlink20.messages.vibration.prototype = new mavlink20.message();
 mavlink20.messages.vibration.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.vibration_x, this.vibration_y, this.vibration_z, this.clipping_0, this.clipping_1, this.clipping_2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.vibration_x, this.vibration_y, this.vibration_z, this.clipping_0, this.clipping_1, this.clipping_2]));
 }
 
 /* 
@@ -11147,7 +11147,7 @@ mavlink20.messages.home_position = function(latitude, longitude, altitude, x, y,
 }
         mavlink20.messages.home_position.prototype = new mavlink20.message();
 mavlink20.messages.home_position.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.time_usec]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.time_usec]));
 }
 
 /* 
@@ -11191,7 +11191,7 @@ mavlink20.messages.set_home_position = function(target_system, latitude, longitu
 }
         mavlink20.messages.set_home_position.prototype = new mavlink20.message();
 mavlink20.messages.set_home_position.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.target_system, this.time_usec]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude, this.x, this.y, this.z, this.q, this.approach_x, this.approach_y, this.approach_z, this.target_system, this.time_usec]));
 }
 
 /* 
@@ -11219,7 +11219,7 @@ mavlink20.messages.message_interval = function(message_id, interval_us) {
 }
         mavlink20.messages.message_interval.prototype = new mavlink20.message();
 mavlink20.messages.message_interval.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.interval_us, this.message_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.interval_us, this.message_id]));
 }
 
 /* 
@@ -11245,7 +11245,7 @@ mavlink20.messages.extended_sys_state = function(vtol_state, landed_state) {
 }
         mavlink20.messages.extended_sys_state.prototype = new mavlink20.message();
 mavlink20.messages.extended_sys_state.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.vtol_state, this.landed_state]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.vtol_state, this.landed_state]));
 }
 
 /* 
@@ -11282,7 +11282,7 @@ mavlink20.messages.adsb_vehicle = function(ICAO_address, lat, lon, altitude_type
 }
         mavlink20.messages.adsb_vehicle.prototype = new mavlink20.message();
 mavlink20.messages.adsb_vehicle.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ICAO_address, this.lat, this.lon, this.altitude, this.heading, this.hor_velocity, this.ver_velocity, this.flags, this.squawk, this.altitude_type, this.callsign, this.emitter_type, this.tslc]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ICAO_address, this.lat, this.lon, this.altitude, this.heading, this.hor_velocity, this.ver_velocity, this.flags, this.squawk, this.altitude_type, this.callsign, this.emitter_type, this.tslc]));
 }
 
 /* 
@@ -11313,7 +11313,7 @@ mavlink20.messages.collision = function(src, id, action, threat_level, time_to_m
 }
         mavlink20.messages.collision.prototype = new mavlink20.message();
 mavlink20.messages.collision.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.time_to_minimum_delta, this.altitude_minimum_delta, this.horizontal_minimum_delta, this.src, this.action, this.threat_level]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.id, this.time_to_minimum_delta, this.altitude_minimum_delta, this.horizontal_minimum_delta, this.src, this.action, this.threat_level]));
 }
 
 /* 
@@ -11343,7 +11343,7 @@ mavlink20.messages.v2_extension = function(target_network, target_system, target
 }
         mavlink20.messages.v2_extension.prototype = new mavlink20.message();
 mavlink20.messages.v2_extension.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.message_type, this.target_network, this.target_system, this.target_component, this.payload]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.message_type, this.target_network, this.target_system, this.target_component, this.payload]));
 }
 
 /* 
@@ -11373,7 +11373,7 @@ mavlink20.messages.memory_vect = function(address, ver, type, value) {
 }
         mavlink20.messages.memory_vect.prototype = new mavlink20.message();
 mavlink20.messages.memory_vect.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.address, this.ver, this.type, this.value]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.address, this.ver, this.type, this.value]));
 }
 
 /* 
@@ -11402,7 +11402,7 @@ mavlink20.messages.debug_vect = function(name, time_usec, x, y, z) {
 }
         mavlink20.messages.debug_vect.prototype = new mavlink20.message();
 mavlink20.messages.debug_vect.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.name]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.name]));
 }
 
 /* 
@@ -11431,7 +11431,7 @@ mavlink20.messages.named_value_float = function(time_boot_ms, name, value) {
 }
         mavlink20.messages.named_value_float.prototype = new mavlink20.message();
 mavlink20.messages.named_value_float.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
 }
 
 /* 
@@ -11460,7 +11460,7 @@ mavlink20.messages.named_value_int = function(time_boot_ms, name, value) {
 }
         mavlink20.messages.named_value_int.prototype = new mavlink20.message();
 mavlink20.messages.named_value_int.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.value, this.name]));
 }
 
 /* 
@@ -11492,7 +11492,7 @@ mavlink20.messages.statustext = function(severity, text, id, chunk_seq) {
 }
         mavlink20.messages.statustext.prototype = new mavlink20.message();
 mavlink20.messages.statustext.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.severity, this.text, this.id, this.chunk_seq]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.severity, this.text, this.id, this.chunk_seq]));
 }
 
 /* 
@@ -11520,7 +11520,7 @@ mavlink20.messages.debug = function(time_boot_ms, ind, value) {
 }
         mavlink20.messages.debug.prototype = new mavlink20.message();
 mavlink20.messages.debug.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.value, this.ind]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.value, this.ind]));
 }
 
 /* 
@@ -11549,7 +11549,7 @@ mavlink20.messages.setup_signing = function(target_system, target_component, sec
 }
         mavlink20.messages.setup_signing.prototype = new mavlink20.message();
 mavlink20.messages.setup_signing.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.initial_timestamp, this.target_system, this.target_component, this.secret_key]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.initial_timestamp, this.target_system, this.target_component, this.secret_key]));
 }
 
 /* 
@@ -11576,7 +11576,7 @@ mavlink20.messages.button_change = function(time_boot_ms, last_change_ms, state)
 }
         mavlink20.messages.button_change.prototype = new mavlink20.message();
 mavlink20.messages.button_change.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.last_change_ms, this.state]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.last_change_ms, this.state]));
 }
 
 /* 
@@ -11604,7 +11604,7 @@ mavlink20.messages.play_tune = function(target_system, target_component, tune, t
 }
         mavlink20.messages.play_tune.prototype = new mavlink20.message();
 mavlink20.messages.play_tune.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.tune, this.tune2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.tune, this.tune2]));
 }
 
 /* 
@@ -11643,7 +11643,7 @@ mavlink20.messages.camera_information = function(time_boot_ms, vendor_name, mode
 }
         mavlink20.messages.camera_information.prototype = new mavlink20.message();
 mavlink20.messages.camera_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.firmware_version, this.focal_length, this.sensor_size_h, this.sensor_size_v, this.flags, this.resolution_h, this.resolution_v, this.cam_definition_version, this.vendor_name, this.model_name, this.lens_id, this.cam_definition_uri, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.firmware_version, this.focal_length, this.sensor_size_h, this.sensor_size_v, this.flags, this.resolution_h, this.resolution_v, this.cam_definition_version, this.vendor_name, this.model_name, this.lens_id, this.cam_definition_uri, this.gimbal_device_id]));
 }
 
 /* 
@@ -11672,7 +11672,7 @@ mavlink20.messages.camera_settings = function(time_boot_ms, mode_id, zoomLevel, 
 }
         mavlink20.messages.camera_settings.prototype = new mavlink20.message();
 mavlink20.messages.camera_settings.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.mode_id, this.zoomLevel, this.focusLevel]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.mode_id, this.zoomLevel, this.focusLevel]));
 }
 
 /* 
@@ -11711,7 +11711,7 @@ mavlink20.messages.storage_information = function(time_boot_ms, storage_id, stor
 }
         mavlink20.messages.storage_information.prototype = new mavlink20.message();
 mavlink20.messages.storage_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.total_capacity, this.used_capacity, this.available_capacity, this.read_speed, this.write_speed, this.storage_id, this.storage_count, this.status, this.type, this.name]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.total_capacity, this.used_capacity, this.available_capacity, this.read_speed, this.write_speed, this.storage_id, this.storage_count, this.status, this.type, this.name]));
 }
 
 /* 
@@ -11743,7 +11743,7 @@ mavlink20.messages.camera_capture_status = function(time_boot_ms, image_status, 
 }
         mavlink20.messages.camera_capture_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_capture_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.image_interval, this.recording_time_ms, this.available_capacity, this.image_status, this.video_status, this.image_count]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.image_interval, this.recording_time_ms, this.available_capacity, this.image_status, this.video_status, this.image_count]));
 }
 
 /* 
@@ -11781,7 +11781,7 @@ mavlink20.messages.camera_image_captured = function(time_boot_ms, time_utc, came
 }
         mavlink20.messages.camera_image_captured.prototype = new mavlink20.message();
 mavlink20.messages.camera_image_captured.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_utc, this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.q, this.image_index, this.camera_id, this.capture_result, this.file_url]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_utc, this.time_boot_ms, this.lat, this.lon, this.alt, this.relative_alt, this.q, this.image_index, this.camera_id, this.capture_result, this.file_url]));
 }
 
 /* 
@@ -11809,7 +11809,7 @@ mavlink20.messages.flight_information = function(time_boot_ms, arming_time_utc, 
 }
         mavlink20.messages.flight_information.prototype = new mavlink20.message();
 mavlink20.messages.flight_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.arming_time_utc, this.takeoff_time_utc, this.flight_uuid, this.time_boot_ms]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.arming_time_utc, this.takeoff_time_utc, this.flight_uuid, this.time_boot_ms]));
 }
 
 /* 
@@ -11838,7 +11838,7 @@ mavlink20.messages.mount_orientation = function(time_boot_ms, roll, pitch, yaw, 
 }
         mavlink20.messages.mount_orientation.prototype = new mavlink20.message();
 mavlink20.messages.mount_orientation.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.yaw_absolute]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.roll, this.pitch, this.yaw, this.yaw_absolute]));
 }
 
 /* 
@@ -11868,7 +11868,7 @@ mavlink20.messages.logging_data = function(target_system, target_component, sequ
 }
         mavlink20.messages.logging_data.prototype = new mavlink20.message();
 mavlink20.messages.logging_data.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
 }
 
 /* 
@@ -11899,7 +11899,7 @@ mavlink20.messages.logging_data_acked = function(target_system, target_component
 }
         mavlink20.messages.logging_data_acked.prototype = new mavlink20.message();
 mavlink20.messages.logging_data_acked.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component, this.length, this.first_message_offset, this.data]));
 }
 
 /* 
@@ -11926,7 +11926,7 @@ mavlink20.messages.logging_ack = function(target_system, target_component, seque
 }
         mavlink20.messages.logging_ack.prototype = new mavlink20.message();
 mavlink20.messages.logging_ack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.sequence, this.target_system, this.target_component]));
 }
 
 /* 
@@ -11964,7 +11964,7 @@ mavlink20.messages.video_stream_information = function(stream_id, count, type, f
 }
         mavlink20.messages.video_stream_information.prototype = new mavlink20.message();
 mavlink20.messages.video_stream_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id, this.count, this.type, this.name, this.uri]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id, this.count, this.type, this.name, this.uri]));
 }
 
 /* 
@@ -11997,7 +11997,7 @@ mavlink20.messages.video_stream_status = function(stream_id, flags, framerate, r
 }
         mavlink20.messages.video_stream_status.prototype = new mavlink20.message();
 mavlink20.messages.video_stream_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.framerate, this.bitrate, this.flags, this.resolution_h, this.resolution_v, this.rotation, this.hfov, this.stream_id]));
 }
 
 /* 
@@ -12032,7 +12032,7 @@ mavlink20.messages.camera_fov_status = function(time_boot_ms, lat_camera, lon_ca
 }
         mavlink20.messages.camera_fov_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_fov_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat_camera, this.lon_camera, this.alt_camera, this.lat_image, this.lon_image, this.alt_image, this.q, this.hfov, this.vfov]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat_camera, this.lon_camera, this.alt_camera, this.lat_image, this.lon_image, this.alt_image, this.q, this.hfov, this.vfov]));
 }
 
 /* 
@@ -12067,7 +12067,7 @@ mavlink20.messages.camera_tracking_image_status = function(tracking_status, trac
 }
         mavlink20.messages.camera_tracking_image_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_tracking_image_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.point_x, this.point_y, this.radius, this.rec_top_x, this.rec_top_y, this.rec_bottom_x, this.rec_bottom_y, this.tracking_status, this.tracking_mode, this.target_data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.point_x, this.point_y, this.radius, this.rec_top_x, this.rec_top_y, this.rec_bottom_x, this.rec_bottom_y, this.tracking_status, this.tracking_mode, this.target_data]));
 }
 
 /* 
@@ -12105,7 +12105,7 @@ mavlink20.messages.camera_tracking_geo_status = function(tracking_status, lat, l
 }
         mavlink20.messages.camera_tracking_geo_status.prototype = new mavlink20.message();
 mavlink20.messages.camera_tracking_geo_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.lat, this.lon, this.alt, this.h_acc, this.v_acc, this.vel_n, this.vel_e, this.vel_d, this.vel_acc, this.dist, this.hdg, this.hdg_acc, this.tracking_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.lat, this.lon, this.alt, this.h_acc, this.v_acc, this.vel_n, this.vel_e, this.vel_d, this.vel_acc, this.dist, this.hdg, this.hdg_acc, this.tracking_status]));
 }
 
 /* 
@@ -12139,7 +12139,7 @@ mavlink20.messages.gimbal_manager_information = function(time_boot_ms, cap_flags
 }
         mavlink20.messages.gimbal_manager_information.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_device_id]));
 }
 
 /* 
@@ -12171,7 +12171,7 @@ mavlink20.messages.gimbal_manager_status = function(time_boot_ms, flags, gimbal_
 }
         mavlink20.messages.gimbal_manager_status.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.flags, this.gimbal_device_id, this.primary_control_sysid, this.primary_control_compid, this.secondary_control_sysid, this.secondary_control_compid]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.flags, this.gimbal_device_id, this.primary_control_sysid, this.primary_control_compid, this.secondary_control_sysid, this.secondary_control_compid]));
 }
 
 /* 
@@ -12205,7 +12205,7 @@ mavlink20.messages.gimbal_manager_set_attitude = function(target_system, target_
 }
         mavlink20.messages.gimbal_manager_set_attitude.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_attitude.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.target_system, this.target_component, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.flags, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.target_system, this.target_component, this.gimbal_device_id]));
 }
 
 /* 
@@ -12249,7 +12249,7 @@ mavlink20.messages.gimbal_device_information = function(time_boot_ms, vendor_nam
 }
         mavlink20.messages.gimbal_device_information.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.uid, this.time_boot_ms, this.firmware_version, this.hardware_version, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.cap_flags, this.custom_cap_flags, this.vendor_name, this.model_name, this.custom_name, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.uid, this.time_boot_ms, this.firmware_version, this.hardware_version, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.cap_flags, this.custom_cap_flags, this.vendor_name, this.model_name, this.custom_name, this.gimbal_device_id]));
 }
 
 /* 
@@ -12298,7 +12298,7 @@ mavlink20.messages.gimbal_device_set_attitude = function(target_system, target_c
 }
         mavlink20.messages.gimbal_device_set_attitude.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_set_attitude.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
 }
 
 /* 
@@ -12358,7 +12358,7 @@ mavlink20.messages.gimbal_device_attitude_status = function(target_system, targe
 }
         mavlink20.messages.gimbal_device_attitude_status.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_device_attitude_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.failure_flags, this.flags, this.target_system, this.target_component, this.delta_yaw, this.delta_yaw_velocity, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.failure_flags, this.flags, this.target_system, this.target_component, this.delta_yaw, this.delta_yaw_velocity, this.gimbal_device_id]));
 }
 
 /* 
@@ -12400,7 +12400,7 @@ mavlink20.messages.autopilot_state_for_gimbal_device = function(target_system, t
 }
         mavlink20.messages.autopilot_state_for_gimbal_device.prototype = new mavlink20.message();
 mavlink20.messages.autopilot_state_for_gimbal_device.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_us, this.q, this.q_estimated_delay_us, this.vx, this.vy, this.vz, this.v_estimated_delay_us, this.feed_forward_angular_velocity_z, this.estimator_status, this.target_system, this.target_component, this.landed_state, this.angular_velocity_z]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_us, this.q, this.q_estimated_delay_us, this.vx, this.vy, this.vz, this.v_estimated_delay_us, this.feed_forward_angular_velocity_z, this.estimator_status, this.target_system, this.target_component, this.landed_state, this.angular_velocity_z]));
 }
 
 /* 
@@ -12437,7 +12437,7 @@ mavlink20.messages.gimbal_manager_set_pitchyaw = function(target_system, target_
 }
         mavlink20.messages.gimbal_manager_set_pitchyaw.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_pitchyaw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
 }
 
 /* 
@@ -12473,7 +12473,7 @@ mavlink20.messages.gimbal_manager_set_manual_control = function(target_system, t
 }
         mavlink20.messages.gimbal_manager_set_manual_control.prototype = new mavlink20.message();
 mavlink20.messages.gimbal_manager_set_manual_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.flags, this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.target_system, this.target_component, this.gimbal_device_id]));
 }
 
 /* 
@@ -12501,7 +12501,7 @@ mavlink20.messages.wifi_config_ap = function(ssid, password) {
 }
         mavlink20.messages.wifi_config_ap.prototype = new mavlink20.message();
 mavlink20.messages.wifi_config_ap.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ssid, this.password]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ssid, this.password]));
 }
 
 /* 
@@ -12542,7 +12542,7 @@ mavlink20.messages.ais_vessel = function(MMSI, lat, lon, COG, heading, velocity,
 }
         mavlink20.messages.ais_vessel.prototype = new mavlink20.message();
 mavlink20.messages.ais_vessel.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.MMSI, this.lat, this.lon, this.COG, this.heading, this.velocity, this.dimension_bow, this.dimension_stern, this.tslc, this.flags, this.turn_rate, this.navigational_status, this.type, this.dimension_port, this.dimension_starboard, this.callsign, this.name]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.MMSI, this.lat, this.lon, this.COG, this.heading, this.velocity, this.dimension_bow, this.dimension_stern, this.tslc, this.flags, this.turn_rate, this.navigational_status, this.type, this.dimension_port, this.dimension_starboard, this.callsign, this.name]));
 }
 
 /* 
@@ -12575,7 +12575,7 @@ mavlink20.messages.uavcan_node_status = function(time_usec, uptime_sec, health, 
 }
         mavlink20.messages.uavcan_node_status.prototype = new mavlink20.message();
 mavlink20.messages.uavcan_node_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.vendor_specific_status_code, this.health, this.mode, this.sub_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.vendor_specific_status_code, this.health, this.mode, this.sub_mode]));
 }
 
 /* 
@@ -12615,7 +12615,7 @@ mavlink20.messages.uavcan_node_info = function(time_usec, uptime_sec, name, hw_v
 }
         mavlink20.messages.uavcan_node_info.prototype = new mavlink20.message();
 mavlink20.messages.uavcan_node_info.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.sw_vcs_commit, this.name, this.hw_version_major, this.hw_version_minor, this.hw_unique_id, this.sw_version_major, this.sw_version_minor]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.uptime_sec, this.sw_vcs_commit, this.name, this.hw_version_major, this.hw_version_minor, this.hw_unique_id, this.sw_version_major, this.sw_version_minor]));
 }
 
 /* 
@@ -12645,7 +12645,7 @@ mavlink20.messages.param_ext_request_read = function(target_system, target_compo
 }
         mavlink20.messages.param_ext_request_read.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_request_read.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_index, this.target_system, this.target_component, this.param_id]));
 }
 
 /* 
@@ -12672,7 +12672,7 @@ mavlink20.messages.param_ext_request_list = function(target_system, target_compo
 }
         mavlink20.messages.param_ext_request_list.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_request_list.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component]));
 }
 
 /* 
@@ -12704,7 +12704,7 @@ mavlink20.messages.param_ext_value = function(param_id, param_value, param_type,
 }
         mavlink20.messages.param_ext_value.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_value.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_count, this.param_index, this.param_id, this.param_value, this.param_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_count, this.param_index, this.param_id, this.param_value, this.param_type]));
 }
 
 /* 
@@ -12738,7 +12738,7 @@ mavlink20.messages.param_ext_set = function(target_system, target_component, par
 }
         mavlink20.messages.param_ext_set.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_set.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.param_id, this.param_value, this.param_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.param_id, this.param_value, this.param_type]));
 }
 
 /* 
@@ -12766,7 +12766,7 @@ mavlink20.messages.param_ext_ack = function(param_id, param_value, param_type, p
 }
         mavlink20.messages.param_ext_ack.prototype = new mavlink20.message();
 mavlink20.messages.param_ext_ack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.param_id, this.param_value, this.param_type, this.param_result]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.param_id, this.param_value, this.param_type, this.param_result]));
 }
 
 /* 
@@ -12800,7 +12800,7 @@ mavlink20.messages.obstacle_distance = function(time_usec, sensor_type, distance
 }
         mavlink20.messages.obstacle_distance.prototype = new mavlink20.message();
 mavlink20.messages.obstacle_distance.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.distances, this.min_distance, this.max_distance, this.sensor_type, this.increment, this.increment_f, this.angle_offset, this.frame]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.distances, this.min_distance, this.max_distance, this.sensor_type, this.increment, this.increment_f, this.angle_offset, this.frame]));
 }
 
 /* 
@@ -12844,7 +12844,7 @@ mavlink20.messages.odometry = function(time_usec, frame_id, child_frame_id, x, y
 }
         mavlink20.messages.odometry.prototype = new mavlink20.message();
 mavlink20.messages.odometry.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.q, this.vx, this.vy, this.vz, this.rollspeed, this.pitchspeed, this.yawspeed, this.pose_covariance, this.velocity_covariance, this.frame_id, this.child_frame_id, this.reset_counter, this.estimator_type, this.quality]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.x, this.y, this.z, this.q, this.vx, this.vy, this.vz, this.rollspeed, this.pitchspeed, this.yawspeed, this.pose_covariance, this.velocity_covariance, this.frame_id, this.child_frame_id, this.reset_counter, this.estimator_type, this.quality]));
 }
 
 /* 
@@ -12876,7 +12876,7 @@ mavlink20.messages.isbd_link_status = function(timestamp, last_heartbeat, failed
 }
         mavlink20.messages.isbd_link_status.prototype = new mavlink20.message();
 mavlink20.messages.isbd_link_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.last_heartbeat, this.failed_sessions, this.successful_sessions, this.signal_quality, this.ring_pending, this.tx_session_pending, this.rx_session_pending]));
 }
 
 /* 
@@ -12902,7 +12902,7 @@ mavlink20.messages.raw_rpm = function(index, frequency) {
 }
         mavlink20.messages.raw_rpm.prototype = new mavlink20.message();
 mavlink20.messages.raw_rpm.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.frequency, this.index]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.frequency, this.index]));
 }
 
 /* 
@@ -12944,7 +12944,7 @@ mavlink20.messages.utm_global_position = function(time, uas_id, lat, lon, alt, r
 }
         mavlink20.messages.utm_global_position.prototype = new mavlink20.message();
 mavlink20.messages.utm_global_position.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time, this.lat, this.lon, this.alt, this.relative_alt, this.next_lat, this.next_lon, this.next_alt, this.vx, this.vy, this.vz, this.h_acc, this.v_acc, this.vel_acc, this.update_rate, this.uas_id, this.flight_state, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time, this.lat, this.lon, this.alt, this.relative_alt, this.next_lat, this.next_lon, this.next_alt, this.vx, this.vy, this.vz, this.h_acc, this.v_acc, this.vel_acc, this.update_rate, this.uas_id, this.flight_state, this.flags]));
 }
 
 /* 
@@ -12975,7 +12975,7 @@ mavlink20.messages.debug_float_array = function(time_usec, name, array_id, data)
 }
         mavlink20.messages.debug_float_array.prototype = new mavlink20.message();
 mavlink20.messages.debug_float_array.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.array_id, this.name, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.array_id, this.name, this.data]));
 }
 
 /* 
@@ -13018,7 +13018,7 @@ mavlink20.messages.smart_battery_info = function(id, battery_function, type, cap
 }
         mavlink20.messages.smart_battery_info.prototype = new mavlink20.message();
 mavlink20.messages.smart_battery_info.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.capacity_full_specification, this.capacity_full, this.cycle_count, this.weight, this.discharge_minimum_voltage, this.charging_minimum_voltage, this.resting_minimum_voltage, this.id, this.battery_function, this.type, this.serial_number, this.device_name, this.charging_maximum_voltage, this.cells_in_series, this.discharge_maximum_current, this.discharge_maximum_burst_current, this.manufacture_date]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.capacity_full_specification, this.capacity_full, this.cycle_count, this.weight, this.discharge_minimum_voltage, this.charging_minimum_voltage, this.resting_minimum_voltage, this.id, this.battery_function, this.type, this.serial_number, this.device_name, this.charging_maximum_voltage, this.cells_in_series, this.discharge_maximum_current, this.discharge_maximum_burst_current, this.manufacture_date]));
 }
 
 /* 
@@ -13054,7 +13054,7 @@ mavlink20.messages.generator_status = function(status, generator_speed, battery_
 }
         mavlink20.messages.generator_status.prototype = new mavlink20.message();
 mavlink20.messages.generator_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.battery_current, this.load_current, this.power_generated, this.bus_voltage, this.bat_current_setpoint, this.runtime, this.time_until_maintenance, this.generator_speed, this.rectifier_temperature, this.generator_temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.status, this.battery_current, this.load_current, this.power_generated, this.bus_voltage, this.bat_current_setpoint, this.runtime, this.time_until_maintenance, this.generator_speed, this.rectifier_temperature, this.generator_temperature]));
 }
 
 /* 
@@ -13082,7 +13082,7 @@ mavlink20.messages.actuator_output_status = function(time_usec, active, actuator
 }
         mavlink20.messages.actuator_output_status.prototype = new mavlink20.message();
 mavlink20.messages.actuator_output_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.active, this.actuator]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.active, this.actuator]));
 }
 
 /* 
@@ -13110,7 +13110,7 @@ mavlink20.messages.relay_status = function(time_boot_ms, on, present) {
 }
         mavlink20.messages.relay_status.prototype = new mavlink20.message();
 mavlink20.messages.relay_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.on, this.present]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.on, this.present]));
 }
 
 /* 
@@ -13143,7 +13143,7 @@ mavlink20.messages.tunnel = function(target_system, target_component, payload_ty
 }
         mavlink20.messages.tunnel.prototype = new mavlink20.message();
 mavlink20.messages.tunnel.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.payload_type, this.target_system, this.target_component, this.payload_length, this.payload]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.payload_type, this.target_system, this.target_component, this.payload_length, this.payload]));
 }
 
 /* 
@@ -13173,7 +13173,7 @@ mavlink20.messages.can_frame = function(target_system, target_component, bus, le
 }
         mavlink20.messages.can_frame.prototype = new mavlink20.message();
 mavlink20.messages.can_frame.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
 }
 
 /* 
@@ -13205,7 +13205,7 @@ mavlink20.messages.canfd_frame = function(target_system, target_component, bus, 
 }
         mavlink20.messages.canfd_frame.prototype = new mavlink20.message();
 mavlink20.messages.canfd_frame.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.id, this.target_system, this.target_component, this.bus, this.len, this.data]));
 }
 
 /* 
@@ -13240,7 +13240,7 @@ mavlink20.messages.can_filter_modify = function(target_system, target_component,
 }
         mavlink20.messages.can_filter_modify.prototype = new mavlink20.message();
 mavlink20.messages.can_filter_modify.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ids, this.target_system, this.target_component, this.bus, this.operation, this.num_ids]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ids, this.target_system, this.target_component, this.bus, this.operation, this.num_ids]));
 }
 
 /* 
@@ -13267,7 +13267,7 @@ mavlink20.messages.wheel_distance = function(time_usec, count, distance) {
 }
         mavlink20.messages.wheel_distance.prototype = new mavlink20.message();
 mavlink20.messages.wheel_distance.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.distance, this.count]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.distance, this.count]));
 }
 
 /* 
@@ -13299,7 +13299,7 @@ mavlink20.messages.winch_status = function(time_usec, line_length, speed, tensio
 }
         mavlink20.messages.winch_status.prototype = new mavlink20.message();
 mavlink20.messages.winch_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_usec, this.line_length, this.speed, this.tension, this.voltage, this.current, this.status, this.temperature]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_usec, this.line_length, this.speed, this.tension, this.voltage, this.current, this.status, this.temperature]));
 }
 
 /* 
@@ -13335,7 +13335,7 @@ mavlink20.messages.open_drone_id_basic_id = function(target_system, target_compo
 }
         mavlink20.messages.open_drone_id_basic_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_basic_id.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.id_type, this.ua_type, this.uas_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.id_type, this.ua_type, this.uas_id]));
 }
 
 /* 
@@ -13380,7 +13380,7 @@ mavlink20.messages.open_drone_id_location = function(target_system, target_compo
 }
         mavlink20.messages.open_drone_id_location.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_location.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude_barometric, this.altitude_geodetic, this.height, this.timestamp, this.direction, this.speed_horizontal, this.speed_vertical, this.target_system, this.target_component, this.id_or_mac, this.status, this.height_reference, this.horizontal_accuracy, this.vertical_accuracy, this.barometer_accuracy, this.speed_accuracy, this.timestamp_accuracy]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.latitude, this.longitude, this.altitude_barometric, this.altitude_geodetic, this.height, this.timestamp, this.direction, this.speed_horizontal, this.speed_vertical, this.target_system, this.target_component, this.id_or_mac, this.status, this.height_reference, this.horizontal_accuracy, this.vertical_accuracy, this.barometer_accuracy, this.speed_accuracy, this.timestamp_accuracy]));
 }
 
 /* 
@@ -13420,7 +13420,7 @@ mavlink20.messages.open_drone_id_authentication = function(target_system, target
 }
         mavlink20.messages.open_drone_id_authentication.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_authentication.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.timestamp, this.target_system, this.target_component, this.id_or_mac, this.authentication_type, this.data_page, this.last_page_index, this.length, this.authentication_data]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.timestamp, this.target_system, this.target_component, this.id_or_mac, this.authentication_type, this.data_page, this.last_page_index, this.length, this.authentication_data]));
 }
 
 /* 
@@ -13455,7 +13455,7 @@ mavlink20.messages.open_drone_id_self_id = function(target_system, target_compon
 }
         mavlink20.messages.open_drone_id_self_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_self_id.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.description_type, this.description]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.description_type, this.description]));
 }
 
 /* 
@@ -13497,7 +13497,7 @@ mavlink20.messages.open_drone_id_system = function(target_system, target_compone
 }
         mavlink20.messages.open_drone_id_system.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_system.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.area_ceiling, this.area_floor, this.operator_altitude_geo, this.timestamp, this.area_count, this.area_radius, this.target_system, this.target_component, this.id_or_mac, this.operator_location_type, this.classification_type, this.category_eu, this.class_eu]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.area_ceiling, this.area_floor, this.operator_altitude_geo, this.timestamp, this.area_count, this.area_radius, this.target_system, this.target_component, this.id_or_mac, this.operator_location_type, this.classification_type, this.category_eu, this.class_eu]));
 }
 
 /* 
@@ -13527,7 +13527,7 @@ mavlink20.messages.open_drone_id_operator_id = function(target_system, target_co
 }
         mavlink20.messages.open_drone_id_operator_id.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_operator_id.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.operator_id_type, this.operator_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.operator_id_type, this.operator_id]));
 }
 
 /* 
@@ -13554,7 +13554,7 @@ mavlink20.messages.open_drone_id_arm_status = function(status, error) {
 }
         mavlink20.messages.open_drone_id_arm_status.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_arm_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status, this.error]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.status, this.error]));
 }
 
 /* 
@@ -13589,7 +13589,7 @@ mavlink20.messages.open_drone_id_message_pack = function(target_system, target_c
 }
         mavlink20.messages.open_drone_id_message_pack.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_message_pack.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.single_message_size, this.msg_pack_size, this.messages]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.id_or_mac, this.single_message_size, this.msg_pack_size, this.messages]));
 }
 
 /* 
@@ -13624,7 +13624,7 @@ mavlink20.messages.open_drone_id_system_update = function(target_system, target_
 }
         mavlink20.messages.open_drone_id_system_update.prototype = new mavlink20.message();
 mavlink20.messages.open_drone_id_system_update.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.operator_altitude_geo, this.timestamp, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.operator_latitude, this.operator_longitude, this.operator_altitude_geo, this.timestamp, this.target_system, this.target_component]));
 }
 
 /* 
@@ -13651,7 +13651,7 @@ mavlink20.messages.hygrometer_sensor = function(id, temperature, humidity) {
 }
         mavlink20.messages.hygrometer_sensor.prototype = new mavlink20.message();
 mavlink20.messages.hygrometer_sensor.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.temperature, this.humidity, this.id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.temperature, this.humidity, this.id]));
 }
 
 /* 
@@ -13695,7 +13695,7 @@ mavlink20.messages.mission_checksum = function(mission_type, checksum) {
 }
         mavlink20.messages.mission_checksum.prototype = new mavlink20.message();
 mavlink20.messages.mission_checksum.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.checksum, this.mission_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.checksum, this.mission_type]));
 }
 
 /* 
@@ -13724,7 +13724,7 @@ mavlink20.messages.airspeed = function(id, airspeed, temperature, raw_press, fla
 }
         mavlink20.messages.airspeed.prototype = new mavlink20.message();
 mavlink20.messages.airspeed.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.airspeed, this.raw_press, this.temperature, this.id, this.flags]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.airspeed, this.raw_press, this.temperature, this.id, this.flags]));
 }
 
 /* 
@@ -13784,7 +13784,7 @@ mavlink20.messages.radio_rc_channels = function(target_system, target_component,
 }
         mavlink20.messages.radio_rc_channels.prototype = new mavlink20.message();
 mavlink20.messages.radio_rc_channels.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_last_update_ms, this.flags, this.target_system, this.target_component, this.count, this.channels]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_last_update_ms, this.flags, this.target_system, this.target_component, this.count, this.channels]));
 }
 
 /* 
@@ -13809,7 +13809,7 @@ mavlink20.messages.icarous_heartbeat = function(status) {
 }
         mavlink20.messages.icarous_heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.icarous_heartbeat.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.status]));
 }
 
 /* 
@@ -13849,7 +13849,7 @@ mavlink20.messages.icarous_kinematic_bands = function(numBands, type1, min1, max
 }
         mavlink20.messages.icarous_kinematic_bands.prototype = new mavlink20.message();
 mavlink20.messages.icarous_kinematic_bands.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.min1, this.max1, this.min2, this.max2, this.min3, this.max3, this.min4, this.max4, this.min5, this.max5, this.numBands, this.type1, this.type2, this.type3, this.type4, this.type5]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.min1, this.max1, this.min2, this.max2, this.min3, this.max3, this.min4, this.max4, this.min5, this.max5, this.numBands, this.type1, this.type2, this.type3, this.type4, this.type5]));
 }
 
 /* 
@@ -13884,7 +13884,7 @@ mavlink20.messages.heartbeat = function(type, autopilot, base_mode, custom_mode,
 }
         mavlink20.messages.heartbeat.prototype = new mavlink20.message();
 mavlink20.messages.heartbeat.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.custom_mode, this.type, this.autopilot, this.base_mode, this.system_status, this.mavlink_version]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.custom_mode, this.type, this.autopilot, this.base_mode, this.system_status, this.mavlink_version]));
 }
 
 /* 
@@ -13913,7 +13913,7 @@ mavlink20.messages.array_test_0 = function(v1, ar_i8, ar_u8, ar_u16, ar_u32) {
 }
         mavlink20.messages.array_test_0.prototype = new mavlink20.message();
 mavlink20.messages.array_test_0.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.ar_u16, this.v1, this.ar_i8, this.ar_u8]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_u32, this.ar_u16, this.v1, this.ar_i8, this.ar_u8]));
 }
 
 /* 
@@ -13938,7 +13938,7 @@ mavlink20.messages.array_test_1 = function(ar_u32) {
 }
         mavlink20.messages.array_test_1.prototype = new mavlink20.message();
 mavlink20.messages.array_test_1.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_u32]));
 }
 
 /* 
@@ -13964,7 +13964,7 @@ mavlink20.messages.array_test_3 = function(v, ar_u32) {
 }
         mavlink20.messages.array_test_3.prototype = new mavlink20.message();
 mavlink20.messages.array_test_3.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.v]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_u32, this.v]));
 }
 
 /* 
@@ -13990,7 +13990,7 @@ mavlink20.messages.array_test_4 = function(ar_u32, v) {
 }
         mavlink20.messages.array_test_4.prototype = new mavlink20.message();
 mavlink20.messages.array_test_4.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_u32, this.v]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_u32, this.v]));
 }
 
 /* 
@@ -14016,7 +14016,7 @@ mavlink20.messages.array_test_5 = function(c1, c2) {
 }
         mavlink20.messages.array_test_5.prototype = new mavlink20.message();
 mavlink20.messages.array_test_5.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.c1, this.c2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.c1, this.c2]));
 }
 
 /* 
@@ -14052,7 +14052,7 @@ mavlink20.messages.array_test_6 = function(v1, v2, v3, ar_u32, ar_i32, ar_u16, a
 }
         mavlink20.messages.array_test_6.prototype = new mavlink20.message();
 mavlink20.messages.array_test_6.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u32, this.ar_i32, this.ar_f, this.v2, this.ar_u16, this.ar_i16, this.v1, this.ar_u8, this.ar_i8, this.ar_c]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u32, this.ar_i32, this.ar_f, this.v2, this.ar_u16, this.ar_i16, this.v1, this.ar_u8, this.ar_i8, this.ar_c]));
 }
 
 /* 
@@ -14085,7 +14085,7 @@ mavlink20.messages.array_test_7 = function(ar_d, ar_f, ar_u32, ar_i32, ar_u16, a
 }
         mavlink20.messages.array_test_7.prototype = new mavlink20.message();
 mavlink20.messages.array_test_7.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.ar_f, this.ar_u32, this.ar_i32, this.ar_u16, this.ar_i16, this.ar_u8, this.ar_i8, this.ar_c]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_d, this.ar_f, this.ar_u32, this.ar_i32, this.ar_u16, this.ar_i16, this.ar_u8, this.ar_i8, this.ar_c]));
 }
 
 /* 
@@ -14112,7 +14112,7 @@ mavlink20.messages.array_test_8 = function(v3, ar_d, ar_u16) {
 }
         mavlink20.messages.array_test_8.prototype = new mavlink20.message();
 mavlink20.messages.array_test_8.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u16]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ar_d, this.v3, this.ar_u16]));
 }
 
 /* 
@@ -14158,7 +14158,7 @@ mavlink20.messages.test_types = function(c, s, u8, u16, u32, u64, s8, s16, s32, 
 }
         mavlink20.messages.test_types.prototype = new mavlink20.message();
 mavlink20.messages.test_types.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.u64, this.s64, this.d, this.u64_array, this.s64_array, this.d_array, this.u32, this.s32, this.f, this.u32_array, this.s32_array, this.f_array, this.u16, this.s16, this.u16_array, this.s16_array, this.c, this.s, this.u8, this.s8, this.u8_array, this.s8_array]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.u64, this.s64, this.d, this.u64_array, this.s64_array, this.d_array, this.u32, this.s32, this.f, this.u32_array, this.s32_array, this.f_array, this.u16, this.s16, this.u16_array, this.s16_array, this.c, this.s, this.u8, this.s8, this.u8_array, this.s8_array]));
 }
 
 /* 
@@ -14189,7 +14189,7 @@ mavlink20.messages.nav_filter_bias = function(usec, accel_0, accel_1, accel_2, g
 }
         mavlink20.messages.nav_filter_bias.prototype = new mavlink20.message();
 mavlink20.messages.nav_filter_bias.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.usec, this.accel_0, this.accel_1, this.accel_2, this.gyro_0, this.gyro_1, this.gyro_2]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.usec, this.accel_0, this.accel_1, this.accel_2, this.gyro_0, this.gyro_1, this.gyro_2]));
 }
 
 /* 
@@ -14219,7 +14219,7 @@ mavlink20.messages.radio_calibration = function(aileron, elevator, rudder, gyro,
 }
         mavlink20.messages.radio_calibration.prototype = new mavlink20.message();
 mavlink20.messages.radio_calibration.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.aileron, this.elevator, this.rudder, this.gyro, this.pitch, this.throttle]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.aileron, this.elevator, this.rudder, this.gyro, this.pitch, this.throttle]));
 }
 
 /* 
@@ -14246,7 +14246,7 @@ mavlink20.messages.ualberta_sys_status = function(mode, nav_mode, pilot) {
 }
         mavlink20.messages.ualberta_sys_status.prototype = new mavlink20.message();
 mavlink20.messages.ualberta_sys_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mode, this.nav_mode, this.pilot]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mode, this.nav_mode, this.pilot]));
 }
 
 /* 
@@ -14279,7 +14279,7 @@ mavlink20.messages.uavionix_adsb_out_cfg = function(ICAO, callsign, emitterType,
 }
         mavlink20.messages.uavionix_adsb_out_cfg.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ICAO, this.stallSpeed, this.callsign, this.emitterType, this.aircraftSize, this.gpsOffsetLat, this.gpsOffsetLon, this.rfSelect]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ICAO, this.stallSpeed, this.callsign, this.emitterType, this.aircraftSize, this.gpsOffsetLat, this.gpsOffsetLon, this.rfSelect]));
 }
 
 /* 
@@ -14319,7 +14319,7 @@ mavlink20.messages.uavionix_adsb_out_dynamic = function(utcTime, gpsLat, gpsLon,
 }
         mavlink20.messages.uavionix_adsb_out_dynamic.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_dynamic.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.utcTime, this.gpsLat, this.gpsLon, this.gpsAlt, this.baroAltMSL, this.accuracyHor, this.accuracyVert, this.accuracyVel, this.velVert, this.velNS, this.VelEW, this.state, this.squawk, this.gpsFix, this.numSats, this.emergencyStatus]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.utcTime, this.gpsLat, this.gpsLon, this.gpsAlt, this.baroAltMSL, this.accuracyHor, this.accuracyVert, this.accuracyVel, this.velVert, this.velNS, this.VelEW, this.state, this.squawk, this.gpsFix, this.numSats, this.emergencyStatus]));
 }
 
 /* 
@@ -14344,7 +14344,7 @@ mavlink20.messages.uavionix_adsb_transceiver_health_report = function(rfHealth) 
 }
         mavlink20.messages.uavionix_adsb_transceiver_health_report.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_transceiver_health_report.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rfHealth]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rfHealth]));
 }
 
 /* 
@@ -14369,7 +14369,7 @@ mavlink20.messages.uavionix_adsb_out_cfg_registration = function(registration) {
 }
         mavlink20.messages.uavionix_adsb_out_cfg_registration.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg_registration.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.registration]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.registration]));
 }
 
 /* 
@@ -14394,7 +14394,7 @@ mavlink20.messages.uavionix_adsb_out_cfg_flightid = function(flight_id) {
 }
         mavlink20.messages.uavionix_adsb_out_cfg_flightid.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_cfg_flightid.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.flight_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.flight_id]));
 }
 
 /* 
@@ -14419,7 +14419,7 @@ mavlink20.messages.uavionix_adsb_get = function(ReqMessageId) {
 }
         mavlink20.messages.uavionix_adsb_get.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_get.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.ReqMessageId]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.ReqMessageId]));
 }
 
 /* 
@@ -14449,7 +14449,7 @@ mavlink20.messages.uavionix_adsb_out_control = function(state, baroAltMSL, squaw
 }
         mavlink20.messages.uavionix_adsb_out_control.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.baroAltMSL, this.squawk, this.state, this.emergencyStatus, this.flight_id, this.x_bit]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.baroAltMSL, this.squawk, this.state, this.emergencyStatus, this.flight_id, this.x_bit]));
 }
 
 /* 
@@ -14480,7 +14480,7 @@ mavlink20.messages.uavionix_adsb_out_status = function(state, squawk, NIC_NACp, 
 }
         mavlink20.messages.uavionix_adsb_out_status.prototype = new mavlink20.message();
 mavlink20.messages.uavionix_adsb_out_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.squawk, this.state, this.NIC_NACp, this.boardTemp, this.fault, this.flight_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.squawk, this.state, this.NIC_NACp, this.boardTemp, this.fault, this.flight_id]));
 }
 
 /* 
@@ -14529,7 +14529,7 @@ mavlink20.messages.loweheiser_gov_efi = function(volt_batt, curr_batt, curr_gen,
 }
         mavlink20.messages.loweheiser_gov_efi.prototype = new mavlink20.message();
 mavlink20.messages.loweheiser_gov_efi.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.volt_batt, this.curr_batt, this.curr_gen, this.curr_rot, this.fuel_level, this.throttle, this.runtime, this.until_maintenance, this.rectifier_temp, this.generator_temp, this.efi_batt, this.efi_rpm, this.efi_pw, this.efi_fuel_flow, this.efi_fuel_consumed, this.efi_baro, this.efi_mat, this.efi_clt, this.efi_tps, this.efi_exhaust_gas_temperature, this.generator_status, this.efi_status, this.efi_index]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.volt_batt, this.curr_batt, this.curr_gen, this.curr_rot, this.fuel_level, this.throttle, this.runtime, this.until_maintenance, this.rectifier_temp, this.generator_temp, this.efi_batt, this.efi_rpm, this.efi_pw, this.efi_fuel_flow, this.efi_fuel_consumed, this.efi_baro, this.efi_mat, this.efi_clt, this.efi_tps, this.efi_exhaust_gas_temperature, this.generator_status, this.efi_status, this.efi_index]));
 }
 
 /* 
@@ -14565,7 +14565,7 @@ mavlink20.messages.storm32_gimbal_device_status = function(target_system, target
 }
         mavlink20.messages.storm32_gimbal_device_status.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_device_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.yaw_absolute, this.flags, this.failure_flags, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.yaw_absolute, this.flags, this.failure_flags, this.target_system, this.target_component]));
 }
 
 /* 
@@ -14598,7 +14598,7 @@ mavlink20.messages.storm32_gimbal_device_control = function(target_system, targe
 }
         mavlink20.messages.storm32_gimbal_device_control.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_device_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.flags, this.target_system, this.target_component]));
 }
 
 /* 
@@ -14635,7 +14635,7 @@ mavlink20.messages.storm32_gimbal_manager_information = function(gimbal_id, devi
 }
         mavlink20.messages.storm32_gimbal_manager_information.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.device_cap_flags, this.manager_cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_id]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.device_cap_flags, this.manager_cap_flags, this.roll_min, this.roll_max, this.pitch_min, this.pitch_max, this.yaw_min, this.yaw_max, this.gimbal_id]));
 }
 
 /* 
@@ -14666,7 +14666,7 @@ mavlink20.messages.storm32_gimbal_manager_status = function(gimbal_id, superviso
 }
         mavlink20.messages.storm32_gimbal_manager_status.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.device_flags, this.manager_flags, this.gimbal_id, this.supervisor, this.profile]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.device_flags, this.manager_flags, this.gimbal_id, this.supervisor, this.profile]));
 }
 
 /* 
@@ -14702,7 +14702,7 @@ mavlink20.messages.storm32_gimbal_manager_control = function(target_system, targ
 }
         mavlink20.messages.storm32_gimbal_manager_control.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_control.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.q, this.angular_velocity_x, this.angular_velocity_y, this.angular_velocity_z, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
 
 /* 
@@ -14738,7 +14738,7 @@ mavlink20.messages.storm32_gimbal_manager_control_pitchyaw = function(target_sys
 }
         mavlink20.messages.storm32_gimbal_manager_control_pitchyaw.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_control_pitchyaw.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.pitch, this.yaw, this.pitch_rate, this.yaw_rate, this.device_flags, this.manager_flags, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
 
 /* 
@@ -14769,7 +14769,7 @@ mavlink20.messages.storm32_gimbal_manager_correct_roll = function(target_system,
 }
         mavlink20.messages.storm32_gimbal_manager_correct_roll.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_correct_roll.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.roll, this.target_system, this.target_component, this.gimbal_id, this.client]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.roll, this.target_system, this.target_component, this.gimbal_id, this.client]));
 }
 
 /* 
@@ -14803,7 +14803,7 @@ mavlink20.messages.storm32_gimbal_manager_profile = function(target_system, targ
 }
         mavlink20.messages.storm32_gimbal_manager_profile.prototype = new mavlink20.message();
 mavlink20.messages.storm32_gimbal_manager_profile.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.target_system, this.target_component, this.gimbal_id, this.profile, this.priorities, this.profile_flags, this.rc_timeout, this.timeouts]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.target_system, this.target_component, this.gimbal_id, this.profile, this.priorities, this.profile_flags, this.rc_timeout, this.timeouts]));
 }
 
 /* 
@@ -14829,7 +14829,7 @@ mavlink20.messages.qshot_status = function(mode, shot_state) {
 }
         mavlink20.messages.qshot_status.prototype = new mavlink20.message();
 mavlink20.messages.qshot_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.mode, this.shot_state]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.mode, this.shot_state]));
 }
 
 /* 
@@ -14858,7 +14858,7 @@ mavlink20.messages.component_prearm_status = function(target_system, target_comp
 }
         mavlink20.messages.component_prearm_status.prototype = new mavlink20.message();
 mavlink20.messages.component_prearm_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.enabled_flags, this.fail_flags, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.enabled_flags, this.fail_flags, this.target_system, this.target_component]));
 }
 
 /* 
@@ -14887,7 +14887,7 @@ mavlink20.messages.avss_prs_sys_status = function(time_boot_ms, error_status, ba
 }
         mavlink20.messages.avss_prs_sys_status.prototype = new mavlink20.message();
 mavlink20.messages.avss_prs_sys_status.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.error_status, this.battery_status, this.arm_status, this.charge_status]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.error_status, this.battery_status, this.arm_status, this.charge_status]));
 }
 
 /* 
@@ -14917,7 +14917,7 @@ mavlink20.messages.avss_drone_position = function(time_boot_ms, lat, lon, alt, g
 }
         mavlink20.messages.avss_drone_position.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_position.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.ground_alt, this.barometer_alt]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.lat, this.lon, this.alt, this.ground_alt, this.barometer_alt]));
 }
 
 /* 
@@ -14953,7 +14953,7 @@ mavlink20.messages.avss_drone_imu = function(time_boot_ms, q1, q2, q3, q4, xacc,
 }
         mavlink20.messages.avss_drone_imu.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_imu.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.q1, this.q2, this.q3, this.q4, this.xacc, this.yacc, this.zacc, this.xgyro, this.ygyro, this.zgyro]));
 }
 
 /* 
@@ -14980,7 +14980,7 @@ mavlink20.messages.avss_drone_operation_mode = function(time_boot_ms, M300_opera
 }
         mavlink20.messages.avss_drone_operation_mode.prototype = new mavlink20.message();
 mavlink20.messages.avss_drone_operation_mode.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.time_boot_ms, this.M300_operation_mode, this.horsefly_operation_mode]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.time_boot_ms, this.M300_operation_mode, this.horsefly_operation_mode]));
 }
 
 /* 
@@ -15005,7 +15005,7 @@ mavlink20.messages.cubepilot_raw_rc = function(rc_raw) {
 }
         mavlink20.messages.cubepilot_raw_rc.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_raw_rc.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rc_raw]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rc_raw]));
 }
 
 /* 
@@ -15037,7 +15037,7 @@ mavlink20.messages.herelink_video_stream_information = function(camera_id, statu
 }
         mavlink20.messages.herelink_video_stream_information.prototype = new mavlink20.message();
 mavlink20.messages.herelink_video_stream_information.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.framerate, this.bitrate, this.resolution_h, this.resolution_v, this.rotation, this.camera_id, this.status, this.uri]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.framerate, this.bitrate, this.resolution_h, this.resolution_v, this.rotation, this.camera_id, this.status, this.uri]));
 }
 
 /* 
@@ -15068,7 +15068,7 @@ mavlink20.messages.herelink_telem = function(rssi, snr, rf_freq, link_bw, link_r
 }
         mavlink20.messages.herelink_telem.prototype = new mavlink20.message();
 mavlink20.messages.herelink_telem.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.rf_freq, this.link_bw, this.link_rate, this.snr, this.cpu_temp, this.board_temp, this.rssi]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.rf_freq, this.link_bw, this.link_rate, this.snr, this.cpu_temp, this.board_temp, this.rssi]));
 }
 
 /* 
@@ -15096,7 +15096,7 @@ mavlink20.messages.cubepilot_firmware_update_start = function(target_system, tar
 }
         mavlink20.messages.cubepilot_firmware_update_start.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_firmware_update_start.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.size, this.crc, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.size, this.crc, this.target_system, this.target_component]));
 }
 
 /* 
@@ -15123,7 +15123,7 @@ mavlink20.messages.cubepilot_firmware_update_resp = function(target_system, targ
 }
         mavlink20.messages.cubepilot_firmware_update_resp.prototype = new mavlink20.message();
 mavlink20.messages.cubepilot_firmware_update_resp.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.offset, this.target_system, this.target_component]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.offset, this.target_system, this.target_component]));
 }
 
 /* 
@@ -15149,7 +15149,7 @@ mavlink20.messages.airlink_auth = function(login, password) {
 }
         mavlink20.messages.airlink_auth.prototype = new mavlink20.message();
 mavlink20.messages.airlink_auth.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.login, this.password]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.login, this.password]));
 }
 
 /* 
@@ -15174,7 +15174,7 @@ mavlink20.messages.airlink_auth_response = function(resp_type) {
 }
         mavlink20.messages.airlink_auth_response.prototype = new mavlink20.message();
 mavlink20.messages.airlink_auth_response.prototype.pack = function(mav) {
-    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jjspack.Pack(this.format, [ this.resp_type]));
+    return mavlink20.message.prototype.pack.call(this, mav, this.crc_extra, jspack.Pack(this.format, [ this.resp_type]));
 }
 
 
@@ -15629,7 +15629,7 @@ MAVLink20Processor.prototype.parsePrefix = function() {
 MAVLink20Processor.prototype.parseLength = function() {
     
     if( this.buf.length >= 2 ) {
-        var unpacked = jjspack.Unpack('BB', this.buf.slice(0, 2));
+        var unpacked = jspack.Unpack('BB', this.buf.slice(0, 2));
         this.expected_length = unpacked[1] + mavlink20.HEADER_LEN + 2 // length of message + header + CRC
     }
 
@@ -15729,7 +15729,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // decode the header
     try {
-        unpacked = jjspack.Unpack('cBBBBBBHB', msgbuf.slice(0, 10));
+        unpacked = jspack.Unpack('cBBBBBBHB', msgbuf.slice(0, 10));
         magic = unpacked[0];
         mlen = unpacked[1];
         incompat_flags = unpacked[2];
@@ -15763,7 +15763,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // decode the checksum
     try {
-        var receivedChecksum = jjspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2));
+        var receivedChecksum = jspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2));
     } catch (e) {
         throw new Error("Unable to unpack MAVLink CRC: " + e.message);
     }
@@ -15773,11 +15773,11 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     // Assuming using crc_extra = True.  See the message.prototype.pack() function.
     messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
     
-    // if ( receivedChecksum !== messageChecksum ) {
-    //     throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
-    // }
+    if ( receivedChecksum[0] !== messageChecksum ) {
+         throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
+    }
 
-    var paylen = jjspack.CalcLength(decoder.format);
+    var paylen = jspack.CalcLength(decoder.format);
     var payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);
 
     //put any truncated 0's back in
@@ -15790,7 +15790,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     }
     // Decode the payload and reorder the fields to match the order map.
     try {
-        var t = jjspack.Unpack(decoder.format, payload);
+        var t = jspack.Unpack(decoder.format, payload);
     }
     catch (e) {
         throw new Error('Unable to unpack MAVLink payload type='+decoder.type+' format='+decoder.format+' payloadLength='+ payload +': '+ e.message);

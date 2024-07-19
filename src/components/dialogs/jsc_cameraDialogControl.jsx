@@ -1,11 +1,13 @@
 import $ from 'jquery'; 
+import 'jquery-ui-dist/jquery-ui.min.js';
+
 import React    from 'react';
 
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter'
-import * as js_andruavMessages from '../js/js_andruavMessages'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../js/js_main';
+import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
 class CLSS_CameraDevice extends React.Component {
 
@@ -158,31 +160,30 @@ export default class CLSS_CameraDialog extends React.Component
 
     fn_initDialog()
     {
-        $('#modal_ctrl_cam').hide();
         $('#modal_ctrl_cam').draggable();
-        $('#modal_ctrl_cam').mouseover(function () {
+        $('#modal_ctrl_cam').index('mouseover', function () {
             $('#modal_ctrl_cam').css('opacity', '1.0');
         });
-        $('#modal_ctrl_cam').mouseout(function () {
+        $('#modal_ctrl_cam').on('mouseout', function () {
             if ($('#modal_ctrl_cam').attr('opacity') == null) {
                 $('#modal_ctrl_cam').css('opacity', '0.4');
             }
         });
         
-        $('#modal_ctrl_cam').find('#btnShot').click(function () {
+        $('#modal_ctrl_cam').find('#btnShot').on('click', function () {
             // assume what there is attribute partyID in the control used to pass parameter
             js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
         });
-        $('#modal_ctrl_cam').find('#btnSwitchCam').click(function () {
+        $('#modal_ctrl_cam').find('#btnSwitchCam').on('click', function () {
             // assume what there is attribute partyID in the control used to pass parameter
             const c_partyID = $('#modal_ctrl_cam').attr('partyID');
             js_globals.v_andruavClient.API_SwitchCamera(c_partyID,c_partyID);
         });
-        $('#modal_ctrl_cam').find('#btnTakeImage').click(function () {
+        $('#modal_ctrl_cam').find('#btnTakeImage').on('click', function () {
             // assume what there is attribute partyID in the control used to pass parameter
             js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
-        $('#modal_ctrl_cam').find('#btnFCBTakeImage').click(function () {
+        $('#modal_ctrl_cam').find('#btnFCBTakeImage').on('click', function () {
             // assume what there is attribute partyID in the control used to pass parameter
             js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
         });
@@ -193,6 +194,8 @@ export default class CLSS_CameraDialog extends React.Component
         $('#modal_ctrl_cam').find('#txt_ShootingInterval').bind("mousedown", function () {
             $(this).parents('tr').removeClass('draggable');
         });
+        $('#modal_ctrl_cam').hide();
+        
     }
 
     fn_closeDialog()
@@ -257,16 +260,16 @@ export default class CLSS_CameraDialog extends React.Component
         
 
         return (
-            <div key='camera_dialog' id="modal_ctrl_cam" data-toggle="tooltip" title="Camera Control" className="card width_fit_max css_ontop border-light p-2 ">
+            <div key='modal_ctrl_cam' id="modal_ctrl_cam" title="Camera Control" data-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 ">
                 <div key='camera_hdr' className="card-header text-center">
-						<div className="row">
-						  <div className="col-10">
-							<h4 className="text-success text-start">Streams of' {v_unitName} </h4>
-						  </div>
-						  <div className="col-2 float-right">
-						  <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
-						   </div>
+					<div className="row">
+				        <div className="col-10">
+						    <h4 className="text-success text-start">Still Image of' {v_unitName} </h4>
 						</div>
+						<div className="col-2 float-right">
+						    <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
+						</div>
+					</div>
 				</div>
                       
                 <div key='camera_body'  id="camera-card-body" className="card-body">

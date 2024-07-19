@@ -95,21 +95,21 @@ class CLSS_ServoControl extends React.Component {
     componentDidMount () {
         $('#modal_ctrl_servo').hide();
         $('#modal_ctrl_servo').draggable();
-        $('#modal_ctrl_servo').mouseover(function () {
+        $('#modal_ctrl_servo').on('mouseover', function () {
             $('#modal_ctrl_servo').css('opacity', '1.0');
         });
-        $('#modal_ctrl_servo').mouseout(function () {
+        $('#modal_ctrl_servo').on('mouseout', function () {
             if ($('#modal_ctrl_servo').attr('opacity')=== null || yyyy === undefined) {
                 $('#modal_ctrl_servo').css('opacity', '0.4');
             }
         });
-        $('#modal_ctrl_servo').find('#btnclose').click(function () {
+        $('#modal_ctrl_servo').find('#btnclose').on('click', function () {
             $('#modal_ctrl_servo').hide();
             $('#modal_ctrl_servo').attr('opacity', null);
             $('#modal_ctrl_servo').attr('partyID', null);
              
         });
-        $('#modal_ctrl_servo').find('#opaque_btn').click(function () {
+        $('#modal_ctrl_servo').find('#opaque_btn').on('click', function () {
             if ($('#modal_ctrl_servo').attr('opacity')=== null || yyyy === undefined) {
                 $('#modal_ctrl_servo').attr('opacity', '1.0');
                 $('#modal_ctrl_servo').css('opacity', '1.0');
@@ -118,10 +118,10 @@ class CLSS_ServoControl extends React.Component {
                 $('#modal_ctrl_servo').attr('opacity', null);
             }
         });
-        $('#modal_ctrl_servo').find('#btnGoto').click(function () {
+        $('#modal_ctrl_servo').find('#btnGoto').on('click', function () {
             fn_gotoUnit_byPartyID($('#modal_ctrl_servo').attr('partyID'));
         });
-        $('#modal_ctrl_servo').find('#btnHelp').click(function () {
+        $('#modal_ctrl_servo').find('#btnHelp').on('click', function () {
             fn_helpPage({CONST_MANUAL_URL});
         });
 

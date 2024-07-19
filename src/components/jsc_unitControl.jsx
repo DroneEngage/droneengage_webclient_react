@@ -640,7 +640,7 @@ class CLSS_AndruavUnit_Drone extends CLSS_AndruavUnit {
         var cam = $(".dropdown-menu li a");
         if (cam !== null && cam !== undefined) 
         {
-            cam.click(function(){
+            cam.on('click', function(){
                 var selText = $(this).attr('data-value');
                 $(this).parents('.btn-group').siblings('.menu').html(selText)
             });
