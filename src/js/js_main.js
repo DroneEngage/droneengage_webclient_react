@@ -59,6 +59,20 @@ function showDialog (id, show)
 	}
 }
 
+function showModal (id, show)
+{
+	const modal = new Modal($(id)); // Instantiates your modal
+	if (show === true && (modal !== null || modal !== undefined))
+	{
+		modal.show();
+	}
+	
+	if (show === false && (modal !== null || modal !== undefined))
+	{
+		modal.hide();
+	}
+}
+
 var elevator;
 
 export var QueryString = function () {
@@ -186,8 +200,9 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('button#btnCancel').on('click', function () 
 			{
 				callback(false);
-				const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
-				modal.hide()
+				// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
+				// modal.hide();
+				showModal('#modal_saveConfirmation', false);
 			});
 			if (p_yesCaption === null || p_yesCaption === undefined)
 			{
@@ -202,9 +217,9 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').children().find('button#btnCancel').html(p_noCaption);
 			
 			//$('#modal_saveConfirmation').modal('show');
-			const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
-			modal.show();
-			
+			// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
+			// modal.show();
+			showModal('#modal_saveConfirmation', true);
 		}
 
 
@@ -865,14 +880,23 @@ function fn_handleKeyBoard() {
 			})
 				.css({ display: 'inline', padding: '0px 10px' });
 
-			$("#yaw_knob").knob({
-				'change': function (v) { }
-			});
+				// unsolved: https://stackoverflow.com/questions/39152877/consider-marking-event-handler-as-passive-to-make-the-page-more-responsive
+				$("#yaw_knob").knob({
+					'change': function (v) {
+					  // Your change event handler code
+					},
+					'mousewheel': function (event) {
+					  event.preventDefault();
+					},
+					'touchstart': function (event) {
+					  event.preventDefault();
+					},
+				  }, {
+					'passive': true // Add the passive option to make the event listeners passive
+				  });
+				  
 
-
-
-
-
+			
 			$('#andruavUnitGlobals').hide();
 
 
@@ -1134,8 +1158,9 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.API_setUnitName(p_andruavUnit, v_unitName, v_unitDescription);
 			});
 			//$('#modal_changeUnitInfo').modal('show');
-			const modal = new Modal($('#modal_changeUnitInfo')); // Instantiates your modal
-			modal.show();
+			// const modal = new Modal($('#modal_changeUnitInfo')); // Instantiates your modal
+			// modal.show();
+			showModal('#modal_changeUnitInfo', true);
 		}
 
 		export function fn_changeAltitude (p_andruavUnit) {
@@ -1180,8 +1205,10 @@ function fn_handleKeyBoard() {
 				}
 			});
 			//$('#changespeed_modal').modal('show');
-			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			modal.show();
+			//const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			//modal.show();
+
+			showModal('#changespeed_modal', true);
 		}
 
 		/**
@@ -1236,9 +1263,10 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
 			});
 			//$('#changespeed_modal').modal('show');
-			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			modal.show();
+			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			// modal.show();
 
+			showModal('#changespeed_modal', true);
 		}
 
 		export function fn_changeUDPPort(p_andruavUnit, init_pot) {
@@ -1261,8 +1289,10 @@ function fn_handleKeyBoard() {
 			});
 			
 			//$('#changespeed_modal').modal('show');
-			const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			modal.show();
+			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
+			// modal.show();
+
+			showModal('#changespeed_modal', true);
 		}
 
 		/**
