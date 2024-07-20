@@ -1,6 +1,14 @@
 import React    from 'react';
 
-import {fn_do_modal_confirmation} from '../js/js_main'
+import $ from 'jquery';
+
+import * as js_siteConfig from '../js/js_siteConfig'
+import Modal from 'bootstrap/js/dist/modal';
+
+import {js_globals} from '../js/js_globals.js';
+import {js_eventEmitter} from '../js/js_eventEmitter'
+
+import {fn_do_modal_confirmation, fn_gotoUnit, fn_helpPage} from '../js/js_main'
 
 
 class Clss_ParameterItem extends  React.Component {
@@ -56,9 +64,9 @@ class Clss_ParameterItem extends  React.Component {
             return ;
         }
         var me = this;
-        fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB ?", function (p_approved) {
+        fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
-            window.AndruavLibs.AndruavClient.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
+            js_globals.v_andruavClient.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
             js_eventEmitter.fn_dispatch(js_globals.EE_displayParameters, me.props.prop_unit);
         }, "YES");
 
@@ -151,7 +159,7 @@ class Clss_ParametersList extends  React.Component {
 }
 
 
-class Clss_UnitParametersList extends React.Component {
+export default class Clss_UnitParametersList extends React.Component {
 
     constructor() 
     {
@@ -168,7 +176,9 @@ class Clss_UnitParametersList extends React.Component {
     fn_displayForm (p_me, p_andruavUnit)
     {
         p_me.setState({'p_unit':p_andruavUnit});
-        $('#modal_ctrl_parameters').modal('show');
+        //$('#modal_ctrl_parameters').modal('show');
+        const modal = new Modal($('#modal_ctrl_parameters')); // Instantiates your modal
+		modal.show();
     }
 
     fn_updateParameters(p_me, p_andruavUnit)
@@ -235,7 +245,7 @@ class Clss_UnitParametersList extends React.Component {
         var me = this;
         fn_do_modal_confirmation("Confirmation", "Release all parameters from FCB?", function (p_approved) {
             if (p_approved === false) return;
-            window.AndruavLibs.AndruavClient.API_requestParamList(me.state.p_unit);
+            js_globals.v_andruavClient.API_requestParamList(me.state.p_unit);
         }, "YES");
     }
 
@@ -245,7 +255,7 @@ class Clss_UnitParametersList extends React.Component {
         var me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
-            window.AndruavLibs.AndruavClient.API_WriteAllParameters(me.state.p_unit);
+            js_globals.v_andruavClient.API_WriteAllParameters(me.state.p_unit);
         }, "YES");
     }
     
@@ -255,7 +265,7 @@ class Clss_UnitParametersList extends React.Component {
         if ((p_andruavUnit!=null) && (Object.keys(p_andruavUnit.m_FCBParameters.m_list_by_index_shadow).length==0))
         {
             // Maybe parameters are not loaded ... send reload request.
-            window.AndruavLibs.AndruavClient.API_requestParamList(p_andruavUnit);
+            js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
         }
 
         
@@ -322,7 +332,7 @@ class Clss_UnitParametersList extends React.Component {
                                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={(e) => fn_gotoUnit(p_andruavUnit)}>Goto</button>
                                             </div>
                                             <div className = "col-6">
-                                                <button id="btnHelp" type="button" className="btn  btn-sm btn-primary" onClick={(e) => fn_helpPage({CONST_MANUAL_URL})}>Help</button>
+                                                <button id="btnHelp" type="button" className="btn  btn-sm btn-primary" onClick={(e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>
                                             </div>
                                         </div>
                             </div>
@@ -334,19 +344,19 @@ class Clss_UnitParametersList extends React.Component {
 };
 
 
-if (CONST_TEST_MODE === true)
-{
-   ReactDOM.render(
-            <React.StrictMode>
-                <Clss_UnitParametersList />
-            </React.StrictMode>,
-            window.document.getElementById('modal_uplCtrl')
-    );
-}
-else
-{
-    ReactDOM.render(
-        <Clss_UnitParametersList key={'AUL'} />,
-        window.document.getElementById('modal_uplCtrl')
-    );
-}   
+// if (CONST_TEST_MODE === true)
+// {
+//    ReactDOM.render(
+//             <React.StrictMode>
+//                 <Clss_UnitParametersList />
+//             </React.StrictMode>,
+//             window.document.getElementById('modal_uplCtrl')
+//     );
+// }
+// else
+// {
+//     ReactDOM.render(
+//         <Clss_UnitParametersList key={'AUL'} />,
+//         window.document.getElementById('modal_uplCtrl')
+//     );
+// }   

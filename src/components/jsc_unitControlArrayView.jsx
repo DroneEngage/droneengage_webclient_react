@@ -913,7 +913,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
         
         var units_details = [];
         
-        if (this.state.andruavUnitPartyIDs.length == 0) 
+        if (this.state.andruavUnitPartyIDs.length === 0) 
         {
 
             unit.push (<div key={'Clss_AndruavUnitListArray_unit_length_empty' + this.props.prop_key} className='bg-success'>NO ONLINE UNITS</div>);

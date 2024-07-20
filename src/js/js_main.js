@@ -45,7 +45,19 @@ $.fn.append = function($el){
 
 var v_contextMenuOpen = false;
 
+function showDialog (id, show)
+{
+	const obj = document.getElementById(id);
+	if (show === true && (obj !== null || obj !== undefined))
+	{
+		obj.style.display = 'block';
+	}
 
+	if (show === false && (obj !== null || obj !== undefined))
+	{
+		obj.style.display = 'none';
+	}
+}
 
 var elevator;
 
@@ -167,23 +179,13 @@ function fn_handleKeyBoard() {
 			p_style += " p-1 rounded_10px ";
 			var callback = p_callback;
 			$('#modal_saveConfirmation').children().find('h4#title').html(p_title);
-			//$('#modal_saveConfirmation').children().find('h4#title').removeClass();
 			$('#modal_saveConfirmation').children().find('h4#title').addClass("modal-title " + p_style);
 			$('#modal_saveConfirmation').children().find('div.modal-body').html(p_message);
-			//$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').off('click');
 			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').unbind('click');
-			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').on('click', function () 
-			{
-				callback(true);
-				//$('#modal_saveConfirmation').modal('hide');
-				const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
-				modal.hide();
-			});
 			$('#modal_saveConfirmation').children().find('button#btnCancel').unbind('click');
 			$('#modal_saveConfirmation').children().find('button#btnCancel').on('click', function () 
 			{
 				callback(false);
-				//$('#modal_saveConfirmation').modal('hide');
 				const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
 				modal.hide()
 			});
@@ -1030,8 +1032,7 @@ function fn_handleKeyBoard() {
 			$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
 			$('#modal_ctrl_yaw').attr('partyID', p_partyID);
 			//$('#modal_ctrl_yaw').show(p_partyID);
-			const non_modal = new Dialog($('#modal_ctrl_yaw')); // Instantiates your modal
-			non_modal.show(p_partyID);
+			showDialog("modal_ctrl_yaw", true);
 		}
 
 
@@ -1097,7 +1098,7 @@ function fn_handleKeyBoard() {
 			fn_gotoUnit(p_andruavUnit);
 		}
 		
-		function fn_gotoUnit(p_andruavUnit) {
+		export function fn_gotoUnit(p_andruavUnit) {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			var marker = p_andruavUnit.m_gui.m_marker;
@@ -1110,7 +1111,7 @@ function fn_handleKeyBoard() {
 			}
 		}
 
-		function fn_helpPage (p_url)
+		export function fn_helpPage (p_url)
 		{
 			window.open(p_url,'_blank');
 		}

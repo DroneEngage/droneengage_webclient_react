@@ -28,7 +28,7 @@ class Clss_CtrlP2PInRangeNodeInfo  extends React.Component {
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_node;
-        const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnit(v_inrange_node.partyID);
+        const unit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnit(v_inrange_node.partyID);
         var txt_node_name;
 
         var p2 = v_andruavUnit.partyID;

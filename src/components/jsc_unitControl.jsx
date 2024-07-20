@@ -209,15 +209,11 @@ class Clss_AndruavUnit extends React.Component {
     }
 
 
-    fn_sendParametersToGCS(p_andruavUnit)
+    fn_displayParamsDialog(p_andruavUnit)
     {
         if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
         
-        // if (p_andruavUnit.m_Telemetry._isActive === true) {
-        //     js_globals.v_andruavClient.sendParametersValuesToGCS(p_andruavUnit);
-        // }
-
-        js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePaddisplayParameters, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_globals.EE_displayParameters, p_andruavUnit);
     }
 
 
@@ -1149,7 +1145,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
                     <button id='btn_webRX'      type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_rx_class}   onClick={ (e) => this.fn_webRX_toggle(p_andruavUnit)} title={btn.btn_rx_title}>{btn.btn_rx_text}</button>
                     <button id='btn_freezerx' type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
                     <button id='btn_releaserx' type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>
-                    <button id='btn_inject_param' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_sendParametersToGCS(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
+                    <button id='btn_inject_param' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_displayParamsDialog(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
                     </div></div>);
 
         return (

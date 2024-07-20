@@ -24,6 +24,7 @@ import Clss_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx
 import Clss_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import Clss_GamePadControl from '../components/jsc_gamepadControl.jsx'
 import Clss_AndruavUnitListArray from '../components/jsc_unitControlArrayView.jsx'
+import Clss_UnitParametersList from '../components/jsc_unitParametersList.jsx'
 import {Clss_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
@@ -120,7 +121,7 @@ const Home = () => {
 
               <Clss_CameraDialog/>
 			  <div id='servoCtrl'></div>
-              <div id='modal_uplCtrl'></div>
+              <Clss_UnitParametersList/>
               <Clss_GamePadControl p_index={js_globals.active_gamepad_index} />
 			  <Clss_StreamDialog/>
 
@@ -150,11 +151,11 @@ const Home = () => {
           </div>
 
 
-          <div className="modal fade" id="altitude_modal">
+          <div className="modal fade" id="altitude_modal" >
 			<div className="modal-dialog">
 				<div className="modal-content">
 					<div className="modal-header">
-						<button type="button" className="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<button type="button" className="close" data-bs-dismiss="modal" aria-hidden="true">×</button>
 						<h4 className="modal-title text-primary">Change Altitude</h4>
 					</div>
 					<div className="container"></div>
@@ -166,8 +167,8 @@ const Home = () => {
 						</div>
 					</div>
 					<div className="modal-footer">
-						<button id="btnCancel" type="button" data-dismiss="modal" className="btn btn-muted">Cancel</button>
-						<button id="btnOK" type="button" data-dismiss="modal" className="btn btn-success">GO</button>
+						<button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">Cancel</button>
+						<button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-success">GO</button>
 					</div>
 				</div>
 			</div>
@@ -222,6 +223,7 @@ const Home = () => {
 				</div>
 			</div>
 		</div>
+
 		<div id="modal_saveConfirmation" className="modal fade"  role="dialog">
 			<div className="modal-dialog">
 				<div className="modal-content">

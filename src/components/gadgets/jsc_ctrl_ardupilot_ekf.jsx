@@ -75,7 +75,7 @@ export class Clss_CTRL_ARDUPILOT_EKF extends React.Component {
         if ((this.state.warning_level & 0x8) !== 0) return 'bg-danger';
         if ((this.state.warning_level & 0x4) !== 0) return 'bg-warning';
         if ((this.state.warning_level & 0x2) !== 0) return 'bg-success';
-        if (this.state.warning_level == 0) return 'bg-none';
+        if (this.state.warning_level === 0) return 'bg-none';
     }
 
     

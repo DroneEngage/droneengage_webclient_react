@@ -141,7 +141,7 @@ export class Clss_CTRL_P2P extends React.Component {
         }
         if (v_andruavUnit.m_P2P.m_parent_address !== "")
         {
-            const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
+            const unit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
             txt_parent_mac = v_andruavUnit.m_P2P.m_parent_address;
             if (unit !== null && unit !== undefined)
             {
@@ -153,7 +153,7 @@ export class Clss_CTRL_P2P extends React.Component {
 
         if (v_andruavUnit.m_P2P.m_logical_parent_address!="")
         {
-            const unit = window.AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_logical_parent_address);
+            const unit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_logical_parent_address);
             txt_logical_parent_mac = v_andruavUnit.m_P2P.m_logical_parent_address;
             if (unit !== null && unit !== undefined)
             {
