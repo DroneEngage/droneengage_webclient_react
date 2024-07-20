@@ -4,7 +4,7 @@ import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
 
-export class Clss_CTRL_BATTERY extends React.Component {
+export class ClssCtrlBattery extends React.Component {
     constructor()
 	{
 		super ();

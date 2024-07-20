@@ -14,7 +14,7 @@ import {js_andruavAuth} from './js_andruavAuth'
 import { mavlink20 } from './js_mavlink_v2.js';
 
 
-export class Clss_AndruavFencePlan
+export class ClssAndruavFencePlan
 {
 	constructor (p_id/*, p_initColor*/)
 	{
@@ -29,10 +29,10 @@ export class Clss_AndruavFencePlan
 	}
 	
 	static getInstance() {
-        if (!Clss_AndruavFencePlan.instance) {
-            Clss_AndruavFencePlan.instance = new Clss_AndruavFencePlan(1);
+        if (!ClssAndruavFencePlan.instance) {
+            ClssAndruavFencePlan.instance = new ClssAndruavFencePlan(1);
         }
-        return Clss_AndruavFencePlan.instance;
+        return ClssAndruavFencePlan.instance;
     }
 
     fn_generateAndruavFenceData(shapes)
@@ -148,7 +148,7 @@ export class Clss_AndruavFencePlan
 	}
 }
 
-class Clss_AndruavMissionPlan 
+class ClssAndruavMissionPlan 
 {
 
 	constructor (p_id, p_initColor)
@@ -449,12 +449,12 @@ class Clss_AndruavMissionPlan
 	{
 		if (this.v_markers.length ===0)	 return;
 		
-		// var v_cmd = Clss_AndruavResala_WayPoints.fn_toJSON(this.v_markers);
+		// var v_cmd = ClssAndruavResala_WayPoints.fn_toJSON(this.v_markers);
 		
 		// Delete Old Shapes
 		if (p_missionV110 !== null && p_missionV110 !== undefined)
 		{
-			if ((js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined) && (js_globals.v_andruavClient.fn_isRegistered()===true))
+			if ((js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined) && (js_globals.v_andruavClient.fn_isRegistered() === true))
 			{
 				js_globals.v_andruavClient.API_requestDeleteWayPoint(p_PartyID,null); // deattach drones from all fences in the group
 				js_globals.v_andruavClient.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,p_PartyID,'_drone_',1);
@@ -713,7 +713,7 @@ class Clss_AndruavMissionPlan
 }
 
 
-class Clss_AndruavMissionPlanManager 
+class ClssAndruavMissionPlanManager 
 {
 	constructor ()
 	{
@@ -725,7 +725,7 @@ class Clss_AndruavMissionPlanManager
 	fn_createNewMission ()
 	{
 		const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter%js_globals.v_colorDrawPathes.length];
-		var v_missionPlan = new Clss_AndruavMissionPlan (this.m_missionCounter, c_initColor);
+		var v_missionPlan = new ClssAndruavMissionPlan (this.m_missionCounter, c_initColor);
 		this.m_missionPlans[this.m_missionCounter] = v_missionPlan;
 		this.m_missionCounter = this.m_missionCounter + 1;
 
@@ -804,4 +804,4 @@ class Clss_AndruavMissionPlanManager
 }
 
 
-export default Clss_AndruavFencePlan.getInstance();
+export default ClssAndruavFencePlan.getInstance();

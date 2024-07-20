@@ -11,7 +11,7 @@ import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
 
-class Clss_CtrlP2PInRangeNodeInfo  extends React.Component {
+class ClssCtrlP2PInRangeNodeInfo  extends React.Component {
     constructor(props)
     {
         super(props);
@@ -100,7 +100,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
         Object.entries(v_andruavUnit.m_P2P.m_detected_node).forEach(([partyID, inrange_node]) => {
             
             v_units.push( 
-                    <Clss_CtrlP2PInRangeNodeInfo key={v_andruavUnit.partID+partyID+'RANGE_NODE_INFO1'}  p_unit={v_andruavUnit} p_inrange_node={inrange_node} />
+                    <ClssCtrlP2PInRangeNodeInfo key={v_andruavUnit.partID+partyID+'RANGE_NODE_INFO1'}  p_unit={v_andruavUnit} p_inrange_node={inrange_node} />
                 );
         });
         

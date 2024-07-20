@@ -3,7 +3,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
-class Clss_AndruavMessageItem extends React.Component {
+class ClssAndruavMessageItem extends React.Component {
 
     constructor(props) {
         super(props);
@@ -46,7 +46,7 @@ class Clss_AndruavMessageItem extends React.Component {
     }
 }
 
-export  class Clss_MESSAGE_LOG  extends React.Component {
+export  class ClssMESSAGE_LOG  extends React.Component {
 
     constructor(props)
     {
@@ -77,7 +77,7 @@ export  class Clss_MESSAGE_LOG  extends React.Component {
             time: (new Date()).toLocaleTimeString()
         });
 
-        if (p_me._isMounted!==true) return ;
+        if (p_me._isMounted !== true) return ;
     
         p_me.setState({'m_update': p_me.state.m_update +1});
         //p_me.state.m_update += 1;
@@ -108,7 +108,7 @@ export  class Clss_MESSAGE_LOG  extends React.Component {
         let min = Math.max(len - js_globals.CONST_MAX_MESSAGE_LOG,0);
         for (let i=len-1; i>=min; --i) 
         {
-            v_messages.push(<Clss_AndruavMessageItem key={this.props.p_unit.partyID + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
+            v_messages.push(<ClssAndruavMessageItem key={this.props.p_unit.partyID + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
         }
         
         return (

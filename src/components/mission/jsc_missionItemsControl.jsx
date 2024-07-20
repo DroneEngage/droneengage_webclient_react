@@ -268,7 +268,7 @@ class MissionControlPanel extends React.Component {
                 );
             }
 
-            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===true)
+            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true)
 			{
                 // overwrite with this if public version 
                 v_partyIDCtrl = [];        
@@ -576,7 +576,7 @@ class CMissionsContainer extends React.Component {
 
         
     return (
-        <div key='Clss_CMissionsContainer' className="width_100">{v_ctrl}</div>
+        <div key='ClssCMissionsContainer' className="width_100">{v_ctrl}</div>
             );
     }
 };

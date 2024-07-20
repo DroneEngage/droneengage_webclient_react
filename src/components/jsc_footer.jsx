@@ -3,7 +3,7 @@
 import React from 'react';
 import * as  js_siteConfig from './siteConfig.js'
 
-class Clss_FooterControl extends React.Component {
+class ClssFooterControl extends React.Component {
 	constructor()
 	{
         super ();

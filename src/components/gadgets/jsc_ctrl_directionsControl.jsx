@@ -1,7 +1,7 @@
 import $ from 'jquery'; 
 import React    from 'react';
 
-export class Clss_CTRL_DIRECTIONS extends React.Component {
+export class ClssCtrlDirections extends React.Component {
 
     constructor()
 	{

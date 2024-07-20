@@ -10,7 +10,7 @@ import {js_speak} from '../js/js_speak'
 import {fn_gotoUnit_byPartyID} from '../js/js_main'
 
 
-class Clss_GamePadAxisControl extends React.Component {
+class ClssGamePadAxisControl extends React.Component {
 
     render()
     {
@@ -28,10 +28,10 @@ class Clss_GamePadAxisControl extends React.Component {
 }
 
 
-class Clss_GamePadButton extends React.Component {
+class ClssGamePadButton extends React.Component {
     render()
     {
-        const c_color = this.props.pressed===true?this.props.color_active:this.props.color_inactive;
+        const c_color = this.props.pressed === true?this.props.color_active:this.props.color_inactive;
         js_globals.fn_console_log ("buttion " + this.props.color_active);
         return (
             <div>
@@ -46,7 +46,7 @@ class Clss_GamePadButton extends React.Component {
 }
 
 
-class Clss_GamePadAxesControl extends React.Component {
+class ClssGamePadAxesControl extends React.Component {
 
     constructor(props)
 	{
@@ -100,15 +100,15 @@ class Clss_GamePadAxesControl extends React.Component {
 
         return (
             <div className='gp_axes'>
-                <Clss_GamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></Clss_GamePadAxisControl>
-                <Clss_GamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]}></Clss_GamePadAxisControl>
+                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]}></ClssGamePadAxisControl>
             </div>
                 
         );
     }
 }
 
-class Clss_GamePadButtonControl extends React.Component {
+class ClssGamePadButtonControl extends React.Component {
     
     
     constructor()
@@ -141,19 +141,19 @@ class Clss_GamePadButtonControl extends React.Component {
 
         return (
             <div className='gp_buttons'>
-                <Clss_GamePadButton id='btn4' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></Clss_GamePadButton>
-                <Clss_GamePadButton id='btn0' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></Clss_GamePadButton>
-                <Clss_GamePadButton id='btn1' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></Clss_GamePadButton>
-                <Clss_GamePadButton id='btn2' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></Clss_GamePadButton>
-                <Clss_GamePadButton id='btn3' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></Clss_GamePadButton>
-                <Clss_GamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></Clss_GamePadButton>
+                <ClssGamePadButton id='btn4' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn0' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn1' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn2' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn3' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
             </div>
         );
     }
 }
 
 
-export default class Clss_GamePadControl extends React.Component {
+export default class ClssGamePadControl extends React.Component {
 
     constructor(props)
 	{
@@ -180,10 +180,10 @@ export default class Clss_GamePadControl extends React.Component {
                 <div className='gp_input'>
                     <div className="row  margin_2px css_padding_zero">
                         <div className='col-12'>
-                            <Clss_GamePadAxesControl p_index={js_globals.active_gamepad_index}></Clss_GamePadAxesControl>
+                            <ClssGamePadAxesControl p_index={js_globals.active_gamepad_index}></ClssGamePadAxesControl>
                         </div>
                         <div className='col-12'>
-                            <Clss_GamePadButtonControl p_index={js_globals.active_gamepad_index}></Clss_GamePadButtonControl>
+                            <ClssGamePadButtonControl p_index={js_globals.active_gamepad_index}></ClssGamePadButtonControl>
                         </div>
                     </div>
                 </div>

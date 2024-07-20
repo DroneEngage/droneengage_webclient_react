@@ -12,7 +12,7 @@ import {js_localStorage} from '../js/js_localStorage'
 import {js_speak} from '../js/js_speak'
 import {js_eventEmitter} from '../js/js_eventEmitter'
 
-export class Clss_LoginControl extends React.Component {
+export class ClssLoginControl extends React.Component {
 	constructor() {
 		super();
 		this.state = {
@@ -27,7 +27,7 @@ export class Clss_LoginControl extends React.Component {
 	fn_onSocketStatus(me, params) {
 		js_globals.fn_console_log('REACT:' + JSON.stringify(params));
 
-		if (me._isMounted!==true) return ;
+		if (me._isMounted !== true) return ;
     	if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
 			me.setState({ btnConnectText: 'Logout' });
@@ -108,7 +108,7 @@ export class Clss_LoginControl extends React.Component {
 		}
 		if (this.props.simple === null || this.props.simple === undefined) {
 			return (
-				<div key={'Clss_LoginControl_simple'}  className="card text-white border-light mb-3" >
+				<div key={'ClssLoginControl_simple'}  className="card text-white border-light mb-3" >
 					<div className="card-header  text-center"> <strong>{login}</strong></div>
 					<div id='login_form' className="card-body">
 						<div className={this.state.is_connected === true ? "hidden" : " "} >
@@ -141,7 +141,7 @@ export class Clss_LoginControl extends React.Component {
 				css = "bg-danger";
 			}
 			control.push(
-				<div key={'Clss_LoginControl_complex'} className="dropdown">
+				<div key={'ClssLoginControl_complex'} className="dropdown">
 					<button className={'btn btn-secondary dropdown-toggle ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
 						{title}
 					</button>

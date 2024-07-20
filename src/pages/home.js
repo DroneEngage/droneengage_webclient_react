@@ -17,15 +17,15 @@ import React , { useEffect } from 'react';
 
 import {js_globals} from '../js/js_globals.js'
 
-import Clss_HeaderControl from '../components/jsc_header'
-import Clss_GlobalSettings from '../components/jsc_globalSettings'
-import Clss_AndruavUnitList from '../components/jsc_unitControl.jsx'
-import Clss_CameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
-import Clss_StreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
-import Clss_GamePadControl from '../components/jsc_gamepadControl.jsx'
-import Clss_AndruavUnitListArray from '../components/jsc_unitControlArrayView.jsx'
-import Clss_UnitParametersList from '../components/jsc_unitParametersList.jsx'
-import {Clss_CVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
+import ClssHeaderControl from '../components/jsc_header'
+import ClssGlobalSettings from '../components/jsc_globalSettings'
+import ClssAndruavUnitList from '../components/jsc_unitControl.jsx'
+import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
+import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
+import ClssGamePadControl from '../components/jsc_gamepadControl.jsx'
+import ClssAndruavUnitListArray from '../components/jsc_unitControlArrayView.jsx'
+import ClssUnitParametersList from '../components/jsc_unitParametersList.jsx'
+import {ClssCVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
 import {fn_on_ready} from '../js/js_main'
 
 
@@ -41,7 +41,7 @@ const Home = () => {
     return (
     <div>
           <div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
-          <Clss_HeaderControl />
+          <ClssHeaderControl />
           </div>
 
           <div id='mainBody' className='row css_mainbody' >
@@ -56,15 +56,15 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="cameraview" id="div_video_control">
-				  	<Clss_CVideoControl />
+				  	<ClssCVideoControl />
 				  </div>
 				  <div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array">
-				  <Clss_AndruavUnitListArray/>
+				  <ClssAndruavUnitListArray/>
 				  </div>
 				</div>
                 
                 <div id="andruav_unit_list_array_float" className="css_ontop  andruav_unit_list_array_float">
-				<Clss_AndruavUnitListArray/>
+				<ClssAndruavUnitListArray/>
                 </div>
               </div>
 
@@ -119,18 +119,18 @@ const Home = () => {
               </div>
 
 
-              <Clss_CameraDialog/>
+              <ClssCameraDialog/>
 			  <div id='servoCtrl'></div>
-              <Clss_UnitParametersList/>
-              <Clss_GamePadControl p_index={js_globals.active_gamepad_index} />
-			  <Clss_StreamDialog/>
+              <ClssUnitParametersList/>
+              <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+			  <ClssStreamDialog/>
 
             </div>
 
             <div id="row_2" className="col-4 ">
 				      <div id='andruavUnits' className='col-sm-12 padding_zero'>
 						    <div id="andruavUnits_in" className=''>
-                <Clss_GlobalSettings/>
+                <ClssGlobalSettings/>
                 
 							    
 							  
@@ -143,7 +143,7 @@ const Home = () => {
                 <div id="guiMessageCtrl" className='row'></div>
 						
 						    <div id='andruavUnitList' className='row'>
-                <Clss_AndruavUnitList></Clss_AndruavUnitList>
+                <ClssAndruavUnitList></ClssAndruavUnitList>
                 </div>
 					    </div>
 				

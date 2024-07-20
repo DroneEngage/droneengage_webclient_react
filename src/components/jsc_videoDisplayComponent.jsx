@@ -13,7 +13,7 @@ import * as js_andruavMessages from '../js/js_andruavMessages'
 import {fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab} from '../js/js_main'
 
 
-class Clss_CVideoScreen extends React.Component {
+class ClssCVideoScreen extends React.Component {
 
     constructor()
 	{
@@ -106,7 +106,7 @@ class Clss_CVideoScreen extends React.Component {
         var v_me = this;
         var v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         //if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
-        if ((v_activeTrack.videoRecording===true) && (v_activeTrack.recorderObject !== null || v_activeTrack.recorderObject !== undefined))
+        if ((v_activeTrack.videoRecording === true) && (v_activeTrack.recorderObject !== null || v_activeTrack.recorderObject !== undefined))
         {
             const recorder = v_activeTrack.recorderObject;
             recorder.stopRecording(() => {
@@ -650,7 +650,7 @@ class Clss_CVideoScreen extends React.Component {
 }
 
 
-export class Clss_CVideoControl extends React.Component {
+export class ClssCVideoControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -753,7 +753,7 @@ render() {
             out_h.push (<li key ={'h'+v_key} className="nav-item">
                     <a className={"nav-link user-select-none  " + _first} data-bs-toggle="tab"  href={'#cam_' + andruavUnit.partyID + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
                 </li>);
-            out_b.push (<Clss_CVideoScreen key ={v_key}  first={_first}  obj={v_obj}/>);
+            out_b.push (<ClssCVideoScreen key ={v_key}  first={_first}  obj={v_obj}/>);
         }
     }
 

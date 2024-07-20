@@ -5,7 +5,7 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
 
-export  class Clss_RX_MESSAGE  extends React.Component {
+export  class ClssRX_MESSAGE  extends React.Component {
 
     constructor(props)
     {
@@ -76,10 +76,10 @@ export  class Clss_RX_MESSAGE  extends React.Component {
                 </tr>);
           });
 
-        return  (<div key={'Clss_RX_MESSAGE' + this.props.p_unit.partyID } className="">
+        return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.partyID } className="">
             <table className = "table table-dark table-striped">
                 <thead>
-                    <tr key={'Clss_RX_MESSAGE1' + this.props.p_unit.partyID }>
+                    <tr key={'ClssRX_MESSAGE1' + this.props.p_unit.partyID }>
                         <th scope="col">MSG&nbsp;ID</th>
                         <th scope="col">Count</th>
                     </tr>

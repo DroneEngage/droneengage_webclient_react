@@ -6,9 +6,9 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_andruavAuth} from '../../js/js_andruavAuth'
 import {fn_changeUDPPort} from '../../js/js_main'
 
-import {Clss_RX_MESSAGE} from './jsc_ctrl_rx_messageControl.jsx'
+import {ClssRX_MESSAGE} from './jsc_ctrl_rx_messageControl.jsx'
 
-export  class Clss_CTRL_SETTINGS   extends React.Component {
+export  class ClssCTRL_SETTINGS   extends React.Component {
     
     constructor(props)
     {
@@ -116,7 +116,7 @@ export  class Clss_CTRL_SETTINGS   extends React.Component {
         {
             cmd_data.push(<div key={v_andruavUnit.partyID + 'settings_cd1'} className='row css_margin_zero padding_zero border-top border-secondary'>
                             <div key={v_andruavUnit.partyID + 'settings_cd11'}className="col-12 mt-1">
-                            <Clss_RX_MESSAGE key={v_andruavUnit.partyID + 'settings_cd111'}p_unit={v_andruavUnit}/>
+                            <ClssRX_MESSAGE key={v_andruavUnit.partyID + 'settings_cd111'}p_unit={v_andruavUnit}/>
                             </div>
                         </div>
             );

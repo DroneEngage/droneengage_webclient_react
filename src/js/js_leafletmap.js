@@ -167,7 +167,7 @@ class CLeafLetAndruavMap {
 
         var update_timeout = null;
         this.m_Map.on('click', function (event) {
-            if (js_globals.CONST_MAP_EDITOR!==true)
+            if (js_globals.CONST_MAP_EDITOR !== true)
 			{
                 update_timeout = setTimeout(function () { // if (dontexecute) return ;
                     $('.contextmenu').remove();
@@ -176,7 +176,7 @@ class CLeafLetAndruavMap {
         });
 
         this.m_Map.on('dblclick', function (event) {
-            if (js_globals.CONST_MAP_EDITOR!==true)
+            if (js_globals.CONST_MAP_EDITOR !== true)
 			{
                 clearTimeout(update_timeout);
                 fn_contextMenu(event.latlng)

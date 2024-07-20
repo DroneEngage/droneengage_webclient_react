@@ -7,7 +7,7 @@ import {js_localStorage} from '../../js/js_localStorage'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
-export class Clss_CTRL_SWARM extends React.Component {
+export class ClssCTRL_SWARM extends React.Component {
 
     constructor(props)
 	{
@@ -83,7 +83,7 @@ export class Clss_CTRL_SWARM extends React.Component {
     
     render ()
     {
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SWARM === true) || (js_localStorage.fn_getAdvancedOptionsEnabled()!==true))
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SWARM === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true))
         {
             return (
                 <div></div>

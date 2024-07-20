@@ -5,7 +5,7 @@ import {js_leafletmap} from '../../js/js_leafletmap'
 import {fn_do_modal_confirmation} from '../../js/js_main'
 
 
-const res_FenceClss_GlobalSettingsControl =
+const res_FenceClssGlobalSettingsControl =
 {
 	'en':
 	{
@@ -35,7 +35,7 @@ const res_FenceClss_GlobalSettingsControl =
 
 }
 
-class Clss_FenceGlobalSettingsControl extends React.Component {
+class ClssFenceGlobalSettingsControl extends React.Component {
   
     constructor()
 	{
@@ -101,7 +101,7 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
 
     fn_delete_confirmation () 
     {
-        fn_do_modal_confirmation (res_FenceClss_GlobalSettingsControl[js_localStorage.fn_getLanguage()]['6'], res_FenceClss_GlobalSettingsControl[js_localStorage.fn_getLanguage()]['7'], 
+        fn_do_modal_confirmation (res_FenceClssGlobalSettingsControl[js_localStorage.fn_getLanguage()]['6'], res_FenceClssGlobalSettingsControl[js_localStorage.fn_getLanguage()]['7'], 
         function (p_approved)
         {
             if (p_approved === false) return;
@@ -121,7 +121,7 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
 
     fn_exportFences()
     {
-        const v = new Clss_AndruavFencePlan(1);
+        const v = new ClssAndruavFencePlan(1);
         const fence_res = v.fn_generateAndruavFenceData(v_map_shapes);
         const de_file = {
             'fileType': 'de_plan',
@@ -148,10 +148,10 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
         {
             v_unit.push ( 
                 <div id="geofence" key='fgscgeofence' className="btn-group  d-flex css_margin_top_small" >
-                       <button id='pre_geo_btn_generate' className='btn btn-primary  w-100'   title ={res_FenceClss_GlobalSettingsControl[js_localStorage.fn_getLanguage()]['1']} type="button "  onClick={ (e) => this.fn_exportFences() } >Export Fences</button>
-                       <button id='pre_geo_btn_generate' className='btn btn-primary  w-100'   title ={res_FenceClss_GlobalSettingsControl[js_localStorage.fn_getLanguage()]['1']} type="button "  onClick={ (e) => this.fn_submit_confirmation() } >Save into System</button>
+                       <button id='pre_geo_btn_generate' className='btn btn-primary  w-100'   title ={res_FenceClssGlobalSettingsControl[js_localStorage.fn_getLanguage()]['1']} type="button "  onClick={ (e) => this.fn_exportFences() } >Export Fences</button>
+                       <button id='pre_geo_btn_generate' className='btn btn-primary  w-100'   title ={res_FenceClssGlobalSettingsControl[js_localStorage.fn_getLanguage()]['1']} type="button "  onClick={ (e) => this.fn_submit_confirmation() } >Save into System</button>
                        <button  id="geo_btn_geo_db"  className="btn btn-warning  w-100" title="Reload"  type="button" onClick={ (e) => this.fn_Reload_confirmation(e) } >Reload</button>
-                       <button  id="geo_btn_geodelete_db"  className="btn btn-danger w-100" title ={res_FenceClss_GlobalSettingsControl[js_localStorage.fn_getLanguage()]['2']} type="button" onClick={ (e) => this.fn_delete_confirmation() } >Delete from System</button>
+                       <button  id="geo_btn_geodelete_db"  className="btn btn-danger w-100" title ={res_FenceClssGlobalSettingsControl[js_localStorage.fn_getLanguage()]['2']} type="button" onClick={ (e) => this.fn_delete_confirmation() } >Delete from System</button>
                 </div>
                 );
         }
@@ -166,6 +166,6 @@ class Clss_FenceGlobalSettingsControl extends React.Component {
 
 
 ReactDOM.render(
-			<Clss_FenceGlobalSettingsControl />,
+			<ClssFenceGlobalSettingsControl />,
 			window.document.getElementById('fence_global')
 		);

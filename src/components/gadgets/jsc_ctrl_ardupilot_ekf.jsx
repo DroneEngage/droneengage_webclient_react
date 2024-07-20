@@ -3,7 +3,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
-export class Clss_CTRL_ARDUPILOT_EKF extends React.Component {
+export class ClssCtrlArdupilotEkf extends React.Component {
     constructor()
 	{
 		super ();

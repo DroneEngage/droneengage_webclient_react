@@ -1,6 +1,6 @@
 import React    from 'react';
 
-export class Clss_CTRL_Layout extends React.Component {
+export class ClssCTRL_Layout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};

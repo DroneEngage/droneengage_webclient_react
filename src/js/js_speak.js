@@ -15,7 +15,7 @@ class CSpeakEngine
 	{
 		var Me = this;
 		
-		this._v_enable_speak =  js_localStorage.fn_getSpeechEnabled()===true;
+		this._v_enable_speak =  js_localStorage.fn_getSpeechEnabled() === true;
 		this._v_speakmsg ='';
 		this._v_to_speak = {};
 		this._v_index = 0;
@@ -76,7 +76,7 @@ class CSpeakEngine
 	}
 	fn_updateSettings()
 	{
-		this._v_enable_speak = js_localStorage.fn_getSpeechEnabled()===true;
+		this._v_enable_speak = js_localStorage.fn_getSpeechEnabled() === true;
 		this._v_speakmsg.volume = js_localStorage.fn_getVolume() / 100; // 1; // 0 to 1
 	}
 

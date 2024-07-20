@@ -16,7 +16,7 @@ import {CLASS_CTRL_P2P_IN_RANGE_NODEs} from './jsc_ctrl_p2p_inrange_nodes.jsx'
 import {CLASS_CTRL_P2P_IN_RANGE_BSSIDs} from './jsc_ctrl_p2p_inrange_bssid.jsx'
 
 
-export class Clss_CTRL_P2P extends React.Component {
+export class ClssCTRL_P2P extends React.Component {
     constructor(props)
     {
         super(props);

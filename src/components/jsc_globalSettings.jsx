@@ -10,7 +10,7 @@ import {gui_toggleUnits} from '../js/js_main'
 import * as js_andruavclient2 from '../js/js_andruavclient2'
 import {js_andruavAuth} from '../js/js_andruavAuth'
 
-class Clss_FireEvent extends React.Component {
+class ClssFireEvent extends React.Component {
 
 
   constructor()
@@ -40,7 +40,7 @@ class Clss_FireEvent extends React.Component {
   }
 
   render() {
-    if (js_localStorage.fn_getAdvancedOptionsEnabled()!==true)
+    if (js_localStorage.fn_getAdvancedOptionsEnabled() !== true)
     {
       return (
                 <div></div>
@@ -62,7 +62,7 @@ class Clss_FireEvent extends React.Component {
 }
 
 
-class Clss_DisplayItems extends React.Component {
+class ClssDisplayItems extends React.Component {
 
   constructor()
 	{
@@ -158,7 +158,7 @@ class Clss_DisplayItems extends React.Component {
 
   
 }
-class Clss_Preferences extends React.Component {
+class ClssPreferences extends React.Component {
   constructor()
 	{
       super ();
@@ -192,7 +192,7 @@ class Clss_Preferences extends React.Component {
       js_localStorage.fn_setSpeechEnabled(enabled);
       js_speak.fn_updateSettings();
 
-      if (enabled===true)
+      if (enabled === true)
       {
         js_speak.fn_speak("enabled");
         $('#volume_range').removeAttr('disabled');
@@ -274,7 +274,7 @@ class Clss_Preferences extends React.Component {
     }
 
 }
-export default class Clss_GlobalSettings extends React.Component {
+export default class ClssGlobalSettings extends React.Component {
   
   constructor()
 	{
@@ -289,7 +289,7 @@ export default class Clss_GlobalSettings extends React.Component {
     this._isMounted = false;
     //gui_toggleUnits();
 
-    if (js_localStorage.fn_getMetricSystem()===true)
+    if (js_localStorage.fn_getMetricSystem() === true)
     {
       this.state.m_unitText = 'm';
     }
@@ -325,7 +325,7 @@ export default class Clss_GlobalSettings extends React.Component {
     
       gui_toggleUnits();
 
-      if (js_localStorage.fn_getMetricSystem()===true)
+      if (js_localStorage.fn_getMetricSystem() === true)
       {
         this.setState({m_unitText:'m'});
       }
@@ -343,7 +343,7 @@ export default class Clss_GlobalSettings extends React.Component {
 
 
   fn_onAuthStatus (me,res) {
-    if (me._isMounted!==true) return ;
+    if (me._isMounted !== true) return ;
     me.setState({'m_update': me.state.m_update +1});
     //me.state.m_update += 1;
     //me.forceUpdate();
@@ -383,7 +383,7 @@ export default class Clss_GlobalSettings extends React.Component {
 
      
 
-  //  js_globals.fn_console_log ("REACT:RENDER Clss_GlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
+  //  js_globals.fn_console_log ("REACT:RENDER ClssGlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
   var v_gadgets = [];
   var v_uploadFile = [];
   var v_telemetryModes = [];
@@ -465,10 +465,10 @@ export default class Clss_GlobalSettings extends React.Component {
                     </div>
                     <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
                     {v_uploadFile} 
-                    <Clss_FireEvent/>
+                    <ClssFireEvent/>
                     </div>
                     <div className="tab-pane fade" id={"settings_preference"}>
-                      <Clss_Preferences/>
+                      <ClssPreferences/>
                     </div>
                 </div>
             

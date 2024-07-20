@@ -14,17 +14,13 @@ import { mavlink20 } from '../js/js_mavlink_v2';
 
 import C_GUI_READING_VALUE from '../js/js_gui_helper.js'
 
-import {Clss_CTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
-import {Clss_CTRL_DIRECTIONS} from './gadgets/jsc_ctrl_directionsControl.jsx'
-import {Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
-import {Clss_CTRL_PX4_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_px4_flightControl.jsx'
-import {Clss_CTRL_ARDUPILOT_EKF} from './gadgets/jsc_ctrl_ardupilot_ekf.jsx'
-import {Clss_CTRL_VIBRATION} from './gadgets/jsc_ctrl_vibration.jsx'
-import {Clss_CTRL_BATTERY} from './gadgets/jsc_ctrl_battery.jsx'
+import {ClssCtrlArdupilotEkf} from './gadgets/jsc_ctrl_ardupilot_ekf.jsx'
+import {ClssCtrlVibration} from './gadgets/jsc_ctrl_vibration.jsx'
+import {ClssCtrlBattery} from './gadgets/jsc_ctrl_battery.jsx'
 
 import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../js/js_main'
 
-class Clss_AndruavUnit_Drone_Header extends React.Component{
+class ClssAndruavUnitDroneHeader extends React.Component{
 
     constructor()
 	{
@@ -117,7 +113,7 @@ class Clss_AndruavUnit_Drone_Header extends React.Component{
     }
 }
 
-class Clss_AndruavUnit_Drone_Row extends React.Component{
+class ClssAndruavUnitDroneRow extends React.Component{
     constructor()
 	{
 		super ();
@@ -289,7 +285,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.abs.value = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
                 res.abs.unit = ' m';
@@ -319,7 +315,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt;
                 res.rel.unit = ' m';
@@ -350,7 +346,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.terC.value = p_andruavUnit.m_Terrain_Info.last_terrain_entry.m_current_height;
                 res.terC.unit = ' m';
@@ -380,7 +376,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.terH.value = p_andruavUnit.m_Terrain_Info.last_terrain_entry.m_terrain_height;
                 res.terH.unit = ' m';
@@ -420,7 +416,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
             else
             {
             
-                if (js_globals.v_useMetricSystem==true)
+                if (js_globals.v_useMetricSystem === true)
                 {
                     res.lidar.value = lidar.m_current_distance;
                     res.lidar.unit = ' m';
@@ -458,7 +454,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         const ground_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
         if ( ground_speed !== null && ground_speed !== undefined)
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.GS.value = ground_speed.toFixed(0);
                 res.GS.unit = ' m/s';
@@ -472,7 +468,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         const air_speed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
         if (air_speed !== null && air_speed !== undefined)
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.AS.value = air_speed.toFixed(0);
                 res.AS.unit = ' m/s';
@@ -499,7 +495,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
 
         if (p_andruavUnit.m_WindSpeed !== null && p_andruavUnit.m_WindSpeed !== undefined)
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.WS.value = p_andruavUnit.m_WindSpeed.toFixed(0);
                 res.WS.unit = ' m/s';
@@ -520,7 +516,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
 
         if (p_andruavUnit.m_WindSpeed_z !== null && p_andruavUnit.m_WindSpeed_z !== undefined)
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.WZ.value = p_andruavUnit.m_WindSpeed_z.toFixed(0);
                 res.WZ.unit = ' m/s';
@@ -580,7 +576,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
             }
 
 
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 res.wp_dist.value = target.wp_dist.toFixed(0);
                 res.wp_dist.unit = ' m';
@@ -627,7 +623,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
         }
         else
         {
-            if (v_andruavUnit.m_isArmed==true) 
+            if (v_andruavUnit.m_isArmed === true) 
             {
                 v_id_class = " bg-danger text-white ";
                 v_armed.text ='ARMED';
@@ -660,7 +656,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
                 ctrl_ekf.push(<div>EKF-PX4</div>);
             break;
             default:
-                ctrl_ekf.push(<Clss_CTRL_ARDUPILOT_EKF key={v_andruavUnit.partyID + "_ctrl_ekf"} id={v_andruavUnit.partyID + "_ctrl_ekf"} m_unit={v_andruavUnit}/>);
+                ctrl_ekf.push(<ClssCtrlArdupilotEkf key={v_andruavUnit.partyID + "_ctrl_ekf"} id={v_andruavUnit.partyID + "_ctrl_ekf"} m_unit={v_andruavUnit}/>);
             break;
         }
 
@@ -725,7 +721,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
                             {ctrl_ekf}
                         </div>
                         <div key={this.props.prop_key+'42'} className = 'row  css_margin_zero  '>
-                            <Clss_CTRL_VIBRATION key={v_andruavUnit.partyID + "_ctrl_vib"} id={v_andruavUnit.partyID + "_ctrl_vib"} m_unit={v_andruavUnit}/>
+                            <ClssCtrlVibration key={v_andruavUnit.partyID + "_ctrl_vib"} id={v_andruavUnit.partyID + "_ctrl_vib"} m_unit={v_andruavUnit}/>
                         </div>
                     
                 </div>
@@ -737,8 +733,8 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
                         </ul>
                 </div>
                 <div key={this.props.prop_key+'6'} className = {'col-4  col-lg-2   d-grid css_margin_zero  si-07x  css_dotted_border  ' + css_battery_enabled}>
-                        <Clss_CTRL_BATTERY key={v_andruavUnit.partyID + "_ctrl_bat1"} id={v_andruavUnit.partyID + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
-                        <Clss_CTRL_BATTERY key={v_andruavUnit.partyID + "_ctrl_bat2"} id={v_andruavUnit.partyID + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
+                        <ClssCtrlBattery key={v_andruavUnit.partyID + "_ctrl_bat1"} id={v_andruavUnit.partyID + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
+                        <ClssCtrlBattery key={v_andruavUnit.partyID + "_ctrl_bat2"} id={v_andruavUnit.partyID + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
                 </div>
                 <div key={this.props.prop_key+'7'} className = 'col-4  col-lg-2   d-none d-lg-grid css_margin_zero css_padding_zero css_dotted_border  '>
                     <div className = 'row  css_margin_zero css_padding_zero'>
@@ -792,7 +788,7 @@ class Clss_AndruavUnit_Drone_Row extends React.Component{
     }
 }
 
-export default class Clss_AndruavUnitListArray extends React.Component {
+export default class ClssAndruavUnitListArray extends React.Component {
   
     constructor()
 	{
@@ -820,14 +816,14 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 
     fn_unitUpdated(me,p_andruavUnit)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         
         js_globals.fn_console_log ("REACT:fn_unitAdded" );
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
@@ -838,7 +834,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
     
     fn_onPreferenceChanged(me)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         
         me.forceUpdate();
     }
@@ -867,14 +863,14 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
                 $('#andruavUnits').show();
         }
         else
         {				
-                if (me._isMounted!==true) return ;
+                if (me._isMounted !== true) return ;
         
                 me.setState({andruavUnitPartyIDs:[]});
         }
@@ -916,16 +912,16 @@ export default class Clss_AndruavUnitListArray extends React.Component {
         if (this.state.andruavUnitPartyIDs.length === 0) 
         {
 
-            unit.push (<div key={'Clss_AndruavUnitListArray_unit_length_empty' + this.props.prop_key} className='bg-success'>NO ONLINE UNITS</div>);
+            unit.push (<div key={'ClssAndruavUnitListArray_unit_length_empty' + this.props.prop_key} className='bg-success'>NO ONLINE UNITS</div>);
         }
         else 
             {
                 const me = this;
-                units_details.push(<Clss_AndruavUnit_Drone_Header prop_key={me.props.prop_key} key={'drone_hdr'+ this.props.prop_key} 
+                units_details.push(<ClssAndruavUnitDroneHeader prop_key={me.props.prop_key} key={'drone_hdr'+ this.props.prop_key} 
                                     prop_speed={me.props.prop_speed}  prop_battery={me.props.prop_battery}  prob_wp={me.props.prob_wp} prob_ekf={me.props.prob_ekf} prob_alt={me.props.prob_alt} prob_ws={me.props.prob_ws}  />);
             
                 var sortedPartyIDs;
-                if (js_localStorage.fn_getUnitSortEnabled()===true)
+                if (js_localStorage.fn_getUnitSortEnabled() === true)
                 {
                     // Sort the array alphabetically
                     sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
@@ -939,16 +935,16 @@ export default class Clss_AndruavUnitListArray extends React.Component {
                     const partyID = object[0];
                     const v_andruavUnit = object[1];
                 
-                    if ((v_andruavUnit==null) || (v_andruavUnit.m_defined!==true))return ;
+                    if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
 
-                    if (v_andruavUnit.m_IsGCS===true)
+                    if (v_andruavUnit.m_IsGCS === true)
                     {
-                        //units_gcs.push (<Clss_AndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
+                        //units_gcs.push (<ClssAndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
                     }
                     else 
                     if (v_andruavUnit.m_IsGCS===false)
                     {
-                        units_details.push(<Clss_AndruavUnit_Drone_Row prop_key={me.props.prop_key+partyID} key={partyID + 'row' + me.props.prop_key} m_unit={v_andruavUnit}
+                        units_details.push(<ClssAndruavUnitDroneRow prop_key={me.props.prop_key+partyID} key={partyID + 'row' + me.props.prop_key} m_unit={v_andruavUnit}
                                             prop_speed={me.props.prop_speed}  prop_battery={me.props.prop_battery}  prob_wp={me.props.prob_wp} prob_ekf={me.props.prob_ekf} prob_alt={me.props.prob_alt} prob_ws={me.props.prob_ws}  />);
                     }
 
@@ -961,20 +957,20 @@ export default class Clss_AndruavUnitListArray extends React.Component {
             //unit.push (<div id="myTabContent" className="tab-content padding_zero"> {units_details} </div>);
             //unit.push (units_gcs);
         
-            unit.push (<div key={'Clss_AndruavUnitListArray1' + this.props.prop_key} className="card-header text-center">
+            unit.push (<div key={'ClssAndruavUnitListArray1' + this.props.prop_key} className="card-header text-center">
                             <div className="row">
                                 <div className="col-11">
                                     <h3 className="text-success text-start">Units</h3>
                                 </div>
-                                <div key={'Clss_AndruavUnitListArray2' + this.props.prop_key} className="col-1 float-right">
-                                    <span key={'Clss_AndruavUnitListArray3' + this.props.prop_key} id ='obaq' className="cursor_hand bi bi-x-diamond" onClick={ (e) => this.fn_OnClick()}></span>
+                                <div key={'ClssAndruavUnitListArray2' + this.props.prop_key} className="col-1 float-right">
+                                    <span key={'ClssAndruavUnitListArray3' + this.props.prop_key} id ='obaq' className="cursor_hand bi bi-x-diamond" onClick={ (e) => this.fn_OnClick()}></span>
                                 </div>
 							</div>
                             {units_details} 
 						</div>);
 
         return (
-            <div key={'Clss_AndruavUnitListArray_main' + this.props.prop_key} className='margin_zero padding_zero row'>{unit}</div>
+            <div key={'ClssAndruavUnitListArray_main' + this.props.prop_key} className='margin_zero padding_zero row'>{unit}</div>
         );
     }
 };
@@ -986,7 +982,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 
 //          ReactDOM.render(
 //              <React.StrictMode>
-//              <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
+//              <ClssAndruavUnitListArray key='ClssAndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
 //              </React.StrictMode>,
 // 	 		window.document.getElementById('andruav_unit_list_array_float')
 //          );
@@ -996,7 +992,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
     
 //          ReactDOM.render(
 //              <React.StrictMode>
-//              <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
+//              <ClssAndruavUnitListArray  key='ClssAndruavUnitListArray2' prop_key='2' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
 //              </React.StrictMode>,
 // 	 		window.document.getElementById('andruav_unit_list_array_fixed')
 //          );
@@ -1008,7 +1004,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 //     if ($('#andruav_unit_list_array_float').length !== 0) {
 
 //          ReactDOM.render(
-//              <Clss_AndruavUnitListArray key='Clss_AndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
+//              <ClssAndruavUnitListArray key='ClssAndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
 //              window.document.getElementById('andruav_unit_list_array_float')
 //          );
 //      }
@@ -1016,7 +1012,7 @@ export default class Clss_AndruavUnitListArray extends React.Component {
 //      if ($('#andruav_unit_list_array_fixed').length !== 0) {
 
 //          ReactDOM.render(
-//              <Clss_AndruavUnitListArray  key='Clss_AndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
+//              <ClssAndruavUnitListArray  key='ClssAndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
 //              window.document.getElementById('andruav_unit_list_array_fixed')
 //          );
 //     }

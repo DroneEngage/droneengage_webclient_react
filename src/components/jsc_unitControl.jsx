@@ -23,19 +23,19 @@ import {fn_changeSpeed, fn_do_modal_confirmation,
 
 import { mavlink20 } from '../js/js_mavlink_v2.js';
 
-import {Clss_CTRL_SETTINGS} from './gadgets/jsc_ctrl_settingsControl.jsx'
-import {Clss_CTRL_P2P} from './gadgets/jsc_ctrl_p2p.jsx'
+import {ClssCTRL_SETTINGS} from './gadgets/jsc_ctrl_settingsControl.jsx'
+import {ClssCTRL_P2P} from './gadgets/jsc_ctrl_p2p.jsx'
 
-import {Clss_CTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
-import {Clss_MESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.
-import {Clss_CTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
-import {Clss_CTRL_DIRECTIONS} from './gadgets/jsc_ctrl_directionsControl.jsx'
-import {Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
-import {Clss_CTRL_PX4_FLIGHT_CONTROL} from './flight_controllers/jsc_ctrl_px4_flightControl.jsx'
-import {Clss_CTRL_SWARM} from './gadgets/jsc_ctrl_swarm.jsx'
-import {Clss_CTRL_AUDIO} from './gadgets/jsc_ctrl_audio.jsx'
+import {ClssCTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
+import {ClssMESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.
+import {ClssCTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
+import {ClssCtrlDirections} from './gadgets/jsc_ctrl_directionsControl.jsx'
+import {ClssCtrlArdupilotFlightController} from './flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
+import {ClssCtrlPx4FlightControl} from './flight_controllers/jsc_ctrl_px4_flightControl.jsx'
+import {ClssCTRL_SWARM} from './gadgets/jsc_ctrl_swarm.jsx'
+import {ClssCTRL_AUDIO} from './gadgets/jsc_ctrl_audio.jsx'
 
-class Clss_AndruavUnit extends React.Component {
+class ClssAndruavUnit extends React.Component {
     constructor(props)
 	{
 		super (props);
@@ -90,7 +90,7 @@ class Clss_AndruavUnit extends React.Component {
 
        // js_globals.fn_console_log ('err: Force Update ' + p_andruavUnit.partyID);
           
-       if (me._isMounted!==true) return ;
+       if (me._isMounted !== true) return ;
         
        me.setState({'m_update': me.state.m_update +1});
        //me.state.m_update += 1;
@@ -226,7 +226,7 @@ class Clss_AndruavUnit extends React.Component {
 
     fn_changeUnitInfo (v_andruavUnit)
     {
-        if ((js_siteConfig.CONST_FEATURE.hasOwnProperty('DISABLE_UNIT_NAMING')) && (js_siteConfig.CONST_FEATURE.DISABLE_UNIT_NAMING===true)) return ;
+        if ((js_siteConfig.CONST_FEATURE.hasOwnProperty('DISABLE_UNIT_NAMING')) && (js_siteConfig.CONST_FEATURE.DISABLE_UNIT_NAMING === true)) return ;
         fn_changeUnitInfo (v_andruavUnit);
     }
 
@@ -246,7 +246,7 @@ class Clss_AndruavUnit extends React.Component {
 
 }
 
-class Clss_AndruavUnit_GCS extends Clss_AndruavUnit {
+class ClssAndruavUnit_GCS extends ClssAndruavUnit {
     constructor(props)
 	{
 		super (props);
@@ -274,7 +274,7 @@ class Clss_AndruavUnit_GCS extends Clss_AndruavUnit {
 }
 
 
-class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
+class ClssAndruavUnit_Drone extends ClssAndruavUnit {
     constructor(props)
 	{
 		super (props);
@@ -302,7 +302,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
     fn_webRX_toggle (p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-        if (p_andruavUnit.m_Telemetry.m_rxEngaged==true)
+        if (p_andruavUnit.m_Telemetry.m_rxEngaged === true)
         {
             js_globals.v_andruavClient.API_disengageRX(p_andruavUnit);        
             js_eventEmitter.fn_dispatch (js_globals.EE_requestGamePadreleaseGamePad, p_andruavUnit);
@@ -561,7 +561,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
         const  c_manualTXBlockedSubAction = p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction();
             
 
-		if (p_andruavUnit.m_isArmed==true) 
+		if (p_andruavUnit.m_isArmed === true) 
 		{
             res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
             res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -769,7 +769,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
             var v_lat2 = v_andruavUnit.m_Nav_Info.p_Location.lat;
             var v_lng2 = v_andruavUnit.m_Nav_Info.p_Location.lng;
             var distance = js_helpers.fn_calcDistance (js_globals.myposition.coords.latitude,js_globals.myposition.coords.longitude,v_lat2,v_lng2) ;
-            if (js_globals.v_useMetricSystem==true) 
+            if (js_globals.v_useMetricSystem === true) 
             {
                 v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + " m";
             }
@@ -825,7 +825,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
         } 
         else 
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 v_altitude = v_altitude.toFixed(0).toString() + "m";
             }
@@ -842,7 +842,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
         } 
         else 
         {
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 v_altitude_abs = v_altitude_abs.toFixed(0).toString() + "m";
             }
@@ -854,7 +854,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
 
         v_altitude_text = v_altitude + '/' + v_altitude_abs;    
 
-        // if (js_globals.v_useMetricSystem==true)
+        // if (js_globals.v_useMetricSystem === true)
         //     {
         //         v_altitude_text = v_altitude_text.toFixed(0).toString();
                 
@@ -891,7 +891,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
             const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
             const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
             v_yaw_text = 'HUD';
-            v_yaw_knob.push(<Clss_CTRL_HUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} v_pitch={c_pitch} v_roll={c_roll} v_yaw={c_yaw}  title ='Pitch: {v_pitch}'/>);
+            v_yaw_knob.push(<ClssCTRL_HUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} v_pitch={c_pitch} v_roll={c_roll} v_yaw={c_yaw}  title ='Pitch: {v_pitch}'/>);
           }
 
         if (v_andruavUnit.m_Nav_Info.p_Location.bearing==null)
@@ -908,7 +908,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
             //v_andruavUnit.m_Nav_Info.p_Desired.nav_bearing = 10.0;
             const c_target = v_andruavUnit.m_Nav_Info._Target.target_bearing ; // ) % js_helpers.CONST_PTx2)).toFixed(1);
             const c_bearing = v_andruavUnit.m_Nav_Info.p_Desired.nav_bearing ;
-            v_bearing_knob.push(<Clss_CTRL_DIRECTIONS key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} v_target={c_target} v_bearing={c_bearing} />);
+            v_bearing_knob.push(<ClssCtrlDirections key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} v_target={c_target} v_bearing={c_bearing} />);
 
         }
 
@@ -925,7 +925,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
         {
             
             
-            if (js_globals.v_useMetricSystem==true)
+            if (js_globals.v_useMetricSystem === true)
             {
                 wpdst_text =   Number(target.wp_dist.toFixed(1)).toLocaleString()  + ' m'; // >' + v_andruavUnit.m_Nav_Info._Target.wp_num;
             }
@@ -1070,9 +1070,9 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
                                 </div>
                         </div>
                         <div key={'telem' + v_andruavUnit.partyID} className= 'col-3   padding_zero css_user_select_text'>
-                        <Clss_CTRL_UDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
+                        <ClssCTRL_UDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
                         <div key={'swarm' + v_andruavUnit.partyID} className= 'col-2   padding_zero'>
-                        <Clss_CTRL_SWARM   key={'cswarm' + v_andruavUnit.partyID}  m_unit={v_andruavUnit}/>
+                        <ClssCTRL_SWARM   key={'cswarm' + v_andruavUnit.partyID}  m_unit={v_andruavUnit}/>
                         </div>
                         
                     </div>
@@ -1123,10 +1123,10 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
             switch (p_andruavUnit.m_autoPilot)
             {
                 case mavlink20.MAV_AUTOPILOT_PX4:
-                    ctrl_flight_controller.push(<Clss_CTRL_PX4_FLIGHT_CONTROL  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
+                    ctrl_flight_controller.push(<ClssCtrlPx4FlightControl  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
                 break;
                 default:
-                    ctrl_flight_controller.push(<Clss_CTRL_ARDUPILOT_FLIGHT_CONTROL  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
+                    ctrl_flight_controller.push(<ClssCtrlArdupilotFlightController  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
                 break;
             }
         }
@@ -1210,7 +1210,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
         }
         else
         {
-            if (v_andruavUnit.m_isArmed==true) 
+            if (v_andruavUnit.m_isArmed === true) 
             {
                 online_class2 =" text-info ";
                 online_class = " bg-none blink_alert";
@@ -1222,7 +1222,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
                 online_class = " blink_success ";
                 online_text  = "online";
             }
-            if (v_andruavUnit.fn_canCamera()==true)
+            if (v_andruavUnit.fn_canCamera === true)
             {
                 camera_class = "cursor_hand camera_active";
                 camera_src   = "./images/camera_bg_32x32.png";
@@ -1239,7 +1239,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
             }
             else
             {
-                if (v_andruavUnit.fn_canVideo()==true)
+                if (v_andruavUnit.fn_canVideo === true)
                 {
                     video_class = "cursor_hand video_ready";
                     video_src   = "./images/videocam_gb_32x32.png";
@@ -1371,14 +1371,14 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
                         </li>);
 
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p===true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.partyID}>P2P</a>
             </li>);
         }
        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (v_andruavUnit.m_modules.has_sound===true)  || (v_andruavUnit.m_isDE === false)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (v_andruavUnit.m_modules.has_sound === true)  || (v_andruavUnit.m_isDE === false)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>
@@ -1395,29 +1395,29 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
                             {this.renderIMU(v_andruavUnit)}
                             {this.renderControl(v_andruavUnit)}
                     </div>);
-        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClss_MESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
-                            <Clss_MESSAGE_LOG  p_unit={v_andruavUnit}/>
+        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
+                            <ClssMESSAGE_LOG  p_unit={v_andruavUnit}/>
                     </div>);
-        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClss_CTRL_SETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
-                            <Clss_CTRL_SETTINGS p_unit={v_andruavUnit}/>
+        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
+                            <ClssCTRL_SETTINGS p_unit={v_andruavUnit}/>
                     </div>);
        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p===true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClss_CTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
-                <Clss_CTRL_P2P p_unit={v_andruavUnit}/>
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
+                <ClssCTRL_P2P p_unit={v_andruavUnit}/>
                 </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && ((v_andruavUnit.m_modules.has_sound===true) || (v_andruavUnit.m_isDE === false))) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClss_CTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
-                <Clss_CTRL_AUDIO p_unit={v_andruavUnit}/>
+            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
+                <ClssCTRL_AUDIO p_unit={v_andruavUnit}/>
             </div>);
         }
             
         // Adding an empty tab
-        container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabClss_CTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
+        container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
                     </div>);
         ////////////////////////////////////TABS ---- END
 
@@ -1443,7 +1443,7 @@ class Clss_AndruavUnit_Drone extends Clss_AndruavUnit {
     }
 }
 
-export default class Clss_AndruavUnitList extends React.Component {
+export default class ClssAndruavUnitList extends React.Component {
   
     constructor()
 	{
@@ -1465,7 +1465,7 @@ export default class Clss_AndruavUnitList extends React.Component {
       
     fn_unitUpdated(me,p_andruavUnit)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         
         // render is initiated via updating state
         me.setState({ 'm_update': me.state.m_update+1});
@@ -1474,7 +1474,7 @@ export default class Clss_AndruavUnitList extends React.Component {
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
     
         js_globals.fn_console_log ("REACT:fn_unitAdded" );
 
@@ -1487,7 +1487,7 @@ export default class Clss_AndruavUnitList extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
     
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
@@ -1508,7 +1508,7 @@ export default class Clss_AndruavUnitList extends React.Component {
 
     fn_onPreferenceChanged(me)
     {
-        if (me._isMounted!==true) return ;
+        if (me._isMounted !== true) return ;
         me.setState({'m_update': me.state.m_update +1});
         //me.forceUpdate();
     }
@@ -1574,7 +1574,7 @@ export default class Clss_AndruavUnitList extends React.Component {
                     
             }
             else 
-            if (v_andruavUnit.m_isArmed==true) 
+            if (v_andruavUnit.m_isArmed === true) 
             {
                 classes = " blink_alert animate_iteration_3s";
             }
@@ -1608,7 +1608,7 @@ export default class Clss_AndruavUnitList extends React.Component {
             var me = this;
 
             var sortedPartyIDs;
-            if (js_localStorage.fn_getUnitSortEnabled()===true)
+            if (js_localStorage.fn_getUnitSortEnabled() === true)
             {
                 // Sort the array alphabetically
                 // returns array
@@ -1626,11 +1626,11 @@ export default class Clss_AndruavUnitList extends React.Component {
                 const v_andruavUnit = object[1];
                 
                 // dont display if unit is not defined yet.
-                if ((v_andruavUnit==null) || (v_andruavUnit.m_defined!==true))return ;
+                if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
                 
-                if (v_andruavUnit.m_IsGCS===true)
+                if (v_andruavUnit.m_IsGCS === true)
                 {
-                    units_gcs.push (<Clss_AndruavUnit_GCS key={'Clss_AndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
+                    units_gcs.push (<ClssAndruavUnit_GCS key={'ClssAndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
                 }
                 else 
                 if (v_andruavUnit.m_IsGCS===false)
@@ -1648,13 +1648,13 @@ export default class Clss_AndruavUnitList extends React.Component {
 
                         units_details.push(
                             <div key={'aud' + partyID} className="tab-pane fade" id={"tab_"+v_andruavUnit.partyID}>
-                                <Clss_AndruavUnit_Drone m_unit = {v_andruavUnit}/>
+                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit}/>
                             </div>
                         );
                     }
                     else
                     {   // Display as List
-                        units_details.push(<Clss_AndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit}/>);
+                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit}/>);
                     }
                 }
 
