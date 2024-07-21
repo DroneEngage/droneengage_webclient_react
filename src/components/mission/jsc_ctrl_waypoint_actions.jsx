@@ -1,4 +1,10 @@
+import $ from 'jquery';
+
 import React    from 'react';
+import L from 'leaflet';
+
+import {js_globals} from '../../js/js_globals.js';
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 import {CFieldChecked} from '../gadgets/jsc_mctrl_field_check'
 
@@ -21,7 +27,7 @@ export class CWayPointAction extends React.Component {
         var icon_img = './images/location_bb_32x32.png';
         switch (waypointType)
 		{
-            case CONST_WayPoint_TYPE_WAYPOINTSTEP:
+            case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
                     //origin: new google.maps.Point(0, 0),
@@ -31,17 +37,17 @@ export class CWayPointAction extends React.Component {
                 };
                 break;
             
-            case CONST_WayPoint_TYPE_SPLINE:
+            case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
                     //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,23], //new google.maps.Point(16, 23),
                     iconSize: [32,32], //new google.maps.Size(32, 32),
-                    labelOrigin: new google.maps.Point(16,40)
+                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
-            case CONST_WayPoint_TYPE_TAKEOFF:
+            case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
 			    icon_img= {
                     iconUrl:'./images/plane_b_32x32.png',
                     //origin: new google.maps.Point(0, 0),
@@ -51,7 +57,7 @@ export class CWayPointAction extends React.Component {
                 };
                 break;
             
-            case CONST_WayPoint_TYPE_LANDING:
+            case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 			    icon_img= {
                     iconUrl:'./images/plane_gr_32x32.png',
                     //origin: new google.maps.Point(0, 0),
@@ -61,7 +67,7 @@ export class CWayPointAction extends React.Component {
                 };
                 break;
             
-            case CONST_WayPoint_TYPE_RTL:
+            case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
                     iconUrl:'./images/rtl_bb_32x32.png',
                     //origin: new google.maps.Point(0, 0),
@@ -71,7 +77,7 @@ export class CWayPointAction extends React.Component {
                 };
                 break;
             
-            case CONST_WayPoint_TYPE_CIRCLE:
+            case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
                 icon_img= {
                     iconUrl:'./images/circle_bb_32x32.png',
                     //origin: new google.maps.Point(0, 0),
@@ -144,11 +150,11 @@ export class CWayPointAction extends React.Component {
         <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed' itemid={v_itemID + 'spd'} txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
         <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw' itemid={v_itemID + 'yaw'} txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
         <select id="msnsel"  className="form-control css_margin_top_small">
-                <option value={CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
-                <option value={CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
-                <option value={CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>
-                <option value={CONST_WayPoint_TYPE_RTL}>RTL</option>
-                <option value={CONST_WayPoint_TYPE_LANDING}>Land</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_RTL}>RTL</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_LANDING}>Land</option>
                 </select>
         </div>);
     }

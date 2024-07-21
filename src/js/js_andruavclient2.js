@@ -3183,6 +3183,7 @@ class CAndruavClient {
     };
 
     fn_connect(p_accesscode) {
+        try{
 
         if (p_accesscode === null || p_accesscode === undefined) {
             alert("Password cannot be empty");
@@ -3252,6 +3253,12 @@ class CAndruavClient {
         } else { // The browser doesn't support WebSocket
             alert("WebSocket NOT supported by your Browser!");
         }
+    }
+    catch (e)
+    {
+        console.log (e);
+        this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);
+    }
     };
 
 };

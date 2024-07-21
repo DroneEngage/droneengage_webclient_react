@@ -1,10 +1,19 @@
+import $ from 'jquery';
+
 import React    from 'react';
 
-import {js_andruavAuth} from '../../js/js_andruavAuth'
+import * as js_helpers from '../../js/js_helpers.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
-import {CWayPointLocation} from '../js/jsc_ctrl_waypoint_location'
-import {CWayPointAction} from '../js/jsc_ctrl_waypoint_actions'
-import {js_leafletmap} from '../js/js_leafletmap'
+import {js_mapmission_planmanager} from '../../js/js_mapmissionPlanManager.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_andruavAuth} from '../../js/js_andruavAuth'
+import {js_eventEmitter} from '../../js/js_eventEmitter'
+import {js_leafletmap} from '../../js/js_leafletmap'
+
+import {CWayPointLocation} from './jsc_ctrl_waypoint_location'
+import {CWayPointAction} from './jsc_ctrl_waypoint_actions'
+
 
 
 
@@ -111,7 +120,7 @@ class MissionControlPanel extends React.Component {
     fn_exportMission ()
     {
         const c_mission_text = this.props.p_mission.fn_exportToV110 ();
-        fn_saveAs (c_mission_text,"Mission" + Date.now() + ".txt","text/plain;charset=utf-8");
+        js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + ".txt","text/plain;charset=utf-8");
     }
 
     fn_saveDBMission ()
@@ -128,7 +137,7 @@ class MissionControlPanel extends React.Component {
     fn_deleteMission ()
     {
         if (this.props.p_mission == null) return ;
-        window.AndruavLibs.MapMission.fn_deleteMission(this.props.p_mission.m_id);
+        js_mapmission_planmanager.fn_deleteMission(this.props.p_mission.m_id);
         this.setState ({m_deleted:true});
     }
 
@@ -210,7 +219,7 @@ class MissionControlPanel extends React.Component {
         if ((this.props.p_ParentCtrl.props.p_missionPlan.m_hidden === true) && (this.props.p_ParentCtrl.props.p_isCurrent === true))
         {
             // display path if group is ACVTIE NOW and was hidden.
-            this.fn_togglePath(e);
+            this.fn_togglePath();
         }
     }
     
@@ -416,7 +425,7 @@ class UnitMissionContainer extends React.Component {
 
 
 
-class CMissionsContainer extends React.Component {
+export default class CMissionsContainer extends React.Component {
   
     constructor()
 	{
@@ -452,12 +461,12 @@ class CMissionsContainer extends React.Component {
         if (p_params.p_isCurrent === true)
         {
             // switch to next
-            window.AndruavLibs.MapMission.fn_activateNextMission(p_params.p_mission.m_id);
+            js_mapmission_planmanager.fn_activateNextMission(p_params.p_mission.m_id);
         }
         else
         {
             // make this the current
-            window.AndruavLibs.MapMission.fn_setCurrentMission(p_params.p_mission.m_id);
+            js_mapmission_planmanager.fn_setCurrentMission(p_params.p_mission.m_id);
         }
         me.forceUpdate();
     }
@@ -467,9 +476,9 @@ class CMissionsContainer extends React.Component {
     {
         js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
         
-        if (p_shape.pm.getShape()!='Marker') return ;
+        if (p_shape.pm.getShape() !== 'Marker') return ;
 
-        let v_mission = window.AndruavLibs.MapMission.fn_getCurrentMission();
+        let v_mission = js_mapmission_planmanager.fn_getCurrentMission();
         v_mission.fn_addMarker(p_shape);
     }
 
@@ -503,8 +512,8 @@ class CMissionsContainer extends React.Component {
 
     fn_addNewPathPlan (e)
     {
-        var v_missionPlan = window.AndruavLibs.MapMission.fn_createNewMission();
-        window.AndruavLibs.MapMission.fn_setCurrentMission(v_missionPlan.m_id);
+        var v_missionPlan = js_mapmission_planmanager.fn_createNewMission();
+        js_mapmission_planmanager.fn_setCurrentMission(v_missionPlan.m_id);
         js_leafletmap.fn_enableDrawMarker(true);
         this.setState ({p_plans: this.state.p_plans.concat([v_missionPlan])});
     }
@@ -527,9 +536,9 @@ class CMissionsContainer extends React.Component {
         var item = [];
         
 
-        let v_mission1 = window.AndruavLibs.MapMission.fn_getCurrentMission();
+        let v_mission1 = js_mapmission_planmanager.fn_getCurrentMission();
 				
-        if ((this.state.is_connected === false) || (this.state.p_plans === null || this.state.p_plans === undefined) || (this.state.p_plans.length ==0))
+        if ((this.state.is_connected === false) || (this.state.p_plans === null || this.state.p_plans === undefined) || (this.state.p_plans.length === 0))
         {
             item.push (<h4 key="mi"></h4>);
         }
@@ -540,7 +549,7 @@ class CMissionsContainer extends React.Component {
                     
                 
                     item.push (
-                            <UnitMissionContainer key={'umc' + v_plan.m_id} p_missionPlan={v_plan} p_isCurrent={v_plan.m_id==v_mission1.m_id}/>
+                            <UnitMissionContainer key={'umc' + v_plan.m_id} p_missionPlan={v_plan} p_isCurrent={v_plan.m_id === v_mission1.m_id}/>
                         );
                 });
                     
@@ -582,7 +591,7 @@ class CMissionsContainer extends React.Component {
 };
 
 
-ReactDOM.render(
-    <CMissionsContainer  />,
-    window.document.getElementById('c_missioncontrol')
-);
+// ReactDOM.render(
+//     <CMissionsContainer  />,
+//     window.document.getElementById('c_missioncontrol')
+// );

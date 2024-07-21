@@ -129,22 +129,22 @@ class CLeafLetAndruavMap {
 
 
             this.m_Map.on('pm:create' , (x) => {
-                js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
+                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
                 js_globals.v_map_shapes.push(x.layer);
 
                 x.layer.on('click', function (p_event) {
-                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
                 });
 
                 x.layer.on('pm:edit', (x) => {
 
-                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeEdited, x.layer);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeEdited, x.layer);
                 });
 
                 x.layer.on('pm:remove', (x) => {
 
-                    js_eventEmitter.default.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
                 });
 
             });

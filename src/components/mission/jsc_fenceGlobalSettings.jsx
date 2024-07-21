@@ -1,8 +1,14 @@
 import React    from 'react';
 
+import * as js_helpers from '../../js/js_helpers'
+import {js_globals} from '../../js/js_globals.js';
 import {js_localStorage} from '../../js/js_localStorage'
+import {js_eventEmitter} from '../../js/js_eventEmitter'
+import * as js_mapmission from '../../js/js_mapmission.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages'
+
 import {js_leafletmap} from '../../js/js_leafletmap'
-import {fn_do_modal_confirmation} from '../../js/js_main'
+import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../js/js_main'
 
 
 const res_FenceClssGlobalSettingsControl =
@@ -35,7 +41,7 @@ const res_FenceClssGlobalSettingsControl =
 
 }
 
-class ClssFenceGlobalSettingsControl extends React.Component {
+export default class ClssFenceGlobalSettingsControl extends React.Component {
   
     constructor()
 	{
@@ -95,7 +101,7 @@ class ClssFenceGlobalSettingsControl extends React.Component {
         function (p_approved)
         {
             if (p_approved === false) return;
-			this.fn_Reload
+			this.fn_Reload();
         });
     }
 
@@ -105,7 +111,7 @@ class ClssFenceGlobalSettingsControl extends React.Component {
         function (p_approved)
         {
             if (p_approved === false) return;
-            this.fn_deleteShapesinDB
+            this.fn_deleteShapesinDB();
         });
 	}
   
@@ -121,13 +127,13 @@ class ClssFenceGlobalSettingsControl extends React.Component {
 
     fn_exportFences()
     {
-        const v = new ClssAndruavFencePlan(1);
-        const fence_res = v.fn_generateAndruavFenceData(v_map_shapes);
+        const v = new js_mapmission.ClssAndruavFencePlan(1);
+        const fence_res = v.fn_generateAndruavFenceData(js_globals.v_map_shapes);
         const de_file = {
             'fileType': 'de_plan',
             'fences': fence_res
         };
-		fn_saveAs (JSON.stringify(de_file),"Fences" + Date.now() + ".txt","text/plain;charset=utf-8");
+		js_helpers.fn_saveAs (JSON.stringify(de_file),"Fences" + Date.now() + ".txt","text/plain;charset=utf-8");
     }
 
     componentWillUnmount () {
@@ -165,7 +171,7 @@ class ClssFenceGlobalSettingsControl extends React.Component {
 };
 
 
-ReactDOM.render(
-			<ClssFenceGlobalSettingsControl />,
-			window.document.getElementById('fence_global')
-		);
+// ReactDOM.render(
+// 			<ClssFenceGlobalSettingsControl />,
+// 			window.document.getElementById('fence_global')
+// 		);

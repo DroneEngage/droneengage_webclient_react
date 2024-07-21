@@ -6,7 +6,6 @@ import ReactDOM from "react-dom/client";
 import $ from 'jquery';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
-import Dialog from 'bootstrap/js/dist/modal';
 
 import RecordRTC from 'recordrtc';
 
@@ -3174,7 +3173,7 @@ function fn_handleKeyBoard() {
 		};
 
 
-		function fn_deleteShapesinDB()
+		export function fn_deleteShapesinDB()
 		{
 			js_globals.v_andruavClient.API_disableGeoFenceTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
 			
@@ -3188,7 +3187,7 @@ function fn_handleKeyBoard() {
 	
 	
 
-		function fn_submitShapes () 
+		export function fn_submitShapes () 
 		{
 			const len = js_globals.v_map_shapes.length;
 
@@ -3389,11 +3388,6 @@ function fn_handleKeyBoard() {
 				//http://127.0.0.1:9980/globalarclight.html?accesscode=myown&email=myown@myown.com&m_groupName=1&m_unitName=GCSWeb1
 
 			}
-			// if (js_globals.CONST_MAP_EDITOR !== true) 
-            // {
-			// 	window.AndruavLibs.LocalTelemetry.fn_onPacketReceived = EVT_GCSDataReceived;
-			// 	window.AndruavLibs.LocalTelemetry.fn_onWebSocketOpened = EVT_GCSDataOpen;
-			// }
 			
 			$("#alert .close").on('click', function (e) {
 				$("#alert").hide();

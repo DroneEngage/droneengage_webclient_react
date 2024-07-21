@@ -48,7 +48,7 @@ export class ClssCtrlVibration extends React.Component {
             value = value.toFixed(2);
         }
         ret.value = value;
-        if ((value == null) || (value===0.0))
+        if ((value === null || value === undefined) || (value === 0.0))
         { 
             ret.css = 'bg-none text-muted';
         }else

@@ -1,4 +1,8 @@
+import $ from 'jquery';
+
 import React    from 'react';
+
+import {js_globals} from '../../js/js_globals.js';
 
 export class CFieldChecked extends React.Component {
     

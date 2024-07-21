@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/home";
-import Planning from "./pages/Planning";
+import Planning from "./pages/planning";
 import NoPage from "./pages/NoPage";
 
 

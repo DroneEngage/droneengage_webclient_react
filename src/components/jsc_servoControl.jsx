@@ -1,4 +1,5 @@
 import React    from 'react';
+import * as  js_siteConfig from '../js/siteConfig.js'
 
 class ClssServoUnit extends React.Component {
 
@@ -10,7 +11,7 @@ class ClssServoUnit extends React.Component {
         var btn_min_disabled = false;
         var btn_max_disabled = false;
 
-        if ((this.props.prop_value=== null || yyyy === undefined) || (this.props.prop_partyid=== null || yyyy === undefined)) 
+        if ((this.props.prop_value === null || this.props.prop_value  === undefined) || (this.props.prop_partyid === null || this.props.prop_partyid === undefined)) 
         {
             btn_min_css = ' btn-outline-secondary ';
             btn_max_css = ' btn-outline-secondary ';
@@ -30,7 +31,6 @@ class ClssServoUnit extends React.Component {
                 btn_max_css = ' css_servo_selected bg-danger text-white ';
             }
         }
-        const js_globals.v_andruavClient = AndruavLibs.AndruavClient; //Object.create(AndruavClientSocket.prototype);
 
         return (
             <div id='servoblk' className='row  margin_zero ' title={'value: ' + this.props.prop_value} >
@@ -99,7 +99,8 @@ class ClssServoControl extends React.Component {
             $('#modal_ctrl_servo').css('opacity', '1.0');
         });
         $('#modal_ctrl_servo').on('mouseout', function () {
-            if ($('#modal_ctrl_servo').attr('opacity')=== null || yyyy === undefined) {
+            const val = $('#modal_ctrl_servo').attr('opacity');
+            if (val === null || val === undefined) {
                 $('#modal_ctrl_servo').css('opacity', '0.4');
             }
         });
@@ -110,7 +111,8 @@ class ClssServoControl extends React.Component {
              
         });
         $('#modal_ctrl_servo').find('#opaque_btn').on('click', function () {
-            if ($('#modal_ctrl_servo').attr('opacity')=== null || yyyy === undefined) {
+            const val = $('#modal_ctrl_servo').attr('opacity');
+            if (val === null || val === undefined) {
                 $('#modal_ctrl_servo').attr('opacity', '1.0');
                 $('#modal_ctrl_servo').css('opacity', '1.0');
             }
