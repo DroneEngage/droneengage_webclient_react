@@ -12,6 +12,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React , { useEffect } from 'react';
 import {js_globals} from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
+import ClssFooterControl from '../components/jsc_footer'
 import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssFenceClssShapeControl from '../components/mission/jsc_fenceControl.jsx'
 import CMissionsContainer from '../components/mission/jsc_missionItemsControl.jsx'
@@ -107,9 +108,10 @@ const Planning = () => {
 						</div>
 					</div>
 				</div>
-			
-			
 		</div>
+		<div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
+			<ClssFooterControl />
+			</div>
 	</div>
   );
 };

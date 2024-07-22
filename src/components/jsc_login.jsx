@@ -148,7 +148,7 @@ export class ClssLoginControl extends React.Component {
 					<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
 						<div id='login_form' className="card-body">
 							<div className={this.state.is_connected === true ? "hidden" : " "} >
-								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
+								<div className="form-group al_l"><label key='txtEmail1' htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
 								<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
 								<div className="form-group al_l hidden">
 									<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
@@ -163,7 +163,7 @@ export class ClssLoginControl extends React.Component {
 							</div>
 							<div id='login_btn mb-2 ' className='text-center'>
 							<div className={this.state.is_connected === false ? "hidden" : " "} >
-								<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-muted">Email</label>
+								<div className="form-group al_l"><label key='txtEmail2' htmlFor="txtEmail" id="email" className="text-muted">Email</label>
 									<p>  {js_localStorage.fn_getEmail()} </p>
 								</div>
 								<div className="form-group al_l">

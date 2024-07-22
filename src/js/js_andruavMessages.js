@@ -1,3 +1,19 @@
+// Params of AUTH
+
+export const CONST_WEB_FUNCTION = "/w";
+export const CONST_WEB_LOGIN_COMMAND = "/wl/";
+export const CONST_ACCOUNT_MANAGMENT = "/am/";
+export const CONST_CMD_CREATE_ACCESSCODE = "c";
+export const CONST_CMD_REGENERATE_ACCESSCODE = "r";
+
+export const CONST_ACCOUNT_NAME_PARAMETER = "acc";
+export const CONST_ACCESS_CODE_PARAMETER = "pwd";
+export const CONST_SUB_COMMAND = "scm";
+export const CONST_ERROR_MSG = "em";
+export const CONST_ACTOR_TYPE = "at";
+export const CONST_SESSION_ID = "sid";
+export const CONST_PERMISSION_PARAMETER = "prm";
+
 // AndruaveMessageID
 
 export const CONST_TYPE_AndruavMessage_GPS = 1002;
@@ -275,8 +291,6 @@ export const CONST_SOCKET_STATUS_REGISTERED = 6; // connected and executed AddMe
 export const CONST_SOCKET_STATUS_UNREGISTERED = 7; // connected but not registred
 export const CONST_SOCKET_STATUS_ERROR = 8; // Error
 
-
-
 export const message_names = {
   1002: "GPS - 1002",
   1003: "POW - 1003",
@@ -322,5 +336,3 @@ export const TYPE_MODULE_CLASS_P2P = "p2p";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
 export const TYPE_MODULE_CLASS_GPIO = "gpio";
 export const TYPE_MODULE_CLASS_GENERIC = "gen";
-
-

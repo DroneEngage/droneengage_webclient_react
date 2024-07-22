@@ -16,6 +16,7 @@ import React , { useEffect } from 'react';
 import {js_globals} from '../js/js_globals.js'
 
 import ClssHeaderControl from '../components/jsc_header'
+import ClssFooterControl from '../components/jsc_footer'
 import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssAndruavUnitList from '../components/jsc_unitControl.jsx'
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
@@ -240,6 +241,12 @@ const Home = () => {
 					</div>
 				</div>
 			</div>
+			
+			<div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
+			<ClssFooterControl />
+			</div>
+
+			
 		</div>
     
     );

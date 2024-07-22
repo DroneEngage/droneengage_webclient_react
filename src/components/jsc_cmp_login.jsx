@@ -1,10 +1,15 @@
+import $ from 'jquery';
+
 import React    from 'react';
 
-import {fn_do_modal_confirmation} from '../../js/js_main'
-import {js_andruavAuth} from '../../js/js_andruavAuth'
+import {fn_do_modal_confirmation} from '../js/js_main'
+import {js_andruavAuth} from '../js/js_andruavAuth'
+import {js_localStorage} from '../js/js_localStorage'
+import {gui_alert} from '../js/js_main_accounts'
+import {CCaptcha} from '../js/js_captcha.js'
 
 // Registration and Regeneration Control
-class ClssLoginControl extends React.Component {
+export default class ClssLoginControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -130,13 +135,13 @@ class ClssLoginControl extends React.Component {
 
 				<div className="form-check">
 				<input className="form-check-input" type="radio" value="" id="input_fullctrl" name='grp_permission'/>
-				<label className="form-check-label" for="myCheckbox">
+				<label className="form-check-label" htmlFor="myCheckbox">
 					Full Control
 				</label>
 				</div>
 				<div className="form-check">
 				<input className="form-check-input" type="radio" value="" id="input_readonlyctrl" name='grp_permission'/>
-				<label className="form-check-label" for="myCheckbox">
+				<label className="form-check-label" htmlFor="myCheckbox">
 					Read Only
 				</label>
 				</div>  
@@ -159,8 +164,4 @@ class ClssLoginControl extends React.Component {
 
 
 
-ReactDOM.render(
-			<ClssLoginControl />,
-			window.document.getElementById('loginCtrl')
-		);
 

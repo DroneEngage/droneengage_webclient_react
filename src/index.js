@@ -3,9 +3,12 @@
 import React  from "react"; 
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import $ from 'jquery';
+
 import Layout from "./pages/Layout";
 import Home from "./pages/home";
 import Planning from "./pages/planning";
+import Accounts from "./pages/accounts";
 import NoPage from "./pages/NoPage";
 
 
@@ -21,6 +24,8 @@ export default function App2() {
           <Route index element={<Home />} />
           <Route path="home"  element={<Home />} />
           <Route path="planning"  element={<Planning />} />
+          <Route path="mapeditor.html"  element={<Planning />} />
+          <Route path="accounts"  element={<Accounts />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

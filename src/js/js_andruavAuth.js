@@ -14,19 +14,7 @@ import {js_eventEmitter} from './js_eventEmitter'
 
 
 
-const CONST_WEB_FUNCTION					= '/w';
-const CONST_WEB_LOGIN_COMMAND				= '/wl/';
-const CONST_ACCOUNT_MANAGMENT       		= '/am/';
-const CONST_CMD_CREATE_ACCESSCODE   		= 'c';
-const CONST_CMD_REGENERATE_ACCESSCODE       = 'r';
 
-const CONST_ACCOUNT_NAME_PARAMETER          = 'acc';
-const CONST_ACCESS_CODE_PARAMETER           = 'pwd';
-const CONST_SUB_COMMAND               		= 'scm';  
-const CONST_ERROR_MSG						= 'em';
-const CONST_ACTOR_TYPE						= 'at'; 
-const CONST_SESSION_ID                      = 'sid';
-const CONST_PERMISSION_PARAMETER            = 'prm';
 
 
 class CAndruavAuth {
@@ -110,11 +98,11 @@ class CAndruavAuth {
 
     var _url;
     if (window.location.protocol === 'https:') {
-	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		
 	}
 	else {
-	    _url = 'http://' + this.m_auth_ip  + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_WEB_LOGIN_COMMAND; //  + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+	    _url = 'http://' + this.m_auth_ip  + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_WEB_LOGIN_COMMAND; //  + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 	}
 
 
@@ -184,17 +172,17 @@ class CAndruavAuth {
 
 		var _url;
 		if (window.location.protocol ===  'https:') {
-			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		} else {
-			_url = 'http://'  + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+			_url = 'http://'  + this.m_auth_ip + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		}
 
 
 		var p_keyValues = {};
-		p_keyValues[CONST_SUB_COMMAND.toString()] = CONST_CMD_CREATE_ACCESSCODE;
-		p_keyValues[CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
-        p_keyValues[CONST_SESSION_ID.toString()] = this._m_session_ID;
-        p_keyValues[CONST_PERMISSION_PARAMETER.toString()] = p_permission;
+		p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE;
+		p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
+        p_keyValues[js_andruavMessages.CONST_SESSION_ID.toString()] = this._m_session_ID;
+        p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
 
 		var v_res = null;
 		var Me = this;
@@ -240,16 +228,16 @@ class CAndruavAuth {
 
         var _url;
         if (window.location.protocol === 'https:') {
-            _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+            _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
         } else {
-            _url = 'http://' + this.m_auth_ip + ':' + this._m_auth_port + CONST_WEB_FUNCTION + CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+            _url = 'http://' + this.m_auth_ip + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
         }
 
 
         var p_keyValues = {};
-        p_keyValues[CONST_SUB_COMMAND.toString()] = CONST_CMD_REGENERATE_ACCESSCODE;
-        p_keyValues[CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
-        p_keyValues[CONST_PERMISSION_PARAMETER.toString()] = p_permission;
+        p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_REGENERATE_ACCESSCODE;
+        p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
+        p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
 
 
         var v_res = null;
