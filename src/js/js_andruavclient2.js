@@ -115,7 +115,7 @@ class CAndruavClient {
         if (p_me.v_sendAxes === false) 
         {
             p_me.v_sendAxes_skip++;
-            if (p_me.v_sendAxes_skip%4 !=0) return;
+            if (p_me.v_sendAxes_skip%4 !== 0) return;
         }
         
 
@@ -3256,6 +3256,7 @@ class CAndruavClient {
     }
     catch (e)
     {
+        console.log ("Web Socket Failed");
         console.log (e);
         this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);
     }

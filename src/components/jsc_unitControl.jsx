@@ -1329,7 +1329,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         js_globals.fn_console_log ("online_comment:" + online_comment);
         var rows=[];
         var sys_id = "";
-        if (v_andruavUnit.m_FCBParameters.m_systemID!=0)
+        if (v_andruavUnit.m_FCBParameters.m_systemID !== 0)
         {
             sys_id=':' + v_andruavUnit.m_FCBParameters.m_systemID + ' ';
         }
@@ -1557,7 +1557,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
         var classes = "";
         var text = v_andruavUnit.m_unitName;
-        if (v_andruavUnit.m_FCBParameters.m_systemID!=0)
+        if (v_andruavUnit.m_FCBParameters.m_systemID !== 0)
         {
             text += ":" + v_andruavUnit.m_FCBParameters.m_systemID;
         }

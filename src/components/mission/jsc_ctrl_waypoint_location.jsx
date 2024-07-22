@@ -19,12 +19,27 @@ export class CWayPointLocation extends React.Component {
     componentDidUpdate() 
     { 
         var lnglat = this.props.p_shape.getLatLng();
-        $('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lat); 
-        $('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lng); 
-        $('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
-        $('btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
+        //$('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lat); 
+        //$('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lng); 
+        //$('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
+        //$('btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     }
 
+    handleLatChange(e)
+    {
+
+    }
+
+    handleLngChange(e)
+    {
+
+    }
+    
+    handleAltChange(e)
+    {
+
+    }
+    
     fn_getAltitudeLabel(frame_type)
     {
         switch (frame_type)
@@ -90,45 +105,48 @@ export class CWayPointLocation extends React.Component {
                 lng:v_lng});
         
         // TODO: Implement Correctly
-        if (this.props.p_shape._alt ==null)
-        {
-            const api = new OpenElevationAPI(this.props.p_shape);
-            api.getElevation(v_lat, v_lng)
-            .then(elevation => this.props.p_shape._alt = elevation)
-            .catch(error => console.error('Error fetching elevation data:', error));
-        }
+        // if (this.props.p_shape._alt ==null)
+        // {
+        //     const api = new OpenElevationAPI(this.props.p_shape);
+        //     api.getElevation(v_lat, v_lng)
+        //     .then(elevation => this.props.p_shape._alt = elevation)
+        //     .catch(error => console.error('Error fetching elevation data:', error));
+        // }
 
         $('#btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     }
 
     render ()
     {
+        var lnglat = this.props.p_shape.getLatLng();
+        
         return (<div className="margin_zero css_margin_top_small">
                     <label className="form-control-label text-white">3D-Location </label>
                     <div className="row margin_zero">
                         <div className="col-4">
                             <div className="form-group">
                                 <label htmlFor="txt_lat" className="form-label text-white "><small>lat</small></label>
-                                <input id={"txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-90} max={90} step="0.0001" className="form-control input-sm input-sm txt_margin" placeholder="0.00"    />
+                                <input id={"txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-90} max={90} step="0.0001" className="form-control input-sm input-sm txt_margin" value={lnglat.lat} placeholder="0.00"    onChange={this.handleLatChange} />
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
                                 <label htmlFor="txt_lng" className="form-label text-white "><small>lng</small></label>
-                                <input id={"txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-180} max={180} step="0.0001" className="form-control input-sm input-sm txt_margin" placeholder="0.00" />
+                                <input id={"txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-180} max={180} step="0.0001" className="form-control input-sm input-sm txt_margin" value={lnglat.lng} placeholder="0.00" onChange={this.handleLngChange} />
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
                                 <label htmlFor="txt_alt" className="form-label text-white "><small>alt</small></label>
                                 <div className="input-group mb-3">
-                                    <input id={"txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={0} max={9000} step="1.0" className="form-control input-sm input-sm txt_margin" placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2"/>
-                                    <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="button" className="btn btn-success" onClick={ (e) => this.fn_editAltitudeType()} >Rel</button>
+                                    <input id={"txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={0} max={9000} step="1.0" className="form-control input-sm input-sm txt_margin" placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2" value={this.props.p_shape.m_missionItem.alt} onChange={this.handleAltChange}/>
+                                    <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="button" className="btn btn-success" onClick={ (e) => this.fn_editAltitudeType()} >{this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType)}</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
         );
     }
 }

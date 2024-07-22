@@ -116,14 +116,14 @@ class ClssParametersList extends  React.Component {
             const c_keys = Object.keys(c_list);
             const c_len = c_keys.length;
             
-            if (c_len !=0 ) 
+            if (c_len !== 0 ) 
             {
                         
                             
                 for (var i =0; i<c_len; ++i) 
                 {
                     const c_parameter_message = c_list[c_keys[i]];
-                    if ((this.props.prop_search =="" ) || (c_parameter_message.param_id.toUpperCase().includes(this.props.prop_search)))
+                    if ((this.props.prop_search == "" ) || (c_parameter_message.param_id.toUpperCase().includes(this.props.prop_search)))
                     {
                         p_params.push(<ClssParameterItem prop_unit={this.props.prob_unit} prop_param_value={c_parameter_message.param_value} prop_param={c_parameter_message} key={c_parameter_message.param_index}/>);
                     }

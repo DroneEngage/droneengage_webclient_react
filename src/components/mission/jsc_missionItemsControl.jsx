@@ -63,23 +63,23 @@ class CMissionStep extends React.Component {
 
         return (
             <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">
-            <div className="card-header text-center"> 
-            <h4 ><strong>{"Mission Item #" + this.props.p_shape.order}</strong></h4>
-            </div>    
-            <div className="card-body">
-    
-            <div className="form-group text-left">
-                <label className="text-primary">ID</label>
-                <input type='text' id={'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} className="form-control input-sm"/>
-            </div>
-		    
+                <div className="card-header text-center"> 
+                    <h4 ><strong>{"Mission Item #" + this.props.p_shape.order}</strong></h4>
+                </div>    
+                <div className="card-body">
+        
+                    <div className="form-group text-left">
+                        <label className="text-primary">ID</label>
+                        <input type='text' id={'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} className="form-control input-sm"/>
+                    </div>
+                
 
-            <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_bdy" className="geo_fence ">
-		        <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.ma = instance}}/>
-                <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.wp = instance}}/>
-                <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
-            </div>
-            </div>
+                    <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_bdy" className="geo_fence ">
+                        <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.ma = instance}}/>
+                        <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.wp = instance}}/>
+                        <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -476,7 +476,7 @@ export default class CMissionsContainer extends React.Component {
     {
         js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
         
-        if (p_shape.pm.getShape() !== 'Marker') return ;
+        if (p_shape.pm.xshape !== 'Marker') return ;
 
         let v_mission = js_mapmission_planmanager.fn_getCurrentMission();
         v_mission.fn_addMarker(p_shape);

@@ -91,27 +91,6 @@ class CLeafLetAndruavMap {
         }
 
         
-        // var stateChangingButton = L.easyButton({
-        //     states: [{
-        //             stateName: 'zoom-to-forest',        // name the state
-        //             icon:      '<img src="/images/de/favicon.ico">',               // and define its properties
-        //             title:     'zoom to a forest',      // like its title
-        //             onClick: function(btn, map) {       // and its callback
-        //                 map.setView([46.25,-121.8],10);
-        //                 btn.state('zoom-to-school');    // change state on click!
-        //             }
-        //             }, {
-        //             stateName: 'zoom-to-school',
-        //             icon:      'fa-university',
-        //             title:     'zoom to a school',
-        //             onClick: function(btn, map) {
-        //                 map.setView([42.3748204,-71.1161913],16);
-        //                 btn.state('zoom-to-forest');
-        //             }
-        //     }]
-        // });
-        
-        // stateChangingButton.addTo(this.m_Map );
 
         
         if (js_globals.CONST_MAP_EDITOR === true) {
@@ -127,8 +106,28 @@ class CLeafLetAndruavMap {
                 drawCircleMarker: false
             });
 
+            // Define your custom marker icon
+            const myIcon = L.icon({
+                iconUrl: 'images/myicon.png',
+                iconSize: [32, 32], // size of the icon
+                iconAnchor: [16, 32], // point of the icon which will correspond to marker's location
+            });
 
-            this.m_Map.on('pm:create' , (x) => {
+            // Initialize Leaflet.PM with the custom marker icon
+            L.PM.addInitHooks(function() {
+                this.options.drawMarker.icon = myIcon;
+            });
+            this.m_Map.on("pm:drawstart", function (e) {
+                console.log("drawstart", e);
+              });
+              
+            this.m_Map.on("pm:dragstart", function (e) {
+                console.log("dragstart", e);
+                e.workingLayer.setIcon(L.icon({iconUrl:'images/mode-portrait_b.png'}))
+              });
+              
+              this.m_Map.on('pm:create' , (x) => {
+                x.layer.pm.xshape = x.shape;
                 js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
                 js_globals.v_map_shapes.push(x.layer);
@@ -139,7 +138,7 @@ class CLeafLetAndruavMap {
 
                 x.layer.on('pm:edit', (x) => {
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeEdited, x.layer);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeEdited, x.target);
                 });
 
                 x.layer.on('pm:remove', (x) => {

@@ -39,7 +39,7 @@ export class ClssCtrlVibration extends React.Component {
     getVibrationCss (value)
     {
         var ret = new C_GUI_READING_VALUE();
-        if (value == undefined) 
+        if (value === null || value === undefined) 
         {
             value = 'na';
         }
@@ -72,6 +72,7 @@ export class ClssCtrlVibration extends React.Component {
 
     getClippingCss (value)
     {
+        // !BUG HERE
         var ret = new C_GUI_READING_VALUE();
         if (value == undefined) value = 'na';
         ret.value = value;
@@ -79,7 +80,7 @@ export class ClssCtrlVibration extends React.Component {
         {
            ret.css = 'bg-none text-muted ';
         }else
-        if (value==0)
+        if (value === 0)
         {
             ret.css = 'bg-success text-white ';
             this.state.warning_level = this.state.warning_level | 0x2;

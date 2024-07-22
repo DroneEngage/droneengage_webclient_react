@@ -128,7 +128,7 @@ class ClssShapeControl extends React.Component {
 
 			//this.props.shape.m_geofenceInfo.m_shouldKeepOutside = this.state.restricted!=null?this.state.restricted:false;
         	var v_name = $('#geo #name').val();
-            if (v_name == "") v_name = ('fence_' + js_helpers.fn_generateRandomString(4));
+            if (v_name === "" || v_name === null || v_name === undefined) v_name = ('fence_' + js_helpers.fn_generateRandomString(4));
 			this.props.shape.m_geofenceInfo.m_geoFenceName      = v_name;
 			this.props.shape.m_geofenceInfo.isHardFence       = parseInt($('#geo #sel').val());
 			this.props.shape.m_geofenceInfo.m_maximumDistance   = 0;
@@ -469,7 +469,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
 
     _renderswitch (v_unit)
     {
-        switch (this.state.m_shape.pm.getShape())
+        switch (this.state.m_shape.pm.xshape)
         {
             case 'Marker':
             break;
@@ -491,7 +491,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
             break;
 
             default:
-                v_unit.push (<h4>Please Create or Select a Region</h4>);
+                v_unit.push (<h4 key='FCSCtrld1' >Please Create or Select a Region</h4>);
             break;
         }
 
@@ -506,7 +506,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
         || ((this.state.m_shape.m_geofenceInfo !== null && this.state.m_shape.m_geofenceInfo !== undefined) && (this.state.m_shape.m_geofenceInfo.m_deleted === true))
         )
         {
-            v_unit.push (<h4 key="h4">Please Select A Shape</h4>);
+            v_unit.push (<h4 key='FCSCtrl1' >Please Select A Shape</h4>);
         }
         else
         {
@@ -516,7 +516,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
             }
             else
             {
-                v_unit.push (<h4>Please login first.</h4>)    ;
+                v_unit.push (<h4 key='FCSCtrl2'>Please login first.</h4>)    ;
             }
         }
         
@@ -529,9 +529,3 @@ export default class ClssFenceClssShapeControl extends React.Component {
             );
     }
 };
-
-
-// ReactDOM.render(
-// 			<ClssFenceClssShapeControl  />,
-// 			window.document.getElementById('fenceControl')
-// 		);

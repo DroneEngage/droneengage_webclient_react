@@ -46,7 +46,7 @@ export class ClssAndruavFencePlan
 			cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
 			cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
 			var lnglat = {};
-			switch (c_shape.pm.getShape())
+			switch (c_shape.shape)
 			{
 				case 'Marker':
 				break;
@@ -154,6 +154,8 @@ export class ClssAndruavMissionPlan
 
 		this.v_highLight = false;
 		this.m_hidden = false;
+
+		this.m_missionCounter =1;
 	}
 
 
