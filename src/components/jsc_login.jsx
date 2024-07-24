@@ -26,7 +26,7 @@ export class ClssLoginControl extends React.Component {
 
 	
 	fn_onSocketStatus(me, params) {
-		js_globals.fn_console_log('REACT:' + JSON.stringify(params));
+		js_common.fn_console_log('REACT:' + JSON.stringify(params));
 
 		if (me._isMounted !== true) return ;
     	if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {

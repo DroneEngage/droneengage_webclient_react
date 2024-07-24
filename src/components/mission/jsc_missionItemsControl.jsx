@@ -4,6 +4,8 @@ import React    from 'react';
 
 import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import * as js_common from '../../js/js_common.js'
+
 
 import {js_mapmission_planmanager} from '../../js/js_mapmissionPlanManager.js'
 import {js_globals} from '../../js/js_globals.js';
@@ -175,7 +177,7 @@ class MissionControlPanel extends React.Component {
      */
     fn_togglePath (e)
     {
-        js_globals.fn_console_log (e);
+        js_common.fn_console_log (e);
         this.props.p_ParentCtrl.props.p_missionPlan.fn_togglePath();
         if (this.props.p_ParentCtrl.props.p_missionPlan.m_hidden === true)
         {
@@ -328,13 +330,13 @@ class UnitMissionContainer extends React.Component {
         // not a marker
         if (p_event.target.m_mission === null || p_event.target.m_mission === undefined) 
         {
-            js_globals.fn_console_log ("MISSION:NULL HERE");
+            js_common.fn_console_log ("MISSION:NULL HERE");
             return ; 
         }
         
         if (me.props.p_missionPlan.m_id !== p_event.target.m_mission.m_id)
         {
-            js_globals.fn_console_log ("Not Me");
+            js_common.fn_console_log ("Not Me");
             return ;
         } 
 
@@ -346,7 +348,7 @@ class UnitMissionContainer extends React.Component {
         me.setState({s_shape:p_event.target});
 
 
-        js_globals.fn_console_log ("REACT:displayGeoForm" );
+        js_common.fn_console_log ("REACT:displayGeoForm" );
 
         me.forceUpdate();
 		
@@ -355,7 +357,7 @@ class UnitMissionContainer extends React.Component {
 
     fn_onMissionItemToggle (me,p_params)
     {
-        js_globals.fn_console_log (p_params);
+        js_common.fn_console_log (p_params);
         
         
         me.forceUpdate();
@@ -474,7 +476,7 @@ export default class CMissionsContainer extends React.Component {
 
     fn_onShapeCreated (me, p_shape) 
     {
-        js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
+        js_common.fn_console_log ("fn_onShapeCreated: " + p_shape);
         
         if (p_shape.pm.xshape !== 'Marker') return ;
 

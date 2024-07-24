@@ -1,9 +1,12 @@
 import $ from 'jquery'; 
 import React    from 'react';
 
+
 import {js_globals} from '../js/js_globals.js';
 import {js_localStorage} from '../js/js_localStorage'
 import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_common from '../js/js_common.js'
+
 import {js_localGamePad} from '../js/js_localGamePad.js'
 import {js_speak} from '../js/js_speak'
 
@@ -32,7 +35,7 @@ class ClssGamePadButton extends React.Component {
     render()
     {
         const c_color = this.props.pressed === true?this.props.color_active:this.props.color_inactive;
-        js_globals.fn_console_log ("buttion " + this.props.color_active);
+        js_common.fn_console_log ("buttion " + this.props.color_active);
         return (
             <div>
                 <svg viewBox="-2.2 -2.2 4.4 4.4" width="48" height="48">
@@ -293,7 +296,7 @@ export default class ClssGamePadControl extends React.Component {
     
         this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
         
-        js_globals.fn_console_log (this.m_output);
+        js_common.fn_console_log (this.m_output);
         var v_title = (this.state.m_andruavUnit !== null && this.state.m_andruavUnit !== undefined )?this.state.m_andruavUnit.m_unitName:'NA';
         var gamepads = [];
         

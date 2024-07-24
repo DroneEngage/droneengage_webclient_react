@@ -15,6 +15,7 @@ import * as js_andruavMessages from './js_andruavMessages'
 import * as js_helpers from '../js/js_helpers'
 import {js_globals} from './js_globals'
 import {js_eventEmitter} from './js_eventEmitter'
+import * as js_common from './js_common.js'
 
 const GAME_XBOX_360_MICROSOFT   = 1;
 const GAME_XBOX_360_MICROSOFT_VENDOR  = ["045e","054c","054c","054c"];
@@ -107,10 +108,10 @@ class CAndruavGamePad {
     }
 
     fn_onConnect(e) {
-        js_globals.fn_console_log(e);
+        js_common.fn_console_log(e);
 
         var gp = navigator.getGamepads()[e.gamepad.index];
-        js_globals.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", gp.index, gp.id, gp.buttons.length, gp.axes.length);
+        js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", gp.index, gp.id, gp.buttons.length, gp.axes.length);
 
         CAndruavGamePad.getInstance().fn_addgamepad(CAndruavGamePad.getInstance(),e.gamepad);
         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Connected, e.gamepad);
@@ -118,7 +119,7 @@ class CAndruavGamePad {
 
 
     fn_onDisconnect(e) {
-        js_globals.fn_console_log(e);
+        js_common.fn_console_log(e);
         CAndruavGamePad.getInstance().fn_removeGamepad(CAndruavGamePad.getInstance(),e.gamepad);
         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Disconnected, e.gamepad);
     }
@@ -131,7 +132,7 @@ class CAndruavGamePad {
     fn_addgamepad(me, p_gamepad) {
         var v_padStatus = new fn_Obj_padStatus();
 
-        js_globals.fn_console_log(p_gamepad.id);
+        js_common.fn_console_log(p_gamepad.id);
         var vendorNumber;
         var productNumber;
         if (js_helpers.fn_isFireFox())
@@ -159,7 +160,7 @@ class CAndruavGamePad {
             }
         }
 
-        js_globals.fn_console_log("vendorNumber:" + vendorNumber + " ::: productNumber:" + productNumber);
+        js_common.fn_console_log("vendorNumber:" + vendorNumber + " ::: productNumber:" + productNumber);
 
         if ((vendorNumber === '06f7') && (productNumber === '0003'))
         {
@@ -317,7 +318,7 @@ class CAndruavGamePad {
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         c_padStatus.p_buttons[i].m_longPress = true;
                         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-                        js_globals.fn_console_log("button " + i + " long press");
+                        js_common.fn_console_log("button " + i + " long press");
                     }
                 }
             }
@@ -369,7 +370,7 @@ class CAndruavGamePad {
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         c_padStatus.p_buttons[i].m_longPress = true;
                         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-                        js_globals.fn_console_log("button " + i + " long press");
+                        js_common.fn_console_log("button " + i + " long press");
                     }
                 }
             }

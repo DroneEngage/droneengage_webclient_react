@@ -27,7 +27,7 @@ import $ from 'jquery';
             }
             else
             {
-                js_globals.fn_console_log ("Repeated");
+                js_common.fn_console_log ("Repeated");
             }
             this.Id = _obj.Id;
             this.Icao = _obj.Icao;
@@ -194,7 +194,7 @@ import $ from 'jquery';
             if (js_globals.v_EnableADSB === false) return ;
             
             var _v_url =  this.v_url + 'lat=' + p_lat.toString() + '&lng=' + p_lng.toString() + '&fDstL=0&fDstU=' + p_radius.toString();
-            js_globals.fn_console_log ("ADSB URL: %s", _v_url);
+            js_common.fn_console_log ("ADSB URL: %s", _v_url);
             var res=null;
             var Me = this;
 			$.ajax({

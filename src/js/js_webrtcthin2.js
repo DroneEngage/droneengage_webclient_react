@@ -1,6 +1,7 @@
 import { js_globals } from "./js_globals.js";
 
 import * as js_siteConfig from "./js_siteConfig";
+import * as js_common from './js_common.js'
 
 class CTalk {
   constructor(number, targetVideoTrack, cAndruavStream) {
@@ -122,11 +123,11 @@ class AndruavStream {
   onOrphanDisconnect() {}
 
   debugerr(msg) {
-    js_globals.fn_console_log("webrtc ERROR: %s", msg);
+    js_common.fn_console_log("webrtc ERROR: %s", msg);
   }
 
   debugcb(msg) {
-    js_globals.fn_console_log("webrtc: %s", JSON.stringify(msg));
+    js_common.fn_console_log("webrtc: %s", JSON.stringify(msg));
     return;
   }
 
@@ -164,7 +165,7 @@ class AndruavStream {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   onaddtrack(talk, mediaStreamEvent) {
     var stream = mediaStreamEvent.streams[0];
-    js_globals.fn_console_log(
+    js_common.fn_console_log(
       "WEBRTC: TRACK-muted:" + stream.getVideoTracks()[0].muted
     );
 
@@ -267,7 +268,7 @@ class AndruavStream {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   transmit(phone, channel, packet, times, time) {
     if (!packet) return;
-    js_globals.fn_console_log("WEBRTC:" + JSON.stringify(packet));
+    js_common.fn_console_log("WEBRTC:" + JSON.stringify(packet));
     var message = {
       packet: packet,
       channel: channel,
@@ -283,7 +284,7 @@ class AndruavStream {
   // SDP Offers & ICE Candidates Receivable Processing
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   EVT_andruavSignalling(andruavUnit, p_signal) {
-    js_globals.fn_console_log("WEBRTC to WEB:" + JSON.stringify(p_signal));
+    js_common.fn_console_log("WEBRTC to WEB:" + JSON.stringify(p_signal));
 
     var me = AndruavStream.getInstance();
 
@@ -335,7 +336,7 @@ class AndruavStream {
       talk.fn_set_status("connected");
       await this.create_answer(pc, talk);
     } catch (e) {
-      js_globals.fn_console_log(e);
+      js_common.fn_console_log(e);
     }
   }
 

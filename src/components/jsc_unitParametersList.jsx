@@ -3,6 +3,8 @@ import React    from 'react';
 import $ from 'jquery';
 
 import * as js_siteConfig from '../js/js_siteConfig'
+import * as js_common from '../js/js_common.js'
+
 import Modal from 'bootstrap/js/dist/modal';
 
 import {js_globals} from '../js/js_globals.js';
@@ -28,7 +30,7 @@ class ClssParameterItem extends  React.Component {
          * Reset value if currently modified.
          */
         this.setState({param_value:this.props.prop_param.param_value});
-        js_globals.fn_console_log("PARAM:" + this.props.prop_param.param_value + " componentWillUpdate");
+        js_common.fn_console_log("PARAM:" + this.props.prop_param.param_value + " componentWillUpdate");
     }
 
     componentWillUpdate()
@@ -75,7 +77,7 @@ class ClssParameterItem extends  React.Component {
 
     render () {
         var cls_color = " bg-white text-black-50";
-        js_globals.fn_console_log ("PARAM_:" + this.props.prop_param.param_id + ":" + this.props.prop_param.param_value + ":" + String(this.state.param_value));
+        js_common.fn_console_log ("PARAM_:" + this.props.prop_param.param_id + ":" + this.props.prop_param.param_value + ":" + String(this.state.param_value));
         if (this.props.prop_param.is_dirty === true) 
         {
             if (this.props.prop_param.is_valid === false)

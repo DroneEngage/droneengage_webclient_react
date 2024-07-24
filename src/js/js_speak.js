@@ -1,4 +1,4 @@
-import {js_globals} from './js_globals.js';
+import * as js_common from './js_common.js'
 import {js_localStorage} from './js_localStorage'
 
 /***************************************************
@@ -39,7 +39,7 @@ class CSpeakEngine
 		var elapsedTime = 0;
 		
 		this._v_speakmsg.onend = function(e) {
-			js_globals.fn_console_log('Finished in ' + elapsedTime + ' seconds.');
+			js_common.fn_console_log('Finished in ' + elapsedTime + ' seconds.');
 			if (Me._v_curIndex < Me._v_index )
 			{
 				Me._v_speakmsg.text = Me._v_to_speak[Me._v_curIndex];

@@ -1,4 +1,3 @@
-import * as  js_siteConfig from './js_siteConfig.js'
 
 class GLOBALS {
 
@@ -144,6 +143,7 @@ class GLOBALS {
 		this.EE_servoOutputUpdate          = "EE_servoOutputUpdate";
 		this.EE_DetectedTarget             = "EE_DetectedTarget";
 		this.EE_SearchableTarget           = "EE_SearchableTarget";
+
 		this.EE_cameraZoomChanged          = "EE_cameraZoomChanged";
 		this.EE_cameraFlashChanged         = "EE_cameraFlashChanged";
 
@@ -183,16 +183,7 @@ class GLOBALS {
 
 
 
-		this.v_smart_Telemetry_Level     = -1;
-		this.v_security_key              = "dynamic_event";
-
-
 		this.CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and keep it unchanged
-
-
-
-		//  this.CONST_MAP_GOOLE   = true;
-		//  this.CONST_MAP_LEAFLET = false;
 
 
 
@@ -224,15 +215,7 @@ class GLOBALS {
 
 
 
-	fn_console_log(p_txt)
-	{
-		//CODEBLOCK_START
-		if ((js_siteConfig.CONST_TEST_MODE === true)  && (js_siteConfig.CONST_TEST_MODE_ENABLE_LOG === true))
-		{
-			console.log (p_txt);
-		}
-		//CODEBLOCK_END
-	}
+	
 
 	fn_date_now()
 	{

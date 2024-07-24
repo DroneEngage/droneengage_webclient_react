@@ -6,6 +6,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
+import * as js_common from '../../js/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
@@ -176,7 +177,7 @@ export default class ClssStreamDialog extends React.Component
 
         if (p_andruavUnit === null || p_andruavUnit === undefined)
         {
-            js_globals.fn_console_log ("stream:  NULL")
+            js_common.fn_console_log ("stream:  NULL")
             
             return (
                 <div id="modal_ctrl_stream_dlg" title="Streaming Video" className="card width_fit_max css_ontop border-light p-2" >

@@ -6,6 +6,7 @@ import FileSaver from 'file-saver';
 
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_common from '../js/js_common.js'
 import * as js_helpers from '../js/js_helpers'
 import * as js_andruavUnit from '../js/js_andruavUnit'
 import * as js_andruavMessages from '../js/js_andruavMessages'
@@ -117,7 +118,7 @@ class ClssCVideoScreen extends React.Component {
         }
         else
         {
-            js_globals.fn_console_log ("start recording");
+            js_common.fn_console_log ("start recording");
             fn_startrecord (v_andruavUnit,this.props.obj.v_track);
                     
         }
@@ -183,7 +184,7 @@ class ClssCVideoScreen extends React.Component {
         && (typeof p_obj.p_jmsg['f'] !== 'number')) return ;
         
         p_me.state.m_flash = p_obj.p_jmsg['f'];
-        js_globals.fn_console_log ("Flash Updated" , p_me.state.m_flash);
+        js_common.fn_console_log ("Flash Updated" , p_me.state.m_flash);
         p_me.forceUpdate();
     }
 
@@ -199,7 +200,7 @@ class ClssCVideoScreen extends React.Component {
         && (typeof p_obj.p_jmsg['b'] !== 'number')) return ;
         
         p_me.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
-        js_globals.fn_console_log ("Zoom Updated" , p_me.state.m_zoom);
+        js_common.fn_console_log ("Zoom Updated" , p_me.state.m_zoom);
         p_me.forceUpdate();
     }
 
@@ -319,7 +320,7 @@ class ClssCVideoScreen extends React.Component {
     fnl_requestFullScreen (e)
     {
         const c_ele = window.document.getElementById("div_video_control");
-        js_globals.fn_console_log ("fnl_requestFullScreen");
+        js_common.fn_console_log ("fnl_requestFullScreen");
         if (this.fnl_isFullScreen())
         {
             if (document.exitFullscreen) {
@@ -356,7 +357,7 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_zoomInOut (e, p_zoomIn, p_obj)
     {
-        js_globals.fn_console_log ("p_cameraIndex: " + JSON.stringify(p_obj));
+        js_common.fn_console_log ("p_cameraIndex: " + JSON.stringify(p_obj));
         js_globals.v_andruavClient.API_CONST_RemoteCommand_zoomCamera (p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
     }
 
@@ -376,7 +377,7 @@ class ClssCVideoScreen extends React.Component {
             // disabled.
             return ; 
         }
-        js_globals.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
+        js_common.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
         js_globals.v_andruavClient.API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
 
         this.state.m_flash = v_flashValue;
@@ -426,7 +427,7 @@ class ClssCVideoScreen extends React.Component {
             return ;
         }
         
-        js_globals.fn_console_log ("x:" + e.nativeEvent.offsetX + "y:" + e.nativeEvent.offsetY);
+        js_common.fn_console_log ("x:" + e.nativeEvent.offsetX + "y:" + e.nativeEvent.offsetY);
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null)
         {
@@ -465,7 +466,7 @@ class ClssCVideoScreen extends React.Component {
 
         $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e)    
         {
-            js_globals.fn_console_log ("I AM CALLED");
+            js_common.fn_console_log ("I AM CALLED");
             me.forceUpdate();
         });
 
@@ -478,7 +479,7 @@ class ClssCVideoScreen extends React.Component {
     componentDidUpdate() {
         this.fn_lnkVideo();
         this.fn_opacity();
-        js_globals.fn_console_log ("componentDidUpdate");
+        js_common.fn_console_log ("componentDidUpdate");
     }
     
     render ()

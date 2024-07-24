@@ -3,6 +3,7 @@ import React    from 'react';
 
 import * as js_helpers from '../js/js_helpers'
 import * as js_siteConfig from '../js/js_siteConfig'
+import * as js_common from '../js/js_common.js'
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
 import {js_speak} from '../js/js_speak'
@@ -58,7 +59,7 @@ class ClssAndruavUnit extends React.Component {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
-          //  js_globals.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
+          //  js_common.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
         }
 
@@ -67,7 +68,7 @@ class ClssAndruavUnit extends React.Component {
         if (p_andruavUnit.m_IsGCS !== me.props.m_unit.m_IsGCS)
         {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
-          // js_globals.fn_console_log ('err: Convert Me ' + p_andruavUnit.partyID);
+          // js_common.fn_console_log ('err: Convert Me ' + p_andruavUnit.partyID);
            
            js_eventEmitter.fn_dispatch(js_globals.EE_unitAdded,p_andruavUnit);
 	
@@ -88,7 +89,7 @@ class ClssAndruavUnit extends React.Component {
             p_andruavUnit.date = new Date();
         }
 
-       // js_globals.fn_console_log ('err: Force Update ' + p_andruavUnit.partyID);
+       // js_common.fn_console_log ('err: Force Update ' + p_andruavUnit.partyID);
           
        if (me._isMounted !== true) return ;
         
@@ -103,7 +104,7 @@ class ClssAndruavUnit extends React.Component {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
-          //  js_globals.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
+          //  js_common.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
         }
         
@@ -115,7 +116,7 @@ class ClssAndruavUnit extends React.Component {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
-          //  js_globals.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
+          //  js_common.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
         }
         
@@ -338,7 +339,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
 
     fn_doChangeAltitudeByStep (p_andruavUnit, p_AltitudeInMeter)
     {
-        js_globals.fn_console_log ("fn_doChangeAltitudeByStep:" + p_AltitudeInMeter);
+        js_common.fn_console_log ("fn_doChangeAltitudeByStep:" + p_AltitudeInMeter);
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         
         if ((p_AltitudeInMeter === null || p_AltitudeInMeter === undefined) || (p_AltitudeInMeter < js_globals.CONST_DEFAULT_ALTITUDE_min)) return ;
@@ -1326,7 +1327,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
                 }
             }
         }
-        js_globals.fn_console_log ("online_comment:" + online_comment);
+        js_common.fn_console_log ("online_comment:" + online_comment);
         var rows=[];
         var sys_id = "";
         if (v_andruavUnit.m_FCBParameters.m_systemID !== 0)
@@ -1476,7 +1477,7 @@ export default class ClssAndruavUnitList extends React.Component {
     {
         if (me._isMounted !== true) return ;
     
-        js_globals.fn_console_log ("REACT:fn_unitAdded" );
+        js_common.fn_console_log ("REACT:fn_unitAdded" );
 
          if (me.state.andruavUnitPartyIDs.includes(p_andruavUnit.partyID)) return ;
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      

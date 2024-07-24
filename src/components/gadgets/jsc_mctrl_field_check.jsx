@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import {js_globals} from '../../js/js_globals.js';
+import * as js_common from '../../js/js_common.js'
 
 export class CFieldChecked extends React.Component {
     
@@ -22,7 +22,7 @@ export class CFieldChecked extends React.Component {
         $(n + ' :checkbox').change(function() {
 
             // this will contain a reference to the checkbox   
-            js_globals.fn_console_log ("HELP");
+            js_common.fn_console_log ("HELP");
             if (this.checked) {
                 this.props = true;
                 $(n + " :text").removeAttr('disabled', true);

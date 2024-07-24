@@ -7,6 +7,7 @@ import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter'
 import {js_localStorage} from '../js/js_localStorage'
 import {js_leafletmap} from '../js/js_leafletmap'
+import * as js_common from '../js/js_common.js'
 import * as js_andruavMessages from '../js/js_andruavMessages'
 import { mavlink20 } from '../js/js_mavlink_v2';
 
@@ -825,7 +826,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
     {
         if (me._isMounted !== true) return ;
         
-        js_globals.fn_console_log ("REACT:fn_unitAdded" );
+        js_common.fn_console_log ("REACT:fn_unitAdded" );
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
          me.setState({ 
             andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.partyID])

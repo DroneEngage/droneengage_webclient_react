@@ -24,10 +24,6 @@ class CLeafLetAndruavMap {
         this.m_elevator = null;
         this.m_markGuided = null;
 
-        // if ((typeof(js_globals.CONST_MAP_GOOLE) !== "undefined") && (js_globals.CONST_MAP_GOOLE === false))
-		// {
-		//     this.fn_initMap('mapid');
-		// }
     };
 
     static getInstance() {

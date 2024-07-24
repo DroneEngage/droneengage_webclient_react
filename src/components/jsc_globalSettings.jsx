@@ -383,7 +383,7 @@ export default class ClssGlobalSettings extends React.Component {
 
      
 
-  //  js_globals.fn_console_log ("REACT:RENDER ClssGlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
+  //  js_common.fn_console_log ("REACT:RENDER ClssGlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
   var v_gadgets = [];
   var v_uploadFile = [];
   var v_telemetryModes = [];

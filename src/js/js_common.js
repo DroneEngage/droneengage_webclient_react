@@ -13,6 +13,7 @@ import ReactDOM from "react-dom/client";
 import $ from 'jquery';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
+import * as  js_siteConfig from './js_siteConfig.js'
 
 
 
@@ -50,5 +51,14 @@ export function showDialog (id, show)
 	if (show === false && (obj !== null || obj !== undefined))
 	{
 		obj.style.display = 'none';
+	}
+}
+
+
+export function fn_console_log(p_txt)
+{
+	if ((js_siteConfig.CONST_TEST_MODE === true)  && (js_siteConfig.CONST_TEST_MODE_ENABLE_LOG === true))
+	{
+		console.log (p_txt);
 	}
 }

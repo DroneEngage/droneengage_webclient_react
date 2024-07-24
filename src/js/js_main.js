@@ -15,7 +15,7 @@ import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
 import {js_speak} from './js_speak'
-import  * as js_common from './js_common.js'
+import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruavclient2 from './js_andruavclient2'
 import {js_andruavAuth} from './js_andruavAuth'
@@ -3135,7 +3135,7 @@ function fn_handleKeyBoard() {
 				
 				
 				
-				js_globals.fn_console_log(js_andruavclient2.c_SOCKET_STATUS);
+				js_common.fn_console_log(js_andruavclient2.c_SOCKET_STATUS);
 
 				js_globals.v_andruavClient.fn_connect(js_andruavAuth.fn_getSessionID());
 			}

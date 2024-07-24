@@ -6,6 +6,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import * as js_common from '../../js/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
@@ -247,7 +248,7 @@ export default class ClssCameraDialog extends React.Component
         {
             p_session = this.state.p_session;
             
-            js_globals.fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
+            js_common.fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
 
             for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
                 v_streanms.push(<ClssCameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id+'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} />);

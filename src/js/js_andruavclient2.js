@@ -22,6 +22,7 @@ import * as js_siteConfig from './js_siteConfig.js';
 import {js_localGamePad} from './js_localGamePad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
+import * as js_common from './js_common.js'
 import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 
@@ -212,7 +213,7 @@ class CAndruavClient {
         p_me.v_axes = c_controller.p_axes;
         p_me.v_sendAxes = true;
 
-        js_globals.fn_console_log("fn_sendAxes");
+        js_common.fn_console_log("fn_sendAxes");
     }
 
     fn_sendButtons(p_me, p_packet) { // game pad should be attached to a unit.
@@ -220,7 +221,7 @@ class CAndruavClient {
             return;
         
 
-        js_globals.fn_console_log("fn_sendButtons ", p_packet.p_buttonIndex);
+        js_common.fn_console_log("fn_sendButtons ", p_packet.p_buttonIndex);
         const c_now = Date.now();
 
         switch (p_me.m_gamePadUnit.m_VehicleType) {
@@ -889,7 +890,7 @@ class CAndruavClient {
             'E': parseInt(parseFloat(p_axes[v_axis[3]]) * 500 + 500),  // Elevator
         };
 
-        js_globals.fn_console_log(p_msg);
+        js_common.fn_console_log(p_msg);
         this.API_sendCMD(this.m_gamePadUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
     };
 
@@ -1545,7 +1546,7 @@ class CAndruavClient {
         };
 
 
-        js_globals.fn_console_log("out:" + JSON.stringify(p_jmsg));
+        js_common.fn_console_log("out:" + JSON.stringify(p_jmsg));
 
         return JSON.stringify(p_jmsg);
     };
@@ -1611,7 +1612,7 @@ class CAndruavClient {
                 }
                 else
                 {
-                    js_globals.fn_console_log ("skip");
+                    js_common.fn_console_log ("skip");
                 }
             }
         }
@@ -2356,7 +2357,7 @@ class CAndruavClient {
                             c_search_target.m_type = "na";
                         } p_unit.m_DetectedTargets.m_searchable_targets[c_search_target.m_name] = c_search_target;
                     }
-                    js_globals.fn_console_log(JSON.stringify(p_jmsg));
+                    js_common.fn_console_log(JSON.stringify(p_jmsg));
                     js_eventEmitter.fn_dispatch(js_globals.EE_SearchableTarget, p_unit);
                 }
                 // CODEBLOCK_END
@@ -2392,7 +2393,7 @@ class CAndruavClient {
 
                         p_unit.m_DetectedTargets.m_targets.m_list.push(c_target);
                     }
-                    js_globals.fn_console_log(JSON.stringify(p_jmsg));
+                    js_common.fn_console_log(JSON.stringify(p_jmsg));
                     js_eventEmitter.fn_dispatch(js_globals.EE_DetectedTarget, p_unit);
                 }
                 break;
@@ -2659,7 +2660,7 @@ class CAndruavClient {
                 //this.EVT_BadMavlink();
                 return ;
             }
-            js_globals.fn_console_log ("PARAM_GCS:" + c_mavlinkMessage.name);
+            js_common.fn_console_log ("PARAM_GCS:" + c_mavlinkMessage.name);
                        
             switch (c_mavlinkMessage.header.msgId) {
                 case mavlink20.MAVLINK_MSG_ID_HEARTBEAT:
@@ -2680,7 +2681,7 @@ class CAndruavClient {
                     
                     // if (c_mst === null || c_mst === undefined) return false; 
                     // c_mst.header.seq = c_mavlinkMessage.header.seq + 1;
-                    // js_globals.fn_console_log ("PARAM_GCS:" + c_mst.param_id);
+                    // js_common.fn_console_log ("PARAM_GCS:" + c_mst.param_id);
                     // c_mst.srcSystem=p_unit.m_FCBParameters.m_systemID;
                     // //c_mst.srcComponent=0; //p_unit.m_FCBParameters.m_componentID;
                     // return true;
@@ -2688,7 +2689,7 @@ class CAndruavClient {
 
                 case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
                 {
-                    // js_globals.fn_console_log ("PARAMGCS: FTP " + c_mavlinkMessage.payload);
+                    // js_common.fn_console_log ("PARAMGCS: FTP " + c_mavlinkMessage.payload);
                     // const c_keys = Object.keys(p_unit.m_FCBParameters.m_list);
                     // const c_len = c_keys.length;
                     // const c_list = p_unit.m_FCBParameters.m_list;
@@ -2715,7 +2716,7 @@ class CAndruavClient {
                 
             }
         }
-        js_globals.fn_console_log ("PARAM----API_sendBinCMD" + p_mavlinkMessages[0]);
+        js_common.fn_console_log ("PARAM----API_sendBinCMD" + p_mavlinkMessages[0]);
             
         return false;
     }
@@ -2735,7 +2736,7 @@ class CAndruavClient {
             {
                 // bad mavlink ... make sure you are using MAVLINK V2
                 //this.EVT_BadMavlink();
-                js_globals.fn_console_log("BAD MAVLINK");
+                js_common.fn_console_log("BAD MAVLINK");
                 continue;
             }
             p_unit.m_Messages.fn_addMavlinkMsg(c_mavlinkMessage);
@@ -2972,7 +2973,7 @@ class CAndruavClient {
                     break;
 
                 case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
-                    js_globals.fn_console_log ("PARAM: FTP " + c_mavlinkMessage.payload);
+                    js_common.fn_console_log ("PARAM: FTP " + c_mavlinkMessage.payload);
                     break;
 
                 case mavlink20.MAVLINK_MSG_ID_HIGH_LATENCY:
@@ -3085,7 +3086,7 @@ class CAndruavClient {
                             v_internalCommandIndexByteBased = out.nextIndex;
                             v_andruavMessage = JSON.parse(out.text);
                         } catch (err) {
-                            js_globals.fn_console_log(err);
+                            js_common.fn_console_log(err);
                             v_andruavMessage = new Object();
                         }
                     }
@@ -3234,7 +3235,7 @@ class CAndruavClient {
                             Me.prv_parseCommunicationMessage(Me, p_jmsg ,evt);
                             break;
                     }
-                    js_globals.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // evt.data));
+                    js_common.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // evt.data));
                 } else {
 
                     Me.prv_extractBinaryPacket(evt);

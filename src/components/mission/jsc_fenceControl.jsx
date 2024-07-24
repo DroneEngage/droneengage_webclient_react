@@ -168,13 +168,13 @@ class ClssPolygonControl extends ClssShapeControl {
 
 
     componentDidUpdate () {
-        js_globals.fn_console_log ("componentWillUpdate");
+        js_common.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         js_globals.fn_console_log ("componentDidMount");
+         js_common.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -235,13 +235,13 @@ class ClssPolylineControl extends ClssShapeControl {
 
 
     componentDidUpdate () {
-        js_globals.fn_console_log ("componentWillUpdate");
+        js_common.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         js_globals.fn_console_log ("componentDidMount");
+         js_common.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -299,13 +299,13 @@ class ClssCircleControl extends ClssShapeControl {
    
 
     componentDidUpdate () {
-        js_globals.fn_console_log ("componentWillUpdate");
+        js_common.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         js_globals.fn_console_log ("componentDidMount");
+         js_common.fn_console_log ("componentDidMount");
 		 this.fn_displayShapeData();
     }
     
@@ -352,13 +352,13 @@ class ClssRectangleControl extends ClssShapeControl {
 
    
     componentDidUpdate () {
-        js_globals.fn_console_log ("componentWillUpdate");
+        js_common.fn_console_log ("componentWillUpdate");
 		this.fn_displayShapeData();
     }
     
     componentDidMount ()
     {
-         js_globals.fn_console_log ("componentDidMount");
+         js_common.fn_console_log ("componentDidMount");
 		this.fn_displayShapeData();
     }
     
@@ -425,7 +425,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
 
     fn_onShapeCreated (me, p_shape) 
     {
-        js_globals.fn_console_log ("fn_onShapeCreated: " + p_shape);
+        js_common.fn_console_log ("fn_onShapeCreated: " + p_shape);
         me.setState({m_shape: p_shape});
     }
 

@@ -2,6 +2,7 @@ import $ from 'jquery';
 import React    from 'react';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
+import * as js_common from '../../js/js_common.js'
 import {js_globals} from '../../js/js_globals.js';
 import {js_localStorage} from '../../js/js_localStorage'
 
@@ -32,7 +33,7 @@ export class ClssCTRL_SWARM extends React.Component {
 
     fn_requestToFollow (p_unit)
     {
-        js_globals.fn_console_log (p_unit);
+        js_common.fn_console_log (p_unit);
         var v_partyID = null;
         var v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
         if (p_unit !== null && p_unit !== undefined)
