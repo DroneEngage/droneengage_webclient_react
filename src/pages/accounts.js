@@ -21,7 +21,6 @@ import {js_globals} from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssLoginControl from '../components/jsc_cmp_login.jsx'
-
 const Accounts = () => {
 
     useEffect(() => {
@@ -35,7 +34,7 @@ const Accounts = () => {
         <div>
 			<div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
                 
-			<ClssHeaderControl />
+			<ClssHeaderControl no_login no_layout_ctrl/>
             </div>
 
 			
@@ -57,7 +56,7 @@ const Accounts = () => {
                             <div className="capbox-inner">
                             Type the above number:<br/>
                 
-                            <input type="hidden" id="txtCaptcha"/>
+                            <input type="text" id="txtCaptcha"/>
                             <input type="text" name="CaptchaInput" id="CaptchaInput" size="15"/><br/>
                             <br/><br/>
                             </div>
@@ -107,7 +106,7 @@ const Accounts = () => {
     </div>
     <div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
 	<ClssFooterControl />
-	</div>
+  	</div>
   </div>
     );
   };

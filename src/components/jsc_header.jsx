@@ -13,7 +13,41 @@ class ClssHeaderControl extends React.Component {
     }
 
     render() {
-        return (
+
+        var ctrl = [];
+        if (this.props.no_layout_ctrl !== null && this.props.no_layout_ctrl !== undefined)
+            {
+                ctrl.push (
+                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                </div>
+                );
+            }
+            else
+            {
+                ctrl.push(
+                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                    <ClssCTRL_Layout/>     
+                </div>
+                );
+            }
+            if (this.props.no_login !== null && this.props.no_login !== undefined)
+                {
+                    ctrl.push (
+                        <div key='hdr_ctrl1' className=' col-2 col-lg-1    css_margin_zero  al_r'>
+                            
+                        </div>
+                    );
+                }
+                else
+                {
+                    ctrl.push(
+                        <div key='hdr_ctrl1' className=' col-2 col-lg-1    css_margin_zero  al_r'>
+                            <ClssLoginControl simple='true'/>
+                        </div>
+                    );
+                }
+                
+            return (
             <div key='ClssHeaderControl' className = 'row  css_padding_zero bg-dark fixed-top ps-3'>
                 <div className = 'col-7  css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -45,12 +79,7 @@ class ClssHeaderControl extends React.Component {
                         </div>
                     </nav>
                 </div>
-                <div className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
-                    <ClssCTRL_Layout/>     
-                </div>
-                <div className=' col-2 col-lg-1    css_margin_zero  al_r'>
-                    <ClssLoginControl simple='true'/>
-                </div>
+                {ctrl}
             </div>
         );
     }

@@ -1,10 +1,21 @@
 {
   "name": "andruav_webclient_2",
   "version": "0.9.1",
-  "build_number":"20240703-01",
+  "build_number": "20240703-01",
   "description": "DroneEngage WebClient GCS Control Station.",
-  "author": {"email": "mohammad.hefny@gmail.com", "name": "Mohammad Said Hefny", "url": "https://github.com/HefnySco"},
-  "keywords": ["ardupilot", "px4", "drone", "andruav", "GCS", "SITL"],
+  "author": {
+    "email": "mohammad.hefny@gmail.com",
+    "name": "Mohammad Said Hefny",
+    "url": "https://github.com/HefnySco"
+  },
+  "keywords": [
+    "ardupilot",
+    "px4",
+    "drone",
+    "andruav",
+    "GCS",
+    "SITL"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DroneEngage/droneengage_webclient"
@@ -33,6 +44,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "^3.0.1",
+    "react-simple-captcha": "^9.3.1",
     "recordrtc": "^5.6.2",
     "underscore": "^1.13.6",
     "web-vitals": "^2.1.4"

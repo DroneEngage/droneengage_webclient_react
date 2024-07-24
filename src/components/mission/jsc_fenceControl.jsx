@@ -5,6 +5,7 @@ import React    from 'react';
 import * as js_helpers from '../../js/js_helpers.js';
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
+import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
 
@@ -74,7 +75,7 @@ class ClssShapeControl extends React.Component {
         if (this.props.shape.m_geofenceInfo==null)
         {
             this.props.shape.m_geofenceInfo= {};
-            this.props.shape.m_geofenceInfo.m_geoFenceName = ('fence_' + js_helpers.fn_generateRandomString(4));
+            this.props.shape.m_geofenceInfo.m_geoFenceName = ('fence_' + js_common.fn_generateRandomString(4));
             this.props.shape.m_geofenceInfo.m_valid = false;
             this.props.shape.m_geofenceInfo.m_shouldKeepOutside = false;
         }
@@ -128,7 +129,7 @@ class ClssShapeControl extends React.Component {
 
 			//this.props.shape.m_geofenceInfo.m_shouldKeepOutside = this.state.restricted!=null?this.state.restricted:false;
         	var v_name = $('#geo #name').val();
-            if (v_name === "" || v_name === null || v_name === undefined) v_name = ('fence_' + js_helpers.fn_generateRandomString(4));
+            if (v_name === "" || v_name === null || v_name === undefined) v_name = ('fence_' + js_common.fn_generateRandomString(4));
 			this.props.shape.m_geofenceInfo.m_geoFenceName      = v_name;
 			this.props.shape.m_geofenceInfo.isHardFence       = parseInt($('#geo #sel').val());
 			this.props.shape.m_geofenceInfo.m_maximumDistance   = 0;

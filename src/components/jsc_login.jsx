@@ -11,6 +11,7 @@ import * as js_andruavMessages from '../js/js_andruavMessages';
 import {js_localStorage} from '../js/js_localStorage'
 import {js_speak} from '../js/js_speak'
 import {js_eventEmitter} from '../js/js_eventEmitter'
+import * as js_common from '../js/js_common.js'
 
 export class ClssLoginControl extends React.Component {
 	constructor() {
@@ -101,38 +102,11 @@ export class ClssLoginControl extends React.Component {
 
 	render() {
 
-
 		var login = "Login";
 		if (this.state.is_connected === true) {
 			login += " - " + $('#txtUnitID').val();
 		}
-		if (this.props.simple === null || this.props.simple === undefined) {
-			return (
-				<div key={'ClssLoginControl_simple'}  className="card text-white border-light mb-3" >
-					<div className="card-header  text-center"> <strong>{login}</strong></div>
-					<div id='login_form' className="card-body">
-						<div className={this.state.is_connected === true ? "hidden" : " "} >
-							<div className="form-group al_l"><label htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
-							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white">Access Code</label><input type="password" id="txtAccessCode" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
-							<div className="form-group al_l hidden">
-								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
-							</div>
-							<div className="form-group al_l">
-								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
-								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
-								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/></div>
-							<br />
-						</div>
-						<div id='login_btn mb-2 ' className='text-center'>
-							<button className={"btn  button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
-
-						</div>
-					</div>
-				</div>
-			);
-		}
-		else {
+		
 			var control = [];
 			var title = "Login";
 			var css = "bg-success";
@@ -157,7 +131,7 @@ export class ClssLoginControl extends React.Component {
 								<div className="form-group al_l">
 									<label htmlFor="txtUnitID"  id="unitID" className="text-muted">GCS ID</label>
 									<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
-									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_helpers.fn_generateRandomString(2)}/>
+									<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)}/>
 								</div>
 								<br />
 							</div>
@@ -181,7 +155,6 @@ export class ClssLoginControl extends React.Component {
 			return (
 				control
 			);
-		}
 	}
 
 }

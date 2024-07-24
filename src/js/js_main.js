@@ -15,7 +15,7 @@ import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
 import {js_speak} from './js_speak'
-
+import  * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruavclient2 from './js_andruavclient2'
 import {js_andruavAuth} from './js_andruavAuth'
@@ -44,33 +44,9 @@ $.fn.append = function($el){
 
 var v_contextMenuOpen = false;
 
-function showDialog (id, show)
-{
-	const obj = document.getElementById(id);
-	if (show === true && (obj !== null || obj !== undefined))
-	{
-		obj.style.display = 'block';
-	}
 
-	if (show === false && (obj !== null || obj !== undefined))
-	{
-		obj.style.display = 'none';
-	}
-}
 
-function showModal (id, show)
-{
-	const modal = new Modal($(id)); // Instantiates your modal
-	if (show === true && (modal !== null || modal !== undefined))
-	{
-		modal.show();
-	}
-	
-	if (show === false && (modal !== null || modal !== undefined))
-	{
-		modal.hide();
-	}
-}
+
 
 var elevator;
 
@@ -201,7 +177,7 @@ function fn_handleKeyBoard() {
 				callback(false);
 				// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
 				// modal.hide();
-				showModal('#modal_saveConfirmation', false);
+				js_common.showModal('#modal_saveConfirmation', false);
 			});
 			if (p_yesCaption === null || p_yesCaption === undefined)
 			{
@@ -218,7 +194,7 @@ function fn_handleKeyBoard() {
 			//$('#modal_saveConfirmation').modal('show');
 			// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
 			// modal.show();
-			showModal('#modal_saveConfirmation', true);
+			js_common.showModal('#modal_saveConfirmation', true);
 		}
 
 
@@ -1052,7 +1028,7 @@ function fn_handleKeyBoard() {
 			$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
 			$('#modal_ctrl_yaw').attr('partyID', p_partyID);
 			//$('#modal_ctrl_yaw').show(p_partyID);
-			showDialog("modal_ctrl_yaw", true);
+			js_common.showDialog("modal_ctrl_yaw", true);
 		}
 
 
@@ -1154,7 +1130,7 @@ function fn_handleKeyBoard() {
 			//$('#modal_changeUnitInfo').modal('show');
 			// const modal = new Modal($('#modal_changeUnitInfo')); // Instantiates your modal
 			// modal.show();
-			showModal('#modal_changeUnitInfo', true);
+			js_common.showModal('#modal_changeUnitInfo', true);
 		}
 
 		export function fn_changeAltitude (p_andruavUnit) {
@@ -1202,7 +1178,7 @@ function fn_handleKeyBoard() {
 			//const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
 			//modal.show();
 
-			showModal('#changespeed_modal', true);
+			js_common.showModal('#changespeed_modal', true);
 		}
 
 		/**
@@ -1260,7 +1236,7 @@ function fn_handleKeyBoard() {
 			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
 			// modal.show();
 
-			showModal('#changespeed_modal', true);
+			js_common.showModal('#changespeed_modal', true);
 		}
 
 		export function fn_changeUDPPort(p_andruavUnit, init_pot) {
@@ -1286,7 +1262,7 @@ function fn_handleKeyBoard() {
 			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
 			// modal.show();
 
-			showModal('#changespeed_modal', true);
+			js_common.showModal('#changespeed_modal', true);
 		}
 
 		/**
@@ -3380,7 +3356,7 @@ function fn_handleKeyBoard() {
 			// LOGIN		
 			if ((QueryString.email === null || QueryString.email === undefined) || (QueryString.accesscode === null || QueryString.accesscode === undefined)) {
 				// window.location.href = "http://example.com";
-				$('#txtUnitID').val('GCSMAP_' + js_helpers.fn_generateRandomString(3));
+				$('#txtUnitID').val('GCSMAP_' + js_common.fn_generateRandomString(3));
 
 			}
 			else {

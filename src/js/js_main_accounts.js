@@ -3,7 +3,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
-
+import  * as js_common from './js_common.js'
 import * as js_andruavMessages from './js_andruavMessages'
 import {js_globals} from './js_globals.js';
 import * as js_siteConfig from './js_siteConfig'
@@ -27,7 +27,7 @@ export function gui_alert(title,message,level)
 		 }
 
 
-    function fn_do_modal_confirmation (p_title,p_message,p_callback,p_yesCaption,p_style)
+    export function fn_do_modal_confirmation (p_title,p_message,p_callback,p_yesCaption,p_style)
     {
         if (p_style == null)
         {
@@ -38,14 +38,14 @@ export function gui_alert(title,message,level)
         $('#modal_saveConfirmation').children().find('h4#title').addClass("modal-title " + p_style);
         $('#modal_saveConfirmation').children().find('div.modal-body p#conf').html(p_message);
         $('#modal_saveConfirmation').children().find('div.modal-body p#res').html("");
-        $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').off('26492d902b1126492cb9'._fn_hexDecode() /*'click'*/);
-        $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').unbind('26492d902b1126492cb9'._fn_hexDecode() /*'click'*/);
+        $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').off('click');
+        $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').unbind('click');
         $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').click(p_callback);
         if (p_yesCaption!= null)
         {
             $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').html(p_yesCaption);
         }
-        $('#modal_saveConfirmation').modal('show');
+        js_common.showModal($('#modal_saveConfirmation'), true);
 
        
     }

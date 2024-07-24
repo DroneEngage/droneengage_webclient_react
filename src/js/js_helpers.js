@@ -331,13 +331,7 @@ export function   fn_loadCss (path) {
         document.head.appendChild(style);
 }
 
-export function  fn_generateRandomString(length)
-{
-	// http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-	
-	return Array(length+1).join((Math.random().toString(36)+'00000000000000000').slice(2, 18)).slice(0, length);
 
-}
 
 
 export function  fn_doNothing (a)
