@@ -468,7 +468,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         const p_Power = p_andruavUnit.m_Power;
 
         if ((p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
-            return { v_battery_src:"./images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:"unknown"};
+            return { v_battery_src:"./images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:' ', temp:' '};
         
         var v_bat = p_Power._Mobile.p_Battery.PlugStatus + " ";
 		const batteryLevel = p_Power._Mobile.p_Battery.BatteryLevel;
@@ -497,7 +497,18 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
 		
 		}
 			 
-		return { m_battery_src: v_battery_src, css:v_bat,level:batteryLevel, charging: p_Power._Mobile.p_Battery.PlugStatus}; 
+        var temp_res = ' ? °C';
+        if (p_Power._Mobile.p_Battery.BatteryTemperature !== null && p_Power._Mobile.p_Battery.BatteryTemperature !== undefined)
+        {
+            temp_res = ' ' + p_Power._Mobile.p_Battery.BatteryTemperature + '°C';
+        }
+			 
+        var charging_res = ' ';
+        if (p_Power._Mobile.p_Battery.PlugStatus !== null && p_Power._Mobile.p_Battery.PlugStatus !== undefined)
+        {
+            charging_res = p_Power._Mobile.p_Battery.PlugStatus
+        }
+		return { m_battery_src: v_battery_src, css:v_bat,level:batteryLevel, charging: charging_res, temp: temp_res}; 
 	}
 
 
@@ -1338,10 +1349,10 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         {
             if (v_andruavUnit.m_isDE !== true) 
             {
-                rows.push (<div key={id +"__5"} className= 'col-1  padding_zero'><img className={v_battery_display.css}  src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level +'% ' + v_battery_display.charging }/></div>);
+                rows.push (<div key={id +"__5"} className= 'col-1  padding_zero'><img className={v_battery_display.css}  src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level +'% ' + v_battery_display.charging +  v_battery_display.temp }/></div>);
             }
             // add FCB battery
-            rows.push (<div  key={id +"fc1"} className= "col-1 padding_zero"><img className= {v_battery_display_fcb.css}   src={v_battery_display_fcb.m_battery_src}  title={"fcb batt: " +  parseFloat(v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryRemaining).toFixed(1) + "%  " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryVoltage/1000).toFixed(2).toString() + "v " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryCurrent/1000).toFixed(1).toString() + "A " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed).toFixed(1).toString() + " mAh " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryTemprature/1000).toFixed(1).toString() + "C"} /></div>);
+            rows.push (<div  key={id +"fc1"} className= "col-1 padding_zero"><img className= {v_battery_display_fcb.css}   src={v_battery_display_fcb.m_battery_src}  title={"fcb batt: " +  parseFloat(v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryRemaining).toFixed(1) +  '% ' + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryVoltage/1000).toFixed(2).toString() + "v " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryCurrent/1000).toFixed(1).toString() + "A " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed).toFixed(1).toString() + " mAh " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryTemprature/1000).toFixed(1).toString() + '°C'} /></div>);
             rows.push (<div  key={id +"fc2"} className= "col-1 padding_zero"  onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ></div>);
             rows.push (<div  key={id +"fc3"} className= "col-4 padding_zero text-end" onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2 } title={module_version} onClick={ (e)=> this.fn_changeUnitInfo(v_andruavUnit)} ><strong>{v_andruavUnit.m_unitName } </strong> {sys_id}<span className={' ' + online_class}>{online_text}</span></p></div>);
         }
@@ -1349,7 +1360,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         {
             if (v_andruavUnit.m_isDE !== true) 
             {
-                rows.push (<div key={id +"__5"} className= 'col-1  padding_zero'><img className={v_battery_display.css}  src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level +'% ' + v_battery_display.charging }/></div>);
+                rows.push (<div key={id +"__5"} className= 'col-1  padding_zero'><img className={v_battery_display.css}  src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level + '% ' + v_battery_display.charging +  v_battery_display.temp }/></div>);
             }
             // add FCB battery
             rows.push (<div key={id +"fc4"} className= "col-2 padding_zero"  onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ></div>);
