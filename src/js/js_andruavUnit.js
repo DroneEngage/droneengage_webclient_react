@@ -309,6 +309,7 @@ class C_GeoTags {
 
   fn_addDestinationPoint(p_lat, p_lng, p_alt, p_type) {
     if (this.p_DestinationPoint.type !== p_type) {
+      // type has changed so we need a new icon.
       this.p_DestinationPoint.m_needsIcon = true;
       this.p_DestinationPoint.type = p_type;
     }

@@ -4,6 +4,7 @@ import 'leaflet.pm/dist/leaflet.pm.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
+import '../css/css_planning.css';
 import '../css/css_gamepad.css';
 
 import 'leaflet.pm';

@@ -2473,34 +2473,34 @@ function fn_handleKeyBoard() {
 
 		var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
-			var marker_destination = p_andruavUnit.m_gui.m_marker_destination;
+			var gui = p_andruavUnit.m_gui;
 
 			if (((js_siteConfig.CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true))
 				&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type === js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION))
 			{
 				
-				if (marker_destination !== null && marker_destination  !== undefined)
+				if (gui.m_marker_destination !== null && gui.m_marker_destination  !== undefined)
 				{
-					js_leafletmap.fn_hideItem(marker_destination);
-					marker_destination = null;
+					js_leafletmap.fn_hideItem(gui.m_marker_destination);
+					gui.m_marker_destination = null;
 					p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon  = true;
 				}
 				return ;
 			}
 			var v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
-			if (marker_destination === null || marker_destination === undefined) {
-				marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
+			if (gui.m_marker_destination === null || gui.m_marker_destination === undefined) {
+				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,16]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setMarkerIcon(marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4));
+				js_leafletmap.fn_setMarkerIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4));
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			
 				
-			js_leafletmap.fn_setPosition(marker_destination,v_latlng)
+			js_leafletmap.fn_setPosition(gui.m_marker_destination,v_latlng)
 		};
 
 

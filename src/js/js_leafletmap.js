@@ -503,7 +503,7 @@ class CLeafLetAndruavMap {
         
         var v_popupAnchor = [-p_iconsize[0]/2,-p_iconsize[0]/2];
         if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
-            v_image = L.icon({
+            v_image = new L.icon({
                 iconUrl: p_image,
                 iconSize: p_iconsize,
                 iconAnchor: v_iconAnchor,
