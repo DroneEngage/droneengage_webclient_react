@@ -2242,7 +2242,9 @@ function fn_handleKeyBoard() {
 					case js_andruavUnit.VEHICLE_SUBMARINE:
 						p_andruavUnit.m_VehicleType_TXT = "Submarine";
 						return './images/submarine_gb_32x32.png';
-						
+					case js_andruavUnit.CONTROL_UNIT:
+						p_andruavUnit.m_VehicleType_TXT = "Control Unit";
+						return './images/antenna.png';	
 						default:
 						return './images/drone_3_32x32.png';
 				}

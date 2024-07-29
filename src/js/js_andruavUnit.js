@@ -28,13 +28,13 @@ export const VEHICLE_PLANE = 3;
 export const VEHICLE_ROVER = 4;
 export const VEHICLE_HELI = 5;
 export const VEHICLE_BOAT = 6;
-
 export const VEHICLE_SUBMARINE = 12;
-
 export const VEHICLE_GIMBAL = 15;
 export const VEHICLE_BUS = 997;
 export const VEHICLE_PERSON = 998;
 export const CONST_VEHICLE_GCS = 999;
+export const CONTROL_UNIT = 10001;
+
 
 //m_enum_userStatus
 export const CONST_ALIVE = 1;
