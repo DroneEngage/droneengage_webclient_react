@@ -3206,14 +3206,17 @@ class CAndruavClient {
         } url = url;
 
         if ("WebSocket" in window) {
-
             this.ws = new WebSocket(url);
             this.ws.parent = this;
             this.ws.sendex = function (msg, isbinary) {
                 if (isbinary === null || isbinary === undefined) {
                     isbinary = false;
                 }
-                Me.ws.send(msg, {binary: isbinary});
+                if (this.readyState === WebSocket.OPEN) {
+                    this.send(msg, {binary: isbinary});
+                }else {
+                    console.error("WebSocket is not yet open, cannot send message.");
+                }
             };
             // OnOpen callback of Websocket
             var Me = this;
