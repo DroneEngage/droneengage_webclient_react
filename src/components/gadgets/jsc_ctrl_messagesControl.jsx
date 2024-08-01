@@ -91,8 +91,8 @@ export  class ClssMESSAGE_LOG  extends React.Component {
 
     fn_clear (e)
     {
-        this.state.setState({'m_update':[]});
-        this.forceUpdate();
+        this.setState({'m_message':[]});
+        //this.forceUpdate();
     }
 
     componentWillUnmount () {
