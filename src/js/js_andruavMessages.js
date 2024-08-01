@@ -95,6 +95,10 @@ export const CONST_TYPE_AndruavMessage_Communication_Line_Status = 6510;
 export const CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH = 6511;
 export const CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE = 6512;
 
+export const CONST_TYPE_AndruavMessage_SDR_INFO = 6513;
+export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
+export const CONST_TYPE_AndruavMessage_SDR_STATUS = 6515;
+
 // System Messages
 export const CONST_TYPE_AndruavSystem_LoadTasks = 9001;
 export const CONST_TYPE_AndruavSystem_SaveTasks = 9002;
@@ -156,10 +160,12 @@ export const CONST_RemoteCommand_MISSION_COUNT = 507;
 export const CONST_RemoteCommand_MISSION_CURRENT = 508;
 
 // P2P Actions
-export const CONST_P2P_ACTION_RESTART_TO_MAC = 0;
-export const CONST_P2P_ACTION_CONNECT_TO_MAC = 1;
-export const CONST_P2P_ACTION_CANDICATE_MAC = 2;
-export const CONST_P2P_ACTION_SCAN_NETWORK = 3;
+export const CONST_P2P_ACTION_RESTART_TO_MAC  = 0;
+export const CONST_P2P_ACTION_CONNECT_TO_MAC  = 1;
+export const CONST_P2P_ACTION_CANDICATE_MAC   = 2;
+export const CONST_P2P_ACTION_SCAN_NETWORK    = 3;
+export const CONST_P2P_ACTION_ACCESS_TO_MAC   = 4;
+
 
 // FenceType
 export const CONST_TYPE_LinearFence = 1;
@@ -333,6 +339,7 @@ export const TYPE_MODULE_CLASS_COMM = "comm";
 export const TYPE_MODULE_CLASS_FCB = "fcb";
 export const TYPE_MODULE_CLASS_VIDEO = "camera";
 export const TYPE_MODULE_CLASS_P2P = "p2p";
+export const TYPE_MODULE_CLASS_SDR = "sdr";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
 export const TYPE_MODULE_CLASS_GPIO = "gpio";
 export const TYPE_MODULE_CLASS_GENERIC = "gen";

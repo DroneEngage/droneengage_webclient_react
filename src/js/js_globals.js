@@ -119,6 +119,7 @@ class GLOBALS {
 		this.EE_unitAdded                  = "EE_unitAdded";
 		this.EE_unitUpdated                = "EE_unitUpdated";
 		this.EE_unitP2PUpdated             = "EE_unitP2PUpdated";
+		this.EE_unitSDRUpdated             = "EE_unitSDRUpdated";
 		this.EE_unitNavUpdated             = "EE_unitNavUpdated";
 		this.EE_onSocketStatus             = "EE_onSocketStatus";
 		this.EE_onSocketStatus2            = "EE_onSocketStatus2";

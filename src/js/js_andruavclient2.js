@@ -763,11 +763,17 @@ class CAndruavClient {
 
     API_requestP2P(p_partyID) {
         var msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO
+            C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION
         };
         this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
+    API_requestSDR(p_partyID) {
+        var msg = {
+            C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO
+        };
+        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+    };
 
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -1666,7 +1672,16 @@ class CAndruavClient {
                 p_unit.m_Nav_Info.p_Location.lat = p_jmsg.la;
                 p_unit.m_Nav_Info.p_Location.lng = p_jmsg.ln
                 p_unit.m_Nav_Info.p_Location.alt = parseFloat(p_jmsg.a);
-                p_unit.m_Nav_Info.p_Location.time = p_jmsg.t;
+                
+                
+                if (p_jmsg.hasOwnProperty('t')) {
+                    p_unit.m_Nav_Info.p_Location.time = p_jmsg.t;
+                }
+                else
+                {
+                    p_unit.m_Nav_Info.p_Location.time = Date.now(); 
+                }
+                
                 if (p_jmsg.hasOwnProperty('s')) {
                     p_unit.m_Nav_Info.p_Location.ground_speed = parseFloat(p_jmsg.s); // can be null
                 }
@@ -2041,7 +2056,8 @@ class CAndruavClient {
 
                     }
                     
-                    if ((p_jmsg.hasOwnProperty('p2') === true) && (p_unit.m_P2P.m_initialized===false))
+                    
+                    if ((p_unit.m_modules.has_p2p === true) && (p_unit.m_P2P.m_initialized===false))
                     {
                         // retrieve p2p data if exists.
                         if (p_unit.m_delayedTimeout!== null && p_unit.m_delayedTimeout !== undefined)
@@ -2054,6 +2070,19 @@ class CAndruavClient {
                             }, 1000);
                     }
 
+                    if ((p_unit.m_modules.has_sdr === true) && (p_unit.m_SDR.m_initialized===false))
+                    {
+                        // retrieve SDR data if exists.
+                        if (p_unit.m_delayedTimeout!== null && p_unit.m_delayedTimeout !== undefined)
+                        {
+                            clearTimeout(p_unit.m_delayedTimeout);
+                            p_unit.m_delayedTimeout = null;
+                        }
+                        p_unit.m_delayedTimeout = setTimeout(function () {
+                                Me.API_requestSDR(p_unit.partyID);
+                            }, 1000);
+                    }
+    
                     if (v_trigger_on_swarm_status) {
                         js_eventEmitter.fn_dispatch("EVT_andruavUnitSwarmUpdated", p_unit);
                     }
@@ -2087,10 +2116,29 @@ class CAndruavClient {
                         js_eventEmitter.fn_dispatch("EVT_andruavUnitModuleUpdated", p_unit);
                     } 
                         
-                }
+            }
+            break;
 
-                break;
-            
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO: {
+                if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
+                    Me.API_requestID(msg.senderName);
+                    return;
+                }
+                p_jmsg = msg.msgPayload;
+                p_unit.m_SDR.m_initialized              = true;
+                p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
+                p_unit.m_SDR.m_frequency                = p_jmsg.f;
+                p_unit.m_SDR.m_band_width               = p_jmsg.b;
+                p_unit.m_SDR.m_gain                     = p_jmsg.g;
+                p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
+                p_unit.m_SDR.m_decode_mode              = p_jmsg.m;
+                p_unit.m_SDR.m_sdr_connected            = true;
+
+                
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+            }
+            break;
+
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO: {
                 if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);

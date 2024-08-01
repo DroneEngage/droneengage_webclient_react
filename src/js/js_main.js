@@ -2244,7 +2244,7 @@ function fn_handleKeyBoard() {
 						return './images/submarine_gb_32x32.png';
 					case js_andruavUnit.CONTROL_UNIT:
 						p_andruavUnit.m_VehicleType_TXT = "Control Unit";
-						return './images/antenna.png';	
+						return './images/tower_cl_32x32.png';	
 						default:
 						return './images/drone_3_32x32.png';
 				}
@@ -2286,6 +2286,7 @@ function fn_handleKeyBoard() {
 															opacity: 0.8,
 															weight: 5,
 															dashArray: '5, 5'
+															
 															};
 
 

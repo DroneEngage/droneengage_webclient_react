@@ -6,11 +6,11 @@
 
 import React    from 'react';
 
-import * as js_siteConfig from '../../js/js_siteConfig'
-import {js_globals} from '../../js/js_globals.js';
-import * as js_andruavMessages from '../../js/js_andruavMessages'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
-import {js_andruavAuth} from '../../js/js_andruavAuth'
+import * as js_siteConfig from '../../../js/js_siteConfig.js'
+import {js_globals} from '../../../js/js_globals.js';
+import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
 
 import {CLASS_CTRL_P2P_IN_RANGE_NODEs} from './jsc_ctrl_p2p_inrange_nodes.jsx'
 import {CLASS_CTRL_P2P_IN_RANGE_BSSIDs} from './jsc_ctrl_p2p_inrange_bssid.jsx'

@@ -42,6 +42,7 @@ export const CONST_FEATURE =
     DISABLE_SWARM: false,
     DISABLE_SWARM_DESTINATION_PONTS: false,
     DISABLE_P2P: false,
+    DISABLE_SDR: false,
     DISABLE_VOICE: false,
 };
 

@@ -7,9 +7,9 @@
 import React    from 'react';
 
 
-import * as js_helpers from '../../js/js_helpers'
-import {js_globals} from '../../js/js_globals.js';
-import {js_eventEmitter} from '../../js/js_eventEmitter'
+import * as js_helpers from '../../../js/js_helpers.js'
+import {js_globals} from '../../../js/js_globals.js';
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 
 
 

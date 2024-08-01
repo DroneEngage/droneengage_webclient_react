@@ -363,8 +363,8 @@ class C_SignalStatus {
 }
 class C_P2P {
   constructor(p_parent) {
-    this.m_initialized = false;
     this.m_parent = p_parent;
+    this.m_initialized = false;
     this.m_address_1 = "";
     this.m_address_2 = "";
     this.m_wifi_channel = 0;
@@ -387,6 +387,22 @@ class C_P2P {
     if (mac === this.m_address_1 || mac === this.m_address_2) return true;
 
     return false;
+  }
+}
+
+
+class C_SDR {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    this.m_initialized = false;
+    this.m_type = '';
+    this.m_center_frequency = 0.0;
+    this.m_frequency = 0.0;
+    this.m_band_width = 0.0;
+    this.m_sample_rate = 0.0;
+    this.m_gain = 0.0;
+    this.m_decode_mode = 0;
+    this.m_sdr_connected = false;
   }
 }
 
@@ -558,6 +574,8 @@ class C_Modules {
     this.has_camera = false;
     this.has_sound = false;
     this.has_gpio = false;
+    this.has_p2p = false;
+    this.has_sdr = false;
     this.m_list = [];
   }
 
@@ -584,7 +602,15 @@ class C_Modules {
         case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
           this.has_sound = true;
           break;
+
+        case js_andruavMessages.TYPE_MODULE_CLASS_P2P:
+					this.has_p2p = true;	
+				  break;
           
+        case js_andruavMessages.TYPE_MODULE_CLASS_SDR:
+          this.has_sdr = true;	
+          break;
+            
         default:
           break;
       }
@@ -736,6 +762,7 @@ export class CAndruavUnitObject {
 
     this.m_Swarm = new C_Swarm(this);
     this.m_P2P = new C_P2P(this);
+    this.m_SDR = new C_SDR(this);
     Object.seal(this.m_Swarm);
     Object.seal(this.m_P2P);
     this.m_SignalStatus = new C_SignalStatus(this);
