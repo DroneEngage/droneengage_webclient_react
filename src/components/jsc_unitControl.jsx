@@ -25,7 +25,8 @@ import {fn_changeSpeed, fn_do_modal_confirmation,
 import { mavlink20 } from '../js/js_mavlink_v2.js';
 
 import {ClssCTRL_SETTINGS} from './gadgets/jsc_ctrl_settingsControl.jsx'
-import {ClssCTRL_P2P} from './gadgets/jsc_ctrl_p2p.jsx'
+import {ClssCTRL_P2P} from './gadgets/p2p/jsc_ctrl_p2p.jsx'
+import {ClssCTRL_SDR} from './gadgets/sdr/jsc_ctrl_sdr.jsx'
 
 import {ClssCTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
 import {ClssMESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.
@@ -1373,7 +1374,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
          
 
         container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
+                        <a className="nav-link user-select-none active" data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
                         </li>);
         container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
                         <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
@@ -1390,6 +1391,13 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
             </li>);
         }
        
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
+                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}>SDR</a>
+            </li>);
+        }
+           
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (v_andruavUnit.m_modules.has_sound === true)  || (v_andruavUnit.m_isDE === false)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
@@ -1417,10 +1425,17 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
-                <ClssCTRL_P2P p_unit={v_andruavUnit}/>
-                </div>);
+                            <ClssCTRL_P2P p_unit={v_andruavUnit}/>
+                    </div>);
         }
 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        {
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
+                            <ClssCTRL_SDR p_unit={v_andruavUnit}/>
+                     </div>);
+        }
+    
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
             container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
