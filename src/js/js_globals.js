@@ -7,7 +7,6 @@ class GLOBALS {
 		this.v_andruavClient = null;
 		this.m_andruavUnitList = null;
  		// auto connect variables
-		this.v_connectState 	 = false;  	
 		this.v_connectRetries  = 5;  	
 
 		this.v_map_shapes = [];

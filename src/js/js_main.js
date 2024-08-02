@@ -1819,7 +1819,6 @@ function fn_handleKeyBoard() {
 		var EVT_onOpen = function () {
 			$('#andruavUnitGlobals').show();
 
-			js_globals.v_connectState = true;
 			js_globals.v_connectRetries = 0;
 		}
 
@@ -3066,39 +3065,29 @@ function fn_handleKeyBoard() {
 		}
 
 
-
-		export function fn_connect() {
-
-			if ((js_andruavAuth.fn_logined() === true) && (js_globals.v_connectState !== true)) {
-				js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-				if ( js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined) {
-					js_globals.v_andruavClient.API_delMe();
-				}
-				return;
-			}
-			else 
-			{
-				js_andruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-			}
-
-			if (js_andruavAuth.logined === false) {
+		function fn_login() {
+			js_andruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+			if (js_andruavAuth.fn_logined() !== true) {
 				// TODO: Replace Messenger REACT2
 				// Messenger().post({
 				// 	type: 'p_error',
 				// 	message: js_andruavAuth.m_errorMessage
 				// });
 
-				if (js_globals.v_connectState === true) {
-					setTimeout(fn_connect, 4000);
-				}
+				setTimeout(fn_connect, 4000);
 
 				return;
 			}
 
 			// create a group object
-			if ( js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) {
+			if (js_andruavclient2.AndruavClient.getSocketStatus() !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED )
+			{
 
-				if (js_andruavAuth.fn_logined() === false) return;
+				if (js_andruavAuth.fn_logined() === false) 
+				{
+					js_common.fn_console_log ("js_andruavAuth.fn_logined() === false");
+					return;
+				}
 				js_globals.v_andruavClient = js_andruavclient2.AndruavClient;
 
 				js_globals.v_andruavClient.partyID = ($('#txtUnitID').val()+$('#txtUnitID_ext').val()).replace('#','_');
@@ -3142,10 +3131,44 @@ function fn_handleKeyBoard() {
 
 				js_globals.v_andruavClient.fn_connect(js_andruavAuth.fn_getSessionID());
 			}
-			else {
-				js_globals.v_andruavClient.API_delMe();
+		}
 
+
+		function fn_logout() {
+			js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+			js_andruavclient2.AndruavClient.API_delMe();
+		}
+
+		export function fn_connect() {
+			if (js_andruavclient2.AndruavClient.isSocketConnectionDone()===true)
+			{
+				fn_logout();
 			}
+			else
+			{
+				fn_login();
+			}
+			// if ((js_andruavAuth.fn_logined() === true) && (js_globals.v_connectState !== true)) {
+			// 	js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+			// 	if (( js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined)
+			// 		&& ((js_andruavclient2.AndruavClient.getSocketStatus() === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED ))) {
+			// 		js_globals.v_andruavClient.API_delMe();
+			// 		return;
+			// 	}
+				
+			// }
+			// else 
+			// {
+				
+			// }
+
+			
+
+			
+			// else {
+			// 	js_globals.v_andruavClient.API_delMe();
+
+			// }
 
 
 		};

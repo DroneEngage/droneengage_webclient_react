@@ -138,6 +138,7 @@ class CAndruavClient {
         this.andruavGeoFences = {};
         this.videoFrameCount = 0;
         this.socketStatus = js_andruavMessages.CONST_SOCKET_STATUS_FREASH;
+        this.socketConnectionDone = false;
         
         
         
@@ -357,7 +358,8 @@ class CAndruavClient {
 
     API_delMe() {
         const c_msg = {};
-
+        this.socketConnectionDone  = false;
+            
         this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer, c_msg);
     };
 
@@ -2644,8 +2646,8 @@ class CAndruavClient {
         }
 
         if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-
-
+            js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
+            this.socketConnectionDone  = true;
             this.API_sendID(); // send now important
             var Me = this;
             this.timerID = setInterval(function () {
@@ -2662,13 +2664,22 @@ class CAndruavClient {
         js_eventEmitter.fn_dispatch(js_globals.EE_onSocketStatus2, {status:status, name: c_SOCKET_STATUS[status - 1]});
     };
 
+    getSocketStatus()
+    {
+        return this.socketStatus;
+    }
+
+    isSocketConnectionDone()
+    {
+        return this.socketConnectionDone;
+    }
 
     prv_parseSystemMessage(Me, msg) {
         if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_ConnectedCommServer) {
             if (msg.msgPayload.s.indexOf('OK:connected') !== -1) {
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
-
+                
             } else { /*Me.onLog ("connection refused");*/
             }
 
@@ -3269,7 +3280,7 @@ class CAndruavClient {
             // OnOpen callback of Websocket
             var Me = this;
             this.ws.onopen = function () {
-                js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
+                // js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
 
             };
 
