@@ -56,11 +56,6 @@ export class ClssLoginControl extends React.Component {
 	clickConnect(e) {
 		// Getting an array of DOM elements
 		// Then finding which element was clicked
-		// if (js_globals.v_connectState === true) {
-		// 	js_globals.v_connectState = false;
-		// 	js_globals.v_connectRetries = 0;
-		// }
-
 		fn_connect();
 	}
 
