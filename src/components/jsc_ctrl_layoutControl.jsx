@@ -1,7 +1,7 @@
 import React    from 'react';
 import {js_localStorage} from '../js/js_localStorage'
 
-import {fn_applyControl, fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';
+import {fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';
 
 export class ClssCTRL_Layout extends React.Component {
     constructor(props) {
@@ -15,7 +15,7 @@ export class ClssCTRL_Layout extends React.Component {
     render() {
         const v_display_mode = js_localStorage.fn_getDisplayMode()%5+1;
         return (
-            <div id="main_btn_group"  role="group" aria-label="Basic example">
+            <div id="main_btn_group"  role="group" >
                 <button type="button" id="btn_showSettings" className="btn btn-success btn-sm ctrlbtn" title='Show/Hide Settings Section' onClick={(e) => fn_showSettings()}><strong>SETTINGS</strong></button>
                 <button type="button" id="btn_showMap" className="btn btn-danger btn-sm ctrlbtn" title='Show Map (ctrl+m)' onClick={(e) => fn_showMap()}><strong>MAP</strong></button>
                 <button type="button" id="btn_showVideo" className="btn btn-warning btn-sm ctrlbtn" title='Show Video (ctrl+r)' onClick={(e) => fn_showVideoMainTab()}><strong>CAMERA</strong></button>

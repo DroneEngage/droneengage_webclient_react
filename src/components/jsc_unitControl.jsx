@@ -721,7 +721,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         }
 
         // calculate Total Time
-        const c_delta = v_andruavUnit.m_FlyingLastStartTime==0?0.0:v_andruavUnit.m_FlyingLastStartTime;
+        const c_delta = v_andruavUnit.m_FlyingLastStartTime === 0?0.0:v_andruavUnit.m_FlyingLastStartTime;
         v_totalFlyingTime = js_helpers.fn_getTimeDiffDetails_Shortest ( (c_delta + v_andruavUnit.m_FlyingTotalDuration));
         
         

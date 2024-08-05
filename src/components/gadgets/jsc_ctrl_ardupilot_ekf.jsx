@@ -37,7 +37,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
     getCss (value)
     {
         var ret = new C_GUI_READING_VALUE();
-        if (value == undefined) 
+        if (value === null || value === undefined) 
         {
             value = 'na';
         }
@@ -48,7 +48,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         
         ret.value = value;
 
-        if ((value == null) || (value===0.0)) 
+        if ((value === null || value === undefined) || (value === 0.0)) 
         {
             ret.css = 'bg-none text-muted ';
         }else

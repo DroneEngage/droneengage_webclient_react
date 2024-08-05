@@ -136,7 +136,7 @@ class ClssUserEntry extends  React.Component {
                         <td key={this.props.prop_single_item.acc} scope='row'>{this.props.prop_single_item.acc}</td>
                         <td><input type="text" className={"form-control " + cls_color } id="prop_val_new"  value={String(this.state.single_item.pwd)} onChange={(e) => this.fn_onParamChanged(e,'pwd')}/></td>
                         <td>
-                            <div className="btn-group" role="group" aria-label="Basic example">
+                            <div className="btn-group" role="group" >
                                 <button className={"btn btn-warning btn-sm btn_prop" + class_modify}  onClick={(e) => this.fn_saveParameter(e)}>Save</button>
                                 <button className={"btn btn-danger btn-sm btn_prop" + class_modify}  onClick={(e) => this.fn_deleteParameter(this.props.prop_single_item)}>Del</button>
                             </div>
@@ -159,7 +159,7 @@ class ClssUserEntry extends  React.Component {
                         <td key={"new_user"} scope="row"><input type="text" className={"form-control " + cls_color } id="prop_val_acc" onChange={(e) => this.fn_onParamChanged(e,'acc')} /></td>
                         <td><input type="text" className={"form-control " + cls_color } id="prop_val_pwd" onChange={(e) => this.fn_onParamChanged(e,'pwd')} /></td>
                         <td>
-                            <div className="btn-group" role="group" aria-label="Basic example">
+                            <div className="btn-group" role="group" >
                                 <button className={"btn btn-warning btn-sm btn_prop"}  onClick={(e) => this.fn_addParameter(this.state.single_item)}>Add</button>
                             </div>
                         </td>
@@ -261,7 +261,7 @@ class ClssUserList extends React.Component {
 
     fn_createParametersCtrl ()
     {
-        if ((this.state.users==null) || (this.state.users.length==0))
+        if ((this.state.users === null || this.state.users === undefined) || (this.state.users.length === 0))
         {
            return (
             <div className='flex-column row margin_zero text-center'>

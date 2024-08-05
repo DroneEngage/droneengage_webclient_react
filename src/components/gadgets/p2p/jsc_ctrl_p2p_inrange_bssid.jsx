@@ -162,7 +162,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
         });
         
         var rendered=[];
-        if (v_units.length==0)
+        if (v_units.length === 0)
         {
             rendered.push(
                 <div key={v_andruavUnit.partID+'rnbssid_00'} className='row css_margin_zero padding_zero border-top border-secondary' >
