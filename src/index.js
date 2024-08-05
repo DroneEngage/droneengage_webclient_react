@@ -3,7 +3,6 @@
 import React  from "react"; 
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import $ from 'jquery';
 
 import Layout from "./pages/Layout";
 import Home from "./pages/home";

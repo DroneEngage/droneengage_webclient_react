@@ -308,6 +308,13 @@ export default class ClssGamePadControl extends React.Component {
             {
                 function add (Me,p_index)
                 {
+                    /*
+                    As per AI
+                    I should use 
+                    gamepads.push(
+                    <button key={'gppu'+gamepad.id} className="dropdown-item" onClick={(e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</button>
+                    );
+                    */
                     gamepads.push(
                         <a key={'gppu'+gamepad.id} className="dropdown-item" href="#" onClick={ (e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</a>
                     );

@@ -399,7 +399,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             res.terH.css = ' text-white ';
         }
         
-        if (p_andruavUnit.m_DistanceSensors[mavlink20.MAV_SENSOR_ROTATION_PITCH_270].m_isValid!=true)
+        if (p_andruavUnit.m_DistanceSensors[mavlink20.MAV_SENSOR_ROTATION_PITCH_270].m_isValid !== true)
         {
             res.lidar.value = 'NA';
             res.lidar.css = ' text-muted ';

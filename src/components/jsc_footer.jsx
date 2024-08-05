@@ -2,7 +2,6 @@ import packageJson from  '../../package.json'
 
 import React from 'react';
 import * as  js_siteConfig from '../js/js_siteConfig.js';
-import {js_globals} from '../js/js_globals.js'
 
 export default class ClssFooterControl extends React.Component {
 	constructor()

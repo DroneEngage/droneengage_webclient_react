@@ -41,10 +41,10 @@ class ClssParameterItem extends  React.Component {
     fn_onParamChanged(e)
     {
        
-    
-        this.props.prop_param.modified_value = $('#' + e.target.id).val();
+        const val  = $('#' + e.target.id).val();
+        this.props.prop_param.modified_value = val;
         this.props.prop_param.is_dirty = true;
-        if ((this.props.prop_param.modified_value=="") || (isNaN(this.props.prop_param.modified_value) === true))
+        if ((val === "" || val === null || val === undefined) || (isNaN(val) === true))
         {
             this.props.prop_param.is_valid = false;
         }
@@ -122,10 +122,10 @@ class ClssParametersList extends  React.Component {
             {
                         
                             
-                for (var i =0; i<c_len; ++i) 
+                for (let i =0; i<c_len; ++i) 
                 {
                     const c_parameter_message = c_list[c_keys[i]];
-                    if ((this.props.prop_search == "" ) || (c_parameter_message.param_id.toUpperCase().includes(this.props.prop_search)))
+                    if ((this.props.prop_search === "" || this.props.prop_search === null  || this.props.prop_search === undefined ) || (c_parameter_message.param_id.toUpperCase().includes(this.props.prop_search)))
                     {
                         p_params.push(<ClssParameterItem prop_unit={this.props.prob_unit} prop_param_value={c_parameter_message.param_value} prop_param={c_parameter_message} key={c_parameter_message.param_index}/>);
                     }
@@ -264,7 +264,7 @@ export default class ClssUnitParametersList extends React.Component {
 
     fn_createParametersCtrl (p_andruavUnit)
     {
-        if ((p_andruavUnit!=null) && (Object.keys(p_andruavUnit.m_FCBParameters.m_list_by_index_shadow).length==0))
+        if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (Object.keys(p_andruavUnit.m_FCBParameters.m_list_by_index_shadow).length === 0))
         {
             // Maybe parameters are not loaded ... send reload request.
             js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
@@ -289,7 +289,7 @@ export default class ClssUnitParametersList extends React.Component {
                         
                 <div key='params' id="parameters_sublist">
                     <div >
-                        <div className="btn-group" role="group" aria-label="Basic example">
+                        <div className="btn-group" role="group" >
                             <button type="button" className="btn btn-danger btn-sm ctrlbtn"   title='Save all changes' onClick={(e) => this.fn_saveAll()}>SAVE</button>
                             <button type="button" className="btn btn-warning btn-sm ctrlbtn"  title='Reset to current values' onClick={(e) => this.fn_resetAll(e)}>RESET</button>
                             <button type="button" className="btn btn-success btn-sm ctrlbtn"  title='Reload parameter from FCB' onClick={(e) => this.fn_reloadAll(e)}>RELOAD</button>
