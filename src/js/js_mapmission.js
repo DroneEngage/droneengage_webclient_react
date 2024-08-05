@@ -181,7 +181,7 @@ export class ClssAndruavMissionPlan
 	fn_showMarkers ()
 	{
 		const v_len =this.v_markers.length;
-		if (v_len ===0) return ;
+		if (v_len === 0) return ;
 
 		for (let i=0;i<v_len;++i)
 		{
@@ -442,7 +442,7 @@ export class ClssAndruavMissionPlan
 
 	fn_exportToJSONAndruav (p_missionV110, p_PartyID)
 	{
-		if (this.v_markers.length ===0)	 return;
+		if (this.v_markers.length === 0)	 return;
 		
 		// var v_cmd = ClssAndruavResala_WayPoints.fn_toJSON(this.v_markers);
 		

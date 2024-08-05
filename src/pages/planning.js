@@ -88,7 +88,7 @@ const Planning = () => {
 				</div>
 				<div id="row_2" className="col col-sm-6 col-md-4">
 					<div className="row">	
-						<div id="main_btn_group" className="btn-group" role="group" aria-label="Basic example"><button
+						<div id="main_btn_group" className="btn-group" role="group" ><button
 							type="button" id="btn_missions" className="btn btn-success btn-sm button_large">Mission Plans</button><button
 							type="button" id="btn_geofences" className="btn btn-success btn-sm button_large">Geo Fences</button>
 						</div>

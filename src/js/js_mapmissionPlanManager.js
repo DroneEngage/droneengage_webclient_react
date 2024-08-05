@@ -51,7 +51,7 @@ class ClssAndruavMissionPlanManager
 	fn_activateNextMission (v_id2)
 	{
 		var p_keys = Object.keys(this.m_missionPlans);
-		if ((p_keys === undefined) || (p_keys ===null) || (p_keys.length ===0))
+		if ((p_keys === undefined) || (p_keys === null) || (p_keys.length === 0))
 		{
 			return null;
 		}

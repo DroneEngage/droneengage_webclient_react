@@ -128,7 +128,7 @@ import $ from 'jquery';
             var Me = this;
             setInterval(function () {
                 // dont call 
-                if ((Me.lat=== null || Me.lat === undefined) || (Me.radius ===0)) return ;
+                if ((Me.lat === null || Me.lat === undefined) || (Me.radius === 0)) return ;
     
                 Me.fn_getADSBData(Me.lat,Me.lng,undefined,Me.radius);
                 

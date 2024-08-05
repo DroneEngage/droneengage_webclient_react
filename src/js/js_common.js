@@ -6,12 +6,7 @@
  * 
  */
 
-import React    from 'react';
-import ReactDOM from "react-dom/client";
-
-
 import $ from 'jquery';
-import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Modal from 'bootstrap/js/dist/modal';
 import * as  js_siteConfig from './js_siteConfig.js'
 

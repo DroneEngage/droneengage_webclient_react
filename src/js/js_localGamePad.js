@@ -281,7 +281,7 @@ class CAndruavGamePad {
                 this.v_lastUpdateSent = c_now;
             }
         }
-        else if (c_padStatus.p_ctrl_type==GAME_XBOX_360_MICROSOFT)
+        else if (c_padStatus.p_ctrl_type === GAME_XBOX_360_MICROSOFT)
         {
 
             for (var j = 0; j < 4; ++ j) {
@@ -296,9 +296,9 @@ class CAndruavGamePad {
                 this.v_lastUpdateSent = c_now;
             }
 
-            var v_buttonChanged = false;
+            let v_buttonChanged = false;
 
-            for (var i = 0; i <= 5; ++ i) {
+            for (let i = 0; i <= 5; ++ i) {
                 const c_pressed = p_gamepad.buttons[i].pressed;
                 if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
                     v_buttonChanged = true;
@@ -313,7 +313,7 @@ class CAndruavGamePad {
                     }
                 } else {
                     if ((c_pressed === true) && (c_padStatus.p_buttons[i].m_longPress === false) && ((Date.now() - c_padStatus.p_buttons[i].m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS)) { // long press
-                        var v_Packet = {};
+                        let v_Packet = {};
                         v_Packet.p_buttonIndex = i;
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         c_padStatus.p_buttons[i].m_longPress = true;
@@ -348,9 +348,9 @@ class CAndruavGamePad {
                 this.v_lastUpdateSent = c_now;
             }
 
-            var v_buttonChanged = false;
+            let v_buttonChanged = false;
 
-            for (var i = 0; i <= 5; ++ i) {
+            for (let i = 0; i <= 5; ++ i) {
                 const c_pressed = p_gamepad.buttons[i].pressed;
                 if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
                     v_buttonChanged = true;
@@ -358,14 +358,14 @@ class CAndruavGamePad {
                     c_padStatus.p_buttons[i].m_timestamp = Date.now();
                     c_padStatus.p_buttons[i].m_longPress = false;
                     if (v_buttonChanged === true) {
-                        var v_Packet = {};
+                        let v_Packet = {};
                         v_Packet.p_buttonIndex = i;
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
                     }
                 } else {
                     if ((c_pressed === true) && (c_padStatus.p_buttons[i].m_longPress === false) && ((Date.now() - c_padStatus.p_buttons[i].m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS)) { // long press
-                        var v_Packet = {};
+                        let v_Packet = {};
                         v_Packet.p_buttonIndex = i;
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         c_padStatus.p_buttons[i].m_longPress = true;

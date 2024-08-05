@@ -1,8 +1,6 @@
 import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
-import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Modal from 'bootstrap/js/dist/modal';
 import  * as js_common from './js_common.js'
 import * as js_andruavMessages from './js_andruavMessages'
 import {js_globals} from './js_globals.js';

@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 
 import $ from 'jquery';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Modal from 'bootstrap/js/dist/modal';
+
 
 import RecordRTC from 'recordrtc';
 
@@ -48,7 +48,6 @@ var v_contextMenuOpen = false;
 
 
 
-var elevator;
 
 export var QueryString = function () {
 	// This function is anonymous, is executed immediately and 
@@ -2909,6 +2908,10 @@ function fn_handleKeyBoard() {
 						geoFenceInfo.Units = oldgeoFenceInfo.Units; // copy attached units
 						oldgeoFenceInfo = geoFenceInfo; // assume new fence is updated one.
 					}
+
+					break;
+				
+				default:
 
 					break;
 			}
