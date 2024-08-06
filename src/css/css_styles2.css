@@ -1025,3 +1025,6 @@ div#displays
 }
 
 
+.leaflet-control-attribution.leaflet-control  a:first-child {
+    display: none;
+}
