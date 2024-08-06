@@ -61,6 +61,12 @@ export class CWayPointLocation extends React.Component {
                 return "ter";            
             }
             break;
+
+            default:
+            {
+                return "na";            
+            }
+            break;
         }
     }
 

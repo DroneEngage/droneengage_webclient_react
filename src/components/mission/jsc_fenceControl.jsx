@@ -44,7 +44,7 @@ class ClssFenceAction extends React.Component {
 
     render ()
     {
-        const selected_value = (this.props.shape.m_geofenceInfo.isHardFence==null?0:this.props.shape.m_geofenceInfo.isHardFence);
+        const selected_value = ((this.props.shape.m_geofenceInfo.isHardFence === null ||  this.props.shape.m_geofenceInfo.isHardFence === undefined)?0:this.props.shape.m_geofenceInfo.isHardFence);
         return (
                 <div className="form-group text-left"><label className="control-label">Fence Action </label>
                 <select id='sel' className="form-control" onChange={(e) => this.fn_onSelect(e)} value={selected_value}>

@@ -95,24 +95,24 @@ export class CWayPointAction extends React.Component {
         if (this.speed.fn_getValue() != null)
         {
             this.props.p_shape.m_missionItem.speed = parseFloat(this.speed.fn_getValue());
-            this.props.p_shape.m_missionItem.m_speedRequired = (this.props.p_shape.m_missionItem.speed != null);
+            this.props.p_shape.m_missionItem.m_speedRequired = (this.props.p_shape.m_missionItem.speed !== null && this.props.p_shape.m_missionItem.speed !== undefined);
         }
 
         if (this.yaw.fn_getValue() != null)
         {
             this.props.p_shape.m_missionItem.yaw = parseFloat(this.yaw.fn_getValue());
-            this.props.p_shape.m_missionItem.m_yawRequired = (this.props.p_shape.m_missionItem.yaw != null) ;
+            this.props.p_shape.m_missionItem.m_yawRequired = (this.props.p_shape.m_missionItem.yaw !== null && this.props.p_shape.m_missionItem.yaw !== undefined) ;
         }
        
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
 		{
             this.props.p_shape.m_missionItem.eventFire = this.eventFire.fn_getValue();
-            this.props.p_shape.m_missionItem.eventFireRequired = (this.props.p_shape.m_missionItem.eventFire != null);
+            this.props.p_shape.m_missionItem.eventFireRequired = (this.props.p_shape.m_missionItem.eventFire !== null && this.props.p_shape.m_missionItem.eventFire  !== undefined);
         
             if (this.eventWait.fn_getValue() != null)
             {
                 this.props.p_shape.m_missionItem.eventWait = parseInt(this.eventWait.fn_getValue()) ;
-                this.props.p_shape.m_missionItem.eventWaitRequired = (this.props.p_shape.m_missionItem.eventWait != null);
+                this.props.p_shape.m_missionItem.eventWaitRequired = (this.props.p_shape.m_missionItem.eventWait !== null && this.props.p_shape.m_missionItem.eventWait !== undefined);
             }
         }
         
@@ -120,7 +120,7 @@ export class CWayPointAction extends React.Component {
 
     componentDidUpdate() 
     {
-        if (this.props.p_shape.m_missionItem.m_missionType ==0) this.props.p_shape.m_missionItem.m_missionType =1;
+        if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
         $('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id + ' #msnsel').val(this.props.p_shape.m_missionItem.m_missionType);
     }
     
