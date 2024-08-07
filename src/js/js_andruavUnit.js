@@ -402,7 +402,10 @@ class C_SDR {
     this.m_sample_rate = 0.0;
     this.m_gain = 0.0;
     this.m_decode_mode = 0;
-    this.m_sdr_connected = false;
+    this.m_driver = '';
+    this.m_driver_index = 0;
+    this.m_status = js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED;
+    this.m_available_drivers = {};
   }
 }
 

@@ -763,19 +763,38 @@ class CAndruavClient {
     };
 
 
-    API_requestP2P(p_partyID) {
+    API_requestP2P(p_andruavUnit) {
         var msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION
+            C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO
         };
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
-    API_requestSDR(p_partyID) {
+
+    API_requestSDR(p_andruavUnit) {
         var msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO
         };
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
-    };
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+    }
+
+
+    API_scanSDRDrivers(p_andruavUnit) {
+        var msg = {
+            C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
+            a: js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES
+
+        };
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute , msg);
+    }
+
+    API_scanSDRFreq(p_andruavUnit) {
+        var msg = {
+            a: js_andruavMessages.CONST_SDR_ACTION_READ_DATA
+
+        };
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION , msg);
+    }
 
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -784,17 +803,17 @@ class CAndruavClient {
             t: p_text
         };
         
-        if (p_language!='')
+        if (p_language !== '' && p_language != null && p_language !== undefined)
         {
             p_msg.l = p_language;
         }
 
-        if (p_pitch!='')
+        if (p_pitch !== '' && p_pitch != null && p_pitch !== undefined)
         {
             p_msg.p = p_pitch;
         }
 
-        if (p_volume!='')
+        if (p_volume !== '' && p_volume != null && p_volume !== undefined)
         {
             p_msg.v = p_volume;
         }
@@ -802,7 +821,6 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH, p_msg);
     }
 
-    // CODEBLOCK_START
 
     API_scanP2P(p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -813,8 +831,9 @@ class CAndruavClient {
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
     }
+
     
-    API_resetP2P(p_andruavUnit) {
+    API_resetP2P (p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
@@ -824,7 +843,7 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
     }
 
-    API_makeSwarm(p_andruavUnit, p_formationID) {
+    API_makeSwarm (p_andruavUnit, p_formationID) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
@@ -834,6 +853,42 @@ class CAndruavClient {
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_MakeSwarm, p_msg);
     }
+
+    API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
+        p_band_width, p_gain, p_sample_rate,
+        p_decode_mode, p_driver_index
+    )
+    {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        let p_msg = {
+            'a': js_andruavMessages.CONST_SDR_ACTION_SET_CONFIG
+        };
+        
+        if (p_fequency_center!== null)  p_msg.fc = p_fequency_center;
+        if (p_fequency!== null)         p_msg.f  = p_fequency;
+        if (p_band_width!== null)       p_msg.b  = p_band_width;
+        if (p_gain!== null)             p_msg.g  = p_gain;
+        if (p_sample_rate!== null)      p_msg.s  = p_sample_rate;
+        if (p_decode_mode!== null)      p_msg.m  = p_decode_mode;
+        if (p_driver_index!== null)     p_msg.i  = p_driver_index;
+        
+        js_common.fn_console_log (p_msg);
+        
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
+    }
+
+    API_activateSDR (p_andruavUnit)
+    {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        let p_msg = {
+            'a': js_andruavMessages.CONST_SDR_ACTION_CONNECT
+        };
+        
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
+    }
+
     // CODEBLOCK_END
 
     // API_updateSwarm(p_andruavUnit, p_action, p_slaveIndex, p_leaderPartyID) {
@@ -2068,7 +2123,7 @@ class CAndruavClient {
                             p_unit.m_delayedTimeout = null;
                         }
                         p_unit.m_delayedTimeout = setTimeout(function () {
-                                Me.API_requestP2P(p_unit.partyID);
+                                Me.API_requestP2P(p_unit);
                             }, 1000);
                     }
 
@@ -2134,9 +2189,28 @@ class CAndruavClient {
                 p_unit.m_SDR.m_gain                     = p_jmsg.g;
                 p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
                 p_unit.m_SDR.m_decode_mode              = p_jmsg.m;
-                p_unit.m_SDR.m_sdr_connected            = true;
+                p_unit.m_SDR.m_driver                   = p_jmsg.n;
+                p_unit.m_SDR.m_status                   = p_jmsg.c;
 
                 
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+            }
+            break;
+
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_STATUS: {
+                if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
+                    Me.API_requestID(msg.senderName);
+                    return;
+                }
+                p_jmsg = msg.msgPayload;
+                if (p_jmsg.dr===null)
+                {
+                    p_unit.m_SDR.m_available_drivers = [];
+                }
+                else
+                {
+                    p_unit.m_SDR.m_available_drivers = p_jmsg.dr;
+                }
                 js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
             }
             break;
@@ -2192,7 +2266,6 @@ class CAndruavClient {
 
 
                     // case js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA:
-                    //     // ////var jmsg = JSON.parse(msg.msgPayload);
                     //     if (p_jmsg.hasOwnProperty('fn')) { // fence name
                     //         var fenceName = p_jmsg.n;
                     //         Me.andruavGeoFences[fenceName];
@@ -2222,7 +2295,8 @@ class CAndruavClient {
             }
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_POW: 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_POW:
+            {
                 
                 p_jmsg = msg.msgPayload;
                 if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
@@ -2252,7 +2326,8 @@ class CAndruavClient {
                 }
 
                 js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_unit);
-                break;
+            }
+            break;
             case js_andruavMessages.CONST_TYPE_AndruavMessage_ExternalGeoFence: {
                     if (msg.senderName !== '_sys_') 
                         return;
@@ -2306,8 +2381,8 @@ class CAndruavClient {
                 }
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence: {
-
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence: 
+                {
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2728,7 +2803,7 @@ class CAndruavClient {
                 case mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ:
                     // BUG HERE WHEN COMMENTED IT WORKS
                     var  c_mst = null;
-                    if (c_mavlinkMessage.param_id[0]=='\x00')
+                    if (c_mavlinkMessage.param_id[0] === '\x00')
                     {
                         c_mst = p_unit.m_FCBParameters.m_list_by_index[c_mavlinkMessage.param_index];
                     }
@@ -2881,7 +2956,7 @@ class CAndruavClient {
 
                 case mavlink20.MAVLINK_MSG_ID_MISSION_CURRENT:
                 {
-                    if ((c_mavlinkMessage.mission_type==null) || (c_mavlinkMessage.mission_type==mavlink20.MAV_MISSION_TYPE_MISSION))
+                    if ((c_mavlinkMessage.mission_type === null || c_mavlinkMessage.mission_type === undefined) || (c_mavlinkMessage.mission_type==mavlink20.MAV_MISSION_TYPE_MISSION))
                     {
                         p_unit.m_Nav_Info._Target.wp_num = c_mavlinkMessage.seq;
                     }
@@ -3115,6 +3190,7 @@ class CAndruavClient {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_ServoOutput: 
+            {
                 var v_servoOutputs = {};
                 /*
 							 String message could be of any length and no padding applied.
@@ -3134,6 +3210,7 @@ class CAndruavClient {
                 v_servoOutputs.m_servo8 = v_values[7];
                 v_unit.m_Servo.m_values = v_servoOutputs;
                 js_eventEmitter.fn_dispatch(js_globals.EE_servoOutputUpdate, v_unit);
+            }
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_IMG: {

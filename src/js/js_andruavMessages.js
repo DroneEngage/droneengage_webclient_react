@@ -160,12 +160,24 @@ export const CONST_RemoteCommand_MISSION_COUNT = 507;
 export const CONST_RemoteCommand_MISSION_CURRENT = 508;
 
 // P2P Actions
-export const CONST_P2P_ACTION_RESTART_TO_MAC  = 0;
-export const CONST_P2P_ACTION_CONNECT_TO_MAC  = 1;
-export const CONST_P2P_ACTION_CANDICATE_MAC   = 2;
-export const CONST_P2P_ACTION_SCAN_NETWORK    = 3;
-export const CONST_P2P_ACTION_ACCESS_TO_MAC   = 4;
+export const CONST_P2P_ACTION_RESTART_TO_MAC      = 0;
+export const CONST_P2P_ACTION_CONNECT_TO_MAC      = 1;
+export const CONST_P2P_ACTION_CANDICATE_MAC       = 2;
+export const CONST_P2P_ACTION_SCAN_NETWORK        = 3;
+export const CONST_P2P_ACTION_ACCESS_TO_MAC       = 4;
 
+// SDR Actions
+export const CONST_SDR_ACTION_CONNECT             = 0;
+export const CONST_SDR_ACTION_DISCONNECT          = 1;
+export const CONST_SDR_ACTION_LIST_SDR_DEVICES    = 2;
+export const CONST_SDR_ACTION_SET_CONFIG          = 3;
+export const CONST_SDR_ACTION_READ_DATA           = 4;
+
+// SDR STATUS
+export const CONST_SDR_STATUS_NOT_CONNECTED = 0;
+export const CONST_SDR_STATUS_CONNECTED     = 1;
+export const CONST_SDR_STATUS_STREAMING     = 2;
+export const CONST_SDR_STATUS_ERROR         = 3;
 
 // FenceType
 export const CONST_TYPE_LinearFence = 1;
