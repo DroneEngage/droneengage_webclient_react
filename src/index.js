@@ -8,6 +8,7 @@ import Layout from "./pages/Layout";
 import Home from "./pages/home";
 import Planning from "./pages/planning";
 import Accounts from "./pages/accounts";
+import Test from "./pages/test";
 import NoPage from "./pages/NoPage";
 
 
@@ -25,6 +26,7 @@ export default function App2() {
           <Route path="planning"  element={<Planning />} />
           <Route path="mapeditor.html"  element={<Planning />} />
           <Route path="accounts"  element={<Accounts />} />
+          <Route path="test"  element={<Test />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
