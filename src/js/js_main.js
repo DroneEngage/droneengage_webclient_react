@@ -29,7 +29,6 @@ import { mavlink20 } from './js_mavlink_v2.js'
 
 import {ClssMainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
 
-const isNumber = require('is-number');
 
 var oldAppend = $.fn.append;
 
@@ -875,7 +874,7 @@ function fn_handleKeyBoard() {
 
 		function fn_setLapout () 
 		{
-			if ((QueryString.displaymode !== null && QueryString.displaymode !== undefined) || (isNumber(parseInt(QueryString.displaymode))))
+			if ((QueryString.displaymode !== null && QueryString.displaymode !== undefined) || (parseInt(QueryString.displaymode)))
 			{
 				fn_applyControl(QueryString.displaymode);
 			}
