@@ -5,10 +5,10 @@
  */
 
 import React    from 'react';
-import {js_globals} from '../../../js/js_globals.js';
-import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
-import * as js_andruavMessages from '../../../js/js_andruavMessages'
-
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import ClassSDRSpectrumVisualizer from './jsc_ctrl_sdr_spectrum.jsx'
 
 export class ClssCTRL_SDR extends React.Component {
     constructor(props)
@@ -246,7 +246,7 @@ export class ClssCTRL_SDR extends React.Component {
         return (
             <div key={v_andruavUnit.partyID + "_ctl_sdr"} className="">
                 <div key={v_andruavUnit.partyID + 'sdr_1'} className='row css_margin_zero padding_zero '>
-                    <div key={v_andruavUnit.partyID + 'sdr_11'} className="col-6 col-md-12 ">
+                    <div key={v_andruavUnit.partyID + 'sdr_11'} className="col-6 col-md-6 ">
                         <div key={v_andruavUnit.partyID + 'sdr_111'} className='row css_margin_zero padding_zero '>
                             {/* <p key={v_andruavUnit.partyID + 'sdr_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>SDR Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p> */}
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dr_name'} className="col-5">SDR Driver</label>
@@ -271,14 +271,8 @@ export class ClssCTRL_SDR extends React.Component {
                             <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5" placeholder="Gain" aria-label="Gain"  value={this.state.m_gain} onChange={(e)=> this.fn_onGain(e)}/>
                         </div>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-12 ">
+                    <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
                         
-                        <div key={v_andruavUnit.partyID + 'sdr_113'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>BW  <span className='text-warning' ><b>{v_andruavUnit.m_SDR.m_band_width}</b></span><span className="text-success">{}</span></b></small></span></p> */}
-                            <label className="col-5">Band Width</label>
-                            {/*<input type="text" className="col-5" placeholder="Bandwidth" aria-label="Bandwidth"  value={this.state.m_band_width} onChange={(e)=> this.fn_onBandWidth(e)}/>*/}
-                            <p  className="col-5" placeholder="Bandwidth" aria-label="Bandwidth">{this.state.m_band_width}</p>
-                        </div>
                         <div key={v_andruavUnit.partyID + 'sdr_211'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_modes'} className="col-5">Decode Mode</label>
                             <select multiple="" className="form-select" id={v_andruavUnit.partyID + 'sdr_dm_modes'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectDecodeModes(e)}>
@@ -294,7 +288,17 @@ export class ClssCTRL_SDR extends React.Component {
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_213'} className='row css_margin_zero padding_zero '>
                             {/* <p key={v_andruavUnit.partyID + 'sdr_2131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Status  <span className={css_parent_connected} ><b>{txt_parent_connected}</b></span></b></small></span></p> */}
+                            <label className="col-5">Sample Rate</label>
+                            <input type="text" className="col-5" placeholder="Sample Rate" aria-label="Sample Rate"  value={this.state.m_sample_rate} onChange={(e)=> this.fn_onSampleRate(e)}/>
+                        
                         </div>
+                        <div key={v_andruavUnit.partyID + 'sdr_113'} className='row css_margin_zero padding_zero '>
+                            {/* <p key={v_andruavUnit.partyID + 'sdr_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>BW  <span className='text-warning' ><b>{v_andruavUnit.m_SDR.m_band_width}</b></span><span className="text-success">{}</span></b></small></span></p> */}
+                            <label className="col-5">Band Width</label>
+                            {/*<input type="text" className="col-5" placeholder="Bandwidth" aria-label="Bandwidth"  value={this.state.m_band_width} onChange={(e)=> this.fn_onBandWidth(e)}/>*/}
+                            <p  className="col-5" placeholder="Bandwidth" aria-label="Bandwidth">{this.state.m_band_width}</p>
+                        </div>
+                        
                     </div>
                 </div>
                 <div key={v_andruavUnit.partyID + 'sdr_3'} className='row css_margin_zero padding_zero '>
@@ -305,6 +309,7 @@ export class ClssCTRL_SDR extends React.Component {
                     {cmd_btns}
                 <div key={v_andruavUnit.partyID + 'sdr_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                     {/* <CLASS_CTRL_P2P_IN_RANGE_NODEs key={v_andruavUnit.partyID + 'sdr_41'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_NODEs> */}
+                    <ClassSDRSpectrumVisualizer p_unit={this.props.p_unit}/>
                 </div> 
                 <div key={v_andruavUnit.partyID + 'sdr_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                     {/* <CLASS_CTRL_P2P_IN_RANGE_BSSIDs key={v_andruavUnit.partyID + 'sdr_51'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_BSSIDs> */}

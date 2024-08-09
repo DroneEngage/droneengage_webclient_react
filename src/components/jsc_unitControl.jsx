@@ -26,7 +26,7 @@ import { mavlink20 } from '../js/js_mavlink_v2.js';
 
 import {ClssCTRL_SETTINGS} from './gadgets/jsc_ctrl_settingsControl.jsx'
 import {ClssCTRL_P2P} from './gadgets/p2p/jsc_ctrl_p2p.jsx'
-import {ClssCTRL_SDR} from './gadgets/sdr/jsc_ctrl_sdr.jsx'
+import {ClssCTRL_SDR} from './sdr/jsc_ctrl_sdr.jsx'
 
 import {ClssCTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
 import {ClssMESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.

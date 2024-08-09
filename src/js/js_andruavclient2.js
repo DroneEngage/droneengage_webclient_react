@@ -3178,16 +3178,29 @@ class CAndruavClient {
 
         switch (andruavCMD.mt) {
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_SPECTRUM: {
+                    // Extract the float data
+                    var floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
+                    v_unit.m_SDR.addSpectrumData(andruavCMD.ms,floatData)
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRSpectrum, v_unit);
+                    
+                    for (let i = 0; i < floatData.length; i++) {
+                        js_common.fn_console_log(`Float value at index ${i}: ${floatData[i]}`);
+                    }
+                    js_common.fn_console_log(andruavCMD);
+            }
+            break;
+
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink: {
 
-                    var v_andruavMessage = {
+                var v_andruavMessage = {
                         'src': js_andruavMessages.CONST_TelemetryProtocol_Source_REMOTE,
                         'data': data.buffer.slice(v_internalCommandIndexByteBased)
                     };
 
-                    this.prv_parseUnitMavlinkMessage(v_unit, v_andruavMessage.data);
-                }
-                break;
+                this.prv_parseUnitMavlinkMessage(v_unit, v_andruavMessage.data);
+            }
+            break;
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_ServoOutput: 
             {

@@ -119,6 +119,7 @@ class GLOBALS {
 		this.EE_unitUpdated                = "EE_unitUpdated";
 		this.EE_unitP2PUpdated             = "EE_unitP2PUpdated";
 		this.EE_unitSDRUpdated             = "EE_unitSDRUpdated";
+		this.EE_unitSDRSpectrum            = "EE_unitSDRSpectrum";
 		this.EE_unitNavUpdated             = "EE_unitNavUpdated";
 		this.EE_onSocketStatus             = "EE_onSocketStatus";
 		this.EE_onSocketStatus2            = "EE_onSocketStatus2";
@@ -182,7 +183,7 @@ class GLOBALS {
 		// EOF LOCAL EVENTS
 
 
-
+		this.CONST_MAX_SDR_SPECTRUM_LENGTH = 100;				
 		this.CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and keep it unchanged
 
 

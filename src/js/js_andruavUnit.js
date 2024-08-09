@@ -406,6 +406,34 @@ class C_SDR {
     this.m_driver_index = 0;
     this.m_status = js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED;
     this.m_available_drivers = {};
+    this.m_spectrum_data = [];
+  }
+
+  getLastSpectrum() {
+    if (this.m_spectrum_data.length > 0) {
+      return this.m_spectrum_data[this.m_spectrum_data.length - 1];
+    } else {
+      return null;
+    }
+  }
+
+  addSpectrumData(p_info, p_data)
+  {   
+    var spectrumData = {
+      frequency_min: p_info.fcm,
+      frequency_step: p_info.fcst,
+      time: p_info.tim,
+      spectrum_data: p_data
+    }
+
+    Object.seal(spectrumData);
+    
+    this.m_spectrum_data.push(spectrumData); // Add the new data to the array
+
+    // Ensure the array length is within the maximum limit
+    if (this.m_spectrum_data.length > js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH) {
+        this.m_spectrum_data = this.m_spectrum_data.slice(-js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH);
+    }
   }
 }
 
