@@ -129,20 +129,20 @@ export function  fn_getStringOfTimeDiff_Shortest (dif)
 //http://chawi3.com/2015/03/03/arraybuffer-to-base64-base64-to-arraybuffer-javascript/
 
 export function  fn_arrayBufferToBase64( buffer ) {
-    var binary = '';
-    var bytes = new Uint8Array( buffer );
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
+    let binary = '';
+    let bytes = new Uint8Array( buffer );
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
         binary += String.fromCharCode( bytes[ i ] );
     }
     return window.btoa( binary );
 }
 
 export function  fn_base64ToArrayBuffer(base64) {
-    var binary_string =  window.atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array( len );
-    for (var i = 0; i < len; i++)        {
+    let binary_string =  window.atob(base64);
+    let len = binary_string.length;
+    let bytes = new Uint8Array( len );
+    for (let i = 0; i < len; i++)        {
         bytes[i] = binary_string.charCodeAt(i);
     }
     return bytes.buffer;
@@ -191,9 +191,9 @@ export function  pad(num, size) {
 export function  array_to_ArrayBuffer (p_array) 
 {
     const len = p_array.length;
-    var buf = new ArrayBuffer(len);
-    var	bufView= new Uint8Array(buf);
-    for (var k=0; k<len; ++k) {
+    let buf = new ArrayBuffer(len);
+    let	bufView= new Uint8Array(buf);
+    for (let k=0; k<len; ++k) {
         bufView[k] = p_array[k];
     }
 
@@ -202,10 +202,10 @@ export function  array_to_ArrayBuffer (p_array)
 
 export function  fn_Str2BinaryArray (str)
 {
-	var buf = new ArrayBuffer(str.length); // 2 bytes for each char
-	var	bufView = new Uint8Array(buf);
+	let buf = new ArrayBuffer(str.length); // 2 bytes for each char
+	let	bufView = new Uint8Array(buf);
 	
-	for (var i=0, strLen=str.length; i<strLen; i++) 
+	for (let i=0, strLen=str.length; i<strLen; i++) 
 	{
 		bufView[i] = str.charCodeAt(i);
 	}
@@ -218,8 +218,8 @@ export function  fn_Str2BinaryArray (str)
 // you need to convert it to Uint8Array if you want a Blob
 export function  fn_str2ByteArray (str)
 {
-    var bytes = [];
-	for (var i=0, strLen=str.length; i<strLen; i++) 
+    let bytes = [];
+	for (let i=0, strLen=str.length; i<strLen; i++) 
 	{
 		bytes.push(str.charCodeAt(i));
 	}
@@ -228,7 +228,7 @@ export function  fn_str2ByteArray (str)
 
 // contact two buffers & ADDs ZERO in between for Andruav compatibility
 export function  fn_concatTypedArrays(a, b, addzero) { // a, b TypedArray of same type
-    var c = new (a.constructor)(a.length + b.length + 1);
+    let c = new (a.constructor)(a.length + b.length + 1);
     c.set(a, 0);
     if (addzero === true)
     {

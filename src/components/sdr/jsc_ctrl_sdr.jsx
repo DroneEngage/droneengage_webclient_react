@@ -23,6 +23,7 @@ export class ClssCTRL_SDR extends React.Component {
                 m_gain : 0.0,
                 m_sample_rate : 0.0,
                 m_decode_mode: 0,
+                m_display_bars: 30,
                 m_updated :
                 {
                     fc : false,
@@ -32,6 +33,7 @@ export class ClssCTRL_SDR extends React.Component {
                     sr : false,
                     dm : false,  // decode mode
                     dr : false,
+                    db : false,
                 }
 		};
 
@@ -58,6 +60,7 @@ export class ClssCTRL_SDR extends React.Component {
         p_me.state.m_sample_rate = p_andruavUnit.m_SDR.m_sample_rate;
         p_me.state.m_gain = p_andruavUnit.m_SDR.m_gain;
         p_me.state.m_decode_mode = p_andruavUnit.m_SDR.m_decode_mode;
+        p_me.state.m_display_bars = p_andruavUnit.m_SDR.m_display_bars;
     }
 
     fn_unitUpdated (p_me, p_unit)
@@ -68,45 +71,43 @@ export class ClssCTRL_SDR extends React.Component {
 
     fn_onDriver(e)
     {   
-        this.state.m_updated.dr = true;
-        
-        this.setState({m_driver_index: e.target.value});
+        this.setState({m_updated: { dr: true }, m_driver_index: e.target.value});
     }
 
     fn_onFreq(e)
     {
         this.state.m_updated.f = true;
-        this.setState({m_frequency: e.target.value});
+        this.setState({m_updated: { dr: true }, m_frequency: e.target.value});
     }
 
     fn_onFreqCenter(e)
     {
-        this.state.m_updated.fc = true;
-        this.setState({m_center_frequency: e.target.value});
+        this.setState({m_updated: { fc: true }, m_center_frequency: e.target.value});
     }
 
     fn_onBandWidth(e)
     {
-        this.state.m_updated.bw = true;
-        this.setState({m_band_width: e.target.value});
+        this.setState({m_updated: { bw: true }, m_band_width: e.target.value});
     }
 
     fn_onSampleRate(e)
     {
-        this.state.m_updated.sr = true;
-        this.setState({m_sample_rate: e.target.value});
+        this.setState({m_updated: { sr: true }, m_sample_rate: e.target.value});
     }
 
     fn_onGain(e)
     {
-        this.state.m_updated.ga = true;
-        this.setState({m_gain: e.target.value});
+        this.setState({m_updated: { ga: true }, m_gain: e.target.value});
+    }
+
+    fn_onDisplayBars(e)
+    {
+        this.setState({m_updated: { db: true }, m_display_bars: e.target.value});
     }
 
     fn_onSelectDecodeModes(e)
     {
-        this.state.m_updated.dm = true;
-        this.setState({m_decode_mode: e.target.value});
+        this.setState({m_updated: { dm: true }, m_decode_mode: e.target.value});
     }
 
     fn_activateSDR(p_andruavUnit)
@@ -123,12 +124,15 @@ export class ClssCTRL_SDR extends React.Component {
         var p_sample_rate = null;
         var p_decode_mode = null;
         var p_driver_index = null;
+        var p_display_bars = null;
 
         if (this.state.m_updated.fc === true)   p_fequency_center   = parseFloat(this.state.m_center_frequency);
         if (this.state.m_updated.f === true)    p_fequency          = parseFloat(this.state.m_frequency);
         if (this.state.m_updated.bw === true)   p_band_width        = parseFloat(this.state.m_band_width);
-        if (this.state.m_updated.ga === true)    p_gain             = parseFloat(this.state.m_gain);
+        if (this.state.m_updated.ga === true)   p_gain              = parseFloat(this.state.m_gain);
         if (this.state.m_updated.sr === true)   p_sample_rate       = parseFloat(this.state.m_sample_rate);
+        if (this.state.m_updated.db === true)   p_display_bars      = parseFloat(this.state.m_display_bars);
+        
         const dm = this.state.m_decode_mode;
         if (this.state.m_updated.dm === true)   p_decode_mode       = ((dm === null)?0:parseInt(dm));
         const index = this.state.m_driver_index;
@@ -136,7 +140,7 @@ export class ClssCTRL_SDR extends React.Component {
         
         js_globals.v_andruavClient.API_setSDRConfig(p_andruavUnit, p_fequency_center, p_fequency,
             p_band_width, p_gain, p_sample_rate,
-            p_decode_mode, p_driver_index); 
+            p_decode_mode, p_driver_index, p_display_bars); 
 
 
         

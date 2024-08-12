@@ -22,8 +22,8 @@ class CEventEmitter {
         // no one is listening to this event
         const len = this.m_v_events[p_event].length;
         const subscribers = this.m_v_events[p_event];
-        for (var i = 0; i < len; i++) {
-            var v_subscriber = subscribers[i];
+        for (let i = 0; i < len; i++) {
+            let v_subscriber = subscribers[i];
             v_subscriber.callback(v_subscriber.listner, p_data);
         }
     };
@@ -34,8 +34,8 @@ class CEventEmitter {
         if (!this.m_v_events[p_event]) 
             return -1;
         
-        for (var i = 0; i < this.m_v_events[p_event].length; i++) {
-            var v_subscriber = this.m_v_events[p_event][i];
+        for (let i = 0; i < this.m_v_events[p_event].length; i++) {
+            let v_subscriber = this.m_v_events[p_event][i];
             if (v_subscriber.listner === p_listner) {
                 return i;
             }

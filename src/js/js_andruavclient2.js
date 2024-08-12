@@ -534,7 +534,7 @@ class CAndruavClient {
         const c_len = c_keys.length;
         
         
-        for (var i =0; i<c_len; ++i) 
+        for (let i =0; i<c_len; ++i) 
         {
             const c_parameter_message = c_list[c_keys[i]];
 
@@ -856,7 +856,8 @@ class CAndruavClient {
 
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
         p_band_width, p_gain, p_sample_rate,
-        p_decode_mode, p_driver_index
+        p_decode_mode, p_driver_index,
+        p_display_bars
     )
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -865,13 +866,15 @@ class CAndruavClient {
             'a': js_andruavMessages.CONST_SDR_ACTION_SET_CONFIG
         };
         
-        if (p_fequency_center!== null)  p_msg.fc = p_fequency_center;
-        if (p_fequency!== null)         p_msg.f  = p_fequency;
-        if (p_band_width!== null)       p_msg.b  = p_band_width;
-        if (p_gain!== null)             p_msg.g  = p_gain;
-        if (p_sample_rate!== null)      p_msg.s  = p_sample_rate;
-        if (p_decode_mode!== null)      p_msg.m  = p_decode_mode;
-        if (p_driver_index!== null)     p_msg.i  = p_driver_index;
+        if (p_fequency_center !== null)  p_msg.fc = p_fequency_center;
+        if (p_fequency !== null)         p_msg.f  = p_fequency;
+        if (p_band_width !== null)       p_msg.b  = p_band_width;
+        if (p_gain !== null)             p_msg.g  = p_gain;
+        if (p_sample_rate !== null)      p_msg.s  = p_sample_rate;
+        if (p_decode_mode !== null)      p_msg.m  = p_decode_mode;
+        if (p_driver_index !== null)     p_msg.i  = p_driver_index;
+        if (p_driver_index !== null)     p_msg.i  = p_driver_index;
+        if (p_display_bars !== null)     p_msg.r  = p_display_bars;
         
         js_common.fn_console_log (p_msg);
         
@@ -1573,7 +1576,7 @@ class CAndruavClient {
 
         var count = (fencetype === js_andruavMessages.CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
 
-        for (var i = 0; i < count; ++ i) {
+        for (let i = 0; i < count; ++ i) {
             var lnglat = {};
             lnglat.lat = parseFloat(p_jmsg[i].a);
             lnglat.lng = parseFloat(p_jmsg[i].g);
@@ -2472,7 +2475,7 @@ class CAndruavClient {
                         break;
                     
                     const c_len = p_jmsg.t.length;
-                    for (var i = 0; i < c_len; ++ i) {
+                    for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg.t[i];
                         var c_search_target = {};
                         c_search_target.m_name = c_targetItem.n;
@@ -2496,7 +2499,7 @@ class CAndruavClient {
                     p_jmsg = msg.msgPayload.t;
                     const c_len = p_jmsg.length;
                     p_unit.m_DetectedTargets.m_targets.m_list = [];
-                    for (var i = 0; i < c_len; ++ i) {
+                    for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg[i];
                         var c_target = {};
                         c_target.x1 = c_targetItem.a;
@@ -2590,7 +2593,7 @@ class CAndruavClient {
                         delete this.v_waypointsCache[p_unit.partyID];
                     }
 
-                    for (var i = 0; i < numberOfRecords; ++ i) {
+                    for (let i = 0; i < numberOfRecords; ++ i) {
                         if (p_jmsg[i] !== null && p_jmsg[i] !== undefined) {
                             var wayPointStep = {};
                             wayPointStep.waypointType = p_jmsg[i].t;
@@ -2785,7 +2788,7 @@ class CAndruavClient {
         let p_mavlinkGCSProcessor = new MAVLink20Processor(null, 0, 0);
         const p_mavlinkMessages = p_mavlinkGCSProcessor.parseBuffer(new Uint8Array(p_mavlinkPacket));
         const len = p_mavlinkMessages.length;
-        for (var i = 0; i < len; ++ i) {
+        for (let i = 0; i < len; ++ i) {
             const c_mavlinkMessage = p_mavlinkMessages[i];
             if (c_mavlinkMessage.id === -1)
             {
@@ -2864,7 +2867,7 @@ class CAndruavClient {
         const p_mavlinkProcessor = new MAVLink20Processor(null, 0, 0);
         const p_mavlinkMessages = p_mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
         const len = p_mavlinkMessages.length;
-        for (var i = 0; i < len; ++ i) {
+        for (let i = 0; i < len; ++ i) {
             let c_mavlinkMessage = p_mavlinkMessages[i];
             if (c_mavlinkMessage.id === -1)
             {
@@ -2956,7 +2959,7 @@ class CAndruavClient {
 
                 case mavlink20.MAVLINK_MSG_ID_MISSION_CURRENT:
                 {
-                    if ((c_mavlinkMessage.mission_type === null || c_mavlinkMessage.mission_type === undefined) || (c_mavlinkMessage.mission_type==mavlink20.MAV_MISSION_TYPE_MISSION))
+                    if ((c_mavlinkMessage.mission_type === null || c_mavlinkMessage.mission_type === undefined) || (c_mavlinkMessage.mission_type === mavlink20.MAV_MISSION_TYPE_MISSION))
                     {
                         p_unit.m_Nav_Info._Target.wp_num = c_mavlinkMessage.seq;
                     }

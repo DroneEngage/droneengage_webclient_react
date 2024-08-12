@@ -50,21 +50,21 @@ class ClssAndruavMissionPlanManager
 
 	fn_activateNextMission (v_id2)
 	{
-		var p_keys = Object.keys(this.m_missionPlans);
+		let p_keys = Object.keys(this.m_missionPlans);
 		if ((p_keys === undefined) || (p_keys === null) || (p_keys.length === 0))
 		{
 			return null;
 		}
 
-		var p_len = p_keys.length;
-		var p_index =0;
+		let p_len = p_keys.length;
+		let p_index =0;
 		
-		for (var i=0;i<p_len;++i)
+		for (let i=0;i<p_len;++i)
 		{
 			if (p_keys[i] === v_id2)
 			{
 				p_index = (i + 1) % p_keys.length;
-				var v_mission = this.m_missionPlans[p_keys[p_index]];
+				let v_mission = this.m_missionPlans[p_keys[p_index]];
 				this.fn_setCurrentMission (v_mission.m_id);
 				return v_mission;
 			}
@@ -93,7 +93,7 @@ class ClssAndruavMissionPlanManager
 	fn_showAllMarkers (v_map1)
 	{
 		
-		var v_missionPlans = Object.values(this.m_missionPlans);
+		let v_missionPlans = Object.values(this.m_missionPlans);
 		v_missionPlans.map(x => x.fn_showMarkers(v_map1));
 		
 	};

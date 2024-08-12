@@ -83,7 +83,7 @@ export class ClssCTRL_AUDIO extends React.Component {
                                 <button id={v_andruavUnit.partyID + "_aln"} 
                                     type="button" 
                                     className={"btn  btn-sm dropdown-toggle "} 
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled={v_language_disabled=='true'}>english</button>
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled={v_language_disabled === 'true'}>english</button>
                                     <div className="dropdown-menu" aria-labelledby="btnGroupDrop2">
                                         <a className="dropdown-item " href="#" onClick={() => this.fn_setLanguage('en')}>english</a>
                                         <a className="dropdown-item " href="#" onClick={() => this.fn_setLanguage('ar')}>عربي</a>
@@ -98,14 +98,14 @@ export class ClssCTRL_AUDIO extends React.Component {
                     <div className="row ">
                         <div key={v_andruavUnit.partyID + 'audio_212'} className= 'col-8 col-sm-6 user-select-none '>
                             <label htmlFor="pitch_range" className="col-sm-4 col-form-label al_r flex" >Pitch</label>
-                            <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id={v_andruavUnit.partyID + 'prng'} disabled={v_pitch_disabled=='true'}  />
+                            <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id={v_andruavUnit.partyID + 'prng'} disabled={v_pitch_disabled === 'true'}  />
                         </div>
                     </div>
                     
                     <div className="row ">
                         <div key={v_andruavUnit.partyID + 'audio_213'} className= 'col-12 col-sm-12 user-select-none '>
                             <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r flex" >Volume</label>
-                            <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id= {v_andruavUnit.partyID + 'vrng'} disabled={v_vol_disabled=='true'}  />
+                            <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id= {v_andruavUnit.partyID + 'vrng'} disabled={v_vol_disabled === 'true'}  />
                         </div>  
                     </div>
                 </div>

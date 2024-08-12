@@ -250,7 +250,7 @@ export default class ClssCameraDialog extends React.Component
             
             js_common.fn_console_log ("Debug:", p_session.m_unit.m_Video.m_videoTracks.length);
 
-            for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
+            for (let i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
                 v_streanms.push(<ClssCameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id+'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} />);
             }
             v_unitName = p_session.m_unit.m_unitName

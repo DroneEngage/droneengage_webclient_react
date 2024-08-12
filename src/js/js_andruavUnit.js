@@ -135,7 +135,7 @@ class C_Video {
       return CONST_VIDEOSTREAMING_OFF;
     }
     var len = c_activeTracks.length;
-    for (var i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       if (
         this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming ===
         CONST_VIDEOSTREAMING_ON
@@ -217,8 +217,9 @@ class C_Video {
     }
 
     var len = c_activeTracks.length;
-    var j = 0;
-    for (var i = 0; i < len; ++i) {
+    let j = 0;
+    let i = 0;
+    for (i = 0; i < len; ++i) {
       if (
         this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming ===
         CONST_VIDEOSTREAMING_ON
@@ -243,7 +244,7 @@ class C_Video {
       return CONST_VIDEOSTREAMING_OFF;
     }
     var len = c_activeTracks.length;
-    for (var i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       if (
         this.m_videoactiveTracks[c_activeTracks[i]].VideoRecording ===
         CONST_VIDEOSTREAMING_OFF
@@ -404,6 +405,7 @@ class C_SDR {
     this.m_decode_mode = 0;
     this.m_driver = '';
     this.m_driver_index = 0;
+    this.m_display_bars = 30;
     this.m_status = js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED;
     this.m_available_drivers = {};
     this.m_spectrum_data = [];
@@ -619,8 +621,8 @@ class C_Modules {
 		{"t", module_item->time_stamp},
 		{"d", module_item->is_dead},
 		*/
-    for (var i = 0; i < jsonmodules.length; ++i) {
-      var module = jsonmodules[i];
+    for (let i = 0; i < jsonmodules.length; ++i) {
+      let module = jsonmodules[i];
       switch (module.c.toLowerCase()) {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
           this.has_fcb = true;
@@ -805,7 +807,7 @@ export class CAndruavUnitObject {
     this.m_DistanceSensors = [];
     this.m_Throttle = 0; //MAVLINK_MSG_ID_VFR_HUD.throttle uint16_t % Current throttle setting (0 to 100).
 
-    for (var i = 0; i <= 40; ++i) {
+    for (let i = 0; i <= 40; ++i) {
       this.m_DistanceSensors.push(new C_DistanceSensor(this, i));
     }
   }

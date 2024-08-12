@@ -74,9 +74,9 @@ export class ClssCtrlVibration extends React.Component {
     {
         // !BUG HERE
         var ret = new C_GUI_READING_VALUE();
-        if (value == undefined) value = 'na';
+        if (value === null || value === undefined) value = 'na';
         ret.value = value;
-        if (value == null)
+        if (value === null || value === undefined)
         {
            ret.css = 'bg-none text-muted ';
         }else

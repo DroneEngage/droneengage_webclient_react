@@ -54,14 +54,14 @@ export var QueryString = function () {
 	var query_string = {};
 	var query = window.location.search.substring(1);
 	var vars = query.split("&");
-	for (var i = 0; i < vars.length; i++) {
+	for (let i = 0; i < vars.length; i++) {
 		var pair = vars[i].split("=");
 		// If first entry with this name
 		if (typeof query_string[pair[0]] === "undefined") {
 			query_string[pair[0]] = decodeURIComponent(pair[1]);
 			// If second entry with this name
 		} else if (typeof query_string[pair[0]] === "string") {
-			var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+			let arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
 			query_string[pair[0]] = arr;
 			// If third or later entry with this name
 		} else {
@@ -552,8 +552,8 @@ function fn_handleKeyBoard() {
 
 		export function fn_VIDEO_login(v_andruavVideo, v_trackId) {
 
-			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
-			for (var i=0;i<len;++i)
+			let len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
+			for (let i=0;i<len;++i)
 			{
 				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id === v_trackId)
 				{
@@ -584,7 +584,7 @@ function fn_handleKeyBoard() {
 			if (v_andruavVideo === null || v_andruavVideo === undefined) return ;
 
 			var len = v_andruavVideo.m_unit.m_Video.m_videoTracks.length;
-			for (var i=0;i<len;++i)
+			for (let i=0;i<len;++i)
 			{
 				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id === v_trackId)
 				{
@@ -713,9 +713,9 @@ function fn_handleKeyBoard() {
 			const now = new Date();
 			const p_keys = Object.keys(js_adsbUnit.List);
 		
-			for (var i=0; i< count; ++i)
+			for (let i=0; i< count; ++i)
 			{
-				var adsb_obj  = js_adsbUnit.List[p_keys[i]];
+				let adsb_obj  = js_adsbUnit.List[p_keys[i]];
 
 				if ((now - adsb_obj.m_last_access) > ADSB_OBJECT_TIMEOUT)
 				{
@@ -1326,20 +1326,20 @@ function fn_handleKeyBoard() {
 		*/
 		export function fn_isBadFencing(p_andruavUnit) {
 
-			var keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
-			var size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
+			let keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
+			let size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
 
 			/* 
 				bit 0: out of green zone
 				bit 1: in bad zone
 				bit 2: in good zone
 			*/
-			var v_res = 0b00; // bit 1 is good & bit 0 is for bad
-			for (var i = 0; i < size; ++i) {
-				var fence = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
+			let v_res = 0b00; // bit 1 is good & bit 0 is for bad
+			for (let i = 0; i < size; ++i) {
+				let fence = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
 
 				if ((fence.Units !== null && fence.Units !== undefined) && (fence.Units.hasOwnProperty(p_andruavUnit.partyID))) {
-					var geoFenceHitInfo = fence.Units[p_andruavUnit.partyID].geoFenceHitInfo;
+					let geoFenceHitInfo = fence.Units[p_andruavUnit.partyID].geoFenceHitInfo;
 					if (geoFenceHitInfo !== null && geoFenceHitInfo !== undefined) {
 
 						if (geoFenceHitInfo.hasValue === true) {
@@ -1381,7 +1381,7 @@ function fn_handleKeyBoard() {
 			if (markers === null || markers === undefined) return;
 
 			var count = markers.length;
-			for (var i = 0; i < count; i++) {
+			for (let i = 0; i < count; i++) {
 				var marker = markers[i];
 				js_leafletmap.fn_hideItem (marker);
 			}
@@ -1389,7 +1389,7 @@ function fn_handleKeyBoard() {
 			var polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
 			if (polygons !== null && polygons !== undefined) {
 				count = polygons.length;
-				for (var i = 0; i < count; i++) {
+				for (let i = 0; i < count; i++) {
 					var polygon = polygons[i];
 					js_leafletmap.fn_hideItem(polygon);
 				}
@@ -1405,7 +1405,7 @@ function fn_handleKeyBoard() {
 			var keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
 			var size = keys.length;
 
-			for (var i = 0; i < size; ++i) {
+			for (let i = 0; i < size; ++i) {
 
 				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 				if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
@@ -1993,11 +1993,11 @@ function fn_handleKeyBoard() {
 			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
 
 			if (wayPointArray.length === 0) return;
-			var latlng = null;
-			for (var i = 0; i < wayPointArray.length; ++i) {
-				var subIcon = false;	
-				var wayPointStep = wayPointArray[i];
-				var icon_img = './images/location_bb_32x32.png';
+			let latlng = null;
+			for (let i = 0; i < wayPointArray.length; ++i) {
+				let subIcon = false;	
+				let wayPointStep = wayPointArray[i];
+				let icon_img = './images/location_bb_32x32.png';
 				switch (wayPointStep.waypointType) {
 					case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
@@ -2720,13 +2720,11 @@ function fn_handleKeyBoard() {
 					{
 						p_elevation = p_elevation.toFixed(1);
 					}
-					markerContent += '<br><span class="text-primary">lat:' 
-								+ '<span class="text-success">'+ (p_lat).toFixed(6) 
-								+ '</span><span class="text-primary">,lng:' + '</span><span class="text-success">' + (p_lng).toFixed(6) 
-								+ '</span><br><span class="text-primary ">alt:' + '</span><span class="text-success">' + vAlt + '</span><span class="text-primary"> m</span>'
-								+ '<br><span class="text-primary ">GS:' + '</span><span class="text-success">' + vSpeed + ' </span><span class="text-primary"> m/s</span>'
-								+ '<span class="text-primary "> AS:' + '</span><span class="text-success">' + vAirSpeed + ' </span><span class="text-primary"> m/s</span>';
-					
+					markerContent += `<br><span class="text-primary">lat:<span class="text-success">${(p_lat).toFixed(6)}</span><span class="text-primary">,lng:</span><span class="text-success">${(p_lng).toFixed(6)}</span></br>
+							<span class="text-primary">alt:</span><span class="text-success">${vAlt}</span><span class="text-primary"> m</span>
+							<br><span class="text-primary">GS:</span><span class="text-success">${vSpeed} </span><span class="text-primary"> m/s</span>
+							<span class="text-primary"> AS:</span><span class="text-success">${vAirSpeed} </span><span class="text-primary"> m/s</span>`;
+
 					if (p_andruavUnit.m_Swarm.m_isLeader === true)
 					{
 						
@@ -2819,10 +2817,10 @@ function fn_handleKeyBoard() {
 			else {
 				// hide all
 
-				var keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
-				var size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
+				let keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
+				let size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
 
-				for (var i = 0; i < size; ++i) {
+				for (let i = 0; i < size; ++i) {
 					geoFenceInfo = js_globals.v_andruavClient.andruavGeoFences[keys[i]];
 
 					if (geoFenceInfo.flightPath !== null && geoFenceInfo.flightPath !== undefined) {

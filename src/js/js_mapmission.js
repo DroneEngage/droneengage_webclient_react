@@ -33,7 +33,7 @@ export class ClssAndruavFencePlan
 		var shapesData = [];
 		const len = js_globals.v_map_shapes.length;
 			
-		for (var i=0; i< len; ++i)
+		for (let i=0; i< len; ++i)
 		{
 				
 			var cmd={};
@@ -269,12 +269,12 @@ export class ClssAndruavMissionPlan
 		len = len - 1;
 				
 		// Disconnect Last Node [distance = 0 and make ure no arrow]
-		var marker;
+		let marker;
 		marker = this.v_markers[len];
 				
 		//this.fn_disconnectMissionItem (marker);
 
-		for (var i=0; i<len; ++i)
+		for (let i=0; i<len; ++i)
 		{
 			marker = this.v_markers[i];
 			if ((v_enforceRedraw === true))
@@ -284,12 +284,12 @@ export class ClssAndruavMissionPlan
 			
 			if (marker.m_next == null)
 			{
-				var arrowCoordinates = {
+				let arrowCoordinates = {
 							'from_pos': marker.getLatLng(),
 							'to_pos': this.v_markers[i+1].getLatLng()	
 				};
 
-				var distance = js_helpers.fn_calcDistance(arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
+				let distance = js_helpers.fn_calcDistance(arrowCoordinates.from_pos.lat, arrowCoordinates.from_pos.lng,
 					arrowCoordinates.to_pos.lat, arrowCoordinates.to_pos.lng);
 						
 				marker.distance = distance;
@@ -309,11 +309,11 @@ export class ClssAndruavMissionPlan
 	*/
 	fn_getMissionDistance ()
 	{
-		var distance = 0;
-		var len = this.v_markers.length;
-		for (var i=0; i<len; ++i)
+		let distance = 0;
+		let len = this.v_markers.length;
+		for (let i=0; i<len; ++i)
 		{
-			var marker = this.v_markers[i];
+			let marker = this.v_markers[i];
 			if (marker.distance !== null && marker.distance !== undefined)
 			{
 				distance  += marker.distance;
@@ -357,8 +357,8 @@ export class ClssAndruavMissionPlan
 	*/
 	fn_deleteMe (marker)
 	{
-		var len = this.v_markers.length;
-		for (var i =0;i<len;++i)
+		let len = this.v_markers.length;
+		for (let i =0;i<len;++i)
 		{
 			if (this.v_markers[i].id === marker.id)
 			{
@@ -388,8 +388,8 @@ export class ClssAndruavMissionPlan
 	**/
 	fn_deleteAll ()
 	{
-		var len = this.v_markers.length;
-		for (var i =0;i<len;++i)
+		let len = this.v_markers.length;
+		for (let i =0;i<len;++i)
 		{
 			var marker = this.v_markers[i];
 			marker.m_mission = null;
@@ -414,11 +414,11 @@ export class ClssAndruavMissionPlan
 	**/
 	fn_orderItems ()
 	{
-		var len = this.v_markers.length;
-		var j = 0;
-		for (var i=1; i<=len; ++i)
+		let len = this.v_markers.length;
+		let j = 0;
+		for (let i=1; i<=len; ++i)
 		{
-			var smallest_item = this.v_markers[0];
+			let smallest_item = this.v_markers[0];
 			for (j=0; j<len; ++j)
 			{
 				if (((this.v_markers[j].order < smallest_item.order)
@@ -464,23 +464,23 @@ export class ClssAndruavMissionPlan
 	fn_exportToV110 ()
 	{
 		let len = this.v_markers.length;
-		var missionSteps = [];
+		let missionSteps = [];
 				
-		var fn_addMissionItem = function (marker, cmd,m_paramsArray)
+		let fn_addMissionItem = function (marker, cmd,m_paramsArray)
 		{
-			step = {};
+			let step = {};
 			step.cmd = cmd;
 			step.m_frameType = marker.m_missionItem.m_frameType;
 			step.m_paramsArray = m_paramsArray;
 			missionSteps.push (step);
 		}
 
-		var skip = false;
-		for (var i =0;i<len;++i)
+		let skip = false;
+		for (let i =0;i<len;++i)
 		{
 			skip = false;
-			var marker = this.v_markers[i];
-			var step={};
+			let marker = this.v_markers[i];
+			let step={};
 			switch (marker.m_missionItem.m_missionType)
 			{
 				case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
@@ -684,14 +684,14 @@ export class ClssAndruavMissionPlan
 		}
 		
 		len = missionSteps.length;
-		var MissionText = "QGC WPL 110\r\n";
-		for (var j=0; j<len; ++j)
+		let MissionText = "QGC WPL 110\r\n";
+		for (let j=0; j<len; ++j)
 		{
-			step = missionSteps[j];
-			var startWith = j>0?0:1;
-			var line = j +"\t" + startWith + "\t"+ step.m_frameType+  "\t" + step.cmd + "\t";
+			let step = missionSteps[j];
+			let startWith = j>0?0:1;
+			let line = j +"\t" + startWith + "\t"+ step.m_frameType+  "\t" + step.cmd + "\t";
 					
-			for (var k =0;k< 7; ++ k)
+			for (let k =0;k< 7; ++ k)
 			{
 				line += step.m_paramsArray[k] + "\t";
 			}
