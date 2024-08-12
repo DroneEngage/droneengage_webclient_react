@@ -34,8 +34,8 @@ class fn_Obj_padStatus {
 
     this.p_vibration = false;
 
-    for (var i = 0; i < 6; ++ i) {
-        var v_obj = {};
+    for (let i = 0; i < 6; ++ i) {
+        let v_obj = {};
         v_obj.m_pressed = false;
         v_obj.m_timestamp = 0;
         v_obj.m_longPress = false;
@@ -208,12 +208,12 @@ class CAndruavGamePad {
 
     fn_scangamepads() {
         const c_gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-        for (var i = 0; i < c_gamepads.length; i++) {
+        for (let i = 0; i < c_gamepads.length; i++) {
             if (c_gamepads[i]) {
                 if (!(c_gamepads[i].index in this.v_controllers)) {
                     this.addgamepad(this,c_gamepads[i]);
                 } else {
-                    var v_ctrl = this.v_controllers[c_gamepads[i].index];
+                    let v_ctrl = this.v_controllers[c_gamepads[i].index];
                     if (v_ctrl === null || v_ctrl === undefined) {
                         v_ctrl = c_gamepads[i];
                     }
@@ -284,7 +284,7 @@ class CAndruavGamePad {
         else if (c_padStatus.p_ctrl_type === GAME_XBOX_360_MICROSOFT)
         {
 
-            for (var j = 0; j < 4; ++ j) {
+            for (let j = 0; j < 4; ++ j) {
                 if (c_padStatus.p_axes[j] !== p_gamepad.axes[j]) {
                     v_axesChanged = true;
                     c_padStatus.p_axes[j] = p_gamepad.axes[j].toFixed(2);
