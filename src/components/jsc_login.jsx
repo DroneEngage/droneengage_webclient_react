@@ -106,7 +106,7 @@ export class ClssLoginControl extends React.Component {
 		}
 		control.push(
 			<div key={'ClssLoginControl_complex'} className="dropdown">
-				<button className={'btn btn-secondary dropdown-toggle ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+				<button className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
 					{title}
 				</button>
 				<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
