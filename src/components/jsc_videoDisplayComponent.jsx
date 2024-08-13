@@ -256,7 +256,7 @@ class ClssCVideoScreen extends React.Component {
 
         const c_list = p_targets.m_list;
         const c_len = c_list.length;
-        for (var i=0; i<c_len;++i)
+        for (let i=0; i<c_len;++i)
         {
 
             const p_target = c_list[i];
@@ -731,7 +731,7 @@ render() {
     
     var out_h = [];
     var out_b = [];
-    for (var i=0; i<len;++i)
+    for (let i=0; i<len;++i)
     {
 
         var _first = "";

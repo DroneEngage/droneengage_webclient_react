@@ -147,7 +147,7 @@ import $ from 'jquery';
             const now = Date.now();
             
             var len = _data.acList.length;
-            for (var i=0;i<len;++i)
+            for (let i=0;i<len;++i)
             {
                 _data.acList[i].m_lastActiveTime = now;
                 if (this.adsbObjectList.hasOwnProperty(_data.acList[i].Id))
@@ -156,7 +156,7 @@ import $ from 'jquery';
                 }
                 else
                 {
-                    var _obj = new v_adsbObject ();
+                    let _obj = new v_adsbObject ();
                     _obj.update(_data.acList[i]);
                     this.adsbObjectList[_data.acList[i].Id] = _obj;
                 }

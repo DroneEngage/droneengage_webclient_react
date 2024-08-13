@@ -218,7 +218,7 @@ export default class ClssStreamDialog extends React.Component
             {
                 p_session = this.state.p_session;
 
-                for (var i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
+                for (let i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
                     v_streanms.push(<ClssStreamChannel key={i} prop_session={p_session} prop_track_number={i} />);
                 }
                 v_unitName = p_session.m_unit.m_unitName;

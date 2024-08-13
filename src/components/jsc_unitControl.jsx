@@ -1207,7 +1207,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
         {
             module_version += "DE version: " + v_andruavUnit.m_version;
             const len = v_andruavUnit.m_modules.length;
-            for (var i=0; i< len; ++i)
+            for (let i=0; i< len; ++i)
             {
                 const module = v_andruavUnit.m_modules[i];
                 module_version += '\n';

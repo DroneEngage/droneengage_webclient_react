@@ -301,7 +301,7 @@ export default class ClssGamePadControl extends React.Component {
         var gamepads = [];
         
         
-        for (var i=0; i<4;++i)
+        for (let i=0; i<4;++i)
         { // 4 gamepads can be connected to computer.
             const gamepad = js_localGamePad.v_controllers[i];
             if (gamepad !== null && gamepad !== undefined)

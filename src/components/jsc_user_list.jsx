@@ -191,7 +191,7 @@ class ClssUserEntryList extends  React.Component {
             p_params.push(<ClssUserEntry prop_add_new={true} prop_single_item={{}}/>);
 
             
-                for (var i =0; i<c_len; ++i) 
+                for (let i =0; i<c_len; ++i) 
                 {
                     const single_item = c_list[c_keys[i]];
                     if ((this.props.prop_search =="" ) || (single_item.acc.toUpperCase().includes(this.props.prop_search)))

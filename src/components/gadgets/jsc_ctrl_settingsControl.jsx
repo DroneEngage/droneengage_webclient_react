@@ -76,7 +76,7 @@ export  class ClssCTRL_SETTINGS   extends React.Component {
             }
             else
             {
-                for (var i=0; i< len; ++i)
+                for (let i=0; i< len; ++i)
                 {
                     const module = v_andruavUnit.m_modules.m_list[i];
                     

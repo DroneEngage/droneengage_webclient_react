@@ -215,7 +215,7 @@ export default class ClssUnitParametersList extends React.Component {
         const c_len = c_keys.length;
         
         
-        for (var i =0; i<c_len; ++i) 
+        for (let i =0; i<c_len; ++i) 
         {
             const c_parameter_message = c_list[c_keys[i]];
 
