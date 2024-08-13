@@ -174,16 +174,16 @@ export class ClssCTRL_SDR extends React.Component {
         switch (v_andruavUnit.m_SDR.m_status)
         {
             case js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED:
-                return "bg-success";
+                return {r:"bg-light", u:"bg-light", s:"bg-light"};
 
             case js_andruavMessages.CONST_SDR_STATUS_ERROR:
-                    return "bg-light";
+                    return {r:"bg-danger", u:"bg-light", s:"bg-light"};
                 
             case js_andruavMessages.CONST_SDR_STATUS_CONNECTED:
-                return "bg-warning";
+                return {r:"bg-success", u:"bg-danger", s:"bg-warning"};
 
             case js_andruavMessages.CONST_SDR_STATUS_STREAMING:
-                return "bg-danger";
+                return {r:"bg-light", u:"bg-light", s:"bg-danger"};
         }
     }
 
@@ -229,17 +229,17 @@ export class ClssCTRL_SDR extends React.Component {
                 
             <div key={v_andruavUnit.partyID + 'sdr2_1'} className="col-12 mt-1">
             <div key={v_andruavUnit.partyID + 'sdr2_2'} className = 'row al_l css_margin_zero d-flex '>
-                <div key={v_andruavUnit.partyID + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_211'} className={' rounded-3 text-white cursor_hand textunit_nowidth al_c ' + btn_activate_css} title ='Activate SDR Device' onClick={() => this.fn_activateSDR(v_andruavUnit)}>Activate</p>
+                <div key={v_andruavUnit.partyID + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.partyID + 'sdr2_241'} className={' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
                 </div>
+                {/* <div key={v_andruavUnit.partyID + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.partyID + 'sdr2_211'} className={' rounded-3 text-white cursor_hand textunit_nowidth al_c ' + btn_activate_css} title ='Activate SDR Device' onClick={() => this.fn_activateSDR(v_andruavUnit)}>Activate</p>
+                </div> */}
                 <div key={v_andruavUnit.partyID + 'sdr2_221'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_221'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
+                    <p key={v_andruavUnit.partyID + 'sdr2_221'} className={' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
                 </div>
                 <div key={v_andruavUnit.partyID + 'sdr2_23'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_231'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit)}>Scan Freq</p>
-                </div>
-                <div key={v_andruavUnit.partyID + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_241'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
+                    <p key={v_andruavUnit.partyID + 'sdr2_231'} className={' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c ' + btn_activate_css.s}  title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit)}>Scan Freq</p>
                 </div>
             </div>
             </div>
@@ -273,7 +273,7 @@ export class ClssCTRL_SDR extends React.Component {
                     </div>
                     <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
                         
-                        <div key={v_andruavUnit.partyID + 'sdr_211'} className='row css_margin_zero padding_zero '>
+                        {/* <div key={v_andruavUnit.partyID + 'sdr_211'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_modes'} className="col-5"><small><b>Decode Mode</b></small></label>
                             <select multiple="" className="col-5" id={v_andruavUnit.partyID + 'sdr_dm_modes'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectDecodeModes(e)}>
                                 <option value="0">FM</option>
@@ -285,7 +285,7 @@ export class ClssCTRL_SDR extends React.Component {
                                 <option value="6">CW</option>
                             </select>
 
-                        </div>
+                        </div> */}
                         <div key={v_andruavUnit.partyID + 'sdr_213'} className='row css_margin_zero padding_zero '>
                             <label className="col-5"><small><b>Sample Rate</b></small></label>
                             <input type="text" className="col-5" placeholder="Sample Rate" aria-label="Sample Rate"  value={this.state.m_sample_rate} onChange={(e)=> this.fn_onSampleRate(e)}/>
