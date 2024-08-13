@@ -17,6 +17,7 @@ export class ClssCTRL_SDR extends React.Component {
         this.state = {
                 m_update : 0,
                 m_center_frequency : 0.0,
+                m_frequency : 0.0,
                 m_band_width : 0.0,
                 m_driver_name : '',
                 m_driver_index: 0,
@@ -218,7 +219,6 @@ export class ClssCTRL_SDR extends React.Component {
     render () 
     {
         const  v_andruavUnit = this.props.p_unit;
-        {/* <button className="btn btn-warning col-2 btn-sm" type="button" id={v_andruavUnit.partyID + 'sdr_1111b'} onClick={() => this.fn_onUpdate(v_andruavUnit)}>Update</button>     */}
         const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
         var btn_activate_css = this.getActiveButtonStyle(v_andruavUnit);
@@ -252,34 +252,30 @@ export class ClssCTRL_SDR extends React.Component {
                 <div key={v_andruavUnit.partyID + 'sdr_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.partyID + 'sdr_11'} className="col-6 col-md-6 ">
                         <div key={v_andruavUnit.partyID + 'sdr_111'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>SDR Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p> */}
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dr_name'} className="col-5">SDR Driver</label>
-                            <select multiple="" className="form-select" id={v_andruavUnit.partyID + 'sdr_dr_name'} value={this.getDriverNameByIndex(v_andruavUnit, this.state.m_driver_index)} onChange={(e) => this.fn_onDriver(e)}>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dr_name'} className="col-5"><small><b>SDR Driver</b></small></label>
+                            <select multiple="" className="col-5" id={v_andruavUnit.partyID + 'sdr_dr_name'} defaultValue={this.getDriverNameByIndex(v_andruavUnit, this.state.m_driver_index)} onChange={(e) => this.fn_onDriver(e)}>
                                 {driver_names}
                             </select>
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_112'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_1121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Freq <span className='text-warning' ><b>{v_andruavUnit.m_SDR.m_center_frequency}</b></span></b></small></span></p> */}
-                            <label className="col-5">Freq Center</label>
+                            <label className="col-5"><small><b>Freq Center</b></small></label>
                             <input type="text" className="col-5" placeholder="Center Frequency" aria-label="Center Frequency"  value={this.state.m_center_frequency} onChange={(e)=> this.fn_onFreqCenter(e)}/>
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_212'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_2121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Group <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_password}</b></span> </b></small></span></p> */}
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_f'} className="col-5">Freq</label>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_f'} className="col-5"><small><b>Freq</b></small></label>
                             <input type="text" id={v_andruavUnit.partyID + 'sdr_f'} className="col-5" placeholder="Freq" aria-label="Freq"  value={this.state.m_frequency} onChange={(e)=> this.fn_onFreq(e)}/>
                         
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_114'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_1141'} className="textunit_nowidth user-select-all m-0"><span><small><b>Gain  <span className='text-warning' ><b>{v_andruavUnit.m_SDR.m_gain}</b></span><span className="text-success">{}</span></b></small></span></p> */}
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5">Gain</label>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5"><small><b>Gain</b></small></label>
                             <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5" placeholder="Gain" aria-label="Gain"  value={this.state.m_gain} onChange={(e)=> this.fn_onGain(e)}/>
                         </div>
                     </div>
                     <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
                         
                         <div key={v_andruavUnit.partyID + 'sdr_211'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_modes'} className="col-5">Decode Mode</label>
-                            <select multiple="" className="form-select" id={v_andruavUnit.partyID + 'sdr_dm_modes'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectDecodeModes(e)}>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_modes'} className="col-5"><small><b>Decode Mode</b></small></label>
+                            <select multiple="" className="col-5" id={v_andruavUnit.partyID + 'sdr_dm_modes'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectDecodeModes(e)}>
                                 <option value="0">FM</option>
                                 <option value="1">NBFM</option>
                                 <option value="2">AM</option>
@@ -291,15 +287,16 @@ export class ClssCTRL_SDR extends React.Component {
 
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_213'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_2131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Status  <span className={css_parent_connected} ><b>{txt_parent_connected}</b></span></b></small></span></p> */}
-                            <label className="col-5">Sample Rate</label>
+                            <label className="col-5"><small><b>Sample Rate</b></small></label>
                             <input type="text" className="col-5" placeholder="Sample Rate" aria-label="Sample Rate"  value={this.state.m_sample_rate} onChange={(e)=> this.fn_onSampleRate(e)}/>
                         
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_113'} className='row css_margin_zero padding_zero '>
-                            {/* <p key={v_andruavUnit.partyID + 'sdr_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>BW  <span className='text-warning' ><b>{v_andruavUnit.m_SDR.m_band_width}</b></span><span className="text-success">{}</span></b></small></span></p> */}
-                            <label className="col-5">Band Width</label>
-                            {/*<input type="text" className="col-5" placeholder="Bandwidth" aria-label="Bandwidth"  value={this.state.m_band_width} onChange={(e)=> this.fn_onBandWidth(e)}/>*/}
+                        <div key={v_andruavUnit.partyID + 'sdr_215'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5"><small><b>Bars</b></small></label>
+                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5" placeholder="Bars" aria-label="Bars"  value={this.state.m_display_bars} onChange={(e)=> this.fn_onDisplayBars(e)}/>
+                        </div>
+                        <div key={v_andruavUnit.partyID + 'sdr_214'} className='row css_margin_zero padding_zero '>
+                            <label className="col-5"><small><b>Band Width</b></small></label>
                             <p  className="col-5" placeholder="Bandwidth" aria-label="Bandwidth">{this.state.m_band_width}</p>
                         </div>
                         
@@ -312,11 +309,10 @@ export class ClssCTRL_SDR extends React.Component {
                 </div>
                     {cmd_btns}
                 <div key={v_andruavUnit.partyID + 'sdr_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
-                    {/* <CLASS_CTRL_P2P_IN_RANGE_NODEs key={v_andruavUnit.partyID + 'sdr_41'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_NODEs> */}
                     <ClassSDRSpectrumVisualizer p_unit={this.props.p_unit}/>
                 </div> 
                 <div key={v_andruavUnit.partyID + 'sdr_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
-                    {/* <CLASS_CTRL_P2P_IN_RANGE_BSSIDs key={v_andruavUnit.partyID + 'sdr_51'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_BSSIDs> */}
+                    
                     
                 </div>
             </div>

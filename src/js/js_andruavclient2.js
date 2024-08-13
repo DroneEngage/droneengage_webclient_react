@@ -2189,12 +2189,13 @@ class CAndruavClient {
                 p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
                 p_unit.m_SDR.m_frequency                = p_jmsg.f;
                 p_unit.m_SDR.m_band_width               = p_jmsg.b;
+                p_unit.m_SDR.m_display_bars             = p_jmsg.r;
                 p_unit.m_SDR.m_gain                     = p_jmsg.g;
                 p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
                 p_unit.m_SDR.m_decode_mode              = p_jmsg.m;
                 p_unit.m_SDR.m_driver                   = p_jmsg.n;
                 p_unit.m_SDR.m_status                   = p_jmsg.c;
-
+                
                 
                 js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
             }
