@@ -232,9 +232,6 @@ export class ClssCTRL_SDR extends React.Component {
                 <div key={v_andruavUnit.partyID + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
                     <p key={v_andruavUnit.partyID + 'sdr2_241'} className={' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
                 </div>
-                {/* <div key={v_andruavUnit.partyID + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_211'} className={' rounded-3 text-white cursor_hand textunit_nowidth al_c ' + btn_activate_css} title ='Activate SDR Device' onClick={() => this.fn_activateSDR(v_andruavUnit)}>Activate</p>
-                </div> */}
                 <div key={v_andruavUnit.partyID + 'sdr2_221'} className= 'col-4 col-sm-3 user-select-none '>
                     <p key={v_andruavUnit.partyID + 'sdr2_221'} className={' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
                 </div>
