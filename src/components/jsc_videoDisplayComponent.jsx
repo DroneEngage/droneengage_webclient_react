@@ -98,7 +98,7 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_recordVideo (v_e)
     {
-        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined)
         {
             return ;
@@ -128,7 +128,7 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_stopVideo (v_e)
     {
-        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
 		if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 		const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         v_talk.hangup(true);
@@ -385,7 +385,7 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_rotate(v_e)
     {
-        var v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
 		if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 		this.m_rotation = (this.m_rotation + 1) %4;
         js_globals.v_andruavClient.API_CONST_RemoteCommand_rotateVideo(v_andruavUnit,this.m_rotations[this.m_rotation], this.props.obj.v_track);

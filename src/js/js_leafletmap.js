@@ -502,30 +502,24 @@ class CLeafLetAndruavMap {
         }
         
         var v_popupAnchor = [-p_iconsize[0]/2,-p_iconsize[0]/2];
+        let v_htmlIcon = "<image src='" + p_image + "'/>";
         if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
-            v_image = new L.icon({
-                iconUrl: p_image,
-                iconSize: p_iconsize,
-                iconAnchor: v_iconAnchor,
-                popupAnchor: v_popupAnchor,
-                // shadowUrl: 'my-icon-shadow.png',
-                // shadowSize: [68, 95],
-                // shadowAnchor: [22, 94]
-            });
+            
         } else {
-            var v_htmlIcon = p_htmlTitle + "<image src='" + p_image + "'/>";
-            v_image = L.divIcon({
-                html: v_htmlIcon,
-                iconSize: p_iconsize,
-                iconAnchor: v_iconAnchor,
-                popupAnchor: v_popupAnchor,
-                className: "css_leaflet_icon"
-                // shadowUrl: 'my-icon-shadow.png',
-                // shadowSize: [68, 95],
-                // shadowAnchor: [22, 94]
-            });
-
+            v_htmlIcon = p_htmlTitle + "<image src='" + p_image + "'/>";
         }
+
+        v_image = L.divIcon({
+            html: v_htmlIcon,
+            iconSize: p_iconsize,
+            iconAnchor: v_iconAnchor,
+            popupAnchor: v_popupAnchor,
+            className: "css_leaflet_icon"
+            // shadowUrl: 'my-icon-shadow.png',
+            // shadowSize: [68, 95],
+            // shadowAnchor: [22, 94]
+        });
+
 
         return v_image;
     }
@@ -543,25 +537,14 @@ class CLeafLetAndruavMap {
     };
 
 
-    fn_setMarkerIcon(p_marker, p_image) {
-        var v_image = L.icon({
-            iconUrl: p_image,
-            iconSize: [
-                32, 32
-            ],
-            iconAnchor: [
-                16, 23
-            ],
-            popupAnchor: [
-                10, 10
-            ],
-            // shadowUrl: 'my-icon-shadow.png',
-            // shadowSize: [68, 95],
-            // shadowAnchor: [22, 94]
-        });
+    fn_setMarkerIcon(p_marker, p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
+        if (p_marker == null) 
+            return;
+        
+        const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
+
 
         p_marker.setIcon(v_image);
-
     };
 
 
