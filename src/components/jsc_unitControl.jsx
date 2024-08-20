@@ -256,8 +256,8 @@ class ClssAndruavUnit_GCS extends ClssAndruavUnit {
 
     render ()
     {
-        var v_andruavUnit = this.props.m_unit; 
-        var v_hidden = "";
+        let v_andruavUnit = this.props.m_unit; 
+        let v_hidden = "";
         if (this.props.v_en_GCS === false)
         {
             v_hidden = 'hidden';
@@ -1178,7 +1178,7 @@ class ClssAndruavUnit_Drone extends ClssAndruavUnit {
     render ()
     {
 
-        var v_andruavUnit = this.props.m_unit; 
+        let v_andruavUnit = this.props.m_unit; 
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 

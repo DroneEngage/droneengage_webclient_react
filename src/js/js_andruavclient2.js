@@ -68,7 +68,6 @@ const CONST_TASK_SCOPE_LOCALGROUP = 2;
 const CONST_TASK_SCOPE_PARTYID = 3;
 
 
-var Me;
 
 
 class CAndruavClient {
@@ -364,7 +363,7 @@ class CAndruavClient {
     };
 
     API_sendCMD(p_target, msgType, msg) {
-        var v_rountingMsg;
+        let v_rountingMsg;
         if (p_target !== null && p_target !== undefined) {
             v_rountingMsg = CMD_COMM_INDIVIDUAL;
         } else { // if you want to prevent GCS to GCS.
@@ -384,15 +383,15 @@ class CAndruavClient {
 
 
     API_sendBinCMD(targetName, msgType, data) {
-        var v_msgRouting;
+        let v_msgRouting;
         if (targetName !== null && targetName !== undefined) {
             v_msgRouting = CMD_COMM_INDIVIDUAL;
         } else {
             v_msgRouting = CMD_COMM_GROUP;
         }
 
-        var h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
-        var ws = this.ws;
+        let h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
+        let ws = this.ws;
         
         const msgx = js_helpers.fn_concatBuffers(h, data, true);
         ws.sendex(msgx, true);
@@ -554,13 +553,13 @@ class CAndruavClient {
      */
      API_WriteParameter (p_andruavUnit, p_mavlink_param) {
         p_mavlink_param.param_value = p_mavlink_param.modified_value;
-        var p_param_set = new mavlink20.messages.param_set(
+        let p_param_set = new mavlink20.messages.param_set(
             p_mavlink_param.target_system, p_mavlink_param.target_component, 
             p_mavlink_param.param_id, p_mavlink_param.param_value, 
             p_mavlink_param.param_type
         );
-        var x = p_param_set.pack(p_param_set);
-        var z = js_helpers.array_to_ArrayBuffer(x);
+        let x = p_param_set.pack(p_param_set);
+        let z = js_helpers.array_to_ArrayBuffer(x);
         this.API_sendBinCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink, z);
         p_mavlink_param.is_dirty = false;
     };
@@ -568,7 +567,7 @@ class CAndruavClient {
 
     // CODEBLOCK_START
     API_SendTrackCRegion(p_andruavUnit, p_corner1_x, p_corner1_y, p_corner2_x, p_corner2_y) {
-        var msg = {
+        let msg = {
             a: p_corner1_x,
             b: p_corner1_y,
             c: p_corner2_x,
@@ -581,7 +580,7 @@ class CAndruavClient {
 
     // CODEBLOCK_START
     API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius) {
-        var msg = {
+        let msg = {
             a: p_center_x,
             b: p_center_y,
             r: p_radius
@@ -591,7 +590,7 @@ class CAndruavClient {
     };
 
     API_StopTracking(p_andruavUnit) {
-        var msg = {
+        let msg = {
             s: true
         };
 
@@ -601,7 +600,7 @@ class CAndruavClient {
 
     API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration) {
 
-        var msg = {
+        let msg = {
         };
 
         if (comm_on_off!=null)
@@ -630,7 +629,7 @@ class CAndruavClient {
 
     API_requestIMU(p_andruavUnit, on_off) {
 
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_RemoteCommand_IMUCTRL,
             Act: on_off
         };
@@ -646,7 +645,7 @@ class CAndruavClient {
             return;
         
 
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
             Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_RESUME
         };
@@ -662,7 +661,7 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)
             return;
         
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
             Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_PAUSE
         };
@@ -674,7 +673,7 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)
             return;
         
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
             Act: js_andruavMessages.CONST_TELEMETRY_ADJUST_RATE
         };
@@ -689,7 +688,7 @@ class CAndruavClient {
     
     API_stopTelemetry(p_andruavUnit) {
 
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
             Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_END
         };
@@ -707,8 +706,8 @@ class CAndruavClient {
     API_SendTelemetryData(p_andruavUnit, data) {
         // var msg = {};
         // msg.src = CONST_TELEMETRY_SOURCE_GCS;
-        var me = this;
-        var reader = new FileReader();
+        let me = this;
+        let reader = new FileReader();
         reader.onload = function (event) {
             const contents = event.target.result;
                 
@@ -734,7 +733,7 @@ class CAndruavClient {
      * @param {*} p_target is partyID not a unit object.
      */
     API_sendID(p_target) {
-        var msg = {
+        let msg = {
             VT: js_andruavUnit.CONST_VEHICLE_GCS, // VehicleType
             GS: this.m_andruavUnit.m_IsGCS, // IsCGS
             VR: 0, // VideoRecording [OPTIONAL in later Andruav versions]
@@ -756,7 +755,7 @@ class CAndruavClient {
      * @param {*} p_partyID is partyID not a unit object.
      */
     API_requestID(p_partyID) {
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_ID
         };
         this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
@@ -764,7 +763,7 @@ class CAndruavClient {
 
 
     API_requestP2P(p_andruavUnit) {
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO
         };
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
@@ -772,7 +771,7 @@ class CAndruavClient {
 
 
     API_requestSDR(p_andruavUnit) {
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO
         };
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
@@ -780,7 +779,7 @@ class CAndruavClient {
 
 
     API_scanSDRDrivers(p_andruavUnit) {
-        var msg = {
+        let msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
             a: js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES
 
@@ -789,7 +788,7 @@ class CAndruavClient {
     }
 
     API_scanSDRFreq(p_andruavUnit) {
-        var msg = {
+        let msg = {
             a: js_andruavMessages.CONST_SDR_ACTION_READ_DATA
 
         };
@@ -931,7 +930,7 @@ class CAndruavClient {
 
 
     API_sendRXChannels(p_axes) {
-        var v_axis = [0, 1, 2, 3];
+        let v_axis = [0, 1, 2, 3];
         if ((this.m_gamePadUnit === null || this.m_gamePadUnit === undefined) || (this.m_gamePadUnit.partyID === null || this.m_gamePadUnit.partyID === undefined)) 
             return;
         
@@ -966,7 +965,7 @@ class CAndruavClient {
 		 */
     API_do_ServoChannel(p_partyID, p_channelNum, p_value) {
 
-        var msg = {
+        let msg = {
             n: parseInt(p_channelNum),
             v: parseInt(p_value)
         };
@@ -976,7 +975,7 @@ class CAndruavClient {
     // Very Danger to expose [emergencyDisarm]
     API_do_Arm(p_andruavUnit, param_toArm, param_emergencyDisarm) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var msg = {
+        let msg = {
             A: param_toArm,
             D: param_emergencyDisarm
         };
@@ -986,7 +985,7 @@ class CAndruavClient {
 
     API_do_ChangeAltitude(p_andruavUnit, param_altitude) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined)||(p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined)) return ;
-        var msg = {
+        let msg = {
             a: parseInt(param_altitude)
         };
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude, msg);
@@ -995,7 +994,7 @@ class CAndruavClient {
 
     API_do_YAW(p_andruavUnit, var_targetAngle, var_turnRate, var_isClockwise, var_isRelative) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined)||(p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined)) return ;
-        var msg = {
+        let msg = {
             A: parseFloat(var_targetAngle),
             R: parseFloat(var_turnRate),
             C: var_isClockwise,
@@ -1025,7 +1024,7 @@ class CAndruavClient {
     API_do_GetHomeLocation (p_andruavUnit)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation
         };
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
@@ -1035,7 +1034,7 @@ class CAndruavClient {
 
     API_do_GimbalCtrl(p_andruavUnit, p_pitch, p_roll, p_yaw, p_isAbsolute) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             A: Math.round(p_pitch),
             B: Math.round(p_roll),
             C: Math.round(p_yaw),
@@ -1054,7 +1053,7 @@ class CAndruavClient {
 
     API_do_ChangeSpeed2(p_andruavUnit, p_speed, p_isGroundSpeed, p_throttle, p_isRelative) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             a: p_speed,
             b: (p_isGroundSpeed === null || p_isGroundSpeed === undefined) ? true : p_isGroundSpeed,
             c: (p_throttle === null || p_throttle === undefined) ? -1 : p_throttle,
@@ -1066,13 +1065,13 @@ class CAndruavClient {
 
     API_do_Land(p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {};
+        let v_msg = {};
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Land, v_msg);
     }
 
     //TODO: change p_partyID to p_andruavUnit
     API_do_FlightMode(p_partyID, flightMode) {
-        var v_msg = {
+        let v_msg = {
             F: flightMode
         };
         this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_FlightControl, v_msg);
@@ -1082,7 +1081,7 @@ class CAndruavClient {
     API_setGPSSource(p_andruavUnit, p_source) { // (p_andruavUnit,OnOff)
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_SET_GPS_SOURCE,
             s: p_source
         };
@@ -1091,7 +1090,7 @@ class CAndruavClient {
 
 
     API_WebRTC_Signalling(p_partyID, p_webrtcMsg) {
-        var v_msg = {
+        let v_msg = {
             w: p_webrtcMsg
         };
         this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Signaling, v_msg);
@@ -1101,7 +1100,7 @@ class CAndruavClient {
     API_CONST_RemoteCommand_streamVideo(p_andruavUnit, p_OnOff, p_number, p_channel) {
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_STREAMVIDEO,
             Act: p_OnOff
         };
@@ -1119,7 +1118,7 @@ class CAndruavClient {
     API_CONST_RemoteCommand_rotateVideo(p_andruavUnit, p_rotation_angle, p_channel) {
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_ROTATECAM,
             r: p_rotation_angle,
             a: p_channel
@@ -1142,7 +1141,7 @@ class CAndruavClient {
 		 * @param {any} zVel
 		 */
     API_do_FlyHere(p_partyID, p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
-        var v_msg = {
+        let v_msg = {
             a: p_latitude,
             g: p_longitude,
             l: p_altitude
@@ -1158,7 +1157,7 @@ class CAndruavClient {
 
 
     API_do_CircleHere(p_partyID, p_latitude, p_longitude, p_altitude, p_radius, p_turns) {
-        var v_msg = {
+        const v_msg = {
             a: p_latitude,
             g: p_longitude,
             l: p_altitude,
@@ -1177,7 +1176,7 @@ class CAndruavClient {
 
     // local function
     _API_requestReloadLocalGroupTasks(v_target, v_taskscope, v_tasktype) {
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavSystem_LoadTasks, // hardcoded here
             ts: v_taskscope
         };
@@ -1191,7 +1190,7 @@ class CAndruavClient {
 
 
     API_requestGeoFences(p_andruavUnit, p_fenceName) {
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence
 
         };
@@ -1204,9 +1203,7 @@ class CAndruavClient {
 
 
     API_requestGeoFencesAttachStatus(p_andruavUnit, p_fenceName) {
-
-
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
 
         };
@@ -1223,7 +1220,7 @@ class CAndruavClient {
     API_requestDeleteGeoFences(p_andruavUnit, p_fenceName) {
 
 
-        var v_msg = {
+        let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA
 
         };
@@ -1241,9 +1238,9 @@ class CAndruavClient {
     API_uploadWayPoints(p_andruavUnit, p_eraseFirst, p_textMission) { // eraseFirst NOT IMPLEMENTED YET
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        var v_msg = {};
-
-        v_msg.a = p_textMission;
+        const v_msg = {   
+            a: p_textMission
+        };
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_UploadWayPoints, v_msg);
 
@@ -1275,7 +1272,7 @@ class CAndruavClient {
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        var v_msg = {
+        const v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_CLEAR_WAY_POINTS
 
         };
@@ -1300,10 +1297,11 @@ class CAndruavClient {
         if (p_missionNumber < 0) 
             p_missionNumber = 0;
         
-        var p_msg = {};
+        const p_msg = {
 
-        p_msg.C = js_andruavMessages.CONST_RemoteCommand_SET_START_MISSION_ITEM;
-        p_msg.n = p_missionNumber;
+                C: js_andruavMessages.CONST_RemoteCommand_SET_START_MISSION_ITEM,
+                n: p_missionNumber
+        };
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
 
@@ -1318,7 +1316,7 @@ class CAndruavClient {
             return;
         }
 
-        var p_msg = {
+        const p_msg = {
             a: parseInt(p_event_id)
         };
 
@@ -1332,7 +1330,7 @@ class CAndruavClient {
             return;
         }
 
-        var p_msg = {};
+        let p_msg = {};
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SearchTargetList, p_msg);
     }
     // CODEBLOCK_END
@@ -1340,7 +1338,7 @@ class CAndruavClient {
     API_requestUdpProxyStatus (p_andruavUnit)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var msg = {
+        const msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_UdpProxy_Info
         };
 
@@ -1351,7 +1349,7 @@ class CAndruavClient {
     API_setUdpProxyClientPort (p_andruavUnit, p_clientPort)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var msg = {
+        const msg = {
             C: js_andruavMessages.CONST_RemoteCommand_SET_UDPPROXY_CLIENT_PORT,
             P: p_clientPort
         };
@@ -1363,7 +1361,7 @@ class CAndruavClient {
     API_requestMissionCount (p_andruavUnit)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var msg = {
+        const msg = {
             C: js_andruavMessages.CONST_RemoteCommand_MISSION_COUNT
         };
 
@@ -1374,7 +1372,7 @@ class CAndruavClient {
     API_requestWayPoints(p_andruavUnit, p_enableFCB) 
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var msg = {};
+        let msg = {};
         if (p_enableFCB === true) {
             msg.C = js_andruavMessages.CONST_RemoteCommand_RELOAD_WAY_POINTS_FROM_FCB;
         } else {
@@ -1394,7 +1392,7 @@ class CAndruavClient {
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        var msg = {};
+        let msg = {};
         msg.C = js_andruavMessages.CONST_RemoteCommand_REQUEST_PARAM_LIST;
         
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
@@ -1407,7 +1405,7 @@ class CAndruavClient {
             this.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList);
         }
 
-        var p_msg = {
+        let p_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList
         };
 
@@ -1417,7 +1415,7 @@ class CAndruavClient {
 
     API_requestDeleteWayPoint(p_PartyID, p_fenceName) {
 
-        var p_msg = {
+        let p_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_CLEAR_WAY_POINTS
 
         };
@@ -1457,7 +1455,7 @@ class CAndruavClient {
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var p_msg = {
+        let p_msg = {
             b: p_subAction
 
         };
@@ -1468,7 +1466,7 @@ class CAndruavClient {
 
     API_connectToFCB(p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        var p_msg = {
+        let p_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_CONNECT_FCB
 
         };
@@ -1477,7 +1475,7 @@ class CAndruavClient {
 
 
     API_SwitchCamera(p_target, p_cameraUniqueName) {
-        var msg = {
+        let msg = {
             u: p_cameraUniqueName
         };
 
@@ -1486,7 +1484,7 @@ class CAndruavClient {
 
 
     API_TurnMobileFlash(p_target, p_flashOn, p_cameraUniqueName) {
-        var msg = {
+        let msg = {
             f: p_flashOn,
             u: p_cameraUniqueName
         };
@@ -1496,7 +1494,7 @@ class CAndruavClient {
 
 
     API_CONST_RemoteCommand_zoomCamera(p_target, p_cameraUniqueName, p_isZoomeIn, p_zoomValue, p_zoomValueStep) {
-        var msg = {
+        let msg = {
             u: p_cameraUniqueName,
             a: p_isZoomeIn
         };
@@ -1514,7 +1512,7 @@ class CAndruavClient {
 
 
     API_CONST_RemoteCommand_takeImage2(p_target, _cameraSource, _numberofImages, _timeBetweenShots, _distanceBetweenShots) {
-        var msg = {
+        const msg = {
             a: _cameraSource,
             b: parseInt(_numberofImages),
             c: parseFloat(_timeBetweenShots),
@@ -1525,12 +1523,12 @@ class CAndruavClient {
 
 
     API_CONST_RemoteCommand_recordVideo(p_target, p_trackId, p_OnOff) {
-        var v_unit = js_globals.m_andruavUnitList.fn_getUnit(p_target);
+        let v_unit = js_globals.m_andruavUnitList.fn_getUnit(p_target);
         if (v_unit === null || v_unit === undefined) { // you may declare an error message or send for ID Request
             return;
         }
 
-        var v_OnOff;
+        let v_OnOff;
 
         if (p_OnOff !== null && p_OnOff !== undefined) {
             v_OnOff = p_OnOff;
@@ -1538,7 +1536,7 @@ class CAndruavClient {
             v_OnOff = ! v_unit.m_Video.VideoRecording
         }
 
-        var v_msg = {
+        const v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_RECORDVIDEO,
             // New field here
             T: p_trackId,
@@ -1550,12 +1548,12 @@ class CAndruavClient {
 
 
     prv_parseFenceInfo(p_andruavUnit, p_jmsg) {
-        var fencetype;
-        var m_shouldKeepOutside = false;
+        let fencetype;
+        let m_shouldKeepOutside = false;
         // var jmsg 				= msg.msgPayload;
 
-        var v_geoFenceName = p_jmsg.n;
-        var v_maximumDistance = (p_jmsg.hasOwnProperty('r')) ? p_jmsg.r : 0; // optional
+        let v_geoFenceName = p_jmsg.n;
+        let v_maximumDistance = (p_jmsg.hasOwnProperty('r')) ? p_jmsg.r : 0; // optional
         if (p_jmsg.hasOwnProperty('o')) { // 1 if restricted area
             m_shouldKeepOutside = (p_jmsg.o === 1); // optional
         }
@@ -1571,13 +1569,13 @@ class CAndruavClient {
                     break;
             }
         }
-        var geoFenceInfo = {};
-        var LngLatPoints = [];
+        let geoFenceInfo = {};
+        let LngLatPoints = [];
 
-        var count = (fencetype === js_andruavMessages.CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
+        let count = (fencetype === js_andruavMessages.CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
 
         for (let i = 0; i < count; ++ i) {
-            var lnglat = {};
+            let lnglat = {};
             lnglat.lat = parseFloat(p_jmsg[i].a);
             lnglat.lng = parseFloat(p_jmsg[i].g);
             if (p_jmsg[i].hasOwnProperty('l')) 
@@ -1599,7 +1597,7 @@ class CAndruavClient {
 
     // please move it out side
     fn_generateJSONMessage(p_senderID, p_targetID, p_msgRouting, p_msgID, p_msg) { // prepare json data
-        var p_jmsg = {
+        const p_jmsg = {
             ty: p_msgRouting,
             // MSGRrouting,
             // cm: cm, //cmd, DEPRECATED
@@ -1634,9 +1632,9 @@ class CAndruavClient {
 
     fn_parseJSONMessage(JsonMessage) {
 
-        var p_jmsg = JSON.parse(JsonMessage); // PHP sends Json data
+        const p_jmsg = JSON.parse(JsonMessage); // PHP sends Json data
 
-        var message = {
+        const message = {
             _ty: p_jmsg.ty,
             // command type
             // _cd 		: p_jmsg.cm,                 //main-command DEPRECATED
@@ -1656,7 +1654,7 @@ class CAndruavClient {
     prv_parseCommunicationMessage(Me, msg, evt) {
 
         var p_jmsg;
-        var p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
+        let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 
         if (p_unit === null || p_unit === undefined)
         {
@@ -1894,15 +1892,15 @@ class CAndruavClient {
 
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_ID: {
-                    var v_trigger_on_vehicleblocked = false;
-                    var v_trigger_on_flying = false;
-                    var v_trigger_on_armed = false;
-                    var v_trigger_on_FCB = false;
-                    var v_trigger_on_flightMode = false;
-                    var v_trigger_on_module_changed = false;
-                    var v_trigger_on_vehiclechanged = false;
-                    var v_trigger_on_swarm_status = false,
-                        v_trigger_on_swarm_status2 = false;
+                let v_trigger_on_vehicleblocked = false;
+                let v_trigger_on_flying = false;
+                let v_trigger_on_armed = false;
+                let v_trigger_on_FCB = false;
+                let v_trigger_on_flightMode = false;
+                let v_trigger_on_module_changed = false;
+                let v_trigger_on_vehiclechanged = false;
+                let v_trigger_on_swarm_status = false;
+                let v_trigger_on_swarm_status2 = false;
                     
                     
 
