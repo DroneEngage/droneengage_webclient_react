@@ -3,6 +3,7 @@ import $ from 'jquery';
 import React    from 'react';
 import L from 'leaflet';
 
+import {js_leafletmap} from '../../js/js_leafletmap'
 import {js_globals} from '../../js/js_globals.js';
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
@@ -89,9 +90,8 @@ export class CWayPointAction extends React.Component {
 
             
         }
-        
-        this.props.p_shape.setIcon(L.icon(icon_img));
-
+        js_leafletmap.fn_setVehicleIcon(this.props.p_shape, icon_img.iconUrl, "", null, icon_img.iconAnchor, false, "", icon_img.scaledSize);
+				
         if (this.speed.fn_getValue() != null)
         {
             this.props.p_shape.m_missionItem.speed = parseFloat(this.speed.fn_getValue());
