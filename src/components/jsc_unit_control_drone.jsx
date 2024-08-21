@@ -37,12 +37,19 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     constructor(props)
 	{
 		super (props);
-        
+        this.state = {
+            m_update: 0
+        };
+
         this.props.m_unit.m_gui.speed_link = false;
-		
     }
 
     
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
+    }
+
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
@@ -54,7 +61,8 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
                 
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         
-        me.forceUpdate();
+        if (me.state.m_update === 0) return ;
+        me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_webRX_toggle (p_andruavUnit)
@@ -94,39 +102,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
   
 
 
-    fn_doChangeAltitudeByStep (p_andruavUnit, p_AltitudeInMeter)
-    {
-        js_common.fn_console_log ("fn_doChangeAltitudeByStep:" + p_AltitudeInMeter);
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-        
-        if ((p_AltitudeInMeter === null || p_AltitudeInMeter === undefined) || (p_AltitudeInMeter < js_globals.CONST_DEFAULT_ALTITUDE_min)) return ;
-
-        var v_speak;
-        
-        if (js_globals.v_useMetricSystem === true) {
-            v_speak = p_AltitudeInMeter.toFixed(1) + "meters";
-        }
-        else {
-            v_speak = (p_AltitudeInMeter * js_helpers.CONST_METER_TO_FEET).toFixed(1) + "feet";
-        }
-
-        
-        if (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE)
-        {
-            v_speak = "change depth to " + v_speak;
-
-            js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, -p_AltitudeInMeter);
-        }
-        else
-        {
-            v_speak = "change altitude to " + v_speak;
-            
-            js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, p_AltitudeInMeter);
-        }
-
-        js_speak.fn_speak(v_speak);
-
-    }
+    
    
 
 

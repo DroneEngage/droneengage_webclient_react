@@ -22,7 +22,7 @@ import {ClssCTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
 import {ClssCtrlDirections} from './gadgets/jsc_ctrl_directionsControl.jsx'
 import {ClssCTRL_SWARM} from './gadgets/jsc_ctrl_swarm.jsx'
 import {ClssCTRL_Drone_Speed_Ctrl} from './gadgets/jsc_ctrl_speed_control.jsx'
-
+import {ClssCTRL_Drone_Altitude_Ctrl} from './gadgets/jsc_ctrl_altitude_control.jsx'
 export class ClssCTRL_Drone_IMU extends React.Component {
     constructor(props)
     {
@@ -129,7 +129,6 @@ export class ClssCTRL_Drone_IMU extends React.Component {
     {
         var v_fence_text = "unknown";
 		var v_fence_class = "text-muted";
-		var v_altitude_text = "";
 		var v_yaw_text;
         var v_yaw_knob = [];
         var v_fcb_mode_title;		
@@ -263,65 +262,6 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         }
 
 
-        var v_alt_title, v_alt_remark;
-
-        if (v_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE)
-        {
-            v_alt_title ='depth:';
-            v_alt_remark = 'depth';
-        }
-        else
-        {
-            v_alt_title = 'Alt:';
-            v_alt_remark = 'Alt ';
-        }    
-        
-        v_alt_remark += 'display: relative/absolute ... step: ' + js_localStorage.fn_getDefaultAltitude();
-
-        if (js_globals.v_useMetricSystem === true) {
-            v_alt_remark += " m";
-        }
-        else
-        {
-            v_alt_remark += " feet";
-        }
-
-        
-		var v_altitude = v_andruavUnit.m_Nav_Info.p_Location.alt;
-		if (v_altitude==null) 
-        {
-            v_altitude = 'NA';
-        } 
-        else 
-        {
-            if (js_globals.v_useMetricSystem === true)
-            {
-                v_altitude = v_altitude.toFixed(0).toString() + "m";
-            }
-            else
-            {
-                v_altitude = (v_altitude * js_helpers.CONST_METER_TO_FEET).toFixed(0) + "ft";
-            }
-        }
-
-        var v_altitude_abs = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
-		if (v_altitude_abs==null) 
-        {
-            v_altitude_abs = 'NA';
-        } 
-        else 
-        {
-            if (js_globals.v_useMetricSystem === true)
-            {
-                v_altitude_abs = v_altitude_abs.toFixed(0).toString() + "m";
-            }
-            else
-            {
-                v_altitude_abs = (v_altitude_abs * js_helpers.CONST_METER_TO_FEET).toFixed(0) + "ft";
-            }
-        }
-
-        v_altitude_text = v_altitude + '/' + v_altitude_abs;    
 
 		if (v_andruavUnit.m_Nav_Info.p_Orientation.yaw==null)
         {
@@ -434,26 +374,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                 <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div className = 'row al_l css_margin_zero d-flex '>
                         <div className= 'col-6 col-md-3 user-select-none  p-1'>
-                                {/* <p className=' rounded-3 text-warning cursor_hand textunit_w135' title ='Ground Speed'>
-                                <span title={"decrease speed"} onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, - js_globals.CONST_DEFAULT_SPEED_STEP )}>
-                                    <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                                    </svg>
-                                </span>
-                                <span id='speed'  title={"target: "+v_targetspeed}onClick={ (e) => this.fn_changeSpeed(e,v_andruavUnit,v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?v_andruavUnit.m_Nav_Info.p_Location.ground_speed:v_andruavUnit.m_gui.speed_link)}>
-                                <small><b>&nbsp;
-                                 {'GS: ' + v_speed_text}
-                                 &nbsp;</b></small>
-                                </span>
-                                <span title="increase speed" onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, + js_globals.CONST_DEFAULT_SPEED_STEP )}>
-                                    <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
-                                    </svg>
-                                </span>
-                                </p> */}
-
                                 <ClssCTRL_Drone_Speed_Ctrl m_unit={v_andruavUnit}/>
-                                
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
@@ -468,25 +389,9 @@ export class ClssCTRL_Drone_IMU extends React.Component {
 
                     <div key={'alt_ctrl' + v_andruavUnit.partyID}   className = 'row al_l css_margin_zero d-flex '>
                         <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  p-1'>
-                                  <p id='alt'   className=' rounded-3 cursor_hand textunit_att_btn text-warning ' >
-                                        <span title={"decrease altitude"} onClick={ (e) => this.fn_doChangeAltitudeByStep(v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.alt - fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()) )}>
-                                            <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                                            </svg>
-                                        </span>
-
-                                        <span title ={v_alt_remark} onClick={ (e) => fn_changeAltitude(v_andruavUnit)}>
-                                            <small><b>{ v_alt_title + v_altitude_text + ' '}</b></small>
-                                        </span>
-
-                                        <span title="increase altitude" onClick={ (e) => this.fn_doChangeAltitudeByStep(v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.alt + fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()) )}>
-                                            <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
-                                            </svg>
-                                        </span>  
-                                  </p>
+                                  <ClssCTRL_Drone_Altitude_Ctrl m_unit={v_andruavUnit}/>
                               
-                        </div>
+                        </div> 
                         <div key={'alt_ctrl2'  + v_andruavUnit.partyID} className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
                                 <p id='fstatus'   className={' rounded-3  textunit_att_btn text-center p-1 ' + v_flight_status_class} title = {'Total Flying: ' + v_totalFlyingTime}>
                                 {v_flight_status_text + " "}   <small> {v_flyingTime}</small>
