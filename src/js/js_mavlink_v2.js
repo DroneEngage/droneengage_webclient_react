@@ -7,11 +7,11 @@ Note: this file has been auto-generated. DO NOT EDIT
 */
 
 import {jspack} from 'jspack' 
-import _, { map } from 'underscore'
+import _ from 'underscore'
 
 
 
-//var events = new EventEmitter(); // mhefny
+
 
 
 // Add a convenience method to Buffer
@@ -20,29 +20,29 @@ import _, { map } from 'underscore'
 // }
 
 
-function inherits(ctor, superCtor) {
-    if (superCtor) {
-      ctor.super_ = superCtor
-      ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-          value: ctor,
-          enumerable: false,
-          writable: true,
-          configurable: true
-        }
-      })
-    }
-  };
+// function inherits(ctor, superCtor) {
+//     if (superCtor) {
+//       ctor.super_ = superCtor
+//       ctor.prototype = Object.create(superCtor.prototype, {
+//         constructor: {
+//           value: ctor,
+//           enumerable: false,
+//           writable: true,
+//           configurable: true
+//         }
+//       })
+//     }
+//   };
 
 export var mavlink20 = function(){};
 
 // Implement the CRC-16/MCRF4XX function (present in the Python version through the mavutil.py package)
 mavlink20.x25Crc = function(buffer, crcIN) {
 
-    var bytes = buffer;
-    var crcOUT = crcIN ===  undefined ? 0xffff : crcIN;
+    let bytes = buffer;
+    let crcOUT = crcIN ===  undefined ? 0xffff : crcIN;
     _.each(bytes, function(e) {
-        var tmp = e ^ (crcOUT & 0xff);
+        let tmp = e ^ (crcOUT & 0xff);
         tmp = (tmp ^ (tmp << 4)) & 0xff;
         crcOUT = (crcOUT >> 8) ^ (tmp << 8) ^ (tmp << 3) ^ (tmp >> 4);
         crcOUT = crcOUT & 0xffff;
@@ -100,7 +100,7 @@ mavlink20.message.prototype.set = function(args) {
 mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
 
     this.payload = payload;
-    var plen = this.payload.length;
+    const plen = this.payload.length;
         //in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
         // variable length arrays and smaller packets
         while (plen > 1 && this.payload[plen-1] === 0) {
@@ -110,7 +110,7 @@ mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
         var incompat_flags = 0;
     this.header = new mavlink20.header(this.id, this.payload.length, mav.seq, mav.srcSystem, mav.srcComponent, incompat_flags, 0,);    
     this.msgbuf = this.header.pack().concat(this.payload);
-    var crc = mavlink20.x25Crc(this.msgbuf.slice(1));
+    let crc = mavlink20.x25Crc(this.msgbuf.slice(1));
 
     // For now, assume always using crc_extra = True.  TODO: check/fix this.
     crc = mavlink20.x25Crc([crc_extra], crc);
@@ -15592,7 +15592,7 @@ MAVLink20Processor.prototype.bytes_needed = function() {
 // add data to the local buffer
 MAVLink20Processor.prototype.pushBuffer = function(data) {
     if(data) {
-        var c = new Uint8Array (this.buf.length + data.length);
+        const c = new Uint8Array (this.buf.length + data.length);
         c.set (this.buf);
         c.set (data);
         this.buf = c;
@@ -15607,7 +15607,7 @@ MAVLink20Processor.prototype.parsePrefix = function() {
     if( this.buf.length >= 1 && this.buf[0] !== this.protocol_marker ) {
 
         // Strip the offending initial byte and throw an error.
-        var badPrefix = this.buf[0];
+        const badPrefix = this.buf[0];
         this.bufInError = this.buf.slice(0,1);
         this.buf = this.buf.slice(1);
         this.expected_length = mavlink20.HEADER_LEN;
@@ -15629,7 +15629,7 @@ MAVLink20Processor.prototype.parsePrefix = function() {
 MAVLink20Processor.prototype.parseLength = function() {
     
     if( this.buf.length >= 2 ) {
-        var unpacked = jspack.Unpack('BB', this.buf.slice(0, 2));
+        const unpacked = jspack.Unpack('BB', this.buf.slice(0, 2));
         this.expected_length = unpacked[1] + mavlink20.HEADER_LEN + 2 // length of message + header + CRC
     }
 
@@ -15638,7 +15638,7 @@ MAVLink20Processor.prototype.parseLength = function() {
 // input some data bytes, possibly returning a new message
 MAVLink20Processor.prototype.parseChar = function(c) {
 
-    var m = null;
+    let m = null;
 
     try {
 
@@ -15667,7 +15667,7 @@ MAVLink20Processor.prototype.parseChar = function(c) {
 
 MAVLink20Processor.prototype.parsePayload = function() {
 
-    var m = null;
+    let m = null;
 
     // If we have enough bytes to try and read it, read it.
     if( this.expected_length >= 8 && this.buf.length >= this.expected_length ) {
@@ -15701,7 +15701,7 @@ MAVLink20Processor.prototype.parsePayload = function() {
 MAVLink20Processor.prototype.parseBuffer = function(s) {
     
     // Get a message, if one is available in the stream.
-    var m = this.parseChar(s);
+    let m = this.parseChar(s);
 
     // No messages available, bail.
     if ( null === m ) {
@@ -15710,7 +15710,7 @@ MAVLink20Processor.prototype.parseBuffer = function(s) {
     
     // While more valid messages can be read from the existing buffer, add
     // them to the array of new messages and return them.
-    var ret = [m];
+    let ret = [m];
     while(true) {
         m = this.parseChar();
         if ( null === m ) {
@@ -15725,7 +15725,7 @@ MAVLink20Processor.prototype.parseBuffer = function(s) {
 /* decode a buffer as a MAVLink message */
 MAVLink20Processor.prototype.decode = function(msgbuf) {
 
-    var magic, incompat_flags, compat_flags, mlen, seq, srcSystem, srcComponent, unpacked, msgId;
+    let magic, incompat_flags, compat_flags, mlen, seq, srcSystem, srcComponent, unpacked, msgId;
 
     // decode the header
     try {
@@ -15737,8 +15737,8 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         seq = unpacked[4];
         srcSystem = unpacked[5];
         srcComponent = unpacked[6];
-        var msgIDlow = ((unpacked[7] & 0xFF) << 8) | ((unpacked[7] >> 8) & 0xFF);
-        var msgIDhigh = unpacked[8];
+        const msgIDlow = ((unpacked[7] & 0xFF) << 8) | ((unpacked[7] >> 8) & 0xFF);
+        const msgIDhigh = unpacked[8];
         msgId = msgIDlow | (msgIDhigh<<16);
         }
     catch(e) {
@@ -15759,7 +15759,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // decode the payload
     // refs: (fmt, type, order_map, crc_extra) = mavlink20.map[msgId]
-    var decoder = mavlink20.map[msgId];
+    let decoder = mavlink20.map[msgId];
 
     // decode the checksum
     try {
@@ -15768,7 +15768,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         throw new Error("Unable to unpack MAVLink CRC: " + e.message);
     }
 
-    var messageChecksum = mavlink20.x25Crc(msgbuf.slice(1, msgbuf.length - 2));
+    let messageChecksum = mavlink20.x25Crc(msgbuf.slice(1, msgbuf.length - 2));
 
     // Assuming using crc_extra = True.  See the message.prototype.pack() function.
     messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
@@ -15777,13 +15777,13 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
          throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got ' + receivedChecksum + ' checksum, calculated payload checksum as '+messageChecksum );
     }
 
-    var paylen = jspack.CalcLength(decoder.format);
-    var payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);
+    let paylen = jspack.CalcLength(decoder.format);
+    let payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);
 
     //put any truncated 0's back in
     if (paylen > payload.length) {
-        var zeros = new Uint8Array(paylen - payload.length)
-        var c = new Uint8Array(payload.length + zeros.length);
+        let zeros = new Uint8Array(paylen - payload.length)
+        let c = new Uint8Array(payload.length + zeros.length);
         c.set(payload);
         c.set(zeros, payload.length);
         payload =  c;
@@ -15797,7 +15797,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     }
 
     // Need to check if the message contains arrays
-    var args = {};
+    let args = {};
     const elementsInMsg = decoder.order_map.length;
     const actualElementsInMsg = JSON.parse(JSON.stringify(t)).length;
 
@@ -15808,15 +15808,15 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
         });
     } else {
         // This message contains arrays
-        var typeIndex = 1;
-        var orderIndex = 0;
-        var memberIndex = 0;
-        var tempArgs = {};
+        let typeIndex = 1;
+        let orderIndex = 0;
+        let memberIndex = 0;
+        let tempArgs = {};
 
         // Walk through the fields 
-        for(var i = 0, size = decoder.format.length-1; i <= size; ++i) {
-            var order = decoder.order_map[orderIndex];
-            var currentType =  decoder.format[typeIndex];
+        for(let i = 0, size = decoder.format.length-1; i <= size; ++i) {
+            let order = decoder.order_map[orderIndex];
+            let currentType =  decoder.format[typeIndex];
 
             if (isNaN(parseInt(currentType))) {
                 // This field is not an array check the type and add it to the args
@@ -15824,15 +15824,15 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
                 memberIndex++;
             } else {
                 // This field is part of an array, need to find the length of the array
-                var arraySize = ''
-                var newArray = []
+                let arraySize = ''
+                let newArray = []
                 while (!isNaN(decoder.format[typeIndex])) {
                     arraySize = arraySize + decoder.format[typeIndex];
                     typeIndex++;
                 }
 
                 // Now that we know how long the array is, create an array with the values
-                for(var j = 0, size2 = parseInt(arraySize); j < size2; ++j){
+                for(let j = 0, size2 = parseInt(arraySize); j < size2; ++j){
                     newArray.push(t[j+orderIndex]);
                     memberIndex++;
                 }
@@ -15854,18 +15854,19 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // construct the message object
     try {
-        var m = new decoder.type(args);
+        const m = new decoder.type(args);
         m.set.call(m, args);
+        m.msgbuf = msgbuf;
+        m.payload = payload
+        m.crc = receivedChecksum;
+        m.header = new mavlink20.header(msgId, mlen, seq, srcSystem, srcComponent, incompat_flags, compat_flags);
+        this.log(m);
+        return m;
     }
     catch (e) {
         throw new Error('Unable to instantiate MAVLink message of type '+decoder.type+' : ' + e.message);
     }
-    m.msgbuf = msgbuf;
-    m.payload = payload
-    m.crc = receivedChecksum;
-    m.header = new mavlink20.header(msgId, mlen, seq, srcSystem, srcComponent, incompat_flags, compat_flags);
-    this.log(m);
-    return m;
+    
 }
 
 
