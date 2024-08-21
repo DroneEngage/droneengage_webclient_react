@@ -506,7 +506,6 @@ function fn_handleKeyBoard() {
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
 			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
 			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
-			//js_globals.v_andruavClient.pub_streamOnOff = p;
 		}
 
 		function onWEBRTCSessionEnded(c_talk) {
@@ -2436,15 +2435,14 @@ function fn_handleKeyBoard() {
 		  Called when a new unit joins the system.
 		*/
 		var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
-			if (p_andruavUnit.m_IsGCS === false) {
-				p_andruavUnit.m_gui.defaultHight = js_globals.CONST_DEFAULT_ALTITUDE;
-				p_andruavUnit.m_gui.defaultCircleRadius = js_globals.CONST_DEFAULT_RADIUS;
-			}
+			// if (p_andruavUnit.m_IsGCS === false) {
+			// 	p_andruavUnit.m_gui.defaultHieght = js_globals.CONST_DEFAULT_ALTITUDE;
+			// 	p_andruavUnit.m_gui.defaultCircleRadius = js_globals.CONST_DEFAULT_RADIUS;
+			// }
 			
 			js_speak.fn_speak(p_andruavUnit.m_unitName + " unit added");
 
 			js_eventEmitter.fn_dispatch( js_globals.EE_unitAdded, p_andruavUnit);
-			js_globals.v_andruavClient.API_requestIMU (p_andruavUnit,true);
 		}	
 
 

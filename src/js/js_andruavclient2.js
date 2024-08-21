@@ -1620,14 +1620,12 @@ class CAndruavClient {
         this.API_requestGeoFencesAttachStatus(target);
         this.API_requestUdpProxyStatus(target);
         this.API_requestWayPoints(target);
+        this.API_requestIMU (target,true);
 
         
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
         }
-
-        
-        
     };
 
     fn_parseJSONMessage(JsonMessage) {
@@ -1702,7 +1700,7 @@ class CAndruavClient {
                     p_unit.m_Telemetry.m_udpProxy_paused = false;
                 }
                 
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_unit);
+                js_eventEmitter.fn_dispatch(js_globals.EE_onProxyInfoUpdated, p_unit);
                 
                 }
                 break;
@@ -2171,7 +2169,7 @@ class CAndruavClient {
                         
                     if (v_trigger_on_module_changed) {
                         // TODO:  not handled... please handle
-                        js_eventEmitter.fn_dispatch("EVT_andruavUnitModuleUpdated", p_unit);
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onModuleUpdated, p_unit);
                     } 
                         
             }

@@ -13,12 +13,12 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
             m_message: [],
             'm_update': 0
         };
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe (js_globals.EE_onProxyInfoUpdated,this,this.fn_onProxyInfoUpdated);
 
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onProxyInfoUpdated,this);
     }
 
     componentDidMount () 
@@ -26,15 +26,14 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
         this.state.m_update = 1;
     }
 
-    fn_unitUpdated (p_me,p_andruavUnit)
+    fn_onProxyInfoUpdated (p_me,p_andruavUnit)
     {
         try
         {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+            if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
 
-        if (p_me.state.m_update === 0) return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
-        //p_me.forceUpdate();
+            if (p_me.state.m_update === 0) return ;
+            p_me.setState({'m_update': p_me.state.m_update +1});
         }
         catch (ex)
         {
