@@ -2,15 +2,15 @@ import React    from 'react';
 
 import $ from 'jquery';
 
-import * as js_siteConfig from '../js/js_siteConfig'
-import * as js_common from '../js/js_common.js'
+import * as js_siteConfig from '../../js/js_siteConfig.js'
+import * as js_common from '../../js/js_common.js'
 
 import Modal from 'bootstrap/js/dist/modal';
 
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
-import {fn_do_modal_confirmation, fn_gotoUnit, fn_helpPage} from '../js/js_main'
+import {fn_do_modal_confirmation, fn_gotoUnit, fn_helpPage} from '../../js/js_main.js'
 
 
 class ClssParameterItem extends  React.Component {

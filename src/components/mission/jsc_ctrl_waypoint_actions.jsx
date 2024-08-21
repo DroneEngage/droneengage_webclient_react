@@ -6,7 +6,7 @@ import L from 'leaflet';
 import {js_globals} from '../../js/js_globals.js';
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
-import {CFieldChecked} from '../gadgets/jsc_mctrl_field_check'
+import {CFieldChecked} from '../micro_gadgets/jsc_mctrl_field_check'
 
 
 export class CWayPointAction extends React.Component {
