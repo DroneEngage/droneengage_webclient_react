@@ -115,17 +115,17 @@ class ClssAndruavUnitDroneHeader extends React.Component{
 }
 
 class ClssAndruavUnitDroneRow extends React.Component{
-    constructor()
+    constructor(props)
 	{
-		super ();
+		super (props);
         this.state={
             'm_update': 0
         };
         
         this._isMounted = false;
         
-        this.localvars={};
-        this.localvars.speed_link = false;	
+        this.props.m_unit.m_gui.speed_link = false;
+
 		this.telemetry_level=["OFF","1","2","3"];
         js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);

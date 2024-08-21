@@ -598,6 +598,7 @@ class C_GUIHelper {
     this.m_wayPoint_polygons = [];
     this.m_marker = null;
     this.m_marker_destination = null;
+    this.speed_link = false;
   }
 }
 

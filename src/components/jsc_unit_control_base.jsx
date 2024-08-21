@@ -9,7 +9,7 @@ import {js_speak} from '../js/js_speak.js'
 
 import * as js_andruavMessages from '../js/js_andruavMessages.js'
 
-import {fn_changeSpeed, fn_gotoUnit_byPartyID, fn_changeUnitInfo} from '../js/js_main.js'
+import {fn_gotoUnit_byPartyID, fn_changeUnitInfo} from '../js/js_main.js'
 
 export class ClssAndruavUnitBase extends React.Component {
     constructor(props)
@@ -34,7 +34,6 @@ export class ClssAndruavUnitBase extends React.Component {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
         {
-          //  js_common.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me
         }
 
@@ -43,11 +42,9 @@ export class ClssAndruavUnitBase extends React.Component {
         if (p_andruavUnit.m_IsGCS !== me.props.m_unit.m_IsGCS)
         {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
-          // js_common.fn_console_log ('err: Convert Me ' + p_andruavUnit.partyID);
-           
-           js_eventEmitter.fn_dispatch(js_globals.EE_unitAdded,p_andruavUnit);
-	
-        }
+            
+            js_eventEmitter.fn_dispatch(js_globals.EE_unitAdded,p_andruavUnit);
+	    }
 
         var v_date = p_andruavUnit.date;
         if (v_date === null || v_date === undefined)
@@ -116,52 +113,7 @@ export class ClssAndruavUnitBase extends React.Component {
 
     
 
-    fn_changeSpeed (e, p_andruavUnit, p_speed)
-    {
-        if (fn_changeSpeed === false) return ; // no speed info
-      fn_changeSpeed (p_andruavUnit);
-    }
-
-    fn_changeSpeedByStep (e, p_andruavUnit, p_step)
-    {
-        var p_speed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed;
-        if (p_speed === 0)
-        {
-            p_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-        }
-        p_speed = parseFloat(p_speed) + p_step;
-        if (p_speed === null || p_speed === undefined) return ;
-        
-        if (p_speed <= 0 )
-        {
-            // BAD SPEED
-            // TODO: Put a popup message here.
-            js_speak.fn_speak('speed cannot be zero');
-            return ;
-        }
-
-        if (isNaN(p_speed ) === true)
-        {
-            js_speak.fn_speak('set speed to 5m/s');
-            p_speed = 5.0
-        }
-        
-        var v_speak = "change speed to ";
-        // save target speed as indication.
-		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = parseFloat(p_speed);
-        
-        
-        if (js_globals.v_useMetricSystem === true) {
-            v_speak = v_speak + p_speed.toFixed(1) + " meter per second";
-        }
-        else {
-            v_speak = v_speak + (p_speed * js_helpers.CONST_METER_TO_MILE).toFixed(1) + "mile per hour";
-        }
-
-        js_speak.fn_speak(v_speak);
-
-        js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(p_speed));
-    }
+    
 
     fn_takeTXCtrl (e,p_andruavUnit)
     {
