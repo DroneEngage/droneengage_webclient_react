@@ -11,22 +11,20 @@ import {js_speak} from '../js/js_speak.js'
 import {js_andruavAuth} from '../js/js_andruavAuth.js'
 import { mavlink20 } from '../js/js_mavlink_v2.js';
 
-import {fn_do_modal_confirmation, fn_changeSpeed,
+import {fn_do_modal_confirmation, 
      getVehicleIcon, 
-     hlp_getFlightMode,
-     fn_isBadFencing, fn_switchGPS, fn_openFenceManager,
-     fn_convertToMeter, fn_putWayPoints, fn_changeAltitude,
+     fn_putWayPoints, 
      toggleVideo, toggleRecrodingVideo} from '../js/js_main.js'
 
 import * as js_andruavUnit from '../js/js_andruavUnit.js';
 import * as js_andruavMessages from '../js/js_andruavMessages.js'
 
 
+import {ClssMESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.
 import {ClssCTRL_SETTINGS} from './gadgets/jsc_ctrl_settingsControl.jsx'
 import {ClssCTRL_P2P} from './modules/p2p/jsc_ctrl_p2p.jsx'
 import {ClssCTRL_SDR} from './modules/sdr/jsc_ctrl_sdr.jsx'
 
-import {ClssMESSAGE_LOG} from './gadgets/jsc_ctrl_messagesControl.jsx' // add extension to allow encryptor to see it as same as file name.
 
 import {ClssCtrlArdupilotFlightController} from './flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
 import {ClssCtrlPx4FlightControl} from './flight_controllers/jsc_ctrl_px4_flightControl.jsx'
@@ -45,53 +43,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     }
 
     
-    fn_changeSpeed (e, p_andruavUnit, p_speed)
-    {
-        if (fn_changeSpeed === false) return ; // no speed info
-      fn_changeSpeed (p_andruavUnit);
-    }
-
-    fn_changeSpeedByStep (e, p_andruavUnit, p_step)
-    {
-        var p_speed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed;
-        if (p_speed === 0)
-        {
-            p_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-        }
-        p_speed = parseFloat(p_speed) + p_step;
-        if (p_speed === null || p_speed === undefined) return ;
-        
-        if (p_speed <= 0 )
-        {
-            // BAD SPEED
-            // TODO: Put a popup message here.
-            js_speak.fn_speak('speed cannot be zero');
-            return ;
-        }
-
-        if (isNaN(p_speed ) === true)
-        {
-            js_speak.fn_speak('set speed to 5m/s');
-            p_speed = 5.0
-        }
-        
-        var v_speak = "change speed to ";
-        // save target speed as indication.
-		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = parseFloat(p_speed);
-        
-        
-        if (js_globals.v_useMetricSystem === true) {
-            v_speak = v_speak + p_speed.toFixed(1) + " meter per second";
-        }
-        else {
-            v_speak = v_speak + (p_speed * js_helpers.CONST_METER_TO_MILE).toFixed(1) + "mile per hour";
-        }
-
-        js_speak.fn_speak(v_speak);
-
-        js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(p_speed));
-    }
-
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;

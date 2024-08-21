@@ -75,7 +75,7 @@ export class ClssAndruavUnitBase extends React.Component {
             return ; // not me
         }
         
-        me.forceUpdate();
+        me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_unitTelemetryOFF(me,p_andruavUnit)
@@ -87,7 +87,7 @@ export class ClssAndruavUnitBase extends React.Component {
             return ; // not me
         }
         
-        me.forceUpdate();
+        me.setState({'m_update': me.state.m_update +1});
     }
 
    

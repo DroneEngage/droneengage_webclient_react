@@ -129,9 +129,6 @@ class ClssAndruavUnitDroneRow extends React.Component{
 		this.telemetry_level=["OFF","1","2","3"];
         js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);
-        // js_eventEmitter.fn_subscribe(js_globals.EE_unitTelemetryOn,this,this.fn_unitTelemetryOn);
-        // js_eventEmitter.fn_subscribe(js_globals.EE_unitTelemetryOff,this,this.fn_unitTelemetryOFF);
-        
     }
 
      
@@ -143,8 +140,6 @@ class ClssAndruavUnitDroneRow extends React.Component{
         this._isMounted = false;
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this,);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this,);
-        //js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOn,this,);
-        //js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOff,this,);
     }
 
 
@@ -156,7 +151,6 @@ class ClssAndruavUnitDroneRow extends React.Component{
         if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         
-        //me.forceUpdate();
     }
 
     

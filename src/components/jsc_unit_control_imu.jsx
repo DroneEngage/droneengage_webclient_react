@@ -21,38 +21,26 @@ import {ClssCTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemet
 import {ClssCTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
 import {ClssCtrlDirections} from './gadgets/jsc_ctrl_directionsControl.jsx'
 import {ClssCTRL_SWARM} from './gadgets/jsc_ctrl_swarm.jsx'
-
+import {ClssCTRL_Drone_Speed_Ctrl} from './gadgets/jsc_ctrl_speed_control.jsx'
 
 export class ClssCTRL_Drone_IMU extends React.Component {
     constructor(props)
     {
         super(props);
         this.state = {
-                m_update : 0,
+            m_update : 0
         };
         
         this.telemetry_level=["OFF","1","2","3"];
-
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
-    
     };
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_unitUpdated,this);
     }
 
     componentDidMount () 
     {
         this.state.m_update = 1;
     }
-
-    fn_unitUpdated (p_me,p_andruavUnit)
-    {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update === 0) return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
-    }
-
 
     hlp_getGPS (p_andruavUnit)
     {
@@ -142,7 +130,6 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         var v_fence_text = "unknown";
 		var v_fence_class = "text-muted";
 		var v_altitude_text = "";
-		var v_speed_text = "";	
 		var v_yaw_text;
         var v_yaw_knob = [];
         var v_fcb_mode_title;		
@@ -194,25 +181,25 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         v_totalFlyingTime = js_helpers.fn_getTimeDiffDetails_Shortest ( (c_delta + v_andruavUnit.m_FlyingTotalDuration));
         
         
-        if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed==null) 
-        {
-            v_speed_text = 'NA'; 
-        }else
-        { 
-            v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-		    v_andruavUnit.m_gui.speed_link = true;
-            if (js_globals.v_useMetricSystem==true)
-            {
-                v_speed_text = v_speed_text.toFixed(0) + ' m/s';
-            }
-            else
-            {
-                v_speed_text = ( v_speed_text * js_helpers.CONST_METER_TO_MILE).toFixed(0) + ' mph';
-            }
+        // if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed==null) 
+        // {
+        //     v_speed_text = 'NA'; 
+        // }else
+        // { 
+        //     v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+		//     v_andruavUnit.m_gui.speed_link = true;
+        //     if (js_globals.v_useMetricSystem==true)
+        //     {
+        //         v_speed_text = v_speed_text.toFixed(0) + ' m/s';
+        //     }
+        //     else
+        //     {
+        //         v_speed_text = ( v_speed_text * js_helpers.CONST_METER_TO_MILE).toFixed(0) + ' mph';
+        //     }
             
-        }
+        // }
 
-
+        // Set Telemetry Status
         switch (v_andruavUnit.m_telemetry_protocol)
         {
             case js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry:
@@ -435,11 +422,11 @@ export class ClssCTRL_Drone_IMU extends React.Component {
        
         const gps = this.hlp_getGPS (v_andruavUnit);
 
-        let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " m/s";
-        if (js_globals.v_useMetricSystem === false) {
-            // value stored in meters per seconds so convert it to miles per hour
-            v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
-        }
+        // let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " m/s";
+        // if (js_globals.v_useMetricSystem === false) {
+        //     // value stored in meters per seconds so convert it to miles per hour
+        //     v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
+        // }
 
         let imu=[];
         // https://icons.getbootstrap.com/icons/caret-down-fill/
@@ -447,7 +434,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                 <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div className = 'row al_l css_margin_zero d-flex '>
                         <div className= 'col-6 col-md-3 user-select-none  p-1'>
-                                <p className=' rounded-3 text-warning cursor_hand textunit_w135' title ='Ground Speed'>
+                                {/* <p className=' rounded-3 text-warning cursor_hand textunit_w135' title ='Ground Speed'>
                                 <span title={"decrease speed"} onClick={ (e) => this.fn_changeSpeedByStep(e,v_andruavUnit, - js_globals.CONST_DEFAULT_SPEED_STEP )}>
                                     <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
@@ -463,7 +450,9 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                                     <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
                                     </svg>
                                 </span>
-                                </p>
+                                </p> */}
+
+                                <ClssCTRL_Drone_Speed_Ctrl m_unit={v_andruavUnit}/>
                                 
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
