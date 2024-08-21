@@ -31,66 +31,54 @@ export class CWayPointAction extends React.Component {
             case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,32], //new google.maps.Point(16, 23),
                     iconSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,23], //new google.maps.Point(16, 23),
                     iconSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
 			    icon_img= {
                     iconUrl:'./images/plane_b_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,16], //new google.maps.Point(16, 16),
                     iconSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 			    icon_img= {
                     iconUrl:'./images/plane_gr_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,16], //new google.maps.Point(16, 16),
                     scaledSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
                     iconUrl:'./images/rtl_bb_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,16], //new google.maps.Point(16, 16),
                     scaledSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
                 icon_img= {
                     iconUrl:'./images/circle_bb_32x32.png',
-                    //origin: new google.maps.Point(0, 0),
                     iconAnchor: [16,23], //new google.maps.Point(16, 23),
                     scaledSize: [32,32], //new google.maps.Size(32, 32),
-                    //labelOrigin: new google.maps.Point(16,40)
                 };
                 break;
 
             
         }
-        js_leafletmap.fn_setVehicleIcon(this.props.p_shape, icon_img.iconUrl, "", null, icon_img.iconAnchor, false, "", icon_img.scaledSize);
+        js_leafletmap.fn_setVehicleIcon(this.props.p_shape, icon_img.iconUrl, "", icon_img.iconAnchor, null, false, "", icon_img.scaledSize);
 				
         if (this.speed.fn_getValue() != null)
         {

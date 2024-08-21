@@ -1962,13 +1962,13 @@ function fn_handleKeyBoard() {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
 								p_andruavUnit.m_Nav_Info._Target.wp_num = c_mission_index + 1;
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png');
+								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png');
+								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png');
+								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 
 						}

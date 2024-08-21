@@ -7,7 +7,6 @@ import * as js_siteConfig from '../js/js_siteConfig.js'
 import * as js_common from '../js/js_common.js'
 import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter.js'
-import {js_speak} from '../js/js_speak.js'
 import {js_andruavAuth} from '../js/js_andruavAuth.js'
 import { mavlink20 } from '../js/js_mavlink_v2.js';
 
