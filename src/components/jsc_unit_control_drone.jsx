@@ -42,6 +42,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             tab_log: this.props.tab_log,
             tab_details: this.props.tab_details,
             tab_module: this.props.tab_module,
+            tab_collapsed: this.props.tab_collapsed
         };
 
         this.props.m_unit.m_gui.speed_link = false;
@@ -301,14 +302,14 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 	}
 
     componentDidUpdate() {
-        var cam = $(".dropdown-menu li a");
-        if (cam !== null && cam !== undefined) 
-        {
-            cam.on('click', function(){
-                var selText = $(this).attr('data-value');
-                $(this).parents('.btn-group').siblings('.menu').html(selText)
-            });
-        }
+        // var cam = $(".dropdown-menu li a");
+        // if (cam !== null && cam !== undefined) 
+        // {
+        //     cam.on('click', function(){
+        //         var selText = $(this).attr('data-value');
+        //         $(this).parents('.btn-group').siblings('.menu').html(selText)
+        //     });
+        // }
         
      }
     
@@ -586,8 +587,13 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
         if (this.state.tab_main === true)
         {
+            let css = 'nav-link user-select-none ';
+            if (this.state.tab_collapsed !== true)
+            {
+                css += 'active ';
+            }
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className="nav-link user-select-none active" data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
+                        <a className={css} data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
                         </li>);
         }
 
@@ -632,15 +638,26 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         // Adding an empty tab
         if (container_tabs.length!==0)
         {
+            let css = 'nav-link user-select-none text-dark ';
+            if (this.state.tab_collapsed === true)
+            {
+                css += 'active ';
+            }
             container_tabs.push(<li key={v_andruavUnit.partyID + 'liempty'} className="nav-item">  
-                        <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
+                        <a className={css} data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
                         </li>);
         }
         
         // TAB Controls 
         if (this.state.tab_main === true)
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
+            let css ='tab-pane fade pt-2 ';
+            if (this.state.tab_collapsed !== true)
+            {
+                css += 'active show ';
+            }
+                
+            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className={css} id={"home" + v_andruavUnit.partyID}>
                             <ClssCTRL_Drone_IMU p_unit={v_andruavUnit} />
                             {this.renderControl(v_andruavUnit)}
                     </div>);
@@ -683,7 +700,13 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         if (container_controls.length !== 0)
         {
             // Adding an empty tab
-            container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
+            let css ='tab-pane fade ';
+            if (this.state.tab_collapsed === true)
+            {
+                css += 'active show ';
+            }
+                
+            container_controls.push(<div className={css} key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
                     </div>);
         }
         ////////////////////////////////////TABS ---- END

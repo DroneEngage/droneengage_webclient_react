@@ -35,8 +35,6 @@ export default class ClssAndruavUnitList extends React.Component {
 		    'm_update': 0
 		};
 
-        this._isMounted = false;
-
         js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
@@ -46,16 +44,15 @@ export default class ClssAndruavUnitList extends React.Component {
       
     fn_unitUpdated(me,p_andruavUnit)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
         
         // render is initiated via updating state
         me.setState({ 'm_update': me.state.m_update+1});
-        //me.forceUpdate();
     }
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
     
         js_common.fn_console_log ("REACT:fn_unitAdded" );
 
@@ -68,7 +65,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
     
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
@@ -83,13 +80,12 @@ export default class ClssAndruavUnitList extends React.Component {
     }
 
     componentDidMount() {
-        this._isMounted = true;
-    
+        this.state.m_update = 1;
     }
 
     fn_onPreferenceChanged(me)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
         me.setState({'m_update': me.state.m_update +1});
         //me.forceUpdate();
     }
@@ -132,12 +128,12 @@ export default class ClssAndruavUnitList extends React.Component {
      */
     getHeaderInfo(v_andruavUnit)
     {
-        var bad_fcb = ((v_andruavUnit.m_useFCBIMU === false) 
+        const bad_fcb = ((v_andruavUnit.m_useFCBIMU === false) 
         ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
             && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)));
 
-        var classes = "";
-        var text = v_andruavUnit.m_unitName;
+        let classes = "";
+        let text = v_andruavUnit.m_unitName;
         if (v_andruavUnit.m_FCBParameters.m_systemID !== 0)
         {
             text += ":" + v_andruavUnit.m_FCBParameters.m_systemID;
@@ -173,11 +169,11 @@ export default class ClssAndruavUnitList extends React.Component {
     }
     
     render() {
-        var unit = [];
+        let unit = [];
         
-        var units_header = [];
-        var units_details = [];
-        var units_gcs = [];
+        let units_header = [];
+        let units_details = [];
+        let units_gcs = [];
 
         if (this.state.andruavUnitPartyIDs.length === 0) 
         {
@@ -188,7 +184,7 @@ export default class ClssAndruavUnitList extends React.Component {
         {
             var me = this;
             
-            var sortedPartyIDs;
+            let sortedPartyIDs;
             if (js_localStorage.fn_getUnitSortEnabled() === true)
             {
                 // Sort the array alphabetically
@@ -232,13 +228,13 @@ export default class ClssAndruavUnitList extends React.Component {
 
                         units_details.push(
                             <div key={'aud' + partyID} className="tab-pane fade" id={"tab_"+v_andruavUnit.partyID}>
-                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_collapsed={false} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
                     }
                     else
                     {   // Display as List
-                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit}/>);
+                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit} tab_collapsed={true} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
                     }
                 }
 
