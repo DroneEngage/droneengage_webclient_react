@@ -1,14 +1,14 @@
 import React    from 'react';
 
-import * as js_siteConfig from '../../js/js_siteConfig'
-import {js_globals} from '../../js/js_globals';
-import {js_eventEmitter} from '../../js/js_eventEmitter'
-import {js_andruavAuth} from '../../js/js_andruavAuth'
-import {fn_changeUDPPort} from '../../js/js_main'
+import * as js_siteConfig from '../../js/js_siteConfig.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {js_andruavAuth} from '../../js/js_andruavAuth.js'
+import {fn_changeUDPPort} from '../../js/js_main.js'
 
-import {ClssRX_MESSAGE} from './jsc_ctrl_rx_messageControl.jsx'
+import {ClssRX_MESSAGE} from '../gadgets/jsc_ctrl_rx_messageControl.jsx'
 
-export  class ClssCTRL_SETTINGS   extends React.Component {
+export  class ClssCTRL_Unit_Details   extends React.Component {
     
     constructor(props)
     {

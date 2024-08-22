@@ -2,24 +2,24 @@ import $ from 'jquery';
 import React    from 'react';
 
 
-import * as js_helpers from '../js/js_helpers'
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter'
-import {js_localStorage} from '../js/js_localStorage'
-import {js_leafletmap} from '../js/js_leafletmap'
-import * as js_common from '../js/js_common.js'
-import * as js_andruavMessages from '../js/js_andruavMessages'
-import { mavlink20 } from '../js/js_mavlink_v2';
+import * as js_helpers from '../../js/js_helpers.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_leafletmap} from '../../js/js_leafletmap.js'
+import * as js_common from '../../js/js_common.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 
 
-import C_GUI_READING_VALUE from '../js/js_gui_helper.js'
+import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 
-import {ClssCtrlArdupilotEkf} from './gadgets/jsc_ctrl_ardupilot_ekf.jsx'
-import {ClssCtrlVibration} from './gadgets/jsc_ctrl_vibration.jsx'
-import {ClssCtrlBattery} from './gadgets/jsc_ctrl_battery.jsx'
+import {ClssCtrlArdupilotEkf} from '../gadgets/jsc_ctrl_ardupilot_ekf.jsx'
+import {ClssCtrlVibration} from '../gadgets/jsc_ctrl_vibration.jsx'
+import {ClssCtrlBattery} from '../gadgets/jsc_ctrl_battery.jsx'
 
-import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../js/js_main'
+import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
 class ClssAndruavUnitDroneHeader extends React.Component{
 

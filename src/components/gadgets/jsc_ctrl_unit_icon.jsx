@@ -1,4 +1,3 @@
-import $ from 'jquery'; 
 import React    from 'react';
 
 import {fn_gotoUnit_byPartyID, 

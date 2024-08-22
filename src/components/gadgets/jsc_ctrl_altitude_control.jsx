@@ -102,7 +102,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
         }
 
         var v_altitude_abs = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
-		if (v_altitude_abs==null) 
+		if (v_altitude_abs === null || v_altitude_abs === undefined) 
         {
             v_altitude_abs = 'NA';
         } 

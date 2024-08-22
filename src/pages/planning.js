@@ -18,7 +18,7 @@ import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssFenceClssShapeControl from '../components/mission/jsc_fenceControl.jsx'
 import CMissionsContainer from '../components/mission/jsc_missionItemsControl.jsx'
 import ClssFenceGlobalSettingsControl from '../components/mission/jsc_fenceGlobalSettings.jsx'
-import ClssAndruavUnitList from '../components/jsc_unitControlMainList.jsx'
+import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 
 import {fn_on_ready} from '../js/js_main'
 

@@ -1,11 +1,11 @@
 import React    from 'react';
 
 
-import {getVehicleIcon} from '../js/js_main.js'
+import {getVehicleIcon} from '../../js/js_main.js'
 
    
 import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
-import {ClssCTRL_Unit_Icon} from './gadgets/jsc_ctrl_unit_icon.jsx'
+import {ClssCTRL_Unit_Icon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 export class ClssAndruavUnit_GCS extends ClssAndruavUnitBase {
     constructor(props)

@@ -1,16 +1,20 @@
 import React    from 'react';
 
-import * as js_helpers from '../js/js_helpers.js'
-import * as js_siteConfig from '../js/js_siteConfig.js'
+import * as js_helpers from '../../js/js_helpers.js'
+import * as js_siteConfig from '../../js/js_siteConfig.js'
 
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter.js'
-import {js_speak} from '../js/js_speak.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {js_speak} from '../../js/js_speak.js'
 
-import * as js_andruavMessages from '../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
-import {fn_gotoUnit_byPartyID, fn_changeUnitInfo} from '../js/js_main.js'
+import {fn_gotoUnit_byPartyID, fn_changeUnitInfo} from '../../js/js_main.js'
 
+
+/**
+ * This is a base class for GCS & Drone Units
+ */
 export class ClssAndruavUnitBase extends React.Component {
     constructor(props)
 	{

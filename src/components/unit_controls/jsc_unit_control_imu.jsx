@@ -1,28 +1,33 @@
 import React    from 'react';
 
-import * as js_helpers from '../js/js_helpers.js'
+import * as js_helpers from '../../js/js_helpers.js'
 
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter.js'
-import {js_localStorage} from '../js/js_localStorage.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {js_localStorage} from '../../js/js_localStorage.js'
 
 
 import {
      hlp_getFlightMode,
      fn_isBadFencing, fn_switchGPS, fn_openFenceManager,
-     fn_convertToMeter, fn_changeAltitude} from '../js/js_main.js'
+     fn_convertToMeter, fn_changeAltitude} from '../../js/js_main.js'
      
-import * as js_andruavUnit from '../js/js_andruavUnit.js';
-import * as js_andruavMessages from '../js/js_andruavMessages.js'
+import * as js_andruavUnit from '../../js/js_andruavUnit.js';
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 
 
-import {ClssCTRL_UDP_PROXY_TELEMETRY} from './gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
-import {ClssCTRL_HUD} from './gadgets/jsc_ctrl_hudControl.jsx'
-import {ClssCtrlDirections} from './gadgets/jsc_ctrl_directionsControl.jsx'
-import {ClssCTRL_SWARM} from './gadgets/jsc_ctrl_swarm.jsx'
-import {ClssCTRL_Drone_Speed_Ctrl} from './gadgets/jsc_ctrl_speed_control.jsx'
-import {ClssCTRL_Drone_Altitude_Ctrl} from './gadgets/jsc_ctrl_altitude_control.jsx'
+import {ClssCTRL_UDP_PROXY_TELEMETRY} from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
+import {ClssCTRL_HUD} from '../gadgets/jsc_ctrl_hudControl.jsx'
+import {ClssCtrlDirections} from '../gadgets/jsc_ctrl_directionsControl.jsx'
+import {ClssCTRL_SWARM} from '../gadgets/jsc_ctrl_swarm.jsx'
+import {ClssCTRL_Drone_Speed_Ctrl} from '../gadgets/jsc_ctrl_speed_control.jsx'
+import {ClssCTRL_Drone_Altitude_Ctrl} from '../gadgets/jsc_ctrl_altitude_control.jsx'
+
+
+/**
+ * This is the MAIN tab control
+ */
 export class ClssCTRL_Drone_IMU extends React.Component {
     constructor(props)
     {

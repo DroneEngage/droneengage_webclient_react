@@ -2,15 +2,15 @@ import $ from 'jquery';
 import React    from 'react';
 
 
-import * as js_common from '../js/js_common.js'
-import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter.js'
+import * as js_common from '../../js/js_common.js'
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 
 
-import * as js_andruavMessages from '../js/js_andruavMessages.js'
-import {js_localStorage} from '../js/js_localStorage.js'
-import {js_leafletmap} from '../js/js_leafletmap.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_leafletmap} from '../../js/js_leafletmap.js'
 
 
 

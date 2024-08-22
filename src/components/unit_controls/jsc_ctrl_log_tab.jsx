@@ -1,7 +1,7 @@
 import React    from 'react';
 
 import {js_globals} from '../../js/js_globals.js';
-import {js_eventEmitter} from '../../js/js_eventEmitter'
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 class ClssAndruavMessageItem extends React.Component {
 
@@ -46,7 +46,7 @@ class ClssAndruavMessageItem extends React.Component {
     }
 }
 
-export  class ClssMESSAGE_LOG  extends React.Component {
+export  class ClssCTRL_Unit_Log  extends React.Component {
 
     constructor(props)
     {
