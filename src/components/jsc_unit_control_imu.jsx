@@ -372,8 +372,8 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         // https://icons.getbootstrap.com/icons/caret-down-fill/
         imu.push (
                 <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
-                    <div className = 'row al_l css_margin_zero d-flex '>
-                        <div className= 'col-6 col-md-3 user-select-none  p-1'>
+                    <div key={'gs_ctrl' + v_andruavUnit.partyID}  className = 'row al_l css_margin_zero d-flex '>
+                        <div key={'alt_ctrl1' + v_andruavUnit.partyID}  className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <ClssCTRL_Drone_Speed_Ctrl m_unit={v_andruavUnit}/>
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>

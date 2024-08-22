@@ -18,6 +18,7 @@ import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssFenceClssShapeControl from '../components/mission/jsc_fenceControl.jsx'
 import CMissionsContainer from '../components/mission/jsc_missionItemsControl.jsx'
 import ClssFenceGlobalSettingsControl from '../components/mission/jsc_fenceGlobalSettings.jsx'
+import ClssAndruavUnitList from '../components/jsc_unitControlMainList.jsx'
 
 import {fn_on_ready} from '../js/js_main'
 
@@ -86,13 +87,18 @@ const Planning = () => {
 					</div>
 
 				</div>
+						
 				<div id="row_2" className="col col-sm-6 col-md-4">
-					<div className="row">	
+				<div id='andruavUnitList' className='row'>
+							<ClssAndruavUnitList tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
+				</div>
+				<div className="row">	
 						<div id="main_btn_group" className="btn-group" role="group" ><button
 							type="button" id="btn_missions" className="btn btn-success btn-sm button_large">Mission Plans</button><button
 							type="button" id="btn_geofences" className="btn btn-success btn-sm button_large">Geo Fences</button>
 						</div>
 					</div>
+					
 					<div id="fenceControl_section" className="row">	
 						<div id="fenceControl" className='col  col-sm-12 m-1 p-1'>
 						<ClssFenceClssShapeControl  />

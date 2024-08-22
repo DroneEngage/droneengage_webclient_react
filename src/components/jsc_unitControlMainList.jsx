@@ -187,7 +187,7 @@ export default class ClssAndruavUnitList extends React.Component {
         else 
         {
             var me = this;
-
+            
             var sortedPartyIDs;
             if (js_localStorage.fn_getUnitSortEnabled() === true)
             {
@@ -201,8 +201,11 @@ export default class ClssAndruavUnitList extends React.Component {
                 sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
             }
             
+            const v_prop = this.props;
+
             sortedPartyIDs.map(function (object)
             {
+                
                 const partyID = object[0];
                 const v_andruavUnit = object[1];
                 
@@ -229,7 +232,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
                         units_details.push(
                             <div key={'aud' + partyID} className="tab-pane fade" id={"tab_"+v_andruavUnit.partyID}>
-                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit}/>
+                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
                     }

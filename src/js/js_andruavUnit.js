@@ -816,6 +816,28 @@ export class CAndruavUnitObject {
   fullName() {
     return this.fn_getFullName(this.m_groupName, this.partyID);
   }
+
+  module_version () {
+    let module_version = (this.Description+'\n');
+                
+        if (this.m_isDE==false)
+        {
+            module_version += "Andruav";
+        }
+        else
+        {
+            module_version += "DE version: " + this.m_version;
+            const len = this.m_modules.length;
+            for (let i=0; i< len; ++i)
+            {
+                const module = this.m_modules[i];
+                module_version += '\n';
+                module_version += module.i + ' ver:' + module.v;
+            }
+        }
+
+        return module_version;
+  }
 }
 
 export class CAndruavUnitList {

@@ -16,7 +16,6 @@ export class CWayPointAction extends React.Component {
     {
         super ();
         this.state = {
-
         };
     }
  
@@ -62,7 +61,7 @@ export class CWayPointAction extends React.Component {
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
-                    iconUrl:'./images/rtl_bb_32x32.png',
+                    iconUrl:'./images/back_b_32x32.png',
                     iconAnchor: [16,16], //new google.maps.Point(16, 16),
                     scaledSize: [32,32], //new google.maps.Size(32, 32),
                 };
@@ -106,12 +105,23 @@ export class CWayPointAction extends React.Component {
         
     }
 
-    componentDidUpdate() 
+    componentDidMount () 
     {
         if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
-        $('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id + ' #msnsel').val(this.props.p_shape.m_missionItem.m_missionType);
+
+        this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
+        
     }
-    
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.p_shape.m_missionItem.m_missionType !== this.props.p_shape.m_missionItem.m_missionType) {
+          this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
+        }
+      }
+      
+    handleMissionTypeChange = (event) => {
+        this.setState({ missionType: event.target.value });
+      }
 
     render ()
     {
@@ -137,7 +147,7 @@ export class CWayPointAction extends React.Component {
         {v_event_firing}
         <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed' itemid={v_itemID + 'spd'} txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
         <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw' itemid={v_itemID + 'yaw'} txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
-        <select id="msnsel"  className="form-control css_margin_top_small">
+        <select id="msnsel"  className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>

@@ -11,7 +11,7 @@ import {js_andruavAuth} from '../js/js_andruavAuth.js'
 import { mavlink20 } from '../js/js_mavlink_v2.js';
 
 import {fn_do_modal_confirmation, 
-     getVehicleIcon, 
+     fn_gotoUnit_byPartyID,
      fn_putWayPoints, 
      toggleVideo, toggleRecrodingVideo} from '../js/js_main.js'
 
@@ -30,14 +30,18 @@ import {ClssCtrlPx4FlightControl} from './flight_controllers/jsc_ctrl_px4_flight
 import {ClssCTRL_AUDIO} from './gadgets/jsc_ctrl_audio.jsx'
 import {ClssCTRL_Drone_IMU} from './jsc_unit_control_imu.jsx'
 import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
-
+import {ClssCTRL_Unit_Icon} from './gadgets/jsc_ctrl_unit_icon.jsx'
 
 export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     constructor(props)
 	{
 		super (props);
         this.state = {
-            m_update: 0
+            m_update: 0,
+            tab_main: this.props.tab_main,
+            tab_log: this.props.tab_log,
+            tab_details: this.props.tab_details,
+            tab_module: this.props.tab_module,
         };
 
         this.props.m_unit.m_gui.speed_link = false;
@@ -409,7 +413,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         var online_class ;
         var online_class2 ;
         var online_text ;
-        var module_version          = "";
         var camera_class            = " camera_inactive ";
         var camera_src              = " ./images/camera_gy_32x32.png ";
         var video_class             = " video_inactive ";
@@ -418,26 +421,10 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         var recvideo_src            = "./images/video_recording_disabled_32x32.png";
         var v_battery_display_fcb  	= this.hlp_getFCBBatteryCSSClass(v_andruavUnit); 
         var v_battery_display 		= this.hlp_getBatteryCSSClass(v_andruavUnit);
-        var id = v_andruavUnit.partyID + "__FAKE";
+        const id = v_andruavUnit.partyID + "__FAKE";
         
-        module_version = (v_andruavUnit.Description+'\n');
+        const module_version = v_andruavUnit.module_version();
                 
-        if (v_andruavUnit.m_isDE==false)
-        {
-            module_version += "Andruav";
-        }
-        else
-        {
-            module_version += "DE version: " + v_andruavUnit.m_version;
-            const len = v_andruavUnit.m_modules.length;
-            for (let i=0; i< len; ++i)
-            {
-                const module = v_andruavUnit.m_modules[i];
-                module_version += '\n';
-                module_version += module.i + ' ver:' + module.v;
-            }
-        }
-
         if ( v_andruavUnit.m_IsShutdown === true)
         {
                 online_class2 =" blink_offline ";
@@ -577,8 +564,8 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             }
             // add FCB battery
             rows.push (<div  key={id +"fc1"} className= "col-1 padding_zero"><img className= {v_battery_display_fcb.css}   src={v_battery_display_fcb.m_battery_src}  title={"fcb batt: " +  parseFloat(v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryRemaining).toFixed(1) +  '% ' + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryVoltage/1000).toFixed(2).toString() + "v " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryCurrent/1000).toFixed(1).toString() + "A " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed).toFixed(1).toString() + " mAh " + (v_andruavUnit.m_Power._FCB.p_Battery.FCB_BatteryTemprature/1000).toFixed(1).toString() + '°C'} /></div>);
-            rows.push (<div  key={id +"fc2"} className= "col-1 padding_zero"  onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ></div>);
-            rows.push (<div  key={id +"fc3"} className= "col-4 padding_zero text-end" onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2 } title={module_version} onClick={ (e)=> this.fn_changeUnitInfo(v_andruavUnit)} ><strong>{v_andruavUnit.m_unitName } </strong> {sys_id}<span className={' ' + online_class}>{online_text}</span></p></div>);
+            rows.push (<div  key={id +"fc2"} className= "col-1 padding_zero"  onClick={ (e) => fn_gotoUnit_byPartyID(v_andruavUnit)} ></div>);
+            rows.push (<div  key={id +"fc3"} className= "col-4 padding_zero text-end" onClick={ (e) => fn_gotoUnit_byPartyID(v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2 } title={module_version} onClick={ (e)=> this.fn_changeUnitInfo(v_andruavUnit)} ><strong>{v_andruavUnit.m_unitName } </strong> {sys_id}<span className={' ' + online_class}>{online_text}</span></p></div>);
         }
         else
         {
@@ -587,41 +574,53 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
                 rows.push (<div key={id +"__5"} className= 'col-1  padding_zero'><img className={v_battery_display.css}  src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level + '% ' + v_battery_display.charging +  v_battery_display.temp }/></div>);
             }
             // add FCB battery
-            rows.push (<div key={id +"fc4"} className= "col-2 padding_zero"  onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ></div>);
-            rows.push (<div key={id +"fc5"} className= "col-4 padding_zero text-end"  onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2 } title={module_version}  onClick={ (e)=> this.fn_changeUnitInfo(v_andruavUnit)}><strong>{v_andruavUnit.m_unitName + " "}</strong><span className={' ' + online_class}>{online_text}</span></p></div>);
+            rows.push (<div key={id +"fc4"} className= "col-2 padding_zero"  onClick={ (e) => fn_gotoUnit_byPartyID(v_andruavUnit)} ></div>);
+            rows.push (<div key={id +"fc5"} className= "col-4 padding_zero text-end"  onClick={ (e) => fn_gotoUnit_byPartyID(v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2 } title={module_version}  onClick={ (e)=> this.fn_changeUnitInfo(v_andruavUnit)}><strong>{v_andruavUnit.m_unitName + " "}</strong><span className={' ' + online_class}>{online_text}</span></p></div>);
         }
 
-        ////////////////////////////////////TABS ---- START
+        /* TABS ---- START */
+        // Tab Labels
         var container_tabs=[];
         var container_controls=[];
          
 
-        container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
+        if (this.state.tab_main === true)
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
                         <a className="nav-link user-select-none active" data-bs-toggle="tab" href={"#home" + v_andruavUnit.partyID}>Main</a>
                         </li>);
-        container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
+        }
+
+        if (this.state.tab_log === true)
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
                         <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
                         </li>);
-        container_tabs.push(<li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
+        }
+        
+        if (this.state.tab_details === true)
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
                         <a className="nav-link  user-select-none " data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID}>Details</a>
                         </li>);
+        }
 
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.partyID}>P2P</a>
             </li>);
         }
        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_sdr === true)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
                 <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}>SDR</a>
             </li>);
         }
            
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (v_andruavUnit.m_modules.has_sound === true)  || (v_andruavUnit.m_isDE === false)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sound === true)  || (v_andruavUnit.m_isDE === false)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>
@@ -631,51 +630,69 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     
 
         // Adding an empty tab
-        container_tabs.push(<li key={v_andruavUnit.partyID + 'liempty'} className="nav-item">  
+        if (container_tabs.length!==0)
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'liempty'} className="nav-item">  
                         <a className="nav-link user-select-none text-dark" data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
                         </li>);
-        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
+        }
+        
+        // TAB Controls 
+        if (this.state.tab_main === true)
+        {
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className="tab-pane fade  active show pt-2" id={"home" + v_andruavUnit.partyID}>
                             <ClssCTRL_Drone_IMU p_unit={v_andruavUnit} />
                             {this.renderControl(v_andruavUnit)}
                     </div>);
-        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
-                            <ClssMESSAGE_LOG  p_unit={v_andruavUnit}/>
+        }
+        if (this.state.tab_log === true)
+        {
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
+                            <ClssMESSAGE_LOG  p_unit={v_andruavUnit} />
                     </div>);
-        container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
+        }
+        
+        if (this.state.tab_details === true)
+        {
+            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
                             <ClssCTRL_SETTINGS p_unit={v_andruavUnit}/>
                     </div>);
+        }
        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (v_andruavUnit.m_modules.has_p2p === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
                             <ClssCTRL_P2P p_unit={v_andruavUnit}/>
                     </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
                             <ClssCTRL_SDR p_unit={v_andruavUnit}/>
                      </div>);
         }
     
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
             container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
                 <ClssCTRL_AUDIO p_unit={v_andruavUnit}/>
             </div>);
         }
-            
-        // Adding an empty tab
-        container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
+        
+        if (container_controls.length !== 0)
+        {
+            // Adding an empty tab
+            container_controls.push(<div className="tab-pane fade" key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
                     </div>);
+        }
         ////////////////////////////////////TABS ---- END
 
      return (
             
              <div  key={id +"1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + v_andruavUnit.m_IsShutdown}>
              <div  key={id +"_1"} id={v_andruavUnit.partyID + "_1"} className='row margin_2px padding_zero user-select-none '>        	
-                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><img className=' cursor_hand gcs IsGCS_false small_icon' src={getVehicleIcon(v_andruavUnit)}  title={module_version}  alt='Vehicle' onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit)}/></div>
+                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon m_unit={v_andruavUnit}/></div>
                 <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={camera_class  } src={camera_src} title='Take Photo' onClick={ (e) => this.fn_toggleCamera(v_andruavUnit)}/></div>
                 <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex '><img className={video_class   } src={video_src} title='Start Live Stream' onClick={ (e) => toggleVideo(v_andruavUnit)}/></div>
                 <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex '><img className={recvideo_class} src={recvideo_src} title='Start Recording on Drone' onClick={ (e) => toggleRecrodingVideo(v_andruavUnit)}/></div>

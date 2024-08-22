@@ -140,12 +140,7 @@ export class ClssAndruavUnitBase extends React.Component {
     }
 
 
-    fn_gotoUnit_byPartyID (e,v_andruavUnit)
-    {
-        //js_globals.v_andruavClient.API_requestID(p_partyID);
-        fn_gotoUnit_byPartyID(v_andruavUnit.partyID);
-        js_globals.v_andruavClient.API_do_GetHomeLocation(v_andruavUnit);
-    }
+    
 
     fn_changeUnitInfo (v_andruavUnit)
     {

@@ -1082,11 +1082,13 @@ function fn_handleKeyBoard() {
 		/**
 		   Goto Unit on map
 		**/
-		export function fn_gotoUnit_byPartyID(p_partyID) {
-			let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+
+		export function fn_gotoUnit_byPartyID(p_andruavUnit) {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 			fn_gotoUnit(p_andruavUnit);
+
+			js_globals.v_andruavClient.API_do_GetHomeLocation(p_andruavUnit);
 		}
 		
 		export function fn_gotoUnit(p_andruavUnit) {
