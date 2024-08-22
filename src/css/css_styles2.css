@@ -932,7 +932,7 @@ div.msgerror {
 
 .textunit_att_btn {
 	display: inline-block;
-	font-size: smaller !important;
+	font-size: small !important;
 	width:100% !important;
 	height: -webkit-fill-available !important;
 }
