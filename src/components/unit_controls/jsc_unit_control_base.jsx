@@ -9,7 +9,6 @@ import {js_speak} from '../../js/js_speak.js'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
-import {fn_gotoUnit_byPartyID, fn_changeUnitInfo} from '../../js/js_main.js'
 
 
 /**
@@ -145,12 +144,6 @@ export class ClssAndruavUnitBase extends React.Component {
 
 
     
-
-    fn_changeUnitInfo (v_andruavUnit)
-    {
-        if ((js_siteConfig.CONST_FEATURE.hasOwnProperty('DISABLE_UNIT_NAMING')) && (js_siteConfig.CONST_FEATURE.DISABLE_UNIT_NAMING === true)) return ;
-        fn_changeUnitInfo (v_andruavUnit);
-    }
 
     fn_toggleCamera(p_andruavUnit)
     {

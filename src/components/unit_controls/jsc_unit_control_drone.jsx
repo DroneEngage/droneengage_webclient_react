@@ -27,10 +27,18 @@ import {ClssCTRL_AUDIO} from '../gadgets/jsc_ctrl_audio.jsx'
 import {ClssCTRL_Drone_IMU} from './jsc_unit_control_imu.jsx'
 import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
 import {ClssCTRL_Unit_Main_Bar} from './jsc_ctrl_unit_main_bar.jsx'
-
+import {ClssCTRL_Unit_Planning_Bar} from './jsc_ctrl_unit_planning_bar.jsx'
 
 /**
  * This class is full control of Drone.
+ * 
+ * Properties:
+ * tab_planning: display planning tab... true in planner.
+ * tab_main: display main bar control.... true in mnormal operation
+ * 
+ * tab_log: log tab that lists messages.
+ * tab_details: detailed tab that display version, attached modules, received messages ....etc.
+ * tab_modules: true to display any other module such as SDR,P2P,Audio ...etc.
  */
 export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     constructor(props)
@@ -38,6 +46,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 		super (props);
         this.state = {
             m_update: 0,
+            tab_planning: this.props.tab_planning,
             tab_main: this.props.tab_main,
             tab_log: this.props.tab_log,
             tab_details: this.props.tab_details,
@@ -455,6 +464,28 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         );
     }
 
+    createMainBar()
+    {
+        let bars = [];
+        let v_andruavUnit = this.props.m_unit; 
+   
+        
+        if (this.state.tab_main === true)
+        {
+            bars.push(
+                <ClssCTRL_Unit_Main_Bar key={v_andruavUnit+'c_c_u_m_b'} m_unit={v_andruavUnit} />);
+        }
+
+        if (this.state.tab_planning === true)
+        {
+            bars.push(
+                <ClssCTRL_Unit_Planning_Bar  key={v_andruavUnit+'c_c_u_p_b'} m_unit={v_andruavUnit} />);
+        }
+
+        return bars;
+    }
+
+
     render ()
     {
 
@@ -462,20 +493,21 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 
-        const id = v_andruavUnit.partyID + "__FAKE";
+        const id = v_andruavUnit.partyID + "__u_c_d";
         
         const tabs = this.createTabs();
 
+        const main_bar = this.createMainBar();
      return (
             
              <div  key={id +"1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + v_andruavUnit.m_IsShutdown}>
                 
-                <ClssCTRL_Unit_Main_Bar m_unit={v_andruavUnit} />
-                
-                <ul key={v_andruavUnit.partyID + 'ul'} className="nav nav-tabs">
+                {main_bar}
+
+                <ul key={id + 'ul'} className="nav nav-tabs">
                     {tabs.container_tabs}
                 </ul>
-                <div key={v_andruavUnit.partyID + 'myTabContent'} id="myTabContent" className="tab-content padding_zero">
+                <div key={id + 'myTabContent'} id="myTabContent" className="tab-content padding_zero">
                     {tabs.container_controls}
                 </div>
             </div>		

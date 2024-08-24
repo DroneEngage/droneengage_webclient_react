@@ -60,8 +60,8 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
     render() {
         const v_andruavUnit = this.props.m_unit;
 
-        var v_altitude_text = "";
-		var v_alt_title, v_alt_remark;
+        let v_altitude_text = "";
+		let v_alt_title, v_alt_remark;
 
         if (v_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE)
         {
@@ -84,7 +84,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
             v_alt_remark += " feet";
         }
 
-        var v_altitude = v_andruavUnit.m_Nav_Info.p_Location.alt;
+        let v_altitude = v_andruavUnit.m_Nav_Info.p_Location.alt;
 		if (v_altitude==null) 
         {
             v_altitude = 'NA';
@@ -101,7 +101,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
             }
         }
 
-        var v_altitude_abs = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
+        let v_altitude_abs = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
 		if (v_altitude_abs === null || v_altitude_abs === undefined) 
         {
             v_altitude_abs = 'NA';
@@ -127,9 +127,9 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
             v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
         }
 
-        var v_speed_text = "";
-
-        if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed == null) {
+        let v_speed_text = "";
+        const ground_speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+        if ( ground_speed === null || ground_speed === undefined) {
             v_speed_text = 'NA';
         } else {
             v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;

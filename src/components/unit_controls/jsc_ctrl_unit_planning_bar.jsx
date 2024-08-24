@@ -21,7 +21,7 @@ import {
 /**
  * This is the bar control that contains Drone Icon, Camera, Video, Battery and Name 
  */
-export class ClssCTRL_Unit_Main_Bar extends React.Component {
+export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 
     constructor(props)
 	{
@@ -141,15 +141,9 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
         let online_class ;
         let online_class2 ;
         let online_text ;
-        let camera_class            = " camera_inactive ";
-        let camera_src              = " ./images/camera_gy_32x32.png ";
-        let video_class             = " video_inactive ";
-		let video_src               = " ./images/videocam_gr_32x32.png";
-		let recvideo_class          = "recvideo_inactive ";
-        let recvideo_src            = "./images/video_recording_disabled_32x32.png";
         let v_battery_display_fcb  	= this.hlp_getFCBBatteryCSSClass(v_andruavUnit); 
         let v_battery_display 		= this.hlp_getBatteryCSSClass(v_andruavUnit);
-        const id = v_andruavUnit.partyID + "_c_u_m_b";
+        const id = v_andruavUnit.partyID + "_c_u_p_b";
         
         const module_version = v_andruavUnit.module_version();
                 
@@ -172,46 +166,6 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
                 online_class2 =" text-info ";
                 online_class = " blink_success ";
                 online_text  = "online";
-            }
-            if (v_andruavUnit.fn_canCamera === true)
-            {
-                camera_class = "cursor_hand camera_active";
-                camera_src   = "./images/camera_bg_32x32.png";
-            }
-            else
-            {
-                camera_class = "camera_inactive";
-                camera_src   = "./images/camera_gy_32x32.png";
-            }
-            if (v_andruavUnit.m_Video.fn_getVideoStreaming() === js_andruavUnit.CONST_VIDEOSTREAMING_ON)
-            {
-                video_class = "cursor_hand video_active";
-                video_src   = "./images/videocam_active_32x32.png";
-            }
-            else
-            {
-                if (v_andruavUnit.fn_canVideo === true)
-                {
-                    video_class = "cursor_hand video_ready";
-                    video_src   = "./images/videocam_gb_32x32.png";
-
-                    if (v_andruavUnit.m_Video.VideoRecording === js_andruavUnit.CONST_VIDEORECORDING_ON)  // ONDRONE RECORDING
-                    {
-                        recvideo_class = "cursor_hand css_recvideo_active";
-                        recvideo_src   = "./images/video_recording_active_32x32.png";
-                    }
-                    else
-                    {
-                        recvideo_class = "cursor_hand css_recvideo_ready";
-                        recvideo_src   = "./images/video_recording_enabled_32x32.png";
-                    }
-
-                }
-                else
-                {
-                    video_class = "video_inactive";
-                    video_src   = "./images/videocam_gr_32x32.png";
-                }
             }
                         
             
@@ -309,11 +263,11 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
         }
 
         return (
-             <div  key={id } className='row margin_2px padding_zero user-select-none '>        	
+             <div  key={id +"_1"} id={id +"_1"} className='row margin_2px padding_zero user-select-none '>        	
                 <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon m_unit={v_andruavUnit}/></div>
-                <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={camera_class  } src={camera_src} title='Take Photo' onClick={ (e) => this.fn_toggleCamera(v_andruavUnit)}/></div>
-                <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={video_class   } src={video_src} title='Start Live Stream' onClick={ (e) => toggleVideo(v_andruavUnit)}/></div>
-                <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={recvideo_class} src={recvideo_src} title='Start Recording on Drone' onClick={ (e) => toggleRecrodingVideo(v_andruavUnit)}/></div>
+                <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
+                <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
+                <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 
                 {rows}
              </div>

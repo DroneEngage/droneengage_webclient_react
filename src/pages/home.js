@@ -147,7 +147,7 @@ const Home = () => {
 					<div id="guiMessageCtrl" className='row'></div>
 							
 					<div id='andruavUnitList' className='row'>
-						<ClssAndruavUnitList tab_main={true} tab_log={true} tab_details={true} tab_module={true} />
+						<ClssAndruavUnitList tab_planning={false} tab_main={true} tab_log={true} tab_details={true} tab_module={true} />
 					</div>
 							</div>
 					

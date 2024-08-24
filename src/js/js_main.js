@@ -1111,6 +1111,8 @@ function fn_handleKeyBoard() {
 
 		export function fn_changeUnitInfo (p_andruavUnit)
 		{
+			if ((js_siteConfig.CONST_FEATURE.hasOwnProperty('DISABLE_UNIT_NAMING')) && (js_siteConfig.CONST_FEATURE.DISABLE_UNIT_NAMING === true)) return ;
+        
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			
 			$('#modal_changeUnitInfo').find('#title').html('Change Unit Name of ' + p_andruavUnit.m_unitName);

@@ -90,7 +90,7 @@ const Planning = () => {
 						
 				<div id="row_2" className="col col-sm-6 col-md-4">
 				<div id='andruavUnitList' className='row'>
-							<ClssAndruavUnitList tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
+							<ClssAndruavUnitList tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
 				</div>
 				<div className="row">	
 						<div id="main_btn_group" className="btn-group" role="group" ><button
@@ -116,6 +116,34 @@ const Planning = () => {
 					</div>
 				</div>
 		</div>
+		<div id="modal_changeUnitInfo"  className="modal fade"  role="dialog">
+				<div className="modal-dialog">
+					<div className="modal-content">
+						<div className="modal-header">
+							<h4 id='title' className="modal-title bg-warning rounded_10px p-1 text-white">Change Speed</h4>
+							<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div className="modal-body">
+						<div className="container"></div>
+							<div className="input-group align-items-center">
+								<span id="txtNamelbl" className="input-group-addon  me-2">Name</span>
+								<input id="txtUnitName" type="text" className="form-control rounded-3 me-3" placeholder=""
+									aria-describedby="basic-addon2"/>
+									
+							</div>
+							<div className="input-group mt-2 align-items-center">
+								<span id="txtDescriptionlbl" className="input-group-addon me-2">Description</span>
+								<input id="txtDescription" type="text" className="form-control rounded-3 me-3" placeholder=""
+									aria-describedby="basic-addon2"/>
+							</div>
+						</div>
+						<div className="modal-footer">
+							<button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">Cancel</button>
+							<button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning">GO</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		<div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
 			<ClssFooterControl />
 			</div>

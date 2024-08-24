@@ -228,13 +228,13 @@ export default class ClssAndruavUnitList extends React.Component {
 
                         units_details.push(
                             <div key={'aud' + partyID} className="tab-pane fade" id={"tab_"+v_andruavUnit.partyID}>
-                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_collapsed={false} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
                     }
                     else
                     {   // Display as List
-                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit} tab_collapsed={true} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
+                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit} tab_collapsed={true} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
                     }
                 }
 
