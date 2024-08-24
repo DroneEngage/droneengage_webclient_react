@@ -2325,7 +2325,7 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.p_hasPowerInfo = false;
                 }
 
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_unit);
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
             }
             break;
             case js_andruavMessages.CONST_TYPE_AndruavMessage_ExternalGeoFence: {

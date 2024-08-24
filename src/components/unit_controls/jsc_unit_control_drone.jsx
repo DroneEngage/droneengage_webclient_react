@@ -55,12 +55,25 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         };
 
         this.props.m_unit.m_gui.speed_link = false;
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onPowUpdate);
+        
     }
-
-    
     componentDidMount () 
     {
         this.state.m_update = 1;
+    }
+
+
+    fn_onPowUpdate(me,p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
+        {
+           return ; // not me
+        }
+
+        if (me.state.m_update === 0) return ;
+        me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_requestGamePad(me,p_andruavUnit)
@@ -386,7 +399,9 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     }
 
     
-    
+    componentWillUnmount () {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
+    }
 
 
     renderControl (p_andruavUnit)

@@ -119,6 +119,7 @@ class GLOBALS {
 		this.EE_onPreferenceChanged        = "EE_onPreferenceChanged";
 		this.EE_unitAdded                  = "EE_unitAdded";
 		this.EE_unitUpdated                = "EE_unitUpdated";
+		this.EE_unitPowUpdated             = "EE_unitPowUpdated";
 		this.EE_unitP2PUpdated             = "EE_unitP2PUpdated";
 		this.EE_unitSDRUpdated             = "EE_unitSDRUpdated";
 		this.EE_unitSDRSpectrum            = "EE_unitSDRSpectrum";
