@@ -120,6 +120,19 @@ export function fn_getFullName(m_groupName, p_partyID) {
   return p_partyID; // partyID is unique
 }
 
+
+class C_Obstacles {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    this.m_obstacles = [];
+  }
+
+  fn_addObstacle ()
+  {
+
+  }
+
+}
 class C_Video {
   constructor(p_parent) {
     this.m_parent = p_parent;
@@ -792,6 +805,7 @@ export class CAndruavUnitObject {
     this.m_Servo = new C_Servo(this);
     this.m_Gimbal = { m_pitch: 0, m_roll: 0, m_yaw: 0 };
     this.m_Video = new C_Video(this);
+    this.m_Obstacles = new C_Obstacles(this);
     this.m_DetectedTargets = new C_DetectedTargets(this);
 
     this.m_Swarm = new C_Swarm(this);

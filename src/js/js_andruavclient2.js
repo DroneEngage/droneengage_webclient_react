@@ -3050,6 +3050,17 @@ class CAndruavClient {
                 }
                 break;
 
+                case mavlink20.MAVLINK_MSG_ID_OBSTACLE_DISTANCE:
+                {   // TODO: not implemented
+                    // https://mavlink.io/en/messages/common.html#MAV_DISTANCE_SENSOR
+                    p_unit.m_Obstacles.fn_addObstacle(c_mavlinkMessage.sensor_type,
+                            c_mavlinkMessage.distances, c_mavlinkMessage.max_distance, c_mavlinkMessage.min_distance,
+                            c_mavlinkMessage.increment_f, c_mavlinkMessage.angle_offset
+                        );
+                }
+                break;
+                
+
                 // case mavlink20.MAVLINK_MSG_ID_ADSB_VEHICLE: REACT2
                 // {
                 //     p_unit.m_FCBParameters.m_systemID = c_mavlinkMessage.header.srcSystem;
