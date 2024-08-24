@@ -87,24 +87,15 @@ export default class ClssAndruavUnitList extends React.Component {
     {
         if (me.state.m_update === 0) return ;
         me.setState({'m_update': me.state.m_update +1});
-        //me.forceUpdate();
     }
 
     fn_updateMapStatus(p_andruavUnit)
     {
         if (p_andruavUnit.hasOwnProperty("p_marker") === false) return;
         if (
-                ((js_globals.v_en_GCS === true ) && (p_andruavUnit.m_IsGCS === true))
-             || ((js_globals.v_en_Drone === true ) && (p_andruavUnit.m_IsGCS ===false))
+                ((js_globals.v_en_GCS !== true ) || (p_andruavUnit.m_IsGCS !== true))
+             && ((js_globals.v_en_Drone !== true ) || (p_andruavUnit.m_IsGCS !== false))
             )
-        {
-            // if (p_andruavUnit.m_gui != null)
-            // {
-            //     //p_andruavUnit.p_marker.setMap(p_andruavUnit.m_gui.m_mapObj);
-            //     js_leafletmap.setMap(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_gui.m_mapObj);
-            // }   
-        }
-        else
         {
             js_leafletmap.fn_hideItem(p_andruavUnit.m_gui.m_marker);
         }
@@ -182,7 +173,7 @@ export default class ClssAndruavUnitList extends React.Component {
         }
         else 
         {
-            var me = this;
+            const me = this;
             
             let sortedPartyIDs;
             if (js_localStorage.fn_getUnitSortEnabled() === true)
