@@ -30,11 +30,11 @@ export class ClssCTRL_SDR extends React.Component {
                     fc : false,
                     f  : false,
                     bw : false,
-                    g  : false,
+                    ga : false,  // gain
                     sr : false,
                     dm : false,  // decode mode
-                    dr : false,
-                    db : false,
+                    dr : false,  // p_driver_index
+                    db : false,  // p_display_bars
                 }
 		};
 
@@ -72,43 +72,50 @@ export class ClssCTRL_SDR extends React.Component {
 
     fn_onDriver(e)
     {   
-        this.setState({m_updated: { dr: true }, m_driver_index: e.target.value});
+        this.state.m_updated.dr = true;
+        this.setState({m_driver_index: e.target.value});
     }
 
     fn_onFreq(e)
     {
         this.state.m_updated.f = true;
-        this.setState({m_updated: { dr: true }, m_frequency: e.target.value});
+        this.setState({m_frequency: e.target.value});
     }
 
     fn_onFreqCenter(e)
     {
-        this.setState({m_updated: { fc: true }, m_center_frequency: e.target.value});
+        this.state.m_updated.fc = true;
+        this.setState({m_center_frequency: e.target.value});
     }
 
     fn_onBandWidth(e)
     {
-        this.setState({m_updated: { bw: true }, m_band_width: e.target.value});
+        this.state.m_updated.bw = true;
+        this.setState({m_band_width: e.target.value});
     }
 
     fn_onSampleRate(e)
     {
-        this.setState({m_updated: { sr: true }, m_sample_rate: e.target.value});
+        this.state.m_updated.sr = true;
+        this.setState({m_sample_rate: e.target.value});
     }
 
     fn_onGain(e)
     {
-        this.setState({m_updated: { ga: true }, m_gain: e.target.value});
+        this.state.m_updated.ga = true;
+        this.setState({m_gain: e.target.value});
     }
 
     fn_onDisplayBars(e)
     {
-        this.setState({m_updated: { db: true }, m_display_bars: e.target.value});
+        this.state.m_updated.db = true;
+        this.setState({m_display_bars: e.target.value});
     }
 
     fn_onSelectDecodeModes(e)
     {
-        this.setState({m_updated: { dm: true }, m_decode_mode: e.target.value});
+        this.state.m_updated.dm = true;
+        this.setState({m_decode_mode: e.target.value});
     }
 
     fn_activateSDR(p_andruavUnit)
