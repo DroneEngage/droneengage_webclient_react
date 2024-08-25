@@ -16,7 +16,7 @@ import {js_leafletmap} from '../../js/js_leafletmap'
 import {CWayPointLocation} from './jsc_ctrl_waypoint_location'
 import {CWayPointAction} from './jsc_ctrl_waypoint_actions'
 
-
+import {ClssAndruavUnit_DropDown_List} from '../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
 
 
@@ -27,7 +27,7 @@ class CMissionStep extends React.Component {
     {
         super ();
         this.state = {
-
+            m_partyID: 0
         };
     }
 
@@ -204,6 +204,13 @@ class MissionControlPanel extends React.Component {
         $('#cp_' + this.props.p_mission.m_id).click();
     }
 
+    fn_onSelectUnit (e)
+    {
+        this.setState({'m_partyID': e.target.value});
+
+        console.log(e.target.value);
+    }
+
     componentWillUnmount () 
     {
         js_eventEmitter.unsubscribe(js_globals.EE_mapMissionUpdate,this);
@@ -267,12 +274,13 @@ class MissionControlPanel extends React.Component {
                 v_partyIDCtrl.push (
                     <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className ="row margin_zero css_margin_top_small">
                         <div className="col-12">
-                            <div className="form-inline">
+                            <ClssAndruavUnit_DropDown_List onSelectUnit={(e) => this.fn_onSelectUnit(e)}/>
+                            {/* <div className="form-inline">
                                 <div className="form-group">
                                     <label htmlFor="txt_partyID" className="text-primary"><small>Party ID</small></label>
                                     <input id={'prt_' + this.props.p_mission.m_id} type="text"  className="form-control input-sm input-sm css_margin_left_5" placeholder="unit pin code"    />
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                             
                     </div>
