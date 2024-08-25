@@ -134,7 +134,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
         } else {
             v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
             v_andruavUnit.m_gui.speed_link = true;
-            if (js_globals.v_useMetricSystem == true) {
+            if (js_globals.v_useMetricSystem === true) {
                 v_speed_text = v_speed_text.toFixed(0) + ' m/s';
             }
             else {
