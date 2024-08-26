@@ -164,17 +164,20 @@ function fn_handleKeyBoard() {
 				p_style = "bg-success";
 			}
 			p_style += " p-1 rounded_10px ";
-			var callback = p_callback;
-			$('#modal_saveConfirmation').children().find('h4#title').html(p_title);
-			$('#modal_saveConfirmation').children().find('h4#title').addClass("modal-title " + p_style);
-			$('#modal_saveConfirmation').children().find('div.modal-body').html(p_message);
-			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').unbind('click');
-			$('#modal_saveConfirmation').children().find('button#btnCancel').unbind('click');
-			$('#modal_saveConfirmation').children().find('button#btnCancel').on('click', function () 
+			let callback = p_callback;
+			$('#modal_saveConfirmation').find('h4#title').html(p_title);
+			$('#modal_saveConfirmation').find('h4#title').addClass("modal-title " + p_style);
+			$('#modal_saveConfirmation').find('div.modal-body').html(p_message);
+			$('#modal_saveConfirmation').find('button#modal_btn_confirm').unbind('click');
+			$('#modal_saveConfirmation').find('button#btnCancel').unbind('click');
+			$('#modal_saveConfirmation').find('button#modal_btn_confirm').on('click', function () 
+			{
+				callback(true);
+				js_common.showModal('#modal_saveConfirmation', false);
+			});
+			$('#modal_saveConfirmation').find('button#btnCancel').on('click', function () 
 			{
 				callback(false);
-				// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
-				// modal.hide();
 				js_common.showModal('#modal_saveConfirmation', false);
 			});
 			if (p_yesCaption === null || p_yesCaption === undefined)
@@ -186,8 +189,8 @@ function fn_handleKeyBoard() {
 				p_noCaption = "Cancel"
 			}
 
-			$('#modal_saveConfirmation').children().find('button#modal_btn_confirm').html(p_yesCaption);
-			$('#modal_saveConfirmation').children().find('button#btnCancel').html(p_noCaption);
+			$('#modal_saveConfirmation').find('button#modal_btn_confirm').html(p_yesCaption);
+			$('#modal_saveConfirmation').find('button#btnCancel').html(p_noCaption);
 			
 			//$('#modal_saveConfirmation').modal('show');
 			// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
