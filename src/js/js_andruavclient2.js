@@ -99,12 +99,12 @@ class CAndruavClient {
 
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
                 unit.m_IsShutdown = true;
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, unit);
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
             } else if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
                 this.API_requestID(unit.partyID);
             } else if (unit.m_IsShutdown) {
                 unit.m_IsShutdown = false;
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, unit);
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
             }
             }
         });

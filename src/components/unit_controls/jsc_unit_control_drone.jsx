@@ -56,7 +56,8 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
         this.props.m_unit.m_gui.speed_link = false;
         js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onPowUpdate);
-        
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated, this, this.fn_onUpdate);
+
     }
     componentDidMount () 
     {
@@ -64,7 +65,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     }
 
 
-    fn_onPowUpdate(me,p_andruavUnit)
+    fn_onUpdate(me, p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
@@ -74,6 +75,11 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
         if (me.state.m_update === 0) return ;
         me.setState({'m_update': me.state.m_update +1});
+    }
+    
+    fn_onPowUpdate(me, p_andruavUnit)
+    {
+        this.fn_onUpdate(me, p_andruavUnit);
     }
 
     fn_requestGamePad(me,p_andruavUnit)

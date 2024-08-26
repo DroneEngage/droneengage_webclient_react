@@ -38,11 +38,11 @@ export default class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
         
     }
       
-    fn_unitUpdated(me,p_andruavUnit)
+    fn_unitOnlineChanged(me,p_andruavUnit)
     {
         if (me.state.m_update === 0) return ;
         
@@ -105,11 +105,10 @@ export default class ClssAndruavUnitList extends React.Component {
 
 
     componentWillUnmount () {
-        this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonPreferenceChanged,this);
         js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonSocketStatus,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitOnlineChanged,this);
     }
 
     /**
