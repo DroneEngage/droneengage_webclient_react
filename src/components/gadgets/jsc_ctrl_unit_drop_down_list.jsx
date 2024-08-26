@@ -16,13 +16,14 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 	{
 		super ();
 		this.state = {
-            key: Math.random().toString(),
             m_update: 0,
         };
 
+        this.key = Math.random().toString();
+            
         js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
-     
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
+
     }
 
        
@@ -40,12 +41,12 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
     componentWillUnmount () {
         this._isMounted = false;
 		js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this);
+
     }
 
     
-
-    fn_unitUpdated(me,p_andruavUnit)
+    fn_unitOnlineChanged (me,p_andruavUnit)
     {
         if (me.state.m_update === 0) return ;
         
@@ -59,11 +60,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
     
         js_common.fn_console_log ("REACT:fn_unitAdded" );
 
-         if (me.state.andruavUnitPartyIDs.includes(p_andruavUnit.partyID)) return ;
-         // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
-         me.setState({ 
-            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.partyID])
-        });
+        me.fn_unitOnlineChanged (me,p_andruavUnit);
     }
 
     fn_onSelectUnit(e)
@@ -95,6 +92,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
         
         const v_prop = this.props;
         let units_details = [];
+        let v_css_select = ' text-white ';
         sortedPartyIDs.map(function (object)
         {
             
@@ -106,17 +104,34 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
             
             if (v_andruavUnit.m_IsGCS === false)
             {
+                let css_unit = 'text-success fw-bold';
+                let txt_unit = v_andruavUnit.m_unitName;
+                if (v_andruavUnit.m_IsShutdown === true)
+                {
+                    css_unit = 'text-light';
+                    txt_unit += ' --- offline';
+                } 
                 
-                units_details.push(<option key={me.state.key + partyID} value={partyID}>{v_andruavUnit.m_unitName}</option>);
+                const v_selected = (partyID === me.props.m_partyID);
+                units_details.push(<option key={me.key + partyID} 
+                    className={css_unit} 
+                    value={partyID}
+                    >{txt_unit}</option>);
+
+                    
+                    if (v_selected === true)
+                    {
+                        v_css_select = css_unit;
+                    }
             }
         });
 
         return (
             <div className="form-inline">
                 <div className="form-group">
-                    <label htmlFor={this.state.key + 'combo_list'} className="col-5"><small><b>Drone ID</b></small></label>
-                    <select multiple="" className="col-5" id={this.state.key + 'combo_list'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectUnit(e)}>
-                        <option key={me.state.key + "00"} value="0">N/A</option>
+                    <label htmlFor={this.key + 'combo_list'} className="col-3 text-white"><small><b>Drone ID</b></small></label>
+                    <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.props.m_partyID} onChange={(e) => this.fn_onSelectUnit(e)}>
+                        <option key={this.key + "00"} className="col-7 text-white" value="0">n/a</option>
                         {units_details}
                     </select>
                 </div>
