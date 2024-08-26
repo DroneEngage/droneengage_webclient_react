@@ -2,8 +2,8 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import {OpenElevationAPI} from '../../js/js_open_elevation.js'
-import { mavlink20, MAVLink20Processor } from '../../js/js_mavlink_v2.js'
+import {OpenElevationAPI} from '../../../js/js_open_elevation.js'
+import { mavlink20, MAVLink20Processor } from '../../../js/js_mavlink_v2.js'
 
 
 export class CWayPointLocation extends React.Component {

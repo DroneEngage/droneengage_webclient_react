@@ -3,11 +3,11 @@ import $ from 'jquery';
 import React    from 'react';
 import L from 'leaflet';
 
-import {js_leafletmap} from '../../js/js_leafletmap'
-import {js_globals} from '../../js/js_globals.js';
-import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import {js_leafletmap} from '../../../js/js_leafletmap.js'
+import {js_globals} from '../../../js/js_globals.js';
+import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 
-import {CFieldChecked} from '../micro_gadgets/jsc_mctrl_field_check'
+import {CFieldChecked} from '../../micro_gadgets/jsc_mctrl_field_check.jsx'
 
 
 export class CWayPointAction extends React.Component {

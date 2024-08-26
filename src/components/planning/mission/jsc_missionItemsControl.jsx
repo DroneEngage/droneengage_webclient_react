@@ -2,21 +2,21 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import * as js_helpers from '../../js/js_helpers.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages.js'
-import * as js_common from '../../js/js_common.js'
+import * as js_helpers from '../../../js/js_helpers.js'
+import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_common from '../../../js/js_common.js'
 
 
-import {js_mapmission_planmanager} from '../../js/js_mapmissionPlanManager.js'
-import {js_globals} from '../../js/js_globals.js';
-import {js_andruavAuth} from '../../js/js_andruavAuth'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
-import {js_leafletmap} from '../../js/js_leafletmap'
+import {js_mapmission_planmanager} from '../../../js/js_mapmissionPlanManager.js'
+import {js_globals} from '../../../js/js_globals.js';
+import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {js_leafletmap} from '../../../js/js_leafletmap.js'
 
-import {CWayPointLocation} from './jsc_ctrl_waypoint_location'
-import {CWayPointAction} from './jsc_ctrl_waypoint_actions'
+import {CWayPointLocation} from './jsc_ctrl_waypoint_location.jsx'
+import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
 
-import {ClssAndruavUnit_DropDown_List} from '../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
+import {ClssAndruavUnit_DropDown_List} from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
 
 
@@ -27,8 +27,10 @@ class CMissionStep extends React.Component {
     {
         super ();
         this.state = {
-            m_partyID: 0
         };
+
+        this.key = Math.random().toString();
+        
     }
 
 
@@ -37,13 +39,7 @@ class CMissionStep extends React.Component {
         this.wp.fn_editShape();
         this.ma.fn_editShape();
         this.props.p_shape.order = parseInt($('#txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val());
-        // this.props.p_shape.setLabel({
-        //     text: $('#txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(), // string
-        //     color: "#977777",
-        //     fontSize: "12px",
-        //     fontWeight: "bold"
-        //   });
-
+        
         this.props.p_shape.m_mission.fn_updatePath(true)
         return ;
     }
@@ -94,9 +90,12 @@ class MissionControlPanel extends React.Component {
 	{
 		super ();
 		this.state = {
-            m_deleted: false
+            m_deleted: false,
+            m_partyID: 0
 		};
     
+        this.key = Math.random().toString();
+
         js_eventEmitter.fn_subscribe(js_globals.EE_mapMissionUpdate,this,this.fn_missionUpdated);
     }
     
@@ -211,6 +210,13 @@ class MissionControlPanel extends React.Component {
         console.log(e.target.value);
     }
 
+
+    fn_requestWayPoints(fromFCB) {
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
+        if (v_andruavUnit === null || v_andruavUnit === undefined) return;
+        js_globals.v_andruavClient.API_requestWayPoints(v_andruavUnit, fromFCB);
+    }
+
     componentWillUnmount () 
     {
         js_eventEmitter.unsubscribe(js_globals.EE_mapMissionUpdate,this);
@@ -218,7 +224,6 @@ class MissionControlPanel extends React.Component {
 
     componentDidMount ()
     {
-        //$('#cp_' + this.props.p_mission.m_id).val()
         $('#pc_' + this.props.p_mission.m_id).css("background-color",this.props.p_mission.m_pathColor);
     }
 
@@ -242,16 +247,16 @@ class MissionControlPanel extends React.Component {
             return (<div className = " margin_zero "/>);
         }
 
-        var v_item2 = [];
-        var v_partyIDCtrl = [];
+        let v_item2 = [];
+        let v_partyIDCtrl = [];
 
-        var v_saveAsTask = [];
+        let v_saveAsTask = [];
 
         //CODEBLOCK_START
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
 		{
-            v_saveAsTask.push (<button  key={'mp1b3' + this.props.p_mission.m_id}  id="geo_btn_geosave_db"  className="btn btn-danger btn-sm ctrlbtn" title ="Save into System" type="button" onClick={ (e) => this.fn_saveDBMission(e) } >Save</button>);
-            v_saveAsTask.push (<button  key={'mp1b4' + this.props.p_mission.m_id} id="geo_btn_geodelete_db_me"  className="btn btn-danger btn-sm ctrlbtn" title ="Delete Any Related Mission from System for this Unit" type="button" onClick={ (e) => this.fn_deleteDBMission(e) } >Delete</button>);
+            v_saveAsTask.push (<button  key={'mp1bst1' + this.props.p_mission.m_id  + this.key}  id="geo_btn_geosave_db"  className="btn btn-danger btn-sm ctrlbtn" title ="Save into System" type="button" onClick={ (e) => this.fn_saveDBMission(e) } >Save</button>);
+            v_saveAsTask.push (<button  key={'mp1bst2' + this.props.p_mission.m_id  + this.key} id="geo_btn_geodelete_db_me"  className="btn btn-danger btn-sm ctrlbtn" title ="Delete Any Related Mission from System for this Unit" type="button" onClick={ (e) => this.fn_deleteDBMission(e) } >Delete</button>);
         }
         //CODEBLOCK_END
 
@@ -260,9 +265,12 @@ class MissionControlPanel extends React.Component {
         {
             v_item2.push (
 
-                <div id="geofence" key={'mp1' + this.props.p_mission.m_id} className="btn-group  css_margin_top_small" >
-                    <button id='pre_geo_btn_generate' key={'mp1b1' + this.props.p_mission.m_id} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission" type="button "  onClick={ (e) => this.fn_exportMission(e) } >Export</button>
-                    <button  id="geo_btn_georeset"  key={'mp1b2' + this.props.p_mission.m_id} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Reset</button>
+                <div id="geofence" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
+                    <button  id='pre_geo_btn_generate' key={'mp1b1' + this.props.p_mission.m_id + this.key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission(e) } >Export</button>
+                    <button  id='geo_btn_georeset'  key={'mp1b2' + this.props.p_mission.m_id + this.key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Reset</button>
+                    <button  id='geo_btn_geoupload'  key={'mp1b3' + this.props.p_mission.m_id + this.key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Upload</button>
+                    <button  id='geo_btn_georead'  key={'mp1b4' + this.props.p_mission.m_id + this.key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(true) } >Read</button>
+                    <button  id='geo_btn_geoclear'  key={'mp1b5' + this.props.p_mission.m_id + this.key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Clear</button>
                     {v_saveAsTask}
                 </div>
 
@@ -274,13 +282,7 @@ class MissionControlPanel extends React.Component {
                 v_partyIDCtrl.push (
                     <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className ="row margin_zero css_margin_top_small">
                         <div className="col-12">
-                            <ClssAndruavUnit_DropDown_List onSelectUnit={(e) => this.fn_onSelectUnit(e)}/>
-                            {/* <div className="form-inline">
-                                <div className="form-group">
-                                    <label htmlFor="txt_partyID" className="text-primary"><small>Party ID</small></label>
-                                    <input id={'prt_' + this.props.p_mission.m_id} type="text"  className="form-control input-sm input-sm css_margin_left_5" placeholder="unit pin code"    />
-                                </div>
-                            </div> */}
+                            <ClssAndruavUnit_DropDown_List m_partyID={this.state.m_partyID} onSelectUnit={(e) => this.fn_onSelectUnit(e)}/>
                         </div>
                             
                     </div>
@@ -296,7 +298,7 @@ class MissionControlPanel extends React.Component {
 
         }
         
-        var v_class = (this.props.p_isCurrent === true)?"w-100 text-warning border border-warning rounded text-center cursor_hand padding_zero":"w-100  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
+        let v_class = (this.props.p_isCurrent === true)?"w-100 text-warning border border-warning rounded text-center cursor_hand padding_zero":"w-100  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
         return (
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
             <div className="form-inline  margin_zero padding_zero">
@@ -389,7 +391,7 @@ class UnitMissionContainer extends React.Component {
         }
 
         
-        var item = [];
+        let item = [];
         
         if (this.props.p_missionPlan == null)
         {
@@ -412,15 +414,7 @@ class UnitMissionContainer extends React.Component {
                             <MissionControlPanel p_mission={this.props.p_missionPlan} p_ParentCtrl= {this}  p_isCurrent={this.props.p_isCurrent}/>
                             <CMissionStep  p_shape={this.state.s_shape} p_isCurrent={this.props.p_isCurrent}/>
                         </div>);
-                
-                    
-            // }
-            // else
-            // {
-                    
-            // }
-        
-        }
+       }
         
     return (
             <div key='fsc' className ="margin_zero width_100">
@@ -573,7 +567,7 @@ export default class CMissionsContainer extends React.Component {
             v_ctrl.push(
                 <div key='fsc' className="width_100">
                 <div className="row margin_zero"> 
-                    <div className="col-11">
+                    <div className="col-11 text-warning">
                     <label>Add New Mission </label>
                     </div>
                     <div className="col-1">

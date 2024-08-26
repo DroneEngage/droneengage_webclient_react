@@ -1,15 +1,15 @@
 import React    from 'react';
 
-import * as js_helpers from '../../js/js_helpers'
-import {js_globals} from '../../js/js_globals.js';
-import {js_localStorage} from '../../js/js_localStorage'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
-import * as js_common from '../../js/js_common.js'
-import * as js_mapmission from '../../js/js_mapmission.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_helpers from '../../../js/js_helpers.js'
+import {js_globals} from '../../../js/js_globals.js';
+import {js_localStorage} from '../../../js/js_localStorage.js'
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import * as js_common from '../../../js/js_common.js'
+import * as js_mapmission from '../../../js/js_mapmission.js'
+import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 
-import {js_leafletmap} from '../../js/js_leafletmap'
-import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../js/js_main'
+import {js_leafletmap} from '../../../js/js_leafletmap.js'
+import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../../js/js_main.js'
 
 
 const res_FenceClssGlobalSettingsControl =

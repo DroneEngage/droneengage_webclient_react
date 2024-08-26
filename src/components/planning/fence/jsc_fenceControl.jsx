@@ -2,11 +2,11 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import * as js_helpers from '../../js/js_helpers.js';
-import {js_globals} from '../../js/js_globals.js';
-import {js_eventEmitter} from '../../js/js_eventEmitter'
-import * as js_common from '../../js/js_common.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_helpers from '../../../js/js_helpers.js';
+import {js_globals} from '../../../js/js_globals.js';
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import * as js_common from '../../../js/js_common.js'
+import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 
 
 const DEFAULT_DISTANCE = 10;
