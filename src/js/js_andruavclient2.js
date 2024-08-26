@@ -98,13 +98,20 @@ class CAndruavClient {
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
 
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
-                unit.m_IsShutdown = true;
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                if (unit.m_IsShutdown !== true)
+                {
+                    unit.m_IsShutdown = true;
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                }
             } else if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
                 this.API_requestID(unit.partyID);
             } else if (unit.m_IsShutdown) {
-                unit.m_IsShutdown = false;
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                if (unit.m_IsShutdown !== false)
+                {
+                    unit.m_IsShutdown = false;
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                }
+
             }
             }
         });
