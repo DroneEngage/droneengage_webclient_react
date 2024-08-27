@@ -2,12 +2,12 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import * as js_helpers from '../../../js/js_helpers.js'
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 import * as js_common from '../../../js/js_common.js'
 
-import {fn_do_modal_confirmation, 
-    fn_putWayPoints 
+import {
+    fn_requestWayPoints,
+    fn_clearWayPoints, fn_putWayPoints 
     } from '../../../js/js_main.js'
 
 import {js_mapmission_planmanager} from '../../../js/js_mapmissionPlanManager.js'
@@ -18,6 +18,7 @@ import {js_leafletmap} from '../../../js/js_leafletmap.js'
 
 import {CWayPointLocation} from './jsc_ctrl_waypoint_location.jsx'
 import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
+import {ClssMission_Control_Bar} from './jsc_ctrl_mission_control_bar.jsx'
 
 import {ClssAndruavUnit_DropDown_List} from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
@@ -121,12 +122,6 @@ class MissionControlPanel extends React.Component {
         me.forceUpdate();
     }
 
-    fn_exportMission ()
-    {
-        const c_mission_text = this.props.p_mission.fn_exportToV110 ();
-        js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + ".txt","text/plain;charset=utf-8");
-    }
-
     fn_saveDBMission ()
     {
         const c_mission_text = this.props.p_mission.fn_exportToV110 ();
@@ -145,20 +140,6 @@ class MissionControlPanel extends React.Component {
         this.setState ({m_deleted:true});
     }
 
-
-    fn_clearWayPoints (p_partyID, p_fromFCB)
-    {
-        const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
-
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-        fn_do_modal_confirmation("Delete Mission for " + p_andruavUnit.m_unitName,
-            "Are you sure you want to delete mission?", function (p_approved) {
-                if (p_approved === false) return;
-				js_globals.v_andruavClient.API_clearWayPoints(p_andruavUnit, p_fromFCB);
-
-            }, "YES", "bg-danger text-white");
-    }
 
     fn_changeColor ()
     {
@@ -280,15 +261,15 @@ class MissionControlPanel extends React.Component {
 
         if (this.props.p_isCurrent === true)
         {
+            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
+
+        
             v_item2.push (
 
+                
                 <div id="geofence" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
-                    <button  id='pre_geo_btn_generate' key={'mp1b1' + this.props.p_mission.m_id + this.key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission(e) } >Export</button>
-                    <button  id='geo_btn_georeset'  key={'mp1b2' + this.props.p_mission.m_id + this.key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Reset</button>
-                    <button  id='geo_btn_geoupload'  key={'mp1b3' + this.props.p_mission.m_id + this.key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_deleteMission(e) } >Upload</button>
-                    <button  id='geo_btn_georead'  key={'mp1b4' + this.props.p_mission.m_id + this.key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(true) } >Read</button>
-                    <button  id='geo_btn_geoclear'  key={'mp1b5' + this.props.p_mission.m_id + this.key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_clearWayPoints(this.state.m_partyID, true) } >Clear</button>
-                    {v_saveAsTask}
+                    <ClssMission_Control_Bar p_mission={this.props.p_mission} m_selected_unit={this.state.m_partyID}/>
+                    {/* {v_saveAsTask} */}
                 </div>
 
             );
