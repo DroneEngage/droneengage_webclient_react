@@ -948,6 +948,11 @@ padding-left: 5px
 	width: 60px;
 }
 
+.input-sm
+{
+	height: 30px !important;
+}
+
 .button_small
 {
 	min-width: 40px !important;
