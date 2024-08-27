@@ -2244,6 +2244,9 @@ function fn_handleKeyBoard() {
 
 		export function getVehicleIcon(p_andruavUnit, applyBearing) {
 
+			if (p_andruavUnit === null || p_andruavUnit === undefined) {
+				return './images/drone_3_32x32.png';
+			}
 
 			if (p_andruavUnit.m_IsGCS === true) {
 				return './images/map_gcs_3_32x32.png';
