@@ -145,7 +145,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
 
 
         return (
-                <p id='alt' className=' rounded-3 cursor_hand textunit_att_btn text-warning ' >
+                <p id='alt' className={this.props.className + ' rounded-3 cursor_hand textunit_att_btn text-warning '} >
                     <span title={"decrease altitude"} onClick={(e) => this.fn_doChangeAltitudeByStep(v_andruavUnit.m_Nav_Info.p_Location.alt - fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()))}>
                         <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />

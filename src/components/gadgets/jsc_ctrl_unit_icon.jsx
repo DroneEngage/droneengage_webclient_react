@@ -2,8 +2,7 @@ import React    from 'react';
 
 import {fn_gotoUnit, 
     getVehicleIcon, 
-    fn_putWayPoints, 
-    toggleVideo, toggleRecrodingVideo} from '../../js/js_main.js'
+    } from '../../js/js_main.js'
 
 
 export class ClssCTRL_Unit_Icon extends React.Component {
@@ -14,7 +13,9 @@ export class ClssCTRL_Unit_Icon extends React.Component {
 		
         this.state = {
         };
-
+        
+        this.key = Math.random().toString();
+        
     }
 
 
@@ -33,13 +34,13 @@ export class ClssCTRL_Unit_Icon extends React.Component {
         if (is_GCS === false)
         {
             return (
-                <img key={id +"u_ico"} className={this.props.className + ' cursor_hand gcs IsGCS_false small_icon'} src={getVehicleIcon(v_andruavUnit)}  title={module_version}  alt='Vehicle' onClick={ (e) => fn_gotoUnit(v_andruavUnit)}/>
+                <img key={this.key + id +"u_ico1"} className={this.props.className + ' cursor_hand gcs IsGCS_false small_icon'} src={getVehicleIcon(v_andruavUnit)}  title={module_version}  alt='Vehicle' onClick={ (e) => fn_gotoUnit(v_andruavUnit)}/>
             );
         }
         else
         {
             return (
-                <img className={this.props.className + ' gcs IsGCS_true cursor_hand'} src={getVehicleIcon(v_andruavUnit)} alt='GCS' onClick={ (e) => fn_gotoUnit(v_andruavUnit)} />
+                <img key={this.key + id +"u_ico2"}  className={this.props.className + ' gcs IsGCS_true cursor_hand'} src={getVehicleIcon(v_andruavUnit)} alt='GCS' onClick={ (e) => fn_gotoUnit(v_andruavUnit)} />
             );
         }
     
