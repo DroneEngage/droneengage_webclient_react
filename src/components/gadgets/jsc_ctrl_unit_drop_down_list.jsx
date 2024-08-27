@@ -7,6 +7,7 @@ import * as js_common from '../../js/js_common.js'
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_localStorage} from '../../js/js_localStorage.js'
+import {ClssCTRL_Unit_Icon} from './jsc_ctrl_unit_icon.jsx'
 
 
 export class ClssAndruavUnit_DropDown_List extends React.Component {
@@ -126,14 +127,17 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
             }
         });
 
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_partyID);
+
         return (
             <div className="form-inline">
                 <div className="form-group">
                     <label htmlFor={this.key + 'combo_list'} className="col-3 text-white"><small><b>Drone ID</b></small></label>
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.props.m_partyID} onChange={(e) => this.fn_onSelectUnit(e)}>
-                        <option key={this.key + "00"} className="col-7 text-white" value="0">n/a</option>
+                        <option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>
                         {units_details}
                     </select>
+                    <ClssCTRL_Unit_Icon className="ms-2 p-1" m_unit={v_andruavUnit}/>
                 </div>
             </div>
         );
