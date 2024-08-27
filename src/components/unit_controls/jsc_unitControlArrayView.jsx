@@ -127,6 +127,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 		this.telemetry_level=["OFF","1","2","3"];
         js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this,this.fn_unitUpdated);
     }
 
      
@@ -135,8 +136,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
     }
 
     childcomponentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this,);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this,);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this);
     }
 
 

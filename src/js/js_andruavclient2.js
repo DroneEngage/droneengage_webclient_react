@@ -2884,8 +2884,12 @@ class CAndruavClient {
             switch (c_mavlinkMessage.header.msgId) {
                 case mavlink20.MAVLINK_MSG_ID_HEARTBEAT:
                 {
+                    const v_trigger_on_FCB = (p_unit.m_FCBParameters.m_systemID !== c_mavlinkMessage.header.srcSystem);
                     p_unit.m_FCBParameters.m_systemID = c_mavlinkMessage.header.srcSystem;
                     p_unit.m_FCBParameters.m_componentID = c_mavlinkMessage.header.srcComponent;
+                    if (v_trigger_on_FCB === true) {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFCBUpdated, p_unit);
+                    }
                 }
                 break;
                 

@@ -39,6 +39,9 @@ export default class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_globals.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
         
     }
       
@@ -109,6 +112,10 @@ export default class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonSocketStatus,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitOnlineChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitArmedUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitFCBUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this);
+        
     }
 
     /**
