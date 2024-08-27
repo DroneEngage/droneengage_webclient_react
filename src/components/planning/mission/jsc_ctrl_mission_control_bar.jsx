@@ -37,11 +37,12 @@ export class ClssMission_Control_Bar extends React.Component {
         js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + ".txt","text/plain;charset=utf-8");
     }
 
-    fn_putWayPoints(p_andruavUnit, p_eraseFirst)
+    fn_putWayPoints(p_partyID, p_eraseFirst)
     {
         // fn_putWayPoints in js_main
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
         const c_mission_text = this.props.p_mission.fn_exportToV110 ();
-        js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, c_mission_text);
+        js_globals.v_andruavClient.API_uploadWayPoints(v_andruavUnit, p_eraseFirst, c_mission_text);
     }
 
     render ()
