@@ -62,102 +62,6 @@ class ClssFireEvent extends React.Component {
 }
 
 
-class ClssDisplayItems extends React.Component {
-
-  constructor()
-	{
-		super ();
-		this.state = {
-		    
-		};
-  }
-  
-  componentDidMount()
-  {
-    $('#toggle_GCS').prop("checked", js_localStorage.fn_getGCSDisplayEnabled());      
-    $('#toggle_DRONE').prop("checked", js_globals.v_en_Drone);      
-    $('#toggle_ADSB').prop("checked", js_globals.v_EnableADSB);      
-    $('#check_tabs_display').prop("checked", js_globals.v_enable_tabs_display);      
-    $('#check_tabs_display').change(function (e)
-        {
-          var state = $(this).prop('checked');
-          js_globals.v_enable_tabs_display = state;
-          js_localStorage.fn_setTabsDisplayEnabled(state);
-          js_eventEmitter.fn_dispatch(js_globals.EE_onPreferenceChanged);
-        });
-          
-          
-    $('#check_unit_sort').prop("checked", js_globals.v_enable_unit_sort);
-    $('#check_unit_sort').change(function (e)
-        {
-          var state = $(this).prop('checked');
-          js_globals.v_enable_unit_sort = state;
-          js_localStorage.fn_setUnitSortEnabled(state);
-          js_eventEmitter.fn_dispatch(js_globals.EE_onPreferenceChanged);
-        });
-     
-    $('#toggle_GCS').change(function (e)
-        {
-          var state = $(this).prop('checked');
-          js_globals.v_en_GCS = state;
-          js_localStorage.fn_setGCSDisplayEnabled(state);
-          js_eventEmitter.fn_dispatch(js_globals.EE_onPreferenceChanged);
-        });
-          
-    $('#toggle_DRONE').change(function (e)
-        {
-          var state = $(this).prop('checked');
-          js_globals.v_en_Drone = state;
-          js_eventEmitter.fn_dispatch(js_globals.EE_onPreferenceChanged);
-        });
-          
-          
-    $('#toggle_ADSB').change(function (e)
-        {
-          var state = $(this).prop('checked');
-          js_globals.v_EnableADSB = state;
-          js_eventEmitter.fn_dispatch(js_globals.EE_onPreferenceChanged);
-        });
-  }
-
-  render () 
-  {
-    var v_check_btns = [];
-    if (js_globals.CONST_DISABLE_ADSG === false)
-    {
-      v_check_btns.push (
-        <div key="check_btns" className="btn-group css_margin_top_small" role="group" >
-          <label className="checkbox-inline text-white">
-          <input id="toggle_GCS"    type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
-          </label>
-          <label className="checkbox-inline text-white">
-          <input id="toggle_DRONE"  type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
-          </label>
-          <label className="checkbox-inline text-white">
-          <input id="toggle_ADSB"   type="checkbox" data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> ADSB
-          </label> 
-        </div>
-        );
-    }
-    
-    v_check_btns.push (
-        <div key="check_btns" className="btn-group css_margin_top_small" role="group" >
-          <label className="checkbox-inline text-white me-3">
-          <input id="toggle_GCS"    type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> GCS
-          </label>
-          <label className="checkbox-inline text-white me-3">
-          <input id="toggle_DRONE"  type="checkbox"  data-bs-toggle="toggle"  data-size="mini" data-height="20" data-width="47" data-onstyle="success" data-offstyle="danger"/> Drone
-          </label>
-        </div>
-      );
-  
-      return (
-        <div>{v_check_btns}</div>
-        );
-  }
-
-  
-}
 class ClssPreferences extends React.Component {
   constructor()
 	{
@@ -173,6 +77,7 @@ class ClssPreferences extends React.Component {
       $('#check_tabs_display')[0].checked = js_localStorage.fn_getTabsDisplayEnabled();
       $('#check_unit_sort')[0].checked = js_localStorage.fn_getUnitSortEnabled();
       $('#check_advanced')[0].checked = js_localStorage.fn_getAdvancedOptionsEnabled();
+      $('#check_gcs_display')[0].checked = js_localStorage.fn_getGCSDisplayEnabled(); 
   }
 
 
