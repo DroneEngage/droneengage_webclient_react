@@ -198,7 +198,7 @@ export default class ClssAndruavUnitList extends React.Component {
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
                 
-                if (v_andruavUnit.m_IsGCS === true)
+                if ((v_prop.gcs_list !== false) && (v_andruavUnit.m_IsGCS === true))
                 {
                     units_gcs.push (<ClssAndruavUnit_GCS key={'ClssAndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
                 }

@@ -17,6 +17,8 @@ class CEventEmitter {
 
     
     fn_dispatch(p_event, p_data) {
+        try{
+
         if (!this.m_v_events[p_event]) 
             return;
         // no one is listening to this event
@@ -25,6 +27,11 @@ class CEventEmitter {
         for (let i = 0; i < len; i++) {
             let v_subscriber = subscribers[i];
             v_subscriber.callback(v_subscriber.listner, p_data);
+        }
+        }
+        catch (e)
+        {
+            console.log (e);
         }
     };
 

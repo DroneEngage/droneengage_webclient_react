@@ -9,7 +9,8 @@ import {js_andruavAuth} from '../../js/js_andruavAuth.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {fn_do_modal_confirmation, 
-     fn_putWayPoints 
+    fn_requestWayPoints,
+    fn_clearWayPoints, fn_putWayPoints 
      } from '../../js/js_main.js'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
@@ -45,7 +46,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 	{
 		super (props);
         this.state = {
-            m_update: 0,
             tab_planning: this.props.tab_planning,
             tab_main: this.props.tab_main,
             tab_log: this.props.tab_log,
@@ -55,33 +55,18 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         };
 
         this.props.m_unit.m_gui.speed_link = false;
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onPowUpdate);
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated, this, this.fn_onUpdate);
-
+    
     }
+
     componentDidMount () 
     {
+        super.componentDidMount();
         this.state.m_update = 1;
     }
 
 
-    fn_onUpdate(me, p_andruavUnit)
-    {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
-        {
-           return ; // not me
-        }
-
-        if (me.state.m_update === 0) return ;
-        me.setState({'m_update': me.state.m_update +1});
-    }
+   
     
-    fn_onPowUpdate(me, p_andruavUnit)
-    {
-        this.fn_onUpdate(me, p_andruavUnit);
-    }
-
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
@@ -113,30 +98,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         }
     }
     
-    fn_clearWayPoints(p_andruavUnit, p_fromFCB) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-        fn_do_modal_confirmation("Delete Mission for " + p_andruavUnit.m_unitName,
-            "Are you sure you want to delete mission?", function (p_approved) {
-                if (p_approved === false) return;
-				js_globals.v_andruavClient.API_clearWayPoints(p_andruavUnit, p_fromFCB);
-
-            }, "YES", "bg-danger text-white");
-    }
-
-
-    fn_requestWayPoints(p_andruavUnit, fromFCB) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit, fromFCB);
-    }
-
-
-  
-
-
-    
-   
-
 
 
     fn_connectToFCB (p_andruavUnit)
@@ -146,12 +107,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 	}
 
 
-    
-
-    
-
-
-	
 
     hlp_getflightButtonStyles (p_andruavUnit)
 	{
@@ -406,6 +361,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
     
     componentWillUnmount () {
+        super.componentWillUnmount();
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
     }
 
@@ -462,9 +418,9 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
 
         ctrl2.push (<div key={p_andruavUnit.partyID + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
-                    <button id='btn_refreshwp' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => this.fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">R-WP</button>
+                    <button id='btn_refreshwp' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">R-WP</button>
                     <button id='btn_writewp'  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class}   onClick={ (e) => fn_putWayPoints(p_andruavUnit,true)} title="Write Waypoints into Drone">W-WP</button>
-                    <button id='btn_clearwp'   type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => this.fn_clearWayPoints(p_andruavUnit,true)} title="Clear Waypoints" >C-WP</button>
+                    <button id='btn_clearwp'   type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => fn_clearWayPoints(p_andruavUnit,true)} title="Clear Waypoints" >C-WP</button>
                     <button id='btn_webRX'      type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_rx_class}   onClick={ (e) => this.fn_webRX_toggle(p_andruavUnit)} title={btn.btn_rx_title}>{btn.btn_rx_text}</button>
                     <button id='btn_freezerx' type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
                     <button id='btn_releaserx' type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>

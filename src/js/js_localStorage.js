@@ -175,7 +175,7 @@ class CLocalStorage {
     }
 
     fn_setGCSDisplayEnabled = function (value) {
-    localStorage._vGCSDisplay = value;
+        localStorage._vGCSDisplay = value;
     }
 
     fn_getGCSDisplayEnabled = function () {

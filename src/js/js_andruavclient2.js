@@ -2939,6 +2939,7 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery2.p_hasPowerInfo = true;
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryVoltage = c_mavlinkMessage.voltage;
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryCurrent = c_mavlinkMessage.current_battery * 10;
+                    
                 }
                 break;
                 case mavlink20.MAVLINK_MSG_ID_GPS_RAW_INT:
@@ -3150,9 +3151,10 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryRemaining = c_mavlinkMessage.battery_remaining;
                     
                     p_unit.m_GPS_Info1.m_isValid = true;
+
                     js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
                     js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
-
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
                 }
                     break;
 
@@ -3173,7 +3175,7 @@ class CAndruavClient {
                     p_unit.m_GPS_Info1.m_isValid = true;
                     
                     js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
-
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
                     js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
                 }
                     break;

@@ -5,6 +5,8 @@ import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {ClssCTRL_Unit_Icon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 
@@ -28,10 +30,32 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
 		super (props);
 		
         this.state = {
+            'm_update': 0
         };
+
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onPowUpdate);
 
     }
 
+
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
+    }
+
+
+    componentWillUnmount () {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
+    }
+
+
+    fn_onPowUpdate(me, p_andruavUnit)
+    {
+        if (me.state.m_update === 0) return ;
+        me.setState({'m_update': me.state.m_update +1});
+    }
+
+    
 
     /**
      * deceide image and temprature text

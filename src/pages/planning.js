@@ -90,7 +90,7 @@ const Planning = () => {
 						
 				<div id="row_2" className="col col-sm-6 col-md-4">
 				<div id='andruavUnitList' className='row'>
-							<ClssAndruavUnitList tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
+							<ClssAndruavUnitList gcs_list={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
 				</div>
 				<div className="row">	
 						<div id="main_btn_group" className="btn-group" role="group" ><button

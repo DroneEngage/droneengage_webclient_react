@@ -32,6 +32,9 @@ export class ClssAndruavUnitBase extends React.Component {
         
     }
 
+    
+
+
     fn_unitUpdated (me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
@@ -64,7 +67,7 @@ export class ClssAndruavUnitBase extends React.Component {
             p_andruavUnit.date = new Date();
         }
 
-       if (me._isMounted !== true) return ;
+       if (me.state.m_update  === 0) return ;
         
        me.setState({'m_update': me.state.m_update +1});
        
@@ -100,14 +103,12 @@ export class ClssAndruavUnitBase extends React.Component {
     
     componentDidMount() 
     {
-        this._isMounted = true;
         
         this.childcomponentWillMount();
     }
 
     componentWillUnmount () {
-        this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOn,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOff,this);

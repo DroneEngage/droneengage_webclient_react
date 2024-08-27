@@ -1868,8 +1868,35 @@ function fn_handleKeyBoard() {
 			}
 		};
 
+		export function fn_requestWayPoints(p_andruavUnit, fromFCB) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+			js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit, fromFCB);
+		}
 
-		export function fn_putWayPoints(p_andruavUnit, p_eraseFirst) {
+		export function fn_clearWayPoints(p_andruavUnit, p_fromFCB) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+	
+			fn_do_modal_confirmation("Delete Mission for " + p_andruavUnit.m_unitName,
+				"Are you sure you want to delete mission?", function (p_approved) {
+					if (p_approved === false) return;
+					js_globals.v_andruavClient.API_clearWayPoints(p_andruavUnit, p_fromFCB);
+	
+				}, "YES", "bg-danger text-white");
+		}
+	
+		export function fn_putWayPoints (p_andruavUnit, p_eraseFirst) {
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+			
+			fn_do_modal_confirmation("Upload Mission for " + p_andruavUnit.m_unitName,
+				"Are you sure you want to upload mission?", function (p_approved) {
+					if (p_approved === false) return;
+					fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst);
+	
+				}, "YES", "bg-danger text-white");
+		}
+
+
+		function fn_putWayPoints_direct (p_andruavUnit, p_eraseFirst) {
 
 			var files = window.document.getElementById('btn_filesWP').files;
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
