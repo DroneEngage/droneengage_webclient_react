@@ -24,7 +24,7 @@ export class ClssCTRL_Unit_Icon extends React.Component {
         const v_andruavUnit = this.props.m_unit;
         if (v_andruavUnit === null || v_andruavUnit === undefined)
         {
-            return (<img className='gcs IsGCS_true cursor_hand' src={getVehicleIcon(null)} alt='GCS'  />);
+            return (<img className={this.props.className + ' gcs IsGCS_true cursor_default small_icon'} src={getVehicleIcon(null)} alt='GCS'  />);
         }
 
         const is_GCS = false;
@@ -40,7 +40,7 @@ export class ClssCTRL_Unit_Icon extends React.Component {
         else
         {
             return (
-                <img key={this.key + id +"u_ico2"}  className={this.props.className + ' gcs IsGCS_true cursor_hand'} src={getVehicleIcon(v_andruavUnit)} alt='GCS' onClick={ (e) => fn_gotoUnit(v_andruavUnit)} />
+                <img key={this.key + id +"u_ico2"}  className={this.props.className + ' gcs IsGCS_true cursor_hand small_icon'} src={getVehicleIcon(v_andruavUnit)} alt='GCS' onClick={ (e) => fn_gotoUnit(v_andruavUnit)} />
             );
         }
     

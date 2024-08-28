@@ -924,6 +924,15 @@ tr.IsShutdown_false td.camera.m_IsGCS_false
 	cursor: pointer;
 }
 
+.cursor_default
+{
+	cursor: default;
+}
+
+.cursor_none
+{
+	cursor: none;
+}
 
 .one_line
 {
