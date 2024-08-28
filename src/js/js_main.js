@@ -1914,13 +1914,15 @@ function fn_handleKeyBoard() {
 			// If we use onloadend, we need to check the readyState.
 			reader.onloadend = function (evt) {
 				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-					js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, evt.target.result);
+					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
+
+					js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
 				}
 			};
 
 			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
 
-			reader.readAsBinaryString(file);
+			reader.readAsArrayBuffer(file);
 		}
 
 
