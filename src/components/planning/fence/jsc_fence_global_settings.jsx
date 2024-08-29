@@ -5,7 +5,8 @@ import {js_globals} from '../../../js/js_globals.js';
 import {js_localStorage} from '../../../js/js_localStorage.js'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
-import * as js_mapmission from '../../../js/js_mapmission.js'
+import * as js_mission_plan from '../../../js/js_plan_mission.js'
+import * as js_fence_plan from '../../../js/js_mission_fence.js'
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 
 import {js_leafletmap} from '../../../js/js_leafletmap.js'
@@ -128,7 +129,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
     fn_exportFences()
     {
-        const v = new js_mapmission.ClssAndruavFencePlan(1);
+        const v = new js_fence_plan.ClssAndruavFencePlan(1);
         const fence_res = v.fn_generateAndruavFenceData(js_globals.v_map_shapes);
         const de_file = {
             'fileType': 'de_plan',

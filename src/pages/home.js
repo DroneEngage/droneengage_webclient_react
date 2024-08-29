@@ -63,12 +63,12 @@ const Home = () => {
 						<ClssCVideoControl />
 					</div>
 					<div id="andruav_unit_list_array_fixed" className="css_ontop  andruav_unit_list_array">
-					<ClssAndruavUnitListArray/>
+						<ClssAndruavUnitListArray prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />
 					</div>
 					</div>
 					
 					<div id="andruav_unit_list_array_float" className="css_ontop  andruav_unit_list_array_float">
-					<ClssAndruavUnitListArray/>
+						<ClssAndruavUnitListArray prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />
 					</div>
 				</div>
 

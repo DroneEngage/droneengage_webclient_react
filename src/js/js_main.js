@@ -18,12 +18,12 @@ import {js_speak} from './js_speak'
 import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruavclient2 from './js_andruavclient2'
+import {ClssAndruavFencePlan} from './js_plan_fence.js' 
 import {js_andruavAuth} from './js_andruavAuth'
 import {js_leafletmap} from './js_leafletmap'
 import {js_eventEmitter} from './js_eventEmitter'
 import {js_localStorage} from './js_localStorage'
 import {js_webrtcstream} from './js_webrtcthin2.js'
-import * as js_mapmission from './js_mapmission'
 import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
@@ -3248,7 +3248,7 @@ function fn_handleKeyBoard() {
 			js_globals.v_andruavClient.API_disableGeoFenceTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,null,'_drone_',1);
 
 			// new instance
-			const fence_plan = new js_mapmission.ClssAndruavFencePlan(1);
+			const fence_plan = new ClssAndruavFencePlan(1);
 
 			const res = fence_plan.fn_generateAndruavFenceData(js_globals.v_map_shapes);
 			const len_res = res.length;
@@ -3267,43 +3267,7 @@ function fn_handleKeyBoard() {
 			}, 3000);
 		}
 
-		function fn_missionTab()
-		{
-			$('#fenceControl_section').hide();
-			$('#fence_global_section').hide();
-			$('#c_missioncontrol_section').show();
-
-			$('#btn_geofences').removeClass ('btn-success');
-			$('#btn_geofences').addClass ('btn-secondary');
-
-			$('#btn_missions').removeClass ('btn-secondary');
-			$('#btn_missions').addClass ('btn-success');
-
-			js_leafletmap.fn_enableDrawLine(false);
-			js_leafletmap.fn_enableDrawCircle(false);
-			js_leafletmap.fn_enableDrawPolygon(false);
-			js_leafletmap.fn_enableDrawRectangle(false);
-
-		}
-
-		function fn_geoFenceTab()
-		{
-			$('#c_missioncontrol_section').hide();
-			$('#fenceControl_section').show();
-			$('#fence_global_section').show();
-
-			$('#btn_missions').removeClass ('btn-success');
-			$('#btn_missions').addClass ('btn-secondary');
-			
-			$('#btn_geofences').removeClass ('btn-secondary');
-			$('#btn_geofences').addClass ('btn-success');
-
-			js_leafletmap.fn_enableDrawMarker(false);
-			js_leafletmap.fn_enableDrawLine(true);
-			js_leafletmap.fn_enableDrawCircle(true);
-			js_leafletmap.fn_enableDrawPolygon(true);
-			js_leafletmap.fn_enableDrawRectangle(true);
-		}
+		
 
 		
 
@@ -3402,13 +3366,7 @@ function fn_handleKeyBoard() {
 			}
 			else
 			{
-				$('#btn_missions').click(
-					fn_missionTab
-				);
-		
-				$('#btn_geofences').click(
-					fn_geoFenceTab
-				);
+				
 			}
 			
 			if ((QueryString.test !== undefined) && (QueryString.test !== null)) {
@@ -3435,9 +3393,9 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
-			if (js_globals.CONST_MAP_EDITOR === true){
-				fn_missionTab();
-			}
+			// if (js_globals.CONST_MAP_EDITOR === true){
+			// 	fn_missionTab();
+			// }
 
 			
 		};  // end of onReady

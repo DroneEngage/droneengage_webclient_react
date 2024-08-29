@@ -74,10 +74,13 @@ class ClssShapeControl extends React.Component {
     {
         if (this.props.shape.m_geofenceInfo==null)
         {
-            this.props.shape.m_geofenceInfo= {};
-            this.props.shape.m_geofenceInfo.m_geoFenceName = ('fence_' + js_common.fn_generateRandomString(4));
-            this.props.shape.m_geofenceInfo.m_valid = false;
-            this.props.shape.m_geofenceInfo.m_shouldKeepOutside = false;
+            this.props.shape.m_geofenceInfo = {
+                m_geoFenceName : ('fence_' + js_common.fn_generateRandomString(4)),
+                m_valid : false,
+                m_shouldKeepOutside : false,
+                m_deleted: false
+            };
+            
         }
 
         this.fn_updateToolTip();
@@ -391,7 +394,7 @@ class ClssRectangleControl extends ClssShapeControl {
 
 
 
-export default class ClssFenceClssShapeControl extends React.Component {
+export default class ClssFence_Shape_Control extends React.Component {
   
     constructor()
 	{
@@ -526,7 +529,7 @@ export default class ClssFenceClssShapeControl extends React.Component {
 
     return (
 
-                <div key='ClssFenceClssShapeControl'>{v_unit}</div>
+                <div key='ClssFence_Shape_Control'>{v_unit}</div>
             );
     }
 };

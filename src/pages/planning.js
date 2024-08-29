@@ -15,11 +15,8 @@ import {js_globals} from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssGlobalSettings from '../components/jsc_globalSettings'
-import ClssFenceClssShapeControl from '../components/planning/fence/jsc_fenceControl.jsx'
-import CMissionsContainer from '../components/planning/mission/jsc_missionItemsControl.jsx'
-import ClssFenceGlobalSettingsControl from '../components/planning/fence/jsc_fenceGlobalSettings.jsx'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
-
+import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
 import {fn_on_ready} from '../js/js_main'
 
 
@@ -92,28 +89,11 @@ const Planning = () => {
 				<div id='andruavUnitList' className='row'>
 							<ClssAndruavUnitList gcs_list={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false}/>
 				</div>
-				<div className="row">	
-						<div id="main_btn_group" className="btn-group" role="group" ><button
-							type="button" id="btn_missions" className="btn btn-success btn-sm button_large">Mission Plans</button><button
-							type="button" id="btn_geofences" className="btn btn-success btn-sm button_large">Geo Fences</button>
-						</div>
+					<div className="row">	
+						<ClssMain_Control_Buttons/>
 					</div>
 					
-					<div id="fenceControl_section" className="row">	
-						<div id="fenceControl" className='col  col-sm-12 m-1 p-1'>
-						<ClssFenceClssShapeControl  />
-						</div>
-					</div>
-					<div id="c_missioncontrol_section" className="row">	
-						<div id="c_missioncontrol" className='col  col-sm-12 container-fluid localcontainer'>
-						<CMissionsContainer/>
-						</div>
-					</div>
-					<div id="fence_global_section" className="row">	
-						<div id="fence_global" className='col  col-sm-12 container-fluid localcontainer'>
-						<ClssFenceGlobalSettingsControl />
-						</div>
-					</div>
+					
 				</div>
 		</div>
 		<div id="modal_changeUnitInfo"  className="modal fade"  role="dialog">

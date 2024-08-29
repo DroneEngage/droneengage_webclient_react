@@ -341,8 +341,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
 
         if (v_andruavUnit.m_fencestatus !== null && v_andruavUnit.m_fencestatus !== undefined)
 		{
-		    var status;
-			if ((v_andruavUnit.m_fencestatus & 0b010) === 0b010) //bad
+		    if ((v_andruavUnit.m_fencestatus & 0b010) === 0b010) //bad
 			{
 			    v_fence_text = 'fence - bad';
 				v_fence_class = 'bg-danger text-white';

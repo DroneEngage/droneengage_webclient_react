@@ -3379,6 +3379,7 @@ class CAndruavClient {
         } url = url;
 
         if ("WebSocket" in window) {
+            //TODO: HANDLE if WS is not responding.
             this.ws = new WebSocket(url);
             this.ws.parent = this;
             this.ws.sendex = function (msg, isbinary) {

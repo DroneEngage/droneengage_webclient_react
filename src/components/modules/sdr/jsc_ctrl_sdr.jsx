@@ -48,6 +48,7 @@ export class ClssCTRL_SDR extends React.Component {
 
     componentDidMount () 
     {
+        this.state.m_update = 1;
         const  v_andruavUnit = this.props.p_unit;
         this.fn_copyData(this,v_andruavUnit);
     }
@@ -66,6 +67,8 @@ export class ClssCTRL_SDR extends React.Component {
 
     fn_unitUpdated (p_me, p_unit)
     {
+        if (this.state.m_update == 0) return ;
+        
         p_me.fn_copyData(p_me, p_unit);
         p_me.setState({m_update:p_me.state.m_update});
     }

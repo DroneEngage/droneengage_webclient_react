@@ -1,146 +1,24 @@
 /***************************************************
 
 	30 Jul 2016
+    30 Aug 2024
 
 *****************************************************/
-import * as js_helpers from './js_helpers'
+import * as js_helpers from './js_helpers.js'
 import {js_globals} from './js_globals.js';
-import {js_eventEmitter} from './js_eventEmitter'
-import {js_leafletmap} from './js_leafletmap'
+import {js_eventEmitter} from './js_eventEmitter.js'
+import {js_leafletmap} from './js_leafletmap.js'
 
-import * as js_andruavMessages from './js_andruavMessages'
-import {js_andruavAuth} from './js_andruavAuth'
-
+import * as js_andruavMessages from './js_andruavMessages.js'
+import {js_andruavAuth} from './js_andruavAuth.js'
+import {ClssAndruavFencePlan} from  './js_plan_fence.js'
 import { mavlink20 } from './js_mavlink_v2.js';
 
 
-export class ClssAndruavFencePlan
-{
-	constructor (p_id/*, p_initColor*/)
-	{
-		if (p_id === null  || p_id === undefined) throw new Error('Error Bad ID');
-		this.m_id = p_id;
-		this.v_markers = [];
-
-		//this.m_pathColor = p_initColor;
-
-		this.v_highLight = false;
-		this.m_hidden = false;
-	}
-	
-    fn_generateAndruavFenceData(shapes)
-	{
-		var shapesData = [];
-		const len = js_globals.v_map_shapes.length;
-			
-		for (let i=0; i< len; ++i)
-		{
-				
-			var cmd={};
-			const c_shape = shapes[i];
-				
-			if (c_shape.m_geofenceInfo.m_deleted === true) continue;
-				
-			cmd.n = c_shape.m_geofenceInfo.m_geoFenceName;
-			cmd.a = c_shape.m_geofenceInfo.isHardFence;
-			cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
-			cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
-			var lnglat = {};
-			switch (c_shape.shape)
-			{
-				case 'Marker':
-				break;
-					
-				case 'Polygon':
-				{
-					cmd.t = js_andruavMessages.FENCETYPE_PolygonFence;
-					const c_lnglats = c_shape.getLatLngs()[0];
-
-					const len_lnglat = c_lnglats.length;
-
-					for (let j=0; j<len_lnglat; ++j)
-					{
-						
-						lnglat.a = c_lnglats[j].lat * 10000000;
-						lnglat.g = c_lnglats[j].lng * 10000000;
-						cmd[j] = lnglat;
-					}
-
-					cmd.c = 4;					
-				}
-				break;
-
-				case 'Rectangle':
-				{
-					cmd.t = js_andruavMessages.FENCETYPE_PolygonFence;
-					const c_boundary = c_shape.getBounds();
-
-					lnglat.a = c_boundary._northEast.lat;
-					lnglat.g = c_boundary._northEast.lng;
-					cmd[0] = lnglat;
-
-					lnglat = {};
-					lnglat.a = c_boundary._southWest.lat;
-					lnglat.g = c_boundary._northEast.lng;
-					cmd[1] = lnglat;
-
-					lnglat = {};
-					lnglat.a = c_boundary._southWest.lat;
-					lnglat.g = c_boundary._southWest.lng;
-					cmd[2] = lnglat;
-
-					lnglat = {};
-					lnglat.a = c_boundary._northEast.lat;
-					lnglat.g = c_boundary._southWest.lng;
-					cmd[3] = lnglat;
-
-						
-					cmd.c = 4;					
-				}
-				break;
-
-				case 'Circle':
-				{
-					cmd.t = js_andruavMessages.FENCETYPE_CylindersFence;
-					const c_center = c_shape.getLatLng();
-					
-					lnglat.a = c_center.lat;
-					lnglat.g = c_center.lng;
-					cmd["0"] = lnglat;
-					cmd.c=1;
-				}
-				break;
-				
-				case 'Line':
-				{
-					cmd.t = js_andruavMessages.FENCETYPE_LinearFence;
-					const c_lnglats = c_shape.getLatLngs();
-
-					const len_lnglat = c_lnglats.length;
-
-					for (let j=0; j<len_lnglat;++j)
-					{
-						lnglat.a = c_lnglats[j].lat;
-						lnglat.g = c_lnglats[j].lng;
-						cmd[j] = lnglat;
-					}
-
-					cmd.c = len_lnglat;
-				}
-				break;
-
-				default:
-						
-				break;
-			}
-
-			shapesData.push(cmd);
-		}
-
-		return shapesData;
-	}
-}
-
+/**
+ * Represents a single unit plan.
+ * This plan does not include fence plan.
+ */
 export class ClssAndruavMissionPlan 
 {
 
@@ -444,8 +322,6 @@ export class ClssAndruavMissionPlan
 	{
 		if (this.v_markers.length === 0)	 return;
 		
-		// var v_cmd = ClssAndruavResala_WayPoints.fn_toJSON(this.v_markers);
-		
 		// Delete Old Shapes
 		if (p_missionV110 !== null && p_missionV110 !== undefined)
 		{
@@ -459,6 +335,157 @@ export class ClssAndruavMissionPlan
 	};
 
 	/**
+	 * Export fences as json text in DE-format - similar to QGC
+	 * Note: fences are handles out of Ardupilot.
+	 */
+	fn_exportFencesToDE_V1 ()
+	{
+		const v = new ClssAndruavFencePlan(1);
+        const fence_res = v.fn_generateAndruavFenceData(js_globals.v_map_shapes);
+        
+		return fence_res;
+	}
+
+	/**
+	 * Exports mission as json text in DE-format - similar to QGC.
+	 * @param {*} andruavUnit : can be null
+	 * @returns 
+	 */
+	fn_exportToDE_V1 (andruavUnit)
+	{
+		let output_plan = 
+		{
+			"fileType": "de_plan",
+			"unit": 
+			{
+				"partyID": 0,
+				"unitName": "General",
+				"vehichleType": "NA"
+			},
+			"version": 1,
+
+			"de_geoFence": {
+				
+			},
+
+			"de_mission": {
+			},
+			
+		};
+
+		if (andruavUnit!= null)	
+		{
+			output_plan["unit"]["partyID"] = andruavUnit.partyID;
+			output_plan["unit"]["unitName"] = andruavUnit.m_unitName;
+			output_plan["unit"]["vehichleType"] = andruavUnit.m_VehicleType;
+		}
+
+		output_plan["de_geoFence"] = this.fn_exportFencesToDE_V1 ();
+		
+		const len = this.v_markers.length;
+		let missionSteps = [];
+		
+		const fn_addMissionItem = function (marker, cmd, m_paramsArray)
+		{
+			let step = {
+				'cmd': cmd,
+				'frameType': marker.m_missionItem.m_frameType,
+				'mavlink': m_paramsArray,
+			};
+			missionSteps.push (step);
+		}
+
+		let skip = false;
+		for (let i =0;i<len;++i)
+		{
+			skip = false;
+			let marker = this.v_markers[i];
+			let step={};
+			switch (marker.m_missionItem.m_missionType)
+			{
+				case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
+				{
+					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
+				}
+				break;
+
+				case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
+				{
+					fn_addMissionItem(marker,22,[0.0,0.0,0.0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
+					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
+							
+					/*step.id = missionCounter;
+						step.cmd = 22;
+						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+						step.param1 = 0.0;
+						step.param2 = 0.0;
+						step.param3 = 0.0;
+						step.param4 = 0.0;
+						step.param5 = marker.getLatLng().lat;
+						step.param6 = marker.getLatLng().lng;
+						step.param7 = marker.m_missionItem.alt;
+					*/
+				}
+				break;
+				
+				case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
+				{
+					fn_addMissionItem(marker,21,[0.0,0.0,0.0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
+					
+					/*step.id = missionCounter;
+						step.cmd = 21;
+						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+						step.param1 = 0.0;
+						step.param2 = 0.0;
+						step.param3 = 0.0;
+						step.param4 = 0.0;
+						step.param5 = marker.getLatLng().lat;
+						step.param6 = marker.getLatLng().lng;
+						step.param7 = marker.m_missionItem.alt;
+					*/
+				}
+				break;
+				
+				case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
+				{
+					fn_addMissionItem(marker,16,[0,5,0,0.0,marker.getLatLng().lat,marker.getLatLng().lng,marker.m_missionItem.alt]);
+					fn_addMissionItem(marker,20,[0,0,0.0,0.0,0.0,0.0,0.0]);
+							
+					/*step.id = missionCounter;
+						step.cmd = 16;
+						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+						step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+						step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+						step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+						step.param4 = 0.0; 
+						step.param5 = marker.getLatLng().lat;
+						step.param6 = marker.getLatLng().lng;
+						step.param7 = marker.m_missionItem.alt;
+
+						nextstep.id = missionCounter;
+						nextstep.cmd = 20;
+						nextstep.param1 = 0.0;
+						nextstep.param2 = 0.0;
+						nextstep.param3 = 0.0;
+						nextstep.param4 = 0.0;
+						nextstep.param5 = 0.0;
+						nextstep.param6 = 0.0;
+						nextstep.param7 = 0.0; 							
+					*/
+				}
+				break;
+				
+				
+			}
+		}
+
+		output_plan["de_mission"] = missionSteps;
+		
+		return JSON.stringify(output_plan);
+	}
+
+
+	/**
 	* Exports Mission as text file in V110 format understood by Mission Planner & DroneAPI
 	*/
 	fn_exportToV110 ()
@@ -466,7 +493,7 @@ export class ClssAndruavMissionPlan
 		let len = this.v_markers.length;
 		let missionSteps = [];
 				
-		let fn_addMissionItem = function (marker, cmd,m_paramsArray)
+		const fn_addMissionItem = function (marker, cmd, m_paramsArray)
 		{
 			let step = {};
 			step.cmd = cmd;
@@ -476,7 +503,7 @@ export class ClssAndruavMissionPlan
 		}
 
 		let skip = false;
-		for (let i =0;i<len;++i)
+		for (let i=0; i<len; ++i)
 		{
 			skip = false;
 			let marker = this.v_markers[i];
@@ -706,6 +733,3 @@ export class ClssAndruavMissionPlan
 	};
 	 
 }
-
-
-
