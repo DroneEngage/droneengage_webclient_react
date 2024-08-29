@@ -8,9 +8,9 @@ import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
 import {ClssSDR_Planning} from '../modules/jsc_ctrl_sdr_planning.jsx'
 
 /**
- * 
+ * This is a complete Single Mission Plan.
  */
-export class ClssMissionStep extends React.Component {
+export class ClssSingle_Mission_Details extends React.Component {
 
     constructor()
     {
@@ -43,7 +43,7 @@ export class ClssMissionStep extends React.Component {
     
     render ()
     {
-        if ((this.props.p_shape === null || this.props.p_shape === undefined)  || (this.props.p_isCurrent === false))
+        if ((this.props.p_shape === null || this.props.p_shape === undefined)  || (this.props.p_isCurrent === false) || (this.props.p_isCollapsed === true))
         {
             return (<div/>);
         }

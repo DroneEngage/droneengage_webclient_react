@@ -2,7 +2,7 @@ import React    from 'react';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
-import {js_andruavAuth} from '../../../js/js_andruavAuth'
+import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
 
 import {
     fn_requestWayPoints,
@@ -15,7 +15,7 @@ import {
 
 
 
-export class ClssMission_Control_Bar extends React.Component {
+export class ClssSingle_Mission_Control_Bar extends React.Component {
     constructor(props)
 	{
 		super (props);
