@@ -9,30 +9,55 @@ export class ClssCtrlBattery extends React.Component {
 	{
 		super ();
 		    this.state = {
-                is_compact : true
+                is_compact : true,
+                m_update: 0
 		};
 
         js_eventEmitter.fn_subscribe(js_globals.EE_BattViewToggle,this,this.fn_toggle_global);
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitPowUpdated,this,this.fn_update);
+    
+    }
+
+
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
     }
 
     childcomponentWillUnmount () 
     {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_BattViewToggle,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
     }
 
+    fn_update (me)
+    {
+        if (this.state.m_update === 0) return ;
+        
+        me.setState({'m_update': me.state.m_update +1});
+    }
+    
     fn_toggle_global(me,p_compact)
     {
+        if (this.state.m_update === 0) return ;
+        
         me.state.is_compact = p_compact;
-        me.forceUpdate();
+        me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_toggle()
     {
-        if (this.state.is_compact === false) this.state.is_compact = true;
+        if (this.state.is_compact === false) 
+        {
+            this.state.is_compact = true;
+        }
         else
-        this.state.is_compact = false;
+        {
+            this.state.is_compact = false;
+        }
 
-        this.forceUpdate();
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
