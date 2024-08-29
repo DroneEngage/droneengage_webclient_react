@@ -52,8 +52,8 @@ class ClssFireEvent extends React.Component {
         <div className="form-group">
           <label htmlFor="txt_ev" className="user-select-none  form-label text-white "><small>Event&nbsp;No.</small></label>
           <div className="input-group mb-3">
-            <input id="txt_ev"  type="number" min={0} max={2000} step="1.0" className="form-control input-sm input-sm txt_margin" placeholder="0" aria-label="0" />
-            <button id="btn_ev"  type="button" className="btn btn-success" onClick={ (e) => this.fn_fireEvent()} >Fire</button>
+            <input id="txt_ev"  type="number" min={0} max={2000} step="1.0" className="form-control input-sm input-sm txt_margin " placeholder="0" aria-label="0" />
+            <button id="btn_ev"  type="button" className="btn btn-success input-sm line-height-0" onClick={ (e) => this.fn_fireEvent()} >Fire</button>
           </div>
         </div>
       );
@@ -328,7 +328,7 @@ export default class ClssGlobalSettings extends React.Component {
                   <div key='v_uploadFile2' className="form-inline">
                     <div key='v_uploadFile3' className="form-group">
                         <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2"><small>Global&nbsp;Mission&nbsp;File</small></label>
-                        <input type="file" id="btn_filesWP" name="file" className="form-control input-xs input-sm css_margin_left_5"/>
+                        <input type="file" id="btn_filesWP" name="file" className="form-control input-xs input-sm css_margin_left_5 line-height-normal"/>
                     </div>
                   </div>
                 </div>

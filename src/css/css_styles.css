@@ -924,14 +924,14 @@ tr.IsShutdown_false td.camera.m_IsGCS_false
 	cursor: pointer;
 }
 
-.cursor_default
+.line-height-0
 {
-	cursor: default;
+	line-height: 0px !important;
 }
 
-.cursor_none
+.line-height-normal
 {
-	cursor: none;
+	line-height: normal !important;
 }
 
 .one_line
