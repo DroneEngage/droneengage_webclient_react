@@ -54,13 +54,22 @@ class ClssGamePadAxesControl extends React.Component {
     constructor(props)
 	{
 		super (props);
+
+        this.state = {
+            m_update: 0
+        };
         
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Axes_Updated,this, this.fn_gamePadAxesUpdated);
     }
     
+    componentDidMount () {
+        this.state.m_update = 1;
+    }
+
     fn_gamePadAxesUpdated(p_me,p_obj)
     {
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     
@@ -123,7 +132,8 @@ class ClssGamePadButtonControl extends React.Component {
     
     fn_gamePadButtonUpdated(p_me,p_obj)
     {
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     
@@ -200,21 +210,25 @@ export default class ClssGamePadControl extends React.Component {
 
     fn_gamePadConnected(p_me,p_obj)
     {
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_gamePadDisconnected(p_me,p_obj)
     {
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_changeMode (p_mode)
     {
+        if (this.state.m_update === 0) return ;
         if (isNaN(p_mode)) return ;
 
         js_localStorage.fn_setGamePadMode(p_mode);
         js_speak.fn_speak ('Game pad mode is set to ' + p_mode.toString());
-        this.forceUpdate();
+        
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_changeGamePad(p_index)
@@ -232,6 +246,7 @@ export default class ClssGamePadControl extends React.Component {
      */
     fn_requestGamePad(p_me,p_andruavUnit)
     {
+        if (p_me.state.m_update === 0) return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         p_me.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
@@ -239,14 +254,20 @@ export default class ClssGamePadControl extends React.Component {
             fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.partyID));
         });
         $('#modal_ctrl_gamepad').show();
-        p_me.forceUpdate();
+
+       p_me.setState({'m_update': p_me.state.m_update +1});
+        
     }
     
     fn_releaseGamePad(p_me,p_andruavUnit)
     {
+        if (p_me.state.m_update === 0) return ;
+        
         p_me.state.m_andruavUnit = null;
         $('#modal_ctrl_gamepad').hide();  
-        p_me.forceUpdate();
+        
+        p_me.setState({'m_update': p_me.state.m_update +1});
+        
     }
 
         
