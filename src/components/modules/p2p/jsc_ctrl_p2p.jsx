@@ -189,7 +189,7 @@ export class ClssCTRL_P2P extends React.Component {
         const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_p2p"} className="">
+            <div key={v_andruavUnit.partyID + "_ctl_p2p"} className={this.props.className}>
                 <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.partyID + 'p2p_11'} className="col-6 ">
                         <div key={v_andruavUnit.partyID + 'p2p_111'} className='row css_margin_zero padding_zero '>

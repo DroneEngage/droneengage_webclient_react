@@ -153,16 +153,6 @@ export class ClssCTRL_SDR extends React.Component {
             p_band_width, p_gain, p_sample_rate,
             p_decode_mode, p_driver_index, p_display_bars); 
 
-
-        
-        // this.state.m_updated.fc = false;
-        // this.state.m_updated.f = false;
-        // this.state.m_updated.bw = false;
-        // this.state.m_updated.ga= false;
-        // this.state.m_updated.sr = false;
-        // this.state.m_updated.dm = false;
-        // this.state.m_updated.dr = false;
-        
     }
 
     
@@ -263,7 +253,7 @@ export class ClssCTRL_SDR extends React.Component {
 
 
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_sdr"} className="">
+            <div key={v_andruavUnit.partyID + "_ctl_sdr"} className={this.props.className}>
                 <div key={v_andruavUnit.partyID + 'sdr_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.partyID + 'sdr_11'} className="col-6 col-md-6 ">
                         <div key={v_andruavUnit.partyID + 'sdr_111'} className='row css_margin_zero padding_zero '>
