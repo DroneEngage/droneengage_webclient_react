@@ -245,14 +245,14 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_sdr === true)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
                 <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}>SDR</a>
             </li>);
         }
            
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sound === true)  || (v_andruavUnit.m_isDE === false)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>
             </li>);
         }
