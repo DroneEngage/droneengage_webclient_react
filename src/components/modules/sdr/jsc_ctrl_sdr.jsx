@@ -67,7 +67,7 @@ export class ClssCTRL_SDR extends React.Component {
 
     fn_unitUpdated (p_me, p_unit)
     {
-        if (this.state.m_update == 0) return ;
+        if (p_me.state.m_update == 0) return ;
         
         p_me.fn_copyData(p_me, p_unit);
         p_me.setState({m_update:p_me.state.m_update});
@@ -184,10 +184,18 @@ export class ClssCTRL_SDR extends React.Component {
         switch (v_andruavUnit.m_SDR.m_status)
         {
             case js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED:
-                return {r:"bg-light", u:"bg-light", s:"bg-light"};
+                
+                if (Object.keys(v_andruavUnit.m_SDR.m_available_drivers).length === 0)
+                {
+                    return {r:"bg-success", u:"hidden", s:"hidden"};
+                }
+                else
+                {
+                    return {r:"bg-success", u:"bg-danger", s:"hidden"};
+                }
 
             case js_andruavMessages.CONST_SDR_STATUS_ERROR:
-                    return {r:"bg-danger", u:"bg-light", s:"bg-light"};
+                return {r:"bg-danger", u:"bg-light", s:"bg-light"};
                 
             case js_andruavMessages.CONST_SDR_STATUS_CONNECTED:
                 return {r:"bg-success", u:"bg-danger", s:"bg-warning"};
@@ -280,19 +288,6 @@ export class ClssCTRL_SDR extends React.Component {
                     </div>
                     <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
                         
-                        {/* <div key={v_andruavUnit.partyID + 'sdr_211'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_modes'} className="col-5"><small><b>Decode Mode</b></small></label>
-                            <select multiple="" className="col-5" id={v_andruavUnit.partyID + 'sdr_dm_modes'} value={this.state.m_decode_mode} onChange={(e) => this.fn_onSelectDecodeModes(e)}>
-                                <option value="0">FM</option>
-                                <option value="1">NBFM</option>
-                                <option value="2">AM</option>
-                                <option value="3">NAM</option>
-                                <option value="4">USB</option>
-                                <option value="5">LSB</option>
-                                <option value="6">CW</option>
-                            </select>
-
-                        </div> */}
                         <div key={v_andruavUnit.partyID + 'sdr_213'} className='row css_margin_zero padding_zero '>
                             <label className="col-5"><small><b>Sample Rate</b></small></label>
                             <input type="text" className="col-5" placeholder="Sample Rate" aria-label="Sample Rate"  value={this.state.m_sample_rate} onChange={(e)=> this.fn_onSampleRate(e)}/>
