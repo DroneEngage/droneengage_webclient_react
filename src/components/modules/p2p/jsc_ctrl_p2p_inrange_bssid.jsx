@@ -32,7 +32,7 @@ class CLASS_CTRL_P2P_IN_RANGE_BSSID_INFO  extends React.Component {
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_bssid;
-        const unit = js_globals.v_andruavClient.m_andruavUnitList.fn_getUnitByP2PMac(v_inrange_node.bssid);
+        const unit = js_globals.m_andruavUnitList.fn_getUnitByP2PMac(v_inrange_node.bssid);
         var txt_node_name;
 
         var p2 = v_andruavUnit.partyID;
