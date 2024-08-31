@@ -83,17 +83,17 @@ class ClssPreferences extends React.Component {
 
     
 
-  fn_changeVolume ()
+  fn_changeVolume (e)
   {
-      js_localStorage.fn_setVolume($('#volume_range')[0].value);
+      js_localStorage.fn_setVolume(e.currentTarget.value);
       js_speak.fn_updateSettings();
   }
 
   
 
-  fn_enableSpeech ()
+  fn_enableSpeech (e)
   {
-      const enabled = $('#check_enable_speech')[0].checked;
+      const enabled = e.currentTarget.checked;
       js_localStorage.fn_setSpeechEnabled(enabled);
       js_speak.fn_updateSettings();
 
@@ -108,32 +108,32 @@ class ClssPreferences extends React.Component {
       }
   }
 
-  fn_enableAdvanced ()
+  fn_enableAdvanced (e)
   {
-    const enabled = $('#check_advanced')[0].checked;
+    const enabled = e.currentTarget.checked;
     js_localStorage.fn_setAdvancedOptionsEnabled(enabled);
     js_eventEmitter.fn_dispatch (js_globals.EE_onAdvancedMode);
   }
 
-  fn_enableTabsDisplay ()
+  fn_enableTabsDisplay (e)
   {
-    const enabled = $('#check_tabs_display')[0].checked;
+    const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setTabsDisplayEnabled(enabled);
     js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
   }
 
-  fn_sortUnits ()
+  fn_sortUnits (e)
   {
-    const enabled = $('#check_unit_sort')[0].checked;
+    const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setUnitSortEnabled(enabled);
     js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
   }
 
-  fn_enableGCS ()
+  fn_enableGCS (e)
   {
-    const enabled = $('#check_gcs_display')[0].checked;
+    const enabled = e.currentTarget.checked;
     js_globals.v_enable_gcs_display = enabled;
     js_localStorage.fn_setGCSDisplayEnabled(enabled);
     js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
@@ -155,23 +155,23 @@ class ClssPreferences extends React.Component {
           <fieldset>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_enable_speech" className="col-sm-4 col-form-label al_l" >Enable Speech</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_enable_speech" onClick={ () => this.fn_enableSpeech()} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_enable_speech" onClick={ (e) => this.fn_enableSpeech(e)} />
               <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r" >Volume</label>
-              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" disabled={v_speech_disabled==='true'}  onChange={ () => this.fn_changeVolume()}/>
+              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" disabled={v_speech_disabled==='true'}  onChange={ (e) => this.fn_changeVolume(e)}/>
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_tabs_display" className="col-sm-4 col-form-label al_l " >Units in Tabs</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_tabs_display" onClick={ () => this.fn_enableTabsDisplay()} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_tabs_display" onClick={ (e) => this.fn_enableTabsDisplay(e)} />
               <label htmlFor="check_unit_sort" className="col-sm-4 col-form-label al_r" title='sort by unit name of mavlink id'>Sort Units (mav_id)</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" onClick={ () => this.fn_sortUnits()} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" onClick={ (e) => this.fn_sortUnits(e)} />
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_l " >Advanced Options</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" onClick={ () => this.fn_enableAdvanced()} />
+              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" onClick={ (e) => this.fn_enableAdvanced(e)} />
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_gcs_display" className="col-sm-4 col-form-label al_l " >Show Connected GCS</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_gcs_display" onClick={ () => this.fn_enableGCS()} />
+              <input className="form-check-input col-sm-8 " type="checkbox" id="check_gcs_display" onClick={ (e) => this.fn_enableGCS(e)} />
             </div>
           </fieldset>
           
