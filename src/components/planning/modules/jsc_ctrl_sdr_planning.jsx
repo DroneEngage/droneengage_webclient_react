@@ -17,6 +17,7 @@ export class ClssSDR_Planning extends React.Component {
     componentDidMount () 
     {
         this.state.m_update = 1;
+        this.props.p_shape.m_missionItem.modules.sdr= {};
     }
 
     componentWillUnmount() 
@@ -24,11 +25,15 @@ export class ClssSDR_Planning extends React.Component {
         
     }
 
+    fn_editShape()
+    {
+
+    }
 
     render ()
     {
         return (
-            <div>SDR CONTROL</div>
+            <div className={this.props.className } >SDR CONTROL</div>
         );
     }
 

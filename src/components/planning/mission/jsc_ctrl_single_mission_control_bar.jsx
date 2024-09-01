@@ -3,6 +3,7 @@ import React    from 'react';
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
 import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
+import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
 
 import {
     fn_requestWayPoints,
@@ -83,7 +84,11 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
         js_globals.v_andruavClient.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,this.props.m_selected_unit);
     }
 
-    
+    fn_deleteMission() {
+        if (this.props.p_mission == null) return;
+        js_mapmission_planmanager.fn_deleteMission(this.props.p_mission.m_id);
+        this.setState({ m_deleted: true });
+    }
 
     render ()
     {

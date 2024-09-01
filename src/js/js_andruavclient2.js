@@ -22,9 +22,11 @@ import * as js_siteConfig from './js_siteConfig.js';
 import {js_localGamePad} from './js_localGamePad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
+
 import * as js_common from './js_common.js'
 import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
+import {CCommandAPI} from './js_commands_api.js'
 
 import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js'
 
@@ -572,8 +574,9 @@ class CAndruavClient {
     };
 
 
-    // CODEBLOCK_START
     API_SendTrackCRegion(p_andruavUnit, p_corner1_x, p_corner1_y, p_corner2_x, p_corner2_y) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
         let msg = {
             a: p_corner1_x,
             b: p_corner1_y,
@@ -583,10 +586,11 @@ class CAndruavClient {
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget, msg);
     };
-    // CODEBLOCK_END
+    
 
-    // CODEBLOCK_START
     API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
         let msg = {
             a: p_center_x,
             b: p_center_y,
@@ -597,40 +601,21 @@ class CAndruavClient {
     };
 
     API_StopTracking(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
         let msg = {
             s: true
         };
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget, msg);
     };
-    // CODEBLOCK_END
-
+    
     API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration) {
 
-        let msg = {
-        };
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        if (comm_on_off!=null)
-        {
-            msg.ws = comm_on_off;
-            if (comm_on_off_duration!=null)
-            {
-                msg.wsd = comm_on_off_duration;
-            }
-        }
-
-        
-
-        if (p2p_on_off!=null)
-        {
-            msg.p2p = p2p_on_off;
-            if (p2p_on_off_duration!=null)
-            {
-                msg.p2pd = p2p_on_off_duration;
-            }
-        }
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Set_Communication_Line , msg);
+        const cmd = CCommandAPI.API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
 
@@ -762,102 +747,69 @@ class CAndruavClient {
      * @param {*} p_partyID is partyID not a unit object.
      */
     API_requestID(p_partyID) {
-        let msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_ID
-        };
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
-    };
+        const cmd = CCommandAPI.API_requestID(p_partyID);
+        this.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
+    }
 
 
     API_requestP2P(p_andruavUnit) {
-        let msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO
-        };
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
-    };
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        const cmd = CCommandAPI.API_requestP2P(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+    }
 
 
     API_requestSDR(p_andruavUnit) {
-        let msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO
-        };
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        const cmd = CCommandAPI.API_requestP2P(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
 
     API_scanSDRDrivers(p_andruavUnit) {
-        let msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
-            a: js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES
-
-        };
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute , msg);
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        const cmd = CCommandAPI.API_scanSDRDrivers(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
     API_scanSDRFreq(p_andruavUnit) {
-        let msg = {
-            a: js_andruavMessages.CONST_SDR_ACTION_READ_DATA
-
-        };
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION , msg);
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        let p_msg = {
-            t: p_text
-        };
-        
-        if (p_language !== '' && p_language != null && p_language !== undefined)
-        {
-            p_msg.l = p_language;
-        }
-
-        if (p_pitch !== '' && p_pitch != null && p_pitch !== undefined)
-        {
-            p_msg.p = p_pitch;
-        }
-
-        if (p_volume !== '' && p_volume != null && p_volume !== undefined)
-        {
-            p_msg.v = p_volume;
-        }
-    
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH, p_msg);
+        const cmd = CCommandAPI.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
 
     API_scanP2P(p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        let p_msg = {
-            a: js_andruavMessages.CONST_P2P_ACTION_SCAN_NETWORK,
-        };
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
+        const cmd = CCommandAPI.API_scanP2P(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
     
     API_resetP2P (p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        let p_msg = {
-            a: js_andruavMessages.CONST_P2P_ACTION_RESTART_TO_MAC,
-        };
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION, p_msg);
+        const cmd = CCommandAPI.API_resetP2P(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
-    API_makeSwarm (p_andruavUnit, p_formationID) {
+    API_makeSwarm (p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        let p_msg = {
-            a: p_formationID, // m_formation_as_leader
-            b: p_andruavUnit.partyID // Leader
-        };
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_MakeSwarm, p_msg);
+        const cmd = CCommandAPI.API_makeSwarm(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
@@ -868,23 +820,12 @@ class CAndruavClient {
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        let p_msg = {
-            'a': js_andruavMessages.CONST_SDR_ACTION_SET_CONFIG
-        };
-        
-        if (p_fequency_center !== null)  p_msg.fc = p_fequency_center;
-        if (p_fequency !== null)         p_msg.f  = p_fequency;
-        if (p_band_width !== null)       p_msg.b  = p_band_width;
-        if (p_gain !== null)             p_msg.g  = p_gain;
-        if (p_sample_rate !== null)      p_msg.s  = p_sample_rate;
-        if (p_decode_mode !== null)      p_msg.m  = p_decode_mode;
-        if (p_driver_index !== null)     p_msg.i  = p_driver_index;
-        if (p_driver_index !== null)     p_msg.i  = p_driver_index;
-        if (p_display_bars !== null)     p_msg.r  = p_display_bars;
-        
-        js_common.fn_console_log (p_msg);
-        
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
+        const cmd = CCommandAPI.API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
+            p_band_width, p_gain, p_sample_rate,
+            p_decode_mode, p_driver_index,
+            p_display_bars
+        );
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
     API_activateSDR (p_andruavUnit)
@@ -1627,7 +1568,7 @@ class CAndruavClient {
         this.API_requestGeoFencesAttachStatus(target);
         this.API_requestUdpProxyStatus(target);
         this.API_requestWayPoints(target);
-        this.API_requestIMU (target,true);
+        //this.API_requestIMU (target,true);  // NOT USED
 
         
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check

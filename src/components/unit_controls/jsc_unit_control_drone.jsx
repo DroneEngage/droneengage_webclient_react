@@ -300,21 +300,21 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
                     </div>);
         }
        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
                             <ClssCTRL_P2P p_unit={v_andruavUnit}/>
                     </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
                             <ClssCTRL_SDR p_unit={v_andruavUnit}/>
                      </div>);
         }
     
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
             container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
                 <ClssCTRL_AUDIO p_unit={v_andruavUnit}/>

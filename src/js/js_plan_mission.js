@@ -216,7 +216,8 @@ export class ClssAndruavMissionPlan
 			m_speedRequired: false,
 			speed: 5,  // m/s
 			m_yawRequired: false,
-			yaw: 0
+			yaw: 0,
+			modules: {}
 		};
 				
 		this.m_missionCounter+=1;

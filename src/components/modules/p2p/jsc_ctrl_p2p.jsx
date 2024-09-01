@@ -48,12 +48,12 @@ export class ClssCTRL_P2P extends React.Component {
 
     fn_setCommunicationChannel_P2P (p_andruavUnit, p2p_state)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, false, null);
+        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, null, p2p_state, null, null);
     }
 
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null,duration);
+        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)
