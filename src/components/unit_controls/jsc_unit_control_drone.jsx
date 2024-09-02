@@ -100,11 +100,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     
 
 
-    fn_connectToFCB (p_andruavUnit)
-	{
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-		js_globals.v_andruavClient.API_connectToFCB(p_andruavUnit);
-	}
 
 
 

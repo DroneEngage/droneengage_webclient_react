@@ -47,6 +47,13 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         this.state.m_update = 1;
     }
 
+
+    fn_connectToFCB (p_andruavUnit)
+	{
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
+		js_globals.v_andruavClient.API_connectToFCB(p_andruavUnit);
+	}
+    
     hlp_getGPS (p_andruavUnit)
     {
         var res = {
