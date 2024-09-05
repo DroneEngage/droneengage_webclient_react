@@ -121,12 +121,6 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
         v_altitude_text = v_altitude + '/' + v_altitude_abs;    
 
 
-        let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " m/s";
-        if (js_globals.v_useMetricSystem === false) {
-            // value stored in meters per seconds so convert it to miles per hour
-            v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
-        }
-
         let v_speed_text = "";
         const ground_speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
         if ( ground_speed === null || ground_speed === undefined) {
