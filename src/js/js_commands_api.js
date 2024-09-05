@@ -147,7 +147,7 @@ export class CCommandAPI
         
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_MakeSwarm,
             'ms':  {
                 a: p_formationID, // m_formation_as_leader
                 b: p_andruavUnit.partyID // Leader
