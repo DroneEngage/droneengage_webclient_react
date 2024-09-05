@@ -8,11 +8,9 @@ import '../css/css_styles2.css';
 import '../css/css_gamepad.css';
 
 
-import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import  'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Modal from 'bootstrap/js/dist/modal';
 
 import {fn_on_account_ready} from '../js/js_main_accounts'
 
