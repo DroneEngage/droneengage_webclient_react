@@ -142,7 +142,7 @@ export class CCommandAPI
     };
 
 
-    API_makeSwarm (p_andruavUnit, p_formationID) {
+    static API_makeSwarm (p_andruavUnit, p_formationID) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const msg = 
@@ -158,7 +158,7 @@ export class CCommandAPI
     }
 
     
-    API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
+    static API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
         p_band_width, p_gain, p_sample_rate,
         p_decode_mode, p_driver_index,
         p_display_bars
@@ -227,6 +227,39 @@ export class CCommandAPI
 
         return msg;
     }
+
+
+
+    static API_resumeTelemetry() {
+        
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
+                Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_RESUME
+            }
+        };
+
+        return msg;
+    };
+
+
+    static API_pauseTelemetry() {
+        
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
+                Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_PAUSE
+            }
+        };
+
+        return msg;
+    };
+
+    
 
 }
 

@@ -632,33 +632,19 @@ class CAndruavClient {
 
 
 
-    API_resumeTelemetry(p_andruavUnit,lvl) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined)
-            return;
-        
+    API_resumeTelemetry(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        let msg = {
-            C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
-            Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_RESUME
-        };
-        if ((lvl !== null && lvl !== undefined) && (lvl !== -1)) {
-            msg.LVL = lvl;
-        }
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        const cmd = CCommandAPI.API_resumeTelemetry(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     };
 
 
     API_pauseTelemetry(p_andruavUnit) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined)
-            return;
-        
-        let msg = {
-            C: js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL,
-            Act: js_andruavMessages.CONST_TELEMETRY_REQUEST_PAUSE
-        };
-        
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
+        const cmd = CCommandAPI.API_pauseTelemetry(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     };
 
     API_adjustTelemetryDataRate(p_andruavUnit, lvl) {
@@ -763,7 +749,7 @@ class CAndruavClient {
     API_requestSDR(p_andruavUnit) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        const cmd = CCommandAPI.API_requestP2P(p_andruavUnit);
+        const cmd = CCommandAPI.API_requestSDR(p_andruavUnit);
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
