@@ -100,7 +100,7 @@ mavlink20.message.prototype.set = function(args) {
 mavlink20.message.prototype.pack = function(mav, crc_extra, payload) {
 
     this.payload = payload;
-    const plen = this.payload.length;
+    let plen = this.payload.length;
         //in MAVLink2 we can strip trailing zeros off payloads. This allows for simple
         // variable length arrays and smaller packets
         while (plen > 1 && this.payload[plen-1] === 0) {
@@ -15815,7 +15815,6 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
         // Walk through the fields 
         for(let i = 0, size = decoder.format.length-1; i <= size; ++i) {
-            let order = decoder.order_map[orderIndex];
             let currentType =  decoder.format[typeIndex];
 
             if (isNaN(parseInt(currentType))) {
