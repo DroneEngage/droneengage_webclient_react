@@ -144,22 +144,7 @@ class CLeafLetAndruavMap {
 
             });
         }
-        // L.tileLayer('https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=babed5ef144e19a8edafd111a373036b', {
-        // attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
-        // opacity: 0.8
-        // }).addTo(this.m_Map);
-
-        // L.tileLayer('https://{s}.tiles.mapbox.com/v3/pk.eyJ1IjoibWhlZm55IiwiYSI6ImNrZW84Nm9rYTA2ZWgycm9mdmNscmFxYzcifQ.c-zxDjXCthXmRsErPzKhbQ/{z}/{x}/{y}.png',
-        // { attribution: 'Map tiles &copy; <a href="https://mapbox.com">Mapbox</a>', maxZoom: 17 }).addTo(this.m_Map);
-
-        // var bounds = [[90,0], [-90,-180]];
-        // this.m_Map = L.map(p_mapelement, {
-        // crs: L.CRS.EPSG3857,
-        // minZoom: -5
-        // });
-        // L.imageOverlay('./images/map.png', bounds).addTo(this.m_Map);
-        // this.m_Map.fitBounds(bounds);
-
+        
         var update_timeout = null;
         this.m_Map.on('click', function (event) {
             if (js_globals.CONST_MAP_EDITOR !== true)
@@ -307,42 +292,12 @@ class CLeafLetAndruavMap {
             weight: 2
           };
         }
-        //         new L.LatLng(p_positionFromLat,
-        //           p_positionFromLng),
-        //         new L.LatLng(p_positionToLat,
-        //           p_positionToLng)
-        // ];
-
-        // var v_flightPath = new google.maps.Polyline({
-        //     path: flightPlanCoordinates,
-        //     geodesic: true,
-        //     strokeColor: '#F5D29A',
-        //     strokeOpacity: 8.0,
-        //     strokeWeight: 2,
-        //     icons: [{
-        //         icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
-        //         offset: '100%'
-        //     }]
-        // });
-
-        // v_flightPath.setMap (this.m_Map);
-        // return v_flightPath;
-
+        
         return L.polyline(flightPlanCoordinates, p_style).addTo(this.m_Map);
 
     }
 
     fn_drawPolyline(p_lnglatFromTo, p_shouldKeepOutside) {
-        // var v_geoFence = new google.maps.Polyline({
-        //     path: p_lnglatFromTo,
-        //     geodesic: true,
-        //     strokeColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-        //     strokeOpacity: 0.9,
-        //     strokeWeight: 2
-        // });
-        // v_geoFence.setMap(this.m_Map);
-
-        // return v_geoFence;
 
         return L.polyline(p_lnglatFromTo, {
             color: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
@@ -353,18 +308,6 @@ class CLeafLetAndruavMap {
     }
 
     fn_drawPolygon(p_lnglatFromTo, p_shouldKeepOutside) {
-        // var v_geoFence = new google.maps.Polygon({
-        //     path: p_lnglatFromTo,
-        //     geodesic: true,
-        //     fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-        //     //strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
-        //     strokeOpacity: 1.0,
-        //     fillOpacity: 0.45,
-        //     strokeWeight: 0  // you can use width with violation
-        // });
-        // v_geoFence.setMap(this.m_Map);
-
-        // return v_geoFence;
 
         return L.polygon(p_lnglatFromTo, {
             fill: true,
@@ -376,19 +319,6 @@ class CLeafLetAndruavMap {
     }
 
     fn_drawCircle(p_center, p_radius, p_shouldKeepOutside) {
-        // var v_geoFence = new google.maps.Circle({
-        //     fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493', //'#75A4D3':'#F75050',
-        //     //strokeColor: geoFenceInfo.m_shouldKeepOutside==false?'#FFFFFF':'#D3D375',
-        //     strokeOpacity: 1.0,
-        //     strokeWeight: 0,
-        //     fillOpacity: 0.45,
-        //     map: map,
-        //     center: p_center,
-        //     radius: p_radius
-        // });
-        // v_geoFence.setMap(this.m_Map);
-
-        // return v_geoFence;
 
         return L.circle(p_center, {
             radius: parseInt(p_radius),
@@ -402,17 +332,8 @@ class CLeafLetAndruavMap {
     }
 
     fn_drawMissionPolyline(p_lnglatFromTo, p_color) {
-        // var v_missionLine = new google.maps.Polyline({
-        //     path: p_lnglatFromTo,
-        //     geodesic: true,
-        //     strokeColor: '#75A4D3',
-        //     strokeOpacity: 0.9,
-        //     strokeWeight: 2
-        // });
-        // v_missionLine.setMap(this.m_Map);
-
-        // return v_missionLine;
-        var v_color = (p_color === '')?'#75A4D3':p_color;
+        
+        const v_color = (p_color === '')?'#75A4D3':p_color;
 
         return L.polyline(p_lnglatFromTo, {
             color: v_color,
@@ -422,19 +343,7 @@ class CLeafLetAndruavMap {
     }
 
     fn_drawMissionCircle(p_center, p_radius) {
-        // var v_circleMission = new google.maps.Circle({
-        //     fillColor: '#3232CD',
-        //     strokeOpacity: 1.0,
-        //     strokeWeight: 0,
-        //     map: map,
-        //     fillOpacity: 0.25,
-        //     center: p_center,
-        //     radius: parseInt(p_radius)
-        // });
-        // v_circleMission.setMap(this.m_Map);
-
-        // return v_circleMission;
-
+        
         return L.polyline(p_center, {
             radius: parseInt(p_radius),
             fill: true,
@@ -446,22 +355,6 @@ class CLeafLetAndruavMap {
 
     }
 
-    /**
-         * Set icon of a marker.
-         * @param {*} p_marker 
-         * @param {*} p_image 
-         */
-    fn_setIcon(p_marker, p_image) {
-        // var v_image = {
-        //     url: p_image,
-        //     origin: new google.maps.Point(0, 0),
-        //     anchor: new google.maps.Point(16, 16),
-        //     scaledSize: new google.maps.Size(32, 32)
-        // };
-
-        // p_marker.setIcon (v_image);
-
-    };
 
     /**
          * Set position of a marker.
@@ -570,20 +463,6 @@ class CLeafLetAndruavMap {
          * @param {*} p_callback 
          */
     fn_getElevationForLocation(p_lat, p_lng, p_callback) {
-        //     var p_call = p_callback;
-        //     Me.m_elevator.getElevationForLocations({
-        // 'locations': [new google.maps.LatLng(p_lat, p_lng)]
-        //     }, function (results)
-        //     {
-        //         if (results[0])
-        //         {
-        //             p_call (results[0].elevation, p_lat, p_lng);
-        //         }
-        //         else
-        //         {
-        //             p_call (null);
-        //         }
-        //     });
         p_callback("NA", p_lat, p_lng);
     }
 
@@ -596,22 +475,7 @@ class CLeafLetAndruavMap {
          * @param {*} p_lng 
          */
     fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng) {
-        // if (p_infoWindow == null)
-        // {
-        //       p_infoWindow = new google.maps.InfoWindow(
-        // {
-        // });
-        // }
-        // else
-        // {
-        //       p_infoWindow.close();
-        // }
-
-        // p_infoWindow.setContent (p_content);
-        // p_infoWindow.setPosition(new google.maps.LatLng(p_lat, p_lng));
-        // p_infoWindow.open(this.m_Map);
-
-        // return p_infoWindow;
+        
         this.fn_hideInfoWindow(p_infoWindow);
 
         p_infoWindow = L.popup().setLatLng(new L.LatLng(p_lat, p_lng)).setContent(p_content).openOn(this.m_Map);
@@ -620,6 +484,7 @@ class CLeafLetAndruavMap {
     }
 
     fn_showInfoWindow2(p_infoWindow, p_content, p_lat, p_lng) {
+        
         this.fn_hideInfoWindow(p_infoWindow);
 
         p_infoWindow = L.popup().setLatLng(new L.LatLng(p_lat, p_lng)).setContent(p_content).openOn(this.m_Map);
@@ -628,6 +493,7 @@ class CLeafLetAndruavMap {
     }
 
     fn_hideInfoWindow(p_infoWindow) {
+        
         if (p_infoWindow == null) 
             return;
         

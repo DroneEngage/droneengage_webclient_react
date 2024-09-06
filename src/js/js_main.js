@@ -2329,7 +2329,7 @@ function fn_handleKeyBoard() {
 					/*
 						v_htmlTitle: Valid only for Leaflet
 					*/
-					let v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
+					const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 					// Add new Vehicle
 					p_andruavUnit.m_gui.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(),null, false,false, v_htmlTitle,[64,64]) ;
 					js_globals.v_vehicle_gui[p_andruavUnit.partyID]  = p_andruavUnit.m_gui;
@@ -2339,7 +2339,6 @@ function fn_handleKeyBoard() {
 							let id = '#h'+p_andruavUnit.partyID +' a';
 							let iid = $(id);
 							if ( iid[0] === undefined) return ;
-							let tabTrigger = new bootstrap.Tab(id);
 							bootstrap.Tab.getInstance(id).show()
 							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
 							infowindow2.m_ignoreMouseOut = true;
@@ -2362,7 +2361,7 @@ function fn_handleKeyBoard() {
 				else {
 					// DRAW path
 					if (p_andruavUnit.m_Nav_Info.p_Location.oldlat !== null && p_andruavUnit.m_Nav_Info.p_Location.oldlat  !== undefined) {
-						let v_distance = js_helpers.fn_calcDistance(
+						const v_distance = js_helpers.fn_calcDistance(
 							p_andruavUnit.m_Nav_Info.p_Location.oldlat,
 							p_andruavUnit.m_Nav_Info.p_Location.oldlng,
 							p_andruavUnit.m_Nav_Info.p_Location.lat,
@@ -2373,7 +2372,7 @@ function fn_handleKeyBoard() {
 							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt;
 						}
 						else if (v_distance > 10) {
-							let v_flightPath = js_leafletmap.fn_DrawPath(
+							const v_flightPath = js_leafletmap.fn_DrawPath(
 										p_andruavUnit.m_Nav_Info.p_Location.oldlat,
 										p_andruavUnit.m_Nav_Info.p_Location.oldlng,
 										p_andruavUnit.m_Nav_Info.p_Location.lat,
@@ -2401,7 +2400,7 @@ function fn_handleKeyBoard() {
 
 
 				}
-				js_leafletmap.fn_setIcon(p_andruavUnit.m_gui.m_marker, v_image);
+				js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, null,[64,64]) ;
 				js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
 				js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 			}
