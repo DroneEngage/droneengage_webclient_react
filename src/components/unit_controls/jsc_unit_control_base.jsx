@@ -20,7 +20,7 @@ export class ClssAndruavUnitBase extends React.Component {
 		super (props);
 		this.state = {
 		    'm_update': 0,
-            'm_IsGCS':this.props.m_unit.m_IsGCS,
+            'm_IsGCS':this.props.p_unit.m_IsGCS,
 		};
 
         this._isMounted = false;
@@ -38,14 +38,14 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_unitUpdated (me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.p_unit.partyID) 
         {
             return ; // not me
         }
 
       
 
-        if (p_andruavUnit.m_IsGCS !== me.props.m_unit.m_IsGCS)
+        if (p_andruavUnit.m_IsGCS !== me.props.p_unit.m_IsGCS)
         {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
             
@@ -76,7 +76,7 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_unitTelemetryOn (me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.p_unit.partyID) 
         {
             return ; // not me
         }
@@ -87,7 +87,7 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_unitTelemetryOFF(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.p_unit.partyID) 
         {
           //  js_common.fn_console_log ('err: This is not me ' + p_andruavUnit.partyID);
             return ; // not me

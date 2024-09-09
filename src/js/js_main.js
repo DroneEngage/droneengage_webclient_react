@@ -2336,10 +2336,8 @@ function fn_handleKeyBoard() {
 					
 					js_leafletmap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
-							let id = '#h'+p_andruavUnit.partyID +' a';
-							let iid = $(id);
-							if ( iid[0] === undefined) return ;
-							bootstrap.Tab.getInstance(id).show()
+							
+							js_eventEmitter.fn_dispatch(js_globals.EE_unitHighlighted, p_andruavUnit); 
 							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
 							infowindow2.m_ignoreMouseOut = true;
 						});

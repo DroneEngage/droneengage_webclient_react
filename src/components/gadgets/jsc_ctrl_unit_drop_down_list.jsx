@@ -137,7 +137,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
                         <option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>
                         {units_details}
                     </select>
-                    <ClssCTRL_Unit_Icon className="ms-2 p-1" m_unit={v_andruavUnit}/>
+                    <ClssCTRL_Unit_Icon className="ms-2 p-1" p_unit={v_andruavUnit}/>
                 </div>
             </div>
         );

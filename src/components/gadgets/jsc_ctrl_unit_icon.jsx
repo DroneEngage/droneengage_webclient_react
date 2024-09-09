@@ -21,7 +21,7 @@ export class ClssCTRL_Unit_Icon extends React.Component {
 
     render()
     {   
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
         if (v_andruavUnit === null || v_andruavUnit === undefined)
         {
             return (<img className={this.props.className + ' gcs IsGCS_true css_cur_default small_icon'} src={getVehicleIcon(null)} alt='GCS'  />);

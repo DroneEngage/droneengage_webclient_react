@@ -148,7 +148,7 @@ export default class ClssMission_Container extends React.Component {
                 <div key='fsc' className="width_100">
                     <div className="row margin_zero">
                         <div className="col-11 text-warning">
-                            <label>Add New Mission </label>
+                            <p>Add New Mission </p>
                         </div>
                         <div className="col-1">
                             <button className="btn-primary btn-sm float-left" title="Add New Mission Plan" onClick={(e) => this.fn_addNewPathPlan(e)} >+</button>

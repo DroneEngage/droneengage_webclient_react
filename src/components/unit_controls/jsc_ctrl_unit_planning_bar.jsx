@@ -133,7 +133,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 
     render()
     {   
-        let v_andruavUnit = this.props.m_unit; 
+        let v_andruavUnit = this.props.p_unit; 
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 
@@ -264,7 +264,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 
         return (
              <div  key={id +"_1"} id={id +"_1"} className='row margin_2px padding_zero user-select-none '>        	
-                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon m_unit={v_andruavUnit}/></div>
+                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon p_unit={v_andruavUnit}/></div>
                 <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'></div>

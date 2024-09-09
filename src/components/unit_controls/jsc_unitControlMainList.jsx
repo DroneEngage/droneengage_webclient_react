@@ -1,4 +1,6 @@
 import $ from 'jquery'; 
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 import React    from 'react';
 
 
@@ -42,7 +44,20 @@ export default class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
         js_eventEmitter.fn_subscribe(js_globals.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitHighlighted,this,this.fn_unitOnUnitHighlighted);
         
+    }
+
+    fn_unitOnUnitHighlighted (p_me, p_andruavUnit)
+    {
+        if (p_me.state.m_update === 0) return ;
+
+        p_me.setState({m_active_partyID: p_andruavUnit.partyID});
+        // const id = '#h'+p_andruavUnit.partyID +' a';
+		// const iid = $(id);
+		// if (iid[0] === undefined) return ;
+
+        // bootstrap.Tab.getInstance(id).show();
     }
       
     fn_unitOnlineChanged(me,p_andruavUnit)
@@ -115,6 +130,7 @@ export default class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitArmedUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitFCBUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitHighlighted,this);
         
     }
 
@@ -195,7 +211,7 @@ export default class ClssAndruavUnitList extends React.Component {
             }
             
             const v_prop = this.props;
-
+            
             sortedPartyIDs.map(function (object)
             {
                 
@@ -207,7 +223,7 @@ export default class ClssAndruavUnitList extends React.Component {
                 
                 if ((v_prop.gcs_list !== false) && (v_andruavUnit.m_IsGCS === true))
                 {
-                    units_gcs.push (<ClssAndruavUnit_GCS key={'ClssAndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
+                    units_gcs.push (<ClssAndruavUnit_GCS key={'ClssAndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                 }
                 else 
                 if (v_andruavUnit.m_IsGCS===false)
@@ -219,19 +235,20 @@ export default class ClssAndruavUnitList extends React.Component {
                         var header_info = me.getHeaderInfo(v_andruavUnit);
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
-                                <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.partyID}><span className={header_info.classes}> {header_info.text}</span> </a>
+                                <a 
+                                className={`nav-link user-select-none ${me.state.m_active_partyID === v_andruavUnit.partyID ? 'active' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.partyID}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
 
                         units_details.push(
-                            <div key={'aud' + partyID} className="tab-pane fade" id={"tab_"+v_andruavUnit.partyID}>
-                                <ClssAndruavUnit_Drone m_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                            <div key={'aud' + partyID} className={`tab-pane fade ${me.state.m_active_partyID === v_andruavUnit.partyID ? 'active show' : ''}`} id={"tab_"+v_andruavUnit.partyID}>
+                                <ClssAndruavUnit_Drone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
                     }
                     else
                     {   // Display as List
-                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  m_unit = {v_andruavUnit} tab_collapsed={true} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
+                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  p_unit = {v_andruavUnit} tab_collapsed={true} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
                     }
                 }
 

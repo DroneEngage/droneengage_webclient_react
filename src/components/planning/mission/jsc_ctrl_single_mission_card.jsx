@@ -84,17 +84,18 @@ export class ClssSingle_Mission_Card extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
         {
             ctrl.push(<div key={'tab_p2p' + this.key} className="tab-pane fade" id={"tab_p2p"+this.key}>
-                    <ClssP2P_Planning p_shape= {this.props.p_shape} ref={instance => {this.p2p = instance}}/>
+                    <ClssP2P_Planning p_shape={this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.p2p = instance}}/>
                     </div>);
         }
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false))
         {
             ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
-                    <ClssSDR_Planning p_shape= {this.props.p_shape} ref={instance => {this.sdr = instance}}/>
+                    <ClssSDR_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.sdr = instance}}/>
                     </div>);
         }
 
+        const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
         return (
             <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">
                 <div className="card-header text-center"> 
@@ -103,8 +104,9 @@ export class ClssSingle_Mission_Card extends React.Component {
                 <div className="card-body">
         
                     <div className="form-group text-left">
-                        <label className="text-primary">ID</label>
-                        <input type='text' id={'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} className="form-control input-sm" ref={instance => {this.mission_id_txt = instance}}/>
+                        <label htmlfor={ordernum_id} className="text-primary">ID
+                        <input type='text' id={ordernum_id} className="form-control input-sm" ref={instance => {this.mission_id_txt = instance}}/>
+                        </label>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.wp = instance}}/>

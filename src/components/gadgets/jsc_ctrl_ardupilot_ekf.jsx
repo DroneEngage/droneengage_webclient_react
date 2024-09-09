@@ -83,7 +83,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
     {
         this.state.warning_level = 0;
 
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
         const flags = v_andruavUnit.m_EKF.m_flags;
         var gui_V = this.getCss(v_andruavUnit.m_EKF.m_velocity_variance);
         var gui_PH = this.getCss(v_andruavUnit.m_EKF.m_pos_horiz_variance);

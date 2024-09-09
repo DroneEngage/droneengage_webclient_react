@@ -53,7 +53,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 		js_globals.v_andruavClient.API_connectToFCB(p_andruavUnit);
 	}
-    
+
     hlp_getGPS (p_andruavUnit)
     {
         var res = {
@@ -385,7 +385,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                 <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div key={'gs_ctrl' + v_andruavUnit.partyID}  className = 'row al_l css_margin_zero d-flex '>
                         <div key={'alt_ctrl1' + v_andruavUnit.partyID}  className= 'col-6 col-md-3 user-select-none  p-1'>
-                                <ClssCTRL_Drone_Speed_Ctrl m_unit={v_andruavUnit}/>
+                                <ClssCTRL_Drone_Speed_Ctrl p_unit={v_andruavUnit}/>
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
@@ -400,7 +400,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
 
                     <div key={'alt_ctrl' + v_andruavUnit.partyID}   className = 'row al_l css_margin_zero d-flex '>
                         <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  p-1'>
-                                  <ClssCTRL_Drone_Altitude_Ctrl m_unit={v_andruavUnit}/>
+                                  <ClssCTRL_Drone_Altitude_Ctrl p_unit={v_andruavUnit}/>
                               
                         </div> 
                         <div key={'alt_ctrl2'  + v_andruavUnit.partyID} className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
@@ -431,7 +431,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                         <div key={'telem' + v_andruavUnit.partyID} className= 'col-3   padding_zero css_user_select_text'>
                         <ClssCTRL_UDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
                         <div key={'swarm' + v_andruavUnit.partyID} className= 'col-2   padding_zero'>
-                        <ClssCTRL_SWARM   key={'cswarm' + v_andruavUnit.partyID}  m_unit={v_andruavUnit}/>
+                        <ClssCTRL_SWARM   key={'cswarm' + v_andruavUnit.partyID}  className='row padding_zero' p_unit={v_andruavUnit}/>
                         </div>
                         
                     </div>

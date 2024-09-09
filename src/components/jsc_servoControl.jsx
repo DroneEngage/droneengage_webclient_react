@@ -135,7 +135,7 @@ class ClssServoControl extends React.Component {
         var p_andruavUnit = null;
         if (this.state.partyID !== null && this.state.partyID !== undefined)
         {
-            p_andruavUnit = AndruavLibs.AndruavClient.m_andruavUnitList.fn_getUnit(this.state.partyID);
+            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.partyID);
         }
 
         if (p_andruavUnit === null || p_andruavUnit === undefined)

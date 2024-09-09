@@ -2075,11 +2075,11 @@ class CAndruavClient {
                     }
     
                     if (v_trigger_on_swarm_status) {
-                        js_eventEmitter.fn_dispatch("EVT_andruavUnitSwarmUpdated", p_unit);
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onAndruavUnitSwarmUpdated, p_unit);
                     }
                     
                     if (v_trigger_on_swarm_status2) {
-                        js_eventEmitter.fn_dispatch("EVT_andruavUnitSwarmUpdated2", p_unit);
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onAndruavUnitSwarmUpdated, p_unit);
                     }
                     
                     // CODEBLOCK_END

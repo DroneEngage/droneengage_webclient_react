@@ -123,7 +123,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         };
         this.key = Math.random().toString();
 
-        this.props.m_unit.m_gui.speed_link = false;
+        this.props.p_unit.m_gui.speed_link = false;
 
 		this.telemetry_level=["OFF","1","2","3"];
         js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
@@ -145,7 +145,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     fn_unitUpdated(p_me,p_andruavUnit)
     {
-        if (p_andruavUnit.partyID !== p_me.props.m_unit.partyID) return ;
+        if (p_andruavUnit.partyID !== p_me.props.p_unit.partyID) return ;
         if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         
@@ -591,7 +591,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     render()
     {
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
                
         
         var v_id_class = '';
@@ -649,7 +649,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 ctrl_ekf.push(<div>EKF-PX4</div>);
             break;
             default:
-                ctrl_ekf.push(<ClssCtrlArdupilotEkf key={v_andruavUnit.partyID + "_ctrl_ekf"} id={v_andruavUnit.partyID + "_ctrl_ekf"} m_unit={v_andruavUnit}/>);
+                ctrl_ekf.push(<ClssCtrlArdupilotEkf key={v_andruavUnit.partyID + "_ctrl_ekf"} id={v_andruavUnit.partyID + "_ctrl_ekf"} p_unit={v_andruavUnit}/>);
             break;
         }
 
@@ -714,7 +714,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                             {ctrl_ekf}
                         </div>
                         <div key={this.key+'42'} className = 'row  css_margin_zero  '>
-                            <ClssCtrlVibration key={v_andruavUnit.partyID + "_ctrl_vib"} id={v_andruavUnit.partyID + "_ctrl_vib"} m_unit={v_andruavUnit}/>
+                            <ClssCtrlVibration key={v_andruavUnit.partyID + "_ctrl_vib"} id={v_andruavUnit.partyID + "_ctrl_vib"} p_unit={v_andruavUnit}/>
                         </div>
                     
                 </div>
@@ -933,12 +933,12 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
                     if (v_andruavUnit.m_IsGCS === true)
                     {
-                        //units_gcs.push (<ClssAndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} m_unit = {v_andruavUnit}/>);
+                        //units_gcs.push (<ClssAndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                     }
                     else 
                     if (v_andruavUnit.m_IsGCS===false)
                     {
-                        units_details.push(<ClssAndruavUnitDroneRow prop_key={me.key+partyID} key={partyID + 'row' + me.key} m_unit={v_andruavUnit}
+                        units_details.push(<ClssAndruavUnitDroneRow prop_key={me.key+partyID} key={partyID + 'row' + me.key} p_unit={v_andruavUnit}
                                             prop_speed={me.props.prop_speed}  prop_battery={me.props.prop_battery}  prob_wp={me.props.prob_wp} prob_ekf={me.props.prob_ekf} prob_alt={me.props.prob_alt} prob_ws={me.props.prob_ws}  />);
                     }
 

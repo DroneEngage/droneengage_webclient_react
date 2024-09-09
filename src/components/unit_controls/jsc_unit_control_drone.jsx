@@ -54,7 +54,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             tab_collapsed: this.props.tab_collapsed
         };
 
-        this.props.m_unit.m_gui.speed_link = false;
+        this.props.p_unit.m_gui.speed_link = false;
     
     }
 
@@ -70,7 +70,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.m_unit.partyID) 
+        if (p_andruavUnit.partyID !== me.props.p_unit.partyID) 
         {
            // someone else wanta GamePad, I will release it if I have it.
             return ; // not me
@@ -198,7 +198,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
     createTabs ()
     {
-        let v_andruavUnit = this.props.m_unit; 
+        let v_andruavUnit = this.props.p_unit; 
    
         var container_tabs=[];
         var container_controls=[];
@@ -439,19 +439,19 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     createMainBar()
     {
         let bars = [];
-        let v_andruavUnit = this.props.m_unit; 
+        let v_andruavUnit = this.props.p_unit; 
    
         
         if (this.state.tab_main === true)
         {
             bars.push(
-                <ClssCTRL_Unit_Main_Bar key={v_andruavUnit+'c_c_u_m_b'} m_unit={v_andruavUnit} />);
+                <ClssCTRL_Unit_Main_Bar key={v_andruavUnit+'c_c_u_m_b'} p_unit={v_andruavUnit} />);
         }
 
         if (this.state.tab_planning === true)
         {
             bars.push(
-                <ClssCTRL_Unit_Planning_Bar  key={v_andruavUnit+'c_c_u_p_b'} m_unit={v_andruavUnit} />);
+                <ClssCTRL_Unit_Planning_Bar  key={v_andruavUnit+'c_c_u_p_b'} p_unit={v_andruavUnit} />);
         }
 
         return bars;
@@ -461,7 +461,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     render ()
     {
 
-        let v_andruavUnit = this.props.m_unit; 
+        let v_andruavUnit = this.props.p_unit; 
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 

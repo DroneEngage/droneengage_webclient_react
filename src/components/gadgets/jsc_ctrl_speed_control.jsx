@@ -66,7 +66,7 @@ export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
 
 
     render() {
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
 
         let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " m/s";
         if (js_globals.v_useMetricSystem === false) {

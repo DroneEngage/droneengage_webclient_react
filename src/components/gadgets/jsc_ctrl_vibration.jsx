@@ -118,7 +118,7 @@ export class ClssCtrlVibration extends React.Component {
     {
         this.state.warning_level = 0;
         
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
         const flags = v_andruavUnit.m_EKF.m_flags;
         var css_VX = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_x);
         var css_VY = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_y);

@@ -21,7 +21,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
 
     fn_doChangeAltitudeByStep (p_AltitudeInMeter)
     {
-        const p_andruavUnit = this.props.m_unit;
+        const p_andruavUnit = this.props.p_unit;
 
         js_common.fn_console_log ("fn_doChangeAltitudeByStep:" + p_AltitudeInMeter);
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
@@ -58,7 +58,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
 
 
     render() {
-        const v_andruavUnit = this.props.m_unit;
+        const v_andruavUnit = this.props.p_unit;
 
         let v_altitude_text = "";
 		let v_alt_title, v_alt_remark;

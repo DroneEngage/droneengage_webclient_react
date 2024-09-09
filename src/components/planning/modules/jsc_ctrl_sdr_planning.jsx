@@ -54,7 +54,7 @@ export class ClssSDR_Planning extends React.Component {
                 <div key={this.key + 'p2pp_0'} className='row css_margin_zero padding_zero '>
                     <div key={this.key + 'p2pp_01'} className="col-6 pt-2">
                         <div key={this.key + 'p2pp_011'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor="m_enable_servercomm" className="col-8 al_l " ><small>Enabled</small></label>
+                            <label htmlFor={this.key + "m_enable_ctrl"} className="col-8 al_l " ><small>Enabled</small></label>
                             <input className="form-check-input col-4 " type="checkbox" id={this.key + "m_enable_ctrl"} ref={this.servercomm_Ref} onChange={(e) => this.fn_enableCtrl(e)} />
                         </div>
                     </div>

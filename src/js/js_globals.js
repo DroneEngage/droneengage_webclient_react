@@ -113,12 +113,13 @@ class GLOBALS {
 		this.EE_andruavUnitFightModeUpdated        = "EVT_18";
 		this.EE_andruavUnitVehicleTypeUpdated      = "EVT_19";
 		this.EE_onProxyInfoUpdated		   		   = "EVT_20";
-
+		this.EE_onAndruavUnitSwarmUpdated		   = "EVT_21";
 		this.EE_onMessage                  = "EE_onMessage";    
 		this.EE_onModuleUpdated			   = "EE_onModuleUpdated";
 		this.EE_onPreferenceChanged        = "EE_onPreferenceChanged";
 		this.EE_unitAdded                  = "EE_unitAdded";
 		this.EE_unitUpdated                = "EE_unitUpdated";
+		this.EE_unitHighlighted            = "EE_unitHighlighted";
 		this.EE_unitOnlineChanged          = "EE_unitOnlineChanged";
 		this.EE_unitPowUpdated             = "EE_unitPowUpdated";
 		this.EE_unitP2PUpdated             = "EE_unitP2PUpdated";

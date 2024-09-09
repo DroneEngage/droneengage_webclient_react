@@ -116,7 +116,7 @@ export  class ClssCTRL_Unit_Details   extends React.Component {
         {
             cmd_data.push(<div key={v_andruavUnit.partyID + 'settings_cd1'} className='row css_margin_zero padding_zero border-top border-secondary'>
                             <div key={v_andruavUnit.partyID + 'settings_cd11'}className="col-12 mt-1">
-                            <ClssRX_MESSAGE key={v_andruavUnit.partyID + 'settings_cd111'}p_unit={v_andruavUnit}/>
+                            <ClssRX_MESSAGE key={v_andruavUnit.partyID + 'settings_cd111'} p_unit={v_andruavUnit}/>
                             </div>
                         </div>
             );
