@@ -104,7 +104,7 @@ export class ClssSingle_Mission_Card extends React.Component {
                 <div className="card-body">
         
                     <div className="form-group text-left">
-                        <label htmlfor={ordernum_id} className="text-primary">ID
+                        <label htmlFor={ordernum_id} className="text-primary">ID
                         <input type='text' id={ordernum_id} className="form-control input-sm" ref={instance => {this.mission_id_txt = instance}}/>
                         </label>
                     </div>

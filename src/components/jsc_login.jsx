@@ -135,7 +135,7 @@ export class ClssLoginControl extends React.Component {
 									<p > {js_localStorage.fn_getUnitID()} </p>
 								</div>
 							</div>
-							<button className={"btn button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger')} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
+							<button className={"btn button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger') + " p-0"} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
 						</div>
 					</div>
 				</div>
