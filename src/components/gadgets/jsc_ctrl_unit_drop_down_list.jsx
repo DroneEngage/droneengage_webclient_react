@@ -18,6 +18,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 		super ();
 		this.state = {
             m_update: 0,
+            m_selected_party_id: "0"
         };
 
         this.key = Math.random().toString();
@@ -31,6 +32,25 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 
     componentDidMount() {
         this.state.m_update = 1;
+        this.state.m_selected_party_id = this.props.m_partyID;
+        if (this.state.m_selected_party_id === null || this.state.m_selected_party_id === undefined)
+        {
+            this.state.m_selected_party_id = "0";
+        }
+        this.setState({'m_update': this.state.m_update +1});
+    }
+
+    componentDidUpdate(prevProps) {
+        // Check if the prop has changed
+        if (prevProps.m_partyID !== this.props.m_partyID) {
+            this.state.m_selected_party_id = this.props.m_partyID;
+            if (this.state.m_selected_party_id === null || this.state.m_selected_party_id === undefined)
+            {
+                this.state.m_selected_party_id = "0";
+            }
+            this.setState({'m_update': this.state.m_update +1});
+        }
+        
     }
 
     fn_onPreferenceChanged(me)
@@ -66,12 +86,15 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 
     fn_onSelectUnit(e)
     {
-        
+        this.state.m_selected_party_id = e.target.value;
+
         if (this.props.onSelectUnit !== null && this.props.onSelectUnit !== undefined)
         {
             // partyid = e.target.value;
-            this.props.onSelectUnit(e);
+            this.props.onSelectUnit(e.target.value);
         }
+
+        this.setState({ 'm_update': this.state.m_update+1});
     }
 
     render() 
@@ -127,13 +150,14 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
             }
         });
 
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_partyID);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_selected_party_id);
+
 
         return (
-            <div className="form-inline">
+            <div className={"form-inline " + this.props.className}>
                 <div className="form-group">
                     <label htmlFor={this.key + 'combo_list'} className="col-3 text-white"><small><b>Drone ID</b></small></label>
-                    <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.props.m_partyID} onChange={(e) => this.fn_onSelectUnit(e)}>
+                    <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
                         <option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>
                         {units_details}
                     </select>

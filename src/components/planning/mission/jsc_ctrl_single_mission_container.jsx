@@ -20,6 +20,7 @@ export  class ClssSingle_Mission_Container extends React.Component {
         this.state = {
             m_update: 0,
             m_collapsed: false,
+            m_party_id: 0,
         };
 
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.displayGeoForm);
@@ -65,11 +66,6 @@ export  class ClssSingle_Mission_Container extends React.Component {
         if (this.state.m_update === 0) return ;
         
 
-        // if ((this.props.p_missionPlan.m_hidden === true) && (this.props.p_isCurrent === false)) {
-        //     // display path if group is going to be activated and was hidden.
-        //     this.fn_togglePath(e);
-        // }
-
         if (this.props.p_isCurrent===true)
         {
             this.setState({ m_collapsed: !this.state.m_collapsed });
@@ -86,7 +82,10 @@ export  class ClssSingle_Mission_Container extends React.Component {
         this.setState({'m_update': this.state.m_update +1});
     }
 
-
+    fn_onSelectUnit(partyID)
+    {
+        this.setState({'m_party_id': partyID});
+    }
     
     render() {
 
@@ -97,8 +96,10 @@ export  class ClssSingle_Mission_Container extends React.Component {
         }
 
 
-        let item = [];
+        const andruavSelectedUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_party_id);
 
+        let item = [];
+        
         if (this.props.p_missionPlan == null) {
             item.push(<h4 key="mi"></h4>);
         }
@@ -112,8 +113,8 @@ export  class ClssSingle_Mission_Container extends React.Component {
                 });
             }
             item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer " + c_borderStyle}>
-                <ClssSingle_Mission_Header p_mission={this.props.p_missionPlan} p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onClick={(e)=>this.fn_onCollapse(e)}/>
-                <ClssSingle_Mission_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} />
+                <ClssSingle_Mission_Header p_mission={this.props.p_missionPlan} p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
+                <ClssSingle_Mission_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} p_unit={andruavSelectedUnit} />
             </div>);
         }
 

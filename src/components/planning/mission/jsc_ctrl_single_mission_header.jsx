@@ -10,12 +10,20 @@ import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 
 import { ClssSingle_Mission_Control_Bar } from './jsc_ctrl_single_mission_control_bar.jsx'
-
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
 
 
-
+/**
+ * props:
+ * p_ParentCtrl
+ * p_mission
+ * p_missionPlan
+ * 
+ * onClick
+ * onSelectUnit
+ * 
+ */
 export class ClssSingle_Mission_Header extends React.Component {
 
 
@@ -26,6 +34,7 @@ export class ClssSingle_Mission_Header extends React.Component {
             m_deleted: false,
             m_partyID: 0,
             is_connected: false,
+            is_collapsed: false,
             css_pc: "btn  btn-sm css_margin_left_5 text-light border border-primary rounded text-center cursor_hand",
             css_ph: "btn  btn-sm  text-success border border-success rounded text-center cursor_hand"
         };
@@ -74,7 +83,14 @@ export class ClssSingle_Mission_Header extends React.Component {
         if (this.props.onClick === null || this.props.onClick === undefined) return ;
 
         this.props.onClick(e);
-        
+        if (this.state.is_collapsed === true)
+        {
+            this.setState({is_collapsed: false});
+        }
+        else
+        {
+            this.setState({is_collapsed: true});
+        }
     }
 
 
@@ -101,9 +117,12 @@ export class ClssSingle_Mission_Header extends React.Component {
         $('#cp_' + this.props.p_mission.m_id).trigger( "click" ); 
     }
 
-    fn_onSelectUnit(e) {
-        this.setState({ 'm_partyID': e.target.value });
-
+    fn_onSelectUnit(partyID) {
+        this.setState({ 'm_partyID': partyID });
+        if (this.props.onSelectUnit !== null && this.props.onSelectUnit !== undefined)
+        {
+            this.props.onSelectUnit(partyID);
+        }
     }
 
 
@@ -144,8 +163,8 @@ export class ClssSingle_Mission_Header extends React.Component {
 
 
 
-        if (this.props.p_isCurrent === true) {
-            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
+        if (this.props.p_isCurrent === true && this.state.is_collapsed == false) {
+           // const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
 
 
             v_item.push(
@@ -177,12 +196,13 @@ export class ClssSingle_Mission_Header extends React.Component {
 
         }
 
+
         let v_class = (this.props.p_isCurrent === true) ? "w-100 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "w-100  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
         return (
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
                 <div className="form-inline  margin_zero padding_zero">
                     <div className="card-header text-center d-flex">
-                        <label onClick={(e) => this.fn_onClick(e)} className={v_class}><strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></label>
+                        <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.state.is_collapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>
                         <input type='color' className="border hidden" id={'cp_' + this.props.p_mission.m_id} onChange={(e) => this.fn_changeColor()} />
                         <p id={'pc_' + this.props.p_mission.m_id} onClick={(e) => this.fn_simClick(e)} className={this.state.css_pc} title="Change Plan color path"  >C</p>
                         <p id={'ph_' + this.props.p_mission.m_id} onClick={(e) => this.fn_togglePath(e)} className={this.state.css_ph} title="Hide/Display plan on Map" ref={instance => this.btn_toggle_path = instance}  >H</p>

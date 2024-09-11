@@ -13,13 +13,41 @@ export class ClssSDR_Planning extends React.Component {
 
         this.key = Math.random().toString();
         this.m_enabled_ctrl = false;
-        
+        this.enable_Ref = React.createRef();
+       
     }
 
     componentDidMount () 
     {
         this.state.m_update = 1;
-        this.props.p_shape.m_missionItem.modules.sdr= {};
+        
+        if (this.props.p_shape.m_missionItem.modules.p2p === undefined) {
+            // init data
+            this.fn_process_enable (false);
+
+            this.props.p_shape.m_missionItem.modules.sdr= {};
+        }
+        else
+        {
+            this.fn_process_enable (true);
+        }
+
+        this.setState({m_update: this.state.m_update +1});
+
+    }
+
+    fn_process_enable (enabled)
+    {
+        this.enable_Ref.current.checked = enabled;
+        this.m_enabled_ctrl = enabled;
+        if (enabled === true) {
+            
+            
+        }
+        else
+        {
+
+        }
     }
 
     componentWillUnmount() 
@@ -55,7 +83,7 @@ export class ClssSDR_Planning extends React.Component {
                     <div key={this.key + 'p2pp_01'} className="col-6 pt-2">
                         <div key={this.key + 'p2pp_011'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={this.key + "m_enable_ctrl"} className="col-8 al_l " ><small>Enabled</small></label>
-                            <input className="form-check-input col-4 " type="checkbox" id={this.key + "m_enable_ctrl"} ref={this.servercomm_Ref} onChange={(e) => this.fn_enableCtrl(e)} />
+                            <input className="form-check-input col-4 " type="checkbox" id={this.key + "m_enable_ctrl"} ref={this.enable_Ref} onChange={(e) => this.fn_enableCtrl(e)} />
                         </div>
                     </div>
                 </div>

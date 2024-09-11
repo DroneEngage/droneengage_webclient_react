@@ -342,7 +342,10 @@ export class ClssAndruavMissionPlan {
 
       de_geoFence: {},
 
-      de_mission: {},
+      de_mission: {
+		"waypoints":[],
+		"modules":[],
+	  },
     };
 
     if (andruavUnit != null) {
@@ -627,8 +630,8 @@ export class ClssAndruavMissionPlan {
       }
     }
 
-    output_plan["de_mission"] = mission_steps;
-	output_plan["de_modules"] = module_steps;
+    output_plan.de_mission.waypoints  = mission_steps;
+	output_plan.de_mission.modules = module_steps;
 	
     return JSON.stringify(output_plan);
   }

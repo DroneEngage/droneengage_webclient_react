@@ -126,28 +126,35 @@ export class CWayPointLocation extends React.Component {
     {
         var lnglat = this.props.p_shape.getLatLng();
         
+        const lat_id = "txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
+        const lng_id = "txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
+        const alt_id = "txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
+
         return (<div className="margin_zero css_margin_top_small">
-                    <label className="form-control-label text-white">3D-Location </label>
+                    <p className="form-control-label text-white mb-0">3D-Location </p>
                     <div className="row margin_zero">
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor="txt_lat" className="form-label text-white "><small>lat</small></label>
-                                <input id={"txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-90} max={90} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lat} placeholder="0.00"    onChange={this.handleLatChange} />
+                                <label htmlFor={lat_id} className="form-label text-white "><small>lat</small>
+                                <input id={lat_id}  type="number" min={-90} max={90} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lat} placeholder="0.00"    onChange={this.handleLatChange} />
+                                </label>
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor="txt_lng" className="form-label text-white "><small>lng</small></label>
-                                <input id={"txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={-180} max={180} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lng} placeholder="0.00" onChange={this.handleLngChange} />
+                                <label htmlFor={lng_id} className="form-label text-white "><small>lng</small>
+                                <input id={lng_id}  type="number" min={-180} max={180} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lng} placeholder="0.00" onChange={this.handleLngChange} />
+                                </label>
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor="txt_alt" className="form-label text-white "><small>alt</small></label>
+                                <label htmlFor={alt_id} className="form-label text-white "><small>alt</small>
                                 <div className="input-group mb-3">
-                                    <input id={"txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="number" min={0} max={9000} step="1.0" className="form-control  input-sm  txt_margin " placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2" value={this.props.p_shape.m_missionItem.alt} onChange={this.handleAltChange}/>
+                                    <input id={alt_id}  type="number" min={0} max={9000} step="1.0" className="form-control  input-sm  txt_margin " placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2" value={this.props.p_shape.m_missionItem.alt} onChange={this.handleAltChange}/>
                                     <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="button" className="btn btn-success input-sm line-height-0" onClick={ (e) => this.fn_editAltitudeType()} >{this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType)}</button>
                                 </div>
+                                </label>
                             </div>
                         </div>
                     </div>

@@ -848,18 +848,10 @@ class CAndruavClient {
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
 
-        const partyID = p_andruavUnit.partyID;
-        let p_msg = {
-            a: slaveIndex, // index ... could be -1 to take available location.
-            c: partyID, // slave
-            f: do_follow
-        };
+        const cmd = CCommandAPI.API_requestFromDroneToFollowAnother(p_andruavUnit, slaveIndex, leaderPartyID, do_follow);
+        
 
-        if (leaderPartyID !== null && leaderPartyID !== undefined) {
-            p_msg.b = leaderPartyID;
-        }
-
-        this.API_sendCMD(partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_FollowHim_Request, p_msg);
+        this.API_sendCMD(p_andruavUnit.partyID , cmd.mt, cmd.ms);
     };
     // CODEBLOCK_END
 

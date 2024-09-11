@@ -157,6 +157,35 @@ export class CCommandAPI
         return msg;
     }
 
+    static API_requestFromDroneToFollowAnother (p_andruavUnit, slaveIndex, leaderPartyID, do_follow) {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+
+        if ((do_follow === null || do_follow === undefined)
+        && (leaderPartyID === null || leaderPartyID === undefined))
+        {
+            do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
+        }
+        
+        const partyID = p_andruavUnit.partyID;
+        let p_msg = {
+            a: slaveIndex, // index ... could be -1 to take available location.
+            c: partyID, // slave
+            f: do_follow
+        };
+
+        if (leaderPartyID !== null && leaderPartyID !== undefined) {
+            p_msg.b = leaderPartyID;
+        }
+        
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_FollowHim_Request,
+            'ms':  p_msg
+        };
+
+        return msg;
+    }
     
     static API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
         p_band_width, p_gain, p_sample_rate,
