@@ -1,6 +1,7 @@
 import React    from 'react';
 
-
+import {CFieldChecked} from '../../micro_gadgets/jsc_mctrl_field_check.jsx'
+import {CTriStateChecked} from '../../micro_gadgets/jsc_mctl_tri_state_check.jsx'
 
 export class ClssSDR_Planning extends React.Component {
 
@@ -21,7 +22,7 @@ export class ClssSDR_Planning extends React.Component {
     {
         this.state.m_update = 1;
         
-        if (this.props.p_shape.m_missionItem.modules.p2p === undefined) {
+        if (this.props.p_shape.m_missionItem.modules.sdr === undefined) {
             // init data
             this.fn_process_enable (false);
 
@@ -78,15 +79,22 @@ export class ClssSDR_Planning extends React.Component {
     render ()
     {
         return (
-            <div key={this.key + "_ctl_p2pp"} className={this.props.className}>
-                <div key={this.key + 'p2pp_0'} className='row css_margin_zero padding_zero '>
-                    <div key={this.key + 'p2pp_01'} className="col-6 pt-2">
-                        <div key={this.key + 'p2pp_011'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={this.key + "m_enable_ctrl"} className="col-8 al_l " ><small>Enabled</small></label>
-                            <input className="form-check-input col-4 " type="checkbox" id={this.key + "m_enable_ctrl"} ref={this.enable_Ref} onChange={(e) => this.fn_enableCtrl(e)} />
+            <div key={"_ctl_sdrp_" + this.key} className={this.props.className}>
+                <div key={'sdrp_0' + this.key} className='row css_margin_zero padding_zero '>
+                    <div key={'sdrp_01' + this.key} className="col-6 pt-2">
+                        <div key={'sdrp_011' + this.key} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={"m_enable_ctrl" + this.key} className="col-8 al_l " ><small>Enabled</small></label>
+                            <input className="form-check-input col-4 " type="checkbox" id={"m_enable_ctrl" + this.key} ref={this.enable_Ref} onChange={(e) => this.fn_enableCtrl(e)} />
                         </div>
                     </div>
                 </div>
+                <div key={'sdrp_1' + this.key} className='row css_margin_zero padding_zero '>
+                        <CFieldChecked  key={'f4' + this.key} required={this.props.p_shape.m_missionItem.eventFireRequired === true} txtLabel='fire event' itemid={'fv' + this.key} txtValue={0}  ref={instance => {this.eventFire = instance}} />
+                </div>
+                <div key={'sdrp_2' + this.key} className='row css_margin_zero padding_zero '>
+                        <CTriStateChecked  key={'f4' + this.key}  txtLabel='fire event'  txtValue={0}  disabled={false} checked={true} ref={instance => {this.eventFire = instance}} />
+                </div>
+
             </div>
         );
     }

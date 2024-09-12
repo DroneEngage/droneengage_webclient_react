@@ -361,17 +361,17 @@ export class ClssAndruavMissionPlan {
     let module_steps = [];
     const fn_addMissionItem = function (marker, cmd, m_paramsArray) {
       let step = {
-        cmd: cmd,
-        frameType: marker.m_missionItem.m_frameType,
-        mavlink: m_paramsArray,
+        'c': cmd,
+        'ft': marker.m_missionItem.m_frameType,
+        'mv': m_paramsArray,
       };
       mission_steps.push(step);
     };
 
     const fn_addModuleItem = function (cmd, linked_step) {
       let step = {
-        cmd: cmd,
-        linked_step: linked_step,
+        'c': cmd,
+        'ls': linked_step,
       };
       module_steps.push(step);
     };
