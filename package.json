@@ -1,7 +1,7 @@
 {
   "name": "andruav_webclient_2",
-  "version": "0.9.1",
-  "build_number": "20240703-01",
+  "version": "0.9.09",
+  "build_number": "20240912-01",
   "description": "DroneEngage WebClient GCS Control Station.",
   "author": {
     "email": "mohammad.hefny@gmail.com",
