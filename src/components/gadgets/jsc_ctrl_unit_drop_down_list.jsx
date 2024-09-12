@@ -9,7 +9,17 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {ClssCTRL_Unit_Icon} from './jsc_ctrl_unit_icon.jsx'
 
-
+/**
+ * List all units in combobox with icon next to it.
+ * 
+ * properties:
+ * p_partyID
+ * p_fixed_list = [ [value,text, text-color], [value,text, text-color],...]
+ * 
+ * event:
+ * onSelectUnit(partyID)
+ * 
+ */
 export class ClssAndruavUnit_DropDown_List extends React.Component {
 
 
@@ -32,7 +42,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 
     componentDidMount() {
         this.state.m_update = 1;
-        this.state.m_selected_party_id = this.props.m_partyID;
+        this.state.m_selected_party_id = this.props.p_partyID;
         if (this.state.m_selected_party_id === null || this.state.m_selected_party_id === undefined)
         {
             this.state.m_selected_party_id = "0";
@@ -42,8 +52,8 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 
     componentDidUpdate(prevProps) {
         // Check if the prop has changed
-        if (prevProps.m_partyID !== this.props.m_partyID) {
-            this.state.m_selected_party_id = this.props.m_partyID;
+        if (prevProps.p_partyID !== this.props.p_partyID) {
+            this.state.m_selected_party_id = this.props.p_partyID;
             if (this.state.m_selected_party_id === null || this.state.m_selected_party_id === undefined)
             {
                 this.state.m_selected_party_id = "0";
@@ -117,6 +127,19 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
         const v_prop = this.props;
         let units_details = [];
         let v_css_select = ' text-white ';
+
+        if (this.props.p_fixed_list !== undefined)
+        {
+            this.props.p_fixed_list.forEach((value, index, array)=> {
+                units_details.push(<option key={value[0] + this.key} className={"col-6 " + value[2]} value={value[0]}>{value[1]}</option>);
+            });
+
+        }
+        else
+        {
+            units_details.push(<option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>);
+        }
+
         sortedPartyIDs.map(function (object)
         {
             
@@ -136,7 +159,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
                     txt_unit += ' --- offline';
                 } 
                 
-                const v_selected = (partyID === me.props.m_partyID);
+                const v_selected = (partyID === me.props.p_partyID);
                 units_details.push(<option key={me.key + partyID} 
                     className={css_unit} 
                     value={partyID}
@@ -158,7 +181,6 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
                 <div className="form-group">
                     <label htmlFor={this.key + 'combo_list'} className="col-3 text-white"><small><b>Drone ID</b></small></label>
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
-                        <option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>
                         {units_details}
                     </select>
                     <ClssCTRL_Unit_Icon className="ms-2 p-1" p_unit={v_andruavUnit}/>
