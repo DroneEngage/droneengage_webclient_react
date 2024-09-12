@@ -36,7 +36,6 @@ import {ClssCTRL_Unit_Planning_Bar} from './jsc_ctrl_unit_planning_bar.jsx'
  * Properties:
  * tab_planning: display planning tab... true in planner.
  * tab_main: display main bar control.... true in mnormal operation
- * 
  * tab_log: log tab that lists messages.
  * tab_details: detailed tab that display version, attached modules, received messages ....etc.
  * tab_modules: true to display any other module such as SDR,P2P,Audio ...etc.

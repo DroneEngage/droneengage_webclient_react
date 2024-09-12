@@ -15,7 +15,7 @@
  export const CONST_PROD_MODE_IP = 'airgap.droneengage.com'; 
  export const CONST_TEST_MODE_IP = "127.0.0.1";
  export const CONST_TEST_MODE_ENABLE_LOG = false;  // should be used together with CONST_TEST_MODE
- export const CONST_TITLE = "CESCA - Drone Engage";
+ export const CONST_TITLE = "Drone Engage";
 
 /**
  * Links that are used in Header
