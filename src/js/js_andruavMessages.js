@@ -62,13 +62,13 @@ export const CONST_TYPE_AndruavMessage_CameraSwitch = 1050;
 export const CONST_TYPE_AndruavMessage_CameraFlash = 1051;
 export const CONST_TYPE_AndruavMessage_RemoteControl2 = 1052;
 export const CONST_TYPE_AndruavMessage_SensorsStatus = 1053;
-// CODEBLOCK_START
+
 export const CONST_TYPE_AndruavMessage_FollowHim_Request = 1054;
 export const CONST_TYPE_AndruavMessage_FollowMe_Guided = 1055;
 export const CONST_TYPE_AndruavMessage_MakeSwarm = 1056;
 export const CONST_TYPE_AndruavMessage_SwarmReport = 1057;
 export const CONST_TYPE_AndruavMessage_UpdateSwarm = 1058;
-// CODEBLOCK_END
+
 
 export const CONST_TYPE_AndruavMessage_CommSignalsStatus = 1059;
 export const CONST_TYPE_AndruavMessage_Sync_EventFire = 1061;
@@ -76,7 +76,8 @@ export const CONST_TYPE_AndruavMessage_SearchTargetList = 1062;
 export const CONST_TYPE_AndruavMessage_UdpProxy_Info = 1071;
 export const CONST_TYPE_AndruavMessage_Unit_Name = 1072;
 export const CONST_TYPE_AndruavMessage_Ping_Unit = 1073;
-export const CONST_TYPE_AndruavMessage_P2P_INFO = 1074;
+
+export const CONST_TYPE_AndruavMessage_Upload_DE_Mission = 1075;
 
 // Binary Messages
 export const CONST_TYPE_AndruavMessage_LightTelemetry = 2022;
@@ -99,6 +100,7 @@ export const CONST_TYPE_AndruavMessage_SDR_INFO = 6513;
 export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
 export const CONST_TYPE_AndruavMessage_SDR_STATUS = 6515;
 export const CONST_TYPE_AndruavMessage_SDR_SPECTRUM = 6516;
+export const CONST_TYPE_AndruavMessage_P2P_INFO = 6517;
 
 
 // System Messages
