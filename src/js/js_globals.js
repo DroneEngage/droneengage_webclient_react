@@ -87,6 +87,8 @@ class GLOBALS {
 		this.v_enable_gcs_display = false;
 		this.v_gamePadMode = 2;
 
+	    // Mission File Extension
+		this.v_mission_file_extension = '.de';
 
 		// map Color Selection
 		this.v_colorDrawPathes = ['#D9524F', '#337AB7', '#62D284', '#F0AD4E'];

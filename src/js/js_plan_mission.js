@@ -624,9 +624,15 @@ export class ClssAndruavMissionPlan {
         ]);
       }
 
-      if ((marker.m_missionItem.modules.p2p !== undefined && marker.m_missionItem.modules.p2p !== null) 
-		&& (marker.m_missionItem.modules.p2p.cmds !== undefined)) {
-        fn_addModuleItem(marker.m_missionItem.modules.p2p.cmds, i);
+      const keys = Object.keys(marker.m_missionItem.modules);
+
+      for (let key in marker.m_missionItem.modules)
+      {
+          const m = marker.m_missionItem.modules[key];
+          if (m.cmds !== null && m.cmds !== undefined)
+          {
+            fn_addModuleItem(m.cmds, i);    
+          }
       }
     }
 

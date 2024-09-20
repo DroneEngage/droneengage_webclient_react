@@ -1899,7 +1899,7 @@ function fn_handleKeyBoard() {
 
 		function fn_putWayPoints_direct (p_andruavUnit, p_eraseFirst) {
 
-			var files = window.document.getElementById('btn_filesWP').files;
+			const files = window.document.getElementById('btn_filesWP').files;
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 
 			if (!files.length) {
@@ -1907,16 +1907,23 @@ function fn_handleKeyBoard() {
 				return;
 			}
 
-			var file = files[0];
+			const file = files[0];
 
-			var reader = new FileReader();
+			const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
+			const reader = new FileReader();
 
 			// If we use onloadend, we need to check the readyState.
 			reader.onloadend = function (evt) {
 				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
 					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
-
-					js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
+					if (is_de_file === true)
+					{
+						js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, text);
+					}
+					else
+					{
+						js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
+					}
 				}
 			};
 
@@ -2530,7 +2537,7 @@ function fn_handleKeyBoard() {
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, null, false, false, "Target of: " + p_andruavUnit.m_unitName, [32,32]);
+				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, null, false, false, p_andruavUnit.m_unitName, [32,32]);
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			

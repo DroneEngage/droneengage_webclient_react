@@ -1157,8 +1157,6 @@ class CAndruavClient {
 
 
         this.API_sendCMD((p_andruavUnit !== null && p_andruavUnit !== undefined) ? p_andruavUnit.partyID : null, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-
-
     };
 
 
@@ -1170,8 +1168,18 @@ class CAndruavClient {
         };
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_UploadWayPoints, v_msg);
+    };
 
 
+    API_uploadDEMission(p_andruavUnit, p_eraseFirst, p_textMission) { // eraseFirst NOT IMPLEMENTED YET
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        const v_msg = {   
+            a: p_textMission,
+            e: p_eraseFirst
+        };
+
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Upload_DE_Mission, v_msg);
     };
 
     API_saveWayPointTasks (p_accountID, m_groupName, p_partyID, p_receiver, isPermanent, p_missionV110) {
