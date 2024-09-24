@@ -314,7 +314,7 @@ class CLeafLetAndruavMap {
             fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
             fillOpacity: 0.45,
             opacity: 0.9,
-            weight: 0
+            weight: 1
         }).addTo(this.m_Map);
     }
 
@@ -325,7 +325,7 @@ class CLeafLetAndruavMap {
             fill: true,
             fillColor: p_shouldKeepOutside === false ? '#32CD32' : '#FF1493',
             opacity: 1.0,
-            weight: 0,
+            weight: 1,
             fillOpacity: 0.45
         }).addTo(this.m_Map);
 

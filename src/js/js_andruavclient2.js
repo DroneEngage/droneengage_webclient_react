@@ -1175,7 +1175,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const v_msg = {   
-            a: p_textMission,
+            j: p_textMission,
             e: p_eraseFirst
         };
 
@@ -1891,6 +1891,7 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('FI') !== true) {
                             p_jmsg.FI = false;
                         }
+                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI);
                         p_unit.m_useFCBIMU = p_jmsg.FI;
 
                         if (p_jmsg.hasOwnProperty('SD') !== true) {

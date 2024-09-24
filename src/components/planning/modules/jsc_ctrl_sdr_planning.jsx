@@ -70,7 +70,10 @@ export class ClssSDR_Planning extends React.Component {
     fn_editShape()
     {
         if (this.m_enabled_ctrl !== true) {
-            this.props.p_shape.m_missionItem.modules.sdr = undefined;
+            this.props.p_shape.m_missionItem.modules.sdr =
+            {
+                cmds: {}
+            };
 
             return;
         }

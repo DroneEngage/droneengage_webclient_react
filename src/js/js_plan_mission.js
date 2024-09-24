@@ -343,7 +343,7 @@ export class ClssAndruavMissionPlan {
       de_geoFence: {},
 
       de_mission: {
-		"waypoints":[],
+		"mav_waypoints":[],
 		"modules":[],
 	  },
     };
@@ -626,17 +626,28 @@ export class ClssAndruavMissionPlan {
 
       const keys = Object.keys(marker.m_missionItem.modules);
 
+      if (marker.m_missionItem.modules === null || marker.m_missionItem.modules === undefined) continue;
+      const cmds = [];
       for (let key in marker.m_missionItem.modules)
       {
           const m = marker.m_missionItem.modules[key];
           if (m.cmds !== null && m.cmds !== undefined)
           {
-            fn_addModuleItem(m.cmds, i);    
+            const keys2 = Object.keys(m.cmds);
+            for (let key2 in m.cmds)
+            {
+                const single_cmd = m.cmds[key2];
+                if (single_cmd === null || single_cmd === undefined) continue;
+                cmds.push(single_cmd);
+            }
           }
       }
+
+      if (cmds === null || cmds === undefined) continue;
+      fn_addModuleItem(cmds, i);    
     }
 
-    output_plan.de_mission.waypoints  = mission_steps;
+    output_plan.de_mission['mav_waypoints']  = mission_steps;
 	output_plan.de_mission.modules = module_steps;
 	
     return JSON.stringify(output_plan);

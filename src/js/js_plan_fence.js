@@ -40,7 +40,7 @@ export class ClssAndruavFencePlan
 			if (c_shape.m_geofenceInfo.m_deleted === true) continue;
 				
 			cmd.n = c_shape.m_geofenceInfo.m_geoFenceName;
-			cmd.a = c_shape.m_geofenceInfo.isHardFence;
+			cmd.a = c_shape.m_geofenceInfo.isHardFence === undefined?0:c_shape.m_geofenceInfo.isHardFence;
 			cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
 			cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
 			var lnglat = {};
@@ -58,9 +58,9 @@ export class ClssAndruavFencePlan
 
 					for (let j=0; j<len_lnglat; ++j)
 					{
-						
-						lnglat.a = c_lnglats[j].lat * 10000000;
-						lnglat.g = c_lnglats[j].lng * 10000000;
+						lnglat = {};
+						lnglat.a = c_lnglats[j].lat ;
+						lnglat.g = c_lnglats[j].lng ;
 						cmd[j] = lnglat;
 					}
 

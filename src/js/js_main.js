@@ -1918,7 +1918,7 @@ function fn_handleKeyBoard() {
 					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
 					if (is_de_file === true)
 					{
-						js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, text);
+						js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
 					}
 					else
 					{

@@ -76,7 +76,7 @@ export  class ClssRX_MESSAGE  extends React.Component {
                 </tr>);
           });
 
-        return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.partyID } className="">
+        return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.partyID } className=" h-100 overflow-scroll">
             <table className = "table table-dark table-striped">
                 <thead>
                     <tr key={'ClssRX_MESSAGE1' + this.props.p_unit.partyID }>
