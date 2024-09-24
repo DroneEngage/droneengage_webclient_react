@@ -97,6 +97,11 @@ class CAndruavClient {
         if (units===null || units === undefined) return ;
         units.forEach((unit) => {
             if (!unit.m_IsMe) {
+
+            if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true)
+            {
+                js_globals.v_andruavClient.API_do_GetHomeLocation(unit);
+			}
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
 
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {

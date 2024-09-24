@@ -1871,6 +1871,7 @@ function fn_handleKeyBoard() {
 
 		export function fn_requestWayPoints(p_andruavUnit, fromFCB) {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+			js_globals.v_andruavClient.API_do_GetHomeLocation(p_andruavUnit);
 			js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit, fromFCB);
 		}
 
