@@ -352,6 +352,17 @@ export class ClssAndruavMissionPlan {
       output_plan["unit"]["partyID"] = andruavUnit.partyID;
       output_plan["unit"]["unitName"] = andruavUnit.m_unitName;
       output_plan["unit"]["vehichleType"] = andruavUnit.m_VehicleType;
+      const home_point = andruavUnit.m_Geo_Tags.p_HomePoint;
+      if (home_point.m_isValid === true)
+      {
+        output_plan["unit"]["home"] =
+        {
+          'lat': home_point.lat,
+          'lng': home_point.lng,
+          'alt': 0 , //home_point.alt,
+          'ft': mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+        };
+      }
     }
 
     output_plan["de_geoFence"] = this.fn_exportFencesToDE_V1();
@@ -391,7 +402,7 @@ export class ClssAndruavMissionPlan {
               0.0,
               marker.getLatLng().lat,
               marker.getLatLng().lng,
-              marker.m_missionItem.alt,
+              parseFloat(marker.m_missionItem.alt),
             ]);
           }
           break;
@@ -615,7 +626,7 @@ export class ClssAndruavMissionPlan {
 
         fn_addMissionItem(marker, 93, [
           0,
-          1, // param1
+          1, // param1 - Delay 1 hour
           0, // param2
           0,
           0,
