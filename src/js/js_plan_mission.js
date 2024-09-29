@@ -379,19 +379,37 @@ export class ClssAndruavMissionPlan {
       mission_steps.push(step);
     };
 
-    const fn_addModuleItem = function (cmd, linked_step) {
+    const fn_addModuleItem = function (cmd, linked_step, eventFire, eventWait) {
+      
       let step = {
         'c': cmd,
-        'ls': linked_step,
+        'ls': linked_step.toString()
       };
+
+      if (eventFire !== null || eventFire !== undefined)
+      {
+        step.ef = eventFire.toString();
+      }
+
+      if (eventWait !== null || eventWait !== undefined)
+      {
+        step.ew = eventWait.toString();
+      }
+      
       module_steps.push(step);
+
     };
 
     let skip = false;
     for (let i = 0; i < len; ++i) {
       skip = false;
       let marker = this.v_markers[i];
-      let step = {};
+      
+      const eventFireRequired = marker.m_missionItem.eventFireRequired;
+      const eventWaitRequired = marker.m_missionItem.eventWaitRequired;
+      const eventFire = marker.m_missionItem.eventFire;
+      const eventWait = marker.m_missionItem.eventWait;
+      
       switch (marker.m_missionItem.m_missionType) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
           {
@@ -565,7 +583,7 @@ export class ClssAndruavMissionPlan {
         ]);
       }
 
-      if (marker.m_missionItem.eventFireRequired === true) {
+      if (eventFireRequired === true) {
         // fire event will use servo (16) as default or other suitable servo channel.
         /*
 						MAV_CMD_DO_SET_SERVO	Set a servo to a desired PWM value.
@@ -580,7 +598,7 @@ export class ClssAndruavMissionPlan {
 
         fn_addMissionItem(marker, 183, [
           16,
-          marker.m_missionItem.eventFire, // param1
+          parseInt(eventFire), // param1
           0, // param2
           0,
           0,
@@ -589,7 +607,7 @@ export class ClssAndruavMissionPlan {
         ]);
       }
 
-      if (marker.m_missionItem.eventWaitRequired === true) {
+      if (eventWaitRequired === true) {
         // wait event will use servo (15) as default or other suitable servo channel.
         /*
 						MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
@@ -604,7 +622,7 @@ export class ClssAndruavMissionPlan {
 
         fn_addMissionItem(marker, 183, [
           15,
-          marker.m_missionItem.eventWait, // param1
+          parseInt(eventWait), // param1
           0, // param2
           0,
           0,
@@ -653,9 +671,13 @@ export class ClssAndruavMissionPlan {
             }
           }
       }
-
+      
       if (cmds === null || cmds === undefined) continue;
-      fn_addModuleItem(cmds, i);    
+
+      fn_addModuleItem(cmds, i,
+          eventFireRequired === true?eventFire:null,
+          eventWaitRequired === true?eventWait:null
+        );
     }
 
     output_plan.de_mission['mav_waypoints']  = mission_steps;

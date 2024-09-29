@@ -1176,11 +1176,11 @@ class CAndruavClient {
     };
 
 
-    API_uploadDEMission(p_andruavUnit, p_eraseFirst, p_textMission) { // eraseFirst NOT IMPLEMENTED YET
+    API_uploadDEMission(p_andruavUnit, p_eraseFirst, p_jsonMission) { // eraseFirst NOT IMPLEMENTED YET
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const v_msg = {   
-            j: p_textMission,
+            j: p_jsonMission,
             e: p_eraseFirst
         };
 
