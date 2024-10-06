@@ -23,12 +23,12 @@ export function  fn_generateRandomString(length)
 export function showModal (id, show)
 {
 	const modal = new Modal($(id)); // Instantiates your modal
-	if (show === true && (modal !== null || modal !== undefined))
+	if (show === true && (modal !== null && modal !== undefined))
 	{
 		modal.show();
 	}
 	
-	if (show === false && (modal !== null || modal !== undefined))
+	if (show === false && (modal !== null && modal !== undefined))
 	{
 		modal.hide();
 	}
@@ -38,12 +38,12 @@ export function showModal (id, show)
 export function showDialog (id, show)
 {
 	const obj = document.getElementById(id);
-	if (show === true && (obj !== null || obj !== undefined))
+	if (show === true && (obj !== null && obj !== undefined))
 	{
 		obj.style.display = 'block';
 	}
 
-	if (show === false && (obj !== null || obj !== undefined))
+	if (show === false && (obj !== null && obj !== undefined))
 	{
 		obj.style.display = 'none';
 	}

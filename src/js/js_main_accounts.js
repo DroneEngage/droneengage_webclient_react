@@ -104,7 +104,7 @@ export function gui_alert(title,message,level)
         js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_BAD_Operation,  this, 
         function (p_sender,p_msg)
         {
-        if (p_msg !== null || p_msg !== undefined)
+        if (p_msg !== null && p_msg !== undefined)
         {
             var v_Message = "<p className='text-danger'>Operation Failed: <strong>" + p_msg[js_andruavMessages.CONST_ERROR_MSG.toString()]+ "</strong></p>";          
             if (p_msg.hasOwnProperty(js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString())  === true)

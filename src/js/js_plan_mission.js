@@ -386,12 +386,12 @@ export class ClssAndruavMissionPlan {
         'ls': linked_step.toString()
       };
 
-      if (eventFire !== null || eventFire !== undefined)
+      if (eventFire !== null && eventFire !== undefined)
       {
         step.ef = eventFire.toString();
       }
 
-      if (eventWait !== null || eventWait !== undefined)
+      if (eventWait !== null && eventWait !== undefined)
       {
         step.ew = eventWait.toString();
       }
@@ -662,7 +662,6 @@ export class ClssAndruavMissionPlan {
           const m = marker.m_missionItem.modules[key];
           if (m.cmds !== null && m.cmds !== undefined)
           {
-            const keys2 = Object.keys(m.cmds);
             for (let key2 in m.cmds)
             {
                 const single_cmd = m.cmds[key2];

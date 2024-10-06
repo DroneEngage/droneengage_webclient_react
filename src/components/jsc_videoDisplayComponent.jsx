@@ -107,7 +107,7 @@ class ClssCVideoScreen extends React.Component {
         var v_me = this;
         var v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         //if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
-        if ((v_activeTrack.videoRecording === true) && (v_activeTrack.recorderObject !== null || v_activeTrack.recorderObject !== undefined))
+        if ((v_activeTrack.videoRecording === true) && (v_activeTrack.recorderObject !== null && v_activeTrack.recorderObject !== undefined))
         {
             const recorder = v_activeTrack.recorderObject;
             recorder.stopRecording(() => {
