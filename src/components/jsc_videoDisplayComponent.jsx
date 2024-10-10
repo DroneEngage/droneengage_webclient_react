@@ -583,8 +583,7 @@ class ClssCVideoScreen extends React.Component {
           };
           
         var v_btns=[];
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
-		{   
+         
         
             v_btns.push (<div key="btn" id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
             <div key="1" className="col-1"><img id="btnclose" className="cursor_hand css_video_close"  alt="Close Camera" title="Close Camera" onClick={ (e) => this.fnl_stopVideo(e)}/></div>
@@ -603,25 +602,22 @@ class ClssCVideoScreen extends React.Component {
             
             </div>);
             
-        }
-        else
-        {
-            v_btns.push (<div id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
-            <div key="1" className="col-1"><img id="btnclose" className="cursor_hand css_video_close" alt="Close Camera" title="Close Camera" onClick={ (e) => this.fnl_stopVideo(e)}/></div>
-            <div key="2" className="col-1"><img id="btnGoto" className="cursor_hand css_goto_drone" alt="Goto Agent" title="Goto Agent" onClick={ (e) => this.fn_gotoUnit_byPartyID(e)}/></div>
-            <div key="3" className="col-1"></div>
-            <div key="4" className="col-1"><img id="btnPIP" className="cursor_hand css_video_pip" alt="Picture in Picture" title="Picture in Picture" onClick={ (e) => this.fnl_requestPIP(e)}/></div>
-            <div key="5" className="col-1"><img id="btn_fullscreen" className={btn_fullscreen} alt={btn_fullscreen_txt} title={btn_fullscreen_txt} onClick={ (e) => this.fnl_requestFullScreen(e)}/></div>
-            <div key="6" className="col-1"><img id="btnSwitchCam" className={ css_switchCam } alt="Switch between Front & Back Cameras" title="Switch between Front & Back Cameras" onClick={ (e) => this.fnl_switchcam(e, this.props.obj)}/></div>
-            <div key="7" className="col-1"><img id="btn_videorecord" className={btn_videorecordClass} alt="Record Web" title="Record Web" onClick={ (e) => this.fnl_recordVideo(e)}/></div>
-            <div key="8" className="col-1"><img id="btn_takeimage" className="cursor_hand css_camera_ready" alt="Take Snapshot" title="Take Snapshot" onClick={ (e) => this.fnl_takeLocalImage(e)}/></div>
-            <div key="9" className="col-1"><img id="btn_zoom_in" className={css_zoomCam + " css_camera_zoom_in"} alt="Zoom In" title="Zoom In" onClick={ (e) => this.fnl_zoomInOut(e, true,this.props.obj)}/></div>
-            <div key="10" className="col-1"><img id="btn_rotate" className={css_rotateCam + " css_camera_rotate"} alt="Rotate" title="Rotate" onClick={ (e) => this.fnl_rotate_local(e)}/></div>
-            <div key="11" className="col-1"><img id="btn_flash" className={ css_flashCam } alt='Flash (Tourch)' title="Flash (Tourch)" onClick={ (e) => this.fnl_flashOnOff(e, this.props.obj)}/></div>
-            <div key="12" className="col-1"><img id="btn_track" className={ css_trackingBtn } alt='Track' title="Track" onClick={ (e) => this.fnl_TrackingOnOff(e, this.props.obj)}/></div>
+            // v_btns.push (<div id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
+            // <div key="1" className="col-1"><img id="btnclose" className="cursor_hand css_video_close" alt="Close Camera" title="Close Camera" onClick={ (e) => this.fnl_stopVideo(e)}/></div>
+            // <div key="2" className="col-1"><img id="btnGoto" className="cursor_hand css_goto_drone" alt="Goto Agent" title="Goto Agent" onClick={ (e) => this.fn_gotoUnit_byPartyID(e)}/></div>
+            // <div key="3" className="col-1"></div>
+            // <div key="4" className="col-1"><img id="btnPIP" className="cursor_hand css_video_pip" alt="Picture in Picture" title="Picture in Picture" onClick={ (e) => this.fnl_requestPIP(e)}/></div>
+            // <div key="5" className="col-1"><img id="btn_fullscreen" className={btn_fullscreen} alt={btn_fullscreen_txt} title={btn_fullscreen_txt} onClick={ (e) => this.fnl_requestFullScreen(e)}/></div>
+            // <div key="6" className="col-1"><img id="btnSwitchCam" className={ css_switchCam } alt="Switch between Front & Back Cameras" title="Switch between Front & Back Cameras" onClick={ (e) => this.fnl_switchcam(e, this.props.obj)}/></div>
+            // <div key="7" className="col-1"><img id="btn_videorecord" className={btn_videorecordClass} alt="Record Web" title="Record Web" onClick={ (e) => this.fnl_recordVideo(e)}/></div>
+            // <div key="8" className="col-1"><img id="btn_takeimage" className="cursor_hand css_camera_ready" alt="Take Snapshot" title="Take Snapshot" onClick={ (e) => this.fnl_takeLocalImage(e)}/></div>
+            // <div key="9" className="col-1"><img id="btn_zoom_in" className={css_zoomCam + " css_camera_zoom_in"} alt="Zoom In" title="Zoom In" onClick={ (e) => this.fnl_zoomInOut(e, true,this.props.obj)}/></div>
+            // <div key="10" className="col-1"><img id="btn_rotate" className={css_rotateCam + " css_camera_rotate"} alt="Rotate" title="Rotate" onClick={ (e) => this.fnl_rotate_local(e)}/></div>
+            // <div key="11" className="col-1"><img id="btn_flash" className={ css_flashCam } alt='Flash (Tourch)' title="Flash (Tourch)" onClick={ (e) => this.fnl_flashOnOff(e, this.props.obj)}/></div>
+            // <div key="12" className="col-1"><img id="btn_track" className={ css_trackingBtn } alt='Track' title="Track" onClick={ (e) => this.fnl_TrackingOnOff(e, this.props.obj)}/></div>
             
-            </div>);
-        }
+            // </div>);
+        
 
         return (
         <div id={divID} className={"css_videoScreen tab-pane fade " + this.props.first}>

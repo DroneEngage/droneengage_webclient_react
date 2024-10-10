@@ -177,7 +177,7 @@ export class ClssSingle_Mission_Header extends React.Component {
             );
 
 
-            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
                 v_partyIDCtrl.push(
                     <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
                         <div className="col-12">
@@ -188,7 +188,7 @@ export class ClssSingle_Mission_Header extends React.Component {
                 );
             }
 
-            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
+            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
                 // overwrite with this if public version 
                 v_partyIDCtrl = [];
 

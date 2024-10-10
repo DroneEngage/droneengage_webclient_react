@@ -498,14 +498,14 @@ export class ClssAndruavMissionPlan {
               marker.m_missionItem.alt,
             ]);
             fn_addMissionItem(marker, 20, [
-				0, 
-				0, 
-				0.0, 
-				0.0, 
-				0.0, 
-				0.0, 
-				0.0
-			]);
+              0, 
+              0, 
+              0.0, 
+              0.0, 
+              0.0, 
+              0.0, 
+              0.0
+            ]);
 
             /*step.id = missionCounter;
 						step.cmd = 16;

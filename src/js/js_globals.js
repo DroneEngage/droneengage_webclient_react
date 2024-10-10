@@ -191,7 +191,7 @@ class GLOBALS {
 
 
 		this.CONST_MAX_SDR_SPECTRUM_LENGTH = 100;				
-		this.CONST_EXPERIMENTAL_FEATURES_ENABLED = false; // KEEP it above code block and keep it unchanged
+		this.CONST_EXPERIMENTAL_FEATURES_ENABLED = true; // KEEP it above code block and keep it unchanged
 
 
 

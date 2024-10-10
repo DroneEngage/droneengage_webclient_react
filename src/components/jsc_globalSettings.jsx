@@ -2,64 +2,16 @@ import $ from 'jquery';
 import React    from 'react';
 
 import {js_globals} from '../js/js_globals.js';
-import {js_eventEmitter} from '../js/js_eventEmitter'
+import {js_eventEmitter} from '../js/js_eventEmitter';
 
-import {js_localStorage} from '../js/js_localStorage'
-import {js_speak} from '../js/js_speak'
-import {gui_toggleUnits} from '../js/js_main'
+import {js_speak} from '../js/js_speak';
+import {gui_toggleUnits} from '../js/js_main';
+import {js_localStorage} from '../js/js_localStorage';
 import * as js_andruavclient2 from '../js/js_andruavclient2'
-import {js_andruavAuth} from '../js/js_andruavAuth'
 
-class ClssFireEvent extends React.Component {
+import {js_andruavAuth} from '../js/js_andruavAuth';
 
-
-  constructor()
-	{
-		super ();
-		this.state = {
-		    
-		};
-    
-    js_eventEmitter.fn_subscribe(js_globals.EE_onAdvancedMode,this,this.fn_advancedMode);
-  }
-
-  fn_advancedMode (me)
-  {
-    me.forceUpdate();
-  }
-
-  fn_fireEvent()
-  {
-    js_andruavclient2.AndruavClient.API_FireEvent (null,$('#txt_ev').val());
-   
-  }
-
-  componentWillUnmount () 
-  {
-    js_eventEmitter.fn_unsubscribe(js_globals.EE_onAdvancedMode,this);
-  }
-
-  render() {
-    if (js_localStorage.fn_getAdvancedOptionsEnabled() !== true)
-    {
-      return (
-                <div></div>
-            )
-    }
-    else
-    {
-      return (
-        <div className="form-group">
-          <label htmlFor="txt_ev" className="user-select-none  form-label text-white "><small>Event&nbsp;No.</small></label>
-          <div className="input-group mb-3">
-            <input id="txt_ev"  type="number" min={0} max={2000} step="1.0" className="form-control input-sm input-sm txt_margin " placeholder="0" aria-label="0" />
-            <button id="btn_ev"  type="button" className="btn btn-success input-sm line-height-0" onClick={ (e) => this.fn_fireEvent()} >Fire</button>
-          </div>
-        </div>
-      );
-    }
-  }
-}
+import {ClssFireEvent} from  './micro_gadgets/jsc_mctrl_fire_event.jsx';
 
 
 class ClssPreferences extends React.Component {
@@ -284,6 +236,16 @@ export default class ClssGlobalSettings extends React.Component {
   }
 
 
+  fn_fireMavlinkEvent(value)
+  {
+    js_andruavclient2.AndruavClient.API_FireMavlinkEvent (null,parseInt(value));
+  }
+
+  fn_fireDeEvent(value)
+  {
+    js_andruavclient2.AndruavClient.API_FireDeEvent (null,value);
+  }
+
   render() {
 
      
@@ -370,7 +332,8 @@ export default class ClssGlobalSettings extends React.Component {
                     </div>
                     <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
                     {v_uploadFile} 
-                    <ClssFireEvent/>
+                    <ClssFireEvent label={"Event Mavlink No."} onClick={ (value) => this.fn_fireMavlinkEvent(value)} />
+                    <ClssFireEvent label={"Event DroneEngage No."} onClick={ (value) => this.fn_fireDeEvent(value)}/>
                     </div>
                     <div className="tab-pane fade" id={"settings_preference"}>
                       <ClssPreferences/>

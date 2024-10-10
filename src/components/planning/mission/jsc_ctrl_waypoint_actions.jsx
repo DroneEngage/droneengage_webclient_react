@@ -91,7 +91,7 @@ export class CWayPointAction extends React.Component {
             this.props.p_shape.m_missionItem.m_yawRequired = (this.props.p_shape.m_missionItem.yaw !== null && this.props.p_shape.m_missionItem.yaw !== undefined) ;
         }
        
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true)
 		{
             this.props.p_shape.m_missionItem.eventFire = this.eventFire.fn_getValue();
             this.props.p_shape.m_missionItem.eventFireRequired = (this.props.p_shape.m_missionItem.eventFire !== null && this.props.p_shape.m_missionItem.eventFire  !== undefined);
@@ -131,7 +131,7 @@ export class CWayPointAction extends React.Component {
         var v_event_firing = [];
         
         //CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===true)
 		{
             v_event_firing.push(<CFieldChecked  key={'f3' + v_itemID} required={this.props.p_shape.m_missionItem.eventWaitRequired === true} txtLabel='wait for event' itemid={v_itemID + 'wv'} txtValue={this.props.p_shape.m_missionItem.eventWait}  ref={instance => {this.eventWait = instance}} />)
             v_event_firing.push(<CFieldChecked  key={'f4' + v_itemID} required={this.props.p_shape.m_missionItem.eventFireRequired === true} txtLabel='fire event' itemid={v_itemID + 'fv'} txtValue={this.props.p_shape.m_missionItem.eventFire}  ref={instance => {this.eventFire = instance}} />)

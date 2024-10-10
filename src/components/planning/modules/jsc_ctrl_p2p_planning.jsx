@@ -3,9 +3,7 @@ import React from 'react';
 
 import * as js_andruavMessages from '../../../js/js_andruavMessages'
 
-import {js_globals} from '../../../js/js_globals.js';
 import { CCommandAPI } from '../../../js/js_commands_api.js'
-import {ClssCTRL_SWARM} from '../../gadgets/jsc_ctrl_swarm.jsx'
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 import {CTriStateChecked} from '../../micro_gadgets/jsc_mctl_tri_state_check.jsx'
 
