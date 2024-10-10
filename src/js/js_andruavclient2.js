@@ -390,7 +390,8 @@ class CAndruavClient {
         }
 
         if (this.ws !== null && this.ws !== undefined) {
-            this.ws.sendex(this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg));
+            const msgx_txt = this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg);
+            this.ws.sendex(msgx_txt,false);
         } else { // send a warning
         }
     };
@@ -407,8 +408,8 @@ class CAndruavClient {
         let h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
         let ws = this.ws;
         
-        const msgx = js_helpers.fn_concatBuffers(h, data, true);
-        ws.sendex(msgx, true);
+        const msgx_bin = js_helpers.fn_concatBuffers(h, data, true);
+        ws.sendex(msgx_bin, true);
     };
 
 
@@ -1248,7 +1249,7 @@ class CAndruavClient {
 
     };
 
-    API_FireEvent(p_andruavUnit, p_event_id)
+    API_FireMavlinkEvent(p_andruavUnit, p_event_id)
     {
         const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
         
@@ -1258,6 +1259,21 @@ class CAndruavClient {
 
         const p_msg = {
             a: parseInt(p_event_id)
+        };
+
+        this.API_sendCMD(c_party, js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire, p_msg);
+    }
+
+    API_FireDeEvent(p_andruavUnit, p_event_id)
+    {
+        const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
+        
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
+            return;
+        }
+
+        const p_msg = {
+            d: p_event_id.toString()
         };
 
         this.API_sendCMD(c_party, js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire, p_msg);
@@ -3228,6 +3244,7 @@ class CAndruavClient {
         const Me = this;
         var reader = new FileReader();
         reader.onload = function (event) {
+            try{
             var contents = event.target.result;
             var data= new Uint8Array(contents);
             byteLength = contents.byteLength;
@@ -3263,6 +3280,7 @@ class CAndruavClient {
 				return;
             }
         
+            
             v_unit.m_Messages.fn_addMsg(p_jmsg.messageType);
             v_unit.m_Messages.m_received_msg++;
             v_unit.m_Messages.m_received_bytes +=data.length;
@@ -3272,7 +3290,12 @@ class CAndruavClient {
             data = null;
             reader.abort();
             reader = null;
-					
+        }
+        catch 
+        {   
+            console.error ("Bad data format");
+            return ; 
+        }		
         };
 
         reader.onerror = function (event) {
@@ -3317,11 +3340,16 @@ class CAndruavClient {
             this.ws = new WebSocket(url);
             this.ws.parent = this;
             this.ws.sendex = function (msg, isbinary) {
-                if (isbinary === null || isbinary === undefined) {
-                    isbinary = false;
-                }
                 if (this.readyState === WebSocket.OPEN) {
-                    this.send(msg, {binary: isbinary});
+                    
+                    if (isbinary === null || isbinary === undefined || isbinary === false ) {
+                        isbinary = false;
+                        this.send(msg);
+                    }
+                    else
+                    {
+                        this.send(new Blob([msg]));
+                    }
                 }else {
                     console.error("WebSocket is not yet open, cannot send message.");
                 }
