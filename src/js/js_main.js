@@ -28,7 +28,7 @@ import {js_adsbUnit} from './js_adsbUnit.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
 import {ClssMainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
-
+import {ClssWaypointStepContextMenu} from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 
 var oldAppend = $.fn.append;
 
@@ -1074,7 +1074,7 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_doStartMissionFrom(p_partyID, p_missionNumber) {
+		export function fn_doStartMissionFrom(p_partyID, p_missionNumber) {
 			let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 			if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 				js_speak.fn_speak(String(p_missionNumber) + ' is a start point');
@@ -1579,192 +1579,7 @@ function fn_handleKeyBoard() {
 			return "<div id='context_menu_here' class='margin_zero padding_zero row'/>";
 		}
 
-		// function hlp_generateFlyHereMenu( lat, lng ) {
-			
-		// 	if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) {
-		// 	  return <div/>;
-		// 	}
-		  
-		// 	window.v_contextMenuOpen = true;
-		  
-		// 	const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
-		// 	const size = keys.length;
-		// 	let v_contextHTML = (
-		// 	  <div className="test-justified">
-		// 		<p className="bg-success text-white">
-		// 		  <span className="text-success margin_zero text-white">
-		// 			lat: {lat.toFixed(6)} lng: {lng.toFixed(6)}
-		// 		  </span>
-		// 		</p>
-		// 		<div className="row">
-		// 		  <div className="col-sm-12">
-		// 			<p
-		// 			  className="cursor_hand text-primary margin_zero si-07x"
-		// 			  onClick={() =>
-		// 				window.open(
-		// 				  `./mapeditor.html?zoom=${js_leafletmap.fn_getZoom()}&lat=${lat}&lng=${lng}`,
-		// 				  '_blank'
-		// 				)
-		// 			  }
-		// 			>
-		// 			  Open Geo Fence Here
-		// 			</p>
-		// 		  </div>
-		// 		</div>
-		// 	  </div>
-		// 	);
-		  
-		// 	let v_contextMenu ;
-		// 	let v_menuitems = 0;
-		  
-		// 	if (size === 0) {
-		// 	  v_menuitems = 0;
-		// 	} else {
-		// 	  let sortedPartyIDs;
-		// 	  if (js_localStorage.fn_getUnitSortEnabled()) {
-		// 		// Sort the array alphabetically
-		// 		sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
-		// 	  } else {
-		// 		sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
-		// 	  }
-		  
-		// 	  sortedPartyIDs.forEach(([partyID]) => {
-		// 		const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(partyID);
-		// 		if (
-		// 		  p_andruavUnit &&
-		// 		  !p_andruavUnit.m_IsGCS &&
-		// 		  ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER) ||
-		// 			(p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) &&
-		// 		  (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED ||
-		// 			p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO ||
-		// 			p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)
-		// 		) {
-		// 		  v_contextMenu = (
-		// 			<div className="row">
-		// 			  <div className="col-sm-12">
-		// 				<p className="bg-primary text-white si-07x">
-		// 				  {p_andruavUnit.m_unitName} {p_andruavUnit.m_VehicleType_TXT}
-		// 				</p>
-		// 			  </div>
-		// 			  <div className="col-6">
-		// 				<p
-		// 				  className="cursor_hand margin_zero text-primary si-07x"
-		// 				  onClick={() =>
-		// 					window.fn_doFlyHere(
-		// 					  p_andruavUnit.partyID,
-		// 					  lat,
-		// 					  lng,
-		// 					  p_andruavUnit.m_Nav_Info.p_Location.alt
-		// 					)
-		// 				  }
-		// 				>
-		// 				  Goto Here
-		// 				</p>
-		// 			  </div>
-		// 			  <div className="col-6">
-		// 				<p
-		// 				  className="cursor_hand margin_zero text-primary si-07x"
-		// 				  onClick={() =>
-		// 					window.fn_doSetHome(
-		// 					  p_andruavUnit.partyID,
-		// 					  lat,
-		// 					  lng,
-		// 					  p_andruavUnit.m_Nav_Info.p_Location.alt_abs
-		// 					)
-		// 				  }
-		// 				>
-		// 				  Set Home
-		// 				</p>
-		// 			  </div>
-		// 			</div>
-		// 		  );
-		// 		  v_menuitems += 1;
-		// 		} else if (
-		// 		  p_andruavUnit &&
-		// 		  !p_andruavUnit.m_IsGCS &&
-		// 		  (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED ||
-		// 			p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO ||
-		// 			p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)
-		// 		) {
-		// 		  v_contextMenu = (
-		// 			<div className="row css_txt_center">
-		// 			  <div className="col-sm-12">
-		// 				<p className="bg-primary text-white si-07x">
-		// 				  {p_andruavUnit.m_unitName} {p_andruavUnit.m_VehicleType_TXT}
-		// 				</p>
-		// 			  </div>
-		// 			  <div className="col-4 padding_zero">
-		// 				<p
-		// 				  className="cursor_hand margin_zero text-primary si-07x"
-		// 				  onClick={() =>
-		// 					fn_doCircle2(
-		// 					  p_andruavUnit.partyID,
-		// 					  lat,
-		// 					  lng,
-		// 					  fn_convertToMeter(js_globals.CONST_DEFAULT_ALTITUDE),
-		// 					  fn_convertToMeter(js_globals.CONST_DEFAULT_RADIUS),
-		// 					  10
-		// 					)
-		// 				  }
-		// 				>
-		// 				  Circle
-		// 				</p>
-		// 			  </div>
-		// 			  <div className="col-4 padding_zero">
-		// 				<p
-		// 				  className="cursor_hand margin_zero text-primary si-07x"
-		// 				  onClick={() =>
-		// 					fn_doFlyHere(
-		// 					  p_andruavUnit.partyID,
-		// 					  lat,
-		// 					  lng,
-		// 					  p_andruavUnit.m_Nav_Info.p_Location.alt
-		// 					)
-		// 				  }
-		// 				>
-		// 				  Goto Here
-		// 				</p>
-		// 			  </div>
-		// 			  <div className="col-4 padding_zero">
-		// 				<p
-		// 				  className="cursor_hand margin_zero text-primary si-07x"
-		// 				  onClick={() =>
-		// 					fn_doSetHome(
-		// 					  p_andruavUnit.partyID,
-		// 					  lat,
-		// 					  lng,
-		// 					  p_andruavUnit.m_Nav_Info.p_Location.alt_abs
-		// 					)
-		// 				  }
-		// 				>
-		// 				  Set Home
-		// 				</p>
-		// 			  </div>
-		// 			</div>
-		// 		  );
-		// 		  v_menuitems += 1;
-		// 		}
-		// 	  });
-		// 	}
-		  
-		// 	v_contextHTML += v_contextMenu;
-		// 	if (v_menuitems === 0) {
-		// 	  v_contextHTML += (
-		// 		<div className="row">
-		// 		  <div className="col-sm-12">
-		// 			<p className="text-warning">No Guided Mode Vechiles</p>
-		// 		  </div>
-		// 		</div>
-		// 	  );
-		// 	}
-		  
-		// 	v_contextHTML += </div>;
-		// 	return v_contextHTML;
-		//   }
-
-
-
-
+		
 		function fn_generateContextMenuHTML(v_lat, v_lng)
 		{
 			$('.contextmenu').remove(); //remove previous context menus
@@ -1775,9 +1590,41 @@ function fn_handleKeyBoard() {
 			}
 
 			js_leafletmap.fn_showInfoWindow2(null,  hlp_generateFlyHereMenu(v_lat, v_lng),v_lat, v_lng);
+			
+			// Get the container element
+			const container = window.document.getElementById('context_menu_here');
+			// Unmount the previous root if it exists
+			if (container !== null && container._reactRoot) {
+				container._reactRoot.unmount();
+			}
+
+			
 			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
-			root.render(<ClssMainContextMenu p_lat={v_lat} p_lng={v_lng} />);
+			root.render(<ClssMainContextMenu  />);
 		}
+
+		function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit)
+		{
+			$('.contextmenu').remove(); //remove previous context menus
+			if (v_contextMenuOpen === true) 
+			{
+				v_contextMenuOpen = false;
+				return ;
+			}
+
+			js_leafletmap.fn_showInfoWindow2(null,  hlp_generateFlyHereMenu(v_lat, v_lng),v_lat, v_lng);
+
+			// Get the container element
+			const container = window.document.getElementById('context_menu_here');
+			// Unmount the previous root if it exists
+			if (container !== null && container._reactRoot) {
+				container._reactRoot.unmount();
+			}
+
+			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
+			root.render(<ClssWaypointStepContextMenu p_unit={p_andruavUnit} p_waypoint={p_wayPointStep}/>);
+		}
+		
 
 		export function fn_contextMenu( p_position) {
 			// use JS Dom methods to create the menu
@@ -2108,10 +1955,10 @@ function fn_handleKeyBoard() {
 					v_mark.wayPointStep = wayPointStep;
 
 					
-					function fn_clickHandler(w, u) {
+					function fn_clickHandler(p_wayPointStep, p_andruavUnit) {
 						js_leafletmap.fn_addListenerOnClickMarker (v_mark,
 						function (p_lat, p_lng) {
-							fn_showWaypointInfo(p_lat, p_lng, w, u);
+							fn_generateContextMenuHTML_MissionItem(p_lat, p_lng, p_wayPointStep, p_andruavUnit);
 						});
 					}
 
@@ -2804,33 +2651,7 @@ function fn_handleKeyBoard() {
 			infowindow = js_leafletmap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
 		}
 
-		function fn_showWaypointInfo(p_lat, p_lng, p_wayPointStep, p_andruavUnit) {
-
-			let v_style = " css_margin_5px ", v_icon = "";
-
-			
-			let v_footerMenu = "<div class='row'>";
-			v_footerMenu += "<div class= 'col-sm-12'><p class='bg-success si-07x'>" + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT + "</p></div>";
-			v_footerMenu += "<div class= 'col-sm-6'><p class='cursor_hand text-primary si-07x' onclick=\"fn_doStartMissionFrom('" + p_andruavUnit.partyID + "'," + p_wayPointStep.m_Sequence + " )\">Start Here</p></div>";
-			v_footerMenu += "";
-
-			let v_contentString = "";
-			switch (p_wayPointStep.waypointType) {
-				case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
-					v_contentString = "<p class='img-rounded " + v_style + "'><strong> Circle Seq#" + p_wayPointStep.m_Sequence + v_icon + "</strong></p><span class='help-block'>" + p_wayPointStep.Latitude + "," + p_wayPointStep.Longitude + "</span>";
-					v_contentString += "<p class='text-primary'>radius: " + parseInt(p_wayPointStep.m_Radius).toFixed(1) + " m x" + parseInt(p_wayPointStep.m_Turns).toFixed(0) + "</p>";
-					v_contentString += v_footerMenu;
-
-					break;
-				default:
-					v_contentString = "<p class='img-rounded " + v_style + "'><strong> Waypoint Seq#" + p_wayPointStep.m_Sequence + v_icon + "</strong></p><span class='help-block'>" + p_wayPointStep.Latitude + "," + p_wayPointStep.Longitude + "</span>";
-					v_contentString += v_footerMenu;
-					break;
-			}
-
-			infowindow = js_leafletmap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
-		}
-
+		
 		function showGeoFenceInfo(p_lat, p_lng, geoFenceInfo) {
 			let _style, _icon;
 			if (geoFenceInfo.m_shouldKeepOutside === true) {
