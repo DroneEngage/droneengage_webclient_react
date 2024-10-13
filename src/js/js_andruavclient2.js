@@ -1249,20 +1249,6 @@ class CAndruavClient {
 
     };
 
-    API_FireMavlinkEvent(p_andruavUnit, p_event_id)
-    {
-        const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
-        
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
-            return;
-        }
-
-        const p_msg = {
-            a: parseInt(p_event_id)
-        };
-
-        this.API_sendCMD(c_party, js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire, p_msg);
-    }
 
     API_FireDeEvent(p_andruavUnit, p_event_id)
     {

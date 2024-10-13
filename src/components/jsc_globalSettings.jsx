@@ -236,10 +236,6 @@ export default class ClssGlobalSettings extends React.Component {
   }
 
 
-  fn_fireMavlinkEvent(value)
-  {
-    js_andruavclient2.AndruavClient.API_FireMavlinkEvent (null,parseInt(value));
-  }
 
   fn_fireDeEvent(value)
   {
@@ -332,7 +328,6 @@ export default class ClssGlobalSettings extends React.Component {
                     </div>
                     <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
                     {v_uploadFile} 
-                    <ClssFireEvent label={"Event Mavlink No."} onClick={ (value) => this.fn_fireMavlinkEvent(value)} />
                     <ClssFireEvent label={"Event DroneEngage No."} onClick={ (value) => this.fn_fireDeEvent(value)}/>
                     </div>
                     <div className="tab-pane fade" id={"settings_preference"}>
