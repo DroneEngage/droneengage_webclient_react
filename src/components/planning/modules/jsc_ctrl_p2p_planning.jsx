@@ -105,7 +105,7 @@ export class ClssP2P_Planning extends React.Component {
 
         if (this.state.m_follow_partyID !== -1)
         {
-            cmds.srv_cmd = this.fn_callRequestToFollow(this.state.m_follow_partyID);
+            cmds.swr_cmd = this.fn_callRequestToFollow(this.state.m_follow_partyID);
         }
         
         
@@ -190,7 +190,7 @@ export class ClssP2P_Planning extends React.Component {
         
         let v_partyID = null;
         let v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
-        if (p_partyID !== null && p_partyID !== undefined && p_partyID !== 0)
+        if (p_partyID !== null && p_partyID !== undefined && p_partyID !== 0 && p_partyID !== "0")
         {
             v_partyID = p_partyID;
             v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_FOLLOW;

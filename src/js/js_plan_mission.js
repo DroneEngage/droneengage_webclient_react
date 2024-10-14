@@ -402,6 +402,7 @@ export class ClssAndruavMissionPlan {
 
     let skip = false;
     for (let i = 0; i < len; ++i) {
+      let mission_drift = i + 1; // mission tarts from 1 because 0 is home.
       skip = false;
       let marker = this.v_markers[i];
       
@@ -410,6 +411,56 @@ export class ClssAndruavMissionPlan {
       const eventFire = marker.m_missionItem.eventFire;
       const eventWait = marker.m_missionItem.eventWait;
       
+      if (eventWaitRequired === true) {
+        // WAITING EVENT SHOULD BE THE FIRST THING
+
+        // wait event will use servo (15) as default or other suitable servo channel.
+        /*
+						MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
+						Mission Param #1	Servo instance number.
+						Mission Param #2	Pulse Width Modulation.
+						Mission Param #3	Empty
+						Mission Param #4	Empty
+						Mission Param #5	Empty
+						Mission Param #6	Empty
+						Mission Param #7	Empty
+					*/
+
+        fn_addMissionItem(marker, 183, [
+          15,
+          parseInt(eventWait), // param1
+          0, // param2
+          0,
+          0,
+          0,
+          0,
+        ]);
+        
+        // then insert MAV_CMD_NAV_DELAY
+        /*
+						MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
+						1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
+						2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
+						3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+						4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+						5	Empty		
+						6	Empty		
+						7	Empty
+					*/
+
+        fn_addMissionItem(marker, 93, [
+          0,
+          1, // param1 - Delay 1 hour
+          0, // param2
+          0,
+          0,
+          0,
+          0,
+        ]);
+        
+        mission_drift +=2;
+      }
+
       switch (marker.m_missionItem.m_missionType) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
           {
@@ -557,6 +608,8 @@ export class ClssAndruavMissionPlan {
           0,
           0,
         ]);
+
+        ++mission_drift;
       }
 
       if (marker.m_missionItem.m_yawRequired === true) {
@@ -581,6 +634,8 @@ export class ClssAndruavMissionPlan {
           0,
           0,
         ]);
+
+        ++mission_drift;
       }
 
       if (eventFireRequired === true) {
@@ -605,53 +660,11 @@ export class ClssAndruavMissionPlan {
           0,
           0,
         ]);
+
+        ++mission_drift;
       }
 
-      if (eventWaitRequired === true) {
-        // wait event will use servo (15) as default or other suitable servo channel.
-        /*
-						MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
-						Mission Param #1	Servo instance number.
-						Mission Param #2	Pulse Width Modulation.
-						Mission Param #3	Empty
-						Mission Param #4	Empty
-						Mission Param #5	Empty
-						Mission Param #6	Empty
-						Mission Param #7	Empty
-					*/
-
-        fn_addMissionItem(marker, 183, [
-          15,
-          parseInt(eventWait), // param1
-          0, // param2
-          0,
-          0,
-          0,
-          0,
-        ]);
-
-        // then insert MAV_CMD_NAV_DELAY
-        /*
-						MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
-						1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
-						2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
-						3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-						4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-						5	Empty		
-						6	Empty		
-						7	Empty
-					*/
-
-        fn_addMissionItem(marker, 93, [
-          0,
-          1, // param1 - Delay 1 hour
-          0, // param2
-          0,
-          0,
-          0,
-          0,
-        ]);
-      }
+      
 
       const keys = Object.keys(marker.m_missionItem.modules);
 
@@ -673,7 +686,7 @@ export class ClssAndruavMissionPlan {
       
       if (cmds === null || cmds === undefined) continue;
 
-      fn_addModuleItem(cmds, i,
+      fn_addModuleItem(cmds, mission_drift,
           eventFireRequired === true?eventFire:null,
           eventWaitRequired === true?eventWait:null
         );
@@ -708,7 +721,7 @@ export class ClssAndruavMissionPlan {
 
       if (marker.m_missionItem.eventWaitRequired === true) {
         // WAITING EVENT SHOULD BE THE FIRST THING
-        
+
         // wait event will use servo (15) as default or other suitable servo channel.
         /*
 					MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
