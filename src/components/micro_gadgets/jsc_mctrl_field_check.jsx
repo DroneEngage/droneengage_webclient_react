@@ -7,8 +7,8 @@ import * as js_common from '../../js/js_common.js'
 /**
  * Properties:
  *      txtLabel
- *      itemid
  *      txtValue
+ *      required
  * Event:
  *  onChecked (bool)
  */
@@ -83,9 +83,10 @@ export class CFieldChecked extends React.Component {
 
         return (
             <div id={this.key} className="input-group input-group-sm">
-                <label id={'lbl' + this.key} htmlFor={'txt' + this.key} className="form-check-input css_label_waypoint me-2 bg-transparent text-white " >{this.props.txtLabel}</label>
-                <input id={'txt' + this.key} className="form-control input-sm me-5 " type='text' ref={instance => { this.m_value = instance }} />
-                <input id={'chk' + this.key} className="form-check-input ms-2" type="checkbox" ref={instance => { this.m_check = instance }} onChange={(e) => this.fn_onChange(e)} />
+                {/* <label id={'lbl' + this.key} htmlFor={'txt' + this.key} className="form-check-input css_label_waypoint me-2 bg-transparent text-white " >{this.props.txtLabel}</label> */}
+                <label id={'lbl' + this.key} htmlFor={'txt' + this.key} className="bg-transparent text-white col-3 " >{this.props.txtLabel}</label>
+                <input id={'txt' + this.key} className="col-7 form-control input-sm  " type='text' ref={instance => { this.m_value = instance }} />
+                <input id={'chk' + this.key} className="col-2 form-check-input ms-2" type="checkbox" ref={instance => { this.m_check = instance }} onChange={(e) => this.fn_onChange(e)} />
             </div>
         );
     }
