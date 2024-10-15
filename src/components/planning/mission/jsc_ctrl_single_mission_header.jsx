@@ -34,7 +34,7 @@ export class ClssSingle_Mission_Header extends React.Component {
             m_deleted: false,
             m_partyID: 0,
             is_connected: false,
-            is_collapsed: false,
+            //is_collapsed: false,
             css_pc: "btn  btn-sm css_margin_left_5 text-light border border-primary rounded text-center cursor_hand",
             css_ph: "btn  btn-sm  text-success border border-success rounded text-center cursor_hand"
         };
@@ -80,17 +80,17 @@ export class ClssSingle_Mission_Header extends React.Component {
      * @param {*} e 
      */
     fn_onClick(e) {
-        if (this.props.onClick === null || this.props.onClick === undefined) return ;
+        if (this.props.onHeaderClick === null || this.props.onClick === undefined) return ;
 
+        // if (this.state.is_collapsed === true)
+        // {
+        //     this.setState({is_collapsed: false});
+        // }
+        // else
+        // {
+        //     this.setState({is_collapsed: true});
+        // }
         this.props.onClick(e);
-        if (this.state.is_collapsed === true)
-        {
-            this.setState({is_collapsed: false});
-        }
-        else
-        {
-            this.setState({is_collapsed: true});
-        }
     }
 
 
@@ -163,7 +163,7 @@ export class ClssSingle_Mission_Header extends React.Component {
 
 
 
-        if (this.props.p_isCurrent === true && this.state.is_collapsed == false) {
+        if (this.props.p_isCurrent === true && this.props.p_isCollapsed === false) {
            // const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
 
 
@@ -202,7 +202,7 @@ export class ClssSingle_Mission_Header extends React.Component {
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
                 <div className="form-inline  margin_zero padding_zero">
                     <div className="card-header text-center d-flex">
-                        <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.state.is_collapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>
+                        <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.props.p_isCollapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>
                         <input type='color' className="border hidden" id={'cp_' + this.props.p_mission.m_id} onChange={(e) => this.fn_changeColor()} />
                         <p id={'pc_' + this.props.p_mission.m_id} onClick={(e) => this.fn_simClick(e)} className={this.state.css_pc} title="Change Plan color path"  >C</p>
                         <p id={'ph_' + this.props.p_mission.m_id} onClick={(e) => this.fn_togglePath(e)} className={this.state.css_ph} title="Hide/Display plan on Map" ref={instance => this.btn_toggle_path = instance}  >H</p>

@@ -195,6 +195,7 @@ export const CONST_CAMERA_SOURCE_FCB = 2;
 // WayPoints
 export const CONST_WAYPOINT_SIZE = 41; // size of bytes of a waypoint
 
+export const CONST_WayPoint_TYPE_WAYPOINTSTEP_DE = -1; // same as mavlink
 export const CONST_WayPoint_TYPE_WAYPOINTSTEP = 16; // same as mavlink
 export const CONST_WayPoint_TYPE_TAKEOFF = 22; // same as mavlink
 export const CONST_WayPoint_TYPE_LANDING = 21; // same as mavlink

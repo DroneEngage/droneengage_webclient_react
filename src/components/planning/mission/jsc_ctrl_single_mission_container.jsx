@@ -69,14 +69,14 @@ export  class ClssSingle_Mission_Container extends React.Component {
         if (this.props.p_isCurrent===true)
         {
             this.setState({ m_collapsed: !this.state.m_collapsed });
-            return ;
+            
         }
         else
         {
             this.state.m_collapsed = false;
-
-            js_eventEmitter.fn_dispatch(js_globals.EE_onMissionItemToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
         }
+
+        js_eventEmitter.fn_dispatch(js_globals.EE_onMissionItemToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
 
 
         this.setState({'m_update': this.state.m_update +1});
@@ -113,7 +113,7 @@ export  class ClssSingle_Mission_Container extends React.Component {
                 });
             }
             item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer " + c_borderStyle}>
-                <ClssSingle_Mission_Header p_mission={this.props.p_missionPlan} p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
+                <ClssSingle_Mission_Header p_mission={this.props.p_missionPlan} p_isCollapsed={this.state.m_collapsed}  p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
                 <ClssSingle_Mission_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} p_unit={andruavSelectedUnit} />
             </div>);
         }

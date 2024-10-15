@@ -120,7 +120,15 @@ export class CWayPointAction extends React.Component {
       }
       
     handleMissionTypeChange = (event) => {
-        this.setState({ missionType: event.target.value });
+        const mission_type = event.target.value;
+        if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+        {
+            // in DE_Mission Type Waypoints does not fire events.
+            this.props.p_shape.m_missionItem.eventFireRequired = false;
+            this.props.p_shape.m_missionItem.eventFire = undefined;
+        }
+
+        this.setState({ missionType: mission_type });
       }
 
     render ()
@@ -133,8 +141,8 @@ export class CWayPointAction extends React.Component {
         //CODEBLOCK_START
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===true)
 		{
-            v_event_firing.push(<CFieldChecked  key={'f3' + v_itemID} required={this.props.p_shape.m_missionItem.eventWaitRequired === true} txtLabel='wait for event' itemid={v_itemID + 'wv'} txtValue={this.props.p_shape.m_missionItem.eventWait}  ref={instance => {this.eventWait = instance}} />)
-            v_event_firing.push(<CFieldChecked  key={'f4' + v_itemID} required={this.props.p_shape.m_missionItem.eventFireRequired === true} txtLabel='fire event' itemid={v_itemID + 'fv'} txtValue={this.props.p_shape.m_missionItem.eventFire}  ref={instance => {this.eventFire = instance}} />)
+            v_event_firing.push(<CFieldChecked  key={'f3' + v_itemID} required={this.props.p_shape.m_missionItem.eventWaitRequired === true} txtLabel='wait for event'  txtValue={this.props.p_shape.m_missionItem.eventWait}  ref={instance => {this.eventWait = instance}} />)
+            v_event_firing.push(<CFieldChecked  key={'f4' + v_itemID} required={this.props.p_shape.m_missionItem.eventFireRequired === true} txtLabel='fire event'  txtValue={this.props.p_shape.m_missionItem.eventFire}  ref={instance => {this.eventFire = instance}} />)
         }
         //CODEBLOCK_END
 
@@ -145,14 +153,15 @@ export class CWayPointAction extends React.Component {
         <div id={c_id} key={c_id} className={this.props.className + ' form-group text-left '}>
         <p className="form-control-label text-white mb-0">To Do When Arrive </p>
         {v_event_firing}
-        <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed' itemid={v_itemID + 'spd'} txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
-        <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw' itemid={v_itemID + 'yaw'} txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
+        <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed'  txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
+        <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw'  txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
         <select id="msnsel"  className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_RTL}>RTL</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_LANDING}>Land</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE}>DE Mission</option>
                 </select>
         </div>);
     }

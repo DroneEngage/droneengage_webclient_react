@@ -236,9 +236,10 @@ export class ClssP2P_Planning extends React.Component {
 
                         <CTriStateChecked  txtLabel='Swarm Leader'  disabled={this.state.m_swarm_leader==null?true:false} checked={this.state.m_swarm_leader} ref={this.swrm_leader_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableSwarmLeader(is_enabled, is_checked)} />
 
-                        <ClssAndruavUnit_DropDown_List className='row css_margin_zero padding_zero ' p_partyID={this.state.m_follow_partyID}  p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]} ref={this.swarm_Ref} onSelectUnit={(p_partyID) => this.fn_requestToFollow(p_partyID)} />
                     </div>
-                    
+                </div>
+                <div key={this.key + 'p2pp_2'} className="row css_margin_zero padding_zero ">
+                        <ClssAndruavUnit_DropDown_List className='col-12 css_margin_zero padding_zero ' p_partyID={this.state.m_follow_partyID}  p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]} ref={this.swarm_Ref} onSelectUnit={(p_partyID) => this.fn_requestToFollow(p_partyID)} />
                 </div>
             </div>
         );

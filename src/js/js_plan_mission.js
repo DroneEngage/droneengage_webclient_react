@@ -382,10 +382,13 @@ export class ClssAndruavMissionPlan {
     const fn_addModuleItem = function (cmd, linked_step, eventFire, eventWait) {
       
       let step = {
-        'c': cmd,
-        'ls': linked_step.toString()
+        'c': cmd
       };
 
+      if (linked_step !== null && linked_step !== undefined)
+      {
+        step.ls = linked_step.toString();
+      }
       if (eventFire !== null && eventFire !== undefined)
       {
         step.ef = eventFire.toString();
@@ -411,55 +414,58 @@ export class ClssAndruavMissionPlan {
       const eventFire = marker.m_missionItem.eventFire;
       const eventWait = marker.m_missionItem.eventWait;
       
-      if (eventWaitRequired === true) {
-        // WAITING EVENT SHOULD BE THE FIRST THING
+      if (marker.m_missionItem.m_missionType !== js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+      {
+        if (eventWaitRequired === true) {
+          // WAITING EVENT SHOULD BE THE FIRST THING
 
-        // wait event will use servo (15) as default or other suitable servo channel.
-        /*
-						MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
-						Mission Param #1	Servo instance number.
-						Mission Param #2	Pulse Width Modulation.
-						Mission Param #3	Empty
-						Mission Param #4	Empty
-						Mission Param #5	Empty
-						Mission Param #6	Empty
-						Mission Param #7	Empty
-					*/
+          // wait event will use servo (15) as default or other suitable servo channel.
+          /*
+              MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
+              Mission Param #1	Servo instance number.
+              Mission Param #2	Pulse Width Modulation.
+              Mission Param #3	Empty
+              Mission Param #4	Empty
+              Mission Param #5	Empty
+              Mission Param #6	Empty
+              Mission Param #7	Empty
+            */
 
-        fn_addMissionItem(marker, 183, [
-          15,
-          parseInt(eventWait), // param1
-          0, // param2
-          0,
-          0,
-          0,
-          0,
-        ]);
-        
-        // then insert MAV_CMD_NAV_DELAY
-        /*
-						MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
-						1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
-						2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
-						3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-						4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-						5	Empty		
-						6	Empty		
-						7	Empty
-					*/
+          fn_addMissionItem(marker, 183, [
+            15,
+            parseInt(eventWait), // param1
+            0, // param2
+            0,
+            0,
+            0,
+            0,
+          ]);
+          
+          // then insert MAV_CMD_NAV_DELAY
+          /*
+              MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
+              1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
+              2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
+              3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+              4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+              5	Empty		
+              6	Empty		
+              7	Empty
+            */
 
-        fn_addMissionItem(marker, 93, [
-          0,
-          1, // param1 - Delay 1 hour
-          0, // param2
-          0,
-          0,
-          0,
-          0,
-        ]);
-        
-        mission_drift +=2;
-      }
+          fn_addMissionItem(marker, 93, [
+            0,
+            1, // param1 - Delay 1 hour
+            0, // param2
+            0,
+            0,
+            0,
+            0,
+          ]);
+          
+          mission_drift +=2;
+        }
+      
 
       switch (marker.m_missionItem.m_missionType) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
@@ -584,59 +590,60 @@ export class ClssAndruavMissionPlan {
       }
 
       if (skip === true) continue;
-
+      
       if (marker.m_missionItem.m_speedRequired === true) {
-        // add speed command
-        /*
-						MAV_CMD_DO_CHANGE_SPEED	Change speed and/or throttle set points.
-						Mission Param #1	Speed type (0=Airspeed, 1=Ground Speed)
-						Mission Param #2	Speed (m/s, -1 indicates no change)
-						Mission Param #3	Throttle ( Percent, -1 indicates no change)
-						Mission Param #4	absolute or relative [0,1]
-						Mission Param #5	Empty
-						Mission Param #6	Empty
-						Mission Param #7	Empty
-					*/
+          // add speed command
+          /*
+              MAV_CMD_DO_CHANGE_SPEED	Change speed and/or throttle set points.
+              Mission Param #1	Speed type (0=Airspeed, 1=Ground Speed)
+              Mission Param #2	Speed (m/s, -1 indicates no change)
+              Mission Param #3	Throttle ( Percent, -1 indicates no change)
+              Mission Param #4	absolute or relative [0,1]
+              Mission Param #5	Empty
+              Mission Param #6	Empty
+              Mission Param #7	Empty
+            */
 
-        fn_addMissionItem(marker, 178, [
-          1,
-          marker.m_missionItem.speed,
-          1,
-          0.0,
-          0,
-          0,
-          0,
-          0,
-        ]);
+          fn_addMissionItem(marker, 178, [
+            1,
+            marker.m_missionItem.speed,
+            1,
+            0.0,
+            0,
+            0,
+            0,
+            0,
+          ]);
 
-        ++mission_drift;
-      }
+          ++mission_drift;
+        }
 
       if (marker.m_missionItem.m_yawRequired === true) {
-        // add speed command
-        /*
-						MAV_CMD_CONDITION_YAW	Reach a certain target angle.
-						Mission Param #1	target angle: [0-360], 0 is north
-						Mission Param #2	speed during yaw change:[deg per second]
-						Mission Param #3	direction: negative: counter clockwise, positive: clockwise [-1,1]
-						Mission Param #4	relative offset or absolute angle: [ 1,0]
-						Mission Param #5	Empty
-						Mission Param #6	Empty
-						Mission Param #7	Empty
-					*/
+          // add speed command
+          /*
+              MAV_CMD_CONDITION_YAW	Reach a certain target angle.
+              Mission Param #1	target angle: [0-360], 0 is north
+              Mission Param #2	speed during yaw change:[deg per second]
+              Mission Param #3	direction: negative: counter clockwise, positive: clockwise [-1,1]
+              Mission Param #4	relative offset or absolute angle: [ 1,0]
+              Mission Param #5	Empty
+              Mission Param #6	Empty
+              Mission Param #7	Empty
+            */
 
-        fn_addMissionItem(marker, 115, [
-          marker.m_missionItem.yaw, // param1
-          0, // defalt speed [AUTO_YAW_SLEW_RATE]
-          0, // direction is not effectve in absolute degree
-          0, // absolute heading
-          0,
-          0,
-          0,
-        ]);
+          fn_addMissionItem(marker, 115, [
+            marker.m_missionItem.yaw, // param1
+            0, // defalt speed [AUTO_YAW_SLEW_RATE]
+            0, // direction is not effectve in absolute degree
+            0, // absolute heading
+            0,
+            0,
+            0,
+          ]);
 
-        ++mission_drift;
+          ++mission_drift;
       }
+      
 
       if (eventFireRequired === true) {
         // fire event will use servo (16) as default or other suitable servo channel.
@@ -664,6 +671,8 @@ export class ClssAndruavMissionPlan {
         ++mission_drift;
       }
 
+      // EOF m_missionType === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString()
+    }
       
 
       const keys = Object.keys(marker.m_missionItem.modules);
@@ -685,6 +694,10 @@ export class ClssAndruavMissionPlan {
       }
       
       if (cmds === null || cmds === undefined) continue;
+      if (marker.m_missionItem.m_missionType === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+      { 
+        mission_drift = null;
+      }
 
       fn_addModuleItem(cmds, mission_drift,
           eventFireRequired === true?eventFire:null,
