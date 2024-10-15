@@ -1,84 +1,91 @@
 import $ from 'jquery';
 
-import React    from 'react';
+import React from 'react';
 
 import * as js_common from '../../js/js_common.js'
 
+/**
+ * Properties:
+ *      txtLabel
+ *      itemid
+ *      txtValue
+ * Event:
+ *  onChecked (bool)
+ */
 export class CFieldChecked extends React.Component {
-    
-    
-    constructor()
-    {
-        super ();
+
+
+    constructor() {
+        super();
         this.state = {
-            m_messages:{}
+            m_messages: {}
         };
-    }
 
-    componentDidMount()
-    {
-        var n = '#'+this.props.itemid ;
-        //var me = this;    
-        $(n + ' :checkbox').change(function() {
-
-            // this will contain a reference to the checkbox   
-            js_common.fn_console_log ("HELP");
-            if (this.checked) {
-                this.props = true;
-                $(n + " :text").removeAttr('disabled', true);
-            } else {
-                this.props = false;
-                $(n + " :text").attr('disabled', 'disabled');
-            }
-        });
-
-        if ((this.props.required === false) || (this.props.required === 'false'))
-        {
-            $(n + " :text").attr('disabled', 'disabled');
-        }
-        else
-        {
-            $(n + " :text").removeAttr('disabled', true);
-        }
-
-        $('#' + this.props.itemid + " :text").val(this.props.txtValue);
-    }
-
-    componentDidUpdate() 
-    {
-        var n = '#txt'+ this.props.itemid ;
+        this.key = Math.random().toString();
         
-        if ((this.props.required === false) || (this.props.required === 'false'))
-        {
-            $(n + " :text").attr('disabled', 'disabled');
-            $(n + " :checkbox").prop('checked', false);
+    }
+
+    componentDidMount() {
+        if ((this.props.required === false) || (this.props.required === 'false')) {
+            this.m_value.setAttribute('disabled', 'disabled');
+            this.m_check.checked = false;
         }
-        else
+        else {
+            this.m_value.removeAttribute('disabled');
+            this.m_check.checked = true;
+        }
+        if (this.props.txtValue !== undefined)
         {
-            $(n + " :text").removeAttr('disabled', true);
-            $(n + " :checkbox").prop('checked', true);
+            this.m_value.value = this.props.txtValue;
         }
     }
 
-    fn_getValue ()
-    {
-        if ($('#chk' + this.props.itemid ).prop('checked') === false)
+    componentDidUpdate() {
+        if ((this.props.required === false) || (this.props.required === 'false')) {
+            //$(n + " :text").attr('disabled', 'disabled');
+            this.m_value.setAttribute('disabled', 'disabled');
+            this.m_check.checked = false;
+        }
+        else {
+            //$(n + " :text").removeAttr('disabled', true);
+            this.m_value.removeAttribute('disabled');
+            this.m_check.checked = true;
+        }
+    }
+
+    fn_onChange(e) {
+        // this will contain a reference to the checkbox   
+        if (this.m_check.checked) {
+            this.m_value.removeAttribute('disabled');
+            this.m_check.checked = true;
+        } else {
+            this.m_value.setAttribute('disabled', 'disabled');
+            this.m_check.checked = false;
+        }
+
+        if (this.props.onChecked !== null && this.props.onChecked !== undefined)
         {
+            this.props.onChecked (this.m_check.checked);
+        }
+    }
+
+
+    fn_getValue() {
+        if (this.m_check.checked === false) {
             return null;
         }
-        
-        
-        return $('#txt' + this.props.itemid).val();
+
+
+        return this.m_value.value;
     }
 
-    render ()
-    {
+    render() {
 
         return (
-            <div id={this.props.itemid} className="input-group input-group-sm">
-                    <label id={'lbl' + this.props.itemid}  htmlFor={'txt' + this.props.itemid} className="form-check-input css_label_waypoint me-2 bg-transparent text-white " >{this.props.txtLabel}</label>
-                    <input id={'txt' + this.props.itemid}  className="form-control input-sm me-5 " type='text' />
-                    <input id={'chk' + this.props.itemid}  className="form-check-input ms-2" type="checkbox" />
+            <div id={this.key} className="input-group input-group-sm">
+                <label id={'lbl' + this.key} htmlFor={'txt' + this.key} className="form-check-input css_label_waypoint me-2 bg-transparent text-white " >{this.props.txtLabel}</label>
+                <input id={'txt' + this.key} className="form-control input-sm me-5 " type='text' ref={instance => { this.m_value = instance }} />
+                <input id={'chk' + this.key} className="form-check-input ms-2" type="checkbox" ref={instance => { this.m_check = instance }} onChange={(e) => this.fn_onChange(e)} />
             </div>
         );
     }
