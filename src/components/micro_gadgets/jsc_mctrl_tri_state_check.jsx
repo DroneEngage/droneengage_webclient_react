@@ -4,8 +4,9 @@ import React from 'react';
 /**
  * 
  * properties:
- * m_checked: true/false  - as initial state
- * m_disabled: if true then combo is not enabled - as initial state
+ * txtLabel
+ * checked: true/false  - as initial state
+ * disabled: if true then combo is not enabled - as initial state
  * 
  * events:
  * OnChanged (is_enabled, is_checked)

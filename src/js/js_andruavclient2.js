@@ -2566,6 +2566,10 @@ class CAndruavClient {
                                     wayPointStep.m_Sequence = p_jmsg[i].s;
                                     break;
 
+                                case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+                                    wayPointStep.m_Sequence = p_jmsg[i].s;
+                                    break;
+    
                                 case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
                                     wayPointStep.m_Sequence = p_jmsg[i].s;
                                     break;
@@ -2576,7 +2580,7 @@ class CAndruavClient {
                                 case js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL:
                                     wayPointStep.m_Sequence = p_jmsg[i].s;
                                     break;
-                                case js_andruavMessages.CONST_WayPoint_Guided_Enabled:
+                                case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
                                     wayPointStep.m_Sequence = p_jmsg[i].s;
                                     wayPointStep.Enable = p_jmsg[i].e;
                                     break;

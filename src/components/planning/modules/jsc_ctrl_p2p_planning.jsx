@@ -5,7 +5,7 @@ import * as js_andruavMessages from '../../../js/js_andruavMessages'
 
 import { CCommandAPI } from '../../../js/js_commands_api.js'
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
-import {CTriStateChecked} from '../../micro_gadgets/jsc_mctl_tri_state_check.jsx'
+import {CTriStateChecked} from '../../micro_gadgets/jsc_mctrl_tri_state_check.jsx'
 
 
 export class ClssP2P_Planning extends React.Component {
@@ -133,6 +133,17 @@ export class ClssP2P_Planning extends React.Component {
             this.swrm_leader_Ref.current.disabled = true;
         }
     }
+
+    fn_scan_from(e)
+    {
+
+    }
+
+    fn_scan_to(e)
+    {
+
+    }
+
 
     fn_enableTelemetry(m_disabled, is_checked) {
         if (m_disabled === true)

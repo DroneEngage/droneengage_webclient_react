@@ -1600,7 +1600,7 @@ function fn_handleKeyBoard() {
 
 			
 			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
-			root.render(<ClssMainContextMenu  />);
+			root.render(<ClssMainContextMenu  p_lat={v_lat}  p_lng={v_lng}/>);
 		}
 
 		function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit)
@@ -1906,6 +1906,9 @@ function fn_handleKeyBoard() {
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 						wayPointStep.m_label = "Land";
+						break;
+					case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+						wayPointStep.m_label = "Guided";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 						wayPointStep.m_label = "RTL";

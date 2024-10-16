@@ -59,6 +59,14 @@ export class CWayPointAction extends React.Component {
                 };
                 break;
             
+            case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+                icon_img= {
+                    iconUrl:'./images/location_bb_32x32.png',
+                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
+                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                };
+                break;
+            
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
                     iconUrl:'./images/back_b_32x32.png',
@@ -161,6 +169,7 @@ export class CWayPointAction extends React.Component {
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_RTL}>RTL</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_LANDING}>Land</option>
+                <option value={js_andruavMessages.CONST_WayPoint_TYPE_GUIDED}>Guided</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE}>DE Mission</option>
                 </select>
         </div>);

@@ -3,7 +3,7 @@ import React , { useEffect } from 'react';
 
 import {ClassRadar, highlightSection} from '../components/test/jsc_radar';
 
-import {CTriStateChecked} from '../components/micro_gadgets/jsc_mctl_tri_state_check.jsx'
+import {CTriStateChecked} from '../components/micro_gadgets/jsc_mctrl_tri_state_check.jsx'
 
 
 const Test = () => {

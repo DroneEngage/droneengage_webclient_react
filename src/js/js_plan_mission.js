@@ -491,7 +491,7 @@ export class ClssAndruavMissionPlan {
               0.0,
               marker.getLatLng().lat,
               marker.getLatLng().lng,
-              marker.m_missionItem.alt,
+              parseFloat(marker.m_missionItem.alt),
             ]);
             fn_addMissionItem(marker, 16, [
               0,
@@ -500,7 +500,7 @@ export class ClssAndruavMissionPlan {
               0.0,
               marker.getLatLng().lat,
               marker.getLatLng().lng,
-              marker.m_missionItem.alt,
+              parseFloat(marker.m_missionItem.alt),
             ]);
 
             /*step.id = missionCounter;
@@ -526,7 +526,7 @@ export class ClssAndruavMissionPlan {
               0.0,
               marker.getLatLng().lat,
               marker.getLatLng().lng,
-              marker.m_missionItem.alt,
+              parseFloat(marker.m_missionItem.alt),
             ]);
 
             /*step.id = missionCounter;
@@ -543,6 +543,29 @@ export class ClssAndruavMissionPlan {
           }
           break;
 
+        case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+          {
+            fn_addMissionItem(marker, 16, [
+              0,
+              5,
+              0,
+              0.0,
+              marker.getLatLng().lat,
+              marker.getLatLng().lng,
+              parseFloat(marker.m_missionItem.alt),
+            ]);
+            fn_addMissionItem(marker, 92, [ //MAV_CMD_NAV_GUIDED_ENABLE
+              1, 
+              0, 
+              0.0, 
+              0.0, 
+              0.0, 
+              0.0, 
+              0.0
+            ]);
+          }
+          break;
+
         case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
           {
             fn_addMissionItem(marker, 16, [
@@ -552,7 +575,7 @@ export class ClssAndruavMissionPlan {
               0.0,
               marker.getLatLng().lat,
               marker.getLatLng().lng,
-              marker.m_missionItem.alt,
+              parseFloat(marker.m_missionItem.alt),
             ]);
             fn_addMissionItem(marker, 20, [
               0, 
@@ -576,7 +599,7 @@ export class ClssAndruavMissionPlan {
 						step.param7 = marker.m_missionItem.alt;
 
 						nextstep.id = missionCounter;
-						nextstep.cmd = 20;
+						nextstep.cmd = 20; << MAV_CMD_NAV_RETURN_TO_LAUNCH
 						nextstep.param1 = 0.0;
 						nextstep.param2 = 0.0;
 						nextstep.param3 = 0.0;

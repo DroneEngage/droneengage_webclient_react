@@ -94,11 +94,19 @@ export class ClssMainContextMenu extends React.Component {
 
     render() {
         const listUnitsElement = this.listUnits();
+        let v_lat = this.props.p_lat;
+        let v_lng = this.props.p_lng;
+        if (v_lat === null || v_lat === undefined)
+        {
+            v_lat = 0.0;
+            v_lng = 0.0;
+        }
+
         return (
             <div className="text-justified one_line col-12">
                 <p className="bg-success text-white mb-1 padding_zero">
                     <span className="text-success margin_zero text-white si-09x" >
-                        lat:<span className='si-09x'>{this.props.p_lat.toFixed(6)}</span> lng:<span className='si-09x'>{this.props.p_lng.toFixed(6)}</span>
+                        lat:<span className='si-09x'>{v_lat.toFixed(6)}</span> lng:<span className='si-09x'>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
                 <div className="row">
@@ -107,7 +115,7 @@ export class ClssMainContextMenu extends React.Component {
                             className="cursor_hand text-primary margin_zero si-07x"
                             onClick={() =>
                                 window.open(
-                                    `./mapeditor.html?zoom=${js_leafletmap.fn_getZoom()}&lat=${this.props.p_lat}&lng=${this.props.p_lng}`,
+                                    `./mapeditor.html?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
                                     '_blank'
                                 )
                             }
