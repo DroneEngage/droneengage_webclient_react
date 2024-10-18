@@ -297,6 +297,8 @@ class C_NavInfo {
 
     this._Target = {
       target_bearing: 0.0, // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT.target_bearing  int16_t	 deg	Current desired waypoint/target
+      mission_state: mavlink20.MISSION_STATE_UNKNOWN, // (MISSION_STATE)
+      //mission_mode: 0  , // 0: Unknown, 1: In mission mode, 2: Suspended (not in mission mode).
       wp_count: 0, // MAVLINK_MSG_ID_MISSION_COUNT.count
       wp_dist: 0, // MAVLINK_MSG_ID_NAV_CONTROLLER_OUTPUT.wp_dist  		uint16_t  m		Distance to active waypoint
       wp_num: 0, // MAVLINK_MSG_ID_MISSION_CURRENT.seq

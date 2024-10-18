@@ -46,13 +46,13 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
         if (v_andruavUnit===null) return ;
 
-        const c_mission_text = this.props.p_mission.fn_exportToDE_V1 ();
+        const c_mission_text = this.props.p_mission.fn_exportToDE_V1 (v_andruavUnit);
         
         fn_do_modal_confirmation("Upload Mission for " + v_andruavUnit.m_unitName,
             "Are you sure you want to upload mission?", function (p_approved) {
                 if (p_approved === false) return;
-                // fn_putWayPoints in js_main
-                js_globals.v_andruavClient.API_uploadWayPoints(v_andruavUnit, p_eraseFirst, c_mission_text);
+                
+                js_globals.v_andruavClient.API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
 
             }, "YES", "bg-danger text-white");
         

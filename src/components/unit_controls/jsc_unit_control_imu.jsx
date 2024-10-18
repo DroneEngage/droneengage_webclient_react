@@ -5,7 +5,7 @@ import * as js_helpers from '../../js/js_helpers.js'
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
-
+import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {
      hlp_getFlightMode,
@@ -192,24 +192,6 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         v_totalFlyingTime = js_helpers.fn_getTimeDiffDetails_Shortest ( (c_delta + v_andruavUnit.m_FlyingTotalDuration));
         
         
-        // if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed==null) 
-        // {
-        //     v_speed_text = 'NA'; 
-        // }else
-        // { 
-        //     v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-		//     v_andruavUnit.m_gui.speed_link = true;
-        //     if (js_globals.v_useMetricSystem==true)
-        //     {
-        //         v_speed_text = v_speed_text.toFixed(0) + ' m/s';
-        //     }
-        //     else
-        //     {
-        //         v_speed_text = ( v_speed_text * js_helpers.CONST_METER_TO_MILE).toFixed(0) + ' mph';
-        //     }
-            
-        // }
-
         // Set Telemetry Status
         switch (v_andruavUnit.m_telemetry_protocol)
         {
@@ -320,26 +302,47 @@ export class ClssCTRL_Drone_IMU extends React.Component {
             
             if (js_globals.v_useMetricSystem === true)
             {
-                wpdst_text =   Number(target.wp_dist.toFixed(1)).toLocaleString()  + ' m'; // >' + v_andruavUnit.m_Nav_Info._Target.wp_num;
+                wpdst_text =   Number(target.wp_dist.toFixed(1)).toLocaleString()  + ' m';
             }
             else
             {
-                wpdst_text =  Number(target.wp_dist * js_helpers.CONST_METER_TO_FEET).toFixed(1).toLocaleString() + ' ft'; // >' + v_andruavUnit.m_Nav_Info._Target.wp_num;
+                wpdst_text =  Number(target.wp_dist * js_helpers.CONST_METER_TO_FEET).toFixed(1).toLocaleString() + ' ft';
             }
 
             wpdst_text += " >> " + target.wp_num + "/" + target.wp_count;
 
-            if (target.wp_dist > js_globals.CONST_DFM_FAR)
+            switch (target.mission_state)
             {
-                distanceToWP_class = ' bg-danger text-white cursor_hand ';
-            }
-            else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
-            {
-                distanceToWP_class = ' bg-warning cursor_hand ';
-            }
-            else
-            {
-                distanceToWP_class = ' bg-info text-white cursor_hand ';
+                case mavlink20.MISSION_STATE_UNKNOWN:
+                case mavlink20.MISSION_STATE_NO_MISSION:
+                {
+                    distanceToWP_class = ' bg-light text-white cursor_hand ';
+                }
+                break;
+
+                case mavlink20.MISSION_STATE_NOT_STARTED:
+                case mavlink20.MISSION_STATE_PAUSED:
+                {
+                    distanceToWP_class = ' bg-light text-dark-emphasis cursor_hand ';
+                }
+                break;
+    
+                default:
+                {
+                    if (target.wp_dist > js_globals.CONST_DFM_FAR)
+                    {
+                        distanceToWP_class = ' bg-danger text-white cursor_hand ';
+                    }
+                    else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
+                    {
+                        distanceToWP_class = ' bg-warning cursor_hand ';
+                    }
+                    else
+                    {
+                        distanceToWP_class = ' bg-info text-white cursor_hand ';
+                    }
+                }
+                break;
             }
         }				
 						

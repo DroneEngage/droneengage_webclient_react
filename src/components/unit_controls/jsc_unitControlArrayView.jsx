@@ -554,19 +554,34 @@ class ClssAndruavUnitDroneRow extends React.Component{
             res.count = target.wp_count
             res.wp_dist.css = ' text-white ';
 
+            switch (target.mission_state)
+            {
+                case mavlink20.MISSION_STATE_UNKNOWN:
+                case mavlink20.MISSION_STATE_NO_MISSION:
+                {
+                    res.wp_dist.css = ' bg-muted text-white ';
+                }
+                break;
 
-            if (target.wp_dist > js_globals.CONST_DFM_FAR)
-            {
-                res.wp_dist.css = ' bg-danger text-white ';
+                default:
+                {
+                    if (target.wp_dist > js_globals.CONST_DFM_FAR)
+                    {
+                        res.wp_dist.css = ' bg-danger text-white ';
+                    }
+                    else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
+                    {
+                        res.wp_dist.css = ' bg-info  text-white ';
+                    }
+                    else
+                    {
+                        res.wp_dist.css = ' bg-success text-white ';
+                    }
+                }
+                break;
             }
-            else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
-            {
-                res.wp_dist.css = ' bg-info  text-white ';
-            }
-            else
-            {
-                res.wp_dist.css = ' bg-success text-white ';
-            }
+            
+            
 
 
             if (js_globals.v_useMetricSystem === true)
@@ -580,6 +595,10 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 res.wp_dist.value = (target.wp_dist * js_helpers.CONST_METER_TO_FEET).toFixed(0);
                 res.wp_dist.unit = ' ft';
             }
+
+            
+
+            
         }
         else
         {
