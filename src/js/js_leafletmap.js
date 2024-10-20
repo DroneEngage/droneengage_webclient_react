@@ -492,6 +492,14 @@ class CLeafLetAndruavMap {
         return p_infoWindow;
     }
 
+
+    fn_bindPopup (p_infoWindow, p_content, p_lat, p_lng)
+    {
+        p_infoWindow.bindPopup(p_content).openPopup();
+
+        return p_infoWindow;
+    }
+
     fn_hideInfoWindow(p_infoWindow) {
         
         if (p_infoWindow == null) 

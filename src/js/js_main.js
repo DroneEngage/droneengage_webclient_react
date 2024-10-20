@@ -1585,94 +1585,113 @@ function fn_handleKeyBoard() {
 		{
 			if (v_context_busy===true) return ;
 
-			$('.contextmenu').remove(); //remove previous context menus
-
 			v_context_busy = true;
 			// Create a temporary container for the popup content
 			const tempContainer = document.createElement('div');
 			
 			const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-        <ClssMainContextMenu 
-            p_lat={v_lat} 
-            p_lng={v_lng} 
-            OnComplete ={(e) => {
-			// Step 3: Extract the HTML
-			const htmlContent = tempContainer.innerHTML;
-			tempContainer.remove();
-			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
-			v_context_busy = false;
-			}}
-        />, tempContainer
-    );
-	
-			
+			root.render(
+				<ClssMainContextMenu 
+					p_lat={v_lat} 
+					p_lng={v_lng} 
+					OnComplete ={(e) => {
+
+						// Create a DIV in leaflet popup 
+						const htmlContent = tempContainer.innerHTML;
+						info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+
+						// now add your div that contains ReactDOM to it.
+						info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
+						
+						// now your ReactDom div is under the active popup
+
+						info_unit_context_popup.on('remove', function (e)
+						{
+							info_unit_context_popup = null;
+							tempContainer.remove();
+						});
+						v_context_busy = false;
+					}}
+				/>, tempContainer
+			);
 		}
 
 		function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit)
 		{
 			if (v_context_busy===true) return ;
 
-	$('.contextmenu').remove(); //remove previous context menus
-			
-	v_context_busy = true;
-    // Create a temporary container for the popup content
-    const tempContainer = document.createElement('div');
+			v_context_busy = true;
+			// Create a temporary container for the popup content
+			const tempContainer = document.createElement('div');
 
+			const root = ReactDOM.createRoot(tempContainer);
+			root.render(
+				<ClssWaypointStepContextMenu 
+					p_unit={p_andruavUnit}
+					p_waypoint={p_wayPointStep}
+					p_lat={v_lat}  p_lng={v_lng} 
+					OnComplete ={(e) => {
+					
+						// Create a DIV in leaflet popup 
+						const htmlContent = tempContainer.innerHTML;
+						info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
 
-    const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-        <ClssWaypointStepContextMenu 
-			p_unit={p_andruavUnit}
-			p_waypoint={p_wayPointStep}
-			p_lat={v_lat}  p_lng={v_lng}
-            OnComplete ={(e) => {
-			// Step 3: Extract the HTML
-			const htmlContent = tempContainer.innerHTML;
-			tempContainer.remove();
-			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
-			v_context_busy = false;
-			}}
-        />, tempContainer
-    );
+						// now add your div that contains ReactDOM to it.
+						info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
+					
+						// now your ReactDom div is under the active popup
+
+						info_unit_context_popup.on('remove', function (e)
+						{
+							info_unit_context_popup = null;
+							tempContainer.remove();
+						});
+						v_context_busy = false;
+					}}
+				/>, tempContainer
+			);
 		}
 		
 
 		
-function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v_ignore) {
-    
-	
-	if (v_context_busy===true) return ;
+		function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v_ignore) {
+			
+			
+			if (v_context_busy===true) return ;
 
-	v_context_busy = true;
-    // Create a temporary container for the popup content
-    const tempContainer = document.createElement('div');
+			v_context_busy = true;
+			// Create a temporary container for the popup content
+			const tempContainer = document.createElement('div');
 
 
-    const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-        <ClssMainUnitPopup 
-            p_unit={v_andruavUnit} 
-            p_lat={v_lat} 
-            p_lng={v_lng} 
-            OnComplete ={(e) => {
-			// Step 3: Extract the HTML
-			const htmlContent = tempContainer.innerHTML;
-			tempContainer.remove();
-			info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
-			if (v_ignore === true) {
-				info_unit_context_popup.m_ignoreMouseOut = true;
-			}
-			info_unit_context_popup.on('remove', function (e)
-			{
-				info_unit_context_popup = null;
-			});
-			v_context_busy = false;
-			}}
-        />, tempContainer
-    );
+			const root = ReactDOM.createRoot(tempContainer);
+			root.render(
+				<ClssMainUnitPopup 
+					p_unit={v_andruavUnit} 
+					p_lat={v_lat} 
+					p_lng={v_lng} 
+				
+					OnComplete ={(e) => {
+					// Step 3: Extract the HTML
+					const htmlContent = tempContainer.innerHTML;
+					tempContainer.remove();  // the HTML is not linked to REACT object anymore so links will not be working.
+					info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+					if (v_ignore === true) {
+						info_unit_context_popup.m_ignoreMouseOut = true;
+					}
+					info_unit_context_popup.on('remove', function (e)
+					{
+						info_unit_context_popup = null;
+					});
+					v_context_busy = false;
+					}}
+				/>, tempContainer
+			);
 
-}
+		}
+
+
+
 		export function fn_contextMenu( p_position) {
 			// use JS Dom methods to create the menu
 			// use event.pixel.x and event.pixel.y 
