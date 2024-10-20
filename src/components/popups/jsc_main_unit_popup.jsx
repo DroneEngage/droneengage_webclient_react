@@ -92,7 +92,7 @@ export class ClssMainUnitPopup extends React.Component {
 			}
 			else
 			{
-				vAlt = <span key={this.key + 'pop312'} className="text-primary">{vAlt.toFixed(0)}</span>;
+				vAlt = <span key={this.key + 'pop312'} className="text-primary">{vAlt.toFixed(0)}<span className="text-primary"> m</span></span>;
 			}
 			if (vAlt_abs === null || vAlt_abs  === undefined)
 			{
@@ -102,7 +102,7 @@ export class ClssMainUnitPopup extends React.Component {
 			{
 				vAlt_abs = <span><span className="text-primary">abs:</span> {vAlt_abs.toFixed(0)}</span>;
 			}
-        markerContent.push(<p key={this.key + 'pop3'} className='m-0 p-0' >{vAlt} {vAlt_abs}</p>);
+            markerContent.push(<p key={this.key + 'pop3'} className='m-0 p-0' >{vAlt} {vAlt_abs}</p>);
 			
             
             let vSpeed = this.props.p_unit.m_Nav_Info.p_Location.ground_speed;
@@ -112,7 +112,7 @@ export class ClssMainUnitPopup extends React.Component {
 			}
 			else
 			{
-				vSpeed = <span key={this.key + 'pop412'} className="text-primary">{vSpeed.toFixed(1)}</span>;
+				vSpeed = <span key={this.key + 'pop412'} className="text-primary">{vSpeed.toFixed(1)}<span className="text-primary"> m</span></span>;
 			}
 			let vAirSpeed = this.props.p_unit.m_Nav_Info.p_Location.air_speed;
 			if (vAirSpeed === null || vAirSpeed === undefined)
@@ -125,7 +125,7 @@ export class ClssMainUnitPopup extends React.Component {
 			}
         
             markerContent.push(<p key={this.key + 'pop4'} className='m-0 p-0'><span className="text-primary ">GS:</span><span className="text-success">{vSpeed} </span><span className="text-primary"> m/s</span></p>);
-             markerContent.push(<p key={this.key + 'pop5'} className='m-0 p-0'><span className="text-primary"> AS:</span><span className="text-success">{vAirSpeed} </span><span className="text-primary"> m/s</span></p>);
+            markerContent.push(<p key={this.key + 'pop5'} className='m-0 p-0'><span className="text-primary"> AS:</span><span className="text-success">{vAirSpeed} </span><span className="text-primary"> m/s</span></p>);
             
             markerContent.push(
                 <p key={this.key + 'pop6'} className='m-0 p-0'>

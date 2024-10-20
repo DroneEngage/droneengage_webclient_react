@@ -521,7 +521,7 @@ class CLeafLetAndruavMap {
         this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseover');
     };
 
-    fn_addListenerOnMouseOutClickMarker(p_marker, p_callback) {
+    fn_addListenerOnMouseOutMarker(p_marker, p_callback) {
         this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseout');
     };
 

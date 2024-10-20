@@ -45,7 +45,7 @@ $.fn.append = function($el){
 var v_contextMenuOpen = false;
 var v_context_busy = false;
 
-
+var info_unit_context_popup = null;
 
 
 
@@ -1644,8 +1644,6 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 	
 	if (v_context_busy===true) return ;
 
-	$('.contextmenu').remove(); //remove previous context menus
-			
 	v_context_busy = true;
     // Create a temporary container for the popup content
     const tempContainer = document.createElement('div');
@@ -1661,15 +1659,19 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 			// Step 3: Extract the HTML
 			const htmlContent = tempContainer.innerHTML;
 			tempContainer.remove();
-			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+			info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
 			if (v_ignore === true) {
-			 	infowindow2.m_ignoreMouseOut = true;
+				info_unit_context_popup.m_ignoreMouseOut = true;
 			}
+			info_unit_context_popup.on('remove', function (e)
+			{
+				info_unit_context_popup = null;
+			});
 			v_context_busy = false;
 			}}
         />, tempContainer
     );
-    
+
 }
 		export function fn_contextMenu( p_position) {
 			// use JS Dom methods to create the menu
@@ -2241,27 +2243,37 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 						function (p_lat, p_lng) {
 							
 							js_eventEmitter.fn_dispatch(js_globals.EE_unitHighlighted, p_andruavUnit); 
-							//fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
-
+							
 							fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, true);
 
-							//infowindow2.m_ignoreMouseOut = true;
+							
 						});
 					
 					js_leafletmap.fn_addListenerOnMouseOverMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
-							js_leafletmap.fn_addListenerOnMouseOutClickMarker (p_andruavUnit.m_gui.m_marker,
+							
+							if (info_unit_context_popup !== null) return ;
+
+
+							let clickTimer = setTimeout(() => {
+								fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, false);},200);
+
+							// pointer is over then register in event mouseOut
+							js_leafletmap.fn_addListenerOnMouseOutMarker (p_andruavUnit.m_gui.m_marker,
 								function (p_lat, p_lng) {
+									// pointer is out then deregister in mouse-out event.
 									js_leafletmap.fn_removeListenerOnMouseOutClickMarker(p_andruavUnit.m_gui.m_marker);
-									if ((infowindow2==null) || (!infowindow2.hasOwnProperty('m_ignoreMouseOut')) || (infowindow2.m_ignoreMouseOut !== true))
+									clearTimeout(clickTimer);
+									if ((info_unit_context_popup==null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true))
 									{
-										js_leafletmap.fn_hideInfoWindow(infowindow2);
+										// hide me if marked hide.
+										js_leafletmap.fn_hideInfoWindow(info_unit_context_popup);
+										info_unit_context_popup = null;
 									}
 							});
 
-							//fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
-
-							fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, false);
+							
+							
 
 						});
 				}
