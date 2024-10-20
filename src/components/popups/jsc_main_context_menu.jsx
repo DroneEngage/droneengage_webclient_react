@@ -31,6 +31,10 @@ export class ClssMainContextMenu extends React.Component {
 
         this.state.initialized = true;
 
+        if (this.props.OnComplete !== null && this.props.OnComplete !== undefined)
+        {
+            this.props.OnComplete();
+        }
     }
 
 
@@ -44,8 +48,9 @@ export class ClssMainContextMenu extends React.Component {
         else {
             sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
         }
-        var p_lat = this.props.p_lat;
-        var p_lng = this.props.p_lng;
+        
+        const p_lat = this.props.p_lat;
+        const p_lng = this.props.p_lng;
 
         sortedPartyIDs.map(function (object) {
 

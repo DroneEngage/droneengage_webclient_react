@@ -29,6 +29,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 
 import {ClssMainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
 import {ClssWaypointStepContextMenu} from '../components/popups/jsc_waypoint_step_content_menu.jsx'
+import {ClssMainUnitPopup} from '../components/popups/jsc_main_unit_popup.jsx'
 
 var oldAppend = $.fn.append;
 
@@ -42,7 +43,7 @@ $.fn.append = function($el){
 }
 
 var v_contextMenuOpen = false;
-
+var v_context_busy = false;
 
 
 
@@ -1582,50 +1583,94 @@ function fn_handleKeyBoard() {
 		
 		function fn_generateContextMenuHTML(v_lat, v_lng)
 		{
+			if (v_context_busy===true) return ;
+
 			$('.contextmenu').remove(); //remove previous context menus
-			if (v_contextMenuOpen === true) 
-			{
-				v_contextMenuOpen = false;
-				return ;
-			}
 
-			js_leafletmap.fn_showInfoWindow2(null,  hlp_generateFlyHereMenu(v_lat, v_lng),v_lat, v_lng);
+			v_context_busy = true;
+			// Create a temporary container for the popup content
+			const tempContainer = document.createElement('div');
 			
-			// Get the container element
-			const container = window.document.getElementById('context_menu_here');
-			// Unmount the previous root if it exists
-			if (container !== null && container._reactRoot) {
-				container._reactRoot.unmount();
-			}
-
+			const root = ReactDOM.createRoot(tempContainer);
+	root.render(
+        <ClssMainContextMenu 
+            p_lat={v_lat} 
+            p_lng={v_lng} 
+            OnComplete ={(e) => {
+			// Step 3: Extract the HTML
+			const htmlContent = tempContainer.innerHTML;
+			tempContainer.remove();
+			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+			v_context_busy = false;
+			}}
+        />, tempContainer
+    );
+	
 			
-			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
-			root.render(<ClssMainContextMenu  p_lat={v_lat}  p_lng={v_lng}/>);
 		}
 
 		function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit)
 		{
-			$('.contextmenu').remove(); //remove previous context menus
-			if (v_contextMenuOpen === true) 
-			{
-				v_contextMenuOpen = false;
-				return ;
-			}
+			if (v_context_busy===true) return ;
 
-			js_leafletmap.fn_showInfoWindow2(null,  hlp_generateFlyHereMenu(v_lat, v_lng),v_lat, v_lng);
+	$('.contextmenu').remove(); //remove previous context menus
+			
+	v_context_busy = true;
+    // Create a temporary container for the popup content
+    const tempContainer = document.createElement('div');
 
-			// Get the container element
-			const container = window.document.getElementById('context_menu_here');
-			// Unmount the previous root if it exists
-			if (container !== null && container._reactRoot) {
-				container._reactRoot.unmount();
-			}
 
-			const root = ReactDOM.createRoot(window.document.getElementById('context_menu_here'));
-			root.render(<ClssWaypointStepContextMenu p_unit={p_andruavUnit} p_waypoint={p_wayPointStep}/>);
+    const root = ReactDOM.createRoot(tempContainer);
+	root.render(
+        <ClssWaypointStepContextMenu 
+			p_unit={p_andruavUnit}
+			p_waypoint={p_wayPointStep}
+			p_lat={v_lat}  p_lng={v_lng}
+            OnComplete ={(e) => {
+			// Step 3: Extract the HTML
+			const htmlContent = tempContainer.innerHTML;
+			tempContainer.remove();
+			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+			v_context_busy = false;
+			}}
+        />, tempContainer
+    );
 		}
 		
 
+		
+function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v_ignore) {
+    
+	
+	if (v_context_busy===true) return ;
+
+	$('.contextmenu').remove(); //remove previous context menus
+			
+	v_context_busy = true;
+    // Create a temporary container for the popup content
+    const tempContainer = document.createElement('div');
+
+
+    const root = ReactDOM.createRoot(tempContainer);
+	root.render(
+        <ClssMainUnitPopup 
+            p_unit={v_andruavUnit} 
+            p_lat={v_lat} 
+            p_lng={v_lng} 
+            OnComplete ={(e) => {
+			// Step 3: Extract the HTML
+			const htmlContent = tempContainer.innerHTML;
+			tempContainer.remove();
+			let infowindow2= js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+			if (v_ignore === true) {
+			 	infowindow2.m_ignoreMouseOut = true;
+			}
+			v_context_busy = false;
+			}}
+        />, tempContainer
+    );
+    
+}
 		export function fn_contextMenu( p_position) {
 			// use JS Dom methods to create the menu
 			// use event.pixel.x and event.pixel.y 
@@ -2196,8 +2241,11 @@ function fn_handleKeyBoard() {
 						function (p_lat, p_lng) {
 							
 							js_eventEmitter.fn_dispatch(js_globals.EE_unitHighlighted, p_andruavUnit); 
-							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
-							infowindow2.m_ignoreMouseOut = true;
+							//fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
+
+							fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, true);
+
+							//infowindow2.m_ignoreMouseOut = true;
 						});
 					
 					js_leafletmap.fn_addListenerOnMouseOverMarker (p_andruavUnit.m_gui.m_marker,
@@ -2211,7 +2259,10 @@ function fn_handleKeyBoard() {
 									}
 							});
 
-							fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
+							//fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit);
+
+							fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, false);
+
 						});
 				}
 				else {
@@ -2641,7 +2692,6 @@ function fn_handleKeyBoard() {
 				infowindow2 = js_leafletmap.fn_showInfoWindow (infowindow2,markerContent,p_lat,p_lng);
 				
 			});
-
 
 		}
 

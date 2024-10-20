@@ -33,6 +33,10 @@ export class ClssWaypointStepContextMenu extends React.Component {
 
         this.state.initialized = true;
 
+        if (this.props.OnComplete !== null && this.props.OnComplete !== undefined)
+        {
+            this.props.OnComplete();
+        }
     }
 
 
@@ -49,6 +53,11 @@ export class ClssWaypointStepContextMenu extends React.Component {
 			
 
 			let v_contentString = [];
+            //const lat = this.props.p_waypoint.Latitude===undefined?0:this.props.p_waypoint.Latitude.toFixed(6);
+            //const lng = this.props.p_waypoint.Longitude===undefined?0:this.props.p_waypoint.Longitude.toFixed(6);
+            const lat = this.props.p_lat;
+            const lng = this.props.p_lng;
+
 			switch (this.props.p_waypoint.waypointType) {
 				case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
 					v_contentString.push(<p key={this.key + 'c1'} className={'img-rounded bg-primary text-white '+  v_style}><strong> {"Circle Seq#" + this.props.p_waypoint.m_Sequence + v_icon}</strong></p>);
@@ -60,12 +69,11 @@ export class ClssWaypointStepContextMenu extends React.Component {
 					break;
 				default:
 					v_contentString.push(<p key={this.key + 'd1'}  className={'img-rounded bg-primary text-white ' + v_style}><strong>{'Waypoint Seq#' + this.props.p_waypoint.m_Sequence + v_icon }</strong></p>);
-                    //v_contentString.push(<span key={this.key + 'd2'}  className='help-block'>{ this.props.p_waypoint.Latitude + ',' + this.props.p_waypoint.Longitude}</span>);
                     v_contentString.push(<p key={this.key + 'd2'} className="text-primary margin_zero  " >
-                        lat:<span className='si-09x text-success'>{this.props.p_waypoint.Latitude.toFixed(6)}</span> 
+                        lat:<span className='si-09x text-success'>{lat}</span> 
                     </p>);
                     v_contentString.push(<p key={this.key + 'd3'} className="text-primary margin_zero  " >
-                        lng:<span className='si-09x text-success'>{this.props.p_waypoint.Longitude.toFixed(6)}</span>
+                        lng:<span className='si-09x text-success'>{lng}</span>
                     </p>);
                     v_contentString.push(v_footerMenu);
 					break;

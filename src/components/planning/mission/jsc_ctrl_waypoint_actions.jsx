@@ -104,11 +104,17 @@ export class CWayPointAction extends React.Component {
             this.props.p_shape.m_missionItem.eventFire = this.eventFire.fn_getValue();
             this.props.p_shape.m_missionItem.eventFireRequired = (this.props.p_shape.m_missionItem.eventFire !== null && this.props.p_shape.m_missionItem.eventFire  !== undefined);
         
-            if (this.eventWait.fn_getValue() != null)
+            const ret_val = this.eventWait.fn_getValue();
+            if (ret_val === null || ret_val === undefined)
             {
-                this.props.p_shape.m_missionItem.eventWait = parseInt(this.eventWait.fn_getValue()) ;
-                this.props.p_shape.m_missionItem.eventWaitRequired = (this.props.p_shape.m_missionItem.eventWait !== null && this.props.p_shape.m_missionItem.eventWait !== undefined);
+                this.props.p_shape.m_missionItem.eventWait = null ;
             }
+            else
+            {
+                this.props.p_shape.m_missionItem.eventWait = parseInt(ret_val) ;
+            }
+            this.props.p_shape.m_missionItem.eventWaitRequired = (ret_val !== null && ret_val !== undefined);
+            
         }
         
     }
