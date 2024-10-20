@@ -379,6 +379,7 @@ export class ClssAndruavMissionPlan {
       mission_steps.push(step);
     };
 
+    // Add Module mission item
     const fn_addModuleItem = function (cmd, linked_step, eventFire, eventWait) {
       
       let step = {
@@ -404,8 +405,9 @@ export class ClssAndruavMissionPlan {
     };
 
     let skip = false;
+    let mission_drift = 0;
+    let mission_item_latest = 0;
     for (let i = 0; i < len; ++i) {
-      let mission_drift = i + 1; // mission tarts from 1 because 0 is home.
       skip = false;
       let marker = this.v_markers[i];
       
@@ -416,6 +418,7 @@ export class ClssAndruavMissionPlan {
       
       if (marker.m_missionItem.m_missionType !== js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
       {
+        mission_drift += 1; // mission tarts from 1 because 0 is home.
         if (eventWaitRequired === true) {
           // WAITING EVENT SHOULD BE THE FIRST THING
 
@@ -612,6 +615,7 @@ export class ClssAndruavMissionPlan {
           break;
       }
 
+      mission_item_latest = mission_drift;
       if (skip === true) continue;
       
       if (marker.m_missionItem.m_speedRequired === true) {
@@ -717,15 +721,23 @@ export class ClssAndruavMissionPlan {
       }
       
       if (cmds === null || cmds === undefined) continue;
+      
       if (marker.m_missionItem.m_missionType === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
       { 
-        mission_drift = null;
-      }
-
-      fn_addModuleItem(cmds, mission_drift,
+        fn_addModuleItem(cmds, null,
           eventFireRequired === true?eventFire:null,
           eventWaitRequired === true?eventWait:null
         );
+      }
+      else
+      {
+        fn_addModuleItem(cmds, mission_item_latest,
+          eventFireRequired === true?eventFire:null,
+          eventWaitRequired === true?eventWait:null
+        );
+      }
+
+      
     }
 
     output_plan.de_mission['mav_waypoints']  = mission_steps;
