@@ -2126,7 +2126,6 @@ class CAndruavClient {
                 p_jmsg = msg.msgPayload;
                 p_unit.m_SDR.m_initialized              = true;
                 p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
-                p_unit.m_SDR.m_frequency                = p_jmsg.f;
                 p_unit.m_SDR.m_band_width               = p_jmsg.b;
                 p_unit.m_SDR.m_display_bars             = p_jmsg.r;
                 p_unit.m_SDR.m_gain                     = p_jmsg.g;

@@ -17,7 +17,6 @@ export class ClssCTRL_SDR extends React.Component {
         this.state = {
                 m_update : 0,
                 m_center_frequency : 0.0,
-                m_frequency : 0.0,
                 m_band_width : 0.0,
                 m_driver_name : '',
                 m_driver_index: 0,
@@ -28,7 +27,6 @@ export class ClssCTRL_SDR extends React.Component {
                 m_updated :
                 {
                     fc : false,
-                    f  : false,
                     bw : false,
                     ga : false,  // gain
                     sr : false,
@@ -56,7 +54,6 @@ export class ClssCTRL_SDR extends React.Component {
     fn_copyData(p_me, p_andruavUnit)
     {
         p_me.state.m_center_frequency = p_andruavUnit.m_SDR.m_center_frequency;
-        p_me.state.m_frequency = p_andruavUnit.m_SDR.m_frequency;
         p_me.state.m_band_width = p_andruavUnit.m_SDR.m_band_width;
         p_me.state.m_driver_index = p_andruavUnit.m_SDR.m_driver_index;
         p_me.state.m_sample_rate = p_andruavUnit.m_SDR.m_sample_rate;
@@ -77,12 +74,6 @@ export class ClssCTRL_SDR extends React.Component {
     {   
         this.state.m_updated.dr = true;
         this.setState({m_driver_index: e.target.value});
-    }
-
-    fn_onFreq(e)
-    {
-        this.state.m_updated.f = true;
-        this.setState({m_frequency: e.target.value});
     }
 
     fn_onFreqCenter(e)
@@ -138,7 +129,6 @@ export class ClssCTRL_SDR extends React.Component {
         var p_display_bars = null;
 
         if (this.state.m_updated.fc === true)   p_fequency_center   = parseFloat(this.state.m_center_frequency);
-        if (this.state.m_updated.f === true)    p_fequency          = parseFloat(this.state.m_frequency);
         if (this.state.m_updated.bw === true)   p_band_width        = parseFloat(this.state.m_band_width);
         if (this.state.m_updated.ga === true)   p_gain              = parseFloat(this.state.m_gain);
         if (this.state.m_updated.sr === true)   p_sample_rate       = parseFloat(this.state.m_sample_rate);
@@ -267,9 +257,7 @@ export class ClssCTRL_SDR extends React.Component {
                             <input type="text" className="col-5" placeholder="Center Frequency" aria-label="Center Frequency"  value={this.state.m_center_frequency} onChange={(e)=> this.fn_onFreqCenter(e)}/>
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_212'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_f'} className="col-5"><small><b>Freq</b></small></label>
-                            <input type="text" id={v_andruavUnit.partyID + 'sdr_f'} className="col-5" placeholder="Freq" aria-label="Freq"  value={this.state.m_frequency} onChange={(e)=> this.fn_onFreq(e)}/>
-                        
+                            
                         </div>
                         <div key={v_andruavUnit.partyID + 'sdr_114'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5"><small><b>Gain</b></small></label>
