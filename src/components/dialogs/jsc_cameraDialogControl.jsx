@@ -2,6 +2,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
+import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
@@ -117,17 +118,38 @@ export default class ClssCameraDialog extends React.Component
         super();
         this.state = {
 			'm_update': 0,
-            
 		};
         
+        this.key = Math.random().toString();
         
-        this._isMounted = false;
+        this.opaque_clicked = false;
+        this.modal_ctrl_cam = React.createRef();
+        this.txt_TotalImages = React.createRef();
+        this.txt_ShootingInterval = React.createRef();
         
+
         js_eventEmitter.fn_subscribe(js_globals.EE_displayCameraDlgForm,this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_globals.EE_hideCameraDlgForm,this, this.fn_closeDialog);
     }
 
 
+    componentDidMount () {
+        
+        this.state.m_update = 1;
+        
+        this.txt_ShootingInterval.current.value = 1;
+        this.txt_TotalImages.current.value = 1;
+        this.fn_initDialog();
+    }
+
+
+    componentWillUnmount ()
+    {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayCameraDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideCameraDlgForm,this);
+    } 
+
+    
     fn_displayDialog (p_me, p_session)
     {
         var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
@@ -135,16 +157,18 @@ export default class ClssCameraDialog extends React.Component
 		    return;
 		}
         
-        if (p_me._isMounted !== true) return ;
+        if (p_me.state.m_update === 0) return ;
         
-		p_me.setState({'p_session':p_session,'m_update': p_me.state.m_update +1});
-        $('#modal_ctrl_cam').show();
+        p_me.state.p_session = p_session;
+		
         p_me.setState({'m_update': p_me.state.m_update +1});
+        
+        p_me.modal_ctrl_cam.current.style.display = 'block';
     }
 
     fn_gotoUnitPressed()
     {
-        if (this.state.p_session == null) return ;
+        if (this.state.m_update === 0) return ;
         fn_gotoUnit_byPartyID(this.state.p_session.m_unit.partyID);
 
     }
@@ -161,48 +185,53 @@ export default class ClssCameraDialog extends React.Component
 
     fn_initDialog()
     {
-        $('#modal_ctrl_cam').draggable();
-        $('#modal_ctrl_cam').index('mouseover', function () {
-            $('#modal_ctrl_cam').css('opacity', '1.0');
-        });
-        $('#modal_ctrl_cam').on('mouseout', function () {
-            if ($('#modal_ctrl_cam').attr('opacity') == null) {
-                $('#modal_ctrl_cam').css('opacity', '0.4');
+        var me = this;
+        //this.modal_ctrl_cam.current.draggable = true;
+        this.modal_ctrl_cam.current.onmousedown = function (e) {
+            me.modal_ctrl_cam.current.style.opacity = '1.0';
+        };
+        this.modal_ctrl_cam.current.onmouseover = function (e) {
+            me.modal_ctrl_cam.current.style.opacity = '1.0';
+        };
+        this.modal_ctrl_cam.current.onmouseout =function (e) {
+            if (me.opaque_clicked === false) {
+                me.modal_ctrl_cam.current.style.opacity = '0.4';
             }
-        });
+        };
         
-        $('#modal_ctrl_cam').find('#btnShot').on('click', function () {
-            // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
-        });
-        $('#modal_ctrl_cam').find('#btnSwitchCam').on('click', function () {
-            // assume what there is attribute partyID in the control used to pass parameter
-            const c_partyID = $('#modal_ctrl_cam').attr('partyID');
-            js_globals.v_andruavClient.API_SwitchCamera(c_partyID,c_partyID);
-        });
-        $('#modal_ctrl_cam').find('#btnTakeImage').on('click', function () {
-            // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
-        });
-        $('#modal_ctrl_cam').find('#btnFCBTakeImage').on('click', function () {
-            // assume what there is attribute partyID in the control used to pass parameter
-            js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2($('#modal_ctrl_cam').attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_FCB, $('#modal_ctrl_cam').find('#txt_TotalImages').val(), $('#modal_ctrl_cam').find('#txt_ShootingInterval').val(), 0);
-        });
+        // this.modal_ctrl_cam.current.find('#btnShot').on('click', function () {
+        //     // assume what there is attribute partyID in the control used to pass parameter
+        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
+        // });
+        // this.modal_ctrl_cam.current.find('#btnSwitchCam').on('click', function () {
+        //     // assume what there is attribute partyID in the control used to pass parameter
+        //     const c_partyID = this.modal_ctrl_cam.current.attr('partyID');
+        //     js_globals.v_andruavClient.API_SwitchCamera(c_partyID,c_partyID);
+        // });
+        // this.modal_ctrl_cam.current.find('#btnTakeImage').on('click', function () {
+        //     // assume what there is attribute partyID in the control used to pass parameter
+        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, this.modal_ctrl_cam.current.find('#txt_TotalImages').val(), this.modal_ctrl_cam.current.find('#txt_ShootingInterval').val(), 0);
+        // });
+        // this.modal_ctrl_cam.current.find('#btnFCBTakeImage').on('click', function () {
+        //     // assume what there is attribute partyID in the control used to pass parameter
+        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_FCB, this.modal_ctrl_cam.current.find('#txt_TotalImages').val(), this.modal_ctrl_cam.current.find('#txt_ShootingInterval').val(), 0);
+        // });
 
-        $('#modal_ctrl_cam').find('#txt_TotalImages').bind("mousedown", function () {
+        this.txt_TotalImages.current.onmousedown = function () {
             $(this).parents('tr').removeClass('draggable');
-        });
-        $('#modal_ctrl_cam').find('#txt_ShootingInterval').bind("mousedown", function () {
+        };
+        this.txt_ShootingInterval.current.onmousedown = function () {
             $(this).parents('tr').removeClass('draggable');
-        });
-        $('#modal_ctrl_cam').hide();
+        };
+        
+        this.modal_ctrl_cam.current.style.display = 'none';
         
     }
 
     fn_closeDialog()
     {
-	    $('#modal_ctrl_cam').attr('opacity', null);
-        $('#modal_ctrl_cam').hide();
+	    this.modal_ctrl_cam.current.style.opacity = '';
+        this.modal_ctrl_cam.current.style.display = 'none';
         if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
             this.state.p_session = null;            
@@ -211,30 +240,16 @@ export default class ClssCameraDialog extends React.Component
 
     fn_opacityDialog()
     {
-        if ($('#modal_ctrl_cam').attr('opacity') == null) {
-            $('#modal_ctrl_cam').attr('opacity', '1.0');
-            $('#modal_ctrl_cam').css('opacity', '1.0');
+        if (this.opaque_clicked === true)
+        {
+            this.opaque_clicked = false;
         }
-        else {
-            $('#modal_ctrl_cam').attr('opacity', null);
+        else
+        {
+            this.opaque_clicked = true;
+            this.modal_ctrl_cam.current.style.opacity = '1.0';
         }
     }
-
-    componentWillUnmount ()
-    {
-        this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_displayCameraDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideCameraDlgForm,this);
-    } 
-
-    componentDidMount () {
-        this._isMounted = true;
-        
-        $('#txt_ShootingInterval').val(1);
-        $('#txt_TotalImages').val(1);
-        this.fn_initDialog();
-    }
-
 
     render ()
     {
@@ -261,7 +276,8 @@ export default class ClssCameraDialog extends React.Component
         
 
         return (
-            <div key='modal_ctrl_cam' id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 ">
+            <Draggable>
+            <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 " ref={this.modal_ctrl_cam}>
                 <div key='camera_hdr' className="card-header text-center">
 					<div className="row">
 				        <div className="col-10">
@@ -279,19 +295,19 @@ export default class ClssCameraDialog extends React.Component
                     </div>
                     <div className="tab-content">
                         <div className="row margin_5px">
-                            <div className="col-6 col-sm-6 col-lg-6">
+                            <div className="col-6">
                                     <div className="form-group">
                                     <div>
                                         <label htmlFor="txt_ShootingInterval" className="text-primary"><small>Each&nbsp;N&nbsp;sec</small></label>
-                                        <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"   />
+                                        <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"  ref={this.txt_ShootingInterval} />
                                     </div>
                                     </div>
                             </div>
-                            <div className="col-6 col-sm-6 col-lg-6">
+                            <div className="col-6">
                                     <div className="form-group">
                                         <div>
-                                        <label htmlFor="txt_TotalImages" className="text-primary"><small>Total&nbsp;Img</small></label>
-                                        <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm"  />
+                                        <label htmlFor="txt_TotalImages" className="text-primary"  ><small>Total&nbsp;Img</small></label>
+                                        <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm" ref={this.txt_TotalImages} />
                                         </div>
                                     </div>
                             </div>
@@ -306,12 +322,10 @@ export default class ClssCameraDialog extends React.Component
                             <div className= "col-md-6">
                                 <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>
                             </div>
-                            {/* <div className= "col-md-4">
-                                <button id="btnShot" type="button" className="btn btn-sm btn-warning"  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
-                            </div> */}
                         </div>
                     </div>
             </div>
+            </Draggable>
             );
     }
 

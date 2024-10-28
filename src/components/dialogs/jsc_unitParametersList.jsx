@@ -178,9 +178,7 @@ export default class ClssUnitParametersList extends React.Component {
     fn_displayForm (p_me, p_andruavUnit)
     {
         p_me.setState({'p_unit':p_andruavUnit});
-        //$('#modal_ctrl_parameters').modal('show');
-        const modal = new Modal($('#modal_ctrl_parameters')); // Instantiates your modal
-		modal.show();
+        js_common.showModal('#modal_ctrl_parameters', true);
     }
 
     fn_updateParameters(p_me, p_andruavUnit)

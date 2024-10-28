@@ -29,6 +29,8 @@ export class ClssCTRL_SWARM extends React.Component {
 
         };
 
+        this.key = Math.random().toString();
+        
         js_eventEmitter.fn_subscribe(js_globals.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
 
     }
@@ -199,30 +201,29 @@ export class ClssCTRL_SWARM extends React.Component {
             }
 
             return (
-                <div key={'swr_' + this.props.p_unit.partyID} className={this.props.className} >
-                    <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
-                        <button id={this.props.p_unit.partyID + "_ldr"}
+                <div key={'swr_' + this.key} className={this.props.className} >
+                    <div key={'swr_1' + this.key} className="btn-group" role="group" aria-label="Button group with nested dropdown">
+                        <button key={'swr_11' + this.key}  id={this.props.p_unit.partyID + "_ldr"}
                             type="button"
                             className={"btn btn-sm " + v_leader_class}
                             title={v_leader_title_leader + " / folowing:" + v_leader_title_follower}
                             onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_THREAD)}>Leader</button>
-                        <div className="btn-group" role="group">
+                        <div key={'swr_12' + this.key} className="btn-group" role="group">
                             <button id="btnGroupDrop2"
                                 type="button"
                                 className={"btn  btn-sm dropdown-toggle " + v_follower_class}
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop2">
+                            <div key={'swr_121' + this.key} className="dropdown-menu" aria-labelledby="btnGroupDrop2">
                                 {c_items}
                                 <a className="dropdown-item " href="#" onClick={() => this.fn_requestToFollow()}>unfollow</a>
                             </div>
                         </div>
                     </div>
-                    <div className="row al_l css_margin_zero">
-                        <div className={' col-12   padding_zero text-warning ' + v_swarm_class}>
-                            <p className={' si-07x css_margin_zero user-select-none text-danger' + v_class_follower} title='leader I am following'><i className="bi bi-chevron-double-right text-danger"></i> {' ' + v_leader_title_follower}</p>
-                            <p className={' si-07x css_margin_zero css_user_select_text text-warning' + v_class_formation_as_follower} title='formation of my leader'><i className="bi bi-dice-5 text-warning"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_follower]}</p>
-                            <p className={' si-07x css_margin_zero css_user_select_text text-success' + v_class_formation_as_leader} title='formation as a leader'><i className="bi bi-dice-5 text-success"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_leader]}</p>
-
+                    <div key={'swr_2' + this.key} className="row al_l css_margin_zero">
+                        <div key={'swr_21' + this.key} className={' col-12   padding_zero text-warning ' + v_swarm_class}>
+                            <p key={'swr_211' + this.key} className={' si-07x css_margin_zero user-select-none text-danger' + v_class_follower} title='leader I am following'><i className="bi bi-chevron-double-right text-danger"></i> {' ' + v_leader_title_follower}</p>
+                            <p key={'swr_212' + this.key} className={' si-07x css_margin_zero css_user_select_text text-warning' + v_class_formation_as_follower} title='formation of my leader'><i className="bi bi-dice-5 text-warning"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_follower]}</p>
+                            <p key={'swr_213' + this.key} className={' si-07x css_margin_zero css_user_select_text text-success' + v_class_formation_as_leader} title='formation as a leader'><i className="bi bi-dice-5 text-success"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_leader]}</p>
                         </div>
                     </div>
                 </div>

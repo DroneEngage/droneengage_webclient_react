@@ -2,6 +2,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
+import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
@@ -93,37 +94,52 @@ export default class ClssStreamDialog extends React.Component
 	{
 		super ();
 		this.state = {
-			
+			'm_update': 0,
 		};
     
-        this._isMounted = false;
+        this.key = Math.random().toString();
         
+        this.modal_ctrl_stream_dlg  = React.createRef();
+
         js_eventEmitter.fn_subscribe(js_globals.EE_displayStreamDlgForm,this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_globals.EE_hideStreamDlgForm,this, this.fn_closeDialog);
     }
 
 
+    componentWillUnmount ()
+    {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayStreamDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideStreamDlgForm,this);
+    } 
+
+    componentDidMount () {
+        this.state.m_update = 1;
+        this.fn_initDialog();
+    }
+
     fn_displayDialog (p_me, p_session)
     {
-        if (p_me._isMounted !== true) return ;
+        if (p_me.state.m_update === 0) return ;
         
-        p_me.setState({'p_session':p_session});
-        p_me.forceUpdate();
-        $('#modal_ctrl_stream_dlg').show();
+        p_me.state.p_session = p_session;
+        
+        p_me.setState({'m_update': p_me.state.m_update +1});
+        
+        p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
     }
 
     fn_initDialog()
     {
-        $('#modal_ctrl_stream_dlg').draggable();
-        $('#modal_ctrl_stream_dlg').on("mouseover", function () {
-            $('#modal_ctrl_stream_dlg').css('opacity', '1.0');
-        });
-        $('#modal_ctrl_stream_dlg').on("mouseout", function () {
-            if ($('#modal_ctrl_stream_dlg').attr('opacity') == null) {
-                $('#modal_ctrl_stream_dlg').css('opacity', '0.4');
+        var me = this;
+        this.modal_ctrl_stream_dlg.current.onmouseover = function (e) {
+            me.modal_ctrl_stream_dlg.current.style.opacity = '1.0';
+        };
+        this.modal_ctrl_stream_dlg.current.onmouseout = function (e) {
+            if (me.opaque_clicked === false) {
+                me.modal_ctrl_stream_dlg.current.style.opacity = '0.4';
             }
-        });
-        $('#modal_ctrl_stream_dlg').hide();
+        };
+        this.modal_ctrl_stream_dlg.current.style.display = 'none';
     }
 
     fn_gotoUnitPressed()
@@ -134,8 +150,8 @@ export default class ClssStreamDialog extends React.Component
 
     fn_closeDialog()
     {
-        $('#modal_ctrl_stream_dlg').hide();
-        $('#modal_ctrl_stream_dlg').attr('opacity', null);
+        this.modal_ctrl_stream_dlg.current.style.opacity = '';
+        this.modal_ctrl_stream_dlg.current.style.display = 'none';
         if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
             this.state.p_session = null;            
@@ -144,115 +160,77 @@ export default class ClssStreamDialog extends React.Component
 
     fn_opacityDialog()
     {
-        if ($('#modal_ctrl_stream_dlg').attr('opacity') == null) {
-            $('#modal_ctrl_stream_dlg').attr('opacity', '1.0');
-            $('#modal_ctrl_stream_dlg').css('opacity', '1.0');
-        }
-        else 
+        if (this.opaque_clicked === true)
         {
-            $('#modal_ctrl_stream_dlg').attr('opacity', null);
+            this.opaque_clicked = false;
+        }
+        else
+        {
+            this.opaque_clicked = true;
+            this.modal_ctrl_stream_dlg.current.style.opacity = '1.0';
         }
     }
 
     
-    componentWillUnmount ()
-    {
-        this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_displayStreamDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideStreamDlgForm,this);
-    } 
 
-    componentDidMount () {
-        this._isMounted = true;
-        this.fn_initDialog();
-    }
-
-    render ()
-    {
-        var p_andruavUnit = null;
-        if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
-        {
+    render() {
+        let p_andruavUnit = null;
+        
+        if (this.state.p_session) {
             p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.partyID);
         }
 
-        if (p_andruavUnit === null || p_andruavUnit === undefined)
-        {
-            js_common.fn_console_log ("stream:  NULL")
-            
-            return (
-                <div id="modal_ctrl_stream_dlg" title="Streaming Video" className="card width_fit_max css_ontop border-light p-2" >
-                            
-                    <div className="card-header text-center">
-						<div className="row">
-						  <div className="col-10">
-							<h4 className="text-success text-start">No Streams </h4>
-						  </div>
-						  <div className="col-2 float-right">
-						  <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
-						   </div>
-						</div>
-				    </div>
-                    <div key='stream-card-body' id="stream-card-body"   className="card-body ">
-                        {/* <div className = "row">
-                            <div className = "col-md-4">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
-                            </div>    
-                            <div className = "col-md-4">
-                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>
-                            </div>
-                            <div className = "col-md-4">
-                                <button id="btnHelp" type="button" className="btn  btn-sm btn-primary">Help</button>
-                            </div>
-                        </div> */}
-                    </div>
-                </div>
-            );
-        }
-        else
-        {
-            var p_session;
-            var v_streanms = [];
-            var v_unitName;
+        const isNoStreams = p_andruavUnit === null;
 
-            if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
-            {
-                p_session = this.state.p_session;
-
-                for (let i = 0; i < p_session.m_unit.m_Video.m_videoTracks.length; ++i) {
-                    v_streanms.push(<ClssStreamChannel key={i} prop_session={p_session} prop_track_number={i} />);
-                }
-                v_unitName = p_session.m_unit.m_unitName;
-            }
-
-            return (
-                <div key="modal_ctrl_stream_dlg" id="modal_ctrl_stream_dlg" title="Streaming Video" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2" >
-                            
-                <div key='stream_dlg_hdr' className="card-header text-center">
+        return (
+            <Draggable>
+            <div
+                id="modal_ctrl_stream_dlg"
+                title="Streaming Video"
+                className="card width_fit_max css_ontop border-light p-2"
+                ref={this.modal_ctrl_stream_dlg} // Set the ref here
+            >
+                <div className="card-header text-center">
                     <div className="row">
                         <div className="col-10">
-                            <h4 className="text-success text-start">Streams of' {v_unitName} </h4>
+                            <h4 className="text-success text-start">
+                                {isNoStreams 
+                                    ? "No Streams" 
+                                    : `Streams of ${this.state.p_session?.m_unit.m_unitName}`}
+                            </h4>
                         </div>
                         <div className="col-2 float-right">
-                            <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
+                            <button id="btnclose" type="button" className="btn-close" onClick={() => this.fn_closeDialog()}></button>
                         </div>
                     </div>
-                </div>    
-                <div id="modal_ctrl_stream_footer" className="card-body ">
-                            <div className='row'>
-                                {v_streanms}
-                            </div>
-                            </div>
-                            <div id="modal_ctrl_stream_footer" className="form-group text-center localcontainer">
-                                <div className = "btn-group">
-                                        <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e)=>this.fn_opacityDialog()}>opaque</button>
-                                        <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={(e)=>this.fn_gotoUnitPressed()}>Goto</button>
-                                        <button id="btnHelp" type="button" className="btn  btn-sm btn-primary">Help</button>
-                                    
-                                </div>
-                            </div>
+                </div>
+
+                <div className="card-body">
+                    {isNoStreams ? (
+                        <div key='stream-card-body'>
+                            {/* No additional content required */}
                         </div>
-            );
-        }
+                    ) : (
+                        <div className='row'>
+                            {this.state.p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
+                                <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {!isNoStreams && (
+                    <div className="form-group text-center localcontainer">
+                        <div className="btn-group">
+                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" onClick={() => this.fn_opacityDialog()}>Opaque</button>
+                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={() => this.fn_gotoUnitPressed()}>Goto</button>
+                            <button id="btnHelp" type="button" className="btn btn-sm btn-primary">Help</button>
+                        </div>
+                    </div>
+                )}
+            </div>
+            </Draggable>
+        );
     }
 }
 

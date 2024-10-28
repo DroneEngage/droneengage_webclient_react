@@ -18,8 +18,9 @@ export class ClssLoginControl extends React.Component {
 		this.state = {
 			is_connected: false,
 			btnConnectText: 'Login',
+		    'm_update': 0
 		};
-		this._isMounted = false;
+		
 		js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
 	}
 
@@ -27,7 +28,8 @@ export class ClssLoginControl extends React.Component {
 	fn_onSocketStatus(me, params) {
 		js_common.fn_console_log('REACT:' + JSON.stringify(params));
 
-		if (me._isMounted !== true) return;
+		if (me.state.m_update === 0) return ;
+        
 		if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = true;
 			me.setState({ btnConnectText: 'Logout' });
@@ -59,12 +61,11 @@ export class ClssLoginControl extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this._isMounted = false;
 		js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
 	}
 
 	componentDidMount() {
-		this._isMounted = true;
+		this.state.m_update = 1;
 
 		if (QueryString.accesscode !== null) {
 
@@ -87,8 +88,6 @@ export class ClssLoginControl extends React.Component {
 
 			this.clickConnect(null);
 		}
-
-
 	}
 
 
