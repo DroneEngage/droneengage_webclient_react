@@ -23,7 +23,6 @@ export class ClssAndruavUnitBase extends React.Component {
             'm_IsGCS':this.props.p_unit.m_IsGCS,
 		};
 
-        this._isMounted = false;
         
         js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);
@@ -143,21 +142,14 @@ export class ClssAndruavUnitBase extends React.Component {
         js_eventEmitter.fn_dispatch(js_globals.EE_displayParameters, p_andruavUnit);
     }
 
-
+    fn_displayLidarDialog(p_andruavUnit)
+    {
+        if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
+        
+        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitLidarShow, p_andruavUnit);
+    }
     
 
-    fn_toggleCamera(p_andruavUnit)
-    {
-        function fn_callback (p_session)
-        {
-            if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
-            {
-                js_eventEmitter.fn_dispatch(js_globals.EE_displayCameraDlgForm, p_session);
-            }
-        }
-        
-        js_globals.v_andruavClient.API_requestCameraList(p_andruavUnit, fn_callback);
-
-    }
+    
 
 }

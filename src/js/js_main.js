@@ -193,9 +193,6 @@ function fn_handleKeyBoard() {
 			$('#modal_saveConfirmation').find('button#modal_btn_confirm').html(p_yesCaption);
 			$('#modal_saveConfirmation').find('button#btnCancel').html(p_noCaption);
 			
-			//$('#modal_saveConfirmation').modal('show');
-			// const modal = new Modal($('#modal_saveConfirmation')); // Instantiates your modal
-			// modal.show();
 			js_common.showModal('#modal_saveConfirmation', true);
 		}
 
@@ -597,7 +594,7 @@ function fn_handleKeyBoard() {
 		}
 
 
-        function fn_doYAW(p_andruavUnit, targetAngle, turnRate, isClockwise, isRelative) {
+        export function fn_doYAW(p_andruavUnit, targetAngle, turnRate, isClockwise, isRelative) {
         	js_globals.v_andruavClient.API_do_YAW(p_andruavUnit, targetAngle, turnRate, isClockwise, isRelative);
 		}
 		
@@ -1001,11 +998,16 @@ function fn_handleKeyBoard() {
 		}
 
 		export function gui_doYAW(p_partyID) {
+			
+			
 			let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+		
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
 				return;
 			}
 
+			js_eventEmitter.fn_dispatch(js_globals.EE_displayYawDlgForm,p_andruavUnit);
+        
 			let ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
 			ctrl_yaw.unbind("click");
 			ctrl_yaw.on('click', function () {
@@ -1028,7 +1030,6 @@ function fn_handleKeyBoard() {
 			$('#yaw_knob').trigger('change');
 			$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
 			$('#modal_ctrl_yaw').attr('partyID', p_partyID);
-			//$('#modal_ctrl_yaw').show(p_partyID);
 			js_common.showDialog("modal_ctrl_yaw", true);
 		}
 
@@ -1133,9 +1134,7 @@ function fn_handleKeyBoard() {
 				
 				js_globals.v_andruavClient.API_setUnitName(p_andruavUnit, v_unitName, v_unitDescription);
 			});
-			//$('#modal_changeUnitInfo').modal('show');
-			// const modal = new Modal($('#modal_changeUnitInfo')); // Instantiates your modal
-			// modal.show();
+			
 			js_common.showModal('#modal_changeUnitInfo', true);
 		}
 
@@ -1180,10 +1179,7 @@ function fn_handleKeyBoard() {
 					js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, v_alt);
 				}
 			});
-			//$('#changespeed_modal').modal('show');
-			//const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			//modal.show();
-
+			
 			js_common.showModal('#changespeed_modal', true);
 		}
 
@@ -1238,10 +1234,7 @@ function fn_handleKeyBoard() {
 				p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
 				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
 			});
-			//$('#changespeed_modal').modal('show');
-			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			// modal.show();
-
+			
 			js_common.showModal('#changespeed_modal', true);
 		}
 
@@ -1264,10 +1257,6 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
 			});
 			
-			//$('#changespeed_modal').modal('show');
-			// const modal = new Modal($('#changespeed_modal')); // Instantiates your modal
-			// modal.show();
-
 			js_common.showModal('#changespeed_modal', true);
 		}
 
@@ -2937,49 +2926,7 @@ function fn_handleKeyBoard() {
 			$('#btnConnectURL').hide();
 		}
 
-		function gui_init_yawCtrl() {
-			//CTRL YAW	
-			$('#modal_ctrl_yaw').hide();
-			$('#modal_ctrl_yaw').draggable();
-			$('#modal_ctrl_yaw').on("mouseover", function () {
-				$('#modal_ctrl_yaw').css('opacity', '1.0');
-			});
-			$('#modal_ctrl_yaw').on("mouseout", function () {
-				const opacity = $('#modal_ctrl_yaw').attr('opacity')
-				if (opacity === null || opacity === undefined) {
-					$('#modal_ctrl_yaw').css('opacity', '0.4');
-				}
-			});
-			$('#modal_ctrl_yaw').find('#opaque_btn').on('click', function () {
-				const opacity = $('#modal_ctrl_yaw').attr('opacity')
-				if ( opacity === null || opacity === undefined) {
-					$('#modal_ctrl_yaw').attr('opacity', '1.0');
-					$('#modal_ctrl_yaw').css('opacity', '1.0');
-				}
-				else {
-					$('#modal_ctrl_yaw').attr('opacity', null);
-				}
-			});
-			$('#modal_ctrl_yaw').find('#btnGoto').on('click', function () {
-				// assume what there is attribute partyID in the control used to pass parameter
-				fn_gotoUnit_byPartyID($('#modal_ctrl_yaw').attr('partyID'));
-			});
-			$('#modal_ctrl_yaw').find('#btnclose').on('click', function () {
-				$('#modal_ctrl_yaw').attr('opacity', null);
-				$('#modal_ctrl_yaw').attr('partyID', null);
-				$('#modal_ctrl_yaw').hide();
-				$('#modal_ctrl_yaw').find('#btnYaw').unbind("click");
-				$('#modal_ctrl_yaw').find('#btnResetYaw').unbind("click");
-			});
-
-			$('#modal_ctrl_yaw').find('#yaw_knob_out').on('click', function (e) {
-				e.stopPropagation();
-			});
-			$('#modal_ctrl_yaw').find('#yaw_knob_out').mousemove(function (e) {
-				e.stopPropagation();
-			});
-		}
-
+		
 		function fn_gui_init_unitList ()
 		{
 			$('#andruav_unit_list_array_float').draggable();
@@ -3270,7 +3217,6 @@ function fn_handleKeyBoard() {
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, -2);
 			});
 
-			gui_init_yawCtrl();
 			fn_gui_init_fpvVtrl();
 			fn_gui_init_unitList();
 			}

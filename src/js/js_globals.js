@@ -116,6 +116,8 @@ class GLOBALS {
 		this.EE_andruavUnitVehicleTypeUpdated      = "EVT_19";
 		this.EE_onProxyInfoUpdated		   		   = "EVT_20";
 		this.EE_onAndruavUnitSwarmUpdated		   = "EVT_21";
+		this.EE_andruavUnitLidarInfo			   = "EVT_22";
+		this.EE_andruavUnitLidarShow   	   	       = "EVT_23";
 		this.EE_onMessage                  = "EE_onMessage";    
 		this.EE_onModuleUpdated			   = "EE_onModuleUpdated";
 		this.EE_onPreferenceChanged        = "EE_onPreferenceChanged";
@@ -170,6 +172,7 @@ class GLOBALS {
 		this.EE_displayStreamDlgForm        = "EE_displayStreamDlgForm";
 		this.EE_hideStreamDlgForm           = "EE_hideStreamDlgForm";
 
+		this.EE_displayYawDlgForm			= "EE_displayYawDlgForm";
 		this.EE_displayCameraDlgForm        = "EE_displayCameraDlgForm";
 		this.EE_hideCameraDlgForm           = "EE_hideCameraDlgForm";
 

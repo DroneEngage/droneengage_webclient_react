@@ -590,14 +590,62 @@ class C_Vibration {
 }
 
 class C_DistanceSensor {
-  constructor(p_parent, v_orientation) {
+  constructor(p_parent, p_orientation) {
     this.m_parent = p_parent;
-    this.m_orientation = v_orientation; //MAV_SENSOR_ORIENTATION_ENUM_END
+    this.m_orientation = p_orientation; //MAV_SENSOR_ORIENTATION_ENUM_END
     this.m_isValid = false;
     this.m_last_access = null;
     this.m_min_distance = 0;
     this.m_max_distance = 0;
     this.m_current_distance = 0;
+  }
+
+  update (p_mavlink_distance_sensor) {
+    this.m_orientation = p_mavlink_distance_sensor.orientation; //MAV_SENSOR_ORIENTATION_ENUM_END
+    this.m_isValid = true;
+    this.m_min_distance = p_mavlink_distance_sensor.min_distance ;  // cm
+    this.m_max_distance = p_mavlink_distance_sensor.max_distance ;  // cm
+    this.m_current_distance = p_mavlink_distance_sensor.current_distance ;  // cm
+
+    const now = new Date();
+    this.m_last_access = now ;
+
+    this.m_parent.m_last_access = now ;
+  }
+
+}
+
+class C_LidarInfo {
+  constructor (p_parent)
+  {
+    this.m_parent = p_parent;
+    this.m_distance_sensors = [];
+    this.m_last_access = new Date();
+    this.m_any_valid = false;
+    for (let i = 0; i <= 40; ++i) {
+      this.m_distance_sensors.push(new C_DistanceSensor(this, i));
+    }
+  }
+
+  update (mavlink_distance_sensor)
+  {
+    const orientation = mavlink_distance_sensor.orientation;
+    
+    if (orientation >=40) return ;  
+                    
+    this.m_distance_sensors[orientation].update(mavlink_distance_sensor);
+    this.m_any_valid = true;
+  }
+
+  get(p_orientation)
+  {
+    return  this.m_distance_sensors[p_orientation];
+  }
+
+  anyValidDataExists ()
+  {
+    const now = new Date();
+    return ((this.m_any_valid === true) && (now - this.m_last_access) < 5000);
   }
 }
 
@@ -820,12 +868,10 @@ export class CAndruavUnitObject {
     this.m_EKF = new C_EKF(this);
     this.m_Vibration = new C_Vibration(this);
 
-    this.m_DistanceSensors = [];
+    this.m_lidar_info = new C_LidarInfo(this);
     this.m_Throttle = 0; //MAVLINK_MSG_ID_VFR_HUD.throttle uint16_t % Current throttle setting (0 to 100).
 
-    for (let i = 0; i <= 40; ++i) {
-      this.m_DistanceSensors.push(new C_DistanceSensor(this, i));
-    }
+    
   }
 
   fullName() {
@@ -835,7 +881,7 @@ export class CAndruavUnitObject {
   module_version () {
     let module_version = (this.Description+'\n');
                 
-        if (this.m_isDE==false)
+        if (this.m_isDE !== true)
         {
             module_version += "Andruav";
         }

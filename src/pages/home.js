@@ -20,6 +20,7 @@ import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
+import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx'
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import ClssGamePadControl from '../components/jsc_gamepadControl.jsx'
@@ -93,36 +94,9 @@ const Home = () => {
 					</div>
 				</div>
 					
-				<div id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2">
-					<div className="card-header text-center">
-						<div className="row">
-						<div className="col-10">
-						<h3 className="text-success text-start">YAW</h3>
-						</div>
-						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close"></button>
-						</div>
-						</div>
-					</div>
-					<div className="card-body">
-						<div id="yaw_knob_out" className="form-group text-centermodal_dialog_style">
-						<input id="yaw_knob" className=" input-sm dial" data-width="180" data-height="180" data-min="0"
-							data-max="360" defaultValue="0" />
-						</div> 
-					</div>
-					<div id="modal_yaw_knob_footer" className="form-group text-center ">
-						<div className= "row">
-						<div className="btn-group">
-							<button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
-							<button id="btnGoto" type="button" className="btn btn-sm btn-success">Goto</button>
-							<button id="btnYaw" type="button" className="btn btn-sm btn-danger">YAW</button>
-							<button id="btnResetYaw" type="button" className="btn btn-sm btn-warning">reset YAW</button>
-						</div>
-						</div>
-					</div>
-				</div>
+				
 
-
+				<ClssYawDialog/>
 				<ClssCameraDialog/>
 				<div id='servoCtrl'></div>
 				<ClssUnitParametersList/>

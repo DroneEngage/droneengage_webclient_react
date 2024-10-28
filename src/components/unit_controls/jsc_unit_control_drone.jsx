@@ -108,6 +108,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         res.btn_takeCTRL_class          = "";
         res.btn_releaseCTRL_class       = "";
         res.btn_sendParameters_class    = " disabled hidden ";
+        res.btn_lidar_info_class        = ""
         res.btn_tele_class              = "";
         res.btn_load_wp_class           = "";
         
@@ -184,11 +185,22 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             }
         }
 
+
+        if (p_andruavUnit.m_lidar_info.anyValidDataExists ())
+        {
+            res.btn_lidar_info_class    = "btn-warning";
+        }
+        else
+        {
+            res.btn_lidar_info_class    = "btn-muted";
+        }
         // for now this feature is disabled.
         //res.btn_rx_class   = "hidden disabled"; 
-        res.btn_save_wp_class  = "btn-danger";
-        res.btn_clear_wp_class = "btn-danger";
-        res.btn_load_wp_class  = "btn-primary";
+        res.btn_save_wp_class       = "btn-danger";
+        res.btn_clear_wp_class      = "btn-danger";
+        res.btn_load_wp_class       = "btn-primary";
+
+        
 
 	    return res;
 	}
@@ -426,6 +438,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
                     <button id='btn_freezerx' type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
                     <button id='btn_releaserx' type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>
                     <button id='btn_inject_param' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_displayParamsDialog(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
+                    <button id='btn_lidar_info' type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;Lidar&nbsp;</button>
                     </div></div>);
 
         return (

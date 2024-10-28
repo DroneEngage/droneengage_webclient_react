@@ -391,7 +391,8 @@ class ClssAndruavUnitDroneRow extends React.Component{
             res.terH.css = ' text-white ';
         }
         
-        if (p_andruavUnit.m_DistanceSensors[mavlink20.MAV_SENSOR_ROTATION_PITCH_270].m_isValid !== true)
+        let lidar = p_andruavUnit.m_lidar_info.get(mavlink20.MAV_SENSOR_ROTATION_PITCH_270);
+        if (lidar.m_isValid !== true)
         {
             res.lidar.value = 'NA';
             res.lidar.css = ' text-muted ';
@@ -399,7 +400,6 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
         else
         {
-            var lidar = p_andruavUnit.m_DistanceSensors[mavlink20.MAV_SENSOR_ROTATION_PITCH_270];
             if ((lidar.m_min_distance >= lidar.m_current_distance) || (lidar.m_max_distance <= lidar.m_current_distance))
             {
                 res.lidar.value = 'OOR';
@@ -437,7 +437,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     getSpeed(p_andruavUnit)
     {
-        var res= {
+        let res= {
             'GS': new C_GUI_READING_VALUE(),
             'AS': new C_GUI_READING_VALUE()
         };
@@ -479,7 +479,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     getWind (p_andruavUnit)
     {
-        var res= {
+        let res= {
             'WS': new C_GUI_READING_VALUE(),
             'WZ': new C_GUI_READING_VALUE(),
             'WD': new C_GUI_READING_VALUE()
@@ -539,7 +539,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     getWP(p_andruavUnit)
     {
-        var res= {
+        let res= {
             css: ' text-muted ',
             cur: '',
             count: '',
@@ -613,13 +613,13 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const v_andruavUnit = this.props.p_unit;
                
         
-        var v_id_class = '';
-        var v_id_text = v_andruavUnit.m_unitName;
-        var v_id_icon = '';
-        var v_armed = {};
+        let v_id_class = '';
+        let v_id_text = v_andruavUnit.m_unitName;
+        let v_id_icon = '';
+        let v_armed = {};
         v_armed.text = 'Disarmed';
         v_armed.css = 'text-white';
-        var v_mav_id_text = v_andruavUnit.m_FCBParameters.m_systemID;
+        let v_mav_id_text = v_andruavUnit.m_FCBParameters.m_systemID;
         const v_flight_mode = this.fn_getFlightMode(v_andruavUnit);
         const v_HUD = this.fn_getHUD(v_andruavUnit);
         const v_gps1 = this.hlp_getGPS(v_andruavUnit.m_GPS_Info1);
@@ -661,7 +661,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             }
         }
         
-        var ctrl_ekf = [];
+        let ctrl_ekf = [];
         switch (v_andruavUnit.m_autoPilot)
         {
             case mavlink20.MAV_AUTOPILOT_PX4:
@@ -673,12 +673,12 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
 
         
-        var css_speed_enabled = '';
-        var css_battery_enabled = '';
-        var css_ekf_enabled = '';
-        var css_alt_enabled = '';
-        var css_ws_enabled = '';
-        var css_wp_enabled = '';
+        let css_speed_enabled = '';
+        let css_battery_enabled = '';
+        let css_ekf_enabled = '';
+        let css_alt_enabled = '';
+        let css_ws_enabled = '';
+        let css_wp_enabled = '';
 
         if (this.props.prop_speed !== true)
         {
@@ -811,7 +811,6 @@ export default class ClssAndruavUnitListArray extends React.Component {
 		};
         
         
-        this._isMounted = false;
         
         js_eventEmitter.fn_subscribe (js_globals.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -823,20 +822,29 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
     componentDidMount() 
     {
-        this._isMounted = true;
+        this.state.m_update = 1;
     }
+
+    componentWillUnmount () {
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onSocketStatus,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+    }
+
+    
 
 
     fn_unitUpdated(me,p_andruavUnit)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
         
         js_common.fn_console_log ("REACT:fn_unitAdded" );
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
@@ -847,7 +855,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
     
     fn_onPreferenceChanged(me)
     {
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
         
         me.forceUpdate();
     }
@@ -876,7 +884,8 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me._isMounted !== true) return ;
+        if (me.state.m_update === 0) return ;
+
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
                 $('#andruavUnits').show();
@@ -888,14 +897,6 @@ export default class ClssAndruavUnitListArray extends React.Component {
                 me.setState({andruavUnitPartyIDs:[]});
         }
     }
-    componentWillUnmount () {
-        this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe (js_globals.EE_onPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        //js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
-    }
-
     fn_OnClick()
     {
             if ($('#andruav_unit_list_array_float').attr('opacity') == null) {
@@ -918,9 +919,9 @@ export default class ClssAndruavUnitListArray extends React.Component {
     }
 
     render() {
-        var unit = [];
+        let unit = [];
         
-        var units_details = [];
+        let units_details = [];
         
         if (this.state.andruavUnitPartyIDs.length === 0) 
         {
@@ -933,7 +934,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
                 units_details.push(<ClssAndruavUnitDroneHeader prop_key={me.key} key={'drone_hdr'+ this.key} 
                                     prop_speed={me.props.prop_speed}  prop_battery={me.props.prop_battery}  prob_wp={me.props.prob_wp} prob_ekf={me.props.prob_ekf} prob_alt={me.props.prob_alt} prob_ws={me.props.prob_ws}  />);
             
-                var sortedPartyIDs;
+                let sortedPartyIDs;
                 if (js_localStorage.fn_getUnitSortEnabled() === true)
                 {
                     // Sort the array alphabetically
@@ -987,47 +988,3 @@ export default class ClssAndruavUnitListArray extends React.Component {
         );
     }
 };
-
-
-// if (CONST_TEST_MODE === true)
-// {
-//     if ($('#andruav_unit_list_array_float').length !== 0) {
-
-//          ReactDOM.render(
-//              <React.StrictMode>
-//              <ClssAndruavUnitListArray key='ClssAndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
-//              </React.StrictMode>,
-// 	 		window.document.getElementById('andruav_unit_list_array_float')
-//          );
-//     }
-    
-//     if ($('#andruav_unit_list_array_fixed').length !== 0) {
-    
-//          ReactDOM.render(
-//              <React.StrictMode>
-//              <ClssAndruavUnitListArray  key='ClssAndruavUnitListArray2' prop_key='2' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
-//              </React.StrictMode>,
-// 	 		window.document.getElementById('andruav_unit_list_array_fixed')
-//          );
-//     }
-// }
-// else
-// {
-//     // comments
-//     if ($('#andruav_unit_list_array_float').length !== 0) {
-
-//          ReactDOM.render(
-//              <ClssAndruavUnitListArray key='ClssAndruavUnitListArray1' prop_key='1' prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={true} prob_wp={true} />,
-//              window.document.getElementById('andruav_unit_list_array_float')
-//          );
-//      }
-
-//      if ($('#andruav_unit_list_array_fixed').length !== 0) {
-
-//          ReactDOM.render(
-//              <ClssAndruavUnitListArray  key='ClssAndruavUnitListArray2' prop_key='2'  prop_speed={true}  prop_battery={true}  prob_ekf={true} prob_alt={true} prob_ws={false} prob_wp={false} />,
-//              window.document.getElementById('andruav_unit_list_array_fixed')
-//          );
-//     }
-
-// }
