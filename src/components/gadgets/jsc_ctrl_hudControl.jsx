@@ -6,8 +6,12 @@ export class ClssCTRL_HUD extends React.Component {
     constructor(props)
 	{
 		super (props);
-		    this.state = {
+		
+        this.state = {
 		};
+
+        this.key = Math.random().toString();
+        
     }
 
     draw (p_pitch_deg, p_roll_deg, p_yaw_deg) 
@@ -106,7 +110,7 @@ export class ClssCTRL_HUD extends React.Component {
     render ()
     {
         return (
-            <div id={this.props.id} className='css_hud_div'>
+            <div key={this.key + 'hud'} id={this.props.id} className='css_hud_div'>
                 <div className = 'row al_l css_margin_zero'>
                     <div className= 'col-6  css_margin_zero d-flex '>
                         <ul className ='css_hud_bullets'>
@@ -117,7 +121,7 @@ export class ClssCTRL_HUD extends React.Component {
                     </div>
 
                     <div className= 'col-6  css_margin_zero css_padding_zero'>
-                    <canvas id='ctrl_hud' className='css_hud'></canvas>
+                    <canvas key={this.key + 'chud'} id='ctrl_hud' className='css_hud'></canvas>
                     </div>
                    
                 </div>

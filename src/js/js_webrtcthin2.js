@@ -245,10 +245,10 @@ class AndruavStream {
 
     var talk;
     var vid = dialconfig.number;
-    if (dialconfig.targetVideoTrack != undefined) {
+    if (dialconfig.targetVideoTrack !== null && dialconfig.targetVideoTrack !== undefined) {
       vid = dialconfig.targetVideoTrack;
     }
-    if (this.conversations[vid] != null) {
+    if (this.conversations[vid] !== null && this.conversations[vid] !== undefined) {
       talk = this.conversations[vid];
       if (talk.status === "connecting") {
         // this could be a faulty connection hat didnt start
