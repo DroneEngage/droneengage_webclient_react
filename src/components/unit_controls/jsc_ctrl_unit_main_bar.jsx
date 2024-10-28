@@ -32,8 +32,9 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
         this.state = {
             'm_update': 0
         };
-
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onPowUpdate);
+        
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated, this, this.fn_onUpdate);
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onUpdate);
 
     }
 
@@ -46,10 +47,25 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
 
     componentWillUnmount () {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
     }
 
 
-    fn_onPowUpdate(me, p_andruavUnit)
+    fn_toggleCamera(p_andruavUnit)
+    {
+        function fn_callback (p_session)
+        {
+            if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
+            {
+                js_eventEmitter.fn_dispatch(js_globals.EE_displayCameraDlgForm, p_session);
+            }
+        }
+        
+        js_globals.v_andruavClient.API_requestCameraList(p_andruavUnit, fn_callback);
+
+    }
+    
+    fn_onUpdate(me, p_andruavUnit)
     {
         if (me.state.m_update === 0) return ;
         me.setState({'m_update': me.state.m_update +1});
@@ -197,7 +213,7 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
                 online_class = " blink_success ";
                 online_text  = "online";
             }
-            if (v_andruavUnit.fn_canCamera === true)
+            if (v_andruavUnit.fn_canCamera() === true)
             {
                 camera_class = "cursor_hand camera_active";
                 camera_src   = "./images/camera_bg_32x32.png";
@@ -214,7 +230,7 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
             }
             else
             {
-                if (v_andruavUnit.fn_canVideo === true)
+                if (v_andruavUnit.fn_canVideo() === true)
                 {
                     video_class = "cursor_hand video_ready";
                     video_src   = "./images/videocam_gb_32x32.png";
