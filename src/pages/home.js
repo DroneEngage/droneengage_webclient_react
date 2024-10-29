@@ -21,6 +21,7 @@ import ClssFooterControl from '../components/jsc_footer'
 import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx'
+import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx'
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import ClssGamePadControl from '../components/jsc_gamepadControl.jsx'
@@ -95,7 +96,7 @@ const Home = () => {
 				</div>
 					
 				
-
+				<ClssLidarInfoDialog/>
 				<ClssYawDialog/>
 				<ClssCameraDialog/>
 				<div id='servoCtrl'></div>

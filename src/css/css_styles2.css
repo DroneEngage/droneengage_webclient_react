@@ -541,6 +541,16 @@ div#modal_ctrl_yaw
 	opacity:0.85;
 	float:left;
 }
+
+
+div#modal_ctrl_lidar_info
+{
+	position: absolute;
+	top: 200px;
+	left:100px;
+	opacity:0.85;
+	float:left;
+}
  
 
 

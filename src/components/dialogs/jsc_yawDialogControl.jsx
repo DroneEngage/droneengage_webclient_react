@@ -33,8 +33,6 @@ export default class ClssYawDialog extends React.Component
         
         this.state.m_update = 1;
         
-        // this.txt_ShootingInterval.current.value = 1;
-        // this.txt_TotalImages.current.value = 1;
         this.fn_initDialog();
     }
 
@@ -44,6 +42,7 @@ export default class ClssYawDialog extends React.Component
         js_eventEmitter.fn_unsubscribe(js_globals.EE_displayYawDlgForm,this);
     } 
 
+    
     fn_displayDialog(p_me, p_andruavUnit)
     {
         if (p_andruavUnit == null) {
@@ -63,7 +62,7 @@ export default class ClssYawDialog extends React.Component
     fn_initDialog()
     {
         var me = this;
-        //this.modal_ctrl_cam.current.draggable = true;
+        //this.modal_ctrl_yaw.current.draggable = true;
         this.modal_ctrl_yaw.current.onmousedown = function (e) {
             me.modal_ctrl_yaw.current.style.opacity = '1.0';
         };
@@ -99,6 +98,16 @@ export default class ClssYawDialog extends React.Component
         this.yaw_knob.current.value = 0;
     }
 
+    fn_closeDialog()
+    {
+	    this.modal_ctrl_yaw.current.style.opacity = '';
+        this.modal_ctrl_yaw.current.style.display = 'none';
+        if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
+        {
+            this.state.p_session = null;            
+        }
+    }
+
     fn_opacityDialog()
     {
         if (this.opaque_clicked === true)
@@ -108,7 +117,7 @@ export default class ClssYawDialog extends React.Component
         else
         {
             this.opaque_clicked = true;
-            this.modal_ctrl_cam.current.style.opacity = '1.0';
+            this.modal_ctrl_yaw.current.style.opacity = '1.0';
         }
     }
 
@@ -123,7 +132,7 @@ export default class ClssYawDialog extends React.Component
 						<h3 className="text-success text-start">YAW</h3>
 						</div>
 						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close"></button>
+						<button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
 						</div>
 						</div>
 					</div>
