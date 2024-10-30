@@ -101,7 +101,7 @@ export class ClssCtrlLidarDevice extends React.Component {
             
         }
 
-        let ticks = this.props.rotation_ticks % 8;
+        let ticks = (1 + this.props.rotation_ticks % 16);
 
         return (
             
