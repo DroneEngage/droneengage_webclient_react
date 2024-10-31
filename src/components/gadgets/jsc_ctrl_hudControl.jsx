@@ -1,6 +1,8 @@
 import $ from 'jquery'; 
 import React    from 'react';
 
+import * as js_helpers from '../../js/js_helpers.js'
+
 export class ClssCTRL_HUD extends React.Component {
 
     constructor(props)
@@ -27,14 +29,14 @@ export class ClssCTRL_HUD extends React.Component {
         var centerY = c_canvas.height / 2;
         var radius = 22;
         p_pitch_deg = 2 * p_pitch_deg;
-        var v_pitch = p_pitch_deg * Math.PI / 180;
-        var v_roll = -p_roll_deg * Math.PI / 180;
+        var v_pitch = p_pitch_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
+        var v_roll = -p_roll_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
 
         var v_pitch_start = v_pitch;
         var v_pitch_end = 3.14 - v_pitch_start;
         
-        var v_yaw_start = (p_yaw_deg-3-90)* Math.PI / 180;
-        var v_yaw_end = (p_yaw_deg+3-90)* Math.PI / 180;
+        var v_yaw_start = (p_yaw_deg-3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
+        var v_yaw_end = (p_yaw_deg+3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
         
         
 
@@ -90,7 +92,7 @@ export class ClssCTRL_HUD extends React.Component {
         c_ctx.stroke();
 
         c_ctx.beginPath();
-        c_ctx.arc(centerX, centerY, 2, 0, 2*Math.PI, false);
+        c_ctx.arc(centerX, centerY, 2, 0, js_helpers.CONST_PTx2, false);
         c_ctx.fillStyle = '#DA7EB7';
         c_ctx.fill();
         c_ctx.lineWidth = 2;
