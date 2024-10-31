@@ -375,7 +375,6 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     
     componentWillUnmount () {
         super.componentWillUnmount();
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
     }
 
 
