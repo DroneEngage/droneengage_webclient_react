@@ -1,8 +1,17 @@
 import React from 'react';
 
+import * as js_helpers from '../../js/js_helpers.js'
+
 /**
  * This is a GUI control that displays a radar-like screen 
  * and can highlight any area on this grid.
+ * 
+ * sections= number of rays.
+ * depth= number of circles.
+ * rotation_steps= each step is between two rays.
+ * rotation= free rotation in radius.
+ * highlighted_points= [[section,depth,color],...]
+ * [draw_pointer]
  */
 export class Class_Radar_Screen extends React.Component {
   constructor(props) {
@@ -13,8 +22,8 @@ export class Class_Radar_Screen extends React.Component {
   }
 
   componentDidMount() {
-    // Rotate the canvas by the specified angle if it hasn't been drawn yet
-    this.angleInRadians = (this.props.rotation_steps * Math.PI) / this.props.sections;
+    // Calculate the angle for radar rotation based on props
+    this.angleInRadians = (this.props.rotation_steps * Math.PI) / this.props.sections  + this.props.rotation;
     
     this.drawRadar();
     this.highlightSection([[3, 2, '#ff0000'], [5, 4, '#00ff00']]);
@@ -22,8 +31,8 @@ export class Class_Radar_Screen extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // Rotate the canvas by the specified angle if it hasn't been drawn yet
-    this.angleInRadians = (this.props.rotation_steps * Math.PI) / this.props.sections;
+    // Calculate the angle for radar rotation based on props
+    this.angleInRadians = (this.props.rotation_steps * Math.PI) / this.props.sections  + this.props.rotation;
     
     // Redraw only if the sections or depth have changed
     if (prevProps.sections !== this.props.sections || prevProps.depth !== this.props.depth) {
@@ -47,33 +56,39 @@ export class Class_Radar_Screen extends React.Component {
     // Save the current state
     ctx.save();
 
-    // Rotate the canvas by the specified angle
-    const angleInRadians_radar_rays = this.angleInRadians - Math.PI / this.props.sections; // Additional rotation
+    // Adjust the angle for drawing radar rays
+    const angleInRadians_radar_rays = this.angleInRadians - Math.PI / this.props.sections; 
+
+    // Move the context to the center and apply rotation
     ctx.translate(centerX, centerY); // Move to the center of the canvas
-    ctx.rotate(angleInRadians_radar_rays); // Rotate the canvas
+    ctx.rotate(angleInRadians_radar_rays); // Rotate the canvas so that everything rotates together.
 
     // Draw the radar-like grid
     ctx.beginPath();
     for (let i = 1; i <= this.props.sections; i++) {
-      const angle = (2 * Math.PI * i) / this.props.sections;
+      const angle = (js_helpers.CONST_PTx2 * i) / this.props.sections;
       const x = radius * Math.cos(angle);
       const y = radius * Math.sin(angle);
       ctx.moveTo(0, 0);
       ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
+    ctx.strokeStyle = 'green';
+    ctx.stroke(); // Render the lines
   
+    // Draw concentric circles representing depth
     for (let i = 1; i <= this.props.depth; i++) {
       const r = radius * (i / this.props.depth);
       ctx.beginPath();
-      ctx.arc(0, 0, r, 0, 2 * Math.PI);
-      ctx.strokeStyle = 'white';
-      ctx.stroke();
+      ctx.arc(0, 0, r, 0, js_helpers.CONST_PTx2);
+      ctx.strokeStyle = 'green';
+      ctx.stroke(); // Render the circle
     }
   
-    // Draw the north arrow
-    this.drawNorthArrow(radius);
+    if (this.props.draw_pointer === true)
+    {
+      // Draw the north arrow at the top of the radar
+      this.drawNorthArrow(radius);
+    }
 
     // Restore the original state
     ctx.restore();
@@ -105,7 +120,7 @@ export class Class_Radar_Screen extends React.Component {
     ctx.lineTo(left.x, left.y);
     ctx.lineTo(right.x, right.y);
     ctx.closePath();
-    ctx.fillStyle = 'green';
+    ctx.fillStyle = 'yellow';
     ctx.fill();
   };
 
@@ -133,10 +148,10 @@ export class Class_Radar_Screen extends React.Component {
     // Highlight the sections based on the provided points
     pointsToHighlight.forEach(([n, m, color]) => {
       // Calculate the start and end angles for the highlighted section
-      const startAngle = (2 * Math.PI * (n - 1)) / this.props.sections - Math.PI / 2 + this.angleInRadians;
-      const endAngle = (2 * Math.PI * n) / this.props.sections - Math.PI / 2 + this.angleInRadians;
-      const innerRadius = radius * ((m - 1) / this.props.depth);
-      const outerRadius = radius * (m / this.props.depth);
+      const startAngle = (js_helpers.CONST_PTx2 * (n - 2)) / this.props.sections - Math.PI / 2 +  this.angleInRadians;
+      const endAngle = (js_helpers.CONST_PTx2 * (n -1)) / this.props.sections - Math.PI / 2 + this.angleInRadians;
+      const innerRadius = radius * ((m - 2) / this.props.depth);
+      const outerRadius = radius * ((m - 1) / this.props.depth);
 
       // Calculate the intersection points of the highlighted section
       const topLeft = {
@@ -185,6 +200,19 @@ export class Class_Radar_Screen extends React.Component {
       ctx.closePath();
       ctx.fillStyle = color;
       ctx.fill();
+
+
+      // Draw the radius value in the center of the highlighted area
+    const distanceText = outerRadius.toFixed(0) + ' m'; // Use outer radius for the distance value
+    ctx.fillStyle = 'white'; // Set text color
+    ctx.font = '12px Arial'; // Set font style
+
+    // Calculate the position for the distance text
+    const textAngle = (startAngle + endAngle) / 2; // Midpoint angle for placing the text
+    const textX = centerX + (outerRadius + 10) * Math.cos(textAngle); // Positioning text slightly outside the outer radius
+    const textY = centerY + (outerRadius + 10) * Math.sin(textAngle);
+
+    ctx.fillText(distanceText, textX, textY); // Draw the distance value
     });
   };
 

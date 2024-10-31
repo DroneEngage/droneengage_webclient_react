@@ -1,7 +1,11 @@
+
 import $ from 'jquery'; 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
+
+import * as js_helpers from '../../js/js_helpers.js'
+
 import {Class_Radar_Screen} from '../micro_gadgets/jsc_mctrl_radar_screen.jsx'
 
 import {js_globals} from '../../js/js_globals.js';
@@ -18,7 +22,10 @@ export class ClssCtrlLidarDevice extends React.Component {
         
         this.key = Math.random().toString();
         
+        
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarInfo,this,this.fn_update_lidar);
+        js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this, this.fn_update_lidar);
+        
     }
 
     componentDidMount () 
@@ -33,6 +40,8 @@ export class ClssCtrlLidarDevice extends React.Component {
     componentWillUnmount () 
     {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitLidarInfo,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
+        
     }
 
     fn_update_lidar (p_me, p_andruavUnit)
@@ -79,12 +88,19 @@ export class ClssCtrlLidarDevice extends React.Component {
     {
 
         let obstacles = [];
+        let rotation = 0;
         const ranges = 10;
             
         if (this.props.p_unit !== null && this.props.p_unit !== undefined)
         {
             
             const distance_sensors = this.props.p_unit.m_lidar_info.m_distance_sensors;
+
+            if (this.props.follow_unit === true)
+            {
+                rotation = this.props.p_unit.m_Nav_Info.p_Orientation.yaw;
+            }
+
             for (let i=0; i<=7;++i)
             {
                 const degree_45 = distance_sensors[i];
@@ -103,9 +119,13 @@ export class ClssCtrlLidarDevice extends React.Component {
 
         let ticks = (1 + this.props.rotation_ticks % 16);
 
+        
+        
+            
+
         return (
             
-        <Class_Radar_Screen sections={8} depth={ranges+1} rotation_steps={ticks} highlighted_points={obstacles}/>
+        <Class_Radar_Screen sections={8} depth={ranges+1} follow_unit={this.props.follow_unit} rotation_steps={ticks} rotation={rotation} highlighted_points={obstacles} draw_pointer/>
 
         );
     }

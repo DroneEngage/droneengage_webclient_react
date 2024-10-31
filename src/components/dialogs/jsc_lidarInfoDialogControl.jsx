@@ -87,6 +87,13 @@ export default class ClssLidarInfoDialog extends React.Component
         this.setState({'m_update': this.state.m_update +1});
     }
 
+    fn_follow (p_on_off)
+    {
+        this.follow_unit = p_on_off;
+
+        this.setState({'m_update': this.state.m_update +1});
+    }
+
     fn_closeDialog()
     {
 	    this.modal_ctrl_lidar_info.current.style.opacity = '';
@@ -137,22 +144,25 @@ export default class ClssLidarInfoDialog extends React.Component
 						</div>
 					</div>
 					<div key={this.key + "m2"} className="card-body">
-						<ClssCtrlLidarDevice p_unit={this.p_andruavUnit} rotation_ticks={this.rotation_ticks}/>
+						<ClssCtrlLidarDevice p_unit={this.p_andruavUnit} rotation_ticks={this.rotation_ticks} follow_unit={this.follow_unit}/>
 					</div>
 					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"} className="form-group text-center ">
                         <div className= "row">
                             <div className= "col-md-3">
                             <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
                             </div>
-                            <div className= "col-md-3">
-                                <button id="btnROR" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_tick(-1)}>ROR</button>
-                            </div>
-                            <div className= "col-md-3">
-                                <button id="btnROL" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_tick(+1)}>ROL</button>
-                            </div>
+                            
                             <div className= "col-md-3">
                                 <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnit()}>Goto</button>
                             </div>
+                            
+                            <div className= "col-md-3">
+                                <button id="btnFollow" type="button" className="btn btn-sm btn-danger" onClick={(e) => this.fn_follow(true)}>Follow</button>
+                            </div>
+                            <div className= "col-md-3">
+                                <button id="btnReset" type="button" className="btn btn-sm btn-warning" onClick={(e) => this.fn_follow(false)}>Reset</button>
+                            </div>
+                            
                         </div>
 					</div>
 				</div>
