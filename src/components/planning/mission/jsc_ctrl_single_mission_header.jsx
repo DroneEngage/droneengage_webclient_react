@@ -181,7 +181,7 @@ export class ClssSingle_Mission_Header extends React.Component {
                 v_partyIDCtrl.push(
                     <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
                         <div className="col-12">
-                            <ClssAndruavUnit_DropDown_List p_partyID={this.state.m_partyID} onSelectUnit={(partyID) => this.fn_onSelectUnit(partyID)} />
+                            <ClssAndruavUnit_DropDown_List p_label={"Drone"} p_partyID={this.state.m_partyID} onSelectUnit={(partyID) => this.fn_onSelectUnit(partyID)} />
                         </div>
 
                     </div>

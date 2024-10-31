@@ -178,7 +178,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
 
         return (
                 <div className={"form-group" + this.props.className} >
-                    <label htmlFor={this.key + 'combo_list'} className="col-3 text-white"><small><b>Drone ID</b></small></label>
+                    <label htmlFor={this.key + 'combo_list'} className="col-3 text-white al_r pe-2 "><small><b>{this.props.p_label}</b></small></label>
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
                         {units_details}
                     </select>
