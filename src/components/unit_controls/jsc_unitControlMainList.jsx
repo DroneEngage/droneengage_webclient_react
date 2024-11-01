@@ -242,15 +242,16 @@ export default class ClssAndruavUnitList extends React.Component {
                     { 
                         // Display in Tabs
                         var header_info = me.getHeaderInfo(v_andruavUnit);
+                        const c_active = me.state.m_active_partyID === v_andruavUnit.partyID;
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
                                 <a 
-                                className={`nav-link user-select-none ${me.state.m_active_partyID === v_andruavUnit.partyID ? 'active' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.partyID}><span className={header_info.classes}> {header_info.text}</span> </a>
+                                className={`nav-link user-select-none ${c_active === true ? '' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.partyID}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
 
                         units_details.push(
-                            <div key={'aud' + partyID} className={`tab-pane fade ${me.state.m_active_partyID === v_andruavUnit.partyID ? 'active show' : ''}`} id={"tab_"+v_andruavUnit.partyID}>
+                            <div key={'aud' + partyID} className={`tab-pane fade ${c_active === true ? 'active show' : ''}`} id={"tab_"+v_andruavUnit.partyID}>
                                 <ClssAndruavUnit_Drone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
