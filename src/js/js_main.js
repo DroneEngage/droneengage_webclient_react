@@ -1818,6 +1818,8 @@ function fn_handleKeyBoard() {
 			// If we use onloadend, we need to check the readyState.
 			reader.onloadend = function (evt) {
 				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
+					try
+					{
 					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
 					if (is_de_file === true)
 					{
@@ -1827,6 +1829,13 @@ function fn_handleKeyBoard() {
 					{
 						js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
 					}
+					
+					}
+					catch 
+					{
+						//TODO:  failed to upload Mission
+					}
+
 				}
 			};
 
