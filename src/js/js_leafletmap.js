@@ -65,9 +65,11 @@ class CLeafLetAndruavMap {
         v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
 
 
-        this.m_Map = L.map(p_mapelement).setView([
-            51.505, -0.09
-        ], 13);
+        this.m_Map = L.map(p_mapelement, {
+            center: [51.505, -0.09],
+            zoom: 13,
+            doubleClickZoom: false // Disable the default double-click zoom
+        });
         
         if (js_globals.CONST_MAP_GOOLE_PLUGIN === true)
         {
@@ -97,7 +99,7 @@ class CLeafLetAndruavMap {
                 editMode: true,
                 drawPolyline: true,
                 dragMode: true,
-                removalMode: true,
+                removalMode: false,  // as event is not fired om:remove
                 cutPolygon: false,
                 drawCircleMarker: false
             });
@@ -129,7 +131,14 @@ class CLeafLetAndruavMap {
                 js_globals.v_map_shapes.push(x.layer);
 
                 x.layer.on('click', function (p_event) {
-                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+                    if (p_event.originalEvent.ctrlKey===false)
+                    {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+                    }
+                    else
+                    {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
+                    }
                 });
 
                 x.layer.on('pm:edit', (x) => {
@@ -137,7 +146,7 @@ class CLeafLetAndruavMap {
                     js_eventEmitter.fn_dispatch(js_globals.EE_onShapeEdited, x.target);
                 });
 
-                x.layer.on('pm:remove', (x) => {
+                x.layer.on('remove', (x) => {
 
                     js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
                 });
