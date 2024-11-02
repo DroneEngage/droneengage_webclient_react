@@ -11,6 +11,7 @@ import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { js_leafletmap } from '../../../js/js_leafletmap.js'
 import {ClssSingle_Mission_Container} from './jsc_ctrl_single_mission_container.jsx'
+import {setSelectedMissionFilePathToRead, fn_readMissionFile} from '../../../js/js_main.js'
 
 /**
  * Main Class for Mission 
@@ -26,17 +27,25 @@ export default class ClssMission_Container extends React.Component {
             is_connected: false
         };
 
+
+        this.mission_file_ref = React.createRef();
+
         js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_globals.EE_onMissionItemToggle, this, this.fn_onMissionItemToggle);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeCreated, this, this.fn_onShapeCreated);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.fn_onShapeSelected);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeEdited, this, this.fn_onShapeEdited);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeDeleted, this, this.fn_onShapeDeleted);
-
+        
     }
 
     componentDidMount () {
         this.state.m_update = 1;
+    }
+
+    fn_handleFileChange (e)
+    {
+        setSelectedMissionFilePathToRead(this.mission_file_ref.current.files);
     }
 
     fn_onSocketStatus(me, p_params) {
@@ -146,6 +155,16 @@ export default class ClssMission_Container extends React.Component {
         if (this.state.is_connected === true) {
             v_ctrl.push(
                 <div key='fsc' className="width_100">
+                    <div key={this.key + 'v_uploadFile0'} className="row width_100 margin_zero css_margin_top_small ">
+                        <div  key={this.key + 'v_uploadFile1'} className={"col-12 "}>
+                        <div key={this.key + 'v_uploadFile2'} className="form-inline">
+                            <div key={this.key + 'v_uploadFile3'} className="form-group">
+                                <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2"><small>Global&nbsp;Mission&nbsp;File</small></label>
+                                <input type="file" id="btn_filesWP" name="file" className="form-control input-xs input-sm css_margin_left_5 line-height-normal" ref={this.mission_file_ref} onChange={(e)=>this.fn_handleFileChange(e)}/>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
                     <div className="row margin_zero">
                         <div className="col-11 text-warning">
                             <p>Add New Mission </p>

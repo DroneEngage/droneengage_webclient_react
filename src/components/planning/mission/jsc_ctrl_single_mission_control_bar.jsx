@@ -34,16 +34,16 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
     }
 
 
-    fn_exportMission (p_partyID)
+    fn_exportMission ()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1 (v_andruavUnit);
         js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + js_globals.v_mission_file_extension,"text/plain;charset=utf-8");
     }
 
-    fn_putWayPoints(p_partyID, p_eraseFirst)
+    fn_putWayPoints(p_eraseFirst)
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) return ;
 
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1 (v_andruavUnit);
@@ -59,16 +59,16 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
     }
 
 
-    fn_requestWayPoints(p_partyID, p_fromFCB)
+    fn_requestWayPoints(p_fromFCB)
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) return ;
         fn_requestWayPoints(v_andruavUnit, p_fromFCB);
     }
 
-    fn_clearWayPoints(p_partyID, p_fromFCB)
+    fn_clearWayPoints(p_fromFCB)
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) return ;
         fn_clearWayPoints(v_andruavUnit, p_fromFCB);
     }
@@ -104,11 +104,11 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
             
         return (
             <div id="geofence" key={'m_c_b' + c_key} className="btn-group  css_margin_top_small" >
-                <button  id='pre_geo_btn_generate' key={'mp1b1' + c_key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission(this.props.m_selected_unit) } >Export</button>
-                <button  id='geo_btn_georeset'  key={'mp1b2' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission(this.props.m_selected_unit) } >Reset</button>
-                <button  id='geo_btn_geoupload'  key={'mp1b3' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_putWayPoints(this.props.m_selected_unit,true)}  >Upload</button>
-                <button  id='geo_btn_georead'  key={'mp1b4' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(this.props.m_selected_unit,true)} >Read</button>
-                <button  id='geo_btn_geoclear'  key={'mp1b5' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_clearWayPoints(this.props.m_selected_unit, true) } >Clear</button>
+                <button  id='pre_geo_btn_generate' key={'mp1b1' + c_key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission() } >Export</button>
+                <button  id='geo_btn_georeset'  key={'mp1b2' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission() } >Reset</button>
+                <button  id='geo_btn_geoupload'  key={'mp1b3' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_putWayPoints(true)}  >Upload</button>
+                <button  id='geo_btn_georead'  key={'mp1b4' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(true)} >Read</button>
+                <button  id='geo_btn_geoclear'  key={'mp1b5' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_clearWayPoints(true) } >Clear</button>
                 {v_saveAsTask}
             </div>
         );

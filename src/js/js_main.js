@@ -46,9 +46,18 @@ var v_contextMenuOpen = false;
 var v_context_busy = false;
 
 var info_unit_context_popup = null;
+let selectedMissionFilesToRead = "";
+let selectedMissionFilesToWrite = "";
 
+export var setSelectedMissionFilePathToRead = function (p_file_name)
+{
+	selectedMissionFilesToRead = p_file_name;
+}
 
-
+export var setSelectedMissionFilePathToWrite = function (p_file_name)
+{
+	selectedMissionFilesToWrite = p_file_name;
+}
 export var QueryString = function () {
 	// This function is anonymous, is executed immediately and 
 	// the return value is assigned to QueryString!
@@ -1787,66 +1796,112 @@ function fn_handleKeyBoard() {
 	
 				}, "YES", "bg-danger text-white");
 		}
-	
-		export function fn_putWayPoints (p_andruavUnit, p_eraseFirst) {
+
+	    /**
+		 * 
+		 * @param {*} p_me 
+		 * @param {*} p_data [unit, bool(erase_first)]
+		 */
+		export function fn_putWayPoints(p_andruavUnit, p_erase_first)
+		  {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-			
+					
 			fn_do_modal_confirmation("Upload Mission for " + p_andruavUnit.m_unitName,
-				"Are you sure you want to upload mission?", function (p_approved) {
-					if (p_approved === false) return;
-					fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst);
-	
-				}, "YES", "bg-danger text-white");
-		}
+						"Are you sure you want to upload mission?", function (p_approved) {
+							if (p_approved === false) return;
+							fn_putWayPoints_direct(p_andruavUnit, p_erase_first, selectedMissionFilesToWrite);
+			
+						}, "YES", "bg-danger text-white");
+		
+		  }
 
+		export function fn_putWayPoints_direct (p_andruavUnit, p_eraseFirst, p_files) {
 
-		function fn_putWayPoints_direct (p_andruavUnit, p_eraseFirst) {
-
-			const files = window.document.getElementById('btn_filesWP').files;
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-
-			if (!files.length) {
-				alert('Please select a file!');
-				return;
+		
+			if (!p_files.length) {
+			  alert('Please select a file!');
+			  return;
 			}
-
-			const file = files[0];
-
+		
+			const file = p_files[0];
+		
 			const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
 			const reader = new FileReader();
-
+		
 			// If we use onloadend, we need to check the readyState.
 			reader.onloadend = function (evt) {
-				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-					try
-					{
-					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
-					if (is_de_file === true)
-					{
-						js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
-					}
-					else
-					{
-						js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
-					}
-					
-					}
-					catch 
-					{
-						//TODO:  failed to upload Mission
-					}
-
+			  if (evt.target.readyState === FileReader.DONE) { // DONE == 2
+				try
+				{
+				let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
+				if (is_de_file === true)
+				{
+				  js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
 				}
+				else
+				{
+				  js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
+				}
+				
+				}
+				catch 
+				{
+				  //TODO:  failed to upload Mission
+				}
+		
+			  }
 			};
-
+		
 			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
-
+		
 			reader.readAsArrayBuffer(file);
 		}
 
 
-		
+		export function fn_readMissionFile (p_andruavUnit, p_filename) {
 
+			const files = p_filename;
+			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
+		
+			if (!files.length) {
+			  alert('Please select a file!');
+			  return;
+			}
+		
+			const file = files[0];
+		
+			const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
+			const reader = new FileReader();
+		
+			// If we use onloadend, we need to check the readyState.
+			reader.onloadend = function (evt) {
+			  if (evt.target.readyState === FileReader.DONE) { // DONE == 2
+				try
+				{
+					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
+					if (is_de_file === true)
+					{
+					//js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
+					}
+					else
+					{
+					//js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
+					}
+				
+				}
+				catch 
+				{
+				  //TODO:  failed to upload Mission
+				}
+		
+			  }
+			};
+		
+			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
+		
+			reader.readAsArrayBuffer(file);
+		}
 
 		
 

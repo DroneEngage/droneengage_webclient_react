@@ -95,99 +95,99 @@ class GLOBALS {
 
 		//////////////////////////////////
 		//LOCAL EVENTS
-		this.EE_WS_OPEN                            = "EVT_1";
-		this.EE_WS_CLOSE                           = "EVT_2";
-		this.EE_onDeleted                          = "EVT_3";
-		this.EE_msgFromUnit_GPS                    = "EVT_4";
-		this.EE_msgFromUnit_IMG                    = "EVT_5";
-		this.EE_andruavUnitAdded                   = "EVT_6";
-		this.EE_HomePointChanged                   = "EVT_7";
-		this.EE_DistinationPointChanged            = "EVT_8";
-		this.EE_andruavUnitError                   = "EVT_9";
-		this.EE_andruavUnitGeoFenceUpdated         = "EVT_10";
-		this.EE_andruavUnitGeoFenceHit             = "EVT_11";
-		this.EE_msgFromUnit_WayPoints              = "EVT_12";
-		this.EE_msgFromUnit_WayPointsUpdated       = "EVT_13";
-		this.EE_andruavUnitArmedUpdated            = "EVT_14";
-		this.EE_andruavUnitGeoFenceBeforeDelete    = "EVT_15";
-		this.EE_andruavUnitFCBUpdated              = "EVT_16";
-		this.EE_andruavUnitFlyingUpdated           = "EVT_17";
-		this.EE_andruavUnitFightModeUpdated        = "EVT_18";
-		this.EE_andruavUnitVehicleTypeUpdated      = "EVT_19";
-		this.EE_onProxyInfoUpdated		   		   = "EVT_20";
-		this.EE_onAndruavUnitSwarmUpdated		   = "EVT_21";
-		this.EE_andruavUnitLidarInfo			   = "EVT_22";
-		this.EE_andruavUnitLidarShow   	   	       = "EVT_23";
-		this.EE_onMessage                  = "EE_onMessage";    
-		this.EE_onModuleUpdated			   = "EE_onModuleUpdated";
-		this.EE_onPreferenceChanged        = "EE_onPreferenceChanged";
-		this.EE_unitAdded                  = "EE_unitAdded";
-		this.EE_unitUpdated                = "EE_unitUpdated";
-		this.EE_unitHighlighted            = "EE_unitHighlighted";
-		this.EE_unitOnlineChanged          = "EE_unitOnlineChanged";
-		this.EE_unitPowUpdated             = "EE_unitPowUpdated";
-		this.EE_unitP2PUpdated             = "EE_unitP2PUpdated";
-		this.EE_unitSDRUpdated             = "EE_unitSDRUpdated";
-		this.EE_unitSDRSpectrum            = "EE_unitSDRSpectrum";
-		this.EE_unitNavUpdated             = "EE_unitNavUpdated";
-		this.EE_onSocketStatus             = "EE_onSocketStatus";
-		this.EE_onSocketStatus2            = "EE_onSocketStatus2";
-		this.EE_onGUIMessage               = "EE_onGUIMessage";
-		this.EE_onGUIMessageHide           = "EE_onGUIMessageHide";
-		this.EE_updateLogin                = "EE_updateLogin";
-		this.EE_videoStreamStarted         = "EE_videoStreamStarted";
-		this.EE_videoStreamRedraw          = "EE_videoStreamRedraw";
-		this.EE_videoStreamStopped         = "EE_videoStreamStopped";
-		this.EE_unitTelemetryOn            = "EE_unitTelemetryOn";
-		this.EE_unitTelemetryOff           = "EE_unitTelemetryOff";
-		this.EE_BattViewToggle             = "EE_BattViewToggle";
-		this.EE_EKFViewToggle              = "EE_EKFViewToggle";
-		this.EE_adsbExchangeReady          = "EE_adsbExchangeReady";
-		this.EE_displayGeoForm             = "EE_displayGeoForm";
-		this.EE_onShapeCreated             = "EE_onShapeCreated";
-		this.EE_onShapeSelected            = "EE_onShapeSelected";
-		this.EE_onShapeEdited              = "EE_onShapeEdited";
-		this.EE_onShapeDeleted             = "EE_onShapeDeleted";
-		this.EE_mapMissionUpdate           = "EE_mapMissionUpdate";
-		this.EE_displayServoForm           = "EE_displayServoForm";
-		this.EE_servoOutputUpdate          = "EE_servoOutputUpdate";
-		this.EE_DetectedTarget             = "EE_DetectedTarget";
-		this.EE_SearchableTarget           = "EE_SearchableTarget";
+		this.EE_WS_OPEN                            	= "EVT_1";
+		this.EE_WS_CLOSE                           	= "EVT_2";
+		this.EE_onDeleted                          	= "EVT_3";
+		this.EE_msgFromUnit_GPS                    	= "EVT_4";
+		this.EE_msgFromUnit_IMG                    	= "EVT_5";
+		this.EE_andruavUnitAdded                   	= "EVT_6";
+		this.EE_HomePointChanged                   	= "EVT_7";
+		this.EE_DistinationPointChanged            	= "EVT_8";
+		this.EE_andruavUnitError                   	= "EVT_9";
+		this.EE_andruavUnitGeoFenceUpdated         	= "EVT_10";
+		this.EE_andruavUnitGeoFenceHit             	= "EVT_11";
+		this.EE_msgFromUnit_WayPoints              	= "EVT_12";
+		this.EE_msgFromUnit_WayPointsUpdated       	= "EVT_13";
+		this.EE_andruavUnitArmedUpdated            	= "EVT_14";
+		this.EE_andruavUnitGeoFenceBeforeDelete    	= "EVT_15";
+		this.EE_andruavUnitFCBUpdated              	= "EVT_16";
+		this.EE_andruavUnitFlyingUpdated           	= "EVT_17";
+		this.EE_andruavUnitFightModeUpdated        	= "EVT_18";
+		this.EE_andruavUnitVehicleTypeUpdated      	= "EVT_19";
+		this.EE_onProxyInfoUpdated		   		   	= "EVT_20";
+		this.EE_onAndruavUnitSwarmUpdated		   	= "EVT_21";
+		this.EE_andruavUnitLidarInfo			   	= "EVT_22";
+		this.EE_andruavUnitLidarShow   	   	       	= "EVT_23";
+		this.EE_onMessage                  			= "EE_onMessage";    
+		this.EE_onModuleUpdated			   			= "EE_onModuleUpdated";
+		this.EE_onPreferenceChanged        			= "EE_onPreferenceChanged";
+		this.EE_unitAdded                  			= "EE_unitAdded";
+		this.EE_unitUpdated                			= "EE_unitUpdated";
+		this.EE_unitHighlighted            			= "EE_unitHighlighted";
+		this.EE_unitOnlineChanged          			= "EE_unitOnlineChanged";
+		this.EE_unitPowUpdated             			= "EE_unitPowUpdated";
+		this.EE_unitP2PUpdated             			= "EE_unitP2PUpdated";
+		this.EE_unitSDRUpdated             			= "EE_unitSDRUpdated";
+		this.EE_unitSDRSpectrum            			= "EE_unitSDRSpectrum";
+		this.EE_unitNavUpdated             			= "EE_unitNavUpdated";
+		this.EE_onSocketStatus             			= "EE_onSocketStatus";
+		this.EE_onSocketStatus2            			= "EE_onSocketStatus2";
+		this.EE_onGUIMessage               			= "EE_onGUIMessage";
+		this.EE_onGUIMessageHide           			= "EE_onGUIMessageHide";
+		this.EE_updateLogin                			= "EE_updateLogin";
+		this.EE_videoStreamStarted         			= "EE_videoStreamStarted";
+		this.EE_videoStreamRedraw          			= "EE_videoStreamRedraw";
+		this.EE_videoStreamStopped         			= "EE_videoStreamStopped";
+		this.EE_unitTelemetryOn            			= "EE_unitTelemetryOn";
+		this.EE_unitTelemetryOff           			= "EE_unitTelemetryOff";
+		this.EE_BattViewToggle             			= "EE_BattViewToggle";
+		this.EE_EKFViewToggle              			= "EE_EKFViewToggle";
+		this.EE_adsbExchangeReady         			= "EE_adsbExchangeReady";
+		this.EE_displayGeoForm             			= "EE_displayGeoForm";
+		this.EE_onShapeCreated             			= "EE_onShapeCreated";
+		this.EE_onShapeSelected            			= "EE_onShapeSelected";
+		this.EE_onShapeEdited              			= "EE_onShapeEdited";
+		this.EE_onShapeDeleted             			= "EE_onShapeDeleted";
+		this.EE_mapMissionUpdate           			= "EE_mapMissionUpdate";
+		this.EE_displayServoForm           			= "EE_displayServoForm";
+		this.EE_servoOutputUpdate          			= "EE_servoOutputUpdate";
+		this.EE_DetectedTarget             			= "EE_DetectedTarget";
+		this.EE_SearchableTarget           			= "EE_SearchableTarget";
 
-		this.EE_cameraZoomChanged          = "EE_cameraZoomChanged";
-		this.EE_cameraFlashChanged         = "EE_cameraFlashChanged";
+		this.EE_cameraZoomChanged          			= "EE_cameraZoomChanged";
+		this.EE_cameraFlashChanged         			= "EE_cameraFlashChanged";
 
-		this.EE_displayParameters          = "EE_displayParameters";
-		this.EE_updateParameters           = "EE_updateParameters";
+		this.EE_displayParameters          			= "EE_displayParameters";
+		this.EE_updateParameters           			= "EE_updateParameters";
 
-		this.EE_requestGamePad             = "EE_requestGamePad";
-		this.EE_releaseGamePad             = "EE_releaseGamePad";
+		this.EE_requestGamePad             			= "EE_requestGamePad";
+		this.EE_releaseGamePad             			= "EE_releaseGamePad";
 
-		this.EE_GamePad_Connected           = "EE_GamePad_Connected";
-		this.EE_GamePad_Disconnected        = "EE_GamePad_Disconnected";
-		this.EE_GamePad_Axes_Updated		 = "EE_GamePad_Axes_Updated";
-		this.EE_GamePad_Button_Updated		 = "EE_GamePad_Button_Updated";
-
-
-		this.EE_displayStreamDlgForm        = "EE_displayStreamDlgForm";
-		this.EE_hideStreamDlgForm           = "EE_hideStreamDlgForm";
-
-		this.EE_displayYawDlgForm			= "EE_displayYawDlgForm";
-		this.EE_displayCameraDlgForm        = "EE_displayCameraDlgForm";
-		this.EE_hideCameraDlgForm           = "EE_hideCameraDlgForm";
-
-		this.EE_onMissionItemToggle         = "EE_onMissionItemToggle";
-
-		this.EE_onAdvancedMode              = "_MS_96A4ED6B1E5_";
-		this.EE_ErrorMessage                = "_E_A642XYZB4E4_";
-		this.EE_adsbExpiredUpdate           = "_E_XXAZQD6B3E4_";
+		this.EE_GamePad_Connected          	 		= "EE_GamePad_Connected";
+		this.EE_GamePad_Disconnected        		= "EE_GamePad_Disconnected";
+		this.EE_GamePad_Axes_Updated		 		= "EE_GamePad_Axes_Updated";
+		this.EE_GamePad_Button_Updated		 		= "EE_GamePad_Button_Updated";
 
 
-		this.EE_Auth_Logined      		 	 = "_EA_96A4ED6B1E1_";
-		this.EE_Auth_BAD_Logined      		 = "_EA_96A4ED6B1E2_";
-		this.EE_Auth_Account_Created		 = "_EA_96A4ED6B1E3_";
-		this.EE_Auth_Account_Regenerated	 = "_EA_96A4ED6B1E4_";
-		this.EE_Auth_Account_BAD_Operation	 = "_EA_96A4ED6B1E5_";
+		this.EE_displayStreamDlgForm        		= "EE_displayStreamDlgForm";
+		this.EE_hideStreamDlgForm           		= "EE_hideStreamDlgForm";
+
+		this.EE_displayYawDlgForm					= "EE_displayYawDlgForm";
+		this.EE_displayCameraDlgForm        		= "EE_displayCameraDlgForm";
+		this.EE_hideCameraDlgForm           		= "EE_hideCameraDlgForm";
+
+		this.EE_onMissionItemToggle         		= "EE_onMissionItemToggle";
+
+		this.EE_onAdvancedMode              		= "_MS_96A4ED6B1E5_";
+		this.EE_ErrorMessage                		= "_E_A642XYZB4E4_";
+		this.EE_adsbExpiredUpdate           		= "_E_XXAZQD6B3E4_";
+
+
+		this.EE_Auth_Logined      		 	 		= "_EA_96A4ED6B1E1_";
+		this.EE_Auth_BAD_Logined      		 		= "_EA_96A4ED6B1E2_";
+		this.EE_Auth_Account_Created		 		= "_EA_96A4ED6B1E3_";
+		this.EE_Auth_Account_Regenerated	 		= "_EA_96A4ED6B1E4_";
+		this.EE_Auth_Account_BAD_Operation	 		= "_EA_96A4ED6B1E5_";
 		
 
 		// EOF LOCAL EVENTS
@@ -209,7 +209,6 @@ class GLOBALS {
 		//VAR_MAP_LEAFLET_URL = "https://airgap.droneengage.com:88/{x}_{y}_{z}.jpeg" //LOCAL MAP
 		//VAR_MAP_LEAFLET_URL = "http://127.0.0.1:9991/{x}_{y}_{z}.jpeg" //LOCAL MAP
 
-		this.CONST_PRO_VERSION = false;
 		this.CONST_DISABLE_ADSG = true;
 		
 	}

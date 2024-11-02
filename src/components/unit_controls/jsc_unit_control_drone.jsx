@@ -104,7 +104,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
     hlp_getflightButtonStyles (p_andruavUnit)
 	{
-	    var res = {};
+	    let res = {};
         res.btn_takeCTRL_class          = "";
         res.btn_releaseCTRL_class       = "";
         res.btn_sendParameters_class    = " disabled hidden ";
@@ -209,10 +209,10 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
 
     createTabs ()
     {
-        let v_andruavUnit = this.props.p_unit; 
+        const v_andruavUnit = this.props.p_unit; 
    
-        var container_tabs=[];
-        var container_controls=[];
+        let container_tabs=[];
+        let container_controls=[];
          
 
         if (this.state.tab_main === true)
@@ -400,11 +400,11 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             );
         }
 
-        var btn = this.hlp_getflightButtonStyles(p_andruavUnit);
-        var ctrl_flight_controller=[];
-        var ctrl2=[];
-        var cls_ctrl_modes = '  ';
-        var cls_ctrl_wp = '  ';
+        let btn = this.hlp_getflightButtonStyles(p_andruavUnit);
+        let ctrl_flight_controller=[];
+        let ctrl2=[];
+        let cls_ctrl_modes = '  ';
+        let cls_ctrl_wp = '  ';
         if (!js_andruavAuth.fn_do_canControlWP()) 
         {   // no permission
             cls_ctrl_wp = ' hidden disabled ';
@@ -457,7 +457,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     createMainBar()
     {
         let bars = [];
-        let v_andruavUnit = this.props.p_unit; 
+        const v_andruavUnit = this.props.p_unit; 
    
         
         if (this.state.tab_main === true)
@@ -479,7 +479,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
     render ()
     {
 
-        let v_andruavUnit = this.props.p_unit; 
+        const v_andruavUnit = this.props.p_unit; 
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 
