@@ -276,7 +276,7 @@ export default class ClssCameraDialog extends React.Component
         
 
         return (
-            <Draggable>
+            <Draggable nodeRef={this.modal_ctrl_cam}>
             <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card width_fit_max css_ontop border-light p-2 " ref={this.modal_ctrl_cam}>
                 <div key='camera_hdr' className="card-header text-center">
 					<div className="row">

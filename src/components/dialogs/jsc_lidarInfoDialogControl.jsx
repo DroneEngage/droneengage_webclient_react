@@ -25,10 +25,13 @@ export default class ClssLidarInfoDialog extends React.Component
         this.rotation_ticks = 0;
 
         this.opaque_clicked = false;
-        this.modal_ctrl_lidar_info = React.createRef();
-       
+        
+        this.modal_ctrl_lidar_info = React.createRef(); // Assuming you need this ref as well
+        
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarShow,this, this.fn_displayDialog);
         
+        
+    
     }
 
     componentDidMount () {
@@ -124,15 +127,14 @@ export default class ClssLidarInfoDialog extends React.Component
     render()
     {
         let unitname = '';
-
         if (this.p_andruavUnit !== null && this.p_andruavUnit !== undefined)
         {
             unitname = this.p_andruavUnit.m_unitName;
         }    
 
         return (
-            <Draggable>
-                <div key={this.key + "m0"} id="modal_ctrl_lidar_info" title="Lidar Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_lidar_info}>
+            <Draggable nodeRef={this.modal_ctrl_lidar_info}>
+                <div  key={this.key + "m0"} id="modal_ctrl_lidar_info" title="Lidar Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_lidar_info}>
 					<div key={this.key + "m1"} className="card-header text-center">
 						<div className="row">
 						<div className="col-10">

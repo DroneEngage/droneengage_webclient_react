@@ -124,7 +124,7 @@ export default class ClssYawDialog extends React.Component
     render ()
     {
         return (
-            <Draggable>
+            <Draggable nodeRef={this.modal_ctrl_yaw}>
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
 					<div className="card-header text-center">
 						<div className="row">

@@ -183,7 +183,7 @@ export default class ClssStreamDialog extends React.Component
         const isNoStreams = p_andruavUnit === null;
 
         return (
-            <Draggable>
+            <Draggable nodeRef={this.modal_ctrl_stream_dlg}>
             <div
                 id="modal_ctrl_stream_dlg"
                 title="Streaming Video"
