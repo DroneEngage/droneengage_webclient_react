@@ -77,7 +77,7 @@ export default class ClssMission_Container extends React.Component {
     fn_onShapeCreated(me, p_shape) {
         js_common.fn_console_log("fn_onShapeCreated: " + p_shape);
 
-        if (p_shape.pm.xshape !== 'Marker') return;
+        if (p_shape.pm.m_shape_type !== 'Marker') return;
 
         let v_mission = js_mapmission_planmanager.fn_getCurrentMission();
         v_mission.fn_addMarker(p_shape);

@@ -473,7 +473,7 @@ export default class ClssFence_Shape_Control extends React.Component {
 
     _renderswitch (v_unit)
     {
-        switch (this.state.m_shape.pm.xshape)
+        switch (this.state.m_shape.pm.m_shape_type)
         {
             case 'Marker':
             break;

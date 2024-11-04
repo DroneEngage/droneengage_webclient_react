@@ -131,7 +131,7 @@ class CLeafLetAndruavMap {
               });
               
             this.m_Map.on('pm:create' , (x) => {
-                x.layer.pm.xshape = x.shape;
+                x.layer.pm.m_shape_type = x.shape;
                 js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
                 js_globals.v_map_shapes.push(x.layer);
@@ -201,7 +201,7 @@ class CLeafLetAndruavMap {
     fn_addMarker(loc, me) {
         const marker = L.marker(loc).addTo(me.m_Map);
         marker.pm.enable();
-        marker.pm.xshape = 'Marker';
+        marker.pm.m_shape_type = 'Marker';
         // Fire the pm:create event
         // marker.fire('pm:create', {
         //     layer: marker,

@@ -328,11 +328,13 @@ export class ClssAndruavMissionPlan {
       const len = mav_waypoints.length;
       for (let i = 0; i < len; ++i) {
         const maypoint = mav_waypoints[i];
+        
+        
 
         const cmd = maypoint['c'];
         switch (cmd)
         {
-          case 16:
+          case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
             {
             const mavlink = maypoint['mv'];
              //this.fn_addMarker([mavlink[4], mavlink[5]]);
@@ -340,6 +342,8 @@ export class ClssAndruavMissionPlan {
              
             }
             break;
+
+          case 
         }
         
         
@@ -456,7 +460,7 @@ export class ClssAndruavMissionPlan {
 
           // wait event will use servo (15) as default or other suitable servo channel.
           /*
-              MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
+              MAV_CMD_DO_SET_SERVO	mavlink20.MAV_CMD_DO_SET_SERVO Set a servo to a desired PWM value.
               Mission Param #1	Servo instance number.
               Mission Param #2	Pulse Width Modulation.
               Mission Param #3	Empty
@@ -466,7 +470,7 @@ export class ClssAndruavMissionPlan {
               Mission Param #7	Empty
             */
 
-          fn_addMissionItem(marker, 183, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
             15,
             parseInt(eventWait), // param1
             0, // param2
@@ -478,7 +482,7 @@ export class ClssAndruavMissionPlan {
           
           // then insert MAV_CMD_NAV_DELAY
           /*
-              MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
+              MAV_CMD_NAV_DELAY	mavlink20.MAV_CMD_NAV_DELAY Delay the next navigation command a number of seconds or until a specified time
               1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
               2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
               3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
@@ -488,7 +492,7 @@ export class ClssAndruavMissionPlan {
               7	Empty
             */
 
-          fn_addMissionItem(marker, 93, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_DELAY, [
             0,
             1, // param1 - Delay 1 hour
             0, // param2
@@ -505,7 +509,7 @@ export class ClssAndruavMissionPlan {
       switch (marker.m_missionItem.m_missionType) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
           {
-            fn_addMissionItem(marker, 16, [
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
               5,
               0,
@@ -528,7 +532,7 @@ export class ClssAndruavMissionPlan {
               marker.getLatLng().lng,
               parseFloat(marker.m_missionItem.alt),
             ]);
-            fn_addMissionItem(marker, 16, [
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
               5,
               0,
@@ -580,7 +584,7 @@ export class ClssAndruavMissionPlan {
 
         case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
           {
-            fn_addMissionItem(marker, 16, [
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
               5,
               0,
@@ -603,7 +607,7 @@ export class ClssAndruavMissionPlan {
 
         case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
           {
-            fn_addMissionItem(marker, 16, [
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
               5,
               0,
@@ -717,7 +721,7 @@ export class ClssAndruavMissionPlan {
 						Mission Param #7	Empty
 					*/
 
-        fn_addMissionItem(marker, 183, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
           16,
           parseInt(eventFire), // param1
           0, // param2
@@ -804,7 +808,7 @@ export class ClssAndruavMissionPlan {
 
         // wait event will use servo (15) as default or other suitable servo channel.
         /*
-					MAV_CMD_DO_SET_SERVO	183 Set a servo to a desired PWM value.
+					MAV_CMD_DO_SET_SERVO	mavlink20.MAV_CMD_DO_SET_SERVO Set a servo to a desired PWM value.
 					Mission Param #1	Servo instance number.
 					Mission Param #2	Pulse Width Modulation.
 					Mission Param #3	Empty
@@ -814,7 +818,7 @@ export class ClssAndruavMissionPlan {
 					Mission Param #7	Empty
 				*/
 
-        fn_addMissionItem(marker, 183, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
           15,
           marker.m_missionItem.eventWait, // param1
           0, // param2
@@ -826,7 +830,7 @@ export class ClssAndruavMissionPlan {
 
         // then insert MAV_CMD_NAV_DELAY
         /*
-					MAV_CMD_NAV_DELAY	93 Delay the next navigation command a number of seconds or until a specified time
+					MAV_CMD_NAV_DELAY	mavlink20.MAV_CMD_NAV_DELAY Delay the next navigation command a number of seconds or until a specified time
 					1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
 					2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
 					3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
@@ -836,7 +840,7 @@ export class ClssAndruavMissionPlan {
 					7	Empty
 				*/
 
-        fn_addMissionItem(marker, 93, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_DELAY, [
           0,
           1, // param1
           0, // param2
@@ -849,7 +853,7 @@ export class ClssAndruavMissionPlan {
 
       switch (marker.m_missionItem.m_missionType) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
-          fn_addMissionItem(marker, 16, [
+          fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
             0,
             5,
             0,
@@ -880,7 +884,7 @@ export class ClssAndruavMissionPlan {
             marker.getLatLng().lng,
             marker.m_missionItem.alt,
           ]);
-          fn_addMissionItem(marker, 16, [
+          fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
             0,
             5,
             0,
@@ -926,7 +930,7 @@ export class ClssAndruavMissionPlan {
 					*/
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
-          fn_addMissionItem(marker, 16, [
+          fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
             0,
             5,
             0,
@@ -1031,7 +1035,7 @@ export class ClssAndruavMissionPlan {
 					Mission Param #7	Empty
 				*/
 
-        fn_addMissionItem(marker, 183, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
           16,
           marker.m_missionItem.eventFire, // param1
           0, // param2
