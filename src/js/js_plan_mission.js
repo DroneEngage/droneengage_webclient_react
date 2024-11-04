@@ -22,7 +22,9 @@ export class ClssAndruavMissionPlan {
   constructor(p_id, p_initColor) {
     if (p_id === null || p_id === undefined) throw new Error("Error Bad ID");
     this.m_id = p_id;
-    this.v_markers = [];
+
+    // MAIN list to all markers and attached mission items.
+    this.p_all_missions = [];
 
     this.m_pathColor = p_initColor;
 
@@ -46,11 +48,11 @@ export class ClssAndruavMissionPlan {
   }
 
   fn_showMarkers() {
-    const v_len = this.v_markers.length;
+    const v_len = this.p_all_missions.length;
     if (v_len === 0) return;
 
     for (let i = 0; i < v_len; ++i) {
-      let p_m = this.v_markers[i];
+      let p_m = this.p_all_missions[i];
       js_leafletmap.fn_showItem(p_m);
 
       if (p_m.m_next !== null && p_m.m_next !== undefined) {
@@ -65,12 +67,12 @@ export class ClssAndruavMissionPlan {
    *	Hide path from map.
    **/
   fn_hideMarkers() {
-    const v_len = this.v_markers.length;
+    const v_len = this.p_all_missions.length;
 
     if (v_len === 0) return;
 
     for (let i = 0; i < v_len; ++i) {
-      let p_m = this.v_markers[i];
+      let p_m = this.p_all_missions[i];
       // delete marker
       js_leafletmap.fn_hideItem(p_m);
 
@@ -107,13 +109,13 @@ export class ClssAndruavMissionPlan {
   fn_updatePath(v_enforceRedraw) {
     if (this.m_hidden) return;
 
-    var len = this.v_markers.length;
+    var len = this.p_all_missions.length;
     if (len === 0) {
       return;
     }
 
     if (len === 1) {
-      this.fn_disconnectMissionItem(this.v_markers[0]);
+      this.fn_disconnectMissionItem(this.p_all_missions[0]);
       return;
     }
 
@@ -121,12 +123,12 @@ export class ClssAndruavMissionPlan {
 
     // Disconnect Last Node [distance = 0 and make ure no arrow]
     let marker;
-    marker = this.v_markers[len];
+    marker = this.p_all_missions[len];
 
     //this.fn_disconnectMissionItem (marker);
 
     for (let i = 0; i < len; ++i) {
-      marker = this.v_markers[i];
+      marker = this.p_all_missions[i];
       if (v_enforceRedraw === true) {
         this.fn_disconnectMissionItem(marker);
       }
@@ -134,7 +136,7 @@ export class ClssAndruavMissionPlan {
       if (marker.m_next == null) {
         let arrowCoordinates = {
           from_pos: marker.getLatLng(),
-          to_pos: this.v_markers[i + 1].getLatLng(),
+          to_pos: this.p_all_missions[i + 1].getLatLng(),
         };
 
         let distance = js_helpers.fn_calcDistance(
@@ -165,9 +167,9 @@ export class ClssAndruavMissionPlan {
 	*/
   fn_getMissionDistance() {
     let distance = 0;
-    let len = this.v_markers.length;
+    let len = this.p_all_missions.length;
     for (let i = 0; i < len; ++i) {
-      let marker = this.v_markers[i];
+      let marker = this.p_all_missions[i];
       if (marker.distance !== null && marker.distance !== undefined) {
         distance += marker.distance;
       }
@@ -180,7 +182,7 @@ export class ClssAndruavMissionPlan {
    *	Creates a default marker.
    */
   fn_addMarker(p_marker) {
-    p_marker.m_mission = this;
+    p_marker.m_main_de_mission = this;
     p_marker.id = this.m_missionCounter;
     p_marker.order = 99;
     p_marker.m_missionItem = {
@@ -195,23 +197,24 @@ export class ClssAndruavMissionPlan {
     };
 
     this.m_missionCounter += 1;
-    this.v_markers.push(p_marker);
-    this.fn_orderItems();
-    this.fn_updatePath();
+    this.p_all_missions.push(p_marker);
+      this.fn_orderItems();
+      this.fn_updatePath();
 
-    js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
-      mission: this,
-    });
+      js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+        mission: this,
+      });
+    
   }
 
   /**
    *	removes a single marker.
    */
   fn_deleteMe(marker) {
-    let len = this.v_markers.length;
+    let len = this.p_all_missions.length;
     for (let i = 0; i < len; ++i) {
-      if (this.v_markers[i].id === marker.id) {
-        this.v_markers.splice(i, 1);
+      if (this.p_all_missions[i].id === marker.id) {
+        this.p_all_missions.splice(i, 1);
         js_leafletmap.fn_hideItem(marker);
         if (marker.m_next !== null && marker.m_next !== undefined) {
           js_leafletmap.fn_hideItem(marker.m_next);
@@ -219,7 +222,7 @@ export class ClssAndruavMissionPlan {
           marker.distance = undefined;
         }
 
-        marker.m_mission = null;
+        marker.m_main_de_mission = null;
         this.fn_orderItems();
         this.fn_updatePath(true);
         break;
@@ -235,10 +238,10 @@ export class ClssAndruavMissionPlan {
    *	removes all markers of a single mission.
    **/
   fn_deleteAll() {
-    let len = this.v_markers.length;
+    let len = this.p_all_missions.length;
     for (let i = 0; i < len; ++i) {
-      var marker = this.v_markers[i];
-      marker.m_mission = null;
+      var marker = this.p_all_missions[i];
+      marker.m_main_de_mission = null;
       if (marker.m_next !== null && marker.m_next !== undefined) {
         js_leafletmap.fn_hideItem(marker.m_next);
       }
@@ -247,7 +250,7 @@ export class ClssAndruavMissionPlan {
       //marker.EVT_onShapeDeleted(marker);
     }
 
-    this.v_markers = [];
+    this.p_all_missions = [];
 
     js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
       mission: this,
@@ -260,17 +263,17 @@ export class ClssAndruavMissionPlan {
    *	updates to mission.
    **/
   fn_orderItems() {
-    let len = this.v_markers.length;
+    let len = this.p_all_missions.length;
     let j = 0;
     for (let i = 1; i <= len; ++i) {
-      let smallest_item = this.v_markers[0];
+      let smallest_item = this.p_all_missions[0];
       for (j = 0; j < len; ++j) {
         if (
-          (this.v_markers[j].order < smallest_item.order &&
-            this.v_markers[j].order >= i) ||
+          (this.p_all_missions[j].order < smallest_item.order &&
+            this.p_all_missions[j].order >= i) ||
           smallest_item.order < i
         ) {
-          smallest_item = this.v_markers[j];
+          smallest_item = this.p_all_missions[j];
         }
       }
 
@@ -285,7 +288,7 @@ export class ClssAndruavMissionPlan {
   }
 
   fn_exportToJSONAndruav(p_missionV110, p_PartyID) {
-    if (this.v_markers.length === 0) return;
+    if (this.p_all_missions.length === 0) return;
 
     // Delete Old Shapes
     if (p_missionV110 !== null && p_missionV110 !== undefined) {
@@ -312,6 +315,35 @@ export class ClssAndruavMissionPlan {
         );
       }
     }
+  }
+
+
+  fn_importAsDE_V1 (p_andruavUnit, p_plan_text)
+  {
+      if (p_plan_text['fileType'] !== 'de_plan') return ;
+
+      const me_mission = p_plan_text['de_mission'];
+      const mav_waypoints = me_mission['mav_waypoints'];
+
+      const len = mav_waypoints.length;
+      for (let i = 0; i < len; ++i) {
+        const maypoint = mav_waypoints[i];
+
+        const cmd = maypoint['c'];
+        switch (cmd)
+        {
+          case 16:
+            {
+            const mavlink = maypoint['mv'];
+             //this.fn_addMarker([mavlink[4], mavlink[5]]);
+             js_leafletmap.fn_addMarker ([mavlink[4], mavlink[5]],js_leafletmap);
+             
+            }
+            break;
+        }
+        
+        
+      }
   }
 
   /**
@@ -367,7 +399,7 @@ export class ClssAndruavMissionPlan {
 
     output_plan["de_geoFence"] = this.fn_exportFencesToDE_V1();
 
-    const len = this.v_markers.length;
+    const len = this.p_all_missions.length;
     let mission_steps = [];
     let module_steps = [];
     const fn_addMissionItem = function (marker, cmd, m_paramsArray) {
@@ -409,7 +441,7 @@ export class ClssAndruavMissionPlan {
     let mission_item_latest = 0;
     for (let i = 0; i < len; ++i) {
       skip = false;
-      let marker = this.v_markers[i];
+      let marker = this.p_all_missions[i];
       
       const eventFireRequired = marker.m_missionItem.eventFireRequired;
       const eventWaitRequired = marker.m_missionItem.eventWaitRequired;
@@ -750,7 +782,7 @@ export class ClssAndruavMissionPlan {
    * Exports Mission as text file in V110 format understood by Mission Planner & DroneAPI
    */
   fn_exportToV110() {
-    let len = this.v_markers.length;
+    let len = this.p_all_missions.length;
     let mission_steps = [];
 
     const fn_addMissionItem = function (marker, cmd, m_paramsArray) {
@@ -764,7 +796,7 @@ export class ClssAndruavMissionPlan {
     let skip = false;
     for (let i = 0; i < len; ++i) {
       skip = false;
-      let marker = this.v_markers[i];
+      let marker = this.p_all_missions[i];
       let step = {};
 
       if (marker.m_missionItem.eventWaitRequired === true) {

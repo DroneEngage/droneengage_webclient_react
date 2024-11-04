@@ -1610,7 +1610,7 @@ function fn_handleKeyBoard() {
 						});
 						v_context_busy = false;
 					}}
-				/>, tempContainer
+				/>
 			);
 		}
 
@@ -1646,7 +1646,7 @@ function fn_handleKeyBoard() {
 						});
 						v_context_busy = false;
 					}}
-				/>, tempContainer
+				/>
 			);
 		}
 		
@@ -1683,7 +1683,7 @@ function fn_handleKeyBoard() {
 					});
 					v_context_busy = false;
 					}}
-				/>, tempContainer
+				/>
 			);
 
 		}
@@ -1717,10 +1717,16 @@ function fn_handleKeyBoard() {
 		var map = null;
 		var infowindow = null;
 		function initMap() {
-			
+			try
+			{
 			js_leafletmap.fn_initMap('mapid');
 			fn_setLapout();
 			fn_gps_getLocation();
+			}
+			catch (e)
+			{
+				console.log(e);
+			}
 
 		};
 
@@ -1797,6 +1803,51 @@ function fn_handleKeyBoard() {
 				}, "YES", "bg-danger text-white");
 		}
 
+
+		export function fn_readMissionFile(p_mission, p_andruavUnit)
+		{
+			if (p_mission === null || p_mission === undefined) return ;
+
+			if (!selectedMissionFilesToRead.length) {
+				alert('Please select a file!');
+				return;
+			}
+		  
+			const file = selectedMissionFilesToRead[0];
+		
+			
+			const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
+			const reader = new FileReader();
+		
+			// If we use onloadend, we need to check the readyState.
+			reader.onloadend = function (evt) {
+				if (evt.target.readyState === FileReader.DONE) { // DONE == 2
+				  try
+				  {
+				  const plan_text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
+				  if (is_de_file === true)
+				  {
+					p_mission.fn_importAsDE_V1(p_andruavUnit, JSON.parse(plan_text));
+				  }
+				  else
+				  {
+					alert('Please select a valid file!');
+				  }
+				  
+				  }
+				  catch (e)
+				  {
+					alert('Please select a valid file!');
+				  }
+		  
+				}
+			  };
+		  
+			  if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
+		  
+			  reader.readAsArrayBuffer(file);
+		}
+
 	    /**
 		 * 
 		 * @param {*} p_me 
@@ -1834,59 +1885,14 @@ function fn_handleKeyBoard() {
 			  if (evt.target.readyState === FileReader.DONE) { // DONE == 2
 				try
 				{
-				let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
-				if (is_de_file === true)
-				{
-				  js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
-				}
-				else
-				{
-				  js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
-				}
-				
-				}
-				catch 
-				{
-				  //TODO:  failed to upload Mission
-				}
-		
-			  }
-			};
-		
-			if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
-		
-			reader.readAsArrayBuffer(file);
-		}
-
-
-		export function fn_readMissionFile (p_andruavUnit, p_filename) {
-
-			const files = p_filename;
-			if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-		
-			if (!files.length) {
-			  alert('Please select a file!');
-			  return;
-			}
-		
-			const file = files[0];
-		
-			const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
-			const reader = new FileReader();
-		
-			// If we use onloadend, we need to check the readyState.
-			reader.onloadend = function (evt) {
-			  if (evt.target.readyState === FileReader.DONE) { // DONE == 2
-				try
-				{
-					let text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
+					const  plan_text = new TextDecoder("utf-8").decode(evt.target.result); // Convert to string
 					if (is_de_file === true)
 					{
-					//js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(text));
+					js_globals.v_andruavClient.API_uploadDEMission(p_andruavUnit, p_eraseFirst, JSON.parse(plan_text));
 					}
 					else
 					{
-					//js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, text);
+					js_globals.v_andruavClient.API_uploadWayPoints(p_andruavUnit, p_eraseFirst, plan_text);
 					}
 				
 				}
@@ -1902,32 +1908,6 @@ function fn_handleKeyBoard() {
 		
 			reader.readAsArrayBuffer(file);
 		}
-
-		
-
-		var EVT_GCSDataReceived = function (data) {
-			if ((js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) || (js_globals.v_andruavClient.currentTelemetryUnit === null || js_globals.v_andruavClient.currentTelemetryUnit === undefined)) {
-				return;
-			}
-			js_globals.v_andruavClient.API_SendTelemetryData(js_globals.v_andruavClient.currentTelemetryUnit, data);
-		};
-
-		var EVT_GCSDataOpen = function (data) {
-			js_eventEmitter.fn_dispatch(js_globals.EE_onGUIMessageHide);
-		};
-
-
-		var EVT_BadMavlink = function () {
-			//gui_alert('Web Telemetry', 'Please make sure that you use MAVLINK <b>version 2</b>.', 'danger');
-			js_eventEmitter.fn_dispatch(js_globals.EE_onGUIMessage, {
-				p_title:'Web Telemetry',
-				p_msg:'Please make sure that you use MAVLINK <b>version 2</b>.',
-				p_level:'danger'
-			});
-
-		};
-
-
 
 
 		var EVT_onDeleted = function () {
@@ -3191,8 +3171,11 @@ function fn_handleKeyBoard() {
 		
 
 		
-
+		let fn_on_ready_called = false;
 		export function fn_on_ready() {
+			
+			if (fn_on_ready_called=== true) return;
+			fn_on_ready_called = true;
 			
 			$(function () {
 						 $('head').append('<link href="./images/de/favicon.ico" rel="shortcut icon" type="image/x-icon" />');

@@ -19,10 +19,10 @@ export class CWayPointLocation extends React.Component {
     componentDidUpdate() 
     { 
         var lnglat = this.props.p_shape.getLatLng();
-        //$('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lat); 
-        //$('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(lnglat.lng); 
-        //$('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
-        //$('btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
+        //$('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lat); 
+        //$('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lng); 
+        //$('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
+        //$('btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     }
 
     handleLatChange(e)
@@ -93,14 +93,14 @@ export class CWayPointLocation extends React.Component {
             break;
         }
 
-        $('#btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
+        $('#btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     
     }
 
     fn_editShape ()
     {
         const c_shap_id = this.props.p_shape.id;
-        const c_mission_id = this.props.p_shape.m_mission.m_id;
+        const c_mission_id = this.props.p_shape.m_main_de_mission.m_id;
 
         this.props.p_shape.m_missionItem.alt = $('#txt_alt'+ c_shap_id + "_" + c_mission_id).val(); 
 
@@ -119,16 +119,16 @@ export class CWayPointLocation extends React.Component {
         //     .catch(error => console.error('Error fetching elevation data:', error));
         // }
 
-        $('#btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
+        $('#btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     }
 
     render ()
     {
         var lnglat = this.props.p_shape.getLatLng();
         
-        const lat_id = "txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
-        const lng_id = "txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
-        const alt_id = "txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
+        const lat_id = "txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
+        const lng_id = "txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
+        const alt_id = "txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
 
         return (<div className="margin_zero css_margin_top_small">
                     <p className="form-control-label text-white mb-0">3D-Location </p>
@@ -152,7 +152,7 @@ export class CWayPointLocation extends React.Component {
                                 <label htmlFor={alt_id} className="form-label text-white "><small>alt</small>
                                 <div className="input-group mb-3">
                                     <input id={alt_id}  type="number" min={0} max={9000} step="1.0" className="form-control  input-sm  txt_margin " placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2" value={this.props.p_shape.m_missionItem.alt} onChange={this.handleAltChange}/>
-                                    <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id}  type="button" className="btn btn-success input-sm line-height-0" onClick={ (e) => this.fn_editAltitudeType()} >{this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType)}</button>
+                                    <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id}  type="button" className="btn btn-success input-sm line-height-0" onClick={ (e) => this.fn_editAltitudeType()} >{this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType)}</button>
                                 </div>
                                 </label>
                             </div>

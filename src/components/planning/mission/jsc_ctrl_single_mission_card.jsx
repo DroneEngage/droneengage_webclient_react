@@ -37,7 +37,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         }
         this.props.p_shape.order = parseInt(this.mission_id_txt.value);
         
-        this.props.p_shape.m_mission.fn_updatePath(true)
+        this.props.p_shape.m_main_de_mission.fn_updatePath(true)
         return ;
     }
 
@@ -95,9 +95,9 @@ export class ClssSingle_Mission_Card extends React.Component {
                     </div>);
         }
 
-        const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id;
+        const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         return (
-            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">
+            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">
                 <div className="card-header text-center"> 
                     <h4><strong>{"Mission Item #" + this.props.p_shape.order}</strong></h4>
                 </div>    
@@ -108,7 +108,7 @@ export class ClssSingle_Mission_Card extends React.Component {
                         <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={instance => {this.mission_id_txt = instance}}/>
                         </label>
                     </div>
-                    <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_mission.m_id} id="m_bdy" className="geo_fence ">
+                    <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.wp = instance}}/>
                         <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                     </div>

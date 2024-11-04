@@ -4,6 +4,7 @@ import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
 import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
+import {fn_readMissionFile} from '../../../js/js_main.js'
 
 import {
     fn_requestWayPoints,
@@ -58,6 +59,10 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
         
     }
 
+    fn_loadWayPointsFromFile()
+    {
+        fn_readMissionFile(this.props.p_mission, this.props.m_selected_unit);
+    }
 
     fn_requestWayPoints(p_fromFCB)
     {
@@ -109,6 +114,7 @@ export class ClssSingle_Mission_Control_Bar extends React.Component {
                 <button  id='geo_btn_geoupload'  key={'mp1b3' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_putWayPoints(true)}  >Upload</button>
                 <button  id='geo_btn_georead'  key={'mp1b4' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(true)} >Read</button>
                 <button  id='geo_btn_geoclear'  key={'mp1b5' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_clearWayPoints(true) } >Clear</button>
+                <button  id='geo_btn_geoload'  key={'mp1b6' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_loadWayPointsFromFile() } >Load</button>
                 {v_saveAsTask}
             </div>
         );

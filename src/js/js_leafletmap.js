@@ -57,12 +57,18 @@ class CLeafLetAndruavMap {
         this.m_Map.invalidateSize();
     }
 
+    fn_addShapeEvents()
+    {
+
+    }
+
+
     /**
     * Handle map initialization onLoad.
     */
     fn_initMap(p_mapelement) {
         var v_site_copyright;
-        v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
+         v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
 
 
         this.m_Map = L.map(p_mapelement, {
@@ -124,7 +130,7 @@ class CLeafLetAndruavMap {
                 e.workingLayer.setIcon(L.icon({iconUrl:'images/mode-portrait_b.png'}))
               });
               
-              this.m_Map.on('pm:create' , (x) => {
+            this.m_Map.on('pm:create' , (x) => {
                 x.layer.pm.xshape = x.shape;
                 js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
@@ -152,9 +158,24 @@ class CLeafLetAndruavMap {
                 });
 
             });
+
+            //fn_addMarker ([51.505, -0.09], this);
         }
         
-        var update_timeout = null;
+         // Function to add a marker
+        // function fn_addMarker(loc, me) {
+        //     const marker = L.marker(loc).addTo(me.m_Map);
+        //     marker.pm.enable();
+        //     marker.bindPopup('New Marker').openPopup();
+        //     // Fire the pm:create event
+        //     marker.fire('pm:create', {
+        //         layer: marker,
+        //         shape: 'Marker'
+        //     });
+        // }
+
+        
+        let update_timeout = null;
         this.m_Map.on('click', function (event) {
             if (js_globals.CONST_MAP_EDITOR !== true)
 			{
@@ -176,6 +197,30 @@ class CLeafLetAndruavMap {
         this.m_isMapInit = true;
     };
 
+    // Function to add a marker
+    fn_addMarker(loc, me) {
+        const marker = L.marker(loc).addTo(me.m_Map);
+        marker.pm.enable();
+        marker.pm.xshape = 'Marker';
+        // Fire the pm:create event
+        // marker.fire('pm:create', {
+        //     layer: marker,
+        //     shape: 'Marker'
+        // });
+        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, marker)
+                // add to shapes list.
+        js_globals.v_map_shapes.push(marker);
+        marker.on('click', function (p_event) {
+            if (p_event.originalEvent.ctrlKey===false)
+            {
+                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+            }
+            else
+            {
+                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, marker);
+            }
+        });
+    }
 
     setMap(p_map) {
         this.m_Map = p_map;

@@ -46,6 +46,7 @@ export class ClssCtrlLidarDevice extends React.Component {
 
     fn_update_lidar (p_me, p_andruavUnit)
     {
+        if (p_me.props === null || p_me.props === undefined) return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         if (p_me.props.p_unit === null || p_me.props.p_unit === undefined) return ;
         if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;

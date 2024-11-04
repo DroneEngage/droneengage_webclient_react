@@ -17,7 +17,7 @@ export class ClssAndruavFencePlan
 	{
 		if (p_id === null  || p_id === undefined) throw new Error('Error Bad ID');
 		this.m_id = p_id;
-		this.v_markers = [];
+		this.p_all_missions = [];
 
 		//this.m_pathColor = p_initColor;
 

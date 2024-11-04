@@ -37,12 +37,12 @@ export  class ClssSingle_Mission_Container extends React.Component {
     
     displayGeoForm(me, p_event) {
         // not a marker
-        if (p_event.target.m_mission === null || p_event.target.m_mission === undefined) {
+        if (p_event.target.m_main_de_mission === null || p_event.target.m_main_de_mission === undefined) {
             js_common.fn_console_log("MISSION:NULL HERE");
             return;
         }
 
-        if (me.props.p_missionPlan.m_id !== p_event.target.m_mission.m_id) {
+        if (me.props.p_missionPlan.m_id !== p_event.target.m_main_de_mission.m_id) {
             js_common.fn_console_log("Not Me");
             return;
         }

@@ -99,13 +99,13 @@ export default class ClssMission_Container extends React.Component {
     }
 
     fn_onShapeEdited(me, p_shape) {
-        if (p_shape.m_mission == null) return; // geo fence not mission
-        p_shape.m_mission.fn_updatePath(true);
+        if (p_shape.m_main_de_mission == null) return; // geo fence not mission
+        p_shape.m_main_de_mission.fn_updatePath(true);
     }
 
     fn_onShapeDeleted(me, p_shape) {
-        if (p_shape.m_mission == null) return; // geo fence not mission
-        p_shape.m_mission.fn_deleteMe(p_shape);
+        if (p_shape.m_main_de_mission == null) return; // geo fence not mission
+        p_shape.m_main_de_mission.fn_deleteMe(p_shape);
     }
 
     fn_addNewPathPlan(e) {
