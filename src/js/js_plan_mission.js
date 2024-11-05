@@ -568,9 +568,9 @@ export class ClssAndruavMissionPlan {
           }
           break;
 
-        case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
+        case mavlink20.MAV_CMD_NAV_TAKEOFF:
           {
-            fn_addMissionItem(marker, 22, [
+            fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_TAKEOFF, [
               0.0,
               0.0,
               0.0,
@@ -603,9 +603,9 @@ export class ClssAndruavMissionPlan {
           }
           break;
 
-        case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
+        case mavlink20.MAV_CMD_NAV_LAND:
           {
-            fn_addMissionItem(marker, 21, [
+            fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_LAND, [
               0.0,
               0.0,
               0.0,
@@ -629,7 +629,7 @@ export class ClssAndruavMissionPlan {
           }
           break;
 
-        case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+        case mavlink20.MAV_CMD_NAV_GUIDED_ENABLE:
           {
             fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
@@ -640,7 +640,7 @@ export class ClssAndruavMissionPlan {
               marker.getLatLng().lng,
               parseFloat(marker.m_missionItem.alt),
             ]);
-            fn_addMissionItem(marker, 92, [ //MAV_CMD_NAV_GUIDED_ENABLE
+            fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_GUIDED_ENABLE, [ //MAV_CMD_NAV_GUIDED_ENABLE
               1, 
               0, 
               0.0, 
@@ -652,7 +652,7 @@ export class ClssAndruavMissionPlan {
           }
           break;
 
-        case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
+        case mavlink20.MAV_CMD_NAV_RETURN_TO_LAUNCH :
           {
             fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
               0,
@@ -663,7 +663,7 @@ export class ClssAndruavMissionPlan {
               marker.getLatLng().lng,
               parseFloat(marker.m_missionItem.alt),
             ]);
-            fn_addMissionItem(marker, 20, [
+            fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_RETURN_TO_LAUNCH , [
               0, 
               0, 
               0.0, 
