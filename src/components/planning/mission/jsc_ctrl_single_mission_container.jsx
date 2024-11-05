@@ -22,8 +22,9 @@ export  class ClssSingle_Mission_Container extends React.Component {
             m_collapsed: false,
             m_party_id: 0,
         };
-
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.displayGeoForm);
+        
+        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.fn_displayGeoForm);
+        js_eventEmitter.fn_subscribe(js_globals.EE_onMissionReset, this, this.fn_resetMission);
     }
 
     componentDidMount () {
@@ -32,10 +33,11 @@ export  class ClssSingle_Mission_Container extends React.Component {
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeSelected, this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onMissionReset, this);
     }
 
     
-    displayGeoForm(me, p_event) {
+    fn_displayGeoForm(me, p_event) {
         // not a marker
         if (p_event.target.m_main_de_mission === null || p_event.target.m_main_de_mission === undefined) {
             js_common.fn_console_log("MISSION:NULL HERE");
@@ -58,6 +60,11 @@ export  class ClssSingle_Mission_Container extends React.Component {
 
         if (me.state.m_update === 0) return ;
         me.setState({'m_update': me.state.m_update +1});
+    }
+
+    fn_resetMission(p_me)
+    {
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
 

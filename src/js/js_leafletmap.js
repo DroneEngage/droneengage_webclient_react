@@ -153,6 +153,8 @@ class CLeafLetAndruavMap {
                 });
 
                 x.layer.on('remove', (x) => {
+                    
+                    if (x.layer === null || x.layer === undefined) return ;
 
                     js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
                 });
@@ -197,7 +199,12 @@ class CLeafLetAndruavMap {
         this.m_isMapInit = true;
     };
 
-    // Function to add a marker
+    /*
+     * Function to add a physical marker on the map and attached events to it.
+     * This is used when creating the marker programatically not using Map Editor.
+     * @param {*} loc 
+     * @param {*} me 
+     */
     fn_addMarker(loc, me) {
         const marker = L.marker(loc).addTo(me.m_Map);
         marker.pm.enable();

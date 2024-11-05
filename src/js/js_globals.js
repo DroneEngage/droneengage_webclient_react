@@ -146,6 +146,7 @@ class GLOBALS {
 		this.EE_displayGeoForm             			= "EE_displayGeoForm";
 		this.EE_onShapeCreated             			= "EE_onShapeCreated";
 		this.EE_onShapeSelected            			= "EE_onShapeSelected";
+		this.EE_onMissionReset            			= "EE_onMissionReset";
 		this.EE_onShapeEdited              			= "EE_onShapeEdited";
 		this.EE_onShapeDeleted             			= "EE_onShapeDeleted";
 		this.EE_mapMissionUpdate           			= "EE_mapMissionUpdate";

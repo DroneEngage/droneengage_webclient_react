@@ -56,6 +56,11 @@ export class ClssSingle_Mission_Card extends React.Component {
             return (<div/>);
         }
 
+        if (this.props.p_shape.m_main_de_mission === null || this.props.p_shape.m_main_de_mission === undefined)
+        {   // mission has been deleted.
+            return (<div/>);
+        }
+
         let tabs = [];
         tabs.push(<li id={'h' + this.key} key={'h_main' + this.key} className="nav-item nav-units">
                     <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_main" + this.key}>Action</a>

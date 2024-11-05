@@ -317,6 +317,23 @@ export class ClssAndruavMissionPlan {
     }
   }
 
+  fn_getModuleTaskByLinkedMavlink (p_linked_mavlinked, p_module)
+  {
+    // Find the module that matches the given linked mavlink
+    const module = p_module.find(mod => mod.ls === p_linked_mavlinked);
+
+    // If the module is found, return its tasks; otherwise, return null or an empty array
+    if (module) {
+        return module.c.length > 0 ? module.c : null; // Return tasks or null if no tasks
+    } else {
+        return null; // Return null if no module matches
+    }
+  }
+
+  fn_getModuleTaskByLinkedMavlinkAsObject (p_cmds)
+  {
+
+  }
 
   fn_importAsDE_V1 (p_andruavUnit, p_plan_text)
   {
@@ -324,29 +341,59 @@ export class ClssAndruavMissionPlan {
 
       const me_mission = p_plan_text['de_mission'];
       const mav_waypoints = me_mission['mav_waypoints'];
+      const modules = me_mission['modules'];
+
+      let temp_missionItem = {};
 
       const len = mav_waypoints.length;
       for (let i = 0; i < len; ++i) {
         const maypoint = mav_waypoints[i];
         
-        
-
         const cmd = maypoint['c'];
+        const mavlink = maypoint['mv'];
+              
         switch (cmd)
         {
+
+          case mavlink20.MAV_CMD_DO_SET_SERVO:
+          {
+            if (mavlink[0] == 16)
+              { // FIRE EVENT
+                temp_missionItem.eventFireRequired = true;
+                temp_missionItem.eventFire = mavlink[1];
+              }
+            if (mavlink[0] == 15)
+            { // WAIT FOR EVENT
+                temp_missionItem.eventWaitRequired = true;
+                temp_missionItem.eventWait = mavlink[1];
+            }
+          }
+          break;
+
           case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
             {
-            const mavlink = maypoint['mv'];
-             //this.fn_addMarker([mavlink[4], mavlink[5]]);
-             js_leafletmap.fn_addMarker ([mavlink[4], mavlink[5]],js_leafletmap);
-             
+              js_leafletmap.fn_addMarker ([mavlink[4], mavlink[5]],js_leafletmap);
+
+              const cmds = this.fn_getModuleTaskByLinkedMavlink(i.toString(), modules);
+              const p_current_modules = this.fn_getModuleTaskByLinkedMavlinkAsObject(cmds);
+
             }
             break;
 
-          case 
+          case mavlink20.MAV_CMD_DO_CHANGE_SPEED:
+          {
+            temp_missionItem.m_speedRequired = true;
+            temp_missionItem.speed = mavlink[0];
+          }
+          break;
+          
+          case mavlink20.MAV_CMD_CONDITION_YAW:
+          {
+            temp_missionItem.m_yawRequired = true;
+            temp_missionItem.yaw = mavlink[0];
+          }
+          break;
         }
-        
-        
       }
   }
 
@@ -667,7 +714,7 @@ export class ClssAndruavMissionPlan {
               Mission Param #7	Empty
             */
 
-          fn_addMissionItem(marker, 178, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_CHANGE_SPEED, [
             1,
             marker.m_missionItem.speed,
             1,
@@ -694,7 +741,7 @@ export class ClssAndruavMissionPlan {
               Mission Param #7	Empty
             */
 
-          fn_addMissionItem(marker, 115, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_CONDITION_YAW, [
             marker.m_missionItem.yaw, // param1
             0, // defalt speed [AUTO_YAW_SLEW_RATE]
             0, // direction is not effectve in absolute degree

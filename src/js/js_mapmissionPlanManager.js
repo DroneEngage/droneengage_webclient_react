@@ -61,7 +61,7 @@ class ClssAndruavMissionPlanManager {
         // Call the delete method on the mission plan to clean up resources
         v_missionPlan.fn_deleteAll();
         // Remove the mission plan from the manager
-        delete this.m_missionPlans[v_id2];
+        //delete this.m_missionPlans[v_id2];
     }
 
     /**
