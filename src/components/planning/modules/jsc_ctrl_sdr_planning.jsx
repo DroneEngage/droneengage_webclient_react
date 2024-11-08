@@ -10,6 +10,7 @@ export class ClssSDR_Planning extends React.Component {
         super ();
         this.state = {
             m_update : 0,
+            m_cmd_packet: {},
         };
 
         this.key = Math.random().toString();
