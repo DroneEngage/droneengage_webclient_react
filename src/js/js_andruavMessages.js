@@ -178,10 +178,11 @@ export const CONST_SDR_ACTION_SET_CONFIG          = 3;
 export const CONST_SDR_ACTION_READ_DATA           = 4;
 
 // SDR STATUS
-export const CONST_SDR_STATUS_NOT_CONNECTED = 0;
-export const CONST_SDR_STATUS_CONNECTED     = 1;
-export const CONST_SDR_STATUS_STREAMING     = 2;
-export const CONST_SDR_STATUS_ERROR         = 3;
+export const CONST_SDR_STATUS_NOT_CONNECTED       = 0;
+export const CONST_SDR_STATUS_CONNECTED           = 1;
+export const CONST_SDR_STATUS_STREAMING_ONCE      = 2;
+export const CONST_SDR_STATUS_STREAMING_INTERVALS = 3;
+export const CONST_SDR_STATUS_ERROR               = 999;
 
 // FenceType
 export const CONST_TYPE_LinearFence = 1;

@@ -24,6 +24,7 @@ export class ClssCTRL_SDR extends React.Component {
                 m_sample_rate : 0.0,
                 m_decode_mode: 0,
                 m_display_bars: 30,
+                m_interval: 0,
                 m_updated :
                 {
                     fc : false,
@@ -33,10 +34,10 @@ export class ClssCTRL_SDR extends React.Component {
                     dm : false,  // decode mode
                     dr : false,  // p_driver_index
                     db : false,  // p_display_bars
+                    interval: false,
                 }
 		};
 
-        this.Modes = ["FM", "NBFM", "AM", "NAM", "USB", "LSB", "CW"]
         js_eventEmitter.fn_subscribe (js_globals.EE_unitSDRUpdated,this,this.fn_unitUpdated);
     }
 
@@ -58,6 +59,7 @@ export class ClssCTRL_SDR extends React.Component {
         p_me.state.m_driver_index = p_andruavUnit.m_SDR.m_driver_index;
         p_me.state.m_sample_rate = p_andruavUnit.m_SDR.m_sample_rate;
         p_me.state.m_gain = p_andruavUnit.m_SDR.m_gain;
+        p_me.state.m_interval = p_andruavUnit.m_SDR.m_interval;
         p_me.state.m_decode_mode = p_andruavUnit.m_SDR.m_decode_mode;
         p_me.state.m_display_bars = p_andruavUnit.m_SDR.m_display_bars;
     }
@@ -100,6 +102,15 @@ export class ClssCTRL_SDR extends React.Component {
         this.setState({m_gain: e.target.value});
     }
 
+    fn_onInterval(e)
+    {
+        if (isNaN(e.target.value)) return ;
+
+        let res = parseInt(e.target.value);
+        this.state.m_updated.interval = true;
+        this.setState({m_interval: res});
+    }
+
     fn_onDisplayBars(e)
     {
         this.state.m_updated.db = true;
@@ -119,20 +130,22 @@ export class ClssCTRL_SDR extends React.Component {
 
     fn_UpdateSDR(p_andruavUnit)
     {
-        var p_fequency_center = null;
-        var p_fequency = null;
-        var p_band_width = null;
-        var p_gain = null;
-        var p_sample_rate = null;
-        var p_decode_mode = null;
-        var p_driver_index = null;
-        var p_display_bars = null;
+        let p_fequency_center = null;
+        let p_fequency = null;
+        let p_band_width = null;
+        let p_gain = null;
+        let p_sample_rate = null;
+        let p_decode_mode = null;
+        let p_driver_index = null;
+        let p_display_bars = null;
+        let p_interval = null;
 
         if (this.state.m_updated.fc === true)   p_fequency_center   = parseFloat(this.state.m_center_frequency);
         if (this.state.m_updated.bw === true)   p_band_width        = parseFloat(this.state.m_band_width);
         if (this.state.m_updated.ga === true)   p_gain              = parseFloat(this.state.m_gain);
         if (this.state.m_updated.sr === true)   p_sample_rate       = parseFloat(this.state.m_sample_rate);
         if (this.state.m_updated.db === true)   p_display_bars      = parseFloat(this.state.m_display_bars);
+        if (this.state.m_updated.interval === true)   p_interval    = parseFloat(this.state.m_interval);
         
         const dm = this.state.m_decode_mode;
         if (this.state.m_updated.dm === true)   p_decode_mode       = ((dm === null)?0:parseInt(dm));
@@ -141,7 +154,7 @@ export class ClssCTRL_SDR extends React.Component {
         
         js_globals.v_andruavClient.API_setSDRConfig(p_andruavUnit, p_fequency_center, p_fequency,
             p_band_width, p_gain, p_sample_rate,
-            p_decode_mode, p_driver_index, p_display_bars); 
+            p_decode_mode, p_driver_index, p_interval, p_display_bars); 
 
     }
 
@@ -174,14 +187,18 @@ export class ClssCTRL_SDR extends React.Component {
                     return {r:"bg-success", u:"bg-danger", s:"hidden"};
                 }
 
-            case js_andruavMessages.CONST_SDR_STATUS_ERROR:
-                return {r:"bg-danger", u:"bg-light", s:"bg-light"};
                 
             case js_andruavMessages.CONST_SDR_STATUS_CONNECTED:
                 return {r:"bg-success", u:"bg-danger", s:"bg-warning"};
 
-            case js_andruavMessages.CONST_SDR_STATUS_STREAMING:
-                return {r:"bg-light", u:"bg-light", s:"bg-danger"};
+            case js_andruavMessages.CONST_SDR_STATUS_STREAMING_ONCE:
+            case js_andruavMessages.CONST_SDR_STATUS_STREAMING_INTERVALS:
+                    return {r:"bg-light", u:"bg-light", s:"bg-danger"};
+
+            case js_andruavMessages.CONST_SDR_STATUS_ERROR:
+            default:
+                return {r:"bg-danger", u:"bg-light", s:"bg-light"};
+                        
         }
     }
 
@@ -262,6 +279,10 @@ export class ClssCTRL_SDR extends React.Component {
                         <div key={v_andruavUnit.partyID + 'sdr_114'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5"><small><b>Gain</b></small></label>
                             <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5" placeholder="Gain" aria-label="Gain"  value={this.state.m_gain} onChange={(e)=> this.fn_onGain(e)}/>
+                        </div>
+                        <div key={v_andruavUnit.partyID + 'sdr_115'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_interval'} className="col-5"><small><b>Interval</b></small></label>
+                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_interval'} className="col-5" placeholder="Interval" aria-label="Interval"  value={this.state.m_interval} onChange={(e)=> this.fn_onInterval(e)}/>
                         </div>
                     </div>
                     <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
