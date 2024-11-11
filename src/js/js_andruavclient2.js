@@ -807,7 +807,7 @@ class CAndruavClient {
 
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
         p_band_width, p_gain, p_sample_rate,
-        p_decode_mode, p_driver_index,
+        p_decode_mode, p_driver_index,p_interval,
         p_display_bars
     )
     {
@@ -815,7 +815,7 @@ class CAndruavClient {
         
         const cmd = CCommandAPI.API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
             p_band_width, p_gain, p_sample_rate,
-            p_decode_mode, p_driver_index,
+            p_decode_mode, p_driver_index, p_interval,
             p_display_bars
         );
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
@@ -2133,7 +2133,7 @@ class CAndruavClient {
                 p_unit.m_SDR.m_decode_mode              = p_jmsg.m;
                 p_unit.m_SDR.m_driver                   = p_jmsg.n;
                 p_unit.m_SDR.m_status                   = p_jmsg.c;
-                
+                p_unit.m_SDR.m_interval                 = p_jmsg.t;
                 
                 js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
             }

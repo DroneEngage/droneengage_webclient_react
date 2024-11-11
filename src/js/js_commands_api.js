@@ -207,7 +207,7 @@ export class CCommandAPI
         if (p_decode_mode !== null)      p_msg.m  = p_decode_mode;
         if (p_driver_index !== null)     p_msg.i  = p_driver_index;
         if (p_driver_index !== null)     p_msg.i  = p_driver_index;
-        if (p_interval !== null)         p_msg.t = p_interval; // in milli-seconds - 0 means ignore
+        if (p_interval !== null)         p_msg.t  = p_interval; // in milli-seconds - 0 means ignore
         if (p_display_bars !== null)     p_msg.r  = p_display_bars;
         
         js_common.fn_console_log (p_msg);
