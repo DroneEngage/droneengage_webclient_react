@@ -176,6 +176,7 @@ export const CONST_SDR_ACTION_DISCONNECT          = 1;
 export const CONST_SDR_ACTION_LIST_SDR_DEVICES    = 2;
 export const CONST_SDR_ACTION_SET_CONFIG          = 3;
 export const CONST_SDR_ACTION_READ_DATA           = 4;
+export const CONST_SDR_ACTION_PAUSE_DATA          = 5;
 
 // SDR STATUS
 export const CONST_SDR_STATUS_NOT_CONNECTED       = 0;

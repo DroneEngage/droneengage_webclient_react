@@ -414,10 +414,8 @@ class C_SDR {
     this.m_type = '';
     this.m_center_frequency = 0.0;
     this.m_interval = 0.0;
-    this.m_band_width = 0.0;
     this.m_sample_rate = 0.0;
     this.m_gain = 0.0;
-    this.m_decode_mode = 0;
     this.m_driver = '';
     this.m_driver_index = 0;
     this.m_display_bars = 30;

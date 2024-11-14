@@ -70,12 +70,12 @@ export class CCommandAPI
     };
 
 
-    static API_scanSDRFreq(p_andruavUnit) {
+    static API_scanSDRFreq(p_andruavUnit, p_on_off) {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
             'ms': {
-                    a: js_andruavMessages.CONST_SDR_ACTION_READ_DATA
+                    a: p_on_off===true?js_andruavMessages.CONST_SDR_ACTION_READ_DATA:js_andruavMessages.CONST_SDR_ACTION_PAUSE_DATA
                 }   
         };
             
@@ -188,7 +188,7 @@ export class CCommandAPI
     }
     
     static API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
-        p_band_width, p_gain, p_sample_rate,
+        p_gain, p_sample_rate,
         p_decode_mode, p_driver_index, p_interval,
         p_display_bars
     )
@@ -201,7 +201,6 @@ export class CCommandAPI
         
         if (p_fequency_center !== null)  p_msg.fc = p_fequency_center;
         if (p_fequency !== null)         p_msg.f  = p_fequency;
-        if (p_band_width !== null)       p_msg.b  = p_band_width;
         if (p_gain !== null)             p_msg.g  = p_gain;
         if (p_sample_rate !== null)      p_msg.s  = p_sample_rate;
         if (p_decode_mode !== null)      p_msg.m  = p_decode_mode;

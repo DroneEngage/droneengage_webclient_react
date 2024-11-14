@@ -767,10 +767,10 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
-    API_scanSDRFreq(p_andruavUnit) {
+    API_scanSDRFreq(p_andruavUnit, p_on_off) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit);
+        const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit, p_on_off);
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
@@ -806,7 +806,7 @@ class CAndruavClient {
     }
 
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
-        p_band_width, p_gain, p_sample_rate,
+        p_gain, p_sample_rate,
         p_decode_mode, p_driver_index,p_interval,
         p_display_bars
     )
@@ -814,7 +814,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
-            p_band_width, p_gain, p_sample_rate,
+            p_gain, p_sample_rate,
             p_decode_mode, p_driver_index, p_interval,
             p_display_bars
         );
@@ -2126,11 +2126,9 @@ class CAndruavClient {
                 p_jmsg = msg.msgPayload;
                 p_unit.m_SDR.m_initialized              = true;
                 p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
-                p_unit.m_SDR.m_band_width               = p_jmsg.b;
                 p_unit.m_SDR.m_display_bars             = p_jmsg.r;
                 p_unit.m_SDR.m_gain                     = p_jmsg.g;
                 p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
-                p_unit.m_SDR.m_decode_mode              = p_jmsg.m;
                 p_unit.m_SDR.m_driver                   = p_jmsg.n;
                 p_unit.m_SDR.m_status                   = p_jmsg.c;
                 p_unit.m_SDR.m_interval                 = p_jmsg.t;
