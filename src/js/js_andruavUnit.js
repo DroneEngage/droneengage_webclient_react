@@ -801,6 +801,7 @@ export class CAndruavUnitObject {
     this.m_flightMode = CONST_FLIGHT_CONTROL_UNKNOWN;
     this.m_autoPilot = mavlink20.MAV_AUTOPILOT_GENERIC;
     this.m_isArmed = false;
+    this.m_is_ready_to_arm = false;
     this.m_useFCBIMU = false;
     this.m_VehicleType = VEHICLE_UNKNOWN;
     this.m_telemetry_protocol = js_andruavMessages.CONST_No_Telemetry;

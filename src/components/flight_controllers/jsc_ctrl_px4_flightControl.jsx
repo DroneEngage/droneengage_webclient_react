@@ -148,7 +148,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
 			switch (p_andruavUnit.m_VehicleType)
             {
                 case js_andruavUnit.VEHICLE_SUBMARINE:
-                    res.btn_arm_class                   = " btn-danger ";
+                    res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " btn-outline-light ";
 		            res.btn_climb_class 	            = " btn-outline-light ";
                     res.btn_climb_text                  = "Dive";
@@ -169,7 +169,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
 
                 case js_andruavUnit.VEHICLE_BOAT:
                 case js_andruavUnit.VEHICLE_ROVER:
-                    res.btn_arm_class                   = " btn-outline-light ";
+                    res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " disabled hidden  ";
 		            res.btn_manual_ctl_class            = " btn-outline-light ";
                     res.btn_climb_class 	            = " disabled hidden ";
@@ -190,7 +190,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
 
                 case js_andruavUnit.VEHICLE_TRI:
                 case js_andruavUnit.VEHICLE_QUAD:
-                    res.btn_arm_class                   = " btn-danger ";
+                    res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " btn-outline-light ";
 		            res.btn_climb_class 	            = " btn-outline-light ";
                     res.btn_manual_ctl_class            = " btn-outline-light ";
@@ -209,7 +209,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     break;
 
                 case  js_andruavUnit.VEHICLE_PLANE:
-                    res.btn_arm_class                   = " btn-danger ";
+                    res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " disabled hidden ";
 		            res.btn_climb_class 	            = " btn-outline-light ";
                     res.btn_manual_ctl_class            = " btn-outline-light ";

@@ -222,7 +222,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             {
                 case js_andruavUnit.VEHICLE_SUBMARINE:
                     res.btn_takeoff_class      = " btn-outline-light ";
-                    res.btn_arm_class 		    = " btn-danger ";
+                    res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_climb_class 	    = " btn-outline-light ";
                     res.btn_climb_text          = "dive";
 		            res.btn_land_class 		    = " disabled hidden ";
@@ -247,7 +247,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     break;
                 case js_andruavUnit.VEHICLE_BOAT:
                 case js_andruavUnit.VEHICLE_ROVER:
-                    res.btn_arm_class 		    = " btn-danger ";
+                    res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_climb_class 	    = " disabled hidden ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_surface_class       = " disabled hidden ";
@@ -274,7 +274,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_TRI:
                 case js_andruavUnit.VEHICLE_QUAD:
                         res.btn_takeoff_class       = " disabled hidden ";
-                        res.btn_arm_class 		    = " btn-danger ";
+                        res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                         res.btn_climb_class 	    = " btn-outline-light ";
                         res.btn_land_class 		    = " btn-outline-light ";
                         res.btn_surface_class       = " disabled hidden ";
@@ -297,7 +297,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         break;
 
                 case  js_andruavUnit.VEHICLE_PLANE:
-                    res.btn_arm_class 		    = " btn-danger ";
+                    res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_climb_class 	    = " btn-outline-light ";
                     res.btn_takeoff_class       = " btn-outline-light ";
                     res.btn_land_class 		    = " disabled hidden ";

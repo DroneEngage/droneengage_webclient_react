@@ -1918,10 +1918,25 @@ class CAndruavClient {
                         p_unit.m_flightMode = p_jmsg.FM;
 
                         if (p_jmsg.hasOwnProperty('AR') !== true) {
-                            p_jmsg.AR = false;
+                            p_jmsg.AR = 0;
                         }
-                        v_trigger_on_armed = (p_unit.m_isArmed !== p_jmsg.AR);
-                        p_unit.m_isArmed = p_jmsg.AR;
+
+                        let is_armed = false;
+                        let is_ready_to_arm = false;
+                        if (typeof p_jmsg.AR === 'boolean')
+                        {   // backword compatibility/
+                            is_armed = p_jmsg.AR;
+                            is_ready_to_arm = p_jmsg.AR;
+                        }
+                        else if (typeof p_jmsg.AR === 'number')
+                        {
+                            is_armed = (p_jmsg.AR & 0b0010)==0b10;
+                            is_ready_to_arm = (p_jmsg.AR & 0b0001)==0b1;
+                        }
+                        
+                        v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
+                        p_unit.m_isArmed = is_armed;
+                        p_unit.m_is_ready_to_arm = is_ready_to_arm;
 
                         if (p_jmsg.hasOwnProperty('FL') !== true) {
                             p_jmsg.FL = false;
@@ -2011,10 +2026,24 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('AP') === true) {
                             p_unit.m_autoPilot = p_jmsg.AP;
                         }
-                        if (p_jmsg.hasOwnProperty('AR') === true) {
-                            v_trigger_on_armed = (p_unit.m_isArmed !== p_jmsg.AR);
-                            p_unit.m_isArmed = p_jmsg.AR;
+                        
+                        let is_armed = false;
+                        let is_ready_to_arm = false;
+                        if (typeof p_jmsg.AR === 'boolean')
+                        {   // backword compatibility/
+                            is_armed = p_jmsg.AR;
+                            is_ready_to_arm = p_jmsg.AR;
                         }
+                        else if (typeof p_jmsg.AR === 'number')
+                        {
+                            is_armed = (p_jmsg.AR & 0b0010)==0b10;
+                            is_ready_to_arm = (p_jmsg.AR & 0b0001)==0b1;
+                        }
+                        
+                        v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
+                        p_unit.m_isArmed = is_armed;
+                        p_unit.m_is_ready_to_arm = is_ready_to_arm;
+
                         if (p_jmsg.hasOwnProperty('FL') === true) {
                             v_trigger_on_flying = (p_unit.m_isFlying !== p_jmsg.FL);
                             p_unit.m_isFlying = p_jmsg.FL;
