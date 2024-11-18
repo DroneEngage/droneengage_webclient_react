@@ -23,9 +23,10 @@ import {fn_on_ready} from '../js/js_main'
 
 const Planning = () => {
 
-  
+  js_globals.CONST_MAP_EDITOR = true;  
+ 
   useEffect(() => {
-    js_globals.CONST_MAP_EDITOR = true;  
+    
     fn_on_ready();
   }
   );

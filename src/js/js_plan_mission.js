@@ -207,6 +207,24 @@ export class ClssAndruavMissionPlan {
     
   }
 
+
+  fn_loadMarker(p_marker, p_mission_item)
+  {
+    p_marker.m_main_de_mission = this;
+    p_marker.id = this.m_missionCounter;
+    p_marker.order = 99;
+    p_marker.m_missionItem = p_mission_item;
+
+    this.m_missionCounter += 1;
+    this.p_all_missions.push(p_marker);
+      this.fn_orderItems();
+      this.fn_updatePath();
+
+      js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+        mission: this,
+      });
+  }
+
   /**
    *	removes a single marker.
    */
@@ -330,11 +348,6 @@ export class ClssAndruavMissionPlan {
     }
   }
 
-  fn_getModuleTaskByLinkedMavlinkAsObject (p_cmds)
-  {
-
-  }
-
   fn_importAsDE_V1 (p_andruavUnit, p_plan_text)
   {
       if (p_plan_text['fileType'] !== 'de_plan') return ;
@@ -372,10 +385,24 @@ export class ClssAndruavMissionPlan {
 
           case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
             {
-              js_leafletmap.fn_addMarker ([mavlink[4], mavlink[5]],js_leafletmap);
 
-              const cmds = this.fn_getModuleTaskByLinkedMavlink(i.toString(), modules);
-              const p_current_modules = this.fn_getModuleTaskByLinkedMavlinkAsObject(cmds);
+              const cmds = this.fn_getModuleTaskByLinkedMavlink((i+1).toString(), modules);
+              let new_marker = js_leafletmap.fn_addMarkerManually ([mavlink[4], mavlink[5]],js_leafletmap);
+              let p_mission_item =
+              {
+                alt: 30,
+                m_missionType: js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP,
+                m_frameType: mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+                m_speedRequired: false,
+                speed: 5, // m/s
+                m_yawRequired: false,
+                yaw: 0,
+                modules: {
+                  compiled_cmds: cmds
+                },
+              };
+              
+              this.fn_loadMarker(new_marker, p_mission_item);
 
             }
             break;

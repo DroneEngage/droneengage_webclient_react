@@ -24,23 +24,44 @@ export class ClssSDR_Planning extends React.Component {
         this.state.m_update = 1;
         
         if (this.props.p_shape.m_missionItem.modules.sdr === undefined) {
-            // init data
-            this.fn_process_enable (false);
-
-            this.props.p_shape.m_missionItem.modules.sdr= {};
+            // load compiled data [compiled_cmds] -loaded missions-.
+            if (this.props.p_shape.m_missionItem.modules.compiled_cmds !== null && this.props.p_shape.m_missionItem.modules.compiled_cmds !== undefined)
+                {
+                    
+                }
+                else
+                {
+                    // init data
+                    this.props.p_shape.m_missionItem.modules.sdr =
+                    {
+                        // tel: this.state.m_cmd_packet.m_enable_telemetry,
+                        // p2p: this.state.m_cmd_packet.m_enable_p2p,
+                        // srv: this.state.m_cmd_packet.m_enable_servercomm,
+                        // swr: this.state.m_cmd_packet.m_follow_partyID,
+                        // swr_leader: this.state.m_cmd_packet.m_swarm_leader,
+                    };
+                }
         }
         else
         {
-            this.fn_process_enable (true);
+            // // copy saved data
+            // const p2p = this.props.p_shape.m_missionItem.modules.p2p;
+
+            // this.state.m_cmd_packet.m_enable_telemetry = p2p.tel;
+            // this.state.m_cmd_packet.m_enable_p2p = p2p.p2p;
+            // this.state.m_cmd_packet.m_enable_servercomm = p2p.srv;
+            // this.state.m_cmd_packet.m_follow_partyID = p2p.swr;
+            // this.state.m_cmd_packet.m_swarm_leader = p2p.swr_leader;
+
+            // this.telemetry_Ref.current.checked = p2p.tel;
+            // this.p2p_Ref.current.checked = p2p.p2p;
+            // this.servercomm_Ref.current.checked = p2p.srv;
+            // this.swarm_Ref.current.m_partyID = p2p.swr;
+            // this.swrm_leader_Ref.current.checked = p2p.swr_leader;
         }
 
         this.setState({m_update: this.state.m_update +1});
 
-    }
-
-    fn_process_enable (enabled)
-    {
-        
     }
 
     componentWillUnmount() 

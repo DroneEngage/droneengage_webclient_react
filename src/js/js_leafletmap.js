@@ -160,8 +160,6 @@ class CLeafLetAndruavMap {
                 });
 
             });
-
-            //fn_addMarker ([51.505, -0.09], this);
         }
         
          // Function to add a marker
@@ -205,17 +203,11 @@ class CLeafLetAndruavMap {
      * @param {*} loc 
      * @param {*} me 
      */
-    fn_addMarker(loc, me) {
+    fn_addMarkerManually(loc, me) {
         const marker = L.marker(loc).addTo(me.m_Map);
         marker.pm.enable();
         marker.pm.m_shape_type = 'Marker';
-        // Fire the pm:create event
-        // marker.fire('pm:create', {
-        //     layer: marker,
-        //     shape: 'Marker'
-        // });
-        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, marker)
-                // add to shapes list.
+        // add to shapes list.
         js_globals.v_map_shapes.push(marker);
         marker.on('click', function (p_event) {
             if (p_event.originalEvent.ctrlKey===false)
@@ -227,6 +219,9 @@ class CLeafLetAndruavMap {
                 js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, marker);
             }
         });
+
+        //js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, marker)
+        return marker;
     }
 
     setMap(p_map) {

@@ -36,15 +36,101 @@ export class ClssP2P_Planning extends React.Component {
     componentDidMount() {
         this.state.m_update = 1;
         if (this.props.p_shape.m_missionItem.modules.p2p === undefined) {
-            // init data
-            this.props.p_shape.m_missionItem.modules.p2p =
-            {
-                tel: this.state.m_cmd_packet.m_enable_telemetry,
-                p2p: this.state.m_cmd_packet.m_enable_p2p,
-                srv: this.state.m_cmd_packet.m_enable_servercomm,
-                swr: this.state.m_cmd_packet.m_follow_partyID,
-                swr_leader: this.state.m_cmd_packet.m_swarm_leader,
+            this.props.p_shape.m_missionItem.modules.p2p = {
+                cmds: {
+                    'tel_cmd': null,
+                    'p2p_cmd': null,
+                    'srv_cmd': null,
+                    'swr_cmd': null,
+                    'swr_leader': null
+                },
             };
+            let p2p_cmds = this.props.p_shape.m_missionItem.modules.p2p.cmds;
+
+            // load compiled data [compiled_cmds] -loaded missions-.
+            if (this.props.p_shape.m_missionItem.modules.compiled_cmds !== null && this.props.p_shape.m_missionItem.modules.compiled_cmds !== undefined)
+            {
+                const cmds = this.props.p_shape.m_missionItem.modules.compiled_cmds;
+                const len = cmds.length;
+                for (let i=0; i < len; ++i)
+                {
+                    const message_type = cmds[i].mt;
+                    const message_command = cmds[i].ms;
+
+                    switch (message_type)
+                    {
+                        case js_andruavMessages.CONST_TYPE_AndruavMessage_Set_Communication_Line:
+                        {
+                            if (message_command.p2pd !== null && message_command.p2pd !== undefined)
+                            {
+                                this.state.m_cmd_packet.m_enable_p2p = message_command.p2pd;
+                                p2p_cmds.p2p = message_command.p2pd;
+                            }  
+                            
+                            if (message_command.ws !== null && message_command.ws !== undefined)
+                            {
+                                this.state.m_cmd_packet.m_enable_servercomm = message_command.ws;
+                                p2p_cmds.srv = message_command.ws;
+                            }  
+                        }
+                        break;
+
+                        // case js_andruavMessages.CONST_TYPE_AndruavMessage_Set_Communication_Line:
+                        // {
+                        //     if (message_command.p2pd !== null && message_command.p2pd !== undefined)
+                        //     {
+                        //         this.state.m_cmd_packet.m_follow_partyID = message_command.p2pd;
+                        //         p2p_cmds.p2p = message_command.p2pd;
+                        //     }  
+                            
+                        //     if (message_command.ws !== null && message_command.ws !== undefined)
+                        //     {
+                        //         this.state.m_cmd_packet.m_enable_servercomm = message_command.ws;
+                        //         p2p_cmds.srv = message_command.ws;
+                        //     }  
+                        // }
+                        // break;
+
+                        case js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute:
+                        {
+                            switch (message_command.C)
+                            {
+                                case js_andruavMessages.CONST_RemoteCommand_TELEMETRYCTRL:
+                                {
+                                    if (message_command.Act === js_andruavMessages.CONST_TELEMETRY_REQUEST_PAUSE)
+                                    {
+                                        this.state.m_cmd_packet.m_enable_telemetry = false;
+                                        p2p_cmds.tel = false;
+                                    }
+                                    else if (message_command.Act === js_andruavMessages.CONST_TELEMETRY_REQUEST_RESUME)
+                                    {
+                                        this.state.m_cmd_packet.m_enable_telemetry = true;
+                                        p2p_cmds.tel = true;
+                                    }
+                                    else
+                                    {
+                                        // LEAVE IT EMPTY
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // init data
+                this.props.p_shape.m_missionItem.modules.p2p =
+                {
+                    tel: this.state.m_cmd_packet.m_enable_telemetry,
+                    p2p: this.state.m_cmd_packet.m_enable_p2p,
+                    srv: this.state.m_cmd_packet.m_enable_servercomm,
+                    swr: this.state.m_cmd_packet.m_follow_partyID,
+                    swr_leader: this.state.m_cmd_packet.m_swarm_leader,
+                };
+            }
             
         }
         else {
