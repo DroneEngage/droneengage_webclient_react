@@ -56,6 +56,27 @@ class ClassBarChart extends React.Component {
         this.drawChart();
     }
 
+    averageArray(data, m) {
+        const n = data.length;
+        const averagedData = [];
+    
+        // Calculate the size of each segment
+        const segmentSize = Math.floor(n / m);
+        
+        for (let i = 0; i < m; i++) {
+            const start = i * segmentSize; // Start index of the segment
+            const end = (i + 1) * segmentSize; // End index of the segment
+            const segment = data.slice(start, end); // Slice the segment
+    
+            // Calculate the average of the segment
+            const sum = segment.reduce((acc, value) => acc + value, 0);
+            const average = sum / segment.length;
+    
+            averagedData.push(average);
+        }
+    
+        return averagedData;
+    }
 
     drawChart() {
         const canvas = this.canvasRef.current;
@@ -66,21 +87,28 @@ class ClassBarChart extends React.Component {
 
         // Fetch the data and labels
         const { data, labels } = this.props;
-
+        let displayed_data;
         // Calculate the width and height of each bar
-        const barWidth = canvas.width / data.length - 10;
-
-        const corr = (data.length/2);
-        data[corr] = (data[corr-1] + data[corr +1])/2.0;
-        this.m_maxValue = Math.max(...data);
+        let barWidth = canvas.width / data.length;
+        if (barWidth < 1)
+        {
+            barWidth = 1;
+            displayed_data = this.averageArray(data, canvas.width);
+        }
+        else
+        {
+            displayed_data = data;
+        }
+        
+        this.m_maxValue = Math.max(...displayed_data);
 
         const margin = 30;
         const inner_height = canvas.height - (2 * margin);
 
         // Draw the bars
-        data.forEach((value, index) => {
+        displayed_data.forEach((value, index) => {
             const barHeight = (value / this.m_maxValue) * inner_height;
-            const x = index * (barWidth + 10);
+            const x = index * (barWidth);
             const y = inner_height - barHeight + margin;
 
             ctx.fillStyle = this.getColor(value);
@@ -131,15 +159,7 @@ class ClassBarChart extends React.Component {
         ctx.fillStyle = 'white';
         ctx.fillText(parseFloat(this.m_maxValue).toFixed(2), 0, margin);
         ctx.fillText(parseFloat(this.m_maxValue / 2).toFixed(2), 0, inner_height / 2 + margin);
-        //ctx.fillText(parseFloat(this.m_maxValue / 4).toFixed(2), 0, 3 * inner_height / 4 + margin);
         ctx.restore();
-
-        // ctx.beginPath();
-        // ctx.moveTo(30, minY);
-        // ctx.lineTo(10, minY);
-        // ctx.moveTo(20, minY - 5);
-        // ctx.lineTo(20, minY + 5);
-        // ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(30, middleY);

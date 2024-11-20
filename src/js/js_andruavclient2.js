@@ -1917,6 +1917,7 @@ class CAndruavClient {
                         v_trigger_on_flightMode = (p_unit.m_flightMode !== p_jmsg.FM);
                         p_unit.m_flightMode = p_jmsg.FM;
 
+                        
                         if (p_jmsg.hasOwnProperty('AR') !== true) {
                             p_jmsg.AR = 0;
                         }
@@ -1933,11 +1934,11 @@ class CAndruavClient {
                             is_armed = (p_jmsg.AR & 0b0010)==0b10;
                             is_ready_to_arm = (p_jmsg.AR & 0b0001)==0b1;
                         }
-                        
                         v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
                         p_unit.m_isArmed = is_armed;
                         p_unit.m_is_ready_to_arm = is_ready_to_arm;
 
+                        
                         if (p_jmsg.hasOwnProperty('FL') !== true) {
                             p_jmsg.FL = false;
                         }

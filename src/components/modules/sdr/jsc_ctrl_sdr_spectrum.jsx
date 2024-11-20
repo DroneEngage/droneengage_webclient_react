@@ -35,9 +35,9 @@ class ClassSDRSpectrumVisualizer extends React.Component {
 
     render()
     {
-        var data = [];
-        var labels = [];
-        var spectrum = this.props.p_unit.m_SDR.getLastSpectrum();
+        let data = [];
+        let labels = [];
+        let spectrum = this.props.p_unit.m_SDR.getLastSpectrum();
         
         if (spectrum===null || spectrum === undefined)
         {
