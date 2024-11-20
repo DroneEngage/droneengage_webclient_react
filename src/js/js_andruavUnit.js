@@ -112,13 +112,14 @@ export const CONST_FLIGHT_PX4_POSCTL_POSCTL = 214;
 export const CONST_FLIGHT_PX4_POSCTL_ORBIT = 215;
 export const CONST_FLIGHT_CONTROL_UNKNOWN = 999;
 
-
+const SDR_MAXIMUM_SPECTRUM_HISTORY = 10;
 
 export function fn_getFullName(m_groupName, p_partyID) {
   //return m_groupName.replace(" ","_") + "_X_" + partyID.replace(" ","_");
 
   return p_partyID; // partyID is unique
 }
+
 
 
 class C_Obstacles {
@@ -444,6 +445,11 @@ class C_SDR {
     Object.seal(spectrumData);
     
     this.m_spectrum_data.push(spectrumData); // Add the new data to the array
+
+    // Limit the array to the most recent SDR_MAXIMUM_SPECTRUM_HISTORY entries
+    if (this.m_spectrum_data.length > SDR_MAXIMUM_SPECTRUM_HISTORY) {
+      this.m_spectrum_data.splice(0, this.m_spectrum_data.length - SDR_MAXIMUM_SPECTRUM_HISTORY);
+    }
 
     // Ensure the array length is within the maximum limit
     if (this.m_spectrum_data.length > js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH) {
