@@ -300,7 +300,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             res.abs.css = ' text-white ';
         }
 
-        if (p_andruavUnit.m_Nav_Info.p_Location.alt==null)
+        if (p_andruavUnit.m_Nav_Info.p_Location.alt_relative==null)
         {
             res.rel.value = 'NA';
             res.rel.css = ' text-muted ';
@@ -310,15 +310,15 @@ class ClssAndruavUnitDroneRow extends React.Component{
         {
             if (js_globals.v_useMetricSystem === true)
             {
-                res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt;
+                res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
                 res.rel.unit = ' m';
             }
             else
             {
-                res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt * js_helpers.CONST_METER_TO_FEET;
+                res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt_relative * js_helpers.CONST_METER_TO_FEET;
                 res.rel.unit = ' ft';
             }
-            res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt;
+            res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
             if (res.rel.value<10) 
             {
                 res.rel.value = res.rel.value.toFixed(2);

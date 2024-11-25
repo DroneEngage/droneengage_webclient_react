@@ -84,7 +84,7 @@ export class ClssMainUnitPopup extends React.Component {
         }
         
         
-        let vAlt = this.props.p_unit.m_Nav_Info.p_Location.alt;
+        let vAlt = this.props.p_unit.m_Nav_Info.p_Location.alt_relative;
 		let vAlt_abs = this.props.p_unit.m_Nav_Info.p_Location.alt_abs;
 			if (vAlt === null || vAlt  === undefined)
 			{

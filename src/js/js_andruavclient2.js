@@ -808,7 +808,7 @@ class CAndruavClient {
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
         p_gain, p_sample_rate,
         p_decode_mode, p_driver_index,p_interval,
-        p_display_bars
+        p_display_bars, p_trigger_level
     )
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -816,7 +816,7 @@ class CAndruavClient {
         const cmd = CCommandAPI.API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
             p_gain, p_sample_rate,
             p_decode_mode, p_driver_index, p_interval,
-            p_display_bars
+            p_display_bars, p_trigger_level
         );
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
@@ -1669,7 +1669,8 @@ class CAndruavClient {
                 } 
                 p_unit.m_Nav_Info.p_Location.lat = p_jmsg.la;
                 p_unit.m_Nav_Info.p_Location.lng = p_jmsg.ln
-                p_unit.m_Nav_Info.p_Location.alt = parseFloat(p_jmsg.a);
+                p_unit.m_Nav_Info.p_Location.alt_abs = parseFloat(p_jmsg.a);
+                p_unit.m_Nav_Info.p_Location.alt_relative = parseFloat(p_jmsg.r);
                 
                 
                 if (p_jmsg.hasOwnProperty('t')) {
@@ -2148,40 +2149,55 @@ class CAndruavClient {
             }
             break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO: {
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION: {
                 if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
                     Me.API_requestID(msg.senderName);
                     return;
                 }
-                p_jmsg = msg.msgPayload;
-                p_unit.m_SDR.m_initialized              = true;
-                p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
-                p_unit.m_SDR.m_display_bars             = p_jmsg.r;
-                p_unit.m_SDR.m_gain                     = p_jmsg.g;
-                p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
-                p_unit.m_SDR.m_driver                   = p_jmsg.n;
-                p_unit.m_SDR.m_status                   = p_jmsg.c;
-                p_unit.m_SDR.m_interval                 = p_jmsg.t;
-                
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
-            }
-            break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_STATUS: {
-                if (p_unit === null  || p_unit === undefined) { // p_unit not defined here ... send a request for ID
-                    Me.API_requestID(msg.senderName);
-                    return;
-                }
                 p_jmsg = msg.msgPayload;
-                if (p_jmsg.dr===null)
+                switch (p_jmsg.a)
                 {
-                    p_unit.m_SDR.m_available_drivers = [];
+                    case js_andruavMessages.CONST_SDR_ACTION_SDR_INFO:
+                        p_jmsg = msg.msgPayload;
+                        p_unit.m_SDR.m_initialized              = true;
+                        p_unit.m_SDR.m_center_frequency         = p_jmsg.fc;
+                        p_unit.m_SDR.m_display_bars             = p_jmsg.r;
+                        p_unit.m_SDR.m_gain                     = p_jmsg.g;
+                        p_unit.m_SDR.m_sample_rate              = p_jmsg.s;
+                        p_unit.m_SDR.m_driver                   = p_jmsg.n;
+                        p_unit.m_SDR.m_status                   = p_jmsg.c;
+                        p_unit.m_SDR.m_interval                 = p_jmsg.t;
+                        p_unit.m_SDR.m_trigger_level            = p_jmsg.l;
+                        
+                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+                    break;
+
+                    case js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES:
+                        if (p_jmsg.dr===null)
+                        {
+                            p_unit.m_SDR.m_available_drivers = [];
+                        }
+                        else
+                        {
+                        p_unit.m_SDR.m_available_drivers = p_jmsg.dr;
+                        }
+                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+                    break;
+
+                    case js_andruavMessages.CONST_SDR_ACTION_TRIGGER:
+                        console.log (p_jmsg);
+                        p_unit.m_SDR.addDetectedSignal(
+                            p_jmsg.f, p_jmsg.v,
+                            p_jmsg.ln, p_jmsg.la,
+                            p_jmsg.A,
+                            p_jmsg.r,
+                            p_jmsg.d
+                        )
+                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRTrigger, p_unit);
+                    break;
                 }
-                else
-                {
-                    p_unit.m_SDR.m_available_drivers = p_jmsg.dr;
-                }
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+                
             }
             break;
 
@@ -2997,7 +3013,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Location.lat = (c_mavlinkMessage.lat * 0.0000001)  ;
                     p_unit.m_Nav_Info.p_Location.lng = (c_mavlinkMessage.lon * 0.0000001);
                     p_unit.m_Nav_Info.p_Location.alt_abs = c_mavlinkMessage.alt * 0.001;
-                    p_unit.m_Nav_Info.p_Location.alt = c_mavlinkMessage.relative_alt * 0.001;
+                    p_unit.m_Nav_Info.p_Location.alt_relative = c_mavlinkMessage.relative_alt * 0.001;
                     js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
                 }
                 break;

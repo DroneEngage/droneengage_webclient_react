@@ -23,6 +23,7 @@ export class ClssCTRL_SDR extends React.Component {
                 m_sample_rate : 0.0,
                 m_display_bars: 30,
                 m_interval: 0,
+                m_trigger_level: 0,
                 m_updated :
                 {
                     fc : false,
@@ -32,7 +33,8 @@ export class ClssCTRL_SDR extends React.Component {
                     dm : false,  // decode mode
                     dr : false,  // p_driver_index
                     db : false,  // p_display_bars
-                    interval: false,
+                    i  : false,  // interval
+                    tl : false,  // trigger_level
                 }
 		};
 
@@ -58,6 +60,7 @@ export class ClssCTRL_SDR extends React.Component {
         p_me.state.m_gain = p_andruavUnit.m_SDR.m_gain;
         p_me.state.m_interval = p_andruavUnit.m_SDR.m_interval;
         p_me.state.m_display_bars = p_andruavUnit.m_SDR.m_display_bars;
+        p_me.state.m_trigger_level = p_andruavUnit.m_SDR.m_trigger_level;
     }
 
     fn_unitUpdated (p_me, p_unit)
@@ -97,7 +100,7 @@ export class ClssCTRL_SDR extends React.Component {
         if (isNaN(e.target.value)) return ;
 
         let res = parseInt(e.target.value);
-        this.state.m_updated.interval = true;
+        this.state.m_updated.i = true;
         this.setState({m_interval: res});
     }
 
@@ -105,6 +108,12 @@ export class ClssCTRL_SDR extends React.Component {
     {
         this.state.m_updated.db = true;
         this.setState({m_display_bars: e.target.value});
+    }
+
+    fn_onTriggerLevel(e)
+    {
+        this.state.m_updated.tl = true;
+        this.setState({m_trigger_level: e.target.value});
     }
 
     fn_activateSDR(p_andruavUnit)
@@ -115,28 +124,37 @@ export class ClssCTRL_SDR extends React.Component {
     fn_UpdateSDR(p_andruavUnit)
     {
         let p_fequency_center = null;
-        let p_fequency = null;
-        let p_band_width = null;
         let p_gain = null;
         let p_sample_rate = null;
         let p_decode_mode = null;
         let p_driver_index = null;
         let p_display_bars = null;
         let p_interval = null;
+        let p_trigger_level = null;
 
-        if (this.state.m_updated.fc === true)   p_fequency_center   = parseFloat(this.state.m_center_frequency);
-        if (this.state.m_updated.ga === true)   p_gain              = parseFloat(this.state.m_gain);
-        if (this.state.m_updated.sr === true)   p_sample_rate       = parseFloat(this.state.m_sample_rate);
-        if (this.state.m_updated.db === true)   p_display_bars      = parseFloat(this.state.m_display_bars);
-        if (this.state.m_updated.interval === true)   p_interval    = parseFloat(this.state.m_interval);
+        if (this.state.m_updated.fc === true)       p_fequency_center   = parseFloat(this.state.m_center_frequency);
+        if (this.state.m_updated.ga === true)       p_gain              = parseFloat(this.state.m_gain);
+        if (this.state.m_updated.sr === true)       p_sample_rate       = parseFloat(this.state.m_sample_rate);
+        if (this.state.m_updated.db === true)       p_display_bars      = parseFloat(this.state.m_display_bars);
+        if (this.state.m_updated.i  === true)       p_interval          = parseFloat(this.state.m_interval);
+        if (this.state.m_updated.tl === true)       p_trigger_level     = parseFloat(this.state.m_trigger_level);
         
         const index = this.state.m_driver_index;
         if (this.state.m_updated.dr === true)   p_driver_index      = ((index === null)?0:parseInt(index));
         
-        js_globals.v_andruavClient.API_setSDRConfig(p_andruavUnit, p_fequency_center, p_fequency,
+        js_globals.v_andruavClient.API_setSDRConfig(p_andruavUnit, p_fequency_center,
             p_gain, p_sample_rate,
-            p_decode_mode, p_driver_index, p_interval, p_display_bars); 
+            p_decode_mode, p_driver_index, p_interval,
+            p_display_bars, p_trigger_level); 
 
+
+        this.state.m_updated.fc = false;
+        this.state.m_updated.ga = false;
+        this.state.m_updated.sr = false;
+        this.state.m_updated.db = false;
+        this.state.m_updated.i  = false;
+        this.state.m_updated.tl = false;
+        
     }
 
     
@@ -280,6 +298,10 @@ export class ClssCTRL_SDR extends React.Component {
                         <div key={v_andruavUnit.partyID + 'sdr_215'} className='row css_margin_zero padding_zero '>
                             <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5"><small><b>Bars</b></small></label>
                             <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5" placeholder="Bars" aria-label="Bars"  value={this.state.m_display_bars} onChange={(e)=> this.fn_onDisplayBars(e)}/>
+                        </div>
+                        <div key={v_andruavUnit.partyID + 'sdr_216'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_trigger_level'} className="col-5"><small><b>Trigger</b></small></label>
+                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_trigger_level'} className="col-5" placeholder="Trigger" aria-label="Trigger"  value={this.state.m_trigger_level} onChange={(e)=> this.fn_onTriggerLevel(e)}/>
                         </div>
                     </div>
                 </div>

@@ -48,7 +48,8 @@ export class CCommandAPI
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
             'ms': {
-                    C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_INFO
+                    C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
+                    a: js_andruavMessages.CONST_SDR_ACTION_SDR_INFO
                 }   
         };
             
@@ -187,10 +188,10 @@ export class CCommandAPI
         return msg;
     }
     
-    static API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
+    static API_setSDRConfig (p_andruavUnit, p_fequency_center, 
         p_gain, p_sample_rate,
         p_decode_mode, p_driver_index, p_interval,
-        p_display_bars
+        p_display_bars, p_trigger_level
     )
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -200,14 +201,13 @@ export class CCommandAPI
         };
         
         if (p_fequency_center !== null)  p_msg.fc = p_fequency_center;
-        if (p_fequency !== null)         p_msg.f  = p_fequency;
         if (p_gain !== null)             p_msg.g  = p_gain;
         if (p_sample_rate !== null)      p_msg.s  = p_sample_rate;
         if (p_decode_mode !== null)      p_msg.m  = p_decode_mode;
         if (p_driver_index !== null)     p_msg.i  = p_driver_index;
-        if (p_driver_index !== null)     p_msg.i  = p_driver_index;
         if (p_interval !== null)         p_msg.t  = p_interval; // in milli-seconds - 0 means ignore
         if (p_display_bars !== null)     p_msg.r  = p_display_bars;
+        if (p_trigger_level !== null)    p_msg.l  = p_trigger_level;
         
         js_common.fn_console_log (p_msg);
         

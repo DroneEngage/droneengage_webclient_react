@@ -184,7 +184,7 @@ import $ from 'jquery';
 
             if ((now - this.__callsTimeTable[p_andruavUnit.partyID] ) > this.ADSB_DroneRefreshRate)
             {
-                this.fn_getADSBData (p_andruavUnit.m_Nav_Info.p_Location.lat,p_andruavUnit.m_Nav_Info.p_Location.lng,p_andruavUnit.m_Nav_Info.p_Location.alt,10);
+                this.fn_getADSBData (p_andruavUnit.m_Nav_Info.p_Location.lat,p_andruavUnit.m_Nav_Info.p_Location.lng,p_andruavUnit.m_Nav_Info.p_Location.alt_relative,10);
             }
         }
 

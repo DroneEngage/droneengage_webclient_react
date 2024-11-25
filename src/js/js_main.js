@@ -1152,7 +1152,7 @@ function fn_handleKeyBoard() {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 
-			let v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt!=null?(p_andruavUnit.m_Nav_Info.p_Location.alt).toFixed(1):0;
+			let v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt_relative!=null?(p_andruavUnit.m_Nav_Info.p_Location.alt_relative).toFixed(1):0;
 			if (v_altitude_val< js_globals.CONST_DEFAULT_ALTITUDE_min)
 			{
 				v_altitude_val = fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()).toFixed(1) ;
@@ -2134,6 +2134,18 @@ function fn_handleKeyBoard() {
 			js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, v_htmlTitle,[64,64]) ;
 		}
 
+
+		function EVT_andruavUnitSDRTrigger(me , p_andruavUnit) {
+			const detected_signal = p_andruavUnit.m_SDR.getLastDetectedSignal();
+			if (detected_signal === null || detected_signal === undefined) return ;
+			//const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + detected_signal.frequency + 
+			//"</p> <p class='text-white margin_zero fs-6'>" + detected_signal.signal_value + "</p>";
+			//js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, './images/signal_r_512.png', p_andruavUnit.m_unitName,null, false,false, v_htmlTitle,[64,64]) ;
+			const v_marker = js_leafletmap.fn_CreateMarker('./images/signal_r_32.png', 'image');
+			const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(detected_signal.latitude, detected_signal.longitude);
+			js_leafletmap.fn_setPosition(v_marker,latlng);
+		}
+
 		
 		function EVT_andruavUnitArmedUpdated(me, p_andruavUnit) {
 			
@@ -2340,7 +2352,7 @@ function fn_handleKeyBoard() {
 						if (v_distance > 1000) {
 							p_andruavUnit.m_Nav_Info.p_Location.oldlat = p_andruavUnit.m_Nav_Info.p_Location.lat;
 							p_andruavUnit.m_Nav_Info.p_Location.oldlng = p_andruavUnit.m_Nav_Info.p_Location.lng;
-							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt;
+							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
 						}
 						else if (v_distance > 10) {
 							const v_flightPath = js_leafletmap.fn_DrawPath(
@@ -2360,13 +2372,13 @@ function fn_handleKeyBoard() {
 							p_andruavUnit.m_Nav_Info.m_FlightPath.push(v_flightPath);
 							p_andruavUnit.m_Nav_Info.p_Location.oldlat = p_andruavUnit.m_Nav_Info.p_Location.lat;
 							p_andruavUnit.m_Nav_Info.p_Location.oldlng = p_andruavUnit.m_Nav_Info.p_Location.lng;
-							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt;
+							p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
 						}
 					}
 					else {
 						p_andruavUnit.m_Nav_Info.p_Location.oldlat = p_andruavUnit.m_Nav_Info.p_Location.lat;
 						p_andruavUnit.m_Nav_Info.p_Location.oldlng = p_andruavUnit.m_Nav_Info.p_Location.lng;
-						p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt;
+						p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
 					}
 
 
@@ -2412,25 +2424,25 @@ function fn_handleKeyBoard() {
 				$('#modal_fpv').show();
 			}
 
-			var latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
+			const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
 			$('#unitImg').data('imgLocation', latlng);
 			fn_showCameraIcon(latlng);
 		}
 
 		function fn_showCameraIcon(latlng) {
-			var v_marker = js_leafletmap.fn_CreateMarker('./images/camera_24x24.png', 'image');
+			const v_marker = js_leafletmap.fn_CreateMarker('./images/camera_24x24.png', 'image');
 			js_leafletmap.fn_setPosition(v_marker,latlng);
 		}
 
 		function hlp_saveImage_html() {
-			var contents = $('#unitImg').data('binaryImage');
+			const contents = $('#unitImg').data('binaryImage');
 			saveData(contents, 'image.jpg');
 
 		}
 
 
 		function hlp_gotoImage_Map() {
-			var location = $('#unitImg').data('imgLocation');
+			const location = $('#unitImg').data('imgLocation');
 			if (location !== null && location !== undefined) {
 				// if (js_leafletmap.fn_getZoom() < 14) {
 				// 	js_leafletmap.fn_setZoom(14);
@@ -2678,7 +2690,7 @@ function fn_handleKeyBoard() {
 				markerContent += "<p> <span class='text-success'>Ground Control Station</span> </p>";
 			}
 
-			let vAlt = p_andruavUnit.m_Nav_Info.p_Location.alt;
+			let vAlt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
 			let vAlt_abs = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
 			if (vAlt === null || vAlt  === undefined)
 			{
@@ -3061,7 +3073,7 @@ function fn_handleKeyBoard() {
 				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,EVT_andruavUnitFightModeUpdated);
 				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,EVT_andruavUnitVehicleTypeUpdated);
 				
-				
+				js_eventEmitter.fn_subscribe(js_globals.EE_unitSDRTrigger,this,EVT_andruavUnitSDRTrigger);
 				
 				
 				

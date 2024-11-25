@@ -118,22 +118,23 @@ class GLOBALS {
 		this.EE_onAndruavUnitSwarmUpdated		   	= "EVT_21";
 		this.EE_andruavUnitLidarInfo			   	= "EVT_22";
 		this.EE_andruavUnitLidarShow   	   	       	= "EVT_23";
-		this.EE_onMessage                  			= "EE_onMessage";    
-		this.EE_onModuleUpdated			   			= "EE_onModuleUpdated";
-		this.EE_onPreferenceChanged        			= "EE_onPreferenceChanged";
-		this.EE_unitAdded                  			= "EE_unitAdded";
-		this.EE_unitUpdated                			= "EE_unitUpdated";
-		this.EE_unitHighlighted            			= "EE_unitHighlighted";
-		this.EE_unitOnlineChanged          			= "EE_unitOnlineChanged";
-		this.EE_unitPowUpdated             			= "EE_unitPowUpdated";
-		this.EE_unitP2PUpdated             			= "EE_unitP2PUpdated";
-		this.EE_unitSDRUpdated             			= "EE_unitSDRUpdated";
-		this.EE_unitSDRSpectrum            			= "EE_unitSDRSpectrum";
-		this.EE_unitNavUpdated             			= "EE_unitNavUpdated";
-		this.EE_onSocketStatus             			= "EE_onSocketStatus";
-		this.EE_onSocketStatus2            			= "EE_onSocketStatus2";
-		this.EE_onGUIMessage               			= "EE_onGUIMessage";
-		this.EE_onGUIMessageHide           			= "EE_onGUIMessageHide";
+		this.EE_onMessage                  			= "EVT_24";    
+		this.EE_onModuleUpdated			   			= "EVT_25";
+		this.EE_onPreferenceChanged        			= "EVT_26";
+		this.EE_unitAdded                  			= "EVT_27";
+		this.EE_unitUpdated                			= "EVT_28";
+		this.EE_unitHighlighted            			= "EVT_29";
+		this.EE_unitOnlineChanged          			= "EVT_30";
+		this.EE_unitPowUpdated             			= "EVT_31";
+		this.EE_unitP2PUpdated             			= "EVT_32";
+		this.EE_unitSDRUpdated             			= "EVT_33";
+		this.EE_unitSDRSpectrum            			= "EVT_34";
+		this.EE_unitSDRTrigger						= "EVT_35";
+		this.EE_unitNavUpdated             			= "EVT_36";
+		this.EE_onSocketStatus             			= "EVT_37";
+		this.EE_onSocketStatus2            			= "EVT_38";
+		this.EE_onGUIMessage               			= "EVT_39";
+		this.EE_onGUIMessageHide           			= "EVT_40";
 		this.EE_updateLogin                			= "EE_updateLogin";
 		this.EE_videoStreamStarted         			= "EE_videoStreamStarted";
 		this.EE_videoStreamRedraw          			= "EE_videoStreamRedraw";
@@ -195,6 +196,8 @@ class GLOBALS {
 
 
 		this.CONST_MAX_SDR_SPECTRUM_LENGTH = 100;				
+		this.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH = 100;
+
 		this.CONST_EXPERIMENTAL_FEATURES_ENABLED = true; // KEEP it above code block and keep it unchanged
 
 

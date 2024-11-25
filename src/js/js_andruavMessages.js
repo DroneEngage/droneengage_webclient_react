@@ -96,7 +96,7 @@ export const CONST_TYPE_AndruavMessage_Communication_Line_Status = 6510;
 export const CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH = 6511;
 export const CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE = 6512;
 
-export const CONST_TYPE_AndruavMessage_SDR_INFO = 6513;
+export const CONST_TYPE_AndruavMessage_SDR_TRIGGER = 6513;
 export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
 export const CONST_TYPE_AndruavMessage_SDR_STATUS = 6515;
 export const CONST_TYPE_AndruavMessage_SDR_SPECTRUM = 6516;
@@ -177,6 +177,8 @@ export const CONST_SDR_ACTION_LIST_SDR_DEVICES    = 2;
 export const CONST_SDR_ACTION_SET_CONFIG          = 3;
 export const CONST_SDR_ACTION_READ_DATA           = 4;
 export const CONST_SDR_ACTION_PAUSE_DATA          = 5;
+export const CONST_SDR_ACTION_SDR_INFO            = 6;
+export const CONST_SDR_ACTION_TRIGGER             = 7;
 
 // SDR STATUS
 export const CONST_SDR_STATUS_NOT_CONNECTED       = 0;

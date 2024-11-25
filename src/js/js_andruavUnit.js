@@ -112,7 +112,7 @@ export const CONST_FLIGHT_PX4_POSCTL_POSCTL = 214;
 export const CONST_FLIGHT_PX4_POSCTL_ORBIT = 215;
 export const CONST_FLIGHT_CONTROL_UNKNOWN = 999;
 
-const SDR_MAXIMUM_SPECTRUM_HISTORY = 10;
+
 
 export function fn_getFullName(m_groupName, p_partyID) {
   //return m_groupName.replace(" ","_") + "_X_" + partyID.replace(" ","_");
@@ -276,7 +276,7 @@ class C_NavInfo {
   constructor(p_parent) {
     this.m_parent = p_parent;
     this.p_Location = {
-      alt: null, // MAVLINK_MSG_ID_GLOBAL_POSITION_INT.relative_alt ... Altitude above ground - or baro alt if GPS is not available
+      alt_relative: null, // MAVLINK_MSG_ID_GLOBAL_POSITION_INT.relative_alt ... Altitude above ground - or baro alt if GPS is not available
       alt_abs: null, // MAVLINK_MSG_ID_GLOBAL_POSITION_INT.alt  ... Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.
       air_speed: null, // MAVLINK_MSG_ID_VFR_HUD.airspeed ... Vehicle speed in form appropriate for vehicle type. For standard aircraft this is typically calibrated airspeed (CAS) or indicated airspeed (IAS) - either of which can be used by a pilot to estimate stall speed.
       ground_speed: null, // MAVLINK_MSG_ID_VFR_HUD.ground_speed ... float (m/s) ... Note HIGH_LATENCY uses unit8 m/s*5
@@ -415,6 +415,7 @@ class C_SDR {
     this.m_type = '';
     this.m_center_frequency = 0.0;
     this.m_interval = 0.0;
+    this.m_trigger_level = 0.0;
     this.m_sample_rate = 0.0;
     this.m_gain = 0.0;
     this.m_driver = '';
@@ -423,6 +424,8 @@ class C_SDR {
     this.m_status = js_andruavMessages.CONST_SDR_STATUS_NOT_CONNECTED;
     this.m_available_drivers = {};
     this.m_spectrum_data = [];
+    this.m_detectedSignal = [];
+    this.m_detectedSignal_new = false;
   }
 
   getLastSpectrum() {
@@ -433,9 +436,42 @@ class C_SDR {
     }
   }
 
+  addDetectedSignal(frequency, signal_value, longitude, latitude, altitude, relative_altitude, signal_direction)
+  {
+    let reading = 
+    {
+      frequency: frequency,
+      signal_value: signal_value,
+      longitude:longitude,
+      latitude:latitude,
+      altitude:altitude,
+      relative_altitude:relative_altitude,
+      signal_direction:signal_direction
+    }
+
+    Object.seal(reading);
+
+    this.m_detectedSignal.push(reading);
+    this.m_detectedSignal_new = true;
+    // Ensure the array length is within the maximum limit
+    if (this.m_detectedSignal.length > js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH) {
+      this.m_detectedSignal = this.m_detectedSignal.slice(-js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH);
+  }
+
+  }
+
+  getLastDetectedSignal() {
+    if (this.m_detectedSignal_new === true && this.m_detectedSignal.length > 0) {
+      this.m_detectedSignal_new = false;
+      return this.m_detectedSignal[this.m_detectedSignal.length - 1];
+    } else {
+      return null;
+    }
+  }
+
   addSpectrumData(p_info, p_data)
   {   
-    var spectrumData = {
+    let spectrumData = {
       frequency_min: p_info.fcm,
       frequency_step: p_info.fcst,
       time: p_info.tim,
@@ -445,11 +481,6 @@ class C_SDR {
     Object.seal(spectrumData);
     
     this.m_spectrum_data.push(spectrumData); // Add the new data to the array
-
-    // Limit the array to the most recent SDR_MAXIMUM_SPECTRUM_HISTORY entries
-    if (this.m_spectrum_data.length > SDR_MAXIMUM_SPECTRUM_HISTORY) {
-      this.m_spectrum_data.splice(0, this.m_spectrum_data.length - SDR_MAXIMUM_SPECTRUM_HISTORY);
-    }
 
     // Ensure the array length is within the maximum limit
     if (this.m_spectrum_data.length > js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH) {
