@@ -24,7 +24,7 @@ export default function App2() {
           <Route index element={<Home />} />
           <Route path="home"  element={<Home />} />
           <Route path="planning"  element={<Planning />} />
-          <Route path="mapeditor.html"  element={<Planning />} />
+          <Route path="mapeditor"  element={<Planning />} />
           <Route path="accounts"  element={<Accounts />} />
           <Route path="test"  element={<Test />} />
           <Route path="*" element={<NoPage />} />

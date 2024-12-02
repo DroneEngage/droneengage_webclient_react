@@ -29,13 +29,15 @@ class CAndruavAuth {
         if (js_siteConfig.CONST_TEST_MODE === true)
         {
             this.m_auth_ip = js_siteConfig.CONST_TEST_MODE_IP; 
+            this._m_auth_port = js_siteConfig.CONST_TEST_MODE_PORT;
+            this._m_auth_ports = js_siteConfig.CONST_TEST_MODE_PORT; 
         }
         else
         {
             this.m_auth_ip = js_siteConfig.CONST_PROD_MODE_IP;
+            this._m_auth_port = js_siteConfig.CONST_PROD_MODE_PORT;
+            this._m_auth_ports = js_siteConfig.CONST_PROD_MODE_PORT; 
         }
-        this._m_auth_port = '19408';
-        this._m_auth_ports = '19408'; 
         this._m_perm = 0;
         this._m_permissions_ = '';
         this._m_session_ID = null;

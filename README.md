@@ -68,3 +68,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+to run it in pm2 you need 
+npm serve -g
+
+then 
+pm2 start /root/.nvm/versions/node/v18.17.0/lib/node_modules/serve/build/main.js  -- -s build -l 8881 --ssl-cert /home/ap_cloud/ssl/fullchain.pem --ssl-key /home/ap_cloud/ssl/privkey.pem
