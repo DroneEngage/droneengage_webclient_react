@@ -135,61 +135,61 @@ class GLOBALS {
 		this.EE_onSocketStatus2            			= "EVT_38";
 		this.EE_onGUIMessage               			= "EVT_39";
 		this.EE_onGUIMessageHide           			= "EVT_40";
-		this.EE_updateLogin                			= "EE_updateLogin";
-		this.EE_videoStreamStarted         			= "EE_videoStreamStarted";
-		this.EE_videoStreamRedraw          			= "EE_videoStreamRedraw";
-		this.EE_videoStreamStopped         			= "EE_videoStreamStopped";
-		this.EE_unitTelemetryOn            			= "EE_unitTelemetryOn";
-		this.EE_unitTelemetryOff           			= "EE_unitTelemetryOff";
-		this.EE_BattViewToggle             			= "EE_BattViewToggle";
-		this.EE_EKFViewToggle              			= "EE_EKFViewToggle";
-		this.EE_adsbExchangeReady         			= "EE_adsbExchangeReady";
-		this.EE_displayGeoForm             			= "EE_displayGeoForm";
-		this.EE_onShapeCreated             			= "EE_onShapeCreated";
-		this.EE_onShapeSelected            			= "EE_onShapeSelected";
-		this.EE_onMissionReset            			= "EE_onMissionReset";
-		this.EE_onShapeEdited              			= "EE_onShapeEdited";
-		this.EE_onShapeDeleted             			= "EE_onShapeDeleted";
-		this.EE_mapMissionUpdate           			= "EE_mapMissionUpdate";
-		this.EE_displayServoForm           			= "EE_displayServoForm";
-		this.EE_servoOutputUpdate          			= "EE_servoOutputUpdate";
-		this.EE_DetectedTarget             			= "EE_DetectedTarget";
-		this.EE_SearchableTarget           			= "EE_SearchableTarget";
+		this.EE_updateLogin                			= "EVT_41";
+		this.EE_videoStreamStarted         			= "EVT_42";
+		this.EE_videoStreamRedraw          			= "EVT_43";
+		this.EE_videoStreamStopped         			= "EVT_44";
+		this.EE_unitTelemetryOn            			= "EVT_45";
+		this.EE_unitTelemetryOff           			= "EVT_46";
+		this.EE_BattViewToggle             			= "EVT_47";
+		this.EE_EKFViewToggle              			= "EVT_48";
+		this.EE_adsbExchangeReady         			= "EVT_49";
+		this.EE_displayGeoForm             			= "EVT_50";
+		this.EE_onShapeCreated             			= "EVT_51";
+		this.EE_onShapeSelected            			= "EVT_52";
+		this.EE_onMissionReset            			= "EVT_53";
+		this.EE_onShapeEdited              			= "EVT_54";
+		this.EE_onShapeDeleted             			= "EVT_55";
+		this.EE_mapMissionUpdate           			= "EVT_56";
+		this.EE_displayServoForm           			= "EVT_57";
+		this.EE_servoOutputUpdate          			= "EVT_58";
+		this.EE_DetectedTarget             			= "EVT_59";
+		this.EE_SearchableTarget           			= "EVT_60";
 
-		this.EE_cameraZoomChanged          			= "EE_cameraZoomChanged";
-		this.EE_cameraFlashChanged         			= "EE_cameraFlashChanged";
+		this.EE_cameraZoomChanged          			= "EVT_61";
+		this.EE_cameraFlashChanged         			= "EVT_62";
 
-		this.EE_displayParameters          			= "EE_displayParameters";
-		this.EE_updateParameters           			= "EE_updateParameters";
+		this.EE_displayParameters          			= "EVT_63";
+		this.EE_updateParameters           			= "EVT_64";
 
-		this.EE_requestGamePad             			= "EE_requestGamePad";
-		this.EE_releaseGamePad             			= "EE_releaseGamePad";
+		this.EE_requestGamePad             			= "EVT_65";
+		this.EE_releaseGamePad             			= "EVT_66";
 
-		this.EE_GamePad_Connected          	 		= "EE_GamePad_Connected";
-		this.EE_GamePad_Disconnected        		= "EE_GamePad_Disconnected";
-		this.EE_GamePad_Axes_Updated		 		= "EE_GamePad_Axes_Updated";
-		this.EE_GamePad_Button_Updated		 		= "EE_GamePad_Button_Updated";
-
-
-		this.EE_displayStreamDlgForm        		= "EE_displayStreamDlgForm";
-		this.EE_hideStreamDlgForm           		= "EE_hideStreamDlgForm";
-
-		this.EE_displayYawDlgForm					= "EE_displayYawDlgForm";
-		this.EE_displayCameraDlgForm        		= "EE_displayCameraDlgForm";
-		this.EE_hideCameraDlgForm           		= "EE_hideCameraDlgForm";
-
-		this.EE_onMissionItemToggle         		= "EE_onMissionItemToggle";
-
-		this.EE_onAdvancedMode              		= "_MS_96A4ED6B1E5_";
-		this.EE_ErrorMessage                		= "_E_A642XYZB4E4_";
-		this.EE_adsbExpiredUpdate           		= "_E_XXAZQD6B3E4_";
+		this.EE_GamePad_Connected          	 		= "EVT_67";
+		this.EE_GamePad_Disconnected        		= "EVT_68";
+		this.EE_GamePad_Axes_Updated		 		= "EVT_69";
+		this.EE_GamePad_Button_Updated		 		= "EVT_70";
 
 
-		this.EE_Auth_Logined      		 	 		= "_EA_96A4ED6B1E1_";
-		this.EE_Auth_BAD_Logined      		 		= "_EA_96A4ED6B1E2_";
-		this.EE_Auth_Account_Created		 		= "_EA_96A4ED6B1E3_";
-		this.EE_Auth_Account_Regenerated	 		= "_EA_96A4ED6B1E4_";
-		this.EE_Auth_Account_BAD_Operation	 		= "_EA_96A4ED6B1E5_";
+		this.EE_displayStreamDlgForm        		= "EVT_71";
+		this.EE_hideStreamDlgForm           		= "EVT_72";
+
+		this.EE_displayYawDlgForm					= "EVT_73";
+		this.EE_displayCameraDlgForm        		= "EVT_74";
+		this.EE_hideCameraDlgForm           		= "EVT_75";
+
+		this.EE_onMissionItemToggle         		= "EVT_76";
+
+		this.EE_onAdvancedMode              		= "EVT_77";
+		this.EE_ErrorMessage                		= "EVT_78";
+		this.EE_adsbExpiredUpdate           		= "EVT_79";
+
+
+		this.EE_Auth_Logined      		 	 		= "EVT_80";
+		this.EE_Auth_BAD_Logined      		 		= "EVT_81";
+		this.EE_Auth_Account_Created		 		= "EVT_82";
+		this.EE_Auth_Account_Regenerated	 		= "EVT_83";
+		this.EE_Auth_Account_BAD_Operation	 		= "EVT_84";
 		
 
 		// EOF LOCAL EVENTS
