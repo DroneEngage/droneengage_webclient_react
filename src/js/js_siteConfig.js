@@ -11,7 +11,7 @@
  * Communication Server
  */
 
- export const CONST_TEST_MODE = true;
+ export const CONST_TEST_MODE = false;
  export const CONST_PROD_MODE_IP = 'airgap.droneengage.com'; 
  export const CONST_PROD_MODE_PORT = '19408';
  
