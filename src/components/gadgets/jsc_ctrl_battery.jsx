@@ -34,14 +34,14 @@ export class ClssCtrlBattery extends React.Component {
 
     fn_update (me)
     {
-        if (this.state.m_update === 0) return ;
+        if (me.state.m_update === 0) return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
     
     fn_toggle_global(me,p_compact)
     {
-        if (this.state.m_update === 0) return ;
+        if (me.state.m_update === 0) return ;
         
         me.state.is_compact = p_compact;
         me.setState({'m_update': me.state.m_update +1});
