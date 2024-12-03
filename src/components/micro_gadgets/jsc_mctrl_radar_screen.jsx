@@ -150,9 +150,11 @@ export class Class_Radar_Screen extends React.Component {
       // Calculate the start and end angles for the highlighted section
       const startAngle = (js_helpers.CONST_PTx2 * (n - 2)) / this.props.sections - Math.PI / 2 +  this.angleInRadians;
       const endAngle = (js_helpers.CONST_PTx2 * (n -1)) / this.props.sections - Math.PI / 2 + this.angleInRadians;
-      const innerRadius = radius * ((m - 2) / this.props.depth);
-      const outerRadius = radius * ((m - 1) / this.props.depth);
-
+      let innerRadius = radius * ((m - 2) / this.props.depth);
+      let outerRadius = radius * ((m - 1) / this.props.depth);
+      innerRadius = Math.max(0,innerRadius);
+      outerRadius = Math.max(0,outerRadius);
+      
       // Calculate the intersection points of the highlighted section
       const topLeft = {
         x: centerX + innerRadius * Math.cos(startAngle),
