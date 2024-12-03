@@ -80,7 +80,7 @@ export class ClssMainUnitPopup extends React.Component {
             markerContent.push (<p key={this.key + 'pop211'} className='m-0 text-success'><strong> {hlp_getFlightMode(this.props.p_unit)} </strong></p>);
         }
         else {
-            markerContent.push(<p key={this.key + 'pop211'} className='m-0' key={this.key + 'pop2'}> <span className='text-success'>Ground Control Station</span> </p>);
+            markerContent.push(<p key={this.key + 'pop2112'} className='m-0' > <span className='text-success'>Ground Control Station</span> </p>);
         }
         
         
