@@ -74,4 +74,7 @@ to run it in pm2 you need
 npm serve -g
 
 then 
-pm2 start /root/.nvm/versions/node/v18.17.0/lib/node_modules/serve/build/main.js  -- -s build -l 8881 --ssl-cert /home/ap_cloud/ssl/fullchain.pem --ssl-key /home/ap_cloud/ssl/privkey.pem
+
+npm_root=sudo npm root -g
+
+pm2 start $npm_root/serve/build/main.js  -n webclient -- -s build -l 8881 --ssl-cert /home/ap_cloud/ssl/fullchain.pem --ssl-key /home/ap_cloud/ssl/privkey.pem
