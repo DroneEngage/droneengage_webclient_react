@@ -24,13 +24,16 @@ class ClssCameraDevice extends React.Component {
 
     fn_videoStream()
     {
-        fn_VIDEO_login (this.props.prop_session, this.state.v_track.id);
+        const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+        fn_VIDEO_login (this.props.prop_session, v_track.id);
         js_eventEmitter.fn_dispatch (js_globals.EE_hideStreamDlgForm);
     }
 
     fn_videoRecord(p_startRecord)
     {
-        fn_VIDEO_Record (this.props.prop_session, this.state.v_track.id, p_startRecord);
+        const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+        
+        fn_VIDEO_Record (this.props.prop_session, v_track.id, p_startRecord);
     }
 
     fn_oneShot ()
@@ -74,13 +77,14 @@ class ClssCameraDevice extends React.Component {
 
     componentDidMount () 
     {
-        this.state.v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         
     }
 
     render ()  {
-        var v_unit = this.props.prop_session.m_unit;
-        if ((v_unit == null) || (this.state.v_track == null))
+        const v_unit = this.props.prop_session.m_unit;
+        const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+        
+        if ((v_unit == null) || (v_track == null))
         {
             
             return (
@@ -90,13 +94,13 @@ class ClssCameraDevice extends React.Component {
         else
         {
             
-            var v_cam_class = 'btn-warning';
-            var v_record_class = 'btn-primary';
+            const v_cam_class = 'btn-warning';
+            const v_record_class = 'btn-primary';
             
             return (
                     <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className="row al_l css_margin_zero">
                             <div className= "col-8   si-09x css_margin_zero text-white">
-                            <label>{this.state.v_track.ln}</label>
+                            <label>{v_track.ln}</label>
                             </div>
                             <div className= "col-2   si-09x css_margin_zero css_padding_2">
                                 <button type="button" className={"btn btn-sm " + v_cam_class}  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
@@ -199,24 +203,6 @@ export default class ClssCameraDialog extends React.Component
             }
         };
         
-        // this.modal_ctrl_cam.current.find('#btnShot').on('click', function () {
-        //     // assume what there is attribute partyID in the control used to pass parameter
-        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, 1, 0, 0);
-        // });
-        // this.modal_ctrl_cam.current.find('#btnSwitchCam').on('click', function () {
-        //     // assume what there is attribute partyID in the control used to pass parameter
-        //     const c_partyID = this.modal_ctrl_cam.current.attr('partyID');
-        //     js_globals.v_andruavClient.API_SwitchCamera(c_partyID,c_partyID);
-        // });
-        // this.modal_ctrl_cam.current.find('#btnTakeImage').on('click', function () {
-        //     // assume what there is attribute partyID in the control used to pass parameter
-        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE, this.modal_ctrl_cam.current.find('#txt_TotalImages').val(), this.modal_ctrl_cam.current.find('#txt_ShootingInterval').val(), 0);
-        // });
-        // this.modal_ctrl_cam.current.find('#btnFCBTakeImage').on('click', function () {
-        //     // assume what there is attribute partyID in the control used to pass parameter
-        //     js_globals.v_andruavClient.API_CONST_RemoteCommand_takeImage2(this.modal_ctrl_cam.current.attr('partyID'), js_andruavMessages.CONST_CAMERA_SOURCE_FCB, this.modal_ctrl_cam.current.find('#txt_TotalImages').val(), this.modal_ctrl_cam.current.find('#txt_ShootingInterval').val(), 0);
-        // });
-
         this.txt_TotalImages.current.onmousedown = function () {
             $(this).parents('tr').removeClass('draggable');
         };
