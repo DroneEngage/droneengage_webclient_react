@@ -84,8 +84,8 @@ export class ClssMainContextMenu extends React.Component {
                             v_contextMenu.push(
                                 <div key={'cmc2' + p_andruavUnit.partyID} className='row '>                           
                                 <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doCircle2(p_andruavUnit.partyID, p_lat, p_lng, fn_convertToMeter(js_globals.CONST_DEFAULT_ALTITUDE), fn_convertToMeter(js_globals.CONST_DEFAULT_RADIUS), 10)}>Circle</p></div>
-                                <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
-                                <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
+                                <div className='col-4 p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
+                                <div className='col-4 p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.partyID, p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
                             </div>);
 
                     }
@@ -109,15 +109,17 @@ export class ClssMainContextMenu extends React.Component {
 
         return (
             <div className="text-justified one_line col-12">
+                <div className="row">
                 <p className="bg-success text-white mb-1 padding_zero">
                     <span className="text-success margin_zero text-white si-09x" >
                         lat:<span className='si-09x'>{v_lat.toFixed(6)}</span> lng:<span className='si-09x'>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
+                </div>
                 <div className="row">
                     <div className="col-sm-12">
                         <p
-                            className="cursor_hand text-primary margin_zero si-07x"
+                            className="cursor_hand text-primary margin_zero si-07x al_c"
                             onClick={() =>
                                 window.open(
                                     `./mapeditor.html?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
@@ -131,6 +133,7 @@ export class ClssMainContextMenu extends React.Component {
                 </div>
                 {listUnitsElement}
             </div>
+            
         );
     }
 
