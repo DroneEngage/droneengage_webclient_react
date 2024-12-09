@@ -24,8 +24,6 @@ export class ClssCtrlLidarDevice extends React.Component {
         
         
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarInfo,this,this.fn_update_lidar);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this, this.fn_update_lidar);
-        
     }
 
     componentDidMount () 
@@ -40,8 +38,6 @@ export class ClssCtrlLidarDevice extends React.Component {
     componentWillUnmount () 
     {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitLidarInfo,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
-        
     }
 
     fn_update_lidar (p_me, p_andruavUnit)
