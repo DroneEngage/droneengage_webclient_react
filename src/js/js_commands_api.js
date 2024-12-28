@@ -46,7 +46,7 @@ export class CCommandAPI
     static API_requestSDR(p_andruavUnit) {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
             'ms': {
                     C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
                     a: js_andruavMessages.CONST_SDR_ACTION_SDR_INFO
@@ -60,7 +60,7 @@ export class CCommandAPI
     static API_scanSDRDrivers(p_andruavUnit) {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
             'ms': {
                     C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
                     a: js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES
