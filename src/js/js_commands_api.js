@@ -84,7 +84,7 @@ export class CCommandAPI
     };
 
 
-    API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
+    static API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
@@ -106,8 +106,6 @@ export class CCommandAPI
             p_msg.v = p_volume;
         }
     
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH, p_msg);
-
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH,
