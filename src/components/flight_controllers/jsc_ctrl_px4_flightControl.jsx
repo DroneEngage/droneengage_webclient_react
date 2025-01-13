@@ -101,7 +101,8 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     res.btn_pos_orbit_class             = " disabled hidden ";
                 break;
                 
-                case  js_andruavUnit.VEHICLE_PLANE:
+                case js_andruavUnit.VEHICLE_VTOL:
+                case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class                   = " btn-danger ";
                     res.btn_yaw_class                   = " disabled hidden ";
 		            res.btn_climb_class 	            = " disabled hidden ";
@@ -208,7 +209,8 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     res.btn_pos_orbit_class             = " btn-outline-light ";
                     break;
 
-                case  js_andruavUnit.VEHICLE_PLANE:
+                case js_andruavUnit.VEHICLE_VTOL: 
+                case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " disabled hidden ";
 		            res.btn_climb_class 	            = " btn-outline-light ";

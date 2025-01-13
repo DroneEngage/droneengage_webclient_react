@@ -2232,6 +2232,9 @@ function fn_handleKeyBoard() {
 					case js_andruavUnit.VEHICLE_QUAD:
 						p_andruavUnit.m_VehicleType_TXT = "Quadcopter";
 						return js_globals.quad_icon[p_andruavUnit.m_index%4];
+					case js_andruavUnit.VEHICLE_VTOL:
+						p_andruavUnit.m_VehicleType_TXT = "VTOL Wings";
+						return js_globals.planes_icon[p_andruavUnit.m_index%4];
 					case js_andruavUnit.VEHICLE_PLANE:
 						p_andruavUnit.m_VehicleType_TXT = "Fixed Wings";
 						return js_globals.planes_icon[p_andruavUnit.m_index%4];

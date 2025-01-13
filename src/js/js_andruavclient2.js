@@ -241,15 +241,7 @@ class CAndruavClient {
         switch (p_me.m_gamePadUnit.m_VehicleType) {
             case js_andruavUnit.VEHICLE_TRI:
             case js_andruavUnit.VEHICLE_QUAD:
-                // if ((p_packet.p_buttonIndex==4) || (p_packet.p_buttonIndexi==5))
-                // {
-                // if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true)
-                // {
-                // p_me.API_do_Arm (p_me.m_gamePadUnit.partyID, true, false);
-                // return ;
-                // }
-                // }
-
+                
                 if (p_packet.p_buttonIndex === 2) { // BLUE
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[2] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
