@@ -544,6 +544,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
+            case js_andruavUnit.VEHICLE_VTOL:
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group ddd flex-wrap '>
