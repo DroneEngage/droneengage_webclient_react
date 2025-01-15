@@ -25,6 +25,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         res.btn_surface_class           = " disabled hidden ";
         res.btn_auto_class              = "";
         res.btn_guided_class            = "";
+        res.btn_circle_class 	        = "";
         res.btn_brake_class             = " btn-outline-light ";
         res.btn_hold_class              = " btn-outline-light ";
         res.btn_brake_text              = "";
@@ -73,6 +74,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_takeoff_class       = " disabled hidden ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_manual_class	    = " btn-primary  ";
                     res.btn_acro_class	        = " btn-primary  ";
                     res.btn_alt_hold_class      = " disabled hidden  ";
@@ -99,6 +101,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_brake_class 	    = " btn-primary  ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
@@ -125,6 +128,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " btn-warning ";
                     res.btn_auto_class 		    = " btn-primary ";
                     res.btn_guided_class 	    = " btn-primary ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
@@ -150,6 +154,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_manual_class	    = " btn-danger   ";
                     res.btn_stabilize_class     = " btn-danger   ";
                     res.btn_brake_class 	    = " disabled hidden ";
@@ -181,6 +186,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_manual_class	    = " btn-danger   ";
                     res.btn_stabilize_class     = " btn-danger   ";
                     res.btn_brake_class 	    = " disabled hidden ";
@@ -211,6 +217,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_land_class 		    = " btn-warning  ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_circle_class 	    = " btn-primary ";
                     res.btn_manual_class	    = " btn-outline-light  ";
                     res.btn_acro_class	        = " disabled hidden ";
                     res.btn_brake_class 	    = " disabled hidden ";
@@ -237,6 +244,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 			res.btn_land_class 			= " disabled hidden ";
             res.btn_auto_class 			= " disabled hidden ";
 			res.btn_guided_class 		= " btn-outline-light  ";
+            res.btn_circle_class 	    = " btn-outline-light ";
             res.btn_manual_class	    = " disabled hidden ";
             res.btn_acro_class	        = " disabled hidden ";
             res.btn_stabilize_class     = " disabled hidden ";
@@ -260,6 +268,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " btn-outline-light ";
                     res.btn_auto_class 		    = " btn-outline-light ";
                     res.btn_guided_class 	    = " btn-outline-light ";
+                    res.btn_circle_class 	    = " btn-outline-light ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
@@ -285,6 +294,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_auto_class 		    = " btn-outline-light ";
                     res.btn_takeoff_class       = " disabled hidden ";
                     res.btn_guided_class 	    = " btn-outline-light ";
+                    res.btn_circle_class 	    = " btn-outline-light ";
                     res.btn_manual_class	    = " btn-outline-light ";
                     res.btn_acro_class	        = " btn-outline-light ";
                     res.btn_alt_hold_class      = " disabled hidden ";
@@ -311,7 +321,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
                     res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_brake_class 	    = " btn-outline-light ";
+                    res.btn_circle_class 	    = " btn-outline-light ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
                     res.btn_alt_hold_class      = " btn-outline-light ";
@@ -473,6 +483,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     }
 
 
+    fn_doCircle(v_andruavUnit) {
+        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+    }
+
     fn_doFBWA(v_andruavUnit) {
         js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
     }
@@ -556,6 +570,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
                     <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
                     <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
                     <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
                     <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>&nbsp;Loiter&nbsp;</button>
                     </div></div>);
@@ -597,6 +612,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
                     <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
                     <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
                     <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
                     </div></div>);
 

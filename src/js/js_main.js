@@ -1241,7 +1241,7 @@ function fn_handleKeyBoard() {
 				}
 				// save target speed as indication.
 				p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
-				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
+				js_globals.v_andruavClient.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(v_speed));
 			});
 			
 			js_common.showModal('#changespeed_modal', true);

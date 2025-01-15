@@ -971,11 +971,6 @@ class CAndruavClient {
     }
 
 
-    API_do_ChangeSpeed1(p_andruavUnit, p_speed) {
-        this.API_do_ChangeSpeed2(p_andruavUnit, p_speed);
-    }
-
-
     API_do_ChangeSpeed2(p_andruavUnit, p_speed, p_isGroundSpeed, p_throttle, p_isRelative) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         let v_msg = {
@@ -1066,31 +1061,18 @@ class CAndruavClient {
 		 * @param {any} zVel
 		 */
     API_do_FlyHere(p_partyID, p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
-        let v_msg = {
-            a: p_latitude,
-            g: p_longitude,
-            l: p_altitude
-        };
-        if (p_xVel !== null && p_xVel !== undefined) {
-            v_msg.x = p_xVel;
-            v_msg.y = p_yVel;
-            v_msg.z = p_zVel;
-        }
+        
+        const msg = CCommandAPI.API_do_FlyHere (p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel);
 
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_GuidedPoint, v_msg);
+        this.API_sendCMD(p_partyID, msg.mt, msg.ms);
     }
 
 
     API_do_CircleHere(p_partyID, p_latitude, p_longitude, p_altitude, p_radius, p_turns) {
-        const v_msg = {
-            a: p_latitude,
-            g: p_longitude,
-            l: p_altitude,
-            r: p_radius,
-            t: p_turns
-        };
+        
+        const msg = CCommandAPI.API_do_CircleHere (p_latitude, p_longitude, p_altitude, p_radius, p_turns);
 
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_CirclePoint, v_msg);
+        this.API_sendCMD(p_partyID, msg.mt, msg.ms);
     }
 
 

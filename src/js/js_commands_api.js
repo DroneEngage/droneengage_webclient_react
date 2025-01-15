@@ -287,6 +287,47 @@ export class CCommandAPI
     };
 
     
+    static API_do_FlyHere (p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
+        
+        let v_msg = {
+            a: p_latitude,
+            g: p_longitude,
+            l: p_altitude
+        };
+
+        if (p_xVel !== null && p_xVel !== undefined) {
+            v_msg.x = p_xVel;
+            v_msg.y = p_yVel;
+            v_msg.z = p_zVel;
+        }
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_GuidedPoint,
+            'ms': v_msg
+        }
+
+        return msg;
+    };
+
+    static API_do_CircleHere(p_latitude, p_longitude, p_altitude, p_radius, p_turns) {
+    
+        const v_msg = {
+            a: p_latitude,
+            g: p_longitude,
+            l: p_altitude,
+            r: p_radius,
+            t: p_turns
+        };
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CirclePoint,
+            'ms': v_msg
+        }
+
+        return msg;
+    };
 
 }
 
