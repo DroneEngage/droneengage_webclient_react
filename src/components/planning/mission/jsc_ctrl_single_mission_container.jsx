@@ -96,7 +96,7 @@ export  class ClssSingle_Mission_Container extends React.Component {
     
     render() {
 
-        var c_borderStyle;
+        let c_borderStyle;
 
         if (this.props.p_isCurrent === true) {
             c_borderStyle = 'css_missionMapSelected';

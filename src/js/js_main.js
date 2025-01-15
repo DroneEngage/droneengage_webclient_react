@@ -34,7 +34,7 @@ import {ClssMainUnitPopup} from '../components/popups/jsc_main_unit_popup.jsx'
 var oldAppend = $.fn.append;
 
 $.fn.append = function($el){
-    var dom = ($el instanceof $) ? $el[0] : $el
+    let dom = ($el instanceof $) ? $el[0] : $el
     if(dom && dom.tagName==='SCRIPT'){
         this[0].appendChild(dom)
         return this
@@ -87,7 +87,7 @@ function enableDragging() {
 		$.fn.drags = function (opt) {
 
 			opt = $.extend({ handle: "", cursor: "move" }, opt);
-			var $el;
+			let $el;
 			if (opt.handle === "") {
 				$el = this;
 			} else {
@@ -95,13 +95,13 @@ function enableDragging() {
 			}
 
 			return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
-				var $drag;
+				let $drag;
 				if (opt.handle === "") {
 					$drag = $(this).addClass('draggable');
 				} else {
 					$drag = $(this).addClass('active-handle').parent().addClass('draggable');
 				}
-				var z_idx = $drag.css('z-index'),
+				const z_idx = $drag.css('z-index'),
 				drg_h = $drag.outerHeight(),
 				drg_w = $drag.outerWidth(),
 				pos_y = $drag.offset().top + drg_h - e.pageY,
@@ -208,40 +208,25 @@ function fn_handleKeyBoard() {
 
 
 		export function fn_takeLocalImage(p_andruavUnit, videoTrackID) {
-			var v_videoctrl = '#videoObject' + videoTrackID;
-			var v_video = $(v_videoctrl)[0];
-			var v_canvas = document.createElement('canvas');
+			const v_videoctrl = '#videoObject' + videoTrackID;
+			const v_video = $(v_videoctrl)[0];
+			const v_canvas = document.createElement('canvas');
 			v_canvas.width = v_video.videoWidth;
 			v_canvas.height = v_video.videoHeight;
-			var ctx = v_canvas.getContext('2d');
+			const ctx = v_canvas.getContext('2d');
 
 			//draw image to canvas. scale to target dimensions
 			ctx.drawImage(v_video, 0, 0);
 
 			//convert to desired file format
-			var dataURI = v_canvas.toDataURL("image/png"); // can also use 'image/png'
+			let dataURI = v_canvas.toDataURL("image/png"); // can also use 'image/png'
 			js_helpers.fn_saveData(dataURI, 'image/png');
 		}
 
 
 		export function fn_startrecord(v_andruavUnit, v_videoTrackID) {
 
-			// var options = {
-			// 	type: 'video',
-			// 	frameInterval: 30,
-			// 	dontFireOnDataAvailableEvent: true,
-			// 	canvas: { // this line works only in Chrome
-			// 		width: 1280,
-			// 		height: 720
-			// 	},
-			// 	video: { // this line works only in Chrome
-			// 		width: 1280,
-			// 		height: 720
-			// 	}
-			// };
-
-
-			var v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[v_videoTrackID];
+			const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[v_videoTrackID];
 			const recorder = RecordRTC(v_talk.stream, {
 				type: 'video'
 			  });
@@ -405,7 +390,7 @@ function fn_handleKeyBoard() {
 
 		export function fn_applyControl(v_small_mode)
 		{
-			var v_display_mode = js_localStorage.fn_getDisplayMode();
+			let v_display_mode = js_localStorage.fn_getDisplayMode();
 		
 			if (v_display_mode==null) v_display_mode = 0;
 			
@@ -2496,7 +2481,7 @@ function fn_handleKeyBoard() {
 
 		var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
-			var gui = p_andruavUnit.m_gui;
+			const gui = p_andruavUnit.m_gui;
 
 			if (((js_siteConfig.CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true))
 				&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type === js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION))

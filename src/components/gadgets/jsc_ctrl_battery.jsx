@@ -65,11 +65,11 @@ export class ClssCtrlBattery extends React.Component {
 
     hlp_getFCBBatteryCSSClass (v_battery)
 	{
-        var v_battery_display_fcb_div = "";
-        var v_battery_src = "./images/battery_gy_32x32.png";
+        let v_battery_display_fcb_div = "";
+        let v_battery_src = "./images/battery_gy_32x32.png";
         
-	    var v_remainingBat = v_battery.FCB_BatteryRemaining;
-		var v_bat1 = " ";
+	    let v_remainingBat = v_battery.FCB_BatteryRemaining;
+		let v_bat1 = " ";
 			 
 		if (v_battery.p_hasPowerInfo === false)
         {
@@ -101,7 +101,7 @@ export class ClssCtrlBattery extends React.Component {
             v_battery_src = "./images/battery_r_32x32.png";
 		}
 			 
-	    var bat = { m_battery_src: v_battery_src, css:v_bat1, level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div}; 
+	    let bat = { m_battery_src: v_battery_src, css:v_bat1, level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div}; 
         
 
 

@@ -104,7 +104,7 @@ class ClssPreferences extends React.Component {
 
 
   render () {
-    var v_speech_disabled = 'false';
+    let v_speech_disabled = 'false';
     if (js_localStorage.fn_getSpeechEnabled()===false)
     {
       v_speech_disabled = 'true';
@@ -261,9 +261,9 @@ export default class ClssGlobalSettings extends React.Component {
      
 
   //  js_common.fn_console_log ("REACT:RENDER ClssGlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
-  var v_gadgets = [];
-  var v_uploadFile = [];
-  var v_telemetryModes = [];
+  let v_gadgets = [];
+  let v_uploadFile = [];
+  let v_telemetryModes = [];
   
   v_gadgets.push (
       <div key={this.key + "1"} className="row ">
@@ -311,7 +311,7 @@ export default class ClssGlobalSettings extends React.Component {
 
 
     v_uploadFile.push ();
-    var cls_ctrl_wp = '  ';
+    let cls_ctrl_wp = '  ';
     if (!js_andruavAuth.fn_do_canControlWP()) 
     { // no permission
       cls_ctrl_wp = ' hidden disabled ';

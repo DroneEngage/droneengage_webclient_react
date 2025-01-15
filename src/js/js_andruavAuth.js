@@ -98,7 +98,7 @@ class CAndruavAuth {
         return;
     }
 
-    var _url;
+    let _url;
     if (window.location.protocol === 'https:') {
 	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		
@@ -108,7 +108,7 @@ class CAndruavAuth {
 	}
 
 
-    var p_keyValues = {
+    let p_keyValues = {
         'acc': p_userName,
         'pwd': p_accessCode,
         'gr': "1",
@@ -118,8 +118,8 @@ class CAndruavAuth {
         'at': 'g' // GCS
     };
 
-    var v_res = null;
-	var Me = this;
+    let v_res = null;
+	const Me = this;
     $.ajax({
         url: _url,
         type: 'POST',
@@ -172,7 +172,7 @@ class CAndruavAuth {
         }
 
 
-		var _url;
+		let _url;
 		if (window.location.protocol ===  'https:') {
 			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
 		} else {
@@ -180,14 +180,14 @@ class CAndruavAuth {
 		}
 
 
-		var p_keyValues = {};
+		let p_keyValues = {};
 		p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE;
 		p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
         p_keyValues[js_andruavMessages.CONST_SESSION_ID.toString()] = this._m_session_ID;
         p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
 
-		var v_res = null;
-		var Me = this;
+		let v_res = null;
+		const Me = this;
     	$.ajax({
 			url: _url,
 			type: 'POST',
@@ -228,7 +228,7 @@ class CAndruavAuth {
             }
 
 
-        var _url;
+            let _url;
         if (window.location.protocol === 'https:') {
             _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
         } else {
@@ -236,14 +236,14 @@ class CAndruavAuth {
         }
 
 
-        var p_keyValues = {};
+        let p_keyValues = {};
         p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_REGENERATE_ACCESSCODE;
         p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
         p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
 
 
-        var v_res = null;
-        var Me = this;
+        let v_res = null;
+        const Me = this;
         $.ajax({
             url: _url,
             type: 'POST',

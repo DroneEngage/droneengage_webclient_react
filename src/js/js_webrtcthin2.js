@@ -199,7 +199,7 @@ class AndruavStream {
   // Ask to Join a Broadcast
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   pv_join(dialconfig) {
-    var me = this;
+    const me = this;
     var talk = this.get_conversation(
       dialconfig.number,
       dialconfig.targetVideoTrack

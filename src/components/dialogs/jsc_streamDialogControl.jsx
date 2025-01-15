@@ -43,7 +43,7 @@ class ClssStreamChannel extends React.Component {
 
     render ()  {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
-        var v_unit = this.props.prop_session.m_unit;
+        const v_unit = this.props.prop_session.m_unit;
         if ((v_unit == null) || (v_track == null))
         {
             
@@ -54,9 +54,9 @@ class ClssStreamChannel extends React.Component {
         else
         {
             
-            var v_stream_class = 'btn-primary';
-            var v_record_class = 'btn-primary';
-            var v_startRecord = true;
+            let v_stream_class = 'btn-primary';
+            let v_record_class = 'btn-primary';
+            let v_startRecord = true;
             const active_track_id  = v_unit.m_Video.m_videoactiveTracks[v_track.id];
             if ((active_track_id !== null && active_track_id !== undefined) && (active_track_id.VideoStreaming !== js_andruavUnit.CONST_VIDEOSTREAMING_OFF))
             {
@@ -130,7 +130,7 @@ export default class ClssStreamDialog extends React.Component
 
     fn_initDialog()
     {
-        var me = this;
+        const me = this;
         this.modal_ctrl_stream_dlg.current.onmouseover = function (e) {
             me.modal_ctrl_stream_dlg.current.style.opacity = '1.0';
         };

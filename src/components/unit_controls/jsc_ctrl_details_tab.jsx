@@ -59,7 +59,7 @@ export  class ClssCTRL_Unit_Details   extends React.Component {
 
     render() {
         
-        var module_version = [];
+        let module_version = [];
 
         const v_andruavUnit = this.props.p_unit;
         if (v_andruavUnit.m_isDE === false)
@@ -92,7 +92,7 @@ export  class ClssCTRL_Unit_Details   extends React.Component {
             }
         }
         
-        var cmd_btns = [];
+        let cmd_btns = [];
         if (js_siteConfig.CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true)
         if (js_andruavAuth.fn_do_canControl())
         {
@@ -111,7 +111,7 @@ export  class ClssCTRL_Unit_Details   extends React.Component {
             </div>);
         }
         
-        var cmd_data = [];
+        let cmd_data = [];
         if (this.state.m_traffic_monitor === true)
         {
             cmd_data.push(<div key={v_andruavUnit.partyID + 'settings_cd1'} className='row css_margin_zero padding_zero border-top border-secondary'>

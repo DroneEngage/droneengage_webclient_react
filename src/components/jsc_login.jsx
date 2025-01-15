@@ -45,7 +45,7 @@ export class ClssLoginControl extends React.Component {
 
 			js_localStorage.fn_setEmail($('#txtEmail').val());
 			js_localStorage.fn_setAccessCode($('#txtAccessCode').val());
-			var s = $('#txtUnitID').val();
+			let s = $('#txtUnitID').val();
 			if (s !== null) {
 				js_localStorage.fn_setUnitID(s);
 			}
@@ -96,9 +96,9 @@ export class ClssLoginControl extends React.Component {
 	render() {
 
 
-		var control = [];
-		var title = "Login";
-		var css = "bg-success";
+		let control = [];
+		let title = "Login";
+		let css = "bg-success";
 		if (this.state.is_connected === true) {
 			title = "Logout";
 			css = "bg-danger";

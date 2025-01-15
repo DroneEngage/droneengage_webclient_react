@@ -122,14 +122,14 @@ export class ClssCTRL_P2P extends React.Component {
         }        
 
 
-        var txt_parent_mac='--:--:--:--:--';
-        var txt_parent_name = '';
-        var txt_logical_parent_mac='--:--:--:--:--';
-        var txt_logical_parent_name = '';
-        var txt_channel_p2p_offline = 'P2PDC';
-        var txt_channel_ws_offline = 'WSDC';
-        var css_txt_channel_p2p_offline = ' text-white bg-danger ';
-        var css_txt_channel_ws_offline = ' text-white bg-danger ';
+        let txt_parent_mac='--:--:--:--:--';
+        let txt_parent_name = '';
+        let txt_logical_parent_mac='--:--:--:--:--';
+        let txt_logical_parent_name = '';
+        let txt_channel_p2p_offline = 'P2PDC';
+        let txt_channel_ws_offline = 'WSDC';
+        let css_txt_channel_p2p_offline = ' text-white bg-danger ';
+        let css_txt_channel_ws_offline = ' text-white bg-danger ';
         if (v_andruavUnit.m_P2P.m_p2p_disabled === true)
         {
             txt_channel_p2p_offline = 'P2PC';

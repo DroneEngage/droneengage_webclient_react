@@ -13,7 +13,7 @@ class CSpeakEngine
 	
 	constructor () 
 	{
-		var Me = this;
+		const Me = this;
 		
 		this._v_enable_speak =  js_localStorage.fn_getSpeechEnabled() === true;
 		this._v_speakmsg ='';
@@ -36,7 +36,7 @@ class CSpeakEngine
 		});
 		
 
-		var elapsedTime = 0;
+		let elapsedTime = 0;
 		
 		this._v_speakmsg.onend = function(e) {
 			js_common.fn_console_log('Finished in ' + elapsedTime + ' seconds.');

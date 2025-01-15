@@ -25,18 +25,18 @@ export class ClssCTRL_HUD extends React.Component {
         c_canvas.style.width  = '50px';
         c_canvas.style.height = '50px';
 
-        var centerX = c_canvas.width / 2;
-        var centerY = c_canvas.height / 2;
-        var radius = 22;
+        let centerX = c_canvas.width / 2;
+        let centerY = c_canvas.height / 2;
+        let radius = 22;
         p_pitch_deg = 2 * p_pitch_deg;
-        var v_pitch = p_pitch_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
-        var v_roll = -p_roll_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
+        let v_pitch = p_pitch_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
+        let v_roll = -p_roll_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
 
-        var v_pitch_start = v_pitch;
-        var v_pitch_end = 3.14 - v_pitch_start;
+        let v_pitch_start = v_pitch;
+        let v_pitch_end = 3.14 - v_pitch_start;
         
-        var v_yaw_start = (p_yaw_deg-3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
-        var v_yaw_end = (p_yaw_deg+3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
+        let v_yaw_start = (p_yaw_deg-3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
+        let v_yaw_end = (p_yaw_deg+3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
         
         
 

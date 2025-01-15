@@ -149,7 +149,7 @@ class C_Video {
       // NO ACTIVE VIDEOS ARE DEFINED
       return CONST_VIDEOSTREAMING_OFF;
     }
-    var len = c_activeTracks.length;
+    const len = c_activeTracks.length;
     for (let i = 0; i < len; ++i) {
       if (
         this.m_videoactiveTracks[c_activeTracks[i]].VideoStreaming ===
@@ -231,7 +231,7 @@ class C_Video {
       return false;
     }
 
-    var len = c_activeTracks.length;
+    const len = c_activeTracks.length;
     let j = 0;
     let i = 0;
     for (i = 0; i < len; ++i) {
@@ -258,7 +258,7 @@ class C_Video {
       // NO ACTIVE VIDEOS ARE DEFINED
       return CONST_VIDEOSTREAMING_OFF;
     }
-    var len = c_activeTracks.length;
+    const len = c_activeTracks.length;
     for (let i = 0; i < len; ++i) {
       if (
         this.m_videoactiveTracks[c_activeTracks[i]].VideoRecording ===

@@ -241,7 +241,7 @@ export default class ClssAndruavUnitList extends React.Component {
                     if (js_localStorage.fn_getTabsDisplayEnabled() === true)
                     { 
                         // Display in Tabs
-                        var header_info = me.getHeaderInfo(v_andruavUnit);
+                        const header_info = me.getHeaderInfo(v_andruavUnit);
                         const c_active = me.state.m_active_partyID === v_andruavUnit.partyID;
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">

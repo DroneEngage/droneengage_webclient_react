@@ -82,7 +82,7 @@ class ClssCVideoScreen extends React.Component {
     fnl_stoprecord (p_andruavUnit,p_activeTrack,p_blob)
     {
 
-        var filename = 'video_';
+        let filename = 'video_';
         if (p_andruavUnit !== null && p_andruavUnit !== undefined)
         {
             filename = filename + p_andruavUnit.m_unitName;
@@ -90,7 +90,7 @@ class ClssCVideoScreen extends React.Component {
 
         // TODO implement
         FileSaver.saveAs(p_blob, filename);
-        var talk = p_andruavUnit.m_Video.m_videoactiveTracks[p_activeTrack];
+        let talk = p_andruavUnit.m_Video.m_videoactiveTracks[p_activeTrack];
         talk.videoRecording = false;
         js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw,{'andruavUnit': p_andruavUnit,'v_track':p_activeTrack});
     }
@@ -104,8 +104,8 @@ class ClssCVideoScreen extends React.Component {
             return ;
         }
         
-        var v_me = this;
-        var v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
+        let v_me = this;
+        let v_activeTrack = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         //if ((v_activeTrack.mmRTC !== null && v_activeTrack.mmRTC !== undefined) && (v_activeTrack.mmRTC.isStoppedRecording === false))
         if ((v_activeTrack.videoRecording === true) && (v_activeTrack.recorderObject !== null && v_activeTrack.recorderObject !== undefined))
         {
@@ -221,7 +221,7 @@ class ClssCVideoScreen extends React.Component {
     {
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        var v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
+        const v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
         if (v_video === null || v_video === undefined) return ;
         v_video.srcObject = c_talk.stream;
     }
@@ -364,7 +364,7 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_flashOnOff (e, p_obj)
     {
-        var v_flashValue = js_andruavMessages.CONST_FLASH_OFF
+        let v_flashValue = js_andruavMessages.CONST_FLASH_OFF
         if (this.state.m_flash === js_andruavMessages.CONST_FLASH_OFF)
         {   
             v_flashValue = js_andruavMessages.CONST_FLASH_ON;
@@ -462,7 +462,7 @@ class ClssCVideoScreen extends React.Component {
 
     componentDidMount() {
         this.fn_lnkVideo();
-        var me = this;
+        const me = this;
 
         $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e)    
         {
@@ -484,9 +484,9 @@ class ClssCVideoScreen extends React.Component {
     
     render ()
     {
-        var andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-        var talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        var divID = "cam_" + andruavUnit.partyID +  this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
+        const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
+        const divID = "cam_" + andruavUnit.partyID +  this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
         if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF)
         {
             return (
@@ -497,7 +497,7 @@ class ClssCVideoScreen extends React.Component {
             );
         }
         
-        var css_switchCam;
+        let css_switchCam;
         const c_trackAttributes = andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index];
         if (andruavUnit.m_Video.supportCameraSwitch(this.props.obj.v_index))
         {
@@ -508,9 +508,9 @@ class ClssCVideoScreen extends React.Component {
             css_switchCam = 'hidden';
         }
 
-        var css_zoomCam = '';
-        var css_flashCam = '';
-        var css_rotateCam = '';
+        let css_zoomCam = '';
+        let css_flashCam = '';
+        let css_rotateCam = '';
         if (andruavUnit.m_Video.supportZoom(this.props.obj.v_index))
         {
             css_zoomCam = "cursor_hand ";
@@ -529,7 +529,7 @@ class ClssCVideoScreen extends React.Component {
             css_rotateCam = 'hidden';
         }
     
-        var css_trackingBtn = "cursor_hand css_tracking_on";
+        let css_trackingBtn = "cursor_hand css_tracking_on";
 
         if (andruavUnit.m_Video.supportFlashing(this.props.obj.v_index))
         {
@@ -553,7 +553,7 @@ class ClssCVideoScreen extends React.Component {
             css_flashCam = "hidden ";
         }
 
-        var btn_videorecordClass ;
+        let btn_videorecordClass ;
 
         if (talk.videoRecording !== true)
         {
@@ -564,7 +564,7 @@ class ClssCVideoScreen extends React.Component {
             btn_videorecordClass = "cursor_hand  css_recvideo_active";
         }
 
-        var btn_fullscreen, btn_fullscreen_txt;
+        let btn_fullscreen, btn_fullscreen_txt;
 
         if (this.fnl_isFullScreen())
         {
@@ -582,7 +582,7 @@ class ClssCVideoScreen extends React.Component {
             transform: this.m_local_rotations[this.m_rotation] + " " + this.m_transform_mirrored
           };
           
-        var v_btns=[];
+        let v_btns=[];
          
         
             v_btns.push (<div key="btn" id="css_video_ctrl_panel" className="row  margin_2px css_padding_zero">
@@ -665,7 +665,7 @@ export class ClssCVideoControl extends React.Component {
     {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
-        var vid = p_obj.andruavUnit.partyID + p_obj.talk.targetVideoTrack;
+        let vid = p_obj.andruavUnit.partyID + p_obj.talk.targetVideoTrack;
         if (me.state.m_videoScreens.hasOwnProperty(vid) === false)
         {
             me.state.m_videoScreens[vid] = {};
@@ -716,7 +716,7 @@ export class ClssCVideoControl extends React.Component {
 render() {
     const arr = Object.keys (this.state.m_videoScreens);
     
-    var len = arr.length;
+    let len = arr.length;
 
     if (len === 0)
     {
@@ -725,17 +725,17 @@ render() {
         );
     }
     
-    var out_h = [];
-    var out_b = [];
+    let out_h = [];
+    let out_b = [];
     for (let i=0; i<len;++i)
     {
 
-        var _first = "";
+        let _first = "";
         const v_key = arr[i];
-        var v_obj = this.state.m_videoScreens[v_key];
+        const v_obj = this.state.m_videoScreens[v_key];
         if (v_obj !== null && v_obj !== undefined)
         {
-            var andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
+            const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
         
        
             if (this.state.lastadded === v_key)

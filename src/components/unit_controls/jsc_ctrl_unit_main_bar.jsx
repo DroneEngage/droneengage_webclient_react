@@ -114,13 +114,13 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
 		
 		}
 			 
-        var temp_res = ' ? °C';
+        let temp_res = ' ? °C';
         if (p_Power._Mobile.p_Battery.BatteryTemperature !== null && p_Power._Mobile.p_Battery.BatteryTemperature !== undefined)
         {
             temp_res = ' ' + p_Power._Mobile.p_Battery.BatteryTemperature + '°C';
         }
 			 
-        var charging_res = ' ';
+        let charging_res = ' ';
         if (p_Power._Mobile.p_Battery.PlugStatus !== null && p_Power._Mobile.p_Battery.PlugStatus !== undefined)
         {
             charging_res = p_Power._Mobile.p_Battery.PlugStatus

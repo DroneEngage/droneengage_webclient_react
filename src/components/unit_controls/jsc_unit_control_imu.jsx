@@ -56,7 +56,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
 
     hlp_getGPS (p_andruavUnit)
     {
-        var res = {
+        let res = {
         m_gps_class: "",
         m_gps_text: "",
         m_gps_text2: "",
@@ -139,25 +139,25 @@ export class ClssCTRL_Drone_IMU extends React.Component {
     
     renderIMU (v_andruavUnit)
     {
-        var v_fence_text = "unknown";
-		var v_fence_class = "text-muted";
-		var v_yaw_text;
-        var v_yaw_knob = [];
-        var v_fcb_mode_title;		
-		var v_bearing_text;
-        var v_bearing_knob = [];
-        var v_bearingTarget_text;
-        var v_bearingTarget_knob = [];
-        var v_flight_mode_text;
-        var v_flight_mode_class = ' ';
-        var v_distanceToMe_text;
-        var v_distanceToMe_class;
-        var v_flight_status_text;
-        var v_flight_status_class;
-        var distanceToWP_class;
-        var wpdst_text;
-        var v_flyingTime = " ";
-        var v_totalFlyingTime = " ";
+        let v_fence_text = "unknown";
+		let v_fence_class = "text-muted";
+		let v_yaw_text;
+        let v_yaw_knob = [];
+        let v_fcb_mode_title;		
+		let v_bearing_text;
+        let v_bearing_knob = [];
+        let v_bearingTarget_text;
+        let v_bearingTarget_knob = [];
+        let v_flight_mode_text;
+        let v_flight_mode_class = ' ';
+        let v_distanceToMe_text;
+        let v_distanceToMe_class;
+        let v_flight_status_text;
+        let v_flight_status_class;
+        let distanceToWP_class;
+        let wpdst_text;
+        let v_flyingTime = " ";
+        let v_totalFlyingTime = " ";
         
         
         if (v_andruavUnit.m_isFlying === true) 
@@ -228,9 +228,9 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         }
         else
         {
-            var v_lat2 = v_andruavUnit.m_Nav_Info.p_Location.lat;
-            var v_lng2 = v_andruavUnit.m_Nav_Info.p_Location.lng;
-            var distance = js_helpers.fn_calcDistance (js_globals.myposition.coords.latitude,js_globals.myposition.coords.longitude,v_lat2,v_lng2) ;
+            const v_lat2 = v_andruavUnit.m_Nav_Info.p_Location.lat;
+            const v_lng2 = v_andruavUnit.m_Nav_Info.p_Location.lng;
+            const distance = js_helpers.fn_calcDistance (js_globals.myposition.coords.latitude,js_globals.myposition.coords.longitude,v_lat2,v_lng2) ;
             if (js_globals.v_useMetricSystem === true) 
             {
                 v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + " m";

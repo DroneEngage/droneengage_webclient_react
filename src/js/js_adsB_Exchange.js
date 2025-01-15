@@ -125,7 +125,7 @@ import $ from 'jquery';
 
             js_eventEmitter.fn_subscribe (js_globals.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
 
-            var Me = this;
+            const me = this;
             setInterval(function () {
                 // dont call 
                 if ((Me.lat === null || Me.lat === undefined) || (Me.radius === 0)) return ;
@@ -146,7 +146,7 @@ import $ from 'jquery';
         {
             const now = Date.now();
             
-            var len = _data.acList.length;
+            const len = _data.acList.length;
             for (let i=0;i<len;++i)
             {
                 _data.acList[i].m_lastActiveTime = now;
@@ -193,10 +193,10 @@ import $ from 'jquery';
           
             if (js_globals.v_EnableADSB === false) return ;
             
-            var _v_url =  this.v_url + 'lat=' + p_lat.toString() + '&lng=' + p_lng.toString() + '&fDstL=0&fDstU=' + p_radius.toString();
+            const _v_url =  this.v_url + 'lat=' + p_lat.toString() + '&lng=' + p_lng.toString() + '&fDstL=0&fDstU=' + p_radius.toString();
             js_common.fn_console_log ("ADSB URL: %s", _v_url);
-            var res=null;
-            var Me = this;
+            let res=null;
+            const me = this;
 			$.ajax({
 				url: _v_url,
                 type: 'GET',

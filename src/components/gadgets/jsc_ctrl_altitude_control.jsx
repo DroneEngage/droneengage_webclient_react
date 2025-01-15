@@ -28,7 +28,7 @@ export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
         
         if ((p_AltitudeInMeter === null || p_AltitudeInMeter === undefined) || (p_AltitudeInMeter < js_globals.CONST_DEFAULT_ALTITUDE_min)) return ;
 
-        var v_speak;
+        let v_speak;
         
         if (js_globals.v_useMetricSystem === true) {
             v_speak = p_AltitudeInMeter.toFixed(1) + "meters";

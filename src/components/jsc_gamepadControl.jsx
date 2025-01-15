@@ -90,7 +90,7 @@ class ClssGamePadAxesControl extends React.Component {
                 
             );
         }
-        var v_axis = [0,1,2,3];
+        let v_axis = [0,1,2,3];
         
         // KEEP GUI as Sticks ... dont change it that is why we comment below code
         // switch(js_localStorage.fn_getGamePadMode())
@@ -318,8 +318,8 @@ export default class ClssGamePadControl extends React.Component {
         this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
         
         js_common.fn_console_log (this.m_output);
-        var v_title = (this.state.m_andruavUnit !== null && this.state.m_andruavUnit !== undefined )?this.state.m_andruavUnit.m_unitName:'NA';
-        var gamepads = [];
+        const v_title = (this.state.m_andruavUnit !== null && this.state.m_andruavUnit !== undefined )?this.state.m_andruavUnit.m_unitName:'NA';
+        const gamepads = [];
         
         
         for (let i=0; i<4;++i)
@@ -343,7 +343,7 @@ export default class ClssGamePadControl extends React.Component {
                 add (this,i);
             }
         }
-        var gamepad_title = "Select an active Game Pad"; 
+        let gamepad_title = "Select an active Game Pad"; 
         const v_controller = js_localGamePad.v_controllers[js_globals.active_gamepad_index];
         if (v_controller !== null && v_controller !== undefined)
         {

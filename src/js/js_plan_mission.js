@@ -109,7 +109,7 @@ export class ClssAndruavMissionPlan {
   fn_updatePath(v_enforceRedraw) {
     if (this.m_hidden) return;
 
-    var len = this.p_all_missions.length;
+    let len = this.p_all_missions.length;
     if (len === 0) {
       return;
     }
@@ -258,7 +258,7 @@ export class ClssAndruavMissionPlan {
   fn_deleteAll() {
     let len = this.p_all_missions.length;
     for (let i = 0; i < len; ++i) {
-      var marker = this.p_all_missions[i];
+      let marker = this.p_all_missions[i];
       marker.m_main_de_mission = null;
       if (marker.m_next !== null && marker.m_next !== undefined) {
         js_leafletmap.fn_hideItem(marker.m_next);

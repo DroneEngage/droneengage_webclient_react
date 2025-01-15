@@ -68,7 +68,7 @@ export function gui_alert(title,message,level)
         $('#deletemodal').on('show.bs.modal', function(e) {
 
             //get data-id attribute of the clicked element
-            var pwdid = $(e.relatedTarget).data('pwdid');
+            let pwdid = $(e.relatedTarget).data('pwdid');
 
             //populate the textbox
             $(e.currentTarget).find('#Heading').text("Delete access code " + pwdid + "?" );
@@ -78,7 +78,7 @@ export function gui_alert(title,message,level)
         js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_Created,  this, 
         function (p_sender,p_msg)
         {
-        var v_Message = "<p className='text-success'>Access Code Created Successfully.</p>";
+        let v_Message = "<p className='text-success'>Access Code Created Successfully.</p>";
         if (p_msg.hasOwnProperty(js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString())  === true)
         {
             v_Message += "<p className='text-success'>Access Code: <span  className='text-warning'><strong>" + p_msg[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString()] + "</strong></span></p>"
@@ -90,7 +90,7 @@ export function gui_alert(title,message,level)
         js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_Regenerated,  this, 
         function (p_sender,p_msg)
         {
-        var v_Message = "<p className='text-success'>New Access Code Created Successfully.";
+        let v_Message = "<p className='text-success'>New Access Code Created Successfully.";
         if (p_msg.hasOwnProperty(js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString())  === true)
         {
             v_Message += "<p className='text-success'>Access Code: <span  className='text-warning'><strong>" + p_msg[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString()] + "</strong></span></p>"
@@ -106,7 +106,7 @@ export function gui_alert(title,message,level)
         {
         if (p_msg !== null && p_msg !== undefined)
         {
-            var v_Message = "<p className='text-danger'>Operation Failed: <strong>" + p_msg[js_andruavMessages.CONST_ERROR_MSG.toString()]+ "</strong></p>";          
+            let v_Message = "<p className='text-danger'>Operation Failed: <strong>" + p_msg[js_andruavMessages.CONST_ERROR_MSG.toString()]+ "</strong></p>";          
             if (p_msg.hasOwnProperty(js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString())  === true)
             {
             v_Message += "<p className='text-success'>Access Code: <span  className='text-warning'><strong>" + p_msg[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER.toString()] + "</strong></span></p>"

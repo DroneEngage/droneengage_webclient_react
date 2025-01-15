@@ -97,7 +97,7 @@ class ClssUserEntry extends  React.Component {
     }
 
     render () {
-        var cls_color = " bg-white text-black-50";
+        let cls_color = " bg-white text-black-50";
         
         if (this.state.new_item === false)
         {
@@ -114,7 +114,7 @@ class ClssUserEntry extends  React.Component {
             }
         }
 
-        var class_modify;
+        let class_modify;
         if ((this.state.new_item === true)  // should be first 
         || (this.props.prop_single_item.is_valid === false)
         || (!window.StreamSensLibs.WebAdmin.fn_isadmin()))
@@ -178,7 +178,7 @@ class ClssUserEntry extends  React.Component {
 class ClssUserEntryList extends  React.Component {
 
     render () {
-        var p_params=[];
+        let p_params=[];
         
         const c_list = this.props.prop_users;
         
@@ -297,7 +297,7 @@ class ClssUserList extends React.Component {
     }
 
     render() {
-        var p_params = [];
+        let p_params = [];
         
         
         p_params = this.fn_createParametersCtrl();

@@ -29,7 +29,7 @@ export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
 
     fn_changeSpeedByStep (e, p_andruavUnit, p_step)
     {
-        var p_speed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed;
+        let p_speed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed;
         if (p_speed === 0)
         {
             p_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
@@ -51,7 +51,7 @@ export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
             p_speed = 5.0
         }
         
-        var v_speak = "change speed to ";
+        let v_speak = "change speed to ";
         // save target speed as indication.
 		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = parseFloat(p_speed);
         
@@ -78,7 +78,7 @@ export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
             v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
         }
 
-        var v_speed_text = "";	
+        let v_speed_text = "";	
 		
         if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed === null || v_andruavUnit.m_Nav_Info.p_Location.ground_speed === undefined) 
             {

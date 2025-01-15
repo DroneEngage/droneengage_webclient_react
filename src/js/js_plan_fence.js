@@ -27,13 +27,13 @@ export class ClssAndruavFencePlan
 	
     fn_generateAndruavFenceData(shapes)
 	{
-		var shapesData = [];
+		let shapesData = [];
 		const len = js_globals.v_map_shapes.length;
 			
 		for (let i=0; i< len; ++i)
 		{
 				
-			var cmd={};
+			let cmd={};
 			const c_shape = shapes[i];
 			
 			if (c_shape.m_geofenceInfo === undefined ) continue;  // not a fence
@@ -43,7 +43,7 @@ export class ClssAndruavFencePlan
 			cmd.a = c_shape.m_geofenceInfo.isHardFence === undefined?0:c_shape.m_geofenceInfo.isHardFence;
 			cmd.o = c_shape.m_geofenceInfo.m_shouldKeepOutside?1:0;
 			cmd.r = parseInt(c_shape.m_geofenceInfo.m_maximumDistance);
-			var lnglat = {};
+			let lnglat = {};
 			switch (c_shape.pm.m_shape_type)
 			{
 				case 'Marker':

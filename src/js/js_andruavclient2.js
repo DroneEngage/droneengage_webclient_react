@@ -190,7 +190,7 @@ class CAndruavClient {
         js_globals.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
         js_globals.m_andruavUnitList.fn_resetList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
-        var Me = this;
+        const Me = this;
         if (this.fn_timerID_checkStatus === null || this.fn_timerID_checkStatus  === undefined) {
 
             this.fn_timerID_checkStatus = setInterval(function () {
@@ -348,7 +348,7 @@ class CAndruavClient {
             return;
         
 
-        var v_unit = new js_andruavUnit.CAndruavUnitObject();
+        const v_unit = new js_andruavUnit.CAndruavUnitObject();
         v_unit.m_IsMe = true;
         v_unit.m_IsGCS = true;
         v_unit.m_unitName = this.unitID;
@@ -482,7 +482,7 @@ class CAndruavClient {
     {
         if ((p_name===null) || (p_name==="") || (p_description===null) || (p_description==="")) return ;
         
-        var msg = {
+        const msg = {
             UN:p_name,
             DS:p_description,
             PR:true // reset partyID
@@ -1567,7 +1567,7 @@ class CAndruavClient {
 
     prv_parseCommunicationMessage(Me, msg, evt) {
 
-        var p_jmsg;
+        let p_jmsg;
         let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 
         if (p_unit === null || p_unit === undefined)
@@ -1697,7 +1697,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
                     
-                    var v_session = {};
+                    let v_session = {};
                     v_session.status = 'connected';
                     v_session.m_unit = p_unit;
 
@@ -1934,10 +1934,12 @@ class CAndruavClient {
                         } else {
                             v_trigger_on_swarm_status = (p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
                             p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-                        }
-
-                        if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
-                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== true);
+                        }// CODEBLOCK_END
+                    if (v_trigger_on_FCB) {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFCBUpdated, p_unit);
+                    }
+                    
+                    arm_status = (p_unit.m_Swarm.m_isLeader !== true);
                             p_unit.m_Swarm.m_isLeader = true;
                             p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
                         } else {
@@ -2293,8 +2295,8 @@ class CAndruavClient {
                         return;
                     
                     // this is a system command
-                    var fencetype;
-                    var m_shouldKeepOutside = false;
+                    let fencetype;
+                    let m_shouldKeepOutside = false;
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2328,7 +2330,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
                     p_unit.m_Geo_Tags.p_DestinationPoint.m_isValid = true;
-                    var destination_type = js_andruavMessages.CONST_DESTINATION_GUIDED_POINT;
+                    let destination_type = js_andruavMessages.CONST_DESTINATION_GUIDED_POINT;
                     if (p_jmsg.P !== null && p_jmsg.P !== undefined)
                     {
                         destination_type = p_jmsg.P;
@@ -2357,10 +2359,10 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var geoFenceAttachStatus = {};
+                    let geoFenceAttachStatus = {};
                     geoFenceAttachStatus.fenceName = p_jmsg.n;
                     geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                    var fence = Me.andruavGeoFences[geoFenceAttachStatus.fenceName];
+                    let fence = Me.andruavGeoFences[geoFenceAttachStatus.fenceName];
 
                     if (geoFenceAttachStatus.isAttachedToFence === true) { /*
 						* If Action Attach:
@@ -2373,7 +2375,7 @@ class CAndruavClient {
                             return;
                         } else {
                             if (fence.Units[p_unit.partyID] === null || fence.Units[p_unit.partyID] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
-                                var geoFenceInfo = {};
+                                let geoFenceInfo = {};
                                 geoFenceInfo.hasValue = false;
                                 geoFenceInfo.fenceName = fence.m_geoFenceName;
                                 geoFenceInfo.m_inZone = false; // remember isValid = false
@@ -2406,7 +2408,7 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var geoFenceHitInfo = {
+                    let geoFenceHitInfo = {
                         hasValue: true,
                         fenceName: p_jmsg.n,
                         m_inZone: p_jmsg.z,
@@ -2434,7 +2436,7 @@ class CAndruavClient {
                     const c_len = p_jmsg.t.length;
                     for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg.t[i];
-                        var c_search_target = {};
+                        let c_search_target = {};
                         c_search_target.m_name = c_targetItem.n;
                         if (c_targetItem.hasOwnProperty('t')) {
                             c_search_target.m_type = c_targetItem.t;
@@ -2458,7 +2460,7 @@ class CAndruavClient {
                     p_unit.m_DetectedTargets.m_targets.m_list = [];
                     for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg[i];
-                        var c_target = {};
+                        let c_target = {};
                         c_target.x1 = c_targetItem.a;
                         c_target.y1 = c_targetItem.b;
                         if (c_targetItem.hasOwnProperty('r')) {
@@ -2503,13 +2505,13 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var signal = p_jmsg.w || p_jmsg;
+                    let signal = p_jmsg.w || p_jmsg;
                     Me.EVT_andruavSignalling(p_unit, signal);
                 }
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Error: {
-                    var v_error = {};
+                    let v_error = {};
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2531,12 +2533,12 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
 
-                    var v_isChunck = WAYPOINT_NO_CHUNK;
+                    let v_isChunck = WAYPOINT_NO_CHUNK;
                     if (p_jmsg.hasOwnProperty("i")) { // message is INCOMPLETE
                         v_isChunck = p_jmsg.i;
                     }
-                    var numberOfRecords = p_jmsg.n;
-                    var wayPoint = [];
+                    let numberOfRecords = p_jmsg.n;
+                    let wayPoint = [];
 
                     if (v_isChunck !== WAYPOINT_NO_CHUNK) {
                         if (this.v_waypointsCache.hasOwnProperty(p_unit.partyID) === false) {
@@ -2552,7 +2554,7 @@ class CAndruavClient {
 
                     for (let i = 0; i < numberOfRecords; ++ i) {
                         if (p_jmsg[i] !== null && p_jmsg[i] !== undefined) {
-                            var wayPointStep = {};
+                            let wayPointStep = {};
                             wayPointStep.waypointType = p_jmsg[i].t;
 
                             switch (wayPointStep.waypointType) {
@@ -2688,7 +2690,7 @@ class CAndruavClient {
             js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
             this.socketConnectionDone  = true;
             this.API_sendID(); // send now important
-            var Me = this;
+            const Me = this;
             this.timerID = setInterval(function () {
                 Me.API_sendID();
                 js_eventEmitter.fn_dispatch(js_globals.EE_adsbExpiredUpdate, null);
@@ -2791,7 +2793,7 @@ class CAndruavClient {
                     // const c_keys = Object.keys(p_unit.m_FCBParameters.m_list);
                     // const c_len = c_keys.length;
                     // const c_list = p_unit.m_FCBParameters.m_list;
-                    // var Me = this;
+                    // const Me = this;
                     // if (this.m_mavlinkFTPProtocol.parseMavlinkGCS(c_mavlinkMessage,
                     //     function (p_payload) 
                     //     {
@@ -3160,7 +3162,7 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_SPECTRUM: {
                     // Extract the float data
-                    var floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
+                    let floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
                     v_unit.m_SDR.addSpectrumData(andruavCMD.ms,floatData)
                     js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRSpectrum, v_unit);
                     
@@ -3173,7 +3175,7 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink: {
 
-                var v_andruavMessage = {
+                let v_andruavMessage = {
                         'src': js_andruavMessages.CONST_TelemetryProtocol_Source_REMOTE,
                         'data': data.buffer.slice(v_internalCommandIndexByteBased)
                     };
@@ -3184,15 +3186,15 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_ServoOutput: 
             {
-                var v_servoOutputs = {};
+                let v_servoOutputs = {};
                 /*
 							 String message could be of any length and no padding applied.
 							 when reading getUint32 the system assumes that data is paded in 4 bytes 
 							 so it is better to slice data again.
 							 NOTE THAT when reading getUnit16 the index will be different.
 				*/
-                var v_binaryData = data.buffer.slice(v_internalCommandIndexByteBased, data.buffer.byteLength);
-                var v_values = new Int32Array(v_binaryData);
+                let v_binaryData = data.buffer.slice(v_internalCommandIndexByteBased, data.buffer.byteLength);
+                let v_values = new Int32Array(v_binaryData);
                 v_servoOutputs.m_servo1 = v_values[0];
                 v_servoOutputs.m_servo2 = v_values[1];
                 v_servoOutputs.m_servo3 = v_values[2];
@@ -3207,11 +3209,11 @@ class CAndruavClient {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_IMG: {
-                    var v_andruavMessage;
+                    let v_andruavMessage;
                     if (andruavCMD.hasOwnProperty('ms')===false)
                     {   // backward compatibility with ANDRUAV   
                         try {
-                            var out = js_helpers.prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
+                            let out = js_helpers.prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
                             v_internalCommandIndexByteBased = out.nextIndex;
                             v_andruavMessage = JSON.parse(out.text);
                         } catch (err) {
@@ -3242,19 +3244,19 @@ class CAndruavClient {
 
 
     prv_extractBinaryPacket(evt) {
-        var andruavCMD;
-        var p_jmsg;
-        var v_unit;
-        var byteLength;
+        let andruavCMD;
+        let p_jmsg;
+        let v_unit;
+        let byteLength;
 
         const Me = this;
-        var reader = new FileReader();
+        let reader = new FileReader();
         reader.onload = function (event) {
             try{
-            var contents = event.target.result;
-            var data= new Uint8Array(contents);
+            let contents = event.target.result;
+            let data= new Uint8Array(contents);
             byteLength = contents.byteLength;
-            var out = js_helpers.prv_extractString(data, 0, byteLength);
+            let out = js_helpers.prv_extractString(data, 0, byteLength);
             // extract command:
             andruavCMD = JSON.parse(out.text);
             p_jmsg = Me.fn_parseJSONMessage(out.text);
@@ -3329,7 +3331,7 @@ class CAndruavClient {
 
         this.server_accessCode = p_accesscode;
 
-        var url = null;
+        let url = null;
         if (window.location.protocol === 'https:') {
             // f: CONST_CS_LOGIN_TEMP_KEY
             // g: CONST_CS_SERVER_PUBLIC_HOST
@@ -3361,7 +3363,7 @@ class CAndruavClient {
                 }
             };
             // OnOpen callback of Websocket
-            var Me = this;
+            const Me = this;
             this.ws.onopen = function () {
                 // js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
 
@@ -3370,7 +3372,7 @@ class CAndruavClient {
             // OnMessage callback of websocket
             this.ws.onmessage = function (evt) {
                 if (typeof evt.data === "string") { // This is a text message
-                    var p_jmsg = Me.fn_parseJSONMessage(evt.data);
+                    const p_jmsg = Me.fn_parseJSONMessage(evt.data);
                     switch (p_jmsg._ty) {
                         case CMDTYPE_SYS: Me.prv_parseSystemMessage(Me, p_jmsg);
                             break;

@@ -239,4 +239,4 @@ class GLOBALS {
 		
 }
 
-export var js_globals = GLOBALS.getInstance();
+export const js_globals = GLOBALS.getInstance();

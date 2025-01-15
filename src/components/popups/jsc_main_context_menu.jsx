@@ -39,8 +39,8 @@ export class ClssMainContextMenu extends React.Component {
 
 
     listUnits() {
-        var v_contextMenu = [];
-        var sortedPartyIDs;
+        let v_contextMenu = [];
+        let sortedPartyIDs;
         if (js_localStorage.fn_getUnitSortEnabled() === true) {
             // Sort the array alphabetically
             sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();

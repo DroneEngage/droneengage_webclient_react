@@ -66,7 +66,7 @@ export default class ClssLidarInfoDialog extends React.Component
 
     fn_initDialog()
     {
-        var me = this;
+        const me = this;
         //this.modal_ctrl_lidar_info.current.draggable = true;
         this.modal_ctrl_lidar_info.current.onmousedown = function (e) {
             me.modal_ctrl_lidar_info.current.style.opacity = '1.0';

@@ -36,7 +36,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
     
     getCss (value)
     {
-        var ret = new C_GUI_READING_VALUE();
+        let ret = new C_GUI_READING_VALUE();
         if (value === null || value === undefined) 
         {
             value = 'na';
@@ -85,12 +85,12 @@ export class ClssCtrlArdupilotEkf extends React.Component {
 
         const v_andruavUnit = this.props.p_unit;
         const flags = v_andruavUnit.m_EKF.m_flags;
-        var gui_V = this.getCss(v_andruavUnit.m_EKF.m_velocity_variance);
-        var gui_PH = this.getCss(v_andruavUnit.m_EKF.m_pos_horiz_variance);
-        var gui_PV = this.getCss(v_andruavUnit.m_EKF.m_pos_vert_variance);
-        var gui_CO = this.getCss(v_andruavUnit.m_EKF.m_compass_variance);
-        var gui_TA = this.getCss(v_andruavUnit.m_EKF.m_terrain_alt_variance);
-        var gui_AS = this.getCss(v_andruavUnit.m_EKF.m_airspeed_variance);
+        const gui_V = this.getCss(v_andruavUnit.m_EKF.m_velocity_variance);
+        const gui_PH = this.getCss(v_andruavUnit.m_EKF.m_pos_horiz_variance);
+        const gui_PV = this.getCss(v_andruavUnit.m_EKF.m_pos_vert_variance);
+        const gui_CO = this.getCss(v_andruavUnit.m_EKF.m_compass_variance);
+        const gui_TA = this.getCss(v_andruavUnit.m_EKF.m_terrain_alt_variance);
+        const gui_AS = this.getCss(v_andruavUnit.m_EKF.m_airspeed_variance);
 
         
         if (this.state.is_compact === true)

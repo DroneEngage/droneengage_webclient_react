@@ -16,7 +16,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     hlp_getflightButtonStyles (p_andruavUnit)
 	{
-	    var res = {};
+	    let res = {};
 		res.btn_arm_class               = "";
         res.btn_climb_class             = "";
         res.btn_takeoff_class           = " disabled hidden ";
@@ -552,8 +552,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     render ()
     {
-        var btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
-        var ctrl=[];
+        const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
+        let ctrl=[];
         
 
         switch (this.props.v_andruavUnit.m_VehicleType)

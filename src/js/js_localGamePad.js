@@ -110,7 +110,7 @@ class CAndruavGamePad {
     fn_onConnect(e) {
         js_common.fn_console_log(e);
 
-        var gp = navigator.getGamepads()[e.gamepad.index];
+        let gp = navigator.getGamepads()[e.gamepad.index];
         js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", gp.index, gp.id, gp.buttons.length, gp.axes.length);
 
         CAndruavGamePad.getInstance().fn_addgamepad(CAndruavGamePad.getInstance(),e.gamepad);
@@ -130,11 +130,11 @@ class CAndruavGamePad {
     }
 
     fn_addgamepad(me, p_gamepad) {
-        var v_padStatus = new fn_Obj_padStatus();
+        let v_padStatus = new fn_Obj_padStatus();
 
         js_common.fn_console_log(p_gamepad.id);
-        var vendorNumber;
-        var productNumber;
+        let vendorNumber;
+        let productNumber;
         if (js_helpers.fn_isFireFox())
         {
             const regex = /^([^-]+)-([^-]+)/;
@@ -146,8 +146,8 @@ class CAndruavGamePad {
         }
         else if (js_helpers.fn_isChrome())
         {
-            var regex = /Vendor:\s+(\w+)/i;
-            var match = regex.exec(p_gamepad.id);
+            let regex = /Vendor:\s+(\w+)/i;
+            let match = regex.exec(p_gamepad.id);
             if (match) {
             vendorNumber = match[1];
             
@@ -231,7 +231,7 @@ class CAndruavGamePad {
         const c_padStatus = this.v_controllers[p_gamepad.index];
         c_padStatus.p_connected = true;
 
-        var v_axesChanged = false;
+        let v_axesChanged = false;
         const c_now = Date.now();
         //console.log ("xx",p_gamepad.axes);
         if (c_padStatus.p_ctrl_type === GAME_PAD_WAILLY_PPM)
@@ -306,7 +306,7 @@ class CAndruavGamePad {
                     c_padStatus.p_buttons[i].m_timestamp = Date.now();
                     c_padStatus.p_buttons[i].m_longPress = false;
                     if (v_buttonChanged === true) {
-                        var v_Packet = {};
+                        let v_Packet = {};
                         v_Packet.p_buttonIndex = i;
                         v_Packet.p_buttons = c_padStatus.p_buttons;
                         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);

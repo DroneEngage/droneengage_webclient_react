@@ -35,7 +35,7 @@ class ClssAndruavMissionPlanManager {
         const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter % js_globals.v_colorDrawPathes.length];
         
         // Create a new mission plan instance
-        var v_missionPlan = new ClssAndruavMissionPlan(this.m_missionCounter, c_initColor);
+        let v_missionPlan = new ClssAndruavMissionPlan(this.m_missionCounter, c_initColor);
         
         // Store the new mission plan in the manager
         this.m_missionPlans[this.m_missionCounter] = v_missionPlan;

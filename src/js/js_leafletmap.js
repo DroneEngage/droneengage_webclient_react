@@ -34,7 +34,7 @@ class CLeafLetAndruavMap {
     }
 
     fn_addListenerOnMarker(p_marker, p_callback, p_event) {
-        var p_call = p_callback;
+        let p_call = p_callback;
         p_marker.on(p_event, function (p_event) {
             p_call(p_event.latlng.lat, p_event.latlng.lng);
         });
@@ -67,7 +67,7 @@ class CLeafLetAndruavMap {
     * Handle map initialization onLoad.
     */
     fn_initMap(p_mapelement) {
-        var v_site_copyright;
+        let v_site_copyright;
          v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
 
 
@@ -79,10 +79,10 @@ class CLeafLetAndruavMap {
         
         if (js_globals.CONST_MAP_GOOLE_PLUGIN === true)
         {
-            var ggl = new L.Google('SATELLITE'); // Possible types: SATELLITE, ROADMAP, HYBRID, TERRAIN
+            let ggl = new L.Google('SATELLITE'); // Possible types: SATELLITE, ROADMAP, HYBRID, TERRAIN
 
             this.m_Map.addLayer(ggl);
-            var zoomControl = new L.Control.Zoom({ position: 'topright' });
+            let zoomControl = new L.Control.Zoom({ position: 'topright' });
             zoomControl.addTo(this.m_Map);
         }
         else
@@ -230,7 +230,7 @@ class CLeafLetAndruavMap {
 
 
     fn_PanTo_latlng(p_lat, p_lng) {
-        var v_latlng = new L.LatLng(p_lat, p_lng);
+        let v_latlng = new L.LatLng(p_lat, p_lng);
 
         this.m_Map.panTo(v_latlng);
     };
@@ -281,7 +281,7 @@ class CLeafLetAndruavMap {
         
         const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
 
-        var v_marker = L.marker([
+        let v_marker = L.marker([
             0, 0
         ], {
             icon: v_image,

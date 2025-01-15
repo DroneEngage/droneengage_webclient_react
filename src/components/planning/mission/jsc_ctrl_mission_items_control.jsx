@@ -110,7 +110,7 @@ export default class ClssMission_Container extends React.Component {
     }
 
     fn_addNewPathPlan(e) {
-        var v_missionPlan = js_mapmission_planmanager.fn_createNewMission();
+        let v_missionPlan = js_mapmission_planmanager.fn_createNewMission();
         js_mapmission_planmanager.fn_setCurrentMission(v_missionPlan.m_id);
         js_leafletmap.fn_enableDrawMarker(true);
         this.setState({ p_plans: this.state.p_plans.concat([v_missionPlan]) });
@@ -131,7 +131,7 @@ export default class ClssMission_Container extends React.Component {
 
     render() {
 
-        var item = [];
+        let item = [];
 
 
         let v_mission1 = js_mapmission_planmanager.fn_getCurrentMission();

@@ -51,14 +51,14 @@ export class ClssAndruavUnitBase extends React.Component {
             js_eventEmitter.fn_dispatch(js_globals.EE_unitAdded,p_andruavUnit);
 	    }
 
-        var v_date = p_andruavUnit.date;
+        const v_date = p_andruavUnit.date;
         if (v_date === null || v_date === undefined)
         {
             p_andruavUnit.date = new Date();
         }
         else
         {
-            var n = new Date();
+            const n = new Date();
             if ((n - p_andruavUnit.date) < 300)
             {
                 return ;
