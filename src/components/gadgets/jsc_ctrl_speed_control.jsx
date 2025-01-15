@@ -65,7 +65,7 @@ export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
 
         js_speak.fn_speak(v_speak);
 
-        js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(p_speed));
+        js_globals.v_andruavClient.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(p_speed));
     }
 
 
