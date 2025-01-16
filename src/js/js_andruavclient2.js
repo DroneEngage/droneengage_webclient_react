@@ -1829,12 +1829,20 @@ class CAndruavClient {
                         p_unit.m_IsGCS = p_jmsg.GS;
                         p_unit.m_unitName = p_jmsg.UD;
                         p_unit.Description = p_jmsg.DS;
-                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         v_trigger_on_vehiclechanged = (p_unit.m_VehicleType !== p_jmsg.VT);
                         p_unit.m_VehicleType = p_jmsg.VT;
                         p_unit.m_Video.VideoRecording = p_jmsg.VR; // ON DRONE RECORDING
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
                         p_unit.m_Permissions = p_jmsg.p;
+                        
+                        if (p_jmsg.hasOwnProperty('FI') !== true) {
+                            p_jmsg.FI = false;
+                        }
+                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
+                        p_unit.m_useFCBIMU = p_jmsg.FI;
+                        p_unit.m_telemetry_protocol = p_jmsg.TP;
+                        
+                        
                         if (p_unit.hasOwnProperty('T') !== true) {
                             p_unit.m_time_sync = p_jmsg.T;
                         }
@@ -1869,12 +1877,6 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('C') === true) { 
                             p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
                         }
-
-                        if (p_jmsg.hasOwnProperty('FI') !== true) {
-                            p_jmsg.FI = false;
-                        }
-                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI);
-                        p_unit.m_useFCBIMU = p_jmsg.FI;
 
                         if (p_jmsg.hasOwnProperty('SD') !== true) {
                             p_jmsg.SD = false;
@@ -1934,12 +1936,10 @@ class CAndruavClient {
                         } else {
                             v_trigger_on_swarm_status = (p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
                             p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-                        }// CODEBLOCK_END
-                    if (v_trigger_on_FCB) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFCBUpdated, p_unit);
-                    }
-                    
-                    arm_status = (p_unit.m_Swarm.m_isLeader !== true);
+                        }
+
+                        if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
+                            v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== true);
                             p_unit.m_Swarm.m_isLeader = true;
                             p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
                         } else {
@@ -1966,13 +1966,16 @@ class CAndruavClient {
                         p_unit.m_unitName = p_jmsg.UD;
                         p_unit.partyID = msg.senderName;
                         p_unit.Description = p_jmsg.DS;
-                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         p_unit.m_VehicleType = p_jmsg.VT;
                         p_unit.m_Video.VideoRecording = p_jmsg.VR;
                         p_unit.m_Permissions = p_jmsg.p;
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
-                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI);
+                        if (p_jmsg.hasOwnProperty('FL') !== true) {
+                            p_jmsg.FL = false;
+                        }
+                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
                         p_unit.m_useFCBIMU = p_jmsg.FI;
+                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         
                         if (p_jmsg.hasOwnProperty('m1') === true) {
                             p_unit.m_modules.addModules (p_jmsg.m1);
