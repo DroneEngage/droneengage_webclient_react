@@ -289,14 +289,8 @@ class CLeafLetAndruavMap {
             draggable: p_draggable ? true : false,
             zIndexOffset: p_isTop ? 1000 : 0
         }
-        // map: this.m_Map,
-        // //label: c_lbl,
-        // //labelAnchor: new google.maps.Point(22, 0),
-        // anchor: new google.maps.Point(16, 16),
-        // icon: v_image
+        
         ).addTo(this.m_Map);
-
-        //     v_marker.setTitle(p_title);
 
         return v_marker;
     };
@@ -331,7 +325,7 @@ class CLeafLetAndruavMap {
      * @returns 
      */
     fn_DrawPath(p_positionFromLat, p_positionFromLng, p_positionToLat, p_positionToLng, p_style) {
-        var flightPlanCoordinates = [
+        let flightPlanCoordinates = [
             [
                 p_positionFromLat, p_positionFromLng
             ],
@@ -439,18 +433,18 @@ class CLeafLetAndruavMap {
         {
             p_image = './images/destination_g_32x32.png';
         }
-        var v_image;
+        let v_image;
         if (p_iconsize === null || p_iconsize === undefined) {
             p_iconsize = [32,32];
         }
         
-        var v_iconAnchor = [p_iconsize[0]/2,p_iconsize[1]/2];
+        let v_iconAnchor = [p_iconsize[0]/2, p_iconsize[1]/2];
         if (anchor !== null && anchor !== undefined)
         {
             v_iconAnchor = anchor;
         }
         
-        var v_popupAnchor = [-p_iconsize[0]/2,-p_iconsize[0]/2];
+        let v_popupAnchor = [-p_iconsize[0]/2, -p_iconsize[0]/2];
         let v_htmlIcon = "<image src='" + p_image + "'/>";
         if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
             
@@ -462,7 +456,8 @@ class CLeafLetAndruavMap {
             html: v_htmlIcon,
             iconSize: p_iconsize,
             iconAnchor: v_iconAnchor,
-            popupAnchor: v_popupAnchor,
+            tooltipAnchor: v_popupAnchor, // The coordinates of the point from which tooltips will "open", relative to the icon anchor.
+            popupAnchor: v_popupAnchor, //The coordinates of the point from which popups will "open", relative to the icon anchor.
             className: "css_leaflet_icon"
             // shadowUrl: 'my-icon-shadow.png',
             // shadowSize: [68, 95],
