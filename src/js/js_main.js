@@ -1685,7 +1685,7 @@ function fn_handleKeyBoard() {
 				js_globals.m_markGuided = null;
 			}
 			
-            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,16], true, true);
+            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,32], true, true);
             js_leafletmap.fn_setPosition(js_globals.m_markGuided , p_position);
 			
 			js_leafletmap.fn_addListenerOnClickMarker (js_globals.m_markGuided,
@@ -1924,13 +1924,13 @@ function fn_handleKeyBoard() {
 					|| (p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index] === js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL)) {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_24x24.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_24x24.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 						}
 					}
@@ -1938,13 +1938,13 @@ function fn_handleKeyBoard() {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
 								p_andruavUnit.m_Nav_Info._Target.wp_num = c_mission_index + 1;
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_gy_32x32.png', null, [16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_bb_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_bg_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 
 						}
@@ -2498,12 +2498,12 @@ function fn_handleKeyBoard() {
 			let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 			if (gui.m_marker_destination === null || gui.m_marker_destination === undefined) {
-				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, null, false,false, "", [32,32]);
+				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,48], false,false, "", [32,32]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, null, false, false, p_andruavUnit.m_unitName, [32,32]);
+				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			
