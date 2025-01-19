@@ -12,6 +12,10 @@ import {js_eventEmitter} from './js_eventEmitter'
 
 
 
+const AUTH_REQUEST_TIMEOUT = 10000; // Timeout for AJAX requests
+const AUTH_GCS_TYPE = 'g';
+const AUTH_ERROR_BAD_CONNECTION = 'Cannot Login .. Bad Connection or Timeout';
+const DEFAULT_PERMISSIONS = 0xffffffff; // Default permission value
 
 
 
@@ -92,183 +96,128 @@ class CAndruavAuth {
 
 
 
-	fn_do_loginAccount (p_userName, p_accessCode) {
-    if ((p_userName === null || p_userName === undefined) || (p_userName.length === 0) || (p_accessCode === null || p_accessCode === undefined) || (p_userName.accessCode === 0)) {
-        this._m_logined = false;
-        return;
-    }
-
-    let _url;
-    if (window.location.protocol === 'https:') {
-	    _url = 'https://' + this.m_auth_ip  + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_WEB_LOGIN_COMMAND; //   + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
-		
-	}
-	else {
-	    _url = 'http://' + this.m_auth_ip  + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_WEB_LOGIN_COMMAND; //  + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
-	}
-
-
-    let p_keyValues = {
-        'acc': p_userName,
-        'pwd': p_accessCode,
-        'gr': "1",
-        'app': 'andruav',
-        'ver': this._m_ver,
-        'ex': 'Andruav',
-        'at': 'g' // GCS
-    };
-
-    let v_res = null;
-	const Me = this;
-    $.ajax({
-        url: _url,
-        type: 'POST',
-        data: p_keyValues,
-        dataType: 'text',
-
-        success: function (v__res) {
-            v_res = JSON.parse(v__res);
-
-            if (v_res.e === 0) {
-                Me._m_logined = true;
-                Me._m_session_ID = v_res.sid;
-                Me.m_server_port = v_res.cs.h;
-                Me.m_server_ip = v_res.cs.g;
-                Me.server_AuthKey = v_res.cs.f; // authentication key of WS
-                Me.m_username = p_userName;
-                Me._m_permissions_ = v_res.per;
-                if (v_res.prm==null) v_res.prm = 0xffffffff;  // auth server does not support permission (backward compatibility)
-                Me._m_perm = v_res.prm;
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Logined, v_res);
-            } else {
-                Me._m_logined = false;
-                Me.m_error = v_res.e;
-                Me.m_errorMessage = 'Cannot Login .. ' + v_res.em;
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, v_res);
-
-            }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            Me._m_logined = false;
-            Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-            Me.m_errorMessage = 'Cannot Login .. Bad Connection';
-            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, v_res);
-
-        },
-        async: false // remove it later when you SYNC with 2eN
-    });
-	};
-
-
-	fn_generateAccessCode (p_accountName, p_permission) 
-	{
-		if ((p_accountName === null || p_accountName === undefined) || (p_accountName.length === 0)) {
-			return;
-		}
-
-        if ((p_permission === null || p_permission === undefined) || (typeof(p_permission) !== 'string'))
-        {
-            return ;
-        }
-
-
-		let _url;
-		if (window.location.protocol ===  'https:') {
-			_url = 'https://'+ this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
-		} else {
-			_url = 'http://'  + this.m_auth_ip + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
-		}
-
-
-		let p_keyValues = {};
-		p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE;
-		p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
-        p_keyValues[js_andruavMessages.CONST_SESSION_ID.toString()] = this._m_session_ID;
-        p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
-
-		let v_res = null;
-		const Me = this;
-    	$.ajax({
-			url: _url,
-			type: 'POST',
-			data: p_keyValues,
-			dataType: "text",
-
-			success: function (v__res) {
-				v_res = JSON.parse(v__res);
-
-				if (v_res.e === 0) {
-					js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Created, v_res);
-				} else {
-					js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
-				}
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				Me._m_logined = false;
-				Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-				js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
-			},
-			async: false // remove it later when you SYNC with 2eN
-		});
-
-
-		return;
-	}
-
-	fn_regenerateAccessCode = function (p_accountName, p_permission)  
-	{
-        if ((p_accountName === null || p_accountName === undefined) || (p_accountName.length === 0)) {
+	async fn_do_loginAccount(p_userName, p_accessCode) {
+        if (!p_userName || !p_userName.length || !p_accessCode) {
+            this._m_logined = false;
+            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: -1, em: "Invalid username or password" }); // Dispatch an error event
             return;
         }
 
+        const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+        const url = `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_WEB_LOGIN_COMMAND}`;
 
-        if ((p_permission === null || p_permission === undefined) || (typeof(p_permission) !== 'string'))
-            {
-                return ;
+        const keyValues = {
+            acc: p_userName,
+            pwd: p_accessCode,
+            gr: "1",
+            app: 'andruav',
+            ver: this._m_ver,
+            ex: 'Andruav',
+            at: AUTH_GCS_TYPE
+        };
+
+        try {
+            const response = await $.ajax({
+                url,
+                type: 'POST',
+                data: keyValues,
+                dataType: 'json',
+                timeout: AUTH_REQUEST_TIMEOUT,
+            });
+
+            if (response && response.e === 0) { // Check if response exists
+                this._m_logined = true;
+                this._m_session_ID = response.sid;
+                this.m_server_port = response.cs.h;
+                this.m_server_ip = response.cs.g;
+                this.server_AuthKey = response.cs.f;
+                this.m_username = p_userName;
+                this._m_permissions_ = response.per;
+                this._m_perm = response.prm ?? DEFAULT_PERMISSIONS; // Provide default if prm is missing
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Logined, response);
+            } else {
+                this._m_logined = false;
+                const errorMessage = response?.em || "Login failed"; // Extract error message or provide a default
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: response?.e || -2, em: errorMessage }); // Dispatch error event with details
             }
+        } catch (error) {
+            this._m_logined = false;
+            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message }); // Dispatch error event with error message
+            console.error("Login error:", error);
+        }
+    }
 
 
-            let _url;
-        if (window.location.protocol === 'https:') {
-            _url = 'https://' + this.m_auth_ip + ':' + this._m_auth_ports + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
-        } else {
-            _url = 'http://' + this.m_auth_ip + ':' + this._m_auth_port + js_andruavMessages.CONST_WEB_FUNCTION + js_andruavMessages.CONST_ACCOUNT_MANAGMENT; // + '?cmd=v&acc=' + userName + '&pwd=' + accessCode + '&app=andruav&ver=' + ver + '&ex=' + fn_eval ("349032c439313b1937512b112f442710302137510844310024c132c427d92f443490084427103021264935792e6927d92f443490084434902b1134902d9027d90d99040000513d09264924c1349026492a400400064027d9069104003b1905f110812f44271032c4357924c1366405f10d993d09"._fn_hexDecode());
+    async fn_generateAccessCode(p_accountName, p_permission) {
+        if (!p_accountName || !p_accountName.length || typeof p_permission !== 'string') {
+            return;
         }
 
+        const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+        const url = `${protocol}://${this.authIP}:${this.authPort}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
 
-        let p_keyValues = {};
-        p_keyValues[js_andruavMessages.CONST_SUB_COMMAND.toString()] = js_andruavMessages.CONST_CMD_REGENERATE_ACCESSCODE;
-        p_keyValues[js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER.toString()] = p_accountName;
-        p_keyValues[js_andruavMessages.CONST_PERMISSION_PARAMETER.toString()] = p_permission;
+        const keyValues = {
+            [js_andruavMessages.CONST_SUB_COMMAND]: js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE,
+            [js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER]: p_accountName,
+            [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
+            [js_andruavMessages.CONST_PERMISSION_PARAMETER]: p_permission
+        };
 
+        try {
+            const response = await $.ajax({
+                url,
+                type: 'POST',
+                data: keyValues,
+                dataType: 'json',
+                timeout: AUTH_REQUEST_TIMEOUT
+            });
 
-        let v_res = null;
-        const Me = this;
-        $.ajax({
-            url: _url,
-            type: 'POST',
-            data: p_keyValues,
-            dataType: "text",
+            if (response && response.e === 0) {
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Created, response);
+            } else {
+                const errorMessage = response?.em || "Generate Access Code failed"; // Get the error message from response or set default
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: response?.e || -4, em: errorMessage }); // Dispatch error event with details
+            }
+        } catch (error) {
+            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message}); // Dispatch error event with error message
+            console.error("Generate Access Code error:", error);
+        }
+    }
 
-            success: function (v__res) {
-                v_res = JSON.parse(v__res);
+	async fn_regenerateAccessCode(p_accountName, p_permission) {
+        if (!p_accountName || !p_accountName.length || typeof p_permission !== 'string') {
+            return;
+        }
 
-                if (v_res.e === 0) {
-                    js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Regenerated, v_res);
-                } else {
-                    js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                Me._m_logined = false;
-                Me.m_error = Me.C_ERR_SUCCESS_DISPLAY_MESSAGE;
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, v_res);
-            },
-            async: false // remove it later when you SYNC with 2eN
-        });
+        const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+        const url = `${protocol}://${this.authIP}:${this.authPort}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
 
+        const keyValues = {
+            [js_andruavMessages.CONST_SUB_COMMAND]: js_andruavMessages.CONST_CMD_REGENERATE_ACCESSCODE,
+            [js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER]: p_accountName,
+            [js_andruavMessages.CONST_PERMISSION_PARAMETER]: p_permission,
+            [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID
+        };
 
-        return;
+        try {
+            const response = await $.ajax({
+                url,
+                type: 'POST',
+                data: keyValues,
+                dataType: 'json',
+                timeout: AUTH_REQUEST_TIMEOUT
+            });
+
+            if (response && response.e === 0) {
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Regenerated, response);
+            } else {
+                const errorMessage = response?.em || "Regenerate Access Code failed";
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: response?.e || -3, em: errorMessage });
+            }
+        } catch (error) {
+            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message });
+            console.error("Regenerate Access Code error:", error);
+        }
     }
 
 
