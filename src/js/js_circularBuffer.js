@@ -42,7 +42,7 @@ export class ClssCustomCircularBuffer
 
     fn_get (p_ignoreUnderFlow)
     {
-        var t = null;
+        let t = null;
         if (this.m_unitCount === 0) return null;
         if (this.m_unitCount < this.m_buffer.length)
         {

@@ -397,7 +397,7 @@ export function  fn_saveData (fileURL, fileName) {
 
 
 export function  fn_getOS() {
-    var userAgent = window.navigator.userAgent,
+    let userAgent = window.navigator.userAgent,
         platform = window.navigator.platform,
         macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
         windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
