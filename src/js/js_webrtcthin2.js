@@ -6,7 +6,7 @@ import * as js_common from './js_common.js'
 class CTalk {
   constructor(number, targetVideoTrack, cAndruavStream) {
     this.PeerConnection =
-      window.RTCPeerConnection || window.mozRTCPeerConnection;
+      window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 
     this.closed = false;
     this.received = false;
