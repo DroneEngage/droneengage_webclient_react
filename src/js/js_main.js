@@ -61,11 +61,11 @@ export var setSelectedMissionFilePathToWrite = function (p_file_name)
 export var QueryString = function () {
 	// This function is anonymous, is executed immediately and 
 	// the return value is assigned to QueryString!
-	var query_string = {};
-	var query = window.location.search.substring(1);
-	var vars = query.split("&");
+	let query_string = {};
+	let query = window.location.search.substring(1);
+	let vars = query.split("&");
 	for (let i = 0; i < vars.length; i++) {
-		var pair = vars[i].split("=");
+		const pair = vars[i].split("=");
 		// If first entry with this name
 		if (typeof query_string[pair[0]] === "undefined") {
 			query_string[pair[0]] = decodeURIComponent(pair[1]);
@@ -144,7 +144,7 @@ function fn_handleKeyBoard() {
 		}
 
 		if (p_event.ctrlKey) {
-            var c = p_event.which || p_event.keyCode;
+            const c = p_event.which || p_event.keyCode;
             if (c === 82) {
                 p_event.preventDefault();
                 p_event.stopPropagation();
@@ -3184,7 +3184,7 @@ function fn_handleKeyBoard() {
 
 			if ((typeof(js_globals.CONST_MAP_GOOLE) == "undefined") || (js_globals.CONST_MAP_GOOLE === true))
 			{
-				var v_script = window.document.createElement('script');
+				let v_script = window.document.createElement('script');
 				v_script.type='text/javascript';
 				
 				v_script.src="2a4034903490310033a90d2408a108a12e6924c1310033a9084429713021302129712d9027d924c131002b1133a90844264930212e6908a12e6924c1310033a908a124c131002b1108a12be433a90f812cb927d939310e89108114d13a2424c11ae93931118929710c40110414401a441ef11e4010811189302126491e402be40961384033a937510b642be4234127100af9264927d9297107e91ae91ef1129932c40bd1375105a4264924c12d902d90258424c126492cb90e892b112f442b113490172924c13100"._fn_hexDecode();
@@ -3231,36 +3231,36 @@ function fn_handleKeyBoard() {
 
 
 			$('#gimbaldiv').find('#btnpitchm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, -2, 0, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollp').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, +2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, -2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawp').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, +2);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, -2);
 			});
 
@@ -3296,12 +3296,4 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
-			// if (js_globals.CONST_MAP_EDITOR === true){
-			// 	fn_missionTab();
-			// }
-
-			
 		};  // end of onReady
-
-		
-		//$(document).ready(fn_on_ready);

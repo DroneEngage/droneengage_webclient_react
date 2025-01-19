@@ -23,15 +23,15 @@ class ClssCtrlP2PInRangeNodeInfo  extends React.Component {
 
     render()
     {
-        var css_connection_type = "";
+        let css_connection_type = "";
         
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_node;
         const unit = js_globals.m_andruavUnitList.fn_getUnit(v_inrange_node.partyID);
-        var txt_node_name;
+        let txt_node_name;
 
-        var p2 = v_andruavUnit.partyID;
+        let p2 = v_andruavUnit.partyID;
         if (unit!=null)
         {
             p2 = unit.partyID;
@@ -94,7 +94,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
     render () 
     {
         const  v_andruavUnit = this.props.p_unit;
-        var v_units = [];
+        let v_units = [];
         Object.entries(v_andruavUnit.m_P2P.m_detected_node).forEach(([partyID, inrange_node]) => {
             
             v_units.push( 
@@ -102,7 +102,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
                 );
         });
         
-        var rendered=[];
+        let rendered=[];
         if (v_units.length === 0)
         {
             rendered.push (

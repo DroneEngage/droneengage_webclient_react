@@ -138,7 +138,7 @@ class AndruavStream {
     if (p_targetVideoTrack === null || p_targetVideoTrack === undefined) {
       p_targetVideoTrack = "default";
     }
-    var v_talk = new CTalk(p_number, p_targetVideoTrack, this);
+    const v_talk = new CTalk(p_number, p_targetVideoTrack, this);
 
     v_talk.fn_set_status("connecting");
     // Return Brand New Talk Reference
@@ -164,16 +164,16 @@ class AndruavStream {
   // Visually Display New Stream
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   onaddtrack(talk, mediaStreamEvent) {
-    var stream = mediaStreamEvent.streams[0];
+    const stream = mediaStreamEvent.streams[0];
     js_common.fn_console_log(
       "WEBRTC: TRACK-muted:" + stream.getVideoTracks()[0].muted
     );
 
-    var targetVideoTrack = talk.targetVideoTrack
+    const targetVideoTrack = talk.targetVideoTrack
       .replace(/ /g, "_")
       .toLowerCase();
-    var len = stream.getVideoTracks().length;
-    var p = [];
+      const len = stream.getVideoTracks().length;
+      const p = [];
 
     if (window.chrome === true) {
       // Multiple tracks per stream can be implemented in Chrome.
@@ -199,8 +199,8 @@ class AndruavStream {
   // Ask to Join a Broadcast
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   pv_join(dialconfig) {
-    const me = this;
-    var talk = this.get_conversation(
+    let me = this;
+    let talk = this.get_conversation(
       dialconfig.number,
       dialconfig.targetVideoTrack
     );
@@ -243,8 +243,8 @@ class AndruavStream {
     js_globals.v_andruavClient.EVT_andruavSignalling =
       this.EVT_andruavSignalling;
 
-    var talk;
-    var vid = dialconfig.number;
+    let talk;
+    let vid = dialconfig.number;
     if (dialconfig.targetVideoTrack !== null && dialconfig.targetVideoTrack !== undefined) {
       vid = dialconfig.targetVideoTrack;
     }
@@ -269,14 +269,13 @@ class AndruavStream {
   transmit(phone, channel, packet, times, time) {
     if (!packet) return;
     js_common.fn_console_log("WEBRTC:" + JSON.stringify(packet));
-    var message = {
+    const message = {
       packet: packet,
       channel: channel,
       id: phone,
       number: js_globals.v_andruavClient.partyID,
     };
 
-    //this.debugcb(message);
     js_globals.v_andruavClient.API_WebRTC_Signalling(phone, message);
   }
 
@@ -286,12 +285,12 @@ class AndruavStream {
   EVT_andruavSignalling(andruavUnit, p_signal) {
     js_common.fn_console_log("WEBRTC to WEB:" + JSON.stringify(p_signal));
 
-    var me = AndruavStream.getInstance();
+    const me = AndruavStream.getInstance();
 
     me.debugcb(p_signal);
 
     // Get Call Reference
-    var talk = me.conversations[p_signal.channel];
+    const talk = me.conversations[p_signal.channel];
 
     if (!talk || talk.closed) return;
 
@@ -316,9 +315,9 @@ class AndruavStream {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   async add_sdp_offer(p_signal) {
     // Get Call Reference
-    var talk = this.conversations[p_signal.channel];
-    var pc = talk.pc;
-    var type = p_signal.packet.type === "offer" ? "offer" : "answer";
+    const talk = this.conversations[p_signal.channel];
+    const pc = talk.pc;
+    const type = p_signal.packet.type === "offer" ? "offer" : "answer";
 
     // Deduplicate SDP Offerings/Answers
     //if (type in talk) return;
@@ -359,8 +358,8 @@ class AndruavStream {
       if (!p_signal.packet.candidate) return;
 
       // Get Call Reference
-      var talk = this.conversations[p_signal.channel];
-      var pc = talk.pc;
+      const talk = this.conversations[p_signal.channel];
+      const pc = talk.pc;
 
       // Add ICE Candidate Routes
       await pc.addIceCandidate(new this.IceCandidate(p_signal.packet));

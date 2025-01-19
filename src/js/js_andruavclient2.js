@@ -2770,8 +2770,7 @@ class CAndruavClient {
                     return true;
                 break;
                 case mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ:
-                    // BUG HERE WHEN COMMENTED IT WORKS
-                    var  c_mst = null;
+                    let  c_mst = null;
                     if (c_mavlinkMessage.param_id[0] === '\x00')
                     {
                         c_mst = p_unit.m_FCBParameters.m_list_by_index[c_mavlinkMessage.param_index];
@@ -2781,13 +2780,6 @@ class CAndruavClient {
                         c_mst = p_unit.m_FCBParameters.m_list[c_mavlinkMessage.param_id];
                     }
                      
-                    
-                    // if (c_mst === null || c_mst === undefined) return false; 
-                    // c_mst.header.seq = c_mavlinkMessage.header.seq + 1;
-                    // js_common.fn_console_log ("PARAM_GCS:" + c_mst.param_id);
-                    // c_mst.srcSystem=p_unit.m_FCBParameters.m_systemID;
-                    // //c_mst.srcComponent=0; //p_unit.m_FCBParameters.m_componentID;
-                    // return true;
                 break;
 
                 case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
