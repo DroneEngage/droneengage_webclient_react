@@ -97,10 +97,13 @@ class CAndruavAuth {
 
 
 	async fn_do_loginAccount(p_userName, p_accessCode) {
+        
+        js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Login_In_Progress, null);
+                
         if (!p_userName || !p_userName.length || !p_accessCode) {
             this._m_logined = false;
             js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: -1, em: "Invalid username or password" }); // Dispatch an error event
-            return;
+            return false;
         }
 
         const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
@@ -135,6 +138,7 @@ class CAndruavAuth {
                 this._m_permissions_ = response.per;
                 this._m_perm = response.prm ?? DEFAULT_PERMISSIONS; // Provide default if prm is missing
                 js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Logined, response);
+                return true;
             } else {
                 this._m_logined = false;
                 const errorMessage = response?.em || "Login failed"; // Extract error message or provide a default
@@ -145,6 +149,7 @@ class CAndruavAuth {
             js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message }); // Dispatch error event with error message
             console.error("Login error:", error);
         }
+        return false;
     }
 
 

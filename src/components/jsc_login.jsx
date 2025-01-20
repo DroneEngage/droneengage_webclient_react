@@ -12,16 +12,26 @@ import { js_speak } from '../js/js_speak'
 import { js_eventEmitter } from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
 
+const CONST_NOT_CONNECTION_OFFLINE 		= 0;
+const CONST_NOT_CONNECTION_IN_PROGRESS 	= 1;
+const CONST_NOT_CONNECTION_ONLINE 		= 2;
+
 export class ClssLoginControl extends React.Component {
 	constructor() {
 		super();
 		this.state = {
-			is_connected: false,
+			is_connected: CONST_NOT_CONNECTION_OFFLINE,
 			btnConnectText: 'Login',
 		    'm_update': 0
 		};
 		
+		this.key = Math.random().toString();
+        
+		this.txt_email  = React.createRef();
+		this.txt_access_code  = React.createRef();
+		
 		js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
+		js_eventEmitter.fn_subscribe (js_globals.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
 	}
 
 
@@ -31,7 +41,7 @@ export class ClssLoginControl extends React.Component {
 		if (me.state.m_update === 0) return ;
         
 		if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-			me.state.is_connected = true;
+			me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
 			me.setState({ btnConnectText: 'Logout' });
 			me.state.username = $('#txtUnitID').val();
 			js_speak.fn_speak('Connected');
@@ -40,7 +50,7 @@ export class ClssLoginControl extends React.Component {
 		}
 		else {
 
-			me.state.is_connected = false;
+			me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
 			me.setState({ btnConnectText: 'Login' });
 
 			js_localStorage.fn_setEmail($('#txtEmail').val());
@@ -54,6 +64,12 @@ export class ClssLoginControl extends React.Component {
 		}
 	}
 
+	fn_onAuthInProgress(me) {
+		if (me.state.m_update === 0) return ;
+		me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
+		me.setState({'m_update': me.state.m_update +1});
+	}
+
 	clickConnect(e) {
 		// Getting an array of DOM elements
 		// Then finding which element was clicked
@@ -62,7 +78,8 @@ export class ClssLoginControl extends React.Component {
 
 	componentWillUnmount() {
 		js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
-	}
+		js_eventEmitter.fn_unsubscribe (js_globals.EE_Auth_Login_In_Progress, this);
+    }
 
 	componentDidMount() {
 		this.state.m_update = 1;
@@ -99,19 +116,16 @@ export class ClssLoginControl extends React.Component {
 		let control = [];
 		let title = "Login";
 		let css = "bg-success";
-		if (this.state.is_connected === true) {
-			title = "Logout";
-			css = "bg-danger";
-		}
-		control.push(
-			<div key={'ClssLoginControl_complex'} className="dropdown">
-				<button className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-					{title}
-				</button>
-				<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-					<div id='login_form' className="card-body">
-						<div className={this.state.is_connected === true ? "hidden" : " "} >
-							<div className="form-group al_l"><label key='txtEmail1' htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
+		
+		let ctrls = [];
+		let ctrls2 = [];
+		switch(this.state.is_connected)
+		{
+			case CONST_NOT_CONNECTION_OFFLINE:
+			{
+				ctrls.push(
+					<div key={ "div_login" + this.key} className={""} >
+							<div className="form-group al_l"><label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
 							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
 							<div className="form-group al_l hidden">
 								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
@@ -123,22 +137,61 @@ export class ClssLoginControl extends React.Component {
 								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
 							</div>
 							<br />
-						</div>
-						<div id='login_btn mb-2 ' className='text-center'>
-							<div className={this.state.is_connected === false ? "hidden" : " "} >
-								<div className="form-group al_l"><label key='txtEmail2' htmlFor="txtEmail" id="email" className="text-muted">Email</label>
-									<p>  {js_localStorage.fn_getEmail()} </p>
-								</div>
-								<div className="form-group al_l">
-									<p className="text-muted">GCS ID</p>
-									<p > {js_localStorage.fn_getUnitID()} </p>
-								</div>
+						</div>);
+			}
+			break;
+			case CONST_NOT_CONNECTION_ONLINE:
+			{	title = "Logout";
+				css = "bg-danger";
+				ctrls2.push(
+					<div className={" "} >
+					<div className="form-group al_l"><label key='txtEmail2' htmlFor="txtEmail" id="email" className="text-muted">Email</label>
+						<p>  {js_localStorage.fn_getEmail()} </p>
+					</div>
+					<div className="form-group al_l">
+						<p className="text-muted">GCS ID</p>
+						<p > {js_localStorage.fn_getUnitID()} </p>
+					</div>
+				</div>);
+			
+			}
+			break;
+			case CONST_NOT_CONNECTION_IN_PROGRESS:
+			{	title = "Connecting..";
+				css = "bg-warning";
+				
+				ctrls.push(
+					<div key={ "div_login" + this.key} className={""} >
+							<div className="form-group al_l"><label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
+							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
+							<div className="form-group al_l hidden">
+								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
+								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
 							</div>
-							<button className={"btn button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === false ? 'btn-success' : 'btn-danger') + " p-0"} id="btnConnect" title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
+							<div className="form-group al_l">
+								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
+								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
+								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
+							</div>
+							<br />
+						</div>);
+			
+			}
+		}
+		control.push(
+			<div key={'ClssLoginControl_complex' + this.key} className="dropdown">
+				<button className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+					{title}
+				</button>
+				<div key={'dropdown-menu' + this.key} className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+					<div id='login_form' key={'login_form' + this.key} className="card-body">
+						{ctrls}
+						<button  id="btnConnect" key={'btnConnect' + this.key} className={"btn button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE ? 'btn-success' : 'btn-danger') + " p-0"} title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
+						{ctrls2}
 						</div>
 					</div>
 				</div>
-			</div>
+		
 		);
 
 		return (
