@@ -124,7 +124,7 @@ class ClssServoControl extends React.Component {
             fn_gotoUnit_byPartyID($('#modal_ctrl_servo').attr('partyID'));
         });
         $('#modal_ctrl_servo').find('#btnHelp').on('click', function () {
-            fn_helpPage({js_siteConfig.CONST_MANUAL_URL});
+            fn_helpPage(js_siteConfig.CONST_MANUAL_URL);
         });
 
         

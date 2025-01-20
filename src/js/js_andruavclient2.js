@@ -1031,7 +1031,7 @@ class CAndruavClient {
         }
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: p_andruavUnit, onff:p_OnOff});
+        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: p_andruavUnit, onff:p_OnOff});
 
     };
 
@@ -1459,7 +1459,7 @@ class CAndruavClient {
             Act: v_OnOff
         };
         this.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: v_unit, onff:v_OnOff});
+        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: v_unit, onff:v_OnOff});
     };
 
 
