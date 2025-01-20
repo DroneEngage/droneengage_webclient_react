@@ -3006,12 +3006,7 @@ function fn_handleKeyBoard() {
 		function fn_login() {
 			js_andruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
 			if (js_andruavAuth.fn_logined() !== true) {
-				// TODO: Replace Messenger REACT2
-				// Messenger().post({
-				// 	type: 'p_error',
-				// 	message: js_andruavAuth.m_errorMessage
-				// });
-
+				
 				setTimeout(fn_connect, 4000);
 
 				return;
