@@ -27,8 +27,11 @@ export class ClssLoginControl extends React.Component {
 		
 		this.key = Math.random().toString();
         
-		this.txt_email  = React.createRef();
-		this.txt_access_code  = React.createRef();
+		this.txtEmailRef = React.createRef();
+		this.txtAccessCodeRef = React.createRef();
+		this.txtUnitIDRef = React.createRef();
+		this.btnConnectRef = React.createRef();
+		this.txtGroupNameRef = React.createRef();
 		
 		js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
 		js_eventEmitter.fn_subscribe (js_globals.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
@@ -85,20 +88,18 @@ export class ClssLoginControl extends React.Component {
 		this.state.m_update = 1;
 
 		if (QueryString.accesscode !== null) {
-
-			$('#account').val(QueryString.accesscode);
-			$('#email').val(QueryString.email);
-			$('#group').val(QueryString.groupName);
-			$('#unitID').val(QueryString.unitName);
-
-		}
-		else {
-
-			$('#txtEmail').val(js_localStorage.fn_getEmail());
-			$('#txtAccessCode').val(js_localStorage.fn_getAccessCode());
-			$('#txtGroupName').val(js_localStorage.fn_getGroupName());
-			$('#txtUnitID').val(js_localStorage.fn_getUnitID());
-
+			if (this.txtAccessCodeRef.current !=  undefined)
+			{
+			this.txtAccessCodeRef.current.value = QueryString.accesscode;
+			this.txtEmailRef.current.value = QueryString.email;
+			this.txtGroupNameRef.current.value = QueryString.groupName; // Assuming txtGroupNameRef is also created
+			this.txtUnitIDRef.current.value = QueryString.unitName;
+			}
+		  } else {
+			this.txtEmailRef.current.value = js_localStorage.fn_getEmail();
+			this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
+			this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
+			this.txtUnitIDRef.current.value =  js_localStorage.fn_getUnitID();
 		}
 
 		if (QueryString.connect !== undefined) {
@@ -119,86 +120,208 @@ export class ClssLoginControl extends React.Component {
 		
 		let ctrls = [];
 		let ctrls2 = [];
-		switch(this.state.is_connected)
-		{
-			case CONST_NOT_CONNECTION_OFFLINE:
-			{
-				ctrls.push(
-					<div key={ "div_login" + this.key} className={""} >
-							<div className="form-group al_l"><label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
-							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
-							<div className="form-group al_l hidden">
-								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
-							</div>
-							<div className="form-group al_l">
-								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
-								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
-								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
-							</div>
-							<br />
-						</div>);
-			}
+		switch (this.state.is_connected) {
+		  case CONST_NOT_CONNECTION_OFFLINE:
+			ctrls.push(
+			  <div key={"div_login" + this.key} className="">
+				<div className="form-group al_l">
+				  <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">
+					Email
+				  </label>
+				  <input
+					type="email"
+					id="txtEmail"
+					name="txtEmail"
+					ref={this.txtEmailRef}
+					className="form-control"
+					defaultValue={
+					  QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()
+					}
+				  />
+				</div>
+				<div className="form-group al_l">
+				  <label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code">
+					Password
+				  </label>
+				  <input
+					type="password"
+					id="txtAccessCode"
+					title="Access Code"
+					name="txtAccessCode"
+					ref={this.txtAccessCodeRef}
+					className="form-control"
+					defaultValue={
+					  QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
+					}
+				  />
+				</div>
+				<div className="form-group al_l hidden">
+				  <label htmlFor="txtGroupName" id="group" className="text-white">
+					Group Name
+				  </label>
+				  <input
+					type="text"
+					id="txtGroupName"
+					name="txtGroupName"
+					ref={this.txtGroupNameRef} // Assuming txtGroupNameRef is created
+					className="form-control"
+					defaultValue={
+					  QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()
+					}
+				  />
+				</div>
+				<div className="form-group al_l">
+				  <label htmlFor="txtUnitID" id="unitID" className="text-muted">
+					GCS ID
+				  </label>
+				  <input
+					type="text"
+					id="txtUnitID"
+					name="txtUnitID"
+					ref={this.txtUnitIDRef}
+					className="form-control"
+					defaultValue={
+					  QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()
+					}
+				  />
+				  <input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
+				</div>
+				<br />
+			  </div>
+			);
 			break;
 			case CONST_NOT_CONNECTION_ONLINE:
-			{	title = "Logout";
-				css = "bg-danger";
+				title = 'Logout';
+				css = 'bg-danger';
 				ctrls2.push(
-					<div className={" "} >
-					<div className="form-group al_l"><label key='txtEmail2' htmlFor="txtEmail" id="email" className="text-muted">Email</label>
-						<p>  {js_localStorage.fn_getEmail()} </p>
+				  <div key={"div_logout" + this.key} className=" "> {/* Key added here */}
+					<div className="form-group al_l">
+					  <label key={'txtEmail2' + this.key} htmlFor="txtEmail" id="email" className="text-muted">
+						Email
+					  </label>
+					  <p>{js_localStorage.fn_getEmail()}</p>
 					</div>
 					<div className="form-group al_l">
-						<p className="text-muted">GCS ID</p>
-						<p > {js_localStorage.fn_getUnitID()} </p>
+					  <p className="text-muted">GCS ID</p>
+					  <p>{js_localStorage.fn_getUnitID()}</p>
 					</div>
-				</div>);
-			
-			}
-			break;
-			case CONST_NOT_CONNECTION_IN_PROGRESS:
-			{	title = "Connecting..";
-				css = "bg-warning";
-				
+				  </div>
+				);
+				break;
+			  case CONST_NOT_CONNECTION_IN_PROGRESS:
+				title = 'Connecting..';
+				css = 'bg-warning';
 				ctrls.push(
-					<div key={ "div_login" + this.key} className={""} >
-							<div className="form-group al_l"><label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">Email</label><input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()} /></div>
-							<div className="form-group al_l"><label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code" >Password</label><input type="password" id="txtAccessCode" title="Access Code" name="txtAccessCode" className="form-control" defaultValue={QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()} /></div>
-							<div className="form-group al_l hidden">
-								<label htmlFor="txtGroupName" id="group" className="text-white">Group Name</label>
-								<input type="text" id="txtGroupName" name="txtGroupName" className="form-control" defaultValue={QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()} />
-							</div>
-							<div className="form-group al_l">
-								<label htmlFor="txtUnitID" id="unitID" className="text-muted">GCS ID</label>
-								<input type="text" id="txtUnitID" name="txtUnitID" className="form-control" defaultValue={QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()} />
-								<input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
-							</div>
-							<br />
-						</div>);
-			
-			}
-		}
-		control.push(
-			<div key={'ClssLoginControl_complex' + this.key} className="dropdown">
-				<button className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css} type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-					{title}
-				</button>
-				<div key={'dropdown-menu' + this.key} className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-					<div id='login_form' key={'login_form' + this.key} className="card-body">
-						{ctrls}
-						<button  id="btnConnect" key={'btnConnect' + this.key} className={"btn button_large  rounded-3 m-2 user-select-none " + (this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE ? 'btn-success' : 'btn-danger') + " p-0"} title={this.state.username} onClick={(e) => this.clickConnect(e)}>{this.state.btnConnectText}</button>
-						{ctrls2}
-						</div>
+				  <div key={"div_connecting" + this.key} className=""> {/* Key added here */}
+					<div className="form-group al_l">
+					  <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">
+						Email
+					  </label>
+					  <input
+						type="email"
+						id="txtEmail"
+						name="txtEmail"
+						ref={this.txtEmailRef}
+						className="form-control"
+						defaultValue={
+						  QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()
+						}
+						disabled // Disable input during connection
+					  />
 					</div>
-				</div>
+					<div className="form-group al_l">
+					  <label htmlFor="txtAccessCode" id="account" className="text-white" title="Access Code">
+						Password
+					  </label>
+					  <input
+						type="password"
+						id="txtAccessCode"
+						title="Access Code"
+						name="txtAccessCode"
+						ref={this.txtAccessCodeRef}
+						className="form-control"
+						defaultValue={
+						  QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
+						}
+						disabled // Disable input during connection
+					  />
+					</div>
+					<div className="form-group al_l hidden">
+					  <label htmlFor="txtGroupName" id="group" className="text-white">
+						Group Name
+					  </label>
+					  <input
+						type="text"
+						id="txtGroupName"
+						name="txtGroupName"
+						ref={this.txtGroupNameRef}
+						className="form-control"
+						defaultValue={
+						  QueryString.groupName != null ? QueryString.groupName : js_localStorage.fn_getGroupName()
+						}
+						disabled // Disable input during connection
+					  />
+					</div>
+					<div className="form-group al_l">
+					  <label htmlFor="txtUnitID" id="unitID" className="text-muted">
+						GCS ID
+					  </label>
+					  <input
+						type="text"
+						id="txtUnitID"
+						name="txtUnitID"
+						ref={this.txtUnitIDRef}
+						className="form-control"
+						defaultValue={
+						  QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()
+						}
+						disabled // Disable input during connection
+					  />
+					  <input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
+					</div>
+					<br />
+				  </div>
+				);
+				break;
+			}
 		
-		);
-
-		return (
-			control
-		);
-	}
-
+			control.push(
+			  <div key={'ClssLoginControl_complex' + this.key} className="dropdown">
+				<button
+				  className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css}
+				  type="button"
+				  id="dropdownMenuButton1"
+				  data-bs-toggle="dropdown"
+				  aria-expanded="false"
+				>
+				  {title}
+				</button>
+				<div className="dropdown-menu" aria-labelledby="dropdownMenuButton1"> {/* Removed unnecessary key */}
+				  <div id="login_form" className="card-body"> {/* Removed unnecessary key */}
+					{ctrls}
+					<button
+					  id="btnConnect"
+					  className={
+						"btn button_large rounded-3 m-2 user-select-none " +
+						(this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE
+						  ? 'btn-success'
+						  : 'btn-danger') +
+						" p-0"
+					  }
+					  title={this.state.username}
+					  onClick={this.clickConnect} // Removed (e) =>
+					  ref={this.btnConnectRef}
+					>
+					  {this.state.btnConnectText}
+					</button>
+					{ctrls2}
+				  </div>
+				</div>
+			  </div>
+			);
+		
+			return control;
+		  }
 }
 
 
