@@ -25,7 +25,10 @@ class CAndruavAuth {
     constructor() {
         
         this.m_username = '';
-        
+        this.m_accesscode = '';
+        this.m_retry_login = true;
+        this.m_retry_handle = null;
+
         window._localserverIP = "127.0.0.1";
         window._localserverPort = 9211;
 
@@ -95,6 +98,14 @@ class CAndruavAuth {
     }
 
 
+    fn_retryLogin(p_enable) {
+        if (this.m_retry_handle !== null)
+        {
+            clearTimeout (this.m_retry_handle);
+            this.m_retry_handle = null;
+        }
+        this.m_retry_login = p_enable;
+    }
 
 	async fn_do_loginAccount(p_userName, p_accessCode) {
         
@@ -108,7 +119,7 @@ class CAndruavAuth {
 
         const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
         const url = `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_WEB_LOGIN_COMMAND}`;
-
+        this.m_accesscode = p_accessCode;
         const keyValues = {
             acc: p_userName,
             pwd: p_accessCode,
@@ -148,6 +159,13 @@ class CAndruavAuth {
             this._m_logined = false;
             js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message }); // Dispatch error event with error message
             console.error("Login error:", error);
+        }
+
+        if (js_andruavAuth.m_retry_login === true)
+        {
+            this.m_retry_handle = setTimeout(
+                this.fn_do_loginAccount.bind(this, p_userName, p_accessCode),
+                4000);
         }
         return false;
     }
@@ -226,8 +244,9 @@ class CAndruavAuth {
     }
 
 
-    fn_do_logoutAccount(p_userName, p_accessCode) {
+    fn_do_logoutAccount() {
         this._m_logined = false;
+            
     }
 }
 

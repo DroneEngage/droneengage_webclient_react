@@ -58,28 +58,41 @@ export var setSelectedMissionFilePathToWrite = function (p_file_name)
 {
 	selectedMissionFilesToWrite = p_file_name;
 }
+
 export var QueryString = function () {
-	// This function is anonymous, is executed immediately and 
-	// the return value is assigned to QueryString!
 	let query_string = {};
-	let query = window.location.search.substring(1);
-	let vars = query.split("&");
+	let query = window.location.search.substring(1); // Get the query string (excluding the '?')
+	let vars = query.split("&"); // Split into individual key-value pairs
+  
 	for (let i = 0; i < vars.length; i++) {
-		const pair = vars[i].split("=");
-		// If first entry with this name
-		if (typeof query_string[pair[0]] === "undefined") {
-			query_string[pair[0]] = decodeURIComponent(pair[1]);
-			// If second entry with this name
-		} else if (typeof query_string[pair[0]] === "string") {
-			let arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
-			query_string[pair[0]] = arr;
-			// If third or later entry with this name
-		} else {
-			query_string[pair[0]].push(decodeURIComponent(pair[1]));
-		}
+	  const pair = vars[i].split("="); // Split each pair into key and value
+	  const key = decodeURIComponent(pair[0]); // Decode the key
+	  const value = decodeURIComponent(pair[1] || ''); // Decode the value (default to empty string if missing)
+  
+	  // Skip empty keys (e.g., "?=" or "?&")
+	  if (key === "") continue;
+  
+	  // Handle duplicate keys (e.g., "param=1&param=2")
+	  if (typeof query_string[key] === "undefined") {
+		// If this is the first entry with this key, assign the value directly
+		query_string[key] = value;
+	  } else if (typeof query_string[key] === "string") {
+		// If this is the second entry with this key, convert to an array
+		query_string[key] = [query_string[key], value];
+	  } else {
+		// If this is the third or later entry with this key, push to the array
+		query_string[key].push(value);
+	  }
 	}
-		return query_string;
-}();
+  
+	// Override the valueOf method to control boolean behavior
+	query_string.valueOf = function () {
+	  // Return false if query_string is {"": ''} or {}
+	  return !(Object.keys(this).length === 0 || (Object.keys(this).length === 1 && this[""] === ''));
+	};
+  
+	return query_string; // Return the parsed query string object
+  }();
 
 // COULD BE REMOVED I GUESS
 function enableDragging() {
@@ -965,7 +978,7 @@ function fn_handleKeyBoard() {
 				return;
 			}
 
-			window.open('mapeditor.html?zoom=18&lat=' + p_andruavUnit.m_Nav_Info.p_Location.lat + '&lng=' + p_andruavUnit.m_Nav_Info.p_Location.lng);
+			window.open('mapeditor?zoom=18&lat=' + p_andruavUnit.m_Nav_Info.p_Location.lat + '&lng=' + p_andruavUnit.m_Nav_Info.p_Location.lng);
 			return false;
 		}
 
@@ -1316,6 +1329,7 @@ function fn_handleKeyBoard() {
 		   return should be good & bad in the same time for different fences.
 		*/
 		export function fn_isBadFencing(p_andruavUnit) {
+			// !TODO CREATE A CONTROL.
 
 			let keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
 			let size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
@@ -2781,7 +2795,7 @@ function fn_handleKeyBoard() {
 			}
 
 			let v_contentString = "<p class='img-rounded " + _style + "'><strong>" + geoFenceInfo.m_geoFenceName + _icon + "</strong></p><span class='help-block'>" + p_lat.toFixed(7) + " " + p_lng.toFixed(7) + "</span>";
-			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_globals.CONST_DEFAULT_ALTITUDE + "," + js_globals.CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
+			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_globals.CONST_DEFAULT_ALTITUDE + "," + js_globals.CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
 			
 			infowindow = js_leafletmap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 
@@ -3003,15 +3017,16 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_login() {
-			js_andruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-			if (js_andruavAuth.fn_logined() !== true) {
-				
-				setTimeout(fn_connect, 4000);
-
+		async function fn_login(p_email, p_access_code) {
+			js_andruavAuth.fn_retryLogin(true);
+			const loginResult = await js_andruavAuth.fn_do_loginAccount(p_email, p_access_code);
+			if (js_andruavAuth.fn_logined() !== true ) {
+				// note that js_andruavAuth retries internally
 				return;
 			}
+		}
 
+		function fn_connectWebSocket (me) {
 			// create a group object
 			if (js_andruavclient2.AndruavClient.getSocketStatus() !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED )
 			{
@@ -3067,43 +3082,21 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_logout() {
-			js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+		export function fn_logout() {
+			js_andruavAuth.fn_retryLogin(false);
+			js_andruavAuth.fn_do_logoutAccount();
 			js_andruavclient2.AndruavClient.API_delMe();
 		}
 
-		export function fn_connect() {
+		export function fn_connect(p_email, p_access_code) {
 			if (js_andruavclient2.AndruavClient.isSocketConnectionDone()===true)
 			{
 				fn_logout();
 			}
 			else
 			{
-				fn_login();
+				fn_login(p_email, p_access_code);
 			}
-			// if ((js_andruavAuth.fn_logined() === true) && (js_globals.v_connectState !== true)) {
-			// 	js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-			// 	if (( js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined)
-			// 		&& ((js_andruavclient2.AndruavClient.getSocketStatus() === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED ))) {
-			// 		js_globals.v_andruavClient.API_delMe();
-			// 		return;
-			// 	}
-				
-			// }
-			// else 
-			// {
-				
-			// }
-
-			
-
-			
-			// else {
-			// 	js_globals.v_andruavClient.API_delMe();
-
-			// }
-
-
 		};
 
 
@@ -3291,4 +3284,6 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
+			js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined,this,fn_connectWebSocket);
+				
 		};  // end of onReady

@@ -5,7 +5,7 @@ import React from 'react';
 import $ from 'jquery';
 
 import { js_globals } from '../js/js_globals.js';
-import { QueryString, fn_connect } from '../js/js_main';
+import { QueryString, fn_connect, fn_logout } from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
 import { js_localStorage } from '../js/js_localStorage'
 import { js_speak } from '../js/js_speak'
@@ -21,8 +21,7 @@ export class ClssLoginControl extends React.Component {
 		super();
 		this.state = {
 			is_connected: CONST_NOT_CONNECTION_OFFLINE,
-			btnConnectText: 'Login',
-		    'm_update': 0
+			'm_update': 0
 		};
 		
 		this.key = Math.random().toString();
@@ -45,8 +44,7 @@ export class ClssLoginControl extends React.Component {
         
 		if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
-			me.setState({ btnConnectText: 'Logout' });
-			me.state.username = $('#txtUnitID').val();
+			me.state.username = me.txtUnitIDRef.current.value;
 			js_speak.fn_speak('Connected');
 
 
@@ -54,15 +52,7 @@ export class ClssLoginControl extends React.Component {
 		else {
 
 			me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
-			me.setState({ btnConnectText: 'Login' });
-
-			js_localStorage.fn_setEmail($('#txtEmail').val());
-			js_localStorage.fn_setAccessCode($('#txtAccessCode').val());
-			let s = $('#txtUnitID').val();
-			if (s !== null) {
-				js_localStorage.fn_setUnitID(s);
-			}
-			js_localStorage.fn_setGroupName($('#txtGroupName').val());
+			me.setState({'m_update': me.state.m_update +1});
 
 		}
 	}
@@ -74,9 +64,29 @@ export class ClssLoginControl extends React.Component {
 	}
 
 	clickConnect(e) {
-		// Getting an array of DOM elements
-		// Then finding which element was clicked
-		fn_connect();
+		
+		if (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE)
+		{
+			// online or connecting
+			fn_logout();
+			this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE });
+			
+		}
+		else
+		{
+			// offline 
+			this.setState({'m_update': this.state.m_update +1});
+			
+			js_localStorage.fn_setEmail(this.txtEmailRef.current.value);
+			js_localStorage.fn_setAccessCode(this.txtAccessCodeRef.current.value);
+			let s = this.txtUnitIDRef.current.value;
+			if (s !== null) {
+				js_localStorage.fn_setUnitID(s);
+			}
+			js_localStorage.fn_setGroupName(this.txtGroupNameRef.current.value);
+
+			fn_connect(this.txtEmailRef.current.value, this.txtAccessCodeRef.current.value);
+		}
 	}
 
 	componentWillUnmount() {
@@ -85,28 +95,38 @@ export class ClssLoginControl extends React.Component {
     }
 
 	componentDidMount() {
-		this.state.m_update = 1;
-
-		if (QueryString.accesscode !== null) {
-			if (this.txtAccessCodeRef.current !=  undefined)
-			{
-			this.txtAccessCodeRef.current.value = QueryString.accesscode;
-			this.txtEmailRef.current.value = QueryString.email;
-			this.txtGroupNameRef.current.value = QueryString.groupName; // Assuming txtGroupNameRef is also created
-			this.txtUnitIDRef.current.value = QueryString.unitName;
-			}
+		// Use setState to update m_update
+		this.setState({ m_update: 1 });
+	  
+		// Use the QueryString function to get query parameters
+		const queryParams = QueryString;
+		
+		// Check if specific parameters are present in the query string
+		const hasRequiredParams = 
+		queryParams.accesscode !== undefined ||
+		queryParams.email !== undefined ||
+		queryParams.groupName !== undefined ||
+		queryParams.unitName !== undefined;
+		
+		// Only execute the code block if the required parameters are present
+		if (hasRequiredParams && this.txtAccessCodeRef.current) {
+			this.txtAccessCodeRef.current.value = queryParams.accesscode || '';
+			this.txtEmailRef.current.value = queryParams.email || '';
+			this.txtGroupNameRef.current.value = queryParams.groupName || '';
+			this.txtUnitIDRef.current.value = queryParams.unitName || '';
 		  } else {
+			// Fallback to localStorage values if required parameters are not present
 			this.txtEmailRef.current.value = js_localStorage.fn_getEmail();
 			this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
 			this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
-			this.txtUnitIDRef.current.value =  js_localStorage.fn_getUnitID();
+			this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+		  }
+	  
+		// Check if the connect parameter is present in the query string
+		if (queryParams.connect !== undefined) {
+		  this.clickConnect(null); // Remove redundant 'this' argument
 		}
-
-		if (QueryString.connect !== undefined) {
-
-			this.clickConnect(null);
-		}
-	}
+	  }
 
 
 
@@ -211,6 +231,7 @@ export class ClssLoginControl extends React.Component {
 			  case CONST_NOT_CONNECTION_IN_PROGRESS:
 				title = 'Connecting..';
 				css = 'bg-warning';
+				
 				ctrls.push(
 				  <div key={"div_connecting" + this.key} className=""> {/* Key added here */}
 					<div className="form-group al_l">
@@ -303,16 +324,14 @@ export class ClssLoginControl extends React.Component {
 					  id="btnConnect"
 					  className={
 						"btn button_large rounded-3 m-2 user-select-none " +
-						(this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE
-						  ? 'btn-success'
-						  : 'btn-danger') +
+						css +
 						" p-0"
 					  }
 					  title={this.state.username}
-					  onClick={this.clickConnect} // Removed (e) =>
+					  onClick={(e) => this.clickConnect(e)} // Removed (e) =>
 					  ref={this.btnConnectRef}
 					>
-					  {this.state.btnConnectText}
+					  {title}
 					</button>
 					{ctrls2}
 				  </div>

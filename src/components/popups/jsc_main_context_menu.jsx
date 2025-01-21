@@ -122,7 +122,7 @@ export class ClssMainContextMenu extends React.Component {
                             className="cursor_hand text-primary margin_zero si-07x al_c"
                             onClick={() =>
                                 window.open(
-                                    `./mapeditor.html?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
+                                    `./mapeditor?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
                                     '_blank'
                                 )
                             }
