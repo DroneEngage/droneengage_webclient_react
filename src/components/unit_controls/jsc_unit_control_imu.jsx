@@ -3,8 +3,6 @@ import React    from 'react';
 import * as js_helpers from '../../js/js_helpers.js'
 
 import {js_globals} from '../../js/js_globals.js';
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {js_localStorage} from '../../js/js_localStorage.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {
@@ -346,7 +344,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
             }
         }				
 						
-		const res = fn_isBadFencing (v_andruavUnit);
+		const res = 0;//fn_isBadFencing (v_andruavUnit);
 		v_andruavUnit.m_fencestatus = res;
 
         if (v_andruavUnit.m_fencestatus !== null && v_andruavUnit.m_fencestatus !== undefined)

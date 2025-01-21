@@ -1,4 +1,3 @@
-import $ from 'jquery'; 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
@@ -7,7 +6,6 @@ import Draggable from "react-draggable";
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
-import * as js_common from '../../js/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
