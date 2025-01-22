@@ -157,7 +157,26 @@ class CAndruavAuth {
             }
         } catch (error) {
             this._m_logined = false;
-            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message }); // Dispatch error event with error message
+
+            // Check for SSL-related errors
+            if (error.status === 0 || error.message.includes("ERR_CERT") || error.message.includes("SSL")) {
+                // Dispatch a specific event for SSL errors
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, {
+                    e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE,
+                    em: "SSL Error: Unable to establish a secure connection.",
+                    error: error.message,
+                    ssl: true
+                });
+            } else {
+                // Dispatch a generic error event for other types of errors
+                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, {
+                    e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE,
+                    em: AUTH_ERROR_BAD_CONNECTION,
+                    error: error.message,
+                    ssl: false
+                });
+            }
+
             console.error("Login error:", error);
         }
 
