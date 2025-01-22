@@ -1,18 +1,16 @@
 /*jshint esversion: 6 */
-import {js_globals} from './js_globals.js';
-
+import { js_globals } from './js_globals.js';
 
 class CLocalStorage {
-
     constructor() {
-        if (this.isSupported()) { // reset defaults with saved values if exist
+        if (this.isSupported()) {
+            // Initialize global settings with saved values if they exist
             js_globals.v_useMetricSystem = this.fn_getMetricSystem();
             js_globals.v_gamePadMode = this.fn_getGamePadMode();
             js_globals.CONST_DEFAULT_ALTITUDE = this.fn_getDefaultAltitude();
             js_globals.CONST_DEFAULT_RADIUS = this.fn_getDefaultRadius();
         }
     }
-
 
     static getInstance() {
         if (!CLocalStorage.instance) {
@@ -22,168 +20,176 @@ class CLocalStorage {
     }
 
     isSupported() {
-        return(typeof(Storage) !== "undefined")
+        return typeof Storage !== 'undefined';
     }
 
-    getDefaultAttribute(name, defaultValue) {
-        if (!this.isSupported()) 
-            return defaultValue;
-        
+    // Generic method to get a value from local storage
+    _getValue(key, defaultValue) {
+        if (!this.isSupported()) return defaultValue;
 
-        if (localStorage[name] !== null && localStorage[name] !== undefined) {
-            return localStorage[name];
-        } else {
-            return defaultValue;
+        const value = localStorage.getItem(key);
+        return value !== null && value !== undefined ? value : defaultValue;
+    }
+
+    // Generic method to set a value in local storage
+    _setValue(key, value) {
+        if (this.isSupported()) {
+            localStorage.setItem(key, value);
         }
     }
 
-
-    fn_setLanguage = function (value) {
-        localStorage._vLang = value;
+    // Language
+    fn_setLanguage(value) {
+        this._setValue('_vLang', value);
     }
 
-    fn_getLanguage = function () {
-        return this.getDefaultAttribute('_vLang', "en");
+    fn_getLanguage() {
+        return this._getValue('_vLang', 'en');
     }
 
-
-    fn_setEmail = function (value) {
-        localStorage._vEmail = value;
+    // Email
+    fn_setEmail(value) {
+        this._setValue('_vEmail', value);
     }
 
-    fn_getEmail = function () {
-        return this.getDefaultAttribute('_vEmail', "");
+    fn_getEmail() {
+        return this._getValue('_vEmail', '');
     }
 
-    fn_setAccessCode = function (value) {
-        localStorage._vAccessCode = value;
+    // Access Code
+    fn_setAccessCode(value) {
+        this._setValue('_vAccessCode', value);
     }
 
-    fn_getAccessCode = function () {
-        return this.getDefaultAttribute('_vAccessCode', "");
+    fn_getAccessCode() {
+        return this._getValue('_vAccessCode', '');
     }
 
-
-    fn_setUnitID = function (bool) {
-        localStorage._vUnitID = bool;
+    // Unit ID
+    fn_setUnitID(value) {
+        this._setValue('_vUnitID', value);
     }
 
-    fn_getUnitID = function () {
-        return this.getDefaultAttribute('_vUnitID', "WebGCS1");
+    fn_getUnitID() {
+        return this._getValue('_vUnitID', 'WebGCS1');
     }
 
-    fn_setGroupName = function (value) {
-        localStorage._vGroupName = value;
+    // Group Name
+    fn_setGroupName(value) {
+        this._setValue('_vGroupName', value);
     }
 
-    fn_getGroupName = function () {
-        return this.getDefaultAttribute('_vGroupName', "1");
+    fn_getGroupName() {
+        return this._getValue('_vGroupName', '1');
     }
 
-    fn_setDisplayMode = function (value) {
-        localStorage._vDisplayMode = value;
+    // Display Mode
+    fn_setDisplayMode(value) {
+        this._setValue('_vDisplayMode', value);
     }
 
-    fn_getDisplayMode = function () {
-        return this.getDefaultAttribute('_vDisplayMode', 0);
+    fn_getDisplayMode() {
+        return parseInt(this._getValue('_vDisplayMode', 0));
     }
 
-
-    fn_setMetricSystem = function (p_bool) {
-        localStorage._vv_useMetricSystem = p_bool;
+    // Metric System
+    fn_setMetricSystem(value) {
+        this._setValue('_vv_useMetricSystem', value.toString());
     }
 
-    fn_getMetricSystem = function () {
-        return(this.getDefaultAttribute('_vv_useMetricSystem', js_globals.v_useMetricSystem) === 'true');
+    fn_getMetricSystem() {
+        return this._getValue('_vv_useMetricSystem', js_globals.v_useMetricSystem.toString()) === 'true';
     }
 
-    fn_getGamePadMode = function () {
-        return parseInt(this.getDefaultAttribute('_vv_gamePadMode', 2));
+    // Game Pad Mode
+    fn_setGamePadMode(value) {
+        this._setValue('_vv_gamePadMode', value.toString());
     }
 
-    fn_setGamePadMode = function (p_mode) {
-        localStorage._vv_gamePadMode = p_mode;
+    fn_getGamePadMode() {
+        return parseInt(this._getValue('_vv_gamePadMode', '2'));
     }
 
-    fn_setDefaultAltitude = function (value) {
-        if (!this.isSupported) {
-            js_globals.CONST_DEFAULT_ALTITUDE = value;
-        }
-        localStorage._vDefaultAltitude = value;
+    // Default Altitude
+    fn_setDefaultAltitude(value) {
+        this._setValue('_vDefaultAltitude', value.toString());
     }
 
-    fn_getDefaultAltitude = function (value) {
-        return parseInt(this.getDefaultAttribute('_vDefaultAltitude', js_globals.CONST_DEFAULT_ALTITUDE));
+    fn_getDefaultAltitude() {
+        return parseInt(this._getValue('_vDefaultAltitude', js_globals.CONST_DEFAULT_ALTITUDE.toString()));
     }
 
-    fn_setDefaultRadius = function (value) {
-        localStorage._vDefaultRadius = value;
+    // Default Radius
+    fn_setDefaultRadius(value) {
+        this._setValue('_vDefaultRadius', value.toString());
     }
 
-    fn_getDefaultRadius = function (value) {
-        return parseInt(this.getDefaultAttribute('_vDefaultRadius', js_globals.CONST_DEFAULT_RADIUS));
+    fn_getDefaultRadius() {
+        return parseInt(this._getValue('_vDefaultRadius', js_globals.CONST_DEFAULT_RADIUS.toString()));
     }
 
-
-    fn_setSpeechEnabled = function (p_enabled) {
-        localStorage._vv_speechEnabled = p_enabled;
+    // Speech Enabled
+    fn_setSpeechEnabled(value) {
+        this._setValue('_vv_speechEnabled', value.toString());
     }
 
-    fn_getSpeechEnabled = function () {
-        return  this.getDefaultAttribute('_vv_speechEnabled', 'true') === 'true';
+    fn_getSpeechEnabled() {
+        return this._getValue('_vv_speechEnabled', 'true') === 'true';
     }
 
-    fn_setVolume = function (value) {
-        localStorage._vDefaultVolume = value;
+    // Volume
+    fn_setVolume(value) {
+        this._setValue('_vDefaultVolume', value.toString());
     }
 
-    fn_getVolume = function () {
-        return parseInt(this.getDefaultAttribute('_vDefaultVolume', js_globals.CONST_DEFAULT_VOLUME));
+    fn_getVolume() {
+        return parseInt(this._getValue('_vDefaultVolume', js_globals.CONST_DEFAULT_VOLUME.toString()));
     }
 
-    fn_setTabsDisplayEnabled = function (value) {
-        localStorage._vTabsDisplayEnabled = value;
+    // Tabs Display Enabled
+    fn_setTabsDisplayEnabled(value) {
+        this._setValue('_vTabsDisplayEnabled', value.toString());
     }
 
-    fn_getTabsDisplayEnabled = function () {
-        return this.getDefaultAttribute('_vTabsDisplayEnabled', 'true') === 'true';
+    fn_getTabsDisplayEnabled() {
+        return this._getValue('_vTabsDisplayEnabled', 'true') === 'true';
     }
 
-    fn_setUnitSortEnabled = function (value) {
-        localStorage._vUnitSortEnabled = value;
+    // Unit Sort Enabled
+    fn_setUnitSortEnabled(value) {
+        this._setValue('_vUnitSortEnabled', value.toString());
     }
 
-    fn_getUnitSortEnabled = function (value) {
-        return this.getDefaultAttribute('_vUnitSortEnabled', 'true') === 'true';
-    }
-    
-    
-    fn_setGoogleMapKey = function (value) {
-        localStorage._vGoogleMapKey = value;
+    fn_getUnitSortEnabled() {
+        return this._getValue('_vUnitSortEnabled', 'true') === 'true';
     }
 
-    fn_getGoogleMapKey = function () {
-        return this.getDefaultAttribute('_vGoogleMapKey', '');
-    }
-    
-    fn_setAdvancedOptionsEnabled = function (value) {
-        localStorage._vAdvancedOptionsEnabled = value;
+    // Google Map Key
+    fn_setGoogleMapKey(value) {
+        this._setValue('_vGoogleMapKey', value);
     }
 
-    fn_getAdvancedOptionsEnabled = function () {
-        return this.getDefaultAttribute('_vAdvancedOptionsEnabled', true) === 'true';
+    fn_getGoogleMapKey() {
+        return this._getValue('_vGoogleMapKey', '');
     }
 
-    fn_setGCSDisplayEnabled = function (value) {
-        localStorage._vGCSDisplay = value;
+    // Advanced Options Enabled
+    fn_setAdvancedOptionsEnabled(value) {
+        this._setValue('_vAdvancedOptionsEnabled', value.toString());
     }
 
-    fn_getGCSDisplayEnabled = function () {
-        return this.getDefaultAttribute('_vGCSDisplay', true) === 'true';
+    fn_getAdvancedOptionsEnabled() {
+        return this._getValue('_vAdvancedOptionsEnabled', 'true') === 'true';
     }
-          
-    
+
+    // GCS Display Enabled
+    fn_setGCSDisplayEnabled(value) {
+        this._setValue('_vGCSDisplay', value.toString());
+    }
+
+    fn_getGCSDisplayEnabled() {
+        return this._getValue('_vGCSDisplay', 'true') === 'true';
+    }
 }
 
-
-export var js_localStorage= CLocalStorage.getInstance();
+export const js_localStorage = CLocalStorage.getInstance();
