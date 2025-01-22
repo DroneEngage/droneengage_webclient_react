@@ -953,29 +953,38 @@ export class CAndruavUnitList {
     return Array.from(this.List.entries());
   }
 
+  /**
+     * Returns units sorted by name.
+     * @returns {Array} An array of units sorted by name.
+     */
   fn_getUnitsSorted() {
-    return Array.from(this.List.entries()).sort((a, b) => {
-      const name_a = a[1].m_unitName ? a[1].m_unitName : "";
-      const name_b = b[1].m_unitName ? b[1].m_unitName : "";
-      if (name_a < name_b) return -1;
-      if (name_a > name_b) return 1;
-      return 0;
+    return Array.from(this.List.values()).sort((a, b) => {
+        const nameA = a.m_unitName || "";
+        const nameB = b.m_unitName || "";
+        return nameA.localeCompare(nameB);
     });
-  }
+  } 
 
-  fn_getUnitsSortedBy_APID() {
-    return Array.from(this.List).sort(([, a], [, b]) => {
-      const name_a = a.m_FCBParameters.m_systemID || "";
-      const name_b = b.m_FCBParameters.m_systemID || "";
-      if (name_a < name_b) return -1;
-      if (name_a > name_b) return 1;
-      return 0;
-    });
-  }
 
-  fn_getUnitByP2PMac(mac) {
-    return Array.from(this.List.values()).find(unit => unit.m_P2P.fn_isMyMac(mac));
+    /**
+     * Returns units sorted by system ID.
+     * @returns {Array} An array of units sorted by system ID.
+     */
+    fn_getUnitsSortedBy_APID() {
+      return Array.from(this.List.values()).sort((a, b) => {
+          const idA = a.m_FCBParameters.m_systemID || "";
+          const idB = b.m_FCBParameters.m_systemID || "";
+          return idA.localeCompare(idB);
+      });
   }
+ /**
+     * Finds a unit by P2P MAC address.
+     * @param {string} mac The MAC address to search for.
+     * @returns {CAndruavUnitObject|null} The unit with the specified MAC address, or null if not found.
+     */
+ fn_getUnitByP2PMac(mac) {
+  return Array.from(this.List.values()).find(unit => unit.m_P2P.fn_isMyMac(mac)) || null;
+}
 
   Add(partyID, andruavUnit) {
     if (this.List.has(partyID)) return;

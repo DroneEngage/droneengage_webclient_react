@@ -224,8 +224,8 @@ export default class ClssAndruavUnitList extends React.Component {
             sortedPartyIDs.map(function (object)
             {
                 
-                const partyID = object[0];
-                const v_andruavUnit = object[1];
+                const partyID = object.partyID;
+                const v_andruavUnit = object;
                 
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
