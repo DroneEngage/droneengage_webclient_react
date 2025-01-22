@@ -3239,74 +3239,99 @@ class CAndruavClient {
 
 
     prv_extractBinaryPacket(evt) {
-        let andruavCMD;
-        let p_jmsg;
-        let v_unit;
-        let byteLength;
-
         const Me = this;
-        let reader = new FileReader();
-        reader.onload = function (event) {
-            try{
-            let contents = event.target.result;
-            let data= new Uint8Array(contents);
-            byteLength = contents.byteLength;
-            let out = js_helpers.prv_extractString(data, 0, byteLength);
-            // extract command:
-            andruavCMD = JSON.parse(out.text);
-            p_jmsg = Me.fn_parseJSONMessage(out.text);
-            v_unit = js_globals.m_andruavUnitList.fn_getUnit(js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName));
-            if (v_unit === null || v_unit === undefined) {
+    
+        // Initialize the message queue and FileReader if not already done
+        if (!Me.binaryMessageQueue) {
+            Me.binaryMessageQueue = [];
+            Me.binaryReader = new FileReader();
+    
+            Me.binaryReader.onload = function (event) {
+                Me.handleBinaryData(event.target.result);
+    
+                // Process the next message in the queue
+                if (Me.binaryMessageQueue.length > 0) {
+                    const nextMessage = Me.binaryMessageQueue.shift();
+                    Me.binaryReader.readAsArrayBuffer(nextMessage);
+                }
+            };
+    
+            Me.binaryReader.onerror = function (event) {
+                console.error("File could not be read! Code " + event.target.error.code);
+    
+                // Process the next message in the queue even if there's an error
+                if (Me.binaryMessageQueue.length > 0) {
+                    const nextMessage = Me.binaryMessageQueue.shift();
+                    Me.binaryReader.readAsArrayBuffer(nextMessage);
+                }
+            };
+        }
+    
+        // Add the message to the queue
+        Me.binaryMessageQueue.push(evt.data);
+    
+        // Start processing if the FileReader is not busy
+        if (!Me.binaryReader.readyState || Me.binaryReader.readyState === FileReader.DONE) {
+            const nextMessage = Me.binaryMessageQueue.shift();
+            Me.binaryReader.readAsArrayBuffer(nextMessage);
+        }
+    }
+    
+    handleBinaryData(contents) {
+        const Me = this;
+    
+        try {
+            // Convert binary data to Uint8Array
+            const data = new Uint8Array(contents);
+            const byteLength = contents.byteLength;
+    
+            // Extract JSON command from binary data
+            const out = js_helpers.prv_extractString(data, 0, byteLength);
+            if (!out.text) {
+                throw new Error("No JSON command found in binary data");
+            }
+    
+            // Parse JSON command
+            const andruavCMD = JSON.parse(out.text);
+            const p_jmsg = Me.fn_parseJSONMessage(out.text);
+    
+            // Find or create the unit
+            const unitName = js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName);
+            let v_unit = js_globals.m_andruavUnitList.fn_getUnit(unitName);
+    
+            if (!v_unit) {
                 v_unit = new js_andruavUnit.CAndruavUnitObject();
-                // p_unit.m_defined = false; define it as incomplete
                 v_unit.m_IsMe = false;
                 v_unit.m_defined = false;
                 v_unit.partyID = p_jmsg.senderName;
                 v_unit.m_index = js_globals.m_andruavUnitList.count;
                 js_globals.m_andruavUnitList.Add(v_unit.partyID, v_unit);
-                        
-                if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID) === true)
-                {
-                    // it is already identifying itself.
-                    Me.API_requestID(p_jmsg.senderName);
-                    v_unit.m_Messages.fn_doNotRepeatMessageBefore(js_andruavMessages.CONST_TYPE_AndruavMessage_ID,1000,new Date())
-                }
-                else
-                {
-                    console.log ("skip");
-                }
     
-                // Cleanup the reader object
-                data = null;
-                reader.abort();
-                reader = null;
-				return;
+                // Request unit ID if allowed
+                if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
+                    Me.API_requestID(p_jmsg.senderName);
+                    v_unit.m_Messages.fn_doNotRepeatMessageBefore(
+                        js_andruavMessages.CONST_TYPE_AndruavMessage_ID,
+                        1000,
+                        new Date()
+                    );
+                } else {
+                    console.log("Skipping ID request (rate-limited)");
+                }
             }
-        
-            
+    
+            // Update message statistics
             v_unit.m_Messages.fn_addMsg(p_jmsg.messageType);
             v_unit.m_Messages.m_received_msg++;
-            v_unit.m_Messages.m_received_bytes +=data.length;
+            v_unit.m_Messages.m_received_bytes += data.length;
             v_unit.m_Messages.m_lastActiveTime = Date.now();
+    
+            // Process the binary message
             Me.prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
-            
-            data = null;
-            reader.abort();
-            reader = null;
+        } catch (error) {
+            console.error("Error processing binary message:", error.message);
         }
-        catch 
-        {   
-            console.error ("Bad data format");
-            return ; 
-        }		
-        };
-
-        reader.onerror = function (event) {
-            console.error("File could not be read! Code " + event.target.error.code);
-        };
-
-        reader.readAsArrayBuffer(evt.data);
-    }; // EOF - prv_extractBinary
+    }
 
 
     fn_disconnect(p_accesscode) {
@@ -3399,6 +3424,10 @@ class CAndruavClient {
     }
     catch (e)
     {
+        console.error("WebSocket initialization error:", e);
+        if (e.message.includes("SSL") || e.message.includes("TLS")) {
+            alert("SSL/TLS error detected. Please check your certificate configuration.");
+        }
         console.log ("Web Socket Failed");
         console.log (e);
         this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);
