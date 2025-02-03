@@ -14,7 +14,7 @@ class ClssHeaderControl extends React.Component {
 
     render() {
 
-        var ctrl = [];
+        let ctrl = [];
         if (this.props.no_layout_ctrl !== null && this.props.no_layout_ctrl !== undefined)
             {
                 ctrl.push (

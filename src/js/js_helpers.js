@@ -45,7 +45,7 @@ export const v_NETWORK_G_TYPE = ['NA','2','2.5','2.75','3','3.5','3.75','3.9','4
 export function  fn_getTimeSpanDetails (delta)
 {
 
-    var ret = {};
+    let ret = {};
     
     // calculate (and subtract) whole days
     ret.days = Math.floor(delta / 86400);
@@ -71,9 +71,9 @@ export function  fn_getTimeSpanDetails_Shortest (date_future, date_now)
     if (date_now === 0)
     return "";
     // get total seconds between the times
-    var delta = Math.abs(date_future - date_now) / 1000;
+    const delta = Math.abs(date_future - date_now) / 1000;
 
-    var dt = fn_getTimeSpanDetails (delta);
+    const dt = fn_getTimeSpanDetails (delta);
 
     return fn_getStringOfTimeDiff_Shortest (dt);
     
@@ -84,7 +84,7 @@ export function  fn_getTimeDiffDetails_Shortest (dif)
 {
     if (isNaN(dif)) return "";
     
-    var dt = fn_getTimeSpanDetails (dif);
+    const dt = fn_getTimeSpanDetails (dif);
 
     return fn_getStringOfTimeDiff_Shortest (dt);
     
@@ -97,8 +97,8 @@ export function  fn_getTimeDiffDetails_Shortest (dif)
  */
 export function  fn_getStringOfTimeDiff_Shortest (dif)
 {
-    var str = "";
-    var displayLowerDigits = false;
+    let str = "";
+    let displayLowerDigits = false;
     if (!isNaN(dif.days) && (dif.days !== 0))
     {
         str = str + dif.days + 'd:' ;
@@ -162,16 +162,16 @@ export function  isClockwiseAngle (p_start, p_end)
 		
 export function  fn_calcDistance(lat1, lon1, lat2, lon2) 
 {
-        var R = 6371e3; // metres
-        var φ1 = fn_toRad(lat1);
-        var φ2 = fn_toRad(lat2);
-        var Δφ = fn_toRad(lat2-lat1);
-        var Δλ = fn_toRad(lon2-lon1);
+        const R = 6371e3; // metres
+        const φ1 = fn_toRad(lat1);
+        const φ2 = fn_toRad(lat2);
+        const Δφ = fn_toRad(lat2-lat1);
+        const Δλ = fn_toRad(lon2-lon1);
 
-        var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
                 Math.cos(φ1) * Math.cos(φ2) *
                 Math.sin(Δλ/2) * Math.sin(Δλ/2);
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
         return R * c;
 }
@@ -184,7 +184,7 @@ export function  fn_toRad(Value)
 // http://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
 
 export function  pad(num, size) {
-    var s = "000000000" + num;
+    const s = "000000000" + num;
     return s.substr(s.length-size);
 }
 
@@ -252,7 +252,7 @@ export function  fn_concatBuffers(a, b, addzero) {
 
 export function  prv_extractString(data,startIndex,endIndex)
 {
-		var out = {}; // {'text':"", 'nextIndex': startIndex};
+        let out = {}; // {'text':"", 'nextIndex': startIndex};
 		
         let i = startIndex;
         while ( i < endIndex && data[i] !== 0) {
@@ -285,21 +285,21 @@ export function  fn_decrypt(num)
 
 
 Image.prototype.rotate = function(angle) {
-    var c = document.createElement("canvas");
+    let c = document.createElement("canvas");
     c.width = this.width;
     c.height = this.height;    
-    var ctx = c.getContext("2d");    
+    let ctx = c.getContext("2d");    
     ctx.rotate(angle);
-    var imgData = ctx.createImageData(this.width, this.height);
+    let imgData = ctx.createImageData(this.width, this.height);
     ctx.putImageData(imgData);
     return new Image(imgData);
 }
 
 
 export const _fn_hexEncode = function(){
-    var hex, i,v;
+    let hex, i,v;
 
-    var result = "";
+    let result = "";
     for (i=0; i<this.length; i++) {
 		v = this.charCodeAt(i);
 		v =fn_encrypt(v);
@@ -311,9 +311,9 @@ export const _fn_hexEncode = function(){
 }
 
 export const _fn_hexDecode = function(){
-    var j,v;
-    var hexes = this.match(/.{1,4}/g) || [];
-    var back = "";
+    let j,v;
+    let hexes = this.match(/.{1,4}/g) || [];
+    let back = "";
     for(j = 0; j<hexes.length; j++) {
 		v = parseInt(hexes[j], 16);
 		v = fn_decrypt(v);
@@ -325,7 +325,7 @@ export const _fn_hexDecode = function(){
 
 
 export function   fn_loadCss (path) {
-        var style = document.createElement('link');
+        let style = document.createElement('link');
         style.rel = 'stylesheet';
         style.href = './css/' + path + '.css';
         document.head.appendChild(style);
@@ -348,7 +348,7 @@ export function  fn_copyToClipboard(text) {
 
 
 export function  fn_findWithAttributeIndex(array, attr, value) {
-    for(var i = 0; i < array.length; i += 1) {
+    for(let i = 0; i < array.length; i += 1) {
         if(array[i][attr] === value) {
             return i;
         }
@@ -357,11 +357,11 @@ export function  fn_findWithAttributeIndex(array, attr, value) {
 }
 
 export function  fn_saveAs(data, filename, type) {
-    var file = new Blob([data], {type: type});
+    let file = new Blob([data], {type: type});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
-        var a = document.createElement("a"),
+        let a = document.createElement("a"),
                 url = URL.createObjectURL(file);
         a.href = url;
         a.download = filename;
@@ -378,7 +378,7 @@ export function  fn_saveData (fileURL, fileName) {
     //http://muaz-khan.blogspot.com.eg/2012/10/save-files-on-disk-using-javascript-or.html
     // for non-IE
     if (!window.ActiveXObject) {
-        var save = document.createElement('a');
+        let save = document.createElement('a');
         save.href = fileURL;
         save.target = '_blank';
         save.download = fileName || 'unknown';
@@ -387,7 +387,7 @@ export function  fn_saveData (fileURL, fileName) {
 
     // for IE
     else if (!window.ActiveXObject && document.execCommand)     {
-        var _window = window.open(fileURL, '_blank');
+        let _window = window.open(fileURL, '_blank');
         _window.document.close();
         _window.document.execCommand('SaveAs', true, fileName || fileURL);
         _window.close();
@@ -397,7 +397,7 @@ export function  fn_saveData (fileURL, fileName) {
 
 
 export function  fn_getOS() {
-    var userAgent = window.navigator.userAgent,
+    let userAgent = window.navigator.userAgent,
         platform = window.navigator.platform,
         macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
         windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],

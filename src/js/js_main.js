@@ -34,7 +34,7 @@ import {ClssMainUnitPopup} from '../components/popups/jsc_main_unit_popup.jsx'
 var oldAppend = $.fn.append;
 
 $.fn.append = function($el){
-    var dom = ($el instanceof $) ? $el[0] : $el
+    let dom = ($el instanceof $) ? $el[0] : $el
     if(dom && dom.tagName==='SCRIPT'){
         this[0].appendChild(dom)
         return this
@@ -58,28 +58,41 @@ export var setSelectedMissionFilePathToWrite = function (p_file_name)
 {
 	selectedMissionFilesToWrite = p_file_name;
 }
+
 export var QueryString = function () {
-	// This function is anonymous, is executed immediately and 
-	// the return value is assigned to QueryString!
-	var query_string = {};
-	var query = window.location.search.substring(1);
-	var vars = query.split("&");
+	let query_string = {};
+	let query = window.location.search.substring(1); // Get the query string (excluding the '?')
+	let vars = query.split("&"); // Split into individual key-value pairs
+  
 	for (let i = 0; i < vars.length; i++) {
-		var pair = vars[i].split("=");
-		// If first entry with this name
-		if (typeof query_string[pair[0]] === "undefined") {
-			query_string[pair[0]] = decodeURIComponent(pair[1]);
-			// If second entry with this name
-		} else if (typeof query_string[pair[0]] === "string") {
-			let arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
-			query_string[pair[0]] = arr;
-			// If third or later entry with this name
-		} else {
-			query_string[pair[0]].push(decodeURIComponent(pair[1]));
-		}
+	  const pair = vars[i].split("="); // Split each pair into key and value
+	  const key = decodeURIComponent(pair[0]); // Decode the key
+	  const value = decodeURIComponent(pair[1] || ''); // Decode the value (default to empty string if missing)
+  
+	  // Skip empty keys (e.g., "?=" or "?&")
+	  if (key === "") continue;
+  
+	  // Handle duplicate keys (e.g., "param=1&param=2")
+	  if (typeof query_string[key] === "undefined") {
+		// If this is the first entry with this key, assign the value directly
+		query_string[key] = value;
+	  } else if (typeof query_string[key] === "string") {
+		// If this is the second entry with this key, convert to an array
+		query_string[key] = [query_string[key], value];
+	  } else {
+		// If this is the third or later entry with this key, push to the array
+		query_string[key].push(value);
+	  }
 	}
-		return query_string;
-}();
+  
+	// Override the valueOf method to control boolean behavior
+	query_string.valueOf = function () {
+	  // Return false if query_string is {"": ''} or {}
+	  return !(Object.keys(this).length === 0 || (Object.keys(this).length === 1 && this[""] === ''));
+	};
+  
+	return query_string; // Return the parsed query string object
+  }();
 
 // COULD BE REMOVED I GUESS
 function enableDragging() {
@@ -87,7 +100,7 @@ function enableDragging() {
 		$.fn.drags = function (opt) {
 
 			opt = $.extend({ handle: "", cursor: "move" }, opt);
-			var $el;
+			let $el;
 			if (opt.handle === "") {
 				$el = this;
 			} else {
@@ -95,13 +108,13 @@ function enableDragging() {
 			}
 
 			return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
-				var $drag;
+				let $drag;
 				if (opt.handle === "") {
 					$drag = $(this).addClass('draggable');
 				} else {
 					$drag = $(this).addClass('active-handle').parent().addClass('draggable');
 				}
-				var z_idx = $drag.css('z-index'),
+				const z_idx = $drag.css('z-index'),
 				drg_h = $drag.outerHeight(),
 				drg_w = $drag.outerWidth(),
 				pos_y = $drag.offset().top + drg_h - e.pageY,
@@ -144,7 +157,7 @@ function fn_handleKeyBoard() {
 		}
 
 		if (p_event.ctrlKey) {
-            var c = p_event.which || p_event.keyCode;
+            const c = p_event.which || p_event.keyCode;
             if (c === 82) {
                 p_event.preventDefault();
                 p_event.stopPropagation();
@@ -208,40 +221,25 @@ function fn_handleKeyBoard() {
 
 
 		export function fn_takeLocalImage(p_andruavUnit, videoTrackID) {
-			var v_videoctrl = '#videoObject' + videoTrackID;
-			var v_video = $(v_videoctrl)[0];
-			var v_canvas = document.createElement('canvas');
+			const v_videoctrl = '#videoObject' + videoTrackID;
+			const v_video = $(v_videoctrl)[0];
+			const v_canvas = document.createElement('canvas');
 			v_canvas.width = v_video.videoWidth;
 			v_canvas.height = v_video.videoHeight;
-			var ctx = v_canvas.getContext('2d');
+			const ctx = v_canvas.getContext('2d');
 
 			//draw image to canvas. scale to target dimensions
 			ctx.drawImage(v_video, 0, 0);
 
 			//convert to desired file format
-			var dataURI = v_canvas.toDataURL("image/png"); // can also use 'image/png'
+			let dataURI = v_canvas.toDataURL("image/png"); // can also use 'image/png'
 			js_helpers.fn_saveData(dataURI, 'image/png');
 		}
 
 
 		export function fn_startrecord(v_andruavUnit, v_videoTrackID) {
 
-			// var options = {
-			// 	type: 'video',
-			// 	frameInterval: 30,
-			// 	dontFireOnDataAvailableEvent: true,
-			// 	canvas: { // this line works only in Chrome
-			// 		width: 1280,
-			// 		height: 720
-			// 	},
-			// 	video: { // this line works only in Chrome
-			// 		width: 1280,
-			// 		height: 720
-			// 	}
-			// };
-
-
-			var v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[v_videoTrackID];
+			const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[v_videoTrackID];
 			const recorder = RecordRTC(v_talk.stream, {
 				type: 'video'
 			  });
@@ -405,7 +403,7 @@ function fn_handleKeyBoard() {
 
 		export function fn_applyControl(v_small_mode)
 		{
-			var v_display_mode = js_localStorage.fn_getDisplayMode();
+			let v_display_mode = js_localStorage.fn_getDisplayMode();
 		
 			if (v_display_mode==null) v_display_mode = 0;
 			
@@ -980,7 +978,7 @@ function fn_handleKeyBoard() {
 				return;
 			}
 
-			window.open('mapeditor.html?zoom=18&lat=' + p_andruavUnit.m_Nav_Info.p_Location.lat + '&lng=' + p_andruavUnit.m_Nav_Info.p_Location.lng);
+			window.open('mapeditor?zoom=18&lat=' + p_andruavUnit.m_Nav_Info.p_Location.lat + '&lng=' + p_andruavUnit.m_Nav_Info.p_Location.lng);
 			return false;
 		}
 
@@ -1241,7 +1239,7 @@ function fn_handleKeyBoard() {
 				}
 				// save target speed as indication.
 				p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
-				js_globals.v_andruavClient.API_do_ChangeSpeed1(p_andruavUnit, parseFloat(v_speed));
+				js_globals.v_andruavClient.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(v_speed));
 			});
 			
 			js_common.showModal('#changespeed_modal', true);
@@ -1331,6 +1329,7 @@ function fn_handleKeyBoard() {
 		   return should be good & bad in the same time for different fences.
 		*/
 		export function fn_isBadFencing(p_andruavUnit) {
+			// !TODO CREATE A CONTROL.
 
 			let keys = Object.keys(js_globals.v_andruavClient.andruavGeoFences);
 			let size = Object.keys(js_globals.v_andruavClient.andruavGeoFences).length;
@@ -1700,7 +1699,7 @@ function fn_handleKeyBoard() {
 				js_globals.m_markGuided = null;
 			}
 			
-            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,16], true, true);
+            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('./images/waypoint_bg_32x32.png', 'target', [16,32], true, true);
             js_leafletmap.fn_setPosition(js_globals.m_markGuided , p_position);
 			
 			js_leafletmap.fn_addListenerOnClickMarker (js_globals.m_markGuided,
@@ -1939,13 +1938,13 @@ function fn_handleKeyBoard() {
 					|| (p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index] === js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL)) {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_24x24.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_24x24.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 						}
 					}
@@ -1953,13 +1952,13 @@ function fn_handleKeyBoard() {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
 								p_andruavUnit.m_Nav_Info._Target.wp_num = c_mission_index + 1;
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_gy_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_gy_32x32.png', null, [16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bb_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_bb_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setMarkerIcon(v_marker, './images/location_bg_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, './images/location_bg_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 
 						}
@@ -2232,6 +2231,9 @@ function fn_handleKeyBoard() {
 					case js_andruavUnit.VEHICLE_QUAD:
 						p_andruavUnit.m_VehicleType_TXT = "Quadcopter";
 						return js_globals.quad_icon[p_andruavUnit.m_index%4];
+					case js_andruavUnit.VEHICLE_VTOL:
+						p_andruavUnit.m_VehicleType_TXT = "VTOL Wings";
+						return js_globals.planes_icon[p_andruavUnit.m_index%4];
 					case js_andruavUnit.VEHICLE_PLANE:
 						p_andruavUnit.m_VehicleType_TXT = "Fixed Wings";
 						return js_globals.planes_icon[p_andruavUnit.m_index%4];
@@ -2473,7 +2475,7 @@ function fn_handleKeyBoard() {
 
 			if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
 				const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-				let v_home = js_leafletmap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,24], false, false, v_html, [32,32]);
+				let v_home = js_leafletmap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,48], false, false, v_html, [24,24]); 
 				js_leafletmap.fn_setPosition(v_home,v_latlng)
 				p_andruavUnit.m_gui.m_marker_home = v_home;
 				
@@ -2493,7 +2495,7 @@ function fn_handleKeyBoard() {
 
 		var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
-			var gui = p_andruavUnit.m_gui;
+			const gui = p_andruavUnit.m_gui;
 
 			if (((js_siteConfig.CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true))
 				&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type === js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION))
@@ -2510,12 +2512,12 @@ function fn_handleKeyBoard() {
 			let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 			if (gui.m_marker_destination === null || gui.m_marker_destination === undefined) {
-				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, null, false,false, "", [32,32]);
+				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('./images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,48], false,false, "", [32,32]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, null, false, false, p_andruavUnit.m_unitName, [32,32]);
+				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			
@@ -2793,7 +2795,7 @@ function fn_handleKeyBoard() {
 			}
 
 			let v_contentString = "<p class='img-rounded " + _style + "'><strong>" + geoFenceInfo.m_geoFenceName + _icon + "</strong></p><span class='help-block'>" + p_lat.toFixed(7) + " " + p_lng.toFixed(7) + "</span>";
-			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor.html?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_globals.CONST_DEFAULT_ALTITUDE + "," + js_globals.CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
+			v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_globals.CONST_DEFAULT_ALTITUDE + "," + js_globals.CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
 			
 			infowindow = js_leafletmap.fn_showInfoWindow (infowindow, v_contentString, p_lat, p_lng);
 
@@ -3015,20 +3017,16 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_login() {
-			js_andruavAuth.fn_do_loginAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-			if (js_andruavAuth.fn_logined() !== true) {
-				// TODO: Replace Messenger REACT2
-				// Messenger().post({
-				// 	type: 'p_error',
-				// 	message: js_andruavAuth.m_errorMessage
-				// });
-
-				setTimeout(fn_connect, 4000);
-
+		async function fn_login(p_email, p_access_code) {
+			js_andruavAuth.fn_retryLogin(true);
+			const loginResult = await js_andruavAuth.fn_do_loginAccount(p_email, p_access_code);
+			if (js_andruavAuth.fn_logined() !== true ) {
+				// note that js_andruavAuth retries internally
 				return;
 			}
+		}
 
+		function fn_connectWebSocket (me) {
 			// create a group object
 			if (js_andruavclient2.AndruavClient.getSocketStatus() !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED )
 			{
@@ -3084,43 +3082,21 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function fn_logout() {
-			js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
+		export function fn_logout() {
+			js_andruavAuth.fn_retryLogin(false);
+			js_andruavAuth.fn_do_logoutAccount();
 			js_andruavclient2.AndruavClient.API_delMe();
 		}
 
-		export function fn_connect() {
+		export function fn_connect(p_email, p_access_code) {
 			if (js_andruavclient2.AndruavClient.isSocketConnectionDone()===true)
 			{
 				fn_logout();
 			}
 			else
 			{
-				fn_login();
+				fn_login(p_email, p_access_code);
 			}
-			// if ((js_andruavAuth.fn_logined() === true) && (js_globals.v_connectState !== true)) {
-			// 	js_andruavAuth.fn_do_logoutAccount($('#txtEmail').val(), $('#txtAccessCode').val());
-			// 	if (( js_globals.v_andruavClient !== null && js_globals.v_andruavClient !== undefined)
-			// 		&& ((js_andruavclient2.AndruavClient.getSocketStatus() === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED ))) {
-			// 		js_globals.v_andruavClient.API_delMe();
-			// 		return;
-			// 	}
-				
-			// }
-			// else 
-			// {
-				
-			// }
-
-			
-
-			
-			// else {
-			// 	js_globals.v_andruavClient.API_delMe();
-
-			// }
-
-
 		};
 
 
@@ -3196,7 +3172,7 @@ function fn_handleKeyBoard() {
 
 			if ((typeof(js_globals.CONST_MAP_GOOLE) == "undefined") || (js_globals.CONST_MAP_GOOLE === true))
 			{
-				var v_script = window.document.createElement('script');
+				let v_script = window.document.createElement('script');
 				v_script.type='text/javascript';
 				
 				v_script.src="2a4034903490310033a90d2408a108a12e6924c1310033a9084429713021302129712d9027d924c131002b1133a90844264930212e6908a12e6924c1310033a908a124c131002b1108a12be433a90f812cb927d939310e89108114d13a2424c11ae93931118929710c40110414401a441ef11e4010811189302126491e402be40961384033a937510b642be4234127100af9264927d9297107e91ae91ef1129932c40bd1375105a4264924c12d902d90258424c126492cb90e892b112f442b113490172924c13100"._fn_hexDecode();
@@ -3243,36 +3219,36 @@ function fn_handleKeyBoard() {
 
 
 			$('#gimbaldiv').find('#btnpitchm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, -2, 0, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollp').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, +2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnrollm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, -2, 0);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawp').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, +2);
 
 			});
 
 			$('#gimbaldiv').find('#btnyawm').on('click', function () {
-				var p = $('#div_video_view').attr('partyID');
-				var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
+				const p = $('#div_video_view').attr('partyID');
+				const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p);
 				fn_doGimbalCtrlStep(p_andruavUnit, 0, 0, -2);
 			});
 
@@ -3308,12 +3284,6 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
-			// if (js_globals.CONST_MAP_EDITOR === true){
-			// 	fn_missionTab();
-			// }
-
-			
+			js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined,this,fn_connectWebSocket);
+				
 		};  // end of onReady
-
-		
-		//$(document).ready(fn_on_ready);

@@ -25,17 +25,17 @@ class CLASS_CTRL_P2P_IN_RANGE_BSSID_INFO  extends React.Component {
 
     render()
     {
-        var css_connection_type = "";
-        var css_txt_rssi = "";
+        let css_connection_type = "";
+        let css_txt_rssi = "";
             
-        var txt_parent_name = "";
+        let txt_parent_name = "";
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_bssid;
         const unit = js_globals.m_andruavUnitList.fn_getUnitByP2PMac(v_inrange_node.bssid);
-        var txt_node_name;
+        let txt_node_name;
 
-        var p2 = v_andruavUnit.partyID;
+        let p2 = v_andruavUnit.partyID;
         if (unit!=null)
         {
             p2 = unit.partyID;
@@ -55,7 +55,7 @@ class CLASS_CTRL_P2P_IN_RANGE_BSSID_INFO  extends React.Component {
         */
        
         const rssi = new Int8Array([v_inrange_node.rssi ])[0];
-        var txt_rssi="unknown";
+        let txt_rssi="unknown";
         if (rssi > -30)
         {
             css_txt_rssi = 'text-success';
@@ -151,7 +151,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
     render () 
     {
         const  v_andruavUnit = this.props.p_unit;
-        var v_units = [];
+        let v_units = [];
         Object.entries(v_andruavUnit.m_P2P.m_detected_bssid).forEach(([partyID, inrange_bssid]) => {
             
             v_units.push( 
@@ -159,7 +159,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
                 );
         });
         
-        var rendered=[];
+        let rendered=[];
         if (v_units.length === 0)
         {
             rendered.push(

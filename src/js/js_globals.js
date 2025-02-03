@@ -185,12 +185,14 @@ class GLOBALS {
 		this.EE_adsbExpiredUpdate           		= "EVT_79";
 
 
-		this.EE_Auth_Logined      		 	 		= "EVT_80";
-		this.EE_Auth_BAD_Logined      		 		= "EVT_81";
-		this.EE_Auth_Account_Created		 		= "EVT_82";
-		this.EE_Auth_Account_Regenerated	 		= "EVT_83";
-		this.EE_Auth_Account_BAD_Operation	 		= "EVT_84";
+		this.EE_Auth_Login_In_Progress				= "EVT_80";
+		this.EE_Auth_Logined      		 	 		= "EVT_81";
+		this.EE_Auth_BAD_Logined      		 		= "EVT_82";
+		this.EE_Auth_Account_Created		 		= "EVT_83";
+		this.EE_Auth_Account_Regenerated	 		= "EVT_84";
+		this.EE_Auth_Account_BAD_Operation	 		= "EVT_85";
 		
+		this.EE_Video_State_Change           		= "EVT_86";
 
 		// EOF LOCAL EVENTS
 
@@ -239,4 +241,4 @@ class GLOBALS {
 		
 }
 
-export var js_globals = GLOBALS.getInstance();
+export const js_globals = GLOBALS.getInstance();

@@ -46,7 +46,7 @@ export class CCommandAPI
     static API_requestSDR(p_andruavUnit) {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
             'ms': {
                     C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
                     a: js_andruavMessages.CONST_SDR_ACTION_SDR_INFO
@@ -60,7 +60,7 @@ export class CCommandAPI
     static API_scanSDRDrivers(p_andruavUnit) {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
             'ms': {
                     C: js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
                     a: js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES
@@ -84,7 +84,7 @@ export class CCommandAPI
     };
 
 
-    API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
+    static API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
@@ -106,8 +106,6 @@ export class CCommandAPI
             p_msg.v = p_volume;
         }
     
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH, p_msg);
-
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH,
@@ -289,6 +287,47 @@ export class CCommandAPI
     };
 
     
+    static API_do_FlyHere (p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
+        
+        let v_msg = {
+            a: p_latitude,
+            g: p_longitude,
+            l: p_altitude
+        };
+
+        if (p_xVel !== null && p_xVel !== undefined) {
+            v_msg.x = p_xVel;
+            v_msg.y = p_yVel;
+            v_msg.z = p_zVel;
+        }
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_GuidedPoint,
+            'ms': v_msg
+        }
+
+        return msg;
+    };
+
+    static API_do_CircleHere(p_latitude, p_longitude, p_altitude, p_radius, p_turns) {
+    
+        const v_msg = {
+            a: p_latitude,
+            g: p_longitude,
+            l: p_altitude,
+            r: p_radius,
+            t: p_turns
+        };
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CirclePoint,
+            'ms': v_msg
+        }
+
+        return msg;
+    };
 
 }
 

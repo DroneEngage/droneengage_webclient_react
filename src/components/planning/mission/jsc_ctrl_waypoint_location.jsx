@@ -18,7 +18,7 @@ export class CWayPointLocation extends React.Component {
 
     componentDidUpdate() 
     { 
-        var lnglat = this.props.p_shape.getLatLng();
+        //let lnglat = this.props.p_shape.getLatLng();
         //$('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lat); 
         //$('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lng); 
         //$('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
@@ -124,7 +124,7 @@ export class CWayPointLocation extends React.Component {
 
     render ()
     {
-        var lnglat = this.props.p_shape.getLatLng();
+        const lnglat = this.props.p_shape.getLatLng();
         
         const lat_id = "txt_lat" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         const lng_id = "txt_lng" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;

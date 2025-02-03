@@ -38,7 +38,7 @@ export class ClssCtrlVibration extends React.Component {
     
     getVibrationCss (value)
     {
-        var ret = new C_GUI_READING_VALUE();
+        let ret = new C_GUI_READING_VALUE();
         if (value === null || value === undefined) 
         {
             value = 'na';
@@ -73,7 +73,7 @@ export class ClssCtrlVibration extends React.Component {
     getClippingCss (value)
     {
         // !BUG HERE
-        var ret = new C_GUI_READING_VALUE();
+        let ret = new C_GUI_READING_VALUE();
         if (value === null || value === undefined) value = 'na';
         ret.value = value;
         if (value === null || value === undefined)
@@ -120,12 +120,12 @@ export class ClssCtrlVibration extends React.Component {
         
         const v_andruavUnit = this.props.p_unit;
         const flags = v_andruavUnit.m_EKF.m_flags;
-        var css_VX = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_x);
-        var css_VY = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_y);
-        var css_VZ = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_z);
-        var css_C0 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_0);
-        var css_C1 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_1);
-        var css_C2 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_2);
+        const css_VX = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_x);
+        const css_VY = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_y);
+        const css_VZ = this.getVibrationCss(v_andruavUnit.m_Vibration.m_vibration_z);
+        const css_C0 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_0);
+        const css_C1 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_1);
+        const css_C2 = this.getClippingCss(v_andruavUnit.m_Vibration.m_clipping_2);
 
         
         if (this.state.is_compact === true)

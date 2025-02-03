@@ -98,7 +98,7 @@ export const CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE = 6512;
 
 export const CONST_TYPE_AndruavMessage_SDR_TRIGGER = 6513;
 export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
-export const CONST_TYPE_AndruavMessage_SDR_STATUS = 6515;
+export const CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE = 6515;
 export const CONST_TYPE_AndruavMessage_SDR_SPECTRUM = 6516;
 export const CONST_TYPE_AndruavMessage_P2P_INFO = 6517;
 

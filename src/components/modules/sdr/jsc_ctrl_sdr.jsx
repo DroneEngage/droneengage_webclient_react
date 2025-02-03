@@ -215,7 +215,7 @@ export class ClssCTRL_SDR extends React.Component {
 
     getDriverNames(v_andruavUnit)
     {
-        var driver_names = [];
+        let driver_names = [];
         const c_list = v_andruavUnit.m_SDR.m_available_drivers;
         const c_keys = Object.keys(c_list);
         const c_len = c_keys.length;
@@ -236,10 +236,10 @@ export class ClssCTRL_SDR extends React.Component {
         const  v_andruavUnit = this.props.p_unit;
         const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
-        var btn_activate_css = this.getActiveButtonStyle(v_andruavUnit);
+        let btn_activate_css = this.getActiveButtonStyle(v_andruavUnit);
 
-        var cmd_btns = [];
-        var driver_names = this.getDriverNames(v_andruavUnit);
+        let cmd_btns = [];
+        let driver_names = this.getDriverNames(v_andruavUnit);
         cmd_btns.push(<div key={v_andruavUnit.partyID + 'sdr2_'}  className='row css_margin_zero padding_zero  border-secondary'>
                 
             <div key={v_andruavUnit.partyID + 'sdr2_1'} className="col-12 mt-1">

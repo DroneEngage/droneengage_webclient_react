@@ -39,7 +39,7 @@ class ClssCameraDevice extends React.Component {
     fn_oneShot ()
     {
         if (this.props.prop_session == null) return ;
-        var camera_index;
+        let camera_index;
         if (this.props.prop_session.m_unit.m_isDE === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
@@ -58,7 +58,7 @@ class ClssCameraDevice extends React.Component {
     fn_shot()
     {
         if (this.props.prop_session == null) return ;
-        var camera_index;
+        let camera_index;
         if (this.props.prop_session.m_unit.m_isDE === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
@@ -156,7 +156,7 @@ export default class ClssCameraDialog extends React.Component
     
     fn_displayDialog (p_me, p_session)
     {
-        var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
+        const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
 		if (p_andruavUnit == null) {
 		    return;
 		}
@@ -189,7 +189,7 @@ export default class ClssCameraDialog extends React.Component
 
     fn_initDialog()
     {
-        var me = this;
+        const me = this;
         //this.modal_ctrl_cam.current.draggable = true;
         this.modal_ctrl_cam.current.onmousedown = function (e) {
             me.modal_ctrl_cam.current.style.opacity = '1.0';
@@ -239,11 +239,9 @@ export default class ClssCameraDialog extends React.Component
 
     render ()
     {
-
-        
-        var p_session;
-        var v_streanms = [];
-        var v_unitName;
+        let p_session;
+        let v_streanms = [];
+        let v_unitName;
 
         if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
         {

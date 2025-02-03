@@ -35,26 +35,26 @@ export class ClssCTRL_AUDIO extends React.Component {
 
     fn_textToSpeech (p_andruavUnit)
     {
-        var p_text = $('#'+ p_andruavUnit.partyID + 'atxt')[0].value;
-        var p_language = this.state.m_currentLanguage;
-        var p_pitch = parseInt($('#'+ p_andruavUnit.partyID + 'prng')[0].value);
-        var p_volume = parseInt($('#'+ p_andruavUnit.partyID + 'vrng')[0].value);
+        const p_text = $('#'+ p_andruavUnit.partyID + 'atxt')[0].value;
+        const p_language = this.state.m_currentLanguage;
+        const p_pitch = parseInt($('#'+ p_andruavUnit.partyID + 'prng')[0].value);
+        const p_volume = parseInt($('#'+ p_andruavUnit.partyID + 'vrng')[0].value);
         js_globals.v_andruavClient.API_soundTextToSpeech (p_andruavUnit, p_text, p_language, p_pitch, p_volume);
     }
 
     render ()
     {
-        var css_txt_channel_ws_offline = ' text-white bg-danger ';
-        var v_speech_disabled = false;
+        let css_txt_channel_ws_offline = ' text-white bg-danger ';
+        const v_speech_disabled = false;
         const  v_andruavUnit = this.props.p_unit;
-        var v_vol_disabled;
+        let v_vol_disabled;
         if (v_andruavUnit.m_isDE === false)
             v_vol_disabled = 'true';
-        var v_pitch_disabled;
+        let v_pitch_disabled;
         if (v_andruavUnit.m_isDE === false)
             v_pitch_disabled = 'true';
         
-        var v_language_disabled;
+        let v_language_disabled;
         if (v_andruavUnit.m_isDE === false)
             v_language_disabled = 'true';
         

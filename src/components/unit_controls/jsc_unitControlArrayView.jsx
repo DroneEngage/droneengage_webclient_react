@@ -54,12 +54,12 @@ class ClssAndruavUnitDroneHeader extends React.Component{
     render()
     {
 
-        var css_speed_enabled = '';
-        var css_battery_enabled = '';
-        var css_ekf_enabled = '';
-        var css_alt_enabled = '';
-        var css_ws_enabled = '';
-        var css_wp_enabled = '';
+        let css_speed_enabled = '';
+        let css_battery_enabled = '';
+        let css_ekf_enabled = '';
+        let css_alt_enabled = '';
+        let css_ws_enabled = '';
+        let css_wp_enabled = '';
         
         if (this.props.prop_speed !== true)
         {
@@ -154,9 +154,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
     
     fn_getFlightMode(v_andruavUnit)
     {
-        var v_flight_mode_text = "NC";
-        var v_flight_mode_class= " text-warning";
-        var v_flight_mode_title= 'flight board is NOT CONNECTED';
+        let v_flight_mode_text = "NC";
+        let v_flight_mode_class= " text-warning";
+        let v_flight_mode_title= 'flight board is NOT CONNECTED';
         if (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry)
         {
             v_flight_mode_text = hlp_getFlightMode(v_andruavUnit);
@@ -194,7 +194,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     hlp_getGPS (gps_Info)
     {
-        var gps = new C_GUI_READING_VALUE();
+        let gps = new C_GUI_READING_VALUE();
         
         gps.css = "bg-danger text-white text-center";
         if (gps_Info.m_isValid === true)
@@ -262,7 +262,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     getAlt(p_andruavUnit)
     {
-        var res= {
+        let res= {
             'lidar': new C_GUI_READING_VALUE(),
             'abs': new C_GUI_READING_VALUE(),
             'rel': new C_GUI_READING_VALUE(),
@@ -946,8 +946,8 @@ export default class ClssAndruavUnitListArray extends React.Component {
                 }
                 sortedPartyIDs.map(function (object)
                 {
-                    const partyID = object[0];
-                    const v_andruavUnit = object[1];
+                    const partyID = object.partyID;
+                    const v_andruavUnit = object;
                 
                     if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
 

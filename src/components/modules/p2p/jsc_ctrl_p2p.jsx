@@ -66,11 +66,11 @@ export class ClssCTRL_P2P extends React.Component {
     render () 
     {
         const  v_andruavUnit = this.props.p_unit;
-        var txt_connection_type='nothing';
-        var css_connection_type= 'text-warning';
+        let txt_connection_type='nothing';
+        let css_connection_type= 'text-warning';
         
-        var txt_address = ': OFF';
-        var css_txt_address = 'text-disabled';
+        let txt_address = ': OFF';
+        let css_txt_address = 'text-disabled';
 
         if (v_andruavUnit.m_P2P.m_driver_connected === true)
         {
@@ -108,8 +108,8 @@ export class ClssCTRL_P2P extends React.Component {
                 break;
         }
 
-        var txt_parent_connected = '';
-        var css_parent_connected = '';
+        let txt_parent_connected = '';
+        let css_parent_connected = '';
         if (v_andruavUnit.m_P2P.m_parent_connected === true)
         {
             txt_parent_connected='connected';
@@ -122,14 +122,14 @@ export class ClssCTRL_P2P extends React.Component {
         }        
 
 
-        var txt_parent_mac='--:--:--:--:--';
-        var txt_parent_name = '';
-        var txt_logical_parent_mac='--:--:--:--:--';
-        var txt_logical_parent_name = '';
-        var txt_channel_p2p_offline = 'P2PDC';
-        var txt_channel_ws_offline = 'WSDC';
-        var css_txt_channel_p2p_offline = ' text-white bg-danger ';
-        var css_txt_channel_ws_offline = ' text-white bg-danger ';
+        let txt_parent_mac='--:--:--:--:--';
+        let txt_parent_name = '';
+        let txt_logical_parent_mac='--:--:--:--:--';
+        let txt_logical_parent_name = '';
+        let txt_channel_p2p_offline = 'P2PDC';
+        let txt_channel_ws_offline = 'WSDC';
+        let css_txt_channel_p2p_offline = ' text-white bg-danger ';
+        let css_txt_channel_ws_offline = ' text-white bg-danger ';
         if (v_andruavUnit.m_P2P.m_p2p_disabled === true)
         {
             txt_channel_p2p_offline = 'P2PC';
@@ -159,7 +159,7 @@ export class ClssCTRL_P2P extends React.Component {
         }
    
 
-        var cmd_btns = [];
+        let cmd_btns = [];
         if (js_siteConfig.CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true)
         if (js_andruavAuth.fn_do_canControl())
         {

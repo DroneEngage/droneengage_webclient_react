@@ -5,11 +5,11 @@ class ClssServoUnit extends React.Component {
 
     render ()
     {
-        var btn_min_css = 'btn-success';
-        var btn_max_css = 'btn-danger';
+        let btn_min_css = 'btn-success';
+        let btn_max_css = 'btn-danger';
 
-        var btn_min_disabled = false;
-        var btn_max_disabled = false;
+        let btn_min_disabled = false;
+        let btn_max_disabled = false;
 
         if ((this.props.prop_value === null || this.props.prop_value  === undefined) || (this.props.prop_partyid === null || this.props.prop_partyid === undefined)) 
         {
@@ -124,7 +124,7 @@ class ClssServoControl extends React.Component {
             fn_gotoUnit_byPartyID($('#modal_ctrl_servo').attr('partyID'));
         });
         $('#modal_ctrl_servo').find('#btnHelp').on('click', function () {
-            fn_helpPage({js_siteConfig.CONST_MANUAL_URL});
+            fn_helpPage(js_siteConfig.CONST_MANUAL_URL);
         });
 
         
@@ -132,7 +132,7 @@ class ClssServoControl extends React.Component {
 
     render() {
         
-        var p_andruavUnit = null;
+        let p_andruavUnit = null;
         if (this.state.partyID !== null && this.state.partyID !== undefined)
         {
             p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.partyID);

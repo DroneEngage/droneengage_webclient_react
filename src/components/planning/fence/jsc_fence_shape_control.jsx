@@ -131,13 +131,13 @@ class ClssShapeControl extends React.Component {
             if (this.props.shape.m_geofenceInfo == null) {this.props.shape.m_geofenceInfo= {};}
 
 			//this.props.shape.m_geofenceInfo.m_shouldKeepOutside = this.state.restricted!=null?this.state.restricted:false;
-        	var v_name = $('#geo #name').val();
+        	let v_name = $('#geo #name').val();
             if (v_name === "" || v_name === null || v_name === undefined) v_name = ('fence_' + js_common.fn_generateRandomString(4));
 			this.props.shape.m_geofenceInfo.m_geoFenceName      = v_name;
 			this.props.shape.m_geofenceInfo.isHardFence       = parseInt($('#geo #sel').val());
 			this.props.shape.m_geofenceInfo.m_maximumDistance   = 0;
 					
-			var color;
+			let color;
 			if(this.props.shape.m_geofenceInfo.m_shouldKeepOutside) {color='#FF1493';} else {color='#32CD32';}
             this.props.shape.setStyle({
                 color: color
@@ -503,7 +503,7 @@ export default class ClssFence_Shape_Control extends React.Component {
     
     render() {
    
-        var v_unit = [];
+        let v_unit = [];
         
 
         if ((this.state.m_shape === null || this.state.m_shape === undefined) 

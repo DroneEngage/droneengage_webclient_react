@@ -22,9 +22,9 @@ export class CWayPointAction extends React.Component {
 
     fn_editShape ()
     {
-        var waypointType = parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
+        let waypointType = parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
-        var icon_img = './images/location_bb_32x32.png';
+        let icon_img = './images/location_bb_32x32.png';
         switch (waypointType)
 		{
             case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
@@ -148,9 +148,9 @@ export class CWayPointAction extends React.Component {
     render ()
     {
 
-        var v_itemID = this.props.p_shape.id+ "_" + this.props.p_shape.m_main_de_mission.m_id;
+        let v_itemID = this.props.p_shape.id+ "_" + this.props.p_shape.m_main_de_mission.m_id;
 
-        var v_event_firing = [];
+        let v_event_firing = [];
         
         //CODEBLOCK_START
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===true)

@@ -145,7 +145,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
     
     render() {
    
-        var v_unit = [];
+        let v_unit = [];
         
 
         if (this.state.is_connected === false)

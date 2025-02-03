@@ -65,7 +65,7 @@ class ClssParameterItem extends  React.Component {
             alert ("Invalid value. Cannot save it.");
             return ;
         }
-        var me = this;
+        const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
             js_globals.v_andruavClient.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
@@ -76,7 +76,7 @@ class ClssParameterItem extends  React.Component {
     }
 
     render () {
-        var cls_color = " bg-white text-black-50";
+        let cls_color = " bg-white text-black-50";
         js_common.fn_console_log ("PARAM_:" + this.props.prop_param.param_id + ":" + this.props.prop_param.param_value + ":" + String(this.state.param_value));
         if (this.props.prop_param.is_dirty === true) 
         {
@@ -109,7 +109,7 @@ class ClssParameterItem extends  React.Component {
 class ClssParametersList extends  React.Component {
 
     render () {
-        var p_params=[];
+        let p_params=[];
         
         if (this.props.prob_unit !== null && this.props.prob_unit !== undefined)
         {
@@ -230,7 +230,7 @@ export default class ClssUnitParametersList extends React.Component {
     {
         if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
         
-        var me = this;
+        const me = this;
         fn_do_modal_confirmation("Confirmation", "Undo all modified values?", function (p_approved) {
             if (p_approved === false) return;
             me.fn_doResetParameters();
@@ -242,7 +242,7 @@ export default class ClssUnitParametersList extends React.Component {
     {
         if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
 
-        var me = this;
+        const me = this;
         fn_do_modal_confirmation("Confirmation", "Release all parameters from FCB?", function (p_approved) {
             if (p_approved === false) return;
             js_globals.v_andruavClient.API_requestParamList(me.state.p_unit);
@@ -252,7 +252,7 @@ export default class ClssUnitParametersList extends React.Component {
     fn_saveAll()
     {
         if (this.state.p_unit === null || this.state.p_unit === undefined) return ;
-        var me = this;
+        const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
             js_globals.v_andruavClient.API_WriteAllParameters(me.state.p_unit);
@@ -301,9 +301,9 @@ export default class ClssUnitParametersList extends React.Component {
     }
 
     render() {
-        var p_andruavUnit = null;
-        var p_params = [];
-        var v_Name = "Unknown";
+        let p_andruavUnit = null;
+        let p_params = [];
+        let v_Name = "Unknown";
         
         
         if (this.state.p_unit !== null && this.state.p_unit !== undefined)

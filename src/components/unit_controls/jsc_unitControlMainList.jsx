@@ -224,8 +224,8 @@ export default class ClssAndruavUnitList extends React.Component {
             sortedPartyIDs.map(function (object)
             {
                 
-                const partyID = object[0];
-                const v_andruavUnit = object[1];
+                const partyID = object.partyID;
+                const v_andruavUnit = object;
                 
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
@@ -241,7 +241,7 @@ export default class ClssAndruavUnitList extends React.Component {
                     if (js_localStorage.fn_getTabsDisplayEnabled() === true)
                     { 
                         // Display in Tabs
-                        var header_info = me.getHeaderInfo(v_andruavUnit);
+                        const header_info = me.getHeaderInfo(v_andruavUnit);
                         const c_active = me.state.m_active_partyID === v_andruavUnit.partyID;
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">

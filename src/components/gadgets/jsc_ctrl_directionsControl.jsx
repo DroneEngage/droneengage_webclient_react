@@ -23,16 +23,16 @@ export class ClssCtrlDirections extends React.Component {
         c_canvas.style.width  = '50px';
         c_canvas.style.height = '50px';
 
-        var centerX = c_canvas.width / 2;
-        var centerY = c_canvas.height / 2;
-        var radius = 22;
+        let centerX = c_canvas.width / 2;
+        let centerY = c_canvas.height / 2;
+        let radius = 22;
         
-        var v_target_start = (target_deg-4-90)* Math.PI / 180;
-        var v_target_end = (target_deg+4-90)* Math.PI / 180;
+        let v_target_start = (target_deg-4-90)* Math.PI / 180;
+        let v_target_end = (target_deg+4-90)* Math.PI / 180;
         
 
-        var v_bearing_start = (bearing_deg-3-90)* Math.PI / 180;
-        var v_bearing_end = (bearing_deg+3-90)* Math.PI / 180;
+        let v_bearing_start = (bearing_deg-3-90)* Math.PI / 180;
+        let v_bearing_end = (bearing_deg+3-90)* Math.PI / 180;
         
 
         c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);

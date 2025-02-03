@@ -5,7 +5,7 @@
 class CEventEmitter {
 
     constructor() {
-        this.m_v_events = {};
+        this.m_v_events = new Map();
     }
 
     static getInstance() {
@@ -17,72 +17,76 @@ class CEventEmitter {
 
     
     fn_dispatch(p_event, p_data) {
-        try{
+        
+        if (!this.m_v_events.has(p_event)) {
+            return; // No listeners for this event
+        }
 
-        if (!this.m_v_events[p_event]) 
-            return;
-        // no one is listening to this event
-        const len = this.m_v_events[p_event].length;
-        const subscribers = this.m_v_events[p_event];
-        for (let i = 0; i < len; i++) {
-            let v_subscriber = subscribers[i];
-            v_subscriber.callback(v_subscriber.listner, p_data);
+        const subscribers = this.m_v_events.get(p_event);
+
+        for (const { listner, callback } of subscribers) { // Use for...of loop
+            try {
+                callback(listner, p_data); // Correct this context handling
+            } catch (e) {
+                console.error(`Error in event handler for ${p_event}:`, e);
+            }
         }
-        }
-        catch (e)
-        {
-            console.log (e);
-        }
+        
     };
 
 
-    fn_getIndex(p_event, p_listner)
-    {
-        if (!this.m_v_events[p_event]) 
+    fn_getIndex(p_event, p_listner) {
+        if (!this.m_v_events.has(p_event)) {
             return -1;
-        
-        for (let i = 0; i < this.m_v_events[p_event].length; i++) {
-            let v_subscriber = this.m_v_events[p_event][i];
-            if (v_subscriber.listner === p_listner) {
-                return i;
-            }
         }
 
+        const subscribers = this.m_v_events.get(p_event);
+        let index = 0;
+        for (const item of subscribers) {
+            if (item.listner === p_listner) {
+                return index;
+            }
+            index++;
+        }
         return -1;
     }
 
+
     fn_subscribe(p_event, p_listner, callback) {
-        if (!this.m_v_events[p_event]) 
-            this.m_v_events[p_event] = [];
-         // new event
-        
-        if (this.fn_getIndex(p_event, p_listner)===-1)
-        {
-            if (callback!=null)
-            {
-                this.m_v_events[p_event].push({listner: p_listner, callback: callback});
-            }
-            else
-            {
-                console.log ("unknown");
+        if (!this.m_v_events.has(p_event)) {
+            this.m_v_events.set(p_event, new Set());
+        }
+
+        const subscribers = this.m_v_events.get(p_event);
+
+        if (this.fn_getIndex(p_event, p_listner) === -1) {
+            if (callback != null) {
+                subscribers.add({ listner: p_listner, callback: callback });
+            } else {
+                console.log("unknown");
             }
         }
-    };
+    }
 
     fn_removeEvent(p_event) {
-        this.m_v_events[p_event] = []; // all away :)
-    };
+        this.m_v_events.delete(p_event); // Clear the event's listeners
+    }
 
     fn_unsubscribe(p_event, p_listner) {
-        if (!this.m_v_events[p_event]) 
+        if (!this.m_v_events.has(p_event)) {
             return;
-         // no one is listening to this event
+        }
 
-        while (true)
-        {
-            let index = this.fn_getIndex(p_event, p_listner);
-            if (index ===-1) return ;
-            this.m_v_events[p_event].splice(index, 1);
+        const subscribers = this.m_v_events.get(p_event);
+
+        for (const item of subscribers) {
+            if (item.listner === p_listner) {
+                subscribers.delete(item);
+                break; // Exit after finding and deleting
+            }
+        }
+        if (subscribers.size === 0) {
+            this.m_v_events.delete(p_event);
         }
     }
 };

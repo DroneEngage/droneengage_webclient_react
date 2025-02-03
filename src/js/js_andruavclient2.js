@@ -190,7 +190,7 @@ class CAndruavClient {
         js_globals.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
         js_globals.m_andruavUnitList.fn_resetList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
-        var Me = this;
+        const Me = this;
         if (this.fn_timerID_checkStatus === null || this.fn_timerID_checkStatus  === undefined) {
 
             this.fn_timerID_checkStatus = setInterval(function () {
@@ -241,15 +241,7 @@ class CAndruavClient {
         switch (p_me.m_gamePadUnit.m_VehicleType) {
             case js_andruavUnit.VEHICLE_TRI:
             case js_andruavUnit.VEHICLE_QUAD:
-                // if ((p_packet.p_buttonIndex==4) || (p_packet.p_buttonIndexi==5))
-                // {
-                // if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true)
-                // {
-                // p_me.API_do_Arm (p_me.m_gamePadUnit.partyID, true, false);
-                // return ;
-                // }
-                // }
-
+                
                 if (p_packet.p_buttonIndex === 2) { // BLUE
                     if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
                         if (c_now - p_me.m_lastgamePadCommandTime[2] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
@@ -356,7 +348,7 @@ class CAndruavClient {
             return;
         
 
-        var v_unit = new js_andruavUnit.CAndruavUnitObject();
+        const v_unit = new js_andruavUnit.CAndruavUnitObject();
         v_unit.m_IsMe = true;
         v_unit.m_IsGCS = true;
         v_unit.m_unitName = this.unitID;
@@ -490,7 +482,7 @@ class CAndruavClient {
     {
         if ((p_name===null) || (p_name==="") || (p_description===null) || (p_description==="")) return ;
         
-        var msg = {
+        const msg = {
             UN:p_name,
             DS:p_description,
             PR:true // reset partyID
@@ -979,11 +971,6 @@ class CAndruavClient {
     }
 
 
-    API_do_ChangeSpeed1(p_andruavUnit, p_speed) {
-        this.API_do_ChangeSpeed2(p_andruavUnit, p_speed);
-    }
-
-
     API_do_ChangeSpeed2(p_andruavUnit, p_speed, p_isGroundSpeed, p_throttle, p_isRelative) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         let v_msg = {
@@ -1044,7 +1031,7 @@ class CAndruavClient {
         }
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: p_andruavUnit, onff:p_OnOff});
+        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: p_andruavUnit, onff:p_OnOff});
 
     };
 
@@ -1074,31 +1061,18 @@ class CAndruavClient {
 		 * @param {any} zVel
 		 */
     API_do_FlyHere(p_partyID, p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
-        let v_msg = {
-            a: p_latitude,
-            g: p_longitude,
-            l: p_altitude
-        };
-        if (p_xVel !== null && p_xVel !== undefined) {
-            v_msg.x = p_xVel;
-            v_msg.y = p_yVel;
-            v_msg.z = p_zVel;
-        }
+        
+        const msg = CCommandAPI.API_do_FlyHere (p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel);
 
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_GuidedPoint, v_msg);
+        this.API_sendCMD(p_partyID, msg.mt, msg.ms);
     }
 
 
     API_do_CircleHere(p_partyID, p_latitude, p_longitude, p_altitude, p_radius, p_turns) {
-        const v_msg = {
-            a: p_latitude,
-            g: p_longitude,
-            l: p_altitude,
-            r: p_radius,
-            t: p_turns
-        };
+        
+        const msg = CCommandAPI.API_do_CircleHere (p_latitude, p_longitude, p_altitude, p_radius, p_turns);
 
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_CirclePoint, v_msg);
+        this.API_sendCMD(p_partyID, msg.mt, msg.ms);
     }
 
 
@@ -1485,7 +1459,7 @@ class CAndruavClient {
             Act: v_OnOff
         };
         this.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch("EVT_videoStateChanged", {unit: v_unit, onff:v_OnOff});
+        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: v_unit, onff:v_OnOff});
     };
 
 
@@ -1593,7 +1567,7 @@ class CAndruavClient {
 
     prv_parseCommunicationMessage(Me, msg, evt) {
 
-        var p_jmsg;
+        let p_jmsg;
         let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 
         if (p_unit === null || p_unit === undefined)
@@ -1723,7 +1697,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
                     
-                    var v_session = {};
+                    let v_session = {};
                     v_session.status = 'connected';
                     v_session.m_unit = p_unit;
 
@@ -1855,12 +1829,20 @@ class CAndruavClient {
                         p_unit.m_IsGCS = p_jmsg.GS;
                         p_unit.m_unitName = p_jmsg.UD;
                         p_unit.Description = p_jmsg.DS;
-                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         v_trigger_on_vehiclechanged = (p_unit.m_VehicleType !== p_jmsg.VT);
                         p_unit.m_VehicleType = p_jmsg.VT;
                         p_unit.m_Video.VideoRecording = p_jmsg.VR; // ON DRONE RECORDING
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
                         p_unit.m_Permissions = p_jmsg.p;
+                        
+                        if (p_jmsg.hasOwnProperty('FI') !== true) {
+                            p_jmsg.FI = false;
+                        }
+                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
+                        p_unit.m_useFCBIMU = p_jmsg.FI;
+                        p_unit.m_telemetry_protocol = p_jmsg.TP;
+                        
+                        
                         if (p_unit.hasOwnProperty('T') !== true) {
                             p_unit.m_time_sync = p_jmsg.T;
                         }
@@ -1895,12 +1877,6 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('C') === true) { 
                             p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
                         }
-
-                        if (p_jmsg.hasOwnProperty('FI') !== true) {
-                            p_jmsg.FI = false;
-                        }
-                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI);
-                        p_unit.m_useFCBIMU = p_jmsg.FI;
 
                         if (p_jmsg.hasOwnProperty('SD') !== true) {
                             p_jmsg.SD = false;
@@ -1990,13 +1966,16 @@ class CAndruavClient {
                         p_unit.m_unitName = p_jmsg.UD;
                         p_unit.partyID = msg.senderName;
                         p_unit.Description = p_jmsg.DS;
-                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         p_unit.m_VehicleType = p_jmsg.VT;
                         p_unit.m_Video.VideoRecording = p_jmsg.VR;
                         p_unit.m_Permissions = p_jmsg.p;
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
-                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI);
+                        if (p_jmsg.hasOwnProperty('FL') !== true) {
+                            p_jmsg.FL = false;
+                        }
+                        v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
                         p_unit.m_useFCBIMU = p_jmsg.FI;
+                        p_unit.m_telemetry_protocol = p_jmsg.TP;
                         
                         if (p_jmsg.hasOwnProperty('m1') === true) {
                             p_unit.m_modules.addModules (p_jmsg.m1);
@@ -2319,8 +2298,8 @@ class CAndruavClient {
                         return;
                     
                     // this is a system command
-                    var fencetype;
-                    var m_shouldKeepOutside = false;
+                    let fencetype;
+                    let m_shouldKeepOutside = false;
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2354,7 +2333,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
                     p_unit.m_Geo_Tags.p_DestinationPoint.m_isValid = true;
-                    var destination_type = js_andruavMessages.CONST_DESTINATION_GUIDED_POINT;
+                    let destination_type = js_andruavMessages.CONST_DESTINATION_GUIDED_POINT;
                     if (p_jmsg.P !== null && p_jmsg.P !== undefined)
                     {
                         destination_type = p_jmsg.P;
@@ -2383,10 +2362,10 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var geoFenceAttachStatus = {};
+                    let geoFenceAttachStatus = {};
                     geoFenceAttachStatus.fenceName = p_jmsg.n;
                     geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                    var fence = Me.andruavGeoFences[geoFenceAttachStatus.fenceName];
+                    let fence = Me.andruavGeoFences[geoFenceAttachStatus.fenceName];
 
                     if (geoFenceAttachStatus.isAttachedToFence === true) { /*
 						* If Action Attach:
@@ -2399,7 +2378,7 @@ class CAndruavClient {
                             return;
                         } else {
                             if (fence.Units[p_unit.partyID] === null || fence.Units[p_unit.partyID] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
-                                var geoFenceInfo = {};
+                                let geoFenceInfo = {};
                                 geoFenceInfo.hasValue = false;
                                 geoFenceInfo.fenceName = fence.m_geoFenceName;
                                 geoFenceInfo.m_inZone = false; // remember isValid = false
@@ -2432,7 +2411,7 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var geoFenceHitInfo = {
+                    let geoFenceHitInfo = {
                         hasValue: true,
                         fenceName: p_jmsg.n,
                         m_inZone: p_jmsg.z,
@@ -2460,7 +2439,7 @@ class CAndruavClient {
                     const c_len = p_jmsg.t.length;
                     for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg.t[i];
-                        var c_search_target = {};
+                        let c_search_target = {};
                         c_search_target.m_name = c_targetItem.n;
                         if (c_targetItem.hasOwnProperty('t')) {
                             c_search_target.m_type = c_targetItem.t;
@@ -2484,7 +2463,7 @@ class CAndruavClient {
                     p_unit.m_DetectedTargets.m_targets.m_list = [];
                     for (let i = 0; i < c_len; ++ i) {
                         const c_targetItem = p_jmsg[i];
-                        var c_target = {};
+                        let c_target = {};
                         c_target.x1 = c_targetItem.a;
                         c_target.y1 = c_targetItem.b;
                         if (c_targetItem.hasOwnProperty('r')) {
@@ -2529,13 +2508,13 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    var signal = p_jmsg.w || p_jmsg;
+                    let signal = p_jmsg.w || p_jmsg;
                     Me.EVT_andruavSignalling(p_unit, signal);
                 }
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Error: {
-                    var v_error = {};
+                    let v_error = {};
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2557,12 +2536,12 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
 
-                    var v_isChunck = WAYPOINT_NO_CHUNK;
+                    let v_isChunck = WAYPOINT_NO_CHUNK;
                     if (p_jmsg.hasOwnProperty("i")) { // message is INCOMPLETE
                         v_isChunck = p_jmsg.i;
                     }
-                    var numberOfRecords = p_jmsg.n;
-                    var wayPoint = [];
+                    let numberOfRecords = p_jmsg.n;
+                    let wayPoint = [];
 
                     if (v_isChunck !== WAYPOINT_NO_CHUNK) {
                         if (this.v_waypointsCache.hasOwnProperty(p_unit.partyID) === false) {
@@ -2578,7 +2557,7 @@ class CAndruavClient {
 
                     for (let i = 0; i < numberOfRecords; ++ i) {
                         if (p_jmsg[i] !== null && p_jmsg[i] !== undefined) {
-                            var wayPointStep = {};
+                            let wayPointStep = {};
                             wayPointStep.waypointType = p_jmsg[i].t;
 
                             switch (wayPointStep.waypointType) {
@@ -2714,7 +2693,7 @@ class CAndruavClient {
             js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
             this.socketConnectionDone  = true;
             this.API_sendID(); // send now important
-            var Me = this;
+            const Me = this;
             this.timerID = setInterval(function () {
                 Me.API_sendID();
                 js_eventEmitter.fn_dispatch(js_globals.EE_adsbExpiredUpdate, null);
@@ -2791,8 +2770,7 @@ class CAndruavClient {
                     return true;
                 break;
                 case mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ:
-                    // BUG HERE WHEN COMMENTED IT WORKS
-                    var  c_mst = null;
+                    let  c_mst = null;
                     if (c_mavlinkMessage.param_id[0] === '\x00')
                     {
                         c_mst = p_unit.m_FCBParameters.m_list_by_index[c_mavlinkMessage.param_index];
@@ -2802,13 +2780,6 @@ class CAndruavClient {
                         c_mst = p_unit.m_FCBParameters.m_list[c_mavlinkMessage.param_id];
                     }
                      
-                    
-                    // if (c_mst === null || c_mst === undefined) return false; 
-                    // c_mst.header.seq = c_mavlinkMessage.header.seq + 1;
-                    // js_common.fn_console_log ("PARAM_GCS:" + c_mst.param_id);
-                    // c_mst.srcSystem=p_unit.m_FCBParameters.m_systemID;
-                    // //c_mst.srcComponent=0; //p_unit.m_FCBParameters.m_componentID;
-                    // return true;
                 break;
 
                 case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
@@ -2817,7 +2788,7 @@ class CAndruavClient {
                     // const c_keys = Object.keys(p_unit.m_FCBParameters.m_list);
                     // const c_len = c_keys.length;
                     // const c_list = p_unit.m_FCBParameters.m_list;
-                    // var Me = this;
+                    // const Me = this;
                     // if (this.m_mavlinkFTPProtocol.parseMavlinkGCS(c_mavlinkMessage,
                     //     function (p_payload) 
                     //     {
@@ -3186,7 +3157,7 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_SPECTRUM: {
                     // Extract the float data
-                    var floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
+                    let floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
                     v_unit.m_SDR.addSpectrumData(andruavCMD.ms,floatData)
                     js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRSpectrum, v_unit);
                     
@@ -3199,7 +3170,7 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink: {
 
-                var v_andruavMessage = {
+                let v_andruavMessage = {
                         'src': js_andruavMessages.CONST_TelemetryProtocol_Source_REMOTE,
                         'data': data.buffer.slice(v_internalCommandIndexByteBased)
                     };
@@ -3210,15 +3181,15 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_ServoOutput: 
             {
-                var v_servoOutputs = {};
+                let v_servoOutputs = {};
                 /*
 							 String message could be of any length and no padding applied.
 							 when reading getUint32 the system assumes that data is paded in 4 bytes 
 							 so it is better to slice data again.
 							 NOTE THAT when reading getUnit16 the index will be different.
 				*/
-                var v_binaryData = data.buffer.slice(v_internalCommandIndexByteBased, data.buffer.byteLength);
-                var v_values = new Int32Array(v_binaryData);
+                let v_binaryData = data.buffer.slice(v_internalCommandIndexByteBased, data.buffer.byteLength);
+                let v_values = new Int32Array(v_binaryData);
                 v_servoOutputs.m_servo1 = v_values[0];
                 v_servoOutputs.m_servo2 = v_values[1];
                 v_servoOutputs.m_servo3 = v_values[2];
@@ -3233,11 +3204,11 @@ class CAndruavClient {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_IMG: {
-                    var v_andruavMessage;
+                    let v_andruavMessage;
                     if (andruavCMD.hasOwnProperty('ms')===false)
                     {   // backward compatibility with ANDRUAV   
                         try {
-                            var out = js_helpers.prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
+                            let out = js_helpers.prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
                             v_internalCommandIndexByteBased = out.nextIndex;
                             v_andruavMessage = JSON.parse(out.text);
                         } catch (err) {
@@ -3268,74 +3239,99 @@ class CAndruavClient {
 
 
     prv_extractBinaryPacket(evt) {
-        var andruavCMD;
-        var p_jmsg;
-        var v_unit;
-        var byteLength;
-
         const Me = this;
-        var reader = new FileReader();
-        reader.onload = function (event) {
-            try{
-            var contents = event.target.result;
-            var data= new Uint8Array(contents);
-            byteLength = contents.byteLength;
-            var out = js_helpers.prv_extractString(data, 0, byteLength);
-            // extract command:
-            andruavCMD = JSON.parse(out.text);
-            p_jmsg = Me.fn_parseJSONMessage(out.text);
-            v_unit = js_globals.m_andruavUnitList.fn_getUnit(js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName));
-            if (v_unit === null || v_unit === undefined) {
+    
+        // Initialize the message queue and FileReader if not already done
+        if (!Me.binaryMessageQueue) {
+            Me.binaryMessageQueue = [];
+            Me.binaryReader = new FileReader();
+    
+            Me.binaryReader.onload = function (event) {
+                Me.handleBinaryData(event.target.result);
+    
+                // Process the next message in the queue
+                if (Me.binaryMessageQueue.length > 0) {
+                    const nextMessage = Me.binaryMessageQueue.shift();
+                    Me.binaryReader.readAsArrayBuffer(nextMessage);
+                }
+            };
+    
+            Me.binaryReader.onerror = function (event) {
+                console.error("File could not be read! Code " + event.target.error.code);
+    
+                // Process the next message in the queue even if there's an error
+                if (Me.binaryMessageQueue.length > 0) {
+                    const nextMessage = Me.binaryMessageQueue.shift();
+                    Me.binaryReader.readAsArrayBuffer(nextMessage);
+                }
+            };
+        }
+    
+        // Add the message to the queue
+        Me.binaryMessageQueue.push(evt.data);
+    
+        // Start processing if the FileReader is not busy
+        if (!Me.binaryReader.readyState || Me.binaryReader.readyState === FileReader.DONE) {
+            const nextMessage = Me.binaryMessageQueue.shift();
+            Me.binaryReader.readAsArrayBuffer(nextMessage);
+        }
+    }
+    
+    handleBinaryData(contents) {
+        const Me = this;
+    
+        try {
+            // Convert binary data to Uint8Array
+            const data = new Uint8Array(contents);
+            const byteLength = contents.byteLength;
+    
+            // Extract JSON command from binary data
+            const out = js_helpers.prv_extractString(data, 0, byteLength);
+            if (!out.text) {
+                throw new Error("No JSON command found in binary data");
+            }
+    
+            // Parse JSON command
+            const andruavCMD = JSON.parse(out.text);
+            const p_jmsg = Me.fn_parseJSONMessage(out.text);
+    
+            // Find or create the unit
+            const unitName = js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName);
+            let v_unit = js_globals.m_andruavUnitList.fn_getUnit(unitName);
+    
+            if (!v_unit) {
                 v_unit = new js_andruavUnit.CAndruavUnitObject();
-                // p_unit.m_defined = false; define it as incomplete
                 v_unit.m_IsMe = false;
                 v_unit.m_defined = false;
                 v_unit.partyID = p_jmsg.senderName;
                 v_unit.m_index = js_globals.m_andruavUnitList.count;
                 js_globals.m_andruavUnitList.Add(v_unit.partyID, v_unit);
-                        
-                if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID) === true)
-                {
-                    // it is already identifying itself.
-                    Me.API_requestID(p_jmsg.senderName);
-                    v_unit.m_Messages.fn_doNotRepeatMessageBefore(js_andruavMessages.CONST_TYPE_AndruavMessage_ID,1000,new Date())
-                }
-                else
-                {
-                    console.log ("skip");
-                }
     
-                // Cleanup the reader object
-                data = null;
-                reader.abort();
-                reader = null;
-				return;
+                // Request unit ID if allowed
+                if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
+                    Me.API_requestID(p_jmsg.senderName);
+                    v_unit.m_Messages.fn_doNotRepeatMessageBefore(
+                        js_andruavMessages.CONST_TYPE_AndruavMessage_ID,
+                        1000,
+                        new Date()
+                    );
+                } else {
+                    console.log("Skipping ID request (rate-limited)");
+                }
             }
-        
-            
+    
+            // Update message statistics
             v_unit.m_Messages.fn_addMsg(p_jmsg.messageType);
             v_unit.m_Messages.m_received_msg++;
-            v_unit.m_Messages.m_received_bytes +=data.length;
+            v_unit.m_Messages.m_received_bytes += data.length;
             v_unit.m_Messages.m_lastActiveTime = Date.now();
+    
+            // Process the binary message
             Me.prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
-            
-            data = null;
-            reader.abort();
-            reader = null;
+        } catch (error) {
+            console.error("Error processing binary message:", error.message);
         }
-        catch 
-        {   
-            console.error ("Bad data format");
-            return ; 
-        }		
-        };
-
-        reader.onerror = function (event) {
-            console.error("File could not be read! Code " + event.target.error.code);
-        };
-
-        reader.readAsArrayBuffer(evt.data);
-    }; // EOF - prv_extractBinary
+    }
 
 
     fn_disconnect(p_accesscode) {
@@ -3355,7 +3351,7 @@ class CAndruavClient {
 
         this.server_accessCode = p_accesscode;
 
-        var url = null;
+        let url = null;
         if (window.location.protocol === 'https:') {
             // f: CONST_CS_LOGIN_TEMP_KEY
             // g: CONST_CS_SERVER_PUBLIC_HOST
@@ -3387,7 +3383,7 @@ class CAndruavClient {
                 }
             };
             // OnOpen callback of Websocket
-            var Me = this;
+            const Me = this;
             this.ws.onopen = function () {
                 // js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
 
@@ -3396,7 +3392,7 @@ class CAndruavClient {
             // OnMessage callback of websocket
             this.ws.onmessage = function (evt) {
                 if (typeof evt.data === "string") { // This is a text message
-                    var p_jmsg = Me.fn_parseJSONMessage(evt.data);
+                    const p_jmsg = Me.fn_parseJSONMessage(evt.data);
                     switch (p_jmsg._ty) {
                         case CMDTYPE_SYS: Me.prv_parseSystemMessage(Me, p_jmsg);
                             break;
@@ -3428,6 +3424,10 @@ class CAndruavClient {
     }
     catch (e)
     {
+        console.error("WebSocket initialization error:", e);
+        if (e.message.includes("SSL") || e.message.includes("TLS")) {
+            alert("SSL/TLS error detected. Please check your certificate configuration.");
+        }
         console.log ("Web Socket Failed");
         console.log (e);
         this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);

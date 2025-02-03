@@ -76,8 +76,8 @@ export class ClssCTRL_SWARM extends React.Component {
             this.props.onRequestToFollow(p_unit);
         }
 
-        var v_partyID = null;
-        var v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
+        let v_partyID = null;
+        let v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
         if (p_unit !== null && p_unit !== undefined) {
             v_partyID = p_unit.partyID;
             v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_FOLLOW;
@@ -103,7 +103,7 @@ export class ClssCTRL_SWARM extends React.Component {
     componentDidUpdate() {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
         if (this.props.p_unit.m_Swarm.m_following !== null && this.props.p_unit.m_Swarm.m_following !== undefined) {
-            var leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
+            const leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
             if (leaderUnit !== null && leaderUnit !== undefined) {
                 $("#" + this.props.p_unit.partyID + "dldrselsel").val(leaderUnit.partyID);
             }
@@ -130,20 +130,20 @@ export class ClssCTRL_SWARM extends React.Component {
             if (this.props.p_unit === null || this.props.p_unit === undefined) return;
 
             //CODEBLOCK_START
-            var v_units = js_globals.m_andruavUnitList.fn_getUnitValues();
-            var len = v_units.length;
+            const v_units = js_globals.m_andruavUnitList.fn_getUnitValues();
+            const len = v_units.length;
             const c_items = [];
 
-            var v_leader_class = "btn-secondry";
-            var v_follower_class = "bg-secondry";
-            var v_leader_title_leader = "not leader";
-            var v_leader_title_follower = "none";
-            var v_leader_dropdown_class = "bg-secondry";
-            var v_swarm_class = ' text-light';
+            let v_leader_class = "btn-secondry";
+            let v_follower_class = "bg-secondry";
+            let v_leader_title_leader = "not leader";
+            let v_leader_title_follower = "none";
+            let v_leader_dropdown_class = "bg-secondry";
+            let v_swarm_class = ' text-light';
 
-            var v_class_follower = '  hidden  ';
-            var v_class_formation_as_leader = ' hidden  ';
-            var v_class_formation_as_follower = ' hidden ';
+            let v_class_follower = '  hidden  ';
+            let v_class_formation_as_leader = ' hidden  ';
+            let v_class_formation_as_follower = ' hidden ';
 
 
             if (this.props.p_unit.m_Swarm.m_following != null) {
@@ -151,7 +151,7 @@ export class ClssCTRL_SWARM extends React.Component {
                 v_follower_class = "bg-danger";
                 //v_leader_class = "btn-success"; // this state can be overwritten if it is a leader. 
                 v_leader_dropdown_class = "bg-success text-white";
-                var v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
+                const v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
 
                 if (v_leaderUnit != null) {   // display name of party_id as a temp solution untill name is available.
                     // [v_leaderUnit==null] maybe the web is loading and this unit has not been received yet.
@@ -179,7 +179,7 @@ export class ClssCTRL_SWARM extends React.Component {
 
 
             for (let i = 0; i < len; ++i) {
-                var v_unit = v_units[i];
+                const v_unit = v_units[i];
 
                 /*
                     It is not Me.
@@ -190,7 +190,7 @@ export class ClssCTRL_SWARM extends React.Component {
                 if ((this.props.p_unit.partyID !== v_unit.partyID)
                     && (v_unit.m_Swarm.m_isLeader === true)
                     && (this.props.p_unit.m_Swarm.m_following !== v_unit.partyID)) {
-                    var v_out = v_unit; // need a local copy 
+                    // var v_out = v_unit; // need a local copy 
                     // list drones that are not me and are leaders.
                     c_items.push(
                         <a key={v_unit.m_unitName + "s"} className="dropdown-item" href="#" onClick={(unit => {

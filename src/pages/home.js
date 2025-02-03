@@ -6,7 +6,7 @@ import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_gamepad.css';
-import $ from 'jquery';
+
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
@@ -38,9 +38,6 @@ const Home = () => {
 	useEffect(() => {
 		js_globals.CONST_MAP_EDITOR = false;
 		fn_on_ready();
-		//$('.leaflet-control-attribution').childNodes[0].innerHTML="Map";
-		
-        
 	}
 	);
   

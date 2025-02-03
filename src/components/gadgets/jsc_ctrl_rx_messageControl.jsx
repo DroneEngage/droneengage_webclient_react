@@ -35,12 +35,12 @@ export  class ClssRX_MESSAGE  extends React.Component {
 
     render () {
 
-        var msg = [];
+        let msg = [];
 
         const msg_in = this.props.p_unit.m_Messages.m_messages_in;
         const msg_in_mavlink = this.props.p_unit.m_Messages.m_messages_in_mavlink;
 
-        var i =0;
+        let i =0;
           Object.keys(msg_in).forEach(key => {
             i+=1;
             if (js_andruavMessages.message_names[key]==null)
@@ -63,7 +63,7 @@ export  class ClssRX_MESSAGE  extends React.Component {
             {
                 js_andruavMessages.message_names[key] = key;
             }
-            var key_val = i.toString();
+            let key_val = i.toString();
             
             msg.push(
                 <tr key={key + i}>

@@ -49,7 +49,7 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
     fn_changeTelemetryOptimizationLevel(p_andruavUnit, step)
     {
         if (p_andruavUnit==null) return;
-        var next_step = (p_andruavUnit.m_Telemetry.m_telemetry_level + step);
+        let next_step = (p_andruavUnit.m_Telemetry.m_telemetry_level + step);
         if (next_step<0) next_step = 0;
         if (next_step>3) next_step = 3;
         js_globals.v_andruavClient.API_adjustTelemetryDataRate(p_andruavUnit, next_step);
@@ -84,12 +84,12 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
             );
         }
 
-        var v_udpproxy_text_ip = '';
-        var v_udpproxy_text_port = '';
-        var v_telemetry_lvl_class = ' text-warning';
+        let v_udpproxy_text_ip = '';
+        let v_udpproxy_text_port = '';
+        let v_telemetry_lvl_class = ' text-warning';
         const v_andruavUnit = this.props.p_unit;
-        var v_udp_data = [];
-        var v_udp_on_off = [];
+        let v_udp_data = [];
+        let v_udp_on_off = [];
         
                 if (v_andruavUnit.m_Telemetry.m_udpProxy_active === true)
                 {
@@ -139,8 +139,7 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
                         </div>);
                 }
         
-        var rows = [];
-        rows = (
+        const rows = (
         <div className= 'row padding_zero css_user_select_text'>
                             <div className = { v_telemetry_lvl_class + ' row al_l css_margin_zero'}>
                                 <div className= 'col-12  margin_2px padding_zero css_user_select_text'>

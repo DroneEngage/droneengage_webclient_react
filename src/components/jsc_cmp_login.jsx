@@ -76,7 +76,7 @@ export default class ClssLoginControl extends React.Component {
 			const chk_readonlyctrl = document.getElementById("input_readonlyctrl");
 
 			// Check which radio button is selected
-			var v_permission = 0x0;
+			let v_permission = 0x0;
 			if (chk_fullctrl.checked) {
 				v_permission = '0xffffffff';
 			} else if (chk_readonlyctrl.checked) {
@@ -115,7 +115,7 @@ export default class ClssLoginControl extends React.Component {
 
 	render() {
 
-		var login = "Access Code Generator";
+		let login = "Access Code Generator";
 		if (this.state.is_connected === true) {
 			login += "ed - As " + $('#txtEmail').val();
 		}
