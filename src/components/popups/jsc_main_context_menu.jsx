@@ -52,9 +52,9 @@ export class ClssMainContextMenu extends React.Component {
         const p_lat = this.props.p_lat;
         const p_lng = this.props.p_lng;
 
-        sortedPartyIDs.map(function (object) {
+        sortedPartyIDs.map(function (p_andruavUnit) {
 
-            let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(object);
+            //let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(object);
             if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (p_andruavUnit.m_IsGCS !== true)) {
                 if ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER)
                     || (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) {
