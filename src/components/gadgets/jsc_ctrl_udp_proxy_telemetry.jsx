@@ -144,7 +144,7 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
                             <div className = { v_telemetry_lvl_class + ' row al_l css_margin_zero'}>
                                 <div className= 'col-12  margin_2px padding_zero css_user_select_text'>
                                 <p className=' rounded-3 cursor_hand textunit_w135' title ='Smart Telemetry'>
-                                <span title="dec_tel" onClick={ (e) => this.fn_changeTelemetryOptimizationLevel(v_andruavUnit,-1)}>
+                                <span title="decrease message/sec" onClick={ (e) => this.fn_changeTelemetryOptimizationLevel(v_andruavUnit,-1)}>
                                     <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                     </svg>
@@ -154,7 +154,7 @@ export  class ClssCTRL_UDP_PROXY_TELEMETRY   extends React.Component {
                                  {'LVL: ' + this.telemetry_level[v_andruavUnit.m_Telemetry.m_telemetry_level]}
                                  &nbsp;</b></small>
                                 </span>
-                                <span title="inc_tel" onClick={ (e) => this.fn_changeTelemetryOptimizationLevel(v_andruavUnit,+1)}>
+                                <span title="increase message/sec" onClick={ (e) => this.fn_changeTelemetryOptimizationLevel(v_andruavUnit,+1)}>
                                     <svg className="bi bi-caret-up-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"/>
                                     </svg>
