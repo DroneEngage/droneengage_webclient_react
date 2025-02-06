@@ -1,4 +1,3 @@
-import $ from 'jquery';
 
 import React    from 'react';
 import L from 'leaflet';
@@ -17,12 +16,14 @@ export class CWayPointAction extends React.Component {
         super ();
         this.state = {
         };
+
+        this.m_missionTypeRef = React.createRef(); // Add this line
     }
  
 
     fn_editShape ()
     {
-        let waypointType = parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
+        let waypointType = this.m_missionTypeRef.current.value; //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
         let icon_img = './images/location_bb_32x32.png';
         switch (waypointType)
@@ -169,7 +170,7 @@ export class CWayPointAction extends React.Component {
         {v_event_firing}
         <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed'  txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
         <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw'  txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
-        <select id="msnsel"  className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
+        <select id="msnsel"  ref={this.m_missionTypeRef} className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>

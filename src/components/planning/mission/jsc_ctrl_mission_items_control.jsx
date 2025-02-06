@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import React from 'react';
 
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
