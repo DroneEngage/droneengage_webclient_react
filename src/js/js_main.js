@@ -1969,9 +1969,13 @@ function fn_handleKeyBoard() {
 
 		var EVT_msgFromUnit_WayPoints = function (me, data) {
 
+			// dont upload waypoints in map editor mode.
+			if (js_globals.CONST_MAP_EDITOR) return ;
+
 			const p_andruavUnit = data.unit;
 			const wayPointArray = data.wps;
 
+			
 			// TODO HERE >>> DELETE OLD WAYPOINTS AND HIDE THEM FROM MAP
 			var LngLatPoints = [];
 
