@@ -1382,40 +1382,40 @@ function fn_handleKeyBoard() {
 		***/
 		function hlp_deleteOldWayPointOfDrone(p_andruavUnit) {
 			if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) return;
-			let markers = p_andruavUnit.m_gui.m_wayPoint_markers;
+			const markers = p_andruavUnit.m_gui.m_wayPoint_markers;
 			if (markers === null || markers === undefined) return;
 
 			let count = markers.length;
 			for (let i = 0; i < count; i++) {
-				let marker = markers[i];
+				const marker = markers[i];
 				js_leafletmap.fn_hideItem (marker);
 			}
 
-			let polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
+			const polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
 			if (polygons !== null && polygons !== undefined) {
 				count = polygons.length;
 				for (let i = 0; i < count; i++) {
-					let polygon = polygons[i];
+					const polygon = polygons[i];
 					js_leafletmap.fn_hideItem(polygon);
 				}
 			}
 
-			let polylines = p_andruavUnit.m_wayPoint.polylines;
+			const polylines = p_andruavUnit.m_wayPoint.polylines;
 			if (polylines !== null && polylines !== undefined) {
 				js_leafletmap.fn_hideItem(p_andruavUnit.m_wayPoint.polylines);
 				//p_andruavUnit.m_wayPoint.polylines.setMap(null);
 			}
 		}
 		function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
-			let keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
-			let size = keys.length;
+			const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
+			const size = keys.length;
 
 			for (let i = 0; i < size; ++i) {
 
 				let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 				if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 					if (p_andruavUnit.m_VehicleType === vehicleType) {
-						let marker = p_andruavUnit.m_gui.m_marker;
+						const marker = p_andruavUnit.m_gui.m_marker;
 						if (marker !== null && marker !== undefined) {
 							marker.setVisible(visible);
 						}
@@ -1968,6 +1968,7 @@ function fn_handleKeyBoard() {
 		}
 
 		var EVT_msgFromUnit_WayPoints = function (me, data) {
+
 			const p_andruavUnit = data.unit;
 			const wayPointArray = data.wps;
 

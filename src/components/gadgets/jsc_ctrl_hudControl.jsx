@@ -13,12 +13,13 @@ export class ClssCTRL_HUD extends React.Component {
 		};
 
         this.key = Math.random().toString();
-        
+        this.m_hudRef = React.createRef();
+                
     }
 
     draw (p_pitch_deg, p_roll_deg, p_yaw_deg) 
     {
-        const c_canvas=$('#' + this.props.id + ' #ctrl_hud')[0];
+        const c_canvas=this.m_hudRef.current; 
         const c_ctx = c_canvas.getContext('2d');
         c_canvas.width  = 50;
         c_canvas.height = 50; 
@@ -123,7 +124,7 @@ export class ClssCTRL_HUD extends React.Component {
                     </div>
 
                     <div className= 'col-6  css_margin_zero css_padding_zero'>
-                    <canvas key={this.key + 'chud'} id='ctrl_hud' className='css_hud'></canvas>
+                    <canvas key={this.key + 'chud'} id='ctrl_hud' ref={this.m_hudRef} className='css_hud'></canvas>
                     </div>
                    
                 </div>

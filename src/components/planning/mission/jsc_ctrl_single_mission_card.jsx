@@ -25,8 +25,8 @@ export class ClssSingle_Mission_Card extends React.Component {
 
     fn_editShape ()
     {
-        this.wp.fn_editShape();
-        this.ma.fn_editShape();
+        this.m_waypoint_location.fn_editShape();
+        this.m_waypoint_actions.fn_editShape();
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
         {
             this.p2p.fn_editShape();
@@ -83,7 +83,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         let ctrl = [];
 
         ctrl.push(<div key={'tab_main' + this.key} className="tab-pane fade" id={"tab_main"+this.key}>
-                    <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.ma = instance}}/>
+                    <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_actions = instance}}/>
                     </div>);
         
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
@@ -114,7 +114,7 @@ export class ClssSingle_Mission_Card extends React.Component {
                         </label>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
-                        <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.wp = instance}}/>
+                        <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_location = instance}}/>
                         <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                     </div>
                     

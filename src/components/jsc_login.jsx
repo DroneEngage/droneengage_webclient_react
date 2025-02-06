@@ -2,8 +2,6 @@
 
 import React from 'react';
 
-import $ from 'jquery';
-
 import { js_globals } from '../js/js_globals.js';
 import { QueryString, fn_connect, fn_logout } from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
