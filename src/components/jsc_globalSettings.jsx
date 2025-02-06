@@ -1,4 +1,3 @@
-import $ from 'jquery'; 
 import React    from 'react';
 
 import {js_globals} from '../js/js_globals.js';
@@ -21,17 +20,22 @@ class ClssPreferences extends React.Component {
       
       js_globals.v_enable_tabs_display = js_localStorage.fn_getTabsDisplayEnabled();
 
-    
+      this.m_volumeRangeRef = React.createRef();
+      this.m_enableSpeechRef = React.createRef();
+      this.m_tabsDisplayeRef = React.createRef();
+      this.m_unitSortRef = React.createRef();
+      this.m_advancedRef = React.createRef();
+      this.m_gcsDisplayRef = React.createRef();
   }
 
   componentDidMount()
   {
-      $('#check_enable_speech')[0].checked = js_localStorage.fn_getSpeechEnabled();
-      $('#volume_range')[0].value = js_localStorage.fn_getVolume();
-      $('#check_tabs_display')[0].checked = js_localStorage.fn_getTabsDisplayEnabled();
-      $('#check_unit_sort')[0].checked = js_localStorage.fn_getUnitSortEnabled();
-      $('#check_advanced')[0].checked = js_localStorage.fn_getAdvancedOptionsEnabled();
-      $('#check_gcs_display')[0].checked = js_localStorage.fn_getGCSDisplayEnabled(); 
+    this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
+    this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
+    this.m_tabsDisplayeRef.current.checked = js_localStorage.fn_getTabsDisplayEnabled();
+    this.m_unitSortRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
+    this.m_advancedRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
+    this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
   }
 
 
@@ -44,25 +48,26 @@ class ClssPreferences extends React.Component {
   {
       js_localStorage.fn_setVolume(e.currentTarget.value);
       js_speak.fn_updateSettings();
+      js_speak.fn_speakFirst("test volume");
   }
 
   
 
   fn_enableSpeech (e)
   {
-      const enabled = e.currentTarget.checked;
-      js_localStorage.fn_setSpeechEnabled(enabled);
-      js_speak.fn_updateSettings();
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setSpeechEnabled(enabled);
+    js_speak.fn_updateSettings();
 
-      if (enabled === true)
-      {
-        js_speak.fn_speak("enabled");
-        $('#volume_range').removeAttr('disabled');
-      }
-      else
-      {
-        $('#volume_range').attr('disabled', 'disabled');
-      }
+    if (enabled === true) {
+      js_speak.fn_speak("enabled");
+      this.m_volumeRangeRef.current.removeAttribute('disabled'); // Updated this line
+    } 
+    else 
+    {
+      js_speak.stopSpeaking();
+      this.m_volumeRangeRef.current.setAttribute('disabled', 'disabled'); // Updated this line
+    }
   }
 
   fn_enableAdvanced (e)
@@ -96,12 +101,6 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
   }
 
-  fn_keydown()
-  {
-    js_localStorage.fn_setGoogleMapKey($('#txt_google_key').val());
-  }
-
-
 
   render () {
     let v_speech_disabled = 'false';
@@ -114,23 +113,23 @@ class ClssPreferences extends React.Component {
           <fieldset>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_enable_speech" className="col-sm-4 col-form-label al_l" >Enable Speech</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_enable_speech" onClick={ (e) => this.fn_enableSpeech(e)} />
+              <input className="form-check-input col-sm-4 " ref={this.m_enableSpeechRef} type="checkbox" id="check_enable_speech" onClick={ (e) => this.fn_enableSpeech(e)} />
               <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r" >Volume</label>
-              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" disabled={v_speech_disabled==='true'}  onChange={ (e) => this.fn_changeVolume(e)}/>
+              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" ref={this.m_volumeRangeRef} disabled={v_speech_disabled==='true'}  onChange={ (e) => this.fn_changeVolume(e)}/>
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_tabs_display" className="col-sm-4 col-form-label al_l " >Units in Tabs</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_tabs_display" onClick={ (e) => this.fn_enableTabsDisplay(e)} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_tabs_display" ref={this.m_tabsDisplayeRef} onClick={ (e) => this.fn_enableTabsDisplay(e)} />
               <label htmlFor="check_unit_sort" className="col-sm-4 col-form-label al_r" title='sort by unit name of mavlink id'>Sort Units (mav_id)</label>
-              <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" onClick={ (e) => this.fn_sortUnits(e)} />
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" ref={this.m_unitSortRef} onClick={ (e) => this.fn_sortUnits(e)} />
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_l " >Advanced Options</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" onClick={ (e) => this.fn_enableAdvanced(e)} />
+              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" ref={this.m_advancedRef} onClick={ (e) => this.fn_enableAdvanced(e)} />
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_gcs_display" className="col-sm-4 col-form-label al_l " >Show Connected GCS</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_gcs_display" onClick={ (e) => this.fn_enableGCS(e)} />
+              <input className="form-check-input col-sm-8 " type="checkbox" id="check_gcs_display" ref={this.m_gcsDisplayRef} onClick={ (e) => this.fn_enableGCS(e)} />
             </div>
           </fieldset>
           
@@ -232,16 +231,15 @@ export default class ClssGlobalSettings extends React.Component {
 
   onChange (e) {
 
-      js_globals.CONST_DEFAULT_ALTITUDE = parseInt($("#txt_defaultAltitude").val());
-      js_globals.CONST_DEFAULT_RADIUS = parseInt($("#txt_defaultCircle").val());
-      
+    js_globals.CONST_DEFAULT_ALTITUDE = parseInt(this.mission_file_ref.current.value); // Updated this line
+    js_globals.CONST_DEFAULT_RADIUS = parseInt(this.mission_file_ref.current.value); 
  
-      if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min) js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
-      if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)     js_globals.CONST_DEFAULT_RADIUS   = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
+    if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min) js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
+    if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)     js_globals.CONST_DEFAULT_RADIUS   = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
 
 
-      this.setState ({CONST_DEFAULT_ALTITUDE:js_globals.CONST_DEFAULT_ALTITUDE});
-      this.setState ({CONST_DEFAULT_RADIUS:js_globals.CONST_DEFAULT_RADIUS});
+    this.setState ({CONST_DEFAULT_ALTITUDE:js_globals.CONST_DEFAULT_ALTITUDE});
+    this.setState ({CONST_DEFAULT_RADIUS:js_globals.CONST_DEFAULT_RADIUS});
 
   }
 
