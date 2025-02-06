@@ -432,6 +432,7 @@ class CLeafLetAndruavMap {
         if ((p_image === null || p_image === undefined || p_image===""))
         {
             p_image = './images/destination_g_32x32.png';
+            anchor = [16,32];
         }
         let v_image;
         if (p_iconsize === null || p_iconsize === undefined) {
