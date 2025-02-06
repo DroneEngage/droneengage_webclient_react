@@ -21,26 +21,18 @@ export class CWayPointLocation extends React.Component {
 
     componentDidUpdate() 
     { 
-        //let lnglat = this.props.p_shape.getLatLng();
-        //$('#txt_lat' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lat); 
-        //$('#txt_lng' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(lnglat.lng); 
-        //$('#txt_alt' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id).val(this.props.p_shape.m_missionItem.alt); 
-        //$('btn_alt' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id).text(this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType));
     }
 
-    handleLatChange(e)
-    {
-
+    handleLatChange = (e) => {
+        this.setState({ lat: e.target.value });
     }
 
-    handleLngChange(e)
-    {
-
+    handleLngChange = (e) => {
+        this.setState({ lng: e.target.value });
     }
     
-    handleAltChange(e)
-    {
-
+    handleAltChange = (e) => {
+        this.setState({ alt: e.target.value });
     }
     
     fn_getAltitudeLabel(frame_type)
@@ -104,7 +96,9 @@ export class CWayPointLocation extends React.Component {
         const c_shap_id = this.props.p_shape.id;
         const c_mission_id = this.props.p_shape.m_main_de_mission.m_id;
 
-        this.props.p_shape.m_missionItem.alt = this.m_altRef.current.value; 
+        if (this.m_altRef.current) { // Check if m_altRef is not null
+            this.props.p_shape.m_missionItem.alt = this.m_altRef.current.value; 
+        }
 
         const v_lat = this.m_latRef.current.value; 
         const v_lng = this.m_lngRef.current.value; 

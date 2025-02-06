@@ -15,6 +15,7 @@ export class CWayPointAction extends React.Component {
     {
         super ();
         this.state = {
+            missionType: 1
         };
 
         this.m_missionTypeRef = React.createRef(); // Add this line
@@ -126,10 +127,11 @@ export class CWayPointAction extends React.Component {
 
     componentDidMount () 
     {
-        if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
+        if (this.props.p_shape && this.props.p_shape.m_missionItem) { // Check if p_shape and m_missionItem are not null
+            if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
 
-        this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
-        
+            this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -138,17 +140,20 @@ export class CWayPointAction extends React.Component {
         }
       }
       
+    
     handleMissionTypeChange = (event) => {
         const mission_type = event.target.value;
-        if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
-        {
-            // in DE_Mission Type Waypoints does not fire events.
-            this.props.p_shape.m_missionItem.eventFireRequired = false;
-            this.props.p_shape.m_missionItem.eventFire = undefined;
-        }
+        if (this.props.p_shape && this.props.p_shape.m_missionItem) { // Check if p_shape and m_missionItem are not null
+            if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+            {
+                // in DE_Mission Type Waypoints does not fire events.
+                this.props.p_shape.m_missionItem.eventFireRequired = false;
+                this.props.p_shape.m_missionItem.eventFire = undefined;
+            }
 
-        this.setState({ missionType: mission_type });
-      }
+            this.setState({ missionType: mission_type });
+        }
+    }
 
     render ()
     {

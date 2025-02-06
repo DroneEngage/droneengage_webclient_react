@@ -19,6 +19,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         };
 
         this.key = Math.random().toString();
+        this.mission_id_txt = React.createRef(); // Added ref for mission ID input
         
     }
 
@@ -35,17 +36,17 @@ export class ClssSingle_Mission_Card extends React.Component {
         {
             this.sdr.fn_editShape();
         }
-        this.props.p_shape.order = parseInt(this.mission_id_txt.value);
-        
+        if (this.mission_id_txt.current) { // Check if mission_id_txt is not null
+            this.props.p_shape.order = parseInt(this.mission_id_txt.current.value);
+        }
         this.props.p_shape.m_main_de_mission.fn_updatePath(true)
         return ;
     }
 
     componentDidUpdate() 
     {
-        if (this.props.p_shape !== null && (this.mission_id_txt !== null && this.mission_id_txt !== undefined))
-        {
-            this.mission_id_txt.value=this.props.p_shape.order; 
+        if (this.props.p_shape !== null && this.mission_id_txt.current) { // Check if mission_id_txt is not null
+            this.mission_id_txt.current.value = this.props.p_shape.order; 
         }
     }
     
@@ -110,7 +111,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         
                     <div className="form-group text-left">
                         <label htmlFor={ordernum_id} className="text-primary">ID
-                        <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={instance => {this.mission_id_txt = instance}}/>
+                        <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={this.mission_id_txt}/>
                         </label>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
