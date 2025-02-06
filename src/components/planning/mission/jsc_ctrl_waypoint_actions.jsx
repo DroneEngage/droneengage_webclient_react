@@ -25,62 +25,66 @@ export class CWayPointAction extends React.Component {
     {
         let waypointType = this.m_missionTypeRef.current.value; //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
-        let icon_img = './images/location_bb_32x32.png';
+        let icon_img = {
+            iconUrl:'./images/location_bb_32x32.png',
+            iconAnchor: [16,23], 
+            iconSize: [32,32], 
+        };
         switch (waypointType)
 		{
             case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,32], //new google.maps.Point(16, 23),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,32], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,23], //new google.maps.Point(16, 23),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,23], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
 			    icon_img= {
                     iconUrl:'./images/plane_b_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 			    icon_img= {
                     iconUrl:'./images/plane_gr_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
                 icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
                     iconUrl:'./images/back_b_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
                 icon_img= {
                     iconUrl:'./images/circle_bb_32x32.png',
-                    iconAnchor: [16,23], //new google.maps.Point(16, 23),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,23], 
+                    scaledSize: [32,32], 
                 };
                 break;
 
