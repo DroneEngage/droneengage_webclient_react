@@ -7,27 +7,26 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_andruavAuth} from '../../js/js_andruavAuth.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
-import {fn_do_modal_confirmation, 
-    fn_requestWayPoints,
+import {fn_requestWayPoints,
     fn_clearWayPoints, fn_putWayPoints 
      } from '../../js/js_main.js'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 
-import {ClssCTRL_Unit_Log} from './jsc_ctrl_log_tab.jsx' // add extension to allow encryptor to see it as same as file name.
-import {ClssCTRL_Unit_Details} from './jsc_ctrl_details_tab.jsx'
-import {ClssCTRL_P2P} from '../modules/p2p/jsc_ctrl_p2p.jsx'
-import {ClssCTRL_SDR} from '../modules/sdr/jsc_ctrl_sdr.jsx'
+import {ClssCtrlUnitLog} from './jsc_ctrl_log_tab.jsx' // add extension to allow encryptor to see it as same as file name.
+import {ClssCtrlUnitDetails} from './jsc_ctrl_details_tab.jsx'
+import {ClssCtrlP2P} from '../modules/p2p/jsc_ctrl_p2p.jsx'
+import {ClssCtrlSDR} from '../modules/sdr/jsc_ctrl_sdr.jsx'
 
 
 import {ClssCtrlArdupilotFlightController} from '../flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
 import {ClssCtrlPx4FlightControl} from '../flight_controllers/jsc_ctrl_px4_flightControl.jsx'
-import {ClssCTRL_AUDIO} from '../gadgets/jsc_ctrl_audio.jsx'
-import {ClssCTRL_Drone_IMU} from './jsc_unit_control_imu.jsx'
+import {ClssCtrlAUDIO} from '../gadgets/jsc_ctrl_audio.jsx'
+import {ClssCtrlDroneIMU} from './jsc_unit_control_imu.jsx'
 import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
-import {ClssCTRL_Unit_Main_Bar} from './jsc_ctrl_unit_main_bar.jsx'
-import {ClssCTRL_Unit_Planning_Bar} from './jsc_ctrl_unit_planning_bar.jsx'
+import {ClssCtrlUnitMainBar} from './jsc_ctrl_unit_main_bar.jsx'
+import {ClssCtrlUnitPlanningBar} from './jsc_ctrl_unit_planning_bar.jsx'
 
 /**
  * This class is full control of Drone.
@@ -39,7 +38,7 @@ import {ClssCTRL_Unit_Planning_Bar} from './jsc_ctrl_unit_planning_bar.jsx'
  * tab_details: detailed tab that display version, attached modules, received messages ....etc.
  * tab_modules: true to display any other module such as SDR,P2P,Audio ...etc.
  */
-export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
+export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     constructor(props)
 	{
 		super (props);
@@ -294,42 +293,42 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
             }
                 
             container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className={css} id={"main" + v_andruavUnit.partyID}>
-                            <ClssCTRL_Drone_IMU p_unit={v_andruavUnit} />
+                            <ClssCtrlDroneIMU p_unit={v_andruavUnit} />
                             {this.renderControl(v_andruavUnit)}
                     </div>);
         }
         if (this.state.tab_log === true)
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
-                            <ClssCTRL_Unit_Log  p_unit={v_andruavUnit} />
+                            <ClssCtrlUnitLog  p_unit={v_andruavUnit} />
                     </div>);
         }
         
         if (this.state.tab_details === true)
         {
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
-                            <ClssCTRL_Unit_Details p_unit={v_andruavUnit}/>
+            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlSETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
+                            <ClssCtrlUnitDetails p_unit={v_andruavUnit}/>
                     </div>);
         }
        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_P2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
-                            <ClssCTRL_P2P p_unit={v_andruavUnit}/>
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlP2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
+                            <ClssCtrlP2P p_unit={v_andruavUnit}/>
                     </div>);
         }
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_SDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
-                            <ClssCTRL_SDR p_unit={v_andruavUnit}/>
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlSDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
+                            <ClssCtrlSDR p_unit={v_andruavUnit}/>
                      </div>);
         }
     
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCTRL_AUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
-                <ClssCTRL_AUDIO p_unit={v_andruavUnit}/>
+            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
+                <ClssCtrlAUDIO p_unit={v_andruavUnit}/>
             </div>);
         }
         
@@ -342,7 +341,7 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
                 css += 'active show ';
             }
                 
-            container_controls.push(<div className={css} key={v_andruavUnit.partyID + 'myTabClssCTRL_empty'} id={"empty" + v_andruavUnit.partyID}>
+            container_controls.push(<div className={css} key={v_andruavUnit.partyID + 'myTabClssCtrlempty'} id={"empty" + v_andruavUnit.partyID}>
                     </div>);
         }
 
@@ -462,13 +461,13 @@ export class ClssAndruavUnit_Drone extends ClssAndruavUnitBase {
         if (this.state.tab_main === true)
         {
             bars.push(
-                <ClssCTRL_Unit_Main_Bar key={v_andruavUnit+'c_c_u_m_b'} p_unit={v_andruavUnit} />);
+                <ClssCtrlUnitMainBar key={v_andruavUnit+'c_c_u_m_b'} p_unit={v_andruavUnit} />);
         }
 
         if (this.state.tab_planning === true)
         {
             bars.push(
-                <ClssCTRL_Unit_Planning_Bar  key={v_andruavUnit+'c_c_u_p_b'} p_unit={v_andruavUnit} />);
+                <ClssCtrlUnitPlanningBar  key={v_andruavUnit+'c_c_u_p_b'} p_unit={v_andruavUnit} />);
         }
 
         return bars;

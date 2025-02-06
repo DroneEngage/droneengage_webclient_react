@@ -2,7 +2,6 @@ import $ from 'jquery';
 import React from 'react';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
-import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 import { js_globals } from '../../js/js_globals.js';
 import { js_localStorage } from '../../js/js_localStorage'
@@ -19,7 +18,7 @@ import { CCommandAPI } from '../../js/js_commands_api.js'
  * onMakeSwarm
  * onRequestToFollow
  */
-export class ClssCTRL_SWARM extends React.Component {
+export class ClssCtrlSWARM extends React.Component {
 
     constructor(props) {
         super(props);

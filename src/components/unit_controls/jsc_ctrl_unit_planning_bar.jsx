@@ -5,7 +5,7 @@ import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
-import {ClssCTRL_Unit_Icon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
+import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 
 
@@ -21,7 +21,7 @@ import {
 /**
  * This is the bar control that contains Drone Icon, Camera, Video, Battery and Name 
  */
-export class ClssCTRL_Unit_Planning_Bar extends React.Component {
+export class ClssCtrlUnitPlanningBar extends React.Component {
 
     constructor(props)
 	{
@@ -264,7 +264,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 
         return (
              <div  key={id +"_1"} id={id +"_1"} className='row margin_2px padding_zero user-select-none '>        	
-                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon p_unit={v_andruavUnit}/></div>
+                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCtrlUnitIcon p_unit={v_andruavUnit}/></div>
                 <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'></div>

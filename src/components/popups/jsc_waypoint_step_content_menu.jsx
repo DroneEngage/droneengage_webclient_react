@@ -1,10 +1,6 @@
 import React from 'react';
 
 import * as js_andruavMessages from '../../js/js_andruavMessages';
-import { js_globals } from '../../js/js_globals.js'
-import { js_localStorage } from '../../js/js_localStorage.js'
-import { js_leafletmap } from '../../js/js_leafletmap.js'
-import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import { fn_doStartMissionFrom} from '../../js/js_main.js'
 
 

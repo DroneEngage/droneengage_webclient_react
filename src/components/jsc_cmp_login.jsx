@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import React from 'react';
 
-import { fn_do_modal_confirmation } from '../js/js_main_accounts.js'
 import { js_andruavAuth } from '../js/js_andruavAuth'
 import { js_localStorage } from '../js/js_localStorage'
 import { gui_alert } from '../js/js_main_accounts'

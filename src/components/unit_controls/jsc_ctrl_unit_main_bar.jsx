@@ -7,7 +7,7 @@ import * as js_common from '../../js/js_common.js'
 
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {ClssCTRL_Unit_Icon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
+import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 
 
@@ -23,7 +23,7 @@ import {
 /**
  * This is the bar control that contains Drone Icon, Camera, Video, Battery and Name 
  */
-export class ClssCTRL_Unit_Main_Bar extends React.Component {
+export class ClssCtrlUnitMainBar extends React.Component {
 
     constructor(props)
 	{
@@ -350,7 +350,7 @@ export class ClssCTRL_Unit_Main_Bar extends React.Component {
 
         return (
              <div  key={id } className='row margin_2px padding_zero user-select-none '>        	
-                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon p_unit={v_andruavUnit}/></div>
+                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCtrlUnitIcon p_unit={v_andruavUnit}/></div>
                 <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={camera_class  } src={camera_src} title='Take Photo' onClick={ (e) => this.fn_toggleCamera(v_andruavUnit)}/></div>
                 <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={video_class   } src={video_src} title='Start Live Stream' onClick={ (e) => toggleVideo(v_andruavUnit)}/></div>
                 <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'><img className={recvideo_class} src={recvideo_src} title='Start Recording on Drone' onClick={ (e) => toggleRecrodingVideo(v_andruavUnit)}/></div>

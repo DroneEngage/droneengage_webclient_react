@@ -1,10 +1,7 @@
 
-import $ from 'jquery'; 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
-
-import * as js_helpers from '../../js/js_helpers.js'
 
 import {Class_Radar_Screen} from '../micro_gadgets/jsc_mctrl_radar_screen.jsx'
 

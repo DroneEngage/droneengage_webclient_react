@@ -8,7 +8,7 @@ import {fn_changeUDPPort} from '../../js/js_main.js'
 
 import {ClssRX_MESSAGE} from '../gadgets/jsc_ctrl_rx_messageControl.jsx'
 
-export  class ClssCTRL_Unit_Details   extends React.Component {
+export  class ClssCtrlUnitDetails   extends React.Component {
     
     constructor(props)
     {

@@ -1,11 +1,8 @@
 import React    from 'react';
 
-import * as js_helpers from '../../js/js_helpers.js'
-import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {js_speak} from '../../js/js_speak.js'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 

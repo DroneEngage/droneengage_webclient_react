@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {ClssLoginControl} from './jsc_login.jsx'
-import {ClssCTRL_Layout} from './jsc_ctrl_layoutControl.jsx'
+import {ClssCtrlLayout} from './jsc_ctrl_layoutControl.jsx'
 import * as  js_siteConfig from '../js/js_siteConfig'
 
 
@@ -26,7 +26,7 @@ class ClssHeaderControl extends React.Component {
             {
                 ctrl.push(
                     <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
-                    <ClssCTRL_Layout/>     
+                    <ClssCtrlLayout/>     
                 </div>
                 );
             }

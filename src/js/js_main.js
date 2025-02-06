@@ -1969,8 +1969,8 @@ function fn_handleKeyBoard() {
 
 		var EVT_msgFromUnit_WayPoints = function (me, data) {
 
-			// dont upload waypoints in map editor mode.
-			if (js_globals.CONST_MAP_EDITOR) return ;
+			//// dont upload waypoints in map editor mode.
+			//if (js_globals.CONST_MAP_EDITOR) return ;
 
 			const p_andruavUnit = data.unit;
 			const wayPointArray = data.wps;
@@ -2047,6 +2047,7 @@ function fn_handleKeyBoard() {
 						break;
 					default:
 						continue;
+						
 				}
 
 
@@ -2060,6 +2061,25 @@ function fn_handleKeyBoard() {
 					p_andruavUnit.m_gui.m_wayPoint_markers.push(v_mark);
 					v_mark.wayPointStep = wayPointStep;
 
+					if (js_globals.CONST_MAP_EDITOR)
+						{
+							// add to shapes list.
+							v_mark.pm.m_shape_type = 'Marker';
+							v_mark.on('click', function (p_event) {
+								if (p_event.originalEvent.ctrlKey===false)
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+								}
+								else
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, v_mark);
+								}
+							});
+							js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, v_mark)
+							js_globals.v_map_shapes.push(v_mark);
+							
+						}
+						
 					
 					function fn_clickHandler(p_wayPointStep, p_andruavUnit) {
 						js_leafletmap.fn_addListenerOnClickMarker (v_mark,

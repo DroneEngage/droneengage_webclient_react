@@ -43,8 +43,11 @@ export class ClssCtrlBattery extends React.Component {
     {
         if (me.state.m_update === 0) return ;
         
-        me.state.is_compact = p_compact;
-        me.setState({'m_update': me.state.m_update +1});
+        // Use setState to update multiple state variables
+        me.setState((prevState) => ({
+            is_compact: p_compact,
+            m_update: prevState.m_update + 1
+        }));
     }
 
     fn_toggle()

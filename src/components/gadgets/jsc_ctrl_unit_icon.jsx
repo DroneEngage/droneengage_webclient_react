@@ -5,7 +5,7 @@ import {fn_gotoUnit,
     } from '../../js/js_main.js'
 
 
-export class ClssCTRL_Unit_Icon extends React.Component {
+export class ClssCtrlUnitIcon extends React.Component {
 
     constructor(props)
 	{

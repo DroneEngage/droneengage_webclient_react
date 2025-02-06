@@ -1,15 +1,12 @@
 import React from 'react';
 
 import * as js_helpers from '../../js/js_helpers.js'
-
 import {js_globals} from '../../js/js_globals.js';
 import {js_speak} from '../../js/js_speak'
-
-
 import {fn_changeSpeed} from '../../js/js_main.js'
 
 
-export class ClssCTRL_Drone_Speed_Ctrl extends React.Component {
+export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
     constructor(props) {
         super(props);
         

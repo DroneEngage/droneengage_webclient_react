@@ -1,9 +1,8 @@
-import $ from 'jquery'; 
 import React    from 'react';
 
 import * as js_helpers from '../../js/js_helpers.js'
 
-export class ClssCTRL_HUD extends React.Component {
+export class ClssCtrlHUD extends React.Component {
 
     constructor(props)
 	{

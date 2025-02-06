@@ -6,7 +6,7 @@ import * as js_common from '../../js/js_common.js'
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_localStorage} from '../../js/js_localStorage.js'
-import {ClssCTRL_Unit_Icon} from './jsc_ctrl_unit_icon.jsx'
+import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
 
 /**
  * List all units in combobox with icon next to it.
@@ -181,7 +181,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
                         {units_details}
                     </select>
-                    <ClssCTRL_Unit_Icon className="ms-2 p-1" p_unit={v_andruavUnit}/>
+                    <ClssCtrlUnitIcon className="ms-2 p-1" p_unit={v_andruavUnit}/>
                 </div>
             
         );

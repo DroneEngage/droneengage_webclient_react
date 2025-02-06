@@ -10,7 +10,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import { fn_changeAltitude, fn_convertToMeter } from '../../js/js_main.js'
 
 
-export class ClssCTRL_Drone_Altitude_Ctrl extends React.Component {
+export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

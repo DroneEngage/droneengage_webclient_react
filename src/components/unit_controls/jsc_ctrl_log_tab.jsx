@@ -46,7 +46,7 @@ class ClssAndruavMessageItem extends React.Component {
     }
 }
 
-export  class ClssCTRL_Unit_Log  extends React.Component {
+export  class ClssCtrlUnitLog  extends React.Component {
 
     constructor(props)
     {

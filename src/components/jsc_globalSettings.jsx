@@ -4,7 +4,7 @@ import {js_globals} from '../js/js_globals.js';
 import {js_eventEmitter} from '../js/js_eventEmitter';
 
 import {js_speak} from '../js/js_speak';
-import {fn_do_modal_confirmation, gui_toggleUnits} from '../js/js_main';
+import {gui_toggleUnits} from '../js/js_main';
 import {js_localStorage} from '../js/js_localStorage';
 import * as js_andruavclient2 from '../js/js_andruavclient2'
 import {js_andruavAuth} from '../js/js_andruavAuth';

@@ -953,7 +953,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
                     if (v_andruavUnit.m_IsGCS === true)
                     {
-                        //units_gcs.push (<ClssAndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
+                        //units_gcs.push (<ClssAndruavUnitGCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                     }
                     else 
                     if (v_andruavUnit.m_IsGCS===false)
