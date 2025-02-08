@@ -1376,11 +1376,19 @@ function fn_handleKeyBoard() {
 			return v_res;
 		}
 
+		function deleteWayPointsofDrone(p_andruavUnit, p_wayPointArray)
+		{
+			gui_hideOldWayPointOfDrone (p_andruavUnit);
+			p_andruavUnit.m_wayPoint = {};
+			p_andruavUnit.m_wayPoint.wayPointPath = p_wayPointArray;
+			p_andruavUnit.m_gui.m_wayPoint_markers = [];
+			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
+		}
 
 		/***
 		* Hide but does not delete 
 		***/
-		function hlp_deleteOldWayPointOfDrone(p_andruavUnit) {
+		function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 			if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) return;
 			const markers = p_andruavUnit.m_gui.m_wayPoint_markers;
 			if (markers === null || markers === undefined) return;
@@ -1979,13 +1987,8 @@ function fn_handleKeyBoard() {
 			// TODO HERE >>> DELETE OLD WAYPOINTS AND HIDE THEM FROM MAP
 			var LngLatPoints = [];
 
-			hlp_deleteOldWayPointOfDrone(p_andruavUnit);
-
-			p_andruavUnit.m_wayPoint = {};
-			p_andruavUnit.m_wayPoint.wayPointPath = wayPointArray;
-			p_andruavUnit.m_gui.m_wayPoint_markers = [];
-			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
-
+			deleteWayPointsofDrone(p_andruavUnit, wayPointArray);
+			
 			if (wayPointArray.length === 0) return;
 			let latlng = null;
 			for (let i = 0; i < wayPointArray.length; ++i) {
@@ -2061,7 +2064,24 @@ function fn_handleKeyBoard() {
 					p_andruavUnit.m_gui.m_wayPoint_markers.push(v_mark);
 					v_mark.wayPointStep = wayPointStep;
 
-					
+					if (js_globals.CONST_MAP_EDITOR)
+						{
+							// add to shapes list.
+							v_mark.pm.m_shape_type = 'Marker';
+							v_mark.on('click', function (p_event) {
+								if (p_event.originalEvent.ctrlKey===false)
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+								}
+								else
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, v_mark);
+								}
+							});
+							js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, v_mark)
+							js_globals.v_map_shapes.push(v_mark);
+							
+						}
 						
 					
 					function fn_clickHandler(p_wayPointStep, p_andruavUnit) {

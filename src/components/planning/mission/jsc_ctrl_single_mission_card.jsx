@@ -6,6 +6,7 @@ import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
 
 import {ClssSDR_Planning} from '../modules/jsc_ctrl_sdr_planning.jsx'
 import {ClssP2P_Planning} from '../modules/jsc_ctrl_p2p_planning.jsx'
+import {ClssGPIO_Planning} from '../modules/jsc_ctrl_gpio_planning.jsx'
 
 /**
  * This is a complete Single Mission Plan.
@@ -35,6 +36,10 @@ export class ClssSingle_Mission_Card extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false))
         {
             this.sdr.fn_editShape();
+        }
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false))
+        {
+            this.gpio.fn_editShape();
         }
         if (this.mission_id_txt.current) { // Check if mission_id_txt is not null
             this.props.p_shape.order = parseInt(this.mission_id_txt.current.value);
@@ -81,26 +86,40 @@ export class ClssSingle_Mission_Card extends React.Component {
                     </li>);
         }
 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false))
+        {
+            tabs.push(<li id={'h' + this.key} key={'h_gpio' + this.key} className="nav-item nav-units">
+                    <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_gpio" + this.key}>GPIO</a>
+                    </li>);
+        }
+    
         let ctrl = [];
 
         ctrl.push(<div key={'tab_main' + this.key} className="tab-pane fade" id={"tab_main"+this.key}>
                     <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_actions = instance}}/>
                     </div>);
         
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P === false))
         {
             ctrl.push(<div key={'tab_p2p' + this.key} className="tab-pane fade" id={"tab_p2p"+this.key}>
                     <ClssP2P_Planning p_shape={this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.p2p = instance}}/>
                     </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false))
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR === false))
         {
             ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
                     <ClssSDR_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.sdr = instance}}/>
                     </div>);
         }
 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO === false))
+        {
+            ctrl.push(<div key={'tab_gpio' + this.key} className="tab-pane fade" id={"tab_gpio"+this.key}>
+                    <ClssGPIO_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.gpio = instance}}/>
+                    </div>);
+        }
+    
         const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         return (
             <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">

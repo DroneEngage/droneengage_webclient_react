@@ -193,7 +193,8 @@ class GLOBALS {
 		this.EE_Auth_Account_BAD_Operation	 		= "EVT_85";
 		
 		this.EE_Video_State_Change           		= "EVT_86";
-
+		this.EE_unitGPIOUpdated             		= "EVT_87";
+		
 		// EOF LOCAL EVENTS
 
 

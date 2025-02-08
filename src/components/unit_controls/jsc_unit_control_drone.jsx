@@ -18,6 +18,7 @@ import {ClssCtrlUnitLog} from './jsc_ctrl_log_tab.jsx' // add extension to allow
 import {ClssCtrlUnitDetails} from './jsc_ctrl_details_tab.jsx'
 import {ClssCtrlP2P} from '../modules/p2p/jsc_ctrl_p2p.jsx'
 import {ClssCtrlSDR} from '../modules/sdr/jsc_ctrl_sdr.jsx'
+import {ClssCtrlGPIO} from '../modules/gpio/jsc_ctrl_gpio.jsx'
 
 
 import {ClssCtrlArdupilotFlightController} from '../flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
@@ -257,6 +258,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </li>);
         }
            
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_gpio === true)) 
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
+                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.partyID}>GPIO</a>
+            </li>);
+        }
+               
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE != null) 
             && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false) 
             && (this.state.tab_module === true) 
@@ -325,6 +333,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                      </div>);
         }
     
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_gpio === true)) 
+        {
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlGPIO'} className="tab-pane fade pt-2" id={"gpio" + v_andruavUnit.partyID}>
+                            <ClssCtrlGPIO p_unit={v_andruavUnit}/>
+                </div>);
+        }
+        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
             container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
