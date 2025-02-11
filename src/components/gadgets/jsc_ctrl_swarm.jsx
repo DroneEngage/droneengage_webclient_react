@@ -34,6 +34,12 @@ export class ClssCtrlSWARM extends React.Component {
 
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update);
+
+        return update;
+    }
+
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onAndruavUnitSwarmUpdated, this);
     }
