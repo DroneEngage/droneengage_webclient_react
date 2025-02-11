@@ -18,6 +18,10 @@ export class ClssCtrlHUD extends React.Component {
         this.key = Math.random().toString();
         this.m_hudRef = React.createRef();
         
+        this.c_yaw = 0;
+        this.c_pitch = 0;
+        this.c_roll = 0;
+
         js_eventEmitter.fn_subscribe (js_globals.EE_unitNavUpdated,this,this.fn_update);
         
     }
@@ -40,12 +44,8 @@ export class ClssCtrlHUD extends React.Component {
 
     
     componentDidUpdate() {
-        const v_andruavUnit = this.props.p_unit;
-        const c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((v_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-        const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
-        const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
                     
-        this.draw(c_pitch,c_roll,c_yaw);
+        this.draw(this.c_pitch,this.c_roll ,this.c_yaw);
     }
 
     fn_update (p_me,p_andruavUnit)
@@ -152,14 +152,20 @@ export class ClssCtrlHUD extends React.Component {
 
     render ()
     {
+
+        const v_andruavUnit = this.props.p_unit;
+        this.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((v_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+        this.c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
+        this.c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
+
         return (
             <div key={this.key + 'hud'} id={this.props.id} className='css_hud_div'>
                 <div className = 'row al_l css_margin_zero'>
                     <div className= 'col-6  css_margin_zero d-flex '>
                         <ul className ='css_hud_bullets'>
-                            <li><span className='text-white'>R:</span><span className='text-warning'>{this.props.v_roll}º</span></li>
-                            <li><span className='text-white'>P:</span><span className='text-warning'>{this.props.v_pitch}º</span></li>
-                            <li><span className='text-white'>Y:</span><span className='text-warning'>{this.props.v_yaw}º</span></li>
+                            <li><span className='text-white'>R:</span><span className='text-warning'>{this.c_roll}º</span></li>
+                            <li><span className='text-white'>P:</span><span className='text-warning'>{this.c_pitch}º</span></li>
+                            <li><span className='text-white'>Y:</span><span className='text-warning'>{this.c_yaw}º</span></li>
                         </ul>
                     </div>
 
