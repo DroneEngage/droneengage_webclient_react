@@ -10,8 +10,40 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
 	{
 		super (props);
+            const p_andruavUnit = this.props.v_andruavUnit;
 		    this.state = {
+                m_VehicleType: p_andruavUnit.m_VehicleType,
+                m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
+                m_isArmed: p_andruavUnit.m_isArmed
 		};
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        // Only re-render if the gpio_obj has changed
+        const p_andruavUnit = this.state;
+        const { v_andruavUnit } = nextProps;
+
+        const update =  (p_andruavUnit.m_VehicleType != v_andruavUnit.m_VehicleType
+            || p_andruavUnit.m_is_ready_to_arm != v_andruavUnit.m_is_ready_to_arm
+            || p_andruavUnit.m_isArmed != v_andruavUnit.m_isArmed
+        );
+
+        return update;
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        const { v_andruavUnit } = nextProps;
+
+        if (v_andruavUnit.m_VehicleType !== prevState.m_VehicleType ||
+            v_andruavUnit.m_is_ready_to_arm !== prevState.m_is_ready_to_arm ||
+            v_andruavUnit.m_isArmed !== prevState.m_isArmed) {
+            return {
+                m_VehicleType: v_andruavUnit.m_VehicleType,
+                m_is_ready_to_arm: v_andruavUnit.m_is_ready_to_arm,
+                m_isArmed: v_andruavUnit.m_isArmed
+            };
+        }
+        return null; // No state update needed
     }
 
     hlp_getflightButtonStyles (p_andruavUnit)
@@ -544,18 +576,13 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         js_eventEmitter.fn_dispatch (js_globals.EE_displayServoForm, p_andruavUnit.partyID);
     }
 
-    componentDidMount() {
-    }
-
-    componentDidUpdate() {
-    }
+    
 
     render ()
     {
         const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
         let ctrl=[];
         
-
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
             case js_andruavUnit.VEHICLE_VTOL:
