@@ -25,6 +25,7 @@ export class ClssCtrlSWARM extends React.Component {
 
         this.state = {
             'm_update': 0,
+            'm_waiting': false,
 
         };
 
@@ -35,7 +36,7 @@ export class ClssCtrlSWARM extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        const update = (this.state.m_update != nextState.m_update);
+        const update = (this.state.m_update != nextState.m_update) && (!this.state.m_waiting);
 
         return update;
     }
@@ -161,9 +162,11 @@ export class ClssCtrlSWARM extends React.Component {
                 if (v_leaderUnit != null) {   // display name of party_id as a temp solution untill name is available.
                     // [v_leaderUnit==null] maybe the web is loading and this unit has not been received yet.
                     v_leader_title_follower = v_leaderUnit.m_unitName;
+                    this.state.m_waiting = false;
                 }
                 else {
                     v_leader_title_follower = this.props.p_unit.m_Swarm.m_following; // add party_id
+                    this.state.m_waiting = true;
                 }
 
                 v_class_formation_as_follower = '';
