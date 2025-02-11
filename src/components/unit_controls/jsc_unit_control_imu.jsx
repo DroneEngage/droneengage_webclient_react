@@ -266,7 +266,7 @@ export class ClssCtrlDroneIMU extends React.Component {
             const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
             const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
             v_yaw_text = 'HUD';
-            v_yaw_knob.push(<ClssCtrlHUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} v_pitch={c_pitch} v_roll={c_roll} v_yaw={c_yaw}  title ='Pitch: {v_pitch}'/>);
+            v_yaw_knob.push(<ClssCtrlHUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} p_unit={v_andruavUnit}   title ='Pitch: {v_pitch}'/>);
           }
 
         if (v_andruavUnit.m_Nav_Info.p_Location.bearing==null)
@@ -279,9 +279,7 @@ export class ClssCtrlDroneIMU extends React.Component {
         else
         {
             v_bearing_text = 'bearing/target';
-            const c_target = v_andruavUnit.m_Nav_Info._Target.target_bearing ; 
-            const c_bearing = v_andruavUnit.m_Nav_Info.p_Desired.nav_bearing ;
-            v_bearing_knob.push(<ClssCtrlDirections key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} v_target={c_target} v_bearing={c_bearing} />);
+            v_bearing_knob.push(<ClssCtrlDirections key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} p_unit={v_andruavUnit} />);
 
         }
 
