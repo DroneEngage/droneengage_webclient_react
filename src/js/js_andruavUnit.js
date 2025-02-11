@@ -1041,7 +1041,7 @@ export class CAndruavUnitList {
       return Array.from(this.List.values()).sort((a, b) => {
           const idA = a.m_FCBParameters.m_systemID || 0;
           const idB = b.m_FCBParameters.m_systemID || 0;
-          return idA < idB;
+          return idA > idB;
       });
   }
  /**
