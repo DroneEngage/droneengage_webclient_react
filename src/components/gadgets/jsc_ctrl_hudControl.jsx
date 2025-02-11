@@ -1,5 +1,8 @@
 import React    from 'react';
 
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+
 import * as js_helpers from '../../js/js_helpers.js'
 
 export class ClssCtrlHUD extends React.Component {
@@ -9,11 +12,55 @@ export class ClssCtrlHUD extends React.Component {
 		super (props);
 		
         this.state = {
+            'm_update': 0
 		};
 
         this.key = Math.random().toString();
         this.m_hudRef = React.createRef();
-                
+        
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitNavUpdated,this,this.fn_update);
+        
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update) ;
+
+        return update;
+    }
+
+
+    componentWillUnmount () {
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onProxyInfoUpdated,this);
+    }
+
+    
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
+
+    
+    componentDidUpdate() {
+        const v_andruavUnit = this.props.p_unit;
+        const c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((v_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+        const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
+        const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
+                    
+        this.draw(c_pitch,c_roll,c_yaw);
+    }
+
+    fn_update (p_me,p_andruavUnit)
+    {
+        try
+        {
+            if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+
+            if (p_me.state.m_update === 0) return ;
+            p_me.setState({'m_update': p_me.state.m_update +1});
+        }
+        catch (ex)
+        {
+
+        }
     }
 
     draw (p_pitch_deg, p_roll_deg, p_yaw_deg) 
@@ -101,13 +148,7 @@ export class ClssCtrlHUD extends React.Component {
         
     }
 
-    componentDidMount() {
-        this.draw(this.props.v_pitch,this.props.v_roll,this.props.v_yaw,this.props.v_target);
-    }
-
-    componentDidUpdate() {
-        this.draw(this.props.v_pitch,this.props.v_roll,this.props.v_yaw,this.props.v_target);
-    }
+    
 
     render ()
     {
