@@ -5,9 +5,9 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 
 
 export class ClssCtrlBattery extends React.Component {
-    constructor()
+    constructor(props)
 	{
-		super ();
+		super (props);
 		    this.state = {
                 is_compact : true,
                 m_update: 0
@@ -20,6 +20,12 @@ export class ClssCtrlBattery extends React.Component {
     
     }
 
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update);
+
+        return update;
+    }
 
     componentDidMount () 
     {

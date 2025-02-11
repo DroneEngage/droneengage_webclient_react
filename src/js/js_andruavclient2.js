@@ -2890,6 +2890,8 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryRemaining = c_mavlinkMessage.battery_remaining;
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryTemprature = c_mavlinkMessage.temperature;
                     p_unit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed = c_mavlinkMessage.current_consumed;
+
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
                 }
                 break;
                 case mavlink20.MAVLINK_MSG_ID_BATTERY2:
@@ -2897,6 +2899,8 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery2.p_hasPowerInfo = true;
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryVoltage = c_mavlinkMessage.voltage;
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryCurrent = c_mavlinkMessage.current_battery * 10;
+
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
                     
                 }
                 break;
