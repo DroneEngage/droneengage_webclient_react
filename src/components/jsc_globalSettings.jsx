@@ -48,10 +48,14 @@ class ClssPreferences extends React.Component {
   {
       js_localStorage.fn_setVolume(e.currentTarget.value);
       js_speak.fn_updateSettings();
-      js_speak.fn_speakFirst("test volume");
   }
 
-  
+  fn_handleMouseUp (e) 
+  {
+    js_localStorage.fn_setVolume(e.currentTarget.value);
+    js_speak.fn_updateSettings();
+    js_speak.fn_speakFirst("test volume");
+  }
 
   fn_enableSpeech (e)
   {
@@ -115,7 +119,10 @@ class ClssPreferences extends React.Component {
               <label htmlFor="check_enable_speech" className="col-sm-4 col-form-label al_l" >Enable Speech</label>
               <input className="form-check-input col-sm-4 " ref={this.m_enableSpeechRef} type="checkbox" id="check_enable_speech" onClick={ (e) => this.fn_enableSpeech(e)} />
               <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r" >Volume</label>
-              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" ref={this.m_volumeRangeRef} disabled={v_speech_disabled==='true'}  onChange={ (e) => this.fn_changeVolume(e)}/>
+              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" ref={this.m_volumeRangeRef} disabled={v_speech_disabled==='true'}  
+              onChange={ (e) => this.fn_changeVolume(e)}
+              onMouseUp= {(e) => this.fn_handleMouseUp(e)}
+              />
             </div>
             <div className="row mb-12 align-items-center">
               <label htmlFor="check_tabs_display" className="col-sm-4 col-form-label al_l " >Units in Tabs</label>
