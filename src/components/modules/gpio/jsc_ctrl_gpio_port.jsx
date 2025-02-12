@@ -60,16 +60,17 @@ export class ClssCtrlGPIO_Port extends React.Component {
         const { pin_number, pin_name, pin_mode, gpio_type, pin_value } = this.props.gpio_obj;
     
         return (
-            <div key={'gpio_row_' + this.key} className="row mb-3">
+            <div key={'gpio_row_' + this.key} className="row mb-3 ps-3">
                 {/* Pin Number and Name */}
                 <div className="col-6">
                     <span>{pin_number}</span>
                     {pin_name && (
                         <span className={'text-success'}>
                             &nbsp;(&nbsp;{pin_name}
-                            {gpio_type !== 1 && <span className="text-danger"> - system</span>} )
+                            {gpio_type === 1 && (<span className="text-danger"> - system</span>)} 
+                            {pin_mode === 0 && (<span className="text-warning"> - input</span>)} )
                         </span>
-                    )}
+                    ) }
                 </div>
     
                 {/* Input/Output Mode Checkbox */}
@@ -82,6 +83,7 @@ export class ClssCtrlGPIO_Port extends React.Component {
                                 id={"input_output_" + this.key}
                                 ref={this.activeCheckboxOnOffRef}
                                 onClick={(e) => this.fn_onPortOnOff(e)}
+                                disabled={pin_mode === 0}
                             />
                             <label className="form-check-label" htmlFor={"input_output_" + this.key}>
                                 Input/Output

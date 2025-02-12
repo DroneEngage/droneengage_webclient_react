@@ -2507,6 +2507,8 @@ class CAndruavClient {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_STATUS: {
+                    // This message can contain complete or sub data
+                    // sub data is used to update a single port status.
                     p_jmsg = msg.msgPayload;
                     p_unit.m_GPIOs.addGPIO(p_jmsg.s);
                     js_eventEmitter.fn_dispatch(js_globals.EE_unitGPIOUpdated, p_unit);
