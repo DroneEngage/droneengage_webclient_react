@@ -61,6 +61,12 @@ export  class ClssCtrlUnitLog  extends React.Component {
         js_eventEmitter.fn_subscribe (js_globals.EE_onMessage, this, this.fn_onMessage);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update);
+
+        return update;
+    }
+
     fn_onMessage (p_me, p_msg)
     {
         /*
