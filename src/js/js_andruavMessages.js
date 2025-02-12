@@ -102,6 +102,13 @@ export const CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE = 6515;
 export const CONST_TYPE_AndruavMessage_SDR_SPECTRUM = 6516;
 export const CONST_TYPE_AndruavMessage_P2P_INFO = 6517;
 
+export const CONST_TYPE_AndruavMessage_Mission_Item_Sequence = 6518;
+
+
+export const CONST_TYPE_AndruavMessage_GPIO_ACTION           = 6519;
+export const CONST_TYPE_AndruavMessage_GPIO_STATUS           = 6520;
+export const CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE   = 6521;
+
 
 // System Messages
 export const CONST_TYPE_AndruavSystem_LoadTasks = 9001;
@@ -186,6 +193,14 @@ export const CONST_SDR_STATUS_CONNECTED           = 1;
 export const CONST_SDR_STATUS_STREAMING_ONCE      = 2;
 export const CONST_SDR_STATUS_STREAMING_INTERVALS = 3;
 export const CONST_SDR_STATUS_ERROR               = 999;
+
+
+// GPIO Messages
+export const CONST_GPIO_ACTION_PORT_CONFIG        = 0;
+export const CONST_GPIO_ACTION_INFO               = 1;
+export const CONST_GPIO_ACTION_PORT_WRITE         = 2;
+export const CONST_GPIO_ACTION_PORT_READ          = 3;
+
 
 // FenceType
 export const CONST_TYPE_LinearFence = 1;
@@ -324,7 +339,7 @@ export const message_names = {
   1004: "ID - 1004",
   1005: "Remote Execute - 1005",
   1006: "Image - 1006",
-  1008: "Message - 1008",
+  1008: "Text Message - 1008",
   1012: "CameraList - 1012",
   1013: "BinaryIMU - 1013",
   1016: "IMUStatistics - 1016",
@@ -347,6 +362,11 @@ export const message_names = {
   6503: "SWARM - 6503",
   6506: "P2P Status - 6506",
   6507: "P2P in Range - 6507",
+  6509: "Set Comm Line - 6509",
+  6510: "Comm Line Status - 6510",
+  6511: "Text to Speech - 6511",
+  6512: "Play Sound File - 6512",
+  6520: "GPIO Status - 6520",
 };
 
 export const swarm_formation_names = {

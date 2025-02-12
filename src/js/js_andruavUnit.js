@@ -716,7 +716,6 @@ class C_GPIO {
 
     /*
      Json_de json_gpio = {
-        {"a", gpio.active},
         {"b", gpio.pin_number},
         {"m", gpio.pin_mode},
         {"t", gpio.gpio_type},
@@ -739,13 +738,12 @@ class C_GPIO {
     */
       gpio_array.forEach(gpio => {
         // Ensure required properties exist
-        if (gpio.a === undefined || gpio.b === undefined) {
+        if (gpio.b === undefined) {
           console.warn("GPIO object missing required properties:", gpio);
           return;
         }
   
         const gpio_obj = {
-          active: gpio.a,
           pin_number: gpio.b,
           pin_mode: gpio.m,
           gpio_type: gpio.t,

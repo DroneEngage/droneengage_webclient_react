@@ -766,6 +766,13 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
+    API_writeGPIO (p_andruavUnit, pin_number, pin_value_new) {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+
+        const cmd = CCommandAPI.API_writeGPIO(p_andruavUnit, pin_number, pin_value_new);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+    }
+
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
@@ -2496,12 +2503,17 @@ class CAndruavClient {
                     }
                     
                     js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_WayPointsUpdated, {unit: p_unit, mir: p_jmsg.P, status: p_jmsg.R});
-                    
-
-
                 }
                 break;
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_STATUS: {
+                    p_jmsg = msg.msgPayload;
+                    p_unit.m_GPIOs.addGPIO(p_jmsg.s);
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitGPIOUpdated, p_unit);
+                }
+                break;
+        
+                    
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Signaling: {
                     
                     p_jmsg = msg.msgPayload;
