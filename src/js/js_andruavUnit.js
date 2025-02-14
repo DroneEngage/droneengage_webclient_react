@@ -719,7 +719,8 @@ class C_GPIO {
         {"b", gpio.pin_number},
         {"m", gpio.pin_mode},
         {"t", gpio.gpio_type},
-        {"v", gpio.pin_value}
+        {"v", gpio.pin_value},
+        {"d", gpio.pwm_width}
       };
 
 
@@ -748,7 +749,8 @@ class C_GPIO {
           pin_mode: gpio.m,
           gpio_type: gpio.t,
           pin_value: gpio.v,
-          pin_name: gpio.n
+          pin_name: gpio.n,
+          pwm_width: gpio.d==null?0:gpio.d, 
         };
   
         this.m_gpios[gpio.b] = gpio_obj;

@@ -103,6 +103,28 @@ export class CCommandAPI
     }
 
 
+    static API_writeGPIO_PWM (p_andruavUnit, p_pin_number, p_pin_value_new, p_pin_pwm_width_new)
+    {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        let p_msg = {
+            a: js_andruavMessages.CONST_GPIO_ACTION_PORT_WRITE,
+            //n: pin_name,  // optional if pin_number exists.
+            p: p_pin_number,  // optional if pin_name exists.
+            d: p_pin_pwm_width_new, // duty cycle from 0 to 1024
+            v: parseInt(p_pin_value_new),
+        };
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_ACTION,
+            'ms': p_msg 
+        };
+        
+        return msg;
+    }
+
+
     static API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
