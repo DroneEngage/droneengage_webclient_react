@@ -766,6 +766,14 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
+    API_requestGPIOStatus (p_andruavUnit, p_pin_number)
+    {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+
+        const cmd = CCommandAPI.API_requestGPIOStatus(p_andruavUnit, p_pin_number);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+    }
+
     API_writeGPIO (p_andruavUnit, p_pin_number, p_pin_value_new) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
 

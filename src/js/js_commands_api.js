@@ -83,6 +83,30 @@ export class CCommandAPI
         return msg;
     };
 
+    
+    static API_requestGPIOStatus (p_andruavUnit, p_pin_number)
+    {
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        
+        let p_msg = {
+            a: js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_STATUS,
+        };
+
+        if (p_pin_number !== null && p_pin_number !== undefined)
+        {
+            p_msg.p = p_pin_number;
+        }
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE,
+            'ms': p_msg 
+        };
+        
+        return msg;
+    }
+
+    
     static API_writeGPIO (p_andruavUnit, p_pin_number, p_pin_value_new) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         

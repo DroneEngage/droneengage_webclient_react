@@ -195,7 +195,7 @@ export const CONST_SDR_STATUS_STREAMING_INTERVALS = 3;
 export const CONST_SDR_STATUS_ERROR               = 999;
 
 
-// GPIO Messages
+// GPIO Messages for CONST_TYPE_AndruavMessage_GPIO_ACTION
 export const CONST_GPIO_ACTION_PORT_CONFIG        = 0;
 export const CONST_GPIO_ACTION_INFO               = 1;
 export const CONST_GPIO_ACTION_PORT_WRITE         = 2;
