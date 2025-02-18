@@ -149,7 +149,7 @@ class CAndruavClient {
         this.v_axes = null;
         this.v_sendAxes = false;
         this.v_sendAxes_skip = 0;
-        this.andruavGeoFences = {};
+        this.m_andruavGeoFences = {}; // list of fences each fence ha s list of attached units.
         this.videoFrameCount = 0;
         this.socketStatus = js_andruavMessages.CONST_SOCKET_STATUS_FREASH;
         this.socketConnectionDone = false;
@@ -1492,7 +1492,13 @@ class CAndruavClient {
         let v_geoFenceName = p_jmsg.n;
         let v_maximumDistance = (p_jmsg.hasOwnProperty('r')) ? p_jmsg.r : 0; // optional
         if (p_jmsg.hasOwnProperty('o')) { // 1 if restricted area
-            m_shouldKeepOutside = (p_jmsg.o === 1); // optional
+            if (typeof p_jmsg.o === 'number') {
+                // p_jmsg.o is an integer [backward compatibility]
+                m_shouldKeepOutside = (p_jmsg.o === 1);
+            } else if (typeof p_jmsg.o === 'boolean') {
+                // p_jmsg.o is a boolean
+                m_shouldKeepOutside = p_jmsg.o;
+            }
         }
         if (p_jmsg.hasOwnProperty('t')) { // 1 if restricted area
             switch (p_jmsg.t) {
@@ -2268,7 +2274,7 @@ class CAndruavClient {
                     // case js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA:
                     //     if (p_jmsg.hasOwnProperty('fn')) { // fence name
                     //         var fenceName = p_jmsg.n;
-                    //         Me.andruavGeoFences[fenceName];
+                    //         Me.m_andruavGeoFences[fenceName];
 
 
                     //         var keys = Object.keys(GeoLinearFences); //TODO: BUG HERE .. VARIABLE IS NOT USED ELSEWHERE.
@@ -2277,9 +2283,9 @@ class CAndruavClient {
 
                     //         for (var i = 0; i < size; ++ i) {
                     //             if (keys[i] === fenceName) {
-                    //                 js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitGeoFenceBeforeDelete, Me.andruavGeoFences[keys[i]]);
+                    //                 js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitGeoFenceBeforeDelete, Me.m_andruavGeoFences[keys[i]]);
 
-                    //                 Me.andruavGeoFences.splice(i, 1);
+                    //                 Me.m_andruavGeoFences.splice(i, 1);
                     //                 break;
                     //             }
                     //         }
@@ -2287,8 +2293,8 @@ class CAndruavClient {
 					// 				* if you need to keep the original array because you have other references to it that should be updated too, you can clear it without creating a new array by setting its length to zero:
 					// 				*/
                     //         Me.EVT_andruavUnitGeoFenceBeforeDelete();
-                    //         Me.andruavGeoFences = [];
-                    //         Me.andruavGeoFences.length = 0;
+                    //         Me.m_andruavGeoFences = [];
+                    //         Me.m_andruavGeoFences.length = 0;
                     //     }
                     //     break;
                 }
@@ -2397,10 +2403,10 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    let geoFenceAttachStatus = {};
+                    const geoFenceAttachStatus = {};
                     geoFenceAttachStatus.fenceName = p_jmsg.n;
                     geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                    let fence = Me.andruavGeoFences[geoFenceAttachStatus.fenceName];
+                    const fence = Me.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
 
                     if (geoFenceAttachStatus.isAttachedToFence === true) { /*
 						* If Action Attach:
@@ -2446,12 +2452,22 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
+
+                    // info about status of unit vs fence. from the unit perspective.
+                    // inZone & shouldKeepOutside are the most important.
                     let geoFenceHitInfo = {
                         hasValue: true,
                         fenceName: p_jmsg.n,
                         m_inZone: p_jmsg.z,
-                        m_shouldKeepOutside: (p_jmsg.o === 1)
+                        m_shouldKeepOutside: false
                     };
+                    if (typeof p_jmsg.o === 'number') {
+                        // p_jmsg.o is an integer [backward compatibility]
+                        geoFenceHitInfo.m_shouldKeepOutside = (p_jmsg.o === 1);
+                    } else if (typeof p_jmsg.o === 'boolean') {
+                        // p_jmsg.o is a boolean
+                        geoFenceHitInfo.m_shouldKeepOutside = p_jmsg.o;
+                    }
                     if (p_jmsg.hasOwnProperty('d')) 
                         geoFenceHitInfo.distance = p_jmsg.d;
                     else 
