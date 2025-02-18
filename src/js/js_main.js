@@ -2187,60 +2187,32 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function getDestinationPointIcon (p_point_type, p_vehicle_index)
+		function getDestinationPointIcon (p_andruavUnit)
 		{
-			switch (p_point_type)
+			const c_point_type = p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type;
+			const c_vehicle_index = p_andruavUnit.m_index%4;
+			switch (c_point_type)
 			{
 				case js_andruavMessages.CONST_DESTINATION_GUIDED_POINT:
 				return './images/destination_bg_32x32.png';
 				case js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION:
-				return js_globals.swarm_location_icon[p_vehicle_index];
+				{
+					switch (p_andruavUnit.m_VehicleType)
+					{
+						case js_andruavUnit.VEHICLE_PLANE:
+							return js_globals.swarm_plane_location_icon[c_vehicle_index];
+						case js_andruavUnit.VEHICLE_TRI: 
+						case js_andruavUnit.VEHICLE_QUAD:
+						case js_andruavUnit.VEHICLE_VTOL:
+						case js_andruavUnit.VEHICLE_ROVER:
+						default:
+							return js_globals.swarm_quad_location_icon[c_vehicle_index];
+					}
+				}
 			}
 		}
 
-		function getPlanIcon(bearingIndex, vehicle_index) {
-			return js_globals.planes_icon[vehicle_index];
-			switch (bearingIndex) {
-				case 0:
-				case 1:
-					return './images/planetracker_r_0d_.png';
-					break;
-				case 2:
-				case 3:
-					return './images/planetracker_r_45d_.png';
-					break;
-				case 4:
-				case 5:
-					return './images/planetracker_r_90_.png';
-					break;
-				case 6:
-				case 7:
-					return './images/planetracker_r_135d_.png';
-					break;
-				case -8:
-				case -7:
-					return './images/planetracker_r_180d_.png';
-					break;
-				case -6:
-				case -5:
-					return './images/planetracker_r_225d_.png';
-					break;
-				case -4:
-				case -3:
-					return './images/planetracker_r_270d_.png';
-					break;
-				case -2:
-				case -1:
-					return './images/planetracker_r_315d_.png';
-					break;
-				default:
-					return './images/planetracker_r_0d_.png';
-					break;
-
-
-			}
-		}
-
+		
 		export function getVehicleIcon(p_andruavUnit, applyBearing) {
 
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
@@ -2545,7 +2517,7 @@ function fn_handleKeyBoard() {
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
+				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			
