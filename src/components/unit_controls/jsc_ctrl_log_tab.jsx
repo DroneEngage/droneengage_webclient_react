@@ -97,8 +97,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
 
     fn_clear (e)
     {
-        this.setState({'m_message':[]});
-        //this.forceUpdate();
+        this.setState({'m_message':[], 'm_update': this.state.m_update +1});
     }
 
     componentWillUnmount () {
