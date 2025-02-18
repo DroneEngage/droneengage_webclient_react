@@ -152,7 +152,7 @@ export class ClssAndruavUnit_DropDown_List extends React.Component {
             {
                 let css_unit = 'text-success fw-bold';
                 let txt_unit = v_andruavUnit.m_unitName;
-                if (v_andruavUnit.m_IsShutdown === true)
+                if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
                 {
                     css_unit = 'text-light';
                     txt_unit += ' --- offline';

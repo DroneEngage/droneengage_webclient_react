@@ -96,32 +96,33 @@ class CAndruavClient {
         const units = js_globals.m_andruavUnitList.fn_getUnitValues();
         if (units===null || units === undefined) return ;
         units.forEach((unit) => {
-            if (!unit.m_IsMe) {
-
-            if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true)
-            {
-                js_globals.v_andruavClient.API_do_GetHomeLocation(unit);
-			}
+            if (unit.m_IsDisconnectedFromGCS) return; // skip self.
+            
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
 
-            if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
-                if (unit.m_IsShutdown !== true)
+            if ((!unit.m_IsShutdown) && (!unit.m_IsDisconnectedFromGCS))
+            {
+                if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true)
                 {
-                    unit.m_IsShutdown = true;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                    js_globals.v_andruavClient.API_do_GetHomeLocation(unit);
                 }
-            } else if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
-                this.API_requestID(unit.partyID);
-            } else if (unit.m_IsShutdown) {
-                if (unit.m_IsShutdown !== false)
-                {
-                    unit.m_IsShutdown = false;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
-                }
+                if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
+                    this.API_requestID(unit.partyID);
+                } 
 
+                return ;
+            }
+
+            if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
+                if (unit.m_IsDisconnectedFromGCS !== true)
+                {
+                    unit.m_IsDisconnectedFromGCS = true;
+                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                    return ;
+                }
             }
             }
-        });
+        );
     }
 
     // EVENT HANDLER AREA
@@ -1838,7 +1839,7 @@ class CAndruavClient {
                 let v_trigger_on_vehiclechanged = false;
                 let v_trigger_on_swarm_status = false;
                 let v_trigger_on_swarm_status2 = false;
-                    
+                let v_trigger_on_back_online = false;
                     
 
                     p_jmsg = msg.msgPayload;
@@ -1856,7 +1857,8 @@ class CAndruavClient {
                         p_unit.m_Video.VideoRecording = p_jmsg.VR; // ON DRONE RECORDING
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
                         p_unit.m_Permissions = p_jmsg.p;
-                        
+                        p_unit.m_IsDisconnectedFromGCS = false;
+
                         if (p_jmsg.hasOwnProperty('FI') !== true) {
                             p_jmsg.FI = false;
                         }
@@ -1903,7 +1905,11 @@ class CAndruavClient {
                         if (p_jmsg.hasOwnProperty('SD') !== true) {
                             p_jmsg.SD = false;
                         }
-                        p_unit.m_IsShutdown = p_jmsg.SD;
+
+                        if (p_unit.m_IsShutdown !== p_jmsg.SD) {
+                            v_trigger_on_back_online = (p_unit.m_IsShutdown !== p_jmsg.SD);
+                            p_unit.m_IsShutdown = p_jmsg.SD;
+                        }
 
                         if (p_jmsg.hasOwnProperty('AP') === true) {
                             p_unit.m_autoPilot = p_jmsg.AP;
@@ -1991,6 +1997,8 @@ class CAndruavClient {
                         p_unit.m_VehicleType = p_jmsg.VT;
                         p_unit.m_Video.VideoRecording = p_jmsg.VR;
                         p_unit.m_Permissions = p_jmsg.p;
+                        p_unit.m_IsDisconnectedFromGCS = false;
+
                         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
                         if (p_jmsg.hasOwnProperty('FL') !== true) {
                             p_jmsg.FL = false;
@@ -2019,9 +2027,11 @@ class CAndruavClient {
                             p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
                         }
                         
-                        if (p_jmsg.hasOwnProperty('SD') === true) {
+                        if (p_unit.m_IsShutdown !== p_jmsg.SD) {
+                            v_trigger_on_back_online = (p_unit.m_IsShutdown !== p_jmsg.SD);
                             p_unit.m_IsShutdown = p_jmsg.SD;
                         }
+                        
                         if (p_jmsg.hasOwnProperty('FM') === true) {
                             v_trigger_on_flightMode = (p_unit.m_flightMode !== p_jmsg.FM);
                             p_unit.m_flightMode = p_jmsg.FM;
@@ -2141,6 +2151,11 @@ class CAndruavClient {
                     if (v_trigger_on_vehiclechanged) {
                         js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitVehicleTypeUpdated, p_unit);
                     } 
+
+                    if (v_trigger_on_back_online) {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, p_unit);
+                    }
+
                         
                     if (v_trigger_on_module_changed) {
                         // TODO:  not handled... please handle

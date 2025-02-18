@@ -629,7 +629,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const v_wind = this.getWind(v_andruavUnit);
         const v_wp = this.getWP(v_andruavUnit);
 
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS !== true) || (v_andruavUnit.m_IsShutdown === true))
         {
             v_id_class = ' text-muted ';
         }

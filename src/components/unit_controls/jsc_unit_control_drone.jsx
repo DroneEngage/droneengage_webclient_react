@@ -503,7 +503,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         const main_bar = this.createMainBar();
      return (
             
-             <div  key={id +"1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + v_andruavUnit.m_IsShutdown}>
+             <div  key={id +"1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + (v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS)}>
                 
                 {main_bar}
 

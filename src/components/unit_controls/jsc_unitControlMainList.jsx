@@ -160,7 +160,7 @@ export default class ClssAndruavUnitList extends React.Component {
         {
             text += ":" + v_andruavUnit.m_FCBParameters.m_systemID;
         }
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
         {
             classes = " blink_offline ";
         }

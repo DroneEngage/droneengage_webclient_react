@@ -893,7 +893,6 @@ export class CAndruavUnitObject {
     this.m_IsMe = false;
     this.m_IsGCS = true;
     this.m_isDE = false; // is Drone Engage
-    this.m_IsShutdown = false;
     this.Description = "";
     this.m_inZone = null; // name of A ZONE  that the unit is IN.
     this.m_unitName = "unknown";
@@ -938,7 +937,8 @@ export class CAndruavUnitObject {
   init() {
     this.m_time_sync = 0; // time sent by unit so that you can use it to measrue other time fields sent by the same module.
     this.m_Permissions = "X0X0X0X0X0X0";
-    this.m_IsShutdown = false;
+    this.m_IsShutdown = false; // Drone Unit reports a shutdown
+    this.m_IsDisconnectedFromGCS = false; // Unit is connected to WebClient.
     this.m_WindSpeed = null;
     this.m_WindSpeed_z = null;
     this.m_WindDirection = null;

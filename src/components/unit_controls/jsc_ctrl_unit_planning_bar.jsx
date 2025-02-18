@@ -43,7 +43,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
 	{
         const p_Power = p_andruavUnit.m_Power;
 
-        if ((p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
+        if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
             return { v_battery_src:"./images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:' ', temp:' '};
         
         let v_bat = p_Power._Mobile.p_Battery.PlugStatus + " ";
@@ -98,7 +98,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
 	    let v_remainingBat = p_Power._FCB.p_Battery.FCB_BatteryRemaining;
 		let v_bat = " ";
 			 
-		if ((p_andruavUnit.m_IsShutdown === true) || (p_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === false))
+		if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === false))
         {
             v_battery_display_fcb_div = " hidden ";
             return { v_battery_src:"./images/battery_gy_32x32.png", css:v_bat,level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div};
@@ -147,7 +147,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
         
         const module_version = v_andruavUnit.module_version();
                 
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
         {
                 online_class2 =" blink_offline ";
                 online_class = " blink_offline ";
@@ -170,7 +170,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
                         
             
 
-            if ( v_andruavUnit.m_IsShutdown !== true) 
+            if ((v_andruavUnit.m_IsDisconnectedFromGCS !== true) || (v_andruavUnit.m_IsShutdown !== true)) 
             {
                 if ((v_andruavUnit.m_SignalStatus.mobile === true))
                 {
@@ -240,7 +240,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
         {
             sys_id=':' + v_andruavUnit.m_FCBParameters.m_systemID + ' ';
         }
-        if ((v_andruavUnit.m_IsShutdown === false) && (v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true))
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === false) && (v_andruavUnit.m_IsShutdown === false) && (v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true))
         {
             if (v_andruavUnit.m_isDE !== true) 
             {
