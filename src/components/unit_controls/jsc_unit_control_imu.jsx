@@ -7,7 +7,8 @@ import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {
      hlp_getFlightMode,
-     fn_switchGPS, fn_openFenceManager
+     fn_switchGPS, fn_openFenceManager,
+     fn_isBadFencing
      } from '../../js/js_main.js'
      
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
@@ -342,7 +343,7 @@ export class ClssCtrlDroneIMU extends React.Component {
             }
         }				
 						
-		const res = 0;//fn_isBadFencing (v_andruavUnit);
+		const res = fn_isBadFencing (v_andruavUnit);
 		v_andruavUnit.m_fencestatus = res;
 
         if (v_andruavUnit.m_fencestatus !== null && v_andruavUnit.m_fencestatus !== undefined)
