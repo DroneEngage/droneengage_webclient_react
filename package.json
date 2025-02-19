@@ -28,6 +28,7 @@
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "13.5.0",
     "@types/leaflet-rotatedmarker": "0.2.5",
+    "axios": "^1.7.9",
     "bootstrap": "5.3.3",
     "file-saver": "2.0.5",
     "https": "^1.0.0",

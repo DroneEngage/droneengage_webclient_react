@@ -18,7 +18,7 @@ import {
 
 
 
-export class ClssSingle_Mission_Control_Bar extends React.Component {
+export class ClssSingleMissionControlBar extends React.Component {
     constructor(props)
 	{
 		super (props);

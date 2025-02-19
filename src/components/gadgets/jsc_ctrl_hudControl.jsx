@@ -1,24 +1,71 @@
-import $ from 'jquery'; 
 import React    from 'react';
+
+import {js_globals} from '../../js/js_globals.js';
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
 
-export class ClssCTRL_HUD extends React.Component {
+export class ClssCtrlHUD extends React.Component {
 
     constructor(props)
 	{
 		super (props);
 		
         this.state = {
+            'm_update': 0
 		};
 
         this.key = Math.random().toString();
+        this.m_hudRef = React.createRef();
         
+        this.c_yaw = 0;
+        this.c_pitch = 0;
+        this.c_roll = 0;
+
+        js_eventEmitter.fn_subscribe (js_globals.EE_unitNavUpdated,this,this.fn_update);
+        
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update) ;
+
+        return update;
+    }
+
+
+    componentWillUnmount () {
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onProxyInfoUpdated,this);
+    }
+
+    
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
+
+    
+    componentDidUpdate() {
+                    
+        this.draw(this.c_pitch,this.c_roll ,this.c_yaw);
+    }
+
+    fn_update (p_me,p_andruavUnit)
+    {
+        try
+        {
+            if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+
+            if (p_me.state.m_update === 0) return ;
+            p_me.setState({'m_update': p_me.state.m_update +1});
+        }
+        catch (ex)
+        {
+
+        }
     }
 
     draw (p_pitch_deg, p_roll_deg, p_yaw_deg) 
     {
-        const c_canvas=$('#' + this.props.id + ' #ctrl_hud')[0];
+        const c_canvas=this.m_hudRef.current; 
         const c_ctx = c_canvas.getContext('2d');
         c_canvas.width  = 50;
         c_canvas.height = 50; 
@@ -101,29 +148,29 @@ export class ClssCTRL_HUD extends React.Component {
         
     }
 
-    componentDidMount() {
-        this.draw(this.props.v_pitch,this.props.v_roll,this.props.v_yaw,this.props.v_target);
-    }
-
-    componentDidUpdate() {
-        this.draw(this.props.v_pitch,this.props.v_roll,this.props.v_yaw,this.props.v_target);
-    }
+    
 
     render ()
     {
+
+        const v_andruavUnit = this.props.p_unit;
+        this.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((v_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+        this.c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
+        this.c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
+
         return (
             <div key={this.key + 'hud'} id={this.props.id} className='css_hud_div'>
                 <div className = 'row al_l css_margin_zero'>
                     <div className= 'col-6  css_margin_zero d-flex '>
                         <ul className ='css_hud_bullets'>
-                            <li><span className='text-white'>R:</span><span className='text-warning'>{this.props.v_roll}º</span></li>
-                            <li><span className='text-white'>P:</span><span className='text-warning'>{this.props.v_pitch}º</span></li>
-                            <li><span className='text-white'>Y:</span><span className='text-warning'>{this.props.v_yaw}º</span></li>
+                            <li><span className='text-white'>R:</span><span className='text-warning'>{this.c_roll}º</span></li>
+                            <li><span className='text-white'>P:</span><span className='text-warning'>{this.c_pitch}º</span></li>
+                            <li><span className='text-white'>Y:</span><span className='text-warning'>{this.c_yaw}º</span></li>
                         </ul>
                     </div>
 
                     <div className= 'col-6  css_margin_zero css_padding_zero'>
-                    <canvas key={this.key + 'chud'} id='ctrl_hud' className='css_hud'></canvas>
+                    <canvas key={this.key + 'chud'} id='ctrl_hud' ref={this.m_hudRef} className='css_hud'></canvas>
                     </div>
                    
                 </div>

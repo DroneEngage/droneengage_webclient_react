@@ -528,7 +528,7 @@ export class ClssAndruavMissionPlan {
       
       if (marker.m_missionItem.m_missionType !== js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
       {
-        mission_drift += 1; // mission tarts from 1 because 0 is home.
+        mission_drift += 1; // mission starts from 1 because 0 is home.
         if (eventWaitRequired === true) {
           // WAITING EVENT SHOULD BE THE FIRST THING
 
@@ -580,7 +580,7 @@ export class ClssAndruavMissionPlan {
         }
       
 
-      switch (marker.m_missionItem.m_missionType) {
+      switch (parseInt(marker.m_missionItem.m_missionType)) {
         case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
           {
             fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [

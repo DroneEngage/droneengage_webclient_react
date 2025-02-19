@@ -1,4 +1,3 @@
-import $ from 'jquery';
 
 import React    from 'react';
 import L from 'leaflet';
@@ -16,70 +15,77 @@ export class CWayPointAction extends React.Component {
     {
         super ();
         this.state = {
+            missionType: 1
         };
+
+        this.m_missionTypeRef = React.createRef(); // Add this line
     }
  
 
     fn_editShape ()
     {
-        let waypointType = parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
+        let waypointType = this.m_missionTypeRef.current.value; //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
-        let icon_img = './images/location_bb_32x32.png';
+        let icon_img = {
+            iconUrl:'./images/location_bb_32x32.png',
+            iconAnchor: [16,23], 
+            iconSize: [32,32], 
+        };
         switch (waypointType)
 		{
             case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,32], //new google.maps.Point(16, 23),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,32], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
 			    icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,23], //new google.maps.Point(16, 23),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,23], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
 			    icon_img= {
                     iconUrl:'./images/plane_b_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    iconSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    iconSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
 			    icon_img= {
                     iconUrl:'./images/plane_gr_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
                 icon_img= {
                     iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
 			    icon_img= {
                     iconUrl:'./images/back_b_32x32.png',
-                    iconAnchor: [16,16], //new google.maps.Point(16, 16),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,16], 
+                    scaledSize: [32,32], 
                 };
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
                 icon_img= {
                     iconUrl:'./images/circle_bb_32x32.png',
-                    iconAnchor: [16,23], //new google.maps.Point(16, 23),
-                    scaledSize: [32,32], //new google.maps.Size(32, 32),
+                    iconAnchor: [16,23], 
+                    scaledSize: [32,32], 
                 };
                 break;
 
@@ -121,10 +127,11 @@ export class CWayPointAction extends React.Component {
 
     componentDidMount () 
     {
-        if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
+        if (this.props.p_shape && this.props.p_shape.m_missionItem) { // Check if p_shape and m_missionItem are not null
+            if (this.props.p_shape.m_missionItem.m_missionType === 0) this.props.p_shape.m_missionItem.m_missionType = 1;
 
-        this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
-        
+            this.setState({ missionType: this.props.p_shape.m_missionItem.m_missionType });
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -133,17 +140,20 @@ export class CWayPointAction extends React.Component {
         }
       }
       
+    
     handleMissionTypeChange = (event) => {
         const mission_type = event.target.value;
-        if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
-        {
-            // in DE_Mission Type Waypoints does not fire events.
-            this.props.p_shape.m_missionItem.eventFireRequired = false;
-            this.props.p_shape.m_missionItem.eventFire = undefined;
-        }
+        if (this.props.p_shape && this.props.p_shape.m_missionItem) { // Check if p_shape and m_missionItem are not null
+            if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+            {
+                // in DE_Mission Type Waypoints does not fire events.
+                this.props.p_shape.m_missionItem.eventFireRequired = false;
+                this.props.p_shape.m_missionItem.eventFire = undefined;
+            }
 
-        this.setState({ missionType: mission_type });
-      }
+            this.setState({ missionType: mission_type });
+        }
+    }
 
     render ()
     {
@@ -169,7 +179,7 @@ export class CWayPointAction extends React.Component {
         {v_event_firing}
         <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed'  txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
         <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw'  txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
-        <select id="msnsel"  className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
+        <select id="msnsel"  ref={this.m_missionTypeRef} className="form-control css_margin_top_small" value={this.state.missionType} onChange={this.handleMissionTypeChange}>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF}>Take Off</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP}>Waypoint</option>
                 <option value={js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE}>Circle Here</option>

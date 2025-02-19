@@ -9,7 +9,7 @@ import * as js_common from '../../../js/js_common.js'
 import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 
-import { ClssSingle_Mission_Control_Bar } from './jsc_ctrl_single_mission_control_bar.jsx'
+import { ClssSingleMissionControlBar } from './jsc_ctrl_single_mission_control_bar.jsx'
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
 
@@ -171,7 +171,7 @@ export class ClssSingle_Mission_Header extends React.Component {
 
 
                 <div id="geofence" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
-                    <ClssSingle_Mission_Control_Bar p_mission={this.props.p_mission} m_selected_unit={this.state.m_partyID} />
+                    <ClssSingleMissionControlBar p_mission={this.props.p_mission} m_selected_unit={this.state.m_partyID} />
                 </div>
 
             );

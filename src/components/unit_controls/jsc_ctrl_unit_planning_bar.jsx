@@ -5,7 +5,7 @@ import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
-import {ClssCTRL_Unit_Icon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
+import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 
 
@@ -21,7 +21,7 @@ import {
 /**
  * This is the bar control that contains Drone Icon, Camera, Video, Battery and Name 
  */
-export class ClssCTRL_Unit_Planning_Bar extends React.Component {
+export class ClssCtrlUnitPlanningBar extends React.Component {
 
     constructor(props)
 	{
@@ -43,7 +43,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 	{
         const p_Power = p_andruavUnit.m_Power;
 
-        if ((p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
+        if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
             return { v_battery_src:"./images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:' ', temp:' '};
         
         let v_bat = p_Power._Mobile.p_Battery.PlugStatus + " ";
@@ -98,7 +98,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 	    let v_remainingBat = p_Power._FCB.p_Battery.FCB_BatteryRemaining;
 		let v_bat = " ";
 			 
-		if ((p_andruavUnit.m_IsShutdown === true) || (p_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === false))
+		if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === false))
         {
             v_battery_display_fcb_div = " hidden ";
             return { v_battery_src:"./images/battery_gy_32x32.png", css:v_bat,level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div};
@@ -147,7 +147,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
         
         const module_version = v_andruavUnit.module_version();
                 
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
         {
                 online_class2 =" blink_offline ";
                 online_class = " blink_offline ";
@@ -170,7 +170,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
                         
             
 
-            if ( v_andruavUnit.m_IsShutdown !== true) 
+            if ((v_andruavUnit.m_IsDisconnectedFromGCS !== true) || (v_andruavUnit.m_IsShutdown !== true)) 
             {
                 if ((v_andruavUnit.m_SignalStatus.mobile === true))
                 {
@@ -240,7 +240,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
         {
             sys_id=':' + v_andruavUnit.m_FCBParameters.m_systemID + ' ';
         }
-        if ((v_andruavUnit.m_IsShutdown === false) && (v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true))
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === false) && (v_andruavUnit.m_IsShutdown === false) && (v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true))
         {
             if (v_andruavUnit.m_isDE !== true) 
             {
@@ -264,7 +264,7 @@ export class ClssCTRL_Unit_Planning_Bar extends React.Component {
 
         return (
              <div  key={id +"_1"} id={id +"_1"} className='row margin_2px padding_zero user-select-none '>        	
-                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCTRL_Unit_Icon p_unit={v_andruavUnit}/></div>
+                <div key={id +"__1"} className= 'col-1  padding_zero d-flex '><ClssCtrlUnitIcon p_unit={v_andruavUnit}/></div>
                 <div key={id +"__2"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__3"} className= 'col-1  padding_zero d-none d-sm-flex'></div>
                 <div key={id +"__4"} className= 'col-1  padding_zero d-none d-sm-flex'></div>

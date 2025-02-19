@@ -2,7 +2,6 @@ import $ from 'jquery';
 import React from 'react';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
-import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 import { js_globals } from '../../js/js_globals.js';
 import { js_localStorage } from '../../js/js_localStorage'
@@ -19,13 +18,14 @@ import { CCommandAPI } from '../../js/js_commands_api.js'
  * onMakeSwarm
  * onRequestToFollow
  */
-export class ClssCTRL_SWARM extends React.Component {
+export class ClssCtrlSWARM extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             'm_update': 0,
+            'm_waiting': false,
 
         };
 
@@ -33,6 +33,12 @@ export class ClssCTRL_SWARM extends React.Component {
         
         js_eventEmitter.fn_subscribe(js_globals.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
 
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update) && (!this.state.m_waiting);
+
+        return update;
     }
 
     componentWillUnmount() {
@@ -156,9 +162,11 @@ export class ClssCTRL_SWARM extends React.Component {
                 if (v_leaderUnit != null) {   // display name of party_id as a temp solution untill name is available.
                     // [v_leaderUnit==null] maybe the web is loading and this unit has not been received yet.
                     v_leader_title_follower = v_leaderUnit.m_unitName;
+                    this.state.m_waiting = false;
                 }
                 else {
                     v_leader_title_follower = this.props.p_unit.m_Swarm.m_following; // add party_id
+                    this.state.m_waiting = true;
                 }
 
                 v_class_formation_as_follower = '';

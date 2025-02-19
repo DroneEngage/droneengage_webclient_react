@@ -3,7 +3,7 @@ import {js_localStorage} from '../js/js_localStorage'
 
 import {fn_showSettings,fn_showMap, fn_showVideoMainTab, fn_showControl} from '../js/js_main';
 
-export class ClssCTRL_Layout extends React.Component {
+export class ClssCtrlLayout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};

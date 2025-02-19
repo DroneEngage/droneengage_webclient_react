@@ -46,7 +46,7 @@ class ClssAndruavMessageItem extends React.Component {
     }
 }
 
-export  class ClssCTRL_Unit_Log  extends React.Component {
+export  class ClssCtrlUnitLog  extends React.Component {
 
     constructor(props)
     {
@@ -59,6 +59,12 @@ export  class ClssCTRL_Unit_Log  extends React.Component {
         this._isMounted = false;
         
         js_eventEmitter.fn_subscribe (js_globals.EE_onMessage, this, this.fn_onMessage);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update);
+
+        return update;
     }
 
     fn_onMessage (p_me, p_msg)
@@ -91,8 +97,7 @@ export  class ClssCTRL_Unit_Log  extends React.Component {
 
     fn_clear (e)
     {
-        this.setState({'m_message':[]});
-        //this.forceUpdate();
+        this.setState({'m_message':[], 'm_update': this.state.m_update +1});
     }
 
     componentWillUnmount () {

@@ -19,8 +19,8 @@ import {js_leafletmap} from '../../js/js_leafletmap.js'
 
 
 
-import {ClssAndruavUnit_GCS} from './jsc_unit_control_gcs.jsx'
-import {ClssAndruavUnit_Drone} from './jsc_unit_control_drone.jsx'
+import {ClssAndruavUnitGCS} from './jsc_unit_control_gcs.jsx'
+import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
 
 
 
@@ -160,7 +160,7 @@ export default class ClssAndruavUnitList extends React.Component {
         {
             text += ":" + v_andruavUnit.m_FCBParameters.m_systemID;
         }
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
         {
             classes = " blink_offline ";
         }
@@ -232,7 +232,7 @@ export default class ClssAndruavUnitList extends React.Component {
                 
                 if ((v_prop.gcs_list !== false) && (v_andruavUnit.m_IsGCS === true))
                 {
-                    units_gcs.push (<ClssAndruavUnit_GCS key={'ClssAndruavUnit_GCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
+                    units_gcs.push (<ClssAndruavUnitGCS key={'ClssAndruavUnitGCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                 }
                 else 
                 if (v_andruavUnit.m_IsGCS===false)
@@ -252,13 +252,13 @@ export default class ClssAndruavUnitList extends React.Component {
 
                         units_details.push(
                             <div key={'aud' + partyID} className={`tab-pane fade ${c_active === true ? 'active show' : ''}`} id={"tab_"+v_andruavUnit.partyID}>
-                                <ClssAndruavUnit_Drone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                                <ClssAndruavUnitDrone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
                             </div>
                         );
                     }
                     else
                     {   // Display as List
-                        units_details.push(<ClssAndruavUnit_Drone key={'aud2' + partyID}  p_unit = {v_andruavUnit} tab_collapsed={true} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
+                        units_details.push(<ClssAndruavUnitDrone key={'aud2' + partyID}  p_unit = {v_andruavUnit} tab_collapsed={true} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />);
                     }
                 }
 

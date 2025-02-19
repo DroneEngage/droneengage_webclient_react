@@ -629,7 +629,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const v_wind = this.getWind(v_andruavUnit);
         const v_wp = this.getWP(v_andruavUnit);
 
-        if ( v_andruavUnit.m_IsShutdown === true)
+        if ((v_andruavUnit.m_IsDisconnectedFromGCS !== true) || (v_andruavUnit.m_IsShutdown === true))
         {
             v_id_class = ' text-muted ';
         }
@@ -953,7 +953,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
                     if (v_andruavUnit.m_IsGCS === true)
                     {
-                        //units_gcs.push (<ClssAndruavUnit_GCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
+                        //units_gcs.push (<ClssAndruavUnitGCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                     }
                     else 
                     if (v_andruavUnit.m_IsGCS===false)

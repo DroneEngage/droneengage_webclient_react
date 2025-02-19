@@ -48,13 +48,20 @@ class GLOBALS {
 							];
 
 
-		this.swarm_location_icon = [
+		this.swarm_quad_location_icon = [
 						'./images/drone_q1_32x32.png',
 						'./images/drone_q2_32x32.png',
 						'./images/drone_q3_32x32.png',
 						'./images/drone_q4_32x32.png',
 						];
-
+		
+		this.swarm_plane_location_icon = [
+							'./images/drone_1_32x32.png',
+							'./images/drone_2_32x32.png',
+							'./images/drone_3_32x32.png',
+							'./images/drone_4_32x32.png',
+							];
+	
 
 
 		this.CONST_DFM_FAR                 = 3000; // more than 10 Km is far.
@@ -193,7 +200,8 @@ class GLOBALS {
 		this.EE_Auth_Account_BAD_Operation	 		= "EVT_85";
 		
 		this.EE_Video_State_Change           		= "EVT_86";
-
+		this.EE_unitGPIOUpdated             		= "EVT_87";
+		
 		// EOF LOCAL EVENTS
 
 

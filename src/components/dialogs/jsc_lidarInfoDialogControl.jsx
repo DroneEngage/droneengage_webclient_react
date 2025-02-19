@@ -1,4 +1,3 @@
-import $ from 'jquery'; 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';

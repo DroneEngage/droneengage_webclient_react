@@ -68,6 +68,42 @@ class CSpeakEngine {
         this._v_speakmsg.volume = this._validateVolume(js_localStorage.fn_getVolume() / 100);
     }
 
+    fn_speakNow(text) {
+        // Immediately stop any ongoing speech
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel(); // Stop current speech
+        }
+
+        // Clear the queue
+        this._v_to_speak = [];
+
+        // Speak the new text immediately
+        if (text && text.trim()) {
+            this._v_speakmsg.text = text;
+            speechSynthesis.speak(this._v_speakmsg);
+        }
+    }
+
+    stopSpeaking() {
+        // Cancel any ongoing speech
+        // speechSynthesis.cancel(); DONT uncomment.
+
+        // Clear the queue
+        this._v_to_speak = [];
+    }
+    
+    fn_speakFirst(text) {
+        if (!this._v_enable_speak || !text?.trim()) return;
+
+        if (speechSynthesis.speaking) {
+            this._v_to_speak.unshift(text); // Add to the beginning of the queue
+            return;
+        }
+
+        this._v_speakmsg.text = text;
+        speechSynthesis.speak(this._v_speakmsg);
+    }
+
     fn_speak(text) {
         if (!this._v_enable_speak || !text?.trim()) return;
 

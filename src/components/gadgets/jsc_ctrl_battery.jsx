@@ -5,9 +5,9 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 
 
 export class ClssCtrlBattery extends React.Component {
-    constructor()
+    constructor(props)
 	{
-		super ();
+		super (props);
 		    this.state = {
                 is_compact : true,
                 m_update: 0
@@ -20,6 +20,12 @@ export class ClssCtrlBattery extends React.Component {
     
     }
 
+
+    shouldComponentUpdate(nextProps, nextState) {
+        const update = (this.state.m_update != nextState.m_update);
+
+        return update;
+    }
 
     componentDidMount () 
     {
@@ -43,8 +49,11 @@ export class ClssCtrlBattery extends React.Component {
     {
         if (me.state.m_update === 0) return ;
         
-        me.state.is_compact = p_compact;
-        me.setState({'m_update': me.state.m_update +1});
+        // Use setState to update multiple state variables
+        me.setState((prevState) => ({
+            is_compact: p_compact,
+            m_update: prevState.m_update + 1
+        }));
     }
 
     fn_toggle()

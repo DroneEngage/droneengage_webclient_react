@@ -10,7 +10,7 @@ import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 import ClassSDRSpectrumVisualizer from './jsc_ctrl_sdr_spectrum.jsx'
 
-export class ClssCTRL_SDR extends React.Component {
+export class ClssCtrlSDR extends React.Component {
     constructor(props)
     {
         super(props);

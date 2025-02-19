@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import React from 'react';
 
-import { fn_do_modal_confirmation } from '../js/js_main_accounts.js'
 import { js_andruavAuth } from '../js/js_andruavAuth'
 import { js_localStorage } from '../js/js_localStorage'
 import { gui_alert } from '../js/js_main_accounts'
@@ -17,13 +16,17 @@ export default class ClssLoginControl extends React.Component {
 			btnConnectText: 'Login',
 			initialized: false,
 		};
+
+		this.m_emailRef = React.createRef();
+		this.m_accessRef = React.createRef();
+				
 	}
 
 
 	fn_EE_permissionReceived(me, params) {
 
 
-		js_localStorage.fn_setEmail($('#txtEmail').val());
+		js_localStorage.fn_setEmail(this.m_emailRef.current.value);
 		js_localStorage.fn_setAccessCode($('#txtAccessCode').val());
 
 		me.setState({ 'is_connected': true });
@@ -38,7 +41,7 @@ export default class ClssLoginControl extends React.Component {
 	}
 
 	fn_EE_permissionDeleted(me, params) {
-		js_andruavAuth.fn_retrieveLogin($('#txtEmail').val(), $('#txtAccessCode').val());
+		js_andruavAuth.fn_retrieveLogin(this.m_emailRef.current.value, $('#txtAccessCode').val());
 	}
 
 
@@ -63,7 +66,7 @@ export default class ClssLoginControl extends React.Component {
 
 		this.fn_validateCaptcha(() => {
 			const v_permission = '0xffffffff';
-			js_andruavAuth.fn_generateAccessCode($('#txtEmail').val(), v_permission);
+			js_andruavAuth.fn_generateAccessCode(this.m_emailRef.current.value, v_permission);
 		});
 	}
 
@@ -85,7 +88,7 @@ export default class ClssLoginControl extends React.Component {
 				v_permission = '0xffffffff';
 			}
 
-			js_andruavAuth.fn_regenerateAccessCode($('#txtEmail').val(), v_permission);
+			js_andruavAuth.fn_regenerateAccessCode(this.m_emailRef.current.value, v_permission);
 		});
 	}
 
@@ -117,7 +120,7 @@ export default class ClssLoginControl extends React.Component {
 
 		let login = "Access Code Generator";
 		if (this.state.is_connected === true) {
-			login += "ed - As " + $('#txtEmail').val();
+			login += "ed - As " + this.m_emailRef.current.value;
 		}
 		return (
 			<div>
@@ -125,7 +128,7 @@ export default class ClssLoginControl extends React.Component {
 				<div id='login_form' >
 					<div className="form-group al_l">
 						<label htmlFor="txtEmail" id="email">Email</label>
-						<input type="email" id="txtEmail" name="txtEmail" className="form-control" defaultValue={js_localStorage.fn_getEmail()} />
+						<input type="email" id="txtEmail" ref={this.m_emailRef} name="txtEmail" className="form-control" defaultValue={js_localStorage.fn_getEmail()} />
 					</div>
 					<br />
 				</div>

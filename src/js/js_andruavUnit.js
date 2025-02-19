@@ -701,8 +701,66 @@ class C_GUIHelper {
   }
 }
 
+class C_GPIO {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    this.m_gpios = {};
+  }
+
+  addGPIO(gpio_array) {
+    // Ensure gpio_array is an array
+    if (!Array.isArray(gpio_array)) {
+      console.error("Invalid input: gpio_array must be an array.");
+      return;
+    }
+
+    /*
+     Json_de json_gpio = {
+        {"b", gpio.pin_number},
+        {"m", gpio.pin_mode},
+        {"t", gpio.gpio_type},
+        {"v", gpio.pin_value},
+        {"d", gpio.pwm_width}
+      };
+
+
+    * PIN_MODE
+    * *    INPUT			        0
+    * *    OUTPUT			        1
+    * *    PWM_OUTPUT		      2
+    * *    PWM_MS_OUTPUT	    8
+    * *    PWM_BAL_OUTPUT     9
+    * *    GPIO_CLOCK		      3
+    * *    SOFT_PWM_OUTPUT		4
+    * *    SOFT_TONE_OUTPUT	  5
+    * *    PWM_TONE_OUTPUT		6
+    * *    PM_OFF		          7   // to input / release line
+    *
+    */
+      gpio_array.forEach(gpio => {
+        // Ensure required properties exist
+        if (gpio.b === undefined) {
+          console.warn("GPIO object missing required properties:", gpio);
+          return;
+        }
+  
+        const gpio_obj = {
+          pin_number: gpio.b,
+          pin_mode: gpio.m,
+          gpio_type: gpio.t,
+          pin_value: gpio.v,
+          pin_name: gpio.n,
+          pwm_width: gpio.d==null?0:gpio.d, 
+        };
+  
+        this.m_gpios[gpio.b] = gpio_obj;
+      });
+    }
+}
+
 class C_Modules {
   constructor(p_parent) {
+    this.m_parent = p_parent;
     this.has_fcb = false;
     this.has_camera = false;
     this.has_sound = false;
@@ -712,7 +770,14 @@ class C_Modules {
     this.m_list = [];
   }
 
-  addModules(jsonmodules) {
+  addModules(jsonModules) {
+
+    // Ensure jsonModules is an array
+    if (!Array.isArray(jsonModules)) {
+      console.error("Invalid input: jsonModules must be an array.");
+      return;
+    }
+
     // check uavos_camera_plugin
     /*
 		{"v", module_item->version},
@@ -721,8 +786,7 @@ class C_Modules {
 		{"t", module_item->time_stamp},
 		{"d", module_item->is_dead},
 		*/
-    for (let i = 0; i < jsonmodules.length; ++i) {
-      let module = jsonmodules[i];
+    jsonModules.forEach(module => {
       switch (module.c.toLowerCase()) {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
           this.has_fcb = true;
@@ -745,10 +809,12 @@ class C_Modules {
           break;
             
         default:
+          console.warn(`Unknown module class: ${module.c}`);
           break;
       }
-    }
-    this.m_list = jsonmodules;
+    });
+
+    this.m_list = jsonModules;
   }
 }
 /**
@@ -827,7 +893,6 @@ export class CAndruavUnitObject {
     this.m_IsMe = false;
     this.m_IsGCS = true;
     this.m_isDE = false; // is Drone Engage
-    this.m_IsShutdown = false;
     this.Description = "";
     this.m_inZone = null; // name of A ZONE  that the unit is IN.
     this.m_unitName = "unknown";
@@ -872,11 +937,13 @@ export class CAndruavUnitObject {
   init() {
     this.m_time_sync = 0; // time sent by unit so that you can use it to measrue other time fields sent by the same module.
     this.m_Permissions = "X0X0X0X0X0X0";
-    this.m_IsShutdown = false;
+    this.m_IsShutdown = false; // Drone Unit reports a shutdown
+    this.m_IsDisconnectedFromGCS = false; // Unit is connected to WebClient.
     this.m_WindSpeed = null;
     this.m_WindSpeed_z = null;
     this.m_WindDirection = null;
     this.m_modules = new C_Modules(this);
+    this.m_GPIOs = new C_GPIO(this);
     this.m_Messages = new C_Messages(this);
     this.m_Power = new C_Power(this);
     this.m_GPS_Info1 = new C_GPS(this);
@@ -974,7 +1041,7 @@ export class CAndruavUnitList {
       return Array.from(this.List.values()).sort((a, b) => {
           const idA = a.m_FCBParameters.m_systemID || 0;
           const idB = b.m_FCBParameters.m_systemID || 0;
-          return idA < idB;
+          return idA > idB;
       });
   }
  /**

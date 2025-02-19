@@ -7,26 +7,26 @@ import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {
      hlp_getFlightMode,
-     fn_isBadFencing, fn_switchGPS, fn_openFenceManager,
-     fn_convertToMeter, fn_changeAltitude} from '../../js/js_main.js'
+     fn_switchGPS, fn_openFenceManager
+     } from '../../js/js_main.js'
      
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 
 
-import {ClssCTRL_UDP_PROXY_TELEMETRY} from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
-import {ClssCTRL_HUD} from '../gadgets/jsc_ctrl_hudControl.jsx'
+import {ClssCtrlUDP_PROXY_TELEMETRY} from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
+import {ClssCtrlHUD} from '../gadgets/jsc_ctrl_hudControl.jsx'
 import {ClssCtrlDirections} from '../gadgets/jsc_ctrl_directionsControl.jsx'
-import {ClssCTRL_SWARM} from '../gadgets/jsc_ctrl_swarm.jsx'
-import {ClssCTRL_Drone_Speed_Ctrl} from '../gadgets/jsc_ctrl_speed_control.jsx'
-import {ClssCTRL_Drone_Altitude_Ctrl} from '../gadgets/jsc_ctrl_altitude_control.jsx'
+import {ClssCtrlSWARM} from '../gadgets/jsc_ctrl_swarm.jsx'
+import {ClssCtrlDrone_Speed_Ctrl} from '../gadgets/jsc_ctrl_speed_control.jsx'
+import {ClssCtrlDrone_Altitude_Ctrl} from '../gadgets/jsc_ctrl_altitude_control.jsx'
 
 
 /**
  * This is the MAIN tab control
  */
-export class ClssCTRL_Drone_IMU extends React.Component {
+export class ClssCtrlDroneIMU extends React.Component {
     constructor(props)
     {
         super(props);
@@ -266,7 +266,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
             const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
             const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
             v_yaw_text = 'HUD';
-            v_yaw_knob.push(<ClssCTRL_HUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} v_pitch={c_pitch} v_roll={c_roll} v_yaw={c_yaw}  title ='Pitch: {v_pitch}'/>);
+            v_yaw_knob.push(<ClssCtrlHUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} p_unit={v_andruavUnit}   title ='Pitch: {v_pitch}'/>);
           }
 
         if (v_andruavUnit.m_Nav_Info.p_Location.bearing==null)
@@ -279,9 +279,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
         else
         {
             v_bearing_text = 'bearing/target';
-            const c_target = v_andruavUnit.m_Nav_Info._Target.target_bearing ; 
-            const c_bearing = v_andruavUnit.m_Nav_Info.p_Desired.nav_bearing ;
-            v_bearing_knob.push(<ClssCtrlDirections key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} v_target={c_target} v_bearing={c_bearing} />);
+            v_bearing_knob.push(<ClssCtrlDirections key={v_andruavUnit.partyID + "_tb"} id={v_andruavUnit.partyID + "_tb"} p_unit={v_andruavUnit} />);
 
         }
 
@@ -386,7 +384,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                 <div key={'imu_1' + v_andruavUnit.partyID} id='imu_1' className= 'row al_l  css_margin_zero'>
                     <div key={'gs_ctrl' + v_andruavUnit.partyID}  className = 'row al_l css_margin_zero d-flex '>
                         <div key={'alt_ctrl1' + v_andruavUnit.partyID}  className= 'col-6 col-md-3 user-select-none  p-1'>
-                                <ClssCTRL_Drone_Speed_Ctrl p_unit={v_andruavUnit}/>
+                                <ClssCtrlDrone_Speed_Ctrl p_unit={v_andruavUnit}/>
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
                                 <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
@@ -401,7 +399,7 @@ export class ClssCTRL_Drone_IMU extends React.Component {
 
                     <div key={'alt_ctrl' + v_andruavUnit.partyID}   className = 'row al_l css_margin_zero d-flex '>
                         <div key='alt_ctrl1'  className= 'col-6 col-md-3 user-select-none  p-1'>
-                                  <ClssCTRL_Drone_Altitude_Ctrl p_unit={v_andruavUnit}/>
+                                  <ClssCtrlDrone_Altitude_Ctrl p_unit={v_andruavUnit}/>
                               
                         </div> 
                         <div key={'alt_ctrl2'  + v_andruavUnit.partyID} className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
@@ -430,9 +428,9 @@ export class ClssCTRL_Drone_IMU extends React.Component {
                                 </div>
                         </div>
                         <div key={'telem' + v_andruavUnit.partyID} className= 'col-3   padding_zero css_user_select_text'>
-                        <ClssCTRL_UDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
+                        <ClssCtrlUDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
                         <div key={'swarm' + v_andruavUnit.partyID} className= 'col-2   padding_zero'>
-                        <ClssCTRL_SWARM   key={'cswarm' + v_andruavUnit.partyID}  className='row padding_zero' p_unit={v_andruavUnit}/>
+                        <ClssCtrlSWARM   key={'cswarm' + v_andruavUnit.partyID}  className='row padding_zero' p_unit={v_andruavUnit}/>
                         </div>
                         
                     </div>

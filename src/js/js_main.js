@@ -1376,46 +1376,54 @@ function fn_handleKeyBoard() {
 			return v_res;
 		}
 
+		function deleteWayPointsofDrone(p_andruavUnit, p_wayPointArray)
+		{
+			gui_hideOldWayPointOfDrone (p_andruavUnit);
+			p_andruavUnit.m_wayPoint = {};
+			p_andruavUnit.m_wayPoint.wayPointPath = p_wayPointArray;
+			p_andruavUnit.m_gui.m_wayPoint_markers = [];
+			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
+		}
 
 		/***
 		* Hide but does not delete 
 		***/
-		function hlp_deleteOldWayPointOfDrone(p_andruavUnit) {
+		function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 			if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) return;
-			let markers = p_andruavUnit.m_gui.m_wayPoint_markers;
+			const markers = p_andruavUnit.m_gui.m_wayPoint_markers;
 			if (markers === null || markers === undefined) return;
 
 			let count = markers.length;
 			for (let i = 0; i < count; i++) {
-				let marker = markers[i];
+				const marker = markers[i];
 				js_leafletmap.fn_hideItem (marker);
 			}
 
-			let polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
+			const polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
 			if (polygons !== null && polygons !== undefined) {
 				count = polygons.length;
 				for (let i = 0; i < count; i++) {
-					let polygon = polygons[i];
+					const polygon = polygons[i];
 					js_leafletmap.fn_hideItem(polygon);
 				}
 			}
 
-			let polylines = p_andruavUnit.m_wayPoint.polylines;
+			const polylines = p_andruavUnit.m_wayPoint.polylines;
 			if (polylines !== null && polylines !== undefined) {
 				js_leafletmap.fn_hideItem(p_andruavUnit.m_wayPoint.polylines);
 				//p_andruavUnit.m_wayPoint.polylines.setMap(null);
 			}
 		}
 		function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
-			let keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
-			let size = keys.length;
+			const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
+			const size = keys.length;
 
 			for (let i = 0; i < size; ++i) {
 
 				let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 				if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 					if (p_andruavUnit.m_VehicleType === vehicleType) {
-						let marker = p_andruavUnit.m_gui.m_marker;
+						const marker = p_andruavUnit.m_gui.m_marker;
 						if (marker !== null && marker !== undefined) {
 							marker.setVisible(visible);
 						}
@@ -1968,19 +1976,19 @@ function fn_handleKeyBoard() {
 		}
 
 		var EVT_msgFromUnit_WayPoints = function (me, data) {
+
+			//// dont upload waypoints in map editor mode.
+			//if (js_globals.CONST_MAP_EDITOR) return ;
+
 			const p_andruavUnit = data.unit;
 			const wayPointArray = data.wps;
 
+			
 			// TODO HERE >>> DELETE OLD WAYPOINTS AND HIDE THEM FROM MAP
 			var LngLatPoints = [];
 
-			hlp_deleteOldWayPointOfDrone(p_andruavUnit);
-
-			p_andruavUnit.m_wayPoint = {};
-			p_andruavUnit.m_wayPoint.wayPointPath = wayPointArray;
-			p_andruavUnit.m_gui.m_wayPoint_markers = [];
-			p_andruavUnit.m_gui.m_wayPoint_polygons = [];
-
+			deleteWayPointsofDrone(p_andruavUnit, wayPointArray);
+			
 			if (wayPointArray.length === 0) return;
 			let latlng = null;
 			for (let i = 0; i < wayPointArray.length; ++i) {
@@ -2042,6 +2050,7 @@ function fn_handleKeyBoard() {
 						break;
 					default:
 						continue;
+						
 				}
 
 
@@ -2055,6 +2064,25 @@ function fn_handleKeyBoard() {
 					p_andruavUnit.m_gui.m_wayPoint_markers.push(v_mark);
 					v_mark.wayPointStep = wayPointStep;
 
+					if (js_globals.CONST_MAP_EDITOR)
+						{
+							// add to shapes list.
+							v_mark.pm.m_shape_type = 'Marker';
+							v_mark.on('click', function (p_event) {
+								if (p_event.originalEvent.ctrlKey===false)
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+								}
+								else
+								{
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, v_mark);
+								}
+							});
+							js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, v_mark)
+							js_globals.v_map_shapes.push(v_mark);
+							
+						}
+						
 					
 					function fn_clickHandler(p_wayPointStep, p_andruavUnit) {
 						js_leafletmap.fn_addListenerOnClickMarker (v_mark,
@@ -2159,60 +2187,32 @@ function fn_handleKeyBoard() {
 		}
 
 
-		function getDestinationPointIcon (p_point_type, p_vehicle_index)
+		function getDestinationPointIcon (p_andruavUnit)
 		{
-			switch (p_point_type)
+			const c_point_type = p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type;
+			const c_vehicle_index = p_andruavUnit.m_index%4;
+			switch (c_point_type)
 			{
 				case js_andruavMessages.CONST_DESTINATION_GUIDED_POINT:
 				return './images/destination_bg_32x32.png';
 				case js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION:
-				return js_globals.swarm_location_icon[p_vehicle_index];
+				{
+					switch (p_andruavUnit.m_VehicleType)
+					{
+						case js_andruavUnit.VEHICLE_PLANE:
+							return js_globals.swarm_plane_location_icon[c_vehicle_index];
+						case js_andruavUnit.VEHICLE_TRI: 
+						case js_andruavUnit.VEHICLE_QUAD:
+						case js_andruavUnit.VEHICLE_VTOL:
+						case js_andruavUnit.VEHICLE_ROVER:
+						default:
+							return js_globals.swarm_quad_location_icon[c_vehicle_index];
+					}
+				}
 			}
 		}
 
-		function getPlanIcon(bearingIndex, vehicle_index) {
-			return js_globals.planes_icon[vehicle_index];
-			switch (bearingIndex) {
-				case 0:
-				case 1:
-					return './images/planetracker_r_0d_.png';
-					break;
-				case 2:
-				case 3:
-					return './images/planetracker_r_45d_.png';
-					break;
-				case 4:
-				case 5:
-					return './images/planetracker_r_90_.png';
-					break;
-				case 6:
-				case 7:
-					return './images/planetracker_r_135d_.png';
-					break;
-				case -8:
-				case -7:
-					return './images/planetracker_r_180d_.png';
-					break;
-				case -6:
-				case -5:
-					return './images/planetracker_r_225d_.png';
-					break;
-				case -4:
-				case -3:
-					return './images/planetracker_r_270d_.png';
-					break;
-				case -2:
-				case -1:
-					return './images/planetracker_r_315d_.png';
-					break;
-				default:
-					return './images/planetracker_r_0d_.png';
-					break;
-
-
-			}
-		}
-
+		
 		export function getVehicleIcon(p_andruavUnit, applyBearing) {
 
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
@@ -2385,7 +2385,7 @@ function fn_handleKeyBoard() {
 
 
 				}
-				js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, null,[64,64]) ;
+				//js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, null,[64,64]) ;
 				js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
 				js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 			}
@@ -2517,7 +2517,7 @@ function fn_handleKeyBoard() {
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)
 			{
-				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type, p_andruavUnit.m_index%4), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
+				js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit), "Target of: " + p_andruavUnit.m_unitName, [16,48], false, false, p_andruavUnit.m_unitName, [32,32]);
 				p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 			}
 			

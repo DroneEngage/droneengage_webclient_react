@@ -1,8 +1,6 @@
-import $ from 'jquery';
 
 import React from 'react';
 
-import * as js_common from '../../js/js_common.js'
 
 /**
  * Properties:
@@ -42,12 +40,10 @@ export class CFieldChecked extends React.Component {
 
     componentDidUpdate() {
         if ((this.props.required === false) || (this.props.required === 'false')) {
-            //$(n + " :text").attr('disabled', 'disabled');
             this.m_value.setAttribute('disabled', 'disabled');
             this.m_check.checked = false;
         }
         else {
-            //$(n + " :text").removeAttr('disabled', true);
             this.m_value.removeAttribute('disabled');
             this.m_check.checked = true;
         }
