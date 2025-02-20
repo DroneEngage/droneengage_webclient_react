@@ -20,8 +20,8 @@
     "type": "git",
     "url": "git+https://github.com/DroneEngage/droneengage_webclient"
   },
-  "WEB_SSL_CRT": "/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_2/ssl/localssl.crt",
-  "WEB_SSL_KEY": "/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_2/ssl/localssl.key",
+  "WEB_SSL_CRT": "./ssl/localssl.crt",
+  "WEB_SSL_KEY": "./ssl/localssl.key",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "5.17.0",
