@@ -1,0 +1,4 @@
+00BC8C  Green
+3498DB  Blue
+E74C3C Red
+AEAEAE Gray 
