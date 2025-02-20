@@ -11,6 +11,8 @@ package-lock.json
 # production
 /build
 
+/ssl
+
 # misc
 .DS_Store
 .env.local
