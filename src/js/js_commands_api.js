@@ -257,7 +257,7 @@ export class CCommandAPI
         p_display_bars, p_trigger_level
     )
     {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return null;
         
         let p_msg = {
             'a': js_andruavMessages.CONST_SDR_ACTION_SET_CONFIG
@@ -393,6 +393,17 @@ export class CCommandAPI
 
         return msg;
     };
+    static API_FireDeEvent (p_andruavUnit, p_event_id) {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire,
+            'ms':  {
+                d: p_event_id.toString()
+            }
+        };
+
+        return msg;
+    }
 
 }
 

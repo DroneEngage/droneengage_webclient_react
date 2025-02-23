@@ -833,6 +833,7 @@ class CAndruavClient {
             p_decode_mode, p_driver_index, p_interval,
             p_display_bars, p_trigger_level
         );
+        if (cmd === null || cmd === undefined) return;
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
@@ -1254,12 +1255,9 @@ class CAndruavClient {
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
         }
-
-        const p_msg = {
-            d: p_event_id.toString()
-        };
-
-        this.API_sendCMD(c_party, js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire, p_msg);
+        
+        const cmd = CCommandAPI.API_FireDeEvent(p_andruavUnit, p_event_id);
+        this.API_sendCMD(c_party, cmd.mt, cmd.ms);
     }
 
     // CODEBLOCK_START
