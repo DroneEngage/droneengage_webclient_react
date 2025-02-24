@@ -1,2 +1,0 @@
-npm root -g
-pm2 start /root/.nvm/versions/node/v18.17.0/lib/node_modules/serve/build/main.js  -- -s build -l 8881 --ssl-cert /home/ap_cloud/ssl/fullchain.pem --ssl-key /home/ap_cloud/ssl/privkey.pem
