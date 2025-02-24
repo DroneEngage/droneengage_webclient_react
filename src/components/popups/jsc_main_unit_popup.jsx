@@ -41,49 +41,23 @@ export class ClssMainUnitPopup extends React.Component {
         let markerContent = [];
         let keyCounter = 0; // Counter to generate unique keys
     
-        // Create header
-        markerContent.push(
-            <p key={`${this.key}-pop-${keyCounter++}`} className='img-rounded bg-primary text-white'>
-                <strong className='css_padding_5'>{this.props.p_unit.m_unitName}</strong>
-                {this.props.p_unit.m_FCBParameters.m_systemID !== 0 && (
-                    <span key={`${this.key}-sys-${keyCounter++}`}>
-                        {'sysid:' + this.props.p_unit.m_FCBParameters.m_systemID}
-                    </span>
-                )}
-                <style className='img-rounded help-block'>{this.props.p_unit.Description}</style>
-            </p>
-        );
-    
-        // Is armed
-        const armedBadge = this.props.p_unit.m_isArmed ? (
-            <span key={`${this.key}-armed-${keyCounter++}`} className="text-danger">
-                &nbsp;<strong>ARMED</strong>&nbsp;
-            </span>
-        ) : (
-            <span key={`${this.key}-disarmed-${keyCounter++}`} className="text-success">
-                &nbsp;disarmed&nbsp;
-            </span>
-        );
-    
-        // Is flying
-        const flying = this.props.p_unit.m_isFlying ? (
-            <span key={`${this.key}-flying-${keyCounter++}`} className="text-danger">
-                &nbsp;flying&nbsp;
-            </span>
-        ) : (
-            <span key={`${this.key}-onground-${keyCounter++}`} className="text-success">
-                &nbsp;on-ground&nbsp;
-            </span>
-        );
-    
-        // Append armed and flying status
-        markerContent.push(
-            <p key={`${this.key}-status-${keyCounter++}`} className='m-0 p-0'>
-                {armedBadge} - {flying}
-            </p>
-        );
-    
-        // Append flight mode or GCS status
+        // is armed
+        let armedBadge;
+		if (this.props.p_unit.m_isArmed) armedBadge = <span className="text-danger">&nbsp;<strong>ARMED</strong>&nbsp;</span>;
+		else armedBadge = <span key={this.key + 'ar1'} className="text-success">&nbsp;disarmed&nbsp;</span>;
+		
+
+        // is flying
+        let flying;
+        if (this.props.p_unit.m_isFlying) flying = <span className="text-danger">&nbsp;flying&nbsp;</span>;
+		else flying = <span key={this.key + 'ar2'} className="text-success">&nbsp;on-ground&nbsp;</span>;
+
+
+        
+        // append is armed - flying
+        markerContent.push (<p key={this.key + 'pop111'}  className='m-0 p-0'>{armedBadge} - {flying}</p>);
+        
+        // append flying mode
         if (this.props.p_unit.m_IsGCS === false) {
             markerContent.push(
                 <p key={`${this.key}-flightmode-${keyCounter++}`} className='m-0 text-success'>
