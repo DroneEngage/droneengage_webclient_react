@@ -1925,7 +1925,10 @@ function fn_handleKeyBoard() {
 
 
 		var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
-
+			
+			// Live update is not allowed in Map Editor
+			if (js_globals.CONST_MAP_EDITOR === true) return ;
+				
 			const p_andruavUnit = data.unit;
 			const missionIndexReached = data.mir;
 			const status = data.status;
