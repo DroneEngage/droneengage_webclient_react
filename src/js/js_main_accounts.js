@@ -19,11 +19,6 @@ export function gui_alert(title,message,level)
 			 $('#alert').show();
 		 }
 
-		 function gui_alert_hide()
-		 {
-			 $('#alert').hide();
-		 }
-
 
     export function fn_do_modal_confirmation (p_title,p_message,p_callback,p_yesCaption,p_style)
     {
@@ -49,13 +44,6 @@ export function gui_alert(title,message,level)
     }
 
 
-    function  fn_clickRegenerate () {
-			
-        js_localStorage.setEmail($('#txtEmail').val());
-        js_localStorage.setAccessCode($('#txtAccessCode').val());
-        
-        window.AndruavLibs.AndruavPermissions.fn_regenerateLoginAfterLogin($('#txtEmail').val(),$('#txtAccessCode').val());
-    }
     
     export function fn_on_account_ready()
     {

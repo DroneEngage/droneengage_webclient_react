@@ -4,7 +4,7 @@ import { js_globals } from '../../js/js_globals.js'
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_leafletmap } from '../../js/js_leafletmap'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
-import { fn_doFlyHere, fn_doCircle2, fn_doSetHome, fn_convertToMeter } from '../../js/js_main'
+import { fn_doFlyHere, fn_doSetHome } from '../../js/js_main'
 
 // Registration and Regeneration Control
 export class ClssMainContextMenu extends React.Component {

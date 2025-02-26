@@ -121,23 +121,6 @@ export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
         v_altitude_text = v_altitude + '/' + v_altitude_abs;    
 
 
-        let v_speed_text = "";
-        const ground_speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-        if ( ground_speed === null || ground_speed === undefined) {
-            v_speed_text = 'NA';
-        } else {
-            v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-            v_andruavUnit.m_gui.speed_link = true;
-            if (js_globals.v_useMetricSystem === true) {
-                v_speed_text = v_speed_text.toFixed(0) + ' m/s';
-            }
-            else {
-                v_speed_text = (v_speed_text * js_helpers.CONST_METER_TO_MILE).toFixed(0) + ' mph';
-            }
-
-        }
-
-
         return (
                 <p id='alt' className={this.props.className + ' rounded-3 cursor_hand textunit_att_btn text-warning '} >
                     <span title={"decrease altitude"} onClick={(e) => this.fn_doChangeAltitudeByStep(v_andruavUnit.m_Nav_Info.p_Location.alt_relative - fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()))}>

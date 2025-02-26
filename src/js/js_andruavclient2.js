@@ -2338,8 +2338,6 @@ class CAndruavClient {
                         return;
                     
                     // this is a system command
-                    let fencetype;
-                    let m_shouldKeepOutside = false;
                     p_jmsg = msg.msgPayload;
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
@@ -2826,18 +2824,7 @@ class CAndruavClient {
                 case mavlink20.MAVLINK_MSG_ID_HEARTBEAT:
                     return true;
                 break;
-                case mavlink20.MAVLINK_MSG_ID_PARAM_REQUEST_READ:
-                    let  c_mst = null;
-                    if (c_mavlinkMessage.param_id[0] === '\x00')
-                    {
-                        c_mst = p_unit.m_FCBParameters.m_list_by_index[c_mavlinkMessage.param_index];
-                    }
-                    else
-                    {
-                        c_mst = p_unit.m_FCBParameters.m_list[c_mavlinkMessage.param_id];
-                    }
-                     
-                break;
+                
 
                 case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
                 {

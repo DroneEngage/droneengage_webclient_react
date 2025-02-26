@@ -9,7 +9,7 @@ import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { js_leafletmap } from '../../../js/js_leafletmap.js'
 import {ClssSingle_Mission_Container} from './jsc_ctrl_single_mission_container.jsx'
-import {setSelectedMissionFilePathToRead, fn_readMissionFile} from '../../../js/js_main.js'
+import {setSelectedMissionFilePathToRead} from '../../../js/js_main.js'
 
 /**
  * Main Class for Mission 
