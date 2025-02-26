@@ -90,39 +90,38 @@ class CAndruavClient {
     
 
     _fn_checkStatus() {
-
-        
         const now = Date.now();
         const units = js_globals.m_andruavUnitList.fn_getUnitValues();
-        if (units===null || units === undefined) return ;
+        if (!units) return; 
+    
         units.forEach((unit) => {
-            if (unit.m_IsDisconnectedFromGCS) return; // skip self.
-            
+            if (unit.m_IsDisconnectedFromGCS) return; // Skip self.
+    
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
-
-            if ((!unit.m_IsShutdown) && (!unit.m_IsDisconnectedFromGCS))
-            {
-                if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true)
-                {
+    
+            if (!unit.m_IsShutdown) {
+                if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true) {
                     js_globals.v_andruavClient.API_do_GetHomeLocation(unit);
                 }
+    
                 if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
                     this.API_requestID(unit.partyID);
-                } 
-
-                return ;
-            }
-
-            if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
-                if (unit.m_IsDisconnectedFromGCS !== true)
-                {
-                    unit.m_IsDisconnectedFromGCS = true;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
-                    return ;
+                }
+            } else { // Handle shutdown units
+                if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
+                    if (!unit.m_IsDisconnectedFromGCS) {
+                        unit.m_IsDisconnectedFromGCS = true;
+                        js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                    }
                 }
             }
+    
+            // Check for disconnection regardless of shutdown status
+            if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1 && !unit.m_IsDisconnectedFromGCS) {
+                unit.m_IsDisconnectedFromGCS = true;
+                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
             }
-        );
+        });
     }
 
     // EVENT HANDLER AREA
