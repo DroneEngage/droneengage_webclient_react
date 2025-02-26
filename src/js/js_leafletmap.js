@@ -87,7 +87,7 @@ class CLeafLetAndruavMap {
         }
         else
         {
-            L.tileLayer(js_globals.VAR_MAP_LEAFLET_URL, {
+            L.tileLayer(js_siteConfig.CONST_MAP_LEAFLET_URL, {
                 maxZoom: 22,
                 attribution: v_site_copyright,
                 id: 'mapbox.streets'
