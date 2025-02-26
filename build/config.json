@@ -1,0 +1,37 @@
+{
+    "CONST_TEST_MODE": false,
+    "CONST_PROD_MODE_IP": "airgap.droneengage.com",
+    "CONST_PROD_MODE_PORT": "19408",
+    "CONST_TEST_MODE_IP": "127.0.0.1",
+    "CONST_TEST_MODE_PORT": "19408",
+
+/**
+ * This is for disable experimental features.
+ * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
+ */
+    "CONST_FEATURE" :{
+        "DISABLE_UNIT_NAMING": false,
+        "DISABLE_UDPPROXY_UPDATE": false,
+        "DISABLE_SWARM": false,
+        "DISABLE_SWARM_DESTINATION_PONTS": false,
+        "DISABLE_P2P": false,
+        "DISABLE_SDR": false,
+        "DISABLE_GPIO": false,
+        "DISABLE_VOICE": false
+    },
+
+// CHOOSE YOUR MAP SOURCE
+"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
+//export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+//export let CONST_MAP_LEAFLET_URL = "https://airgap.droneengage.com:88/{x}_{y}_{z}.jpeg" //LOCAL MAP
+//export let CONST_MAP_LEAFLET_URL = "http://127.0.0.1:9991/{x}_{y}_{z}.jpeg" //LOCAL MAP
+
+
+/**
+ * WEBRTC Video Streaming Settings
+ */
+    "CONST_ICE_SERVERS": [
+        { "urls": "turn:cloud.ardupilot.org", "credential": "1234", "username": "andruav_ap" },
+        { "urls": "stun:stun1.l.google.com:19302" }
+    ]
+}
