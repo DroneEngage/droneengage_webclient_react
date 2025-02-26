@@ -4,7 +4,6 @@
     30 Aug 2024
 
 *****************************************************/
-import * as js_helpers from './js_helpers.js'
 import {js_globals} from './js_globals.js';
 
 import * as js_andruavMessages from './js_andruavMessages.js'

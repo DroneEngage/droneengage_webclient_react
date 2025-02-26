@@ -63,7 +63,6 @@ export  class ClssRX_MESSAGE  extends React.Component {
             {
                 js_andruavMessages.message_names[key] = key;
             }
-            let key_val = i.toString();
             
             msg.push(
                 <tr key={key + i}>

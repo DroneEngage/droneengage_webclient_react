@@ -2,7 +2,6 @@ import React    from 'react';
 
 
 import * as js_helpers from '../../js/js_helpers.js'
-import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
 import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
@@ -13,8 +12,7 @@ import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 import {
     fn_changeUnitInfo,
     fn_gotoUnit_byPartyID,
-    toggleVideo, 
-    toggleRecrodingVideo} from '../../js/js_main.js'
+    } from '../../js/js_main.js'
 
 
 

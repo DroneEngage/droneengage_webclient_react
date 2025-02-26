@@ -49,7 +49,6 @@ export class ClssCtrlAUDIO extends React.Component {
     render ()
     {
         let css_txt_channel_ws_offline = ' text-white bg-danger ';
-        const v_speech_disabled = false;
         const  v_andruavUnit = this.props.p_unit;
         let v_vol_disabled;
         if (v_andruavUnit.m_isDE === false)

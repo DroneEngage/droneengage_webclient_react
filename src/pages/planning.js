@@ -14,7 +14,6 @@ import React , { useEffect } from 'react';
 import {js_globals} from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
-import ClssGlobalSettings from '../components/jsc_globalSettings'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
 import {fn_on_ready} from '../js/js_main'

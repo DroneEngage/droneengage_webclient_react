@@ -5,9 +5,7 @@ import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import { mavlink20, MAVLink20Processor } from '../../js/js_mavlink_v2.js'
-import {fn_gotoUnit_byPartyID, fn_doYAW} from '../../js/js_main.js'
-import * as js_helpers from '../../js/js_helpers.js';
+import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
 import {ClssCtrlLidarDevice} from '../gadgets/jsc_ctrl_lidar_device.jsx'
 
