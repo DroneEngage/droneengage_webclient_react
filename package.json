@@ -47,7 +47,8 @@
     "react-simple-captcha": "^9.3.1",
     "recordrtc": "^5.6.2",
     "underscore": "^1.13.6",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webpack": "^4.42.0"
   },
   "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=$WEB_SSL_KEY SSL_KEY_FILE=$WEB_SSL_KEY react-scripts start",
