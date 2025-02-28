@@ -17,6 +17,8 @@ export default class ClssMission_Container extends React.Component {
             is_connected: false
         };
 
+        this.m_active_id = 0;
+        
         this.mission_file_ref = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -44,12 +46,17 @@ export default class ClssMission_Container extends React.Component {
     }
 
     fn_onMissionItemToggle(me, p_params) {
+        
+        const c_mission = p_params.p_mission;
+
         if (p_params.p_switch_next) {
             // switch to next mission
-            js_mapmission_planmanager.fn_activateNextMission(p_params.p_mission.m_id);
+            js_mapmission_planmanager.fn_activateNextMission(c_mission.m_id);
+            me.m_active_id = c_mission.m_id;
         } else {
             // make this the current mission
-            js_mapmission_planmanager.fn_setCurrentMission(p_params.p_mission.m_id);
+            js_mapmission_planmanager.fn_setCurrentMission(c_mission.m_id);
+            me.m_active_id = c_mission.m_id;
         }
 
         if (me.state.m_update === 0) return;
@@ -119,12 +126,12 @@ export default class ClssMission_Container extends React.Component {
         let item_details = [];
 
         let v_mission1 = js_mapmission_planmanager.fn_getCurrentMission();
-        let c_active = false;
 
         if (this.state.is_connected && this.state.p_plans && this.state.p_plans.length > 0) {
             this.state.p_plans.forEach((v_plan) => {
+                
                 const c_id = v_plan.m_id;
-                c_active = v_plan.m_id === v_mission1.m_id;
+                const c_active = c_id === this.m_active_id;
 
                 item_header.push(
                     <li key={"mstpt" + c_id} className="nav-item">
@@ -133,7 +140,7 @@ export default class ClssMission_Container extends React.Component {
                             data-bs-toggle="tab"
                             href={"#mstpd_" + c_id}
                         >
-                            <span>{v_plan.m_id}</span>
+                            <i className="bi bi-geo-alt-fill location-icon" style={{ color: v_plan.m_pathColor }} ></i><span className={c_active?'animate_iteration_3s blink_warning':'text-light' } >{`P${v_plan.m_id}-(${(v_plan.fn_getMissionDistance() / 1000.0).toFixed(1)} km)`}</span>
                         </a>
                     </li>
                 );
