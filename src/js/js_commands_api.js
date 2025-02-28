@@ -435,5 +435,18 @@ export class CCommandAPI
 
         return msg;
     }
+
+    static API_requestGeoFencesAttachStatus(p_andruavUnit, p_fenceName) {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
+                ...(p_fenceName && { fn: p_fenceName })
+            }
+        };
+        
+        return msg;
+    }
 }
 
