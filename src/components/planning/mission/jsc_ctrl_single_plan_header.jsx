@@ -24,7 +24,7 @@ import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_
  * onSelectUnit
  * 
  */
-export class ClssSingle_Mission_Header extends React.Component {
+export class ClssSingle_Plan_Header extends React.Component {
 
 
     constructor() {
