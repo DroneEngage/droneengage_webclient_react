@@ -49,10 +49,10 @@ export default class ClssMain_Control_Buttons extends React.Component {
 
             // Enable mission controls
             js_leafletmap.fn_enableDrawMarker(true);
-            js_leafletmap.fn_enableDrawLine(false);
-            js_leafletmap.fn_enableDrawCircle(false);
-            js_leafletmap.fn_enableDrawPolygon(false);
-            js_leafletmap.fn_enableDrawRectangle(false);
+            js_leafletmap.fn_enableDrawLine(true);
+            js_leafletmap.fn_enableDrawCircle(true);
+            js_leafletmap.fn_enableDrawPolygon(true);
+            js_leafletmap.fn_enableDrawRectangle(true);
         
 
         this.setState({ activeTab: 'missions' });
@@ -107,7 +107,24 @@ export default class ClssMain_Control_Buttons extends React.Component {
 
             <div ref={this.missionControlRef} id="c_missioncontrol_section" className="row" style={{ display: this.state.activeTab === 'missions' ? 'block' : 'none' }}>
                 <div id="c_missioncontrol" className="col col-sm-12 container-fluid localcontainer">
-                    <ClssMission_Container />
+                   <div className="row">
+                    <div className="col col-sm-12">
+                        <h5 className="text-center">Geo Fence</h5>
+                        <div className="row">
+                            <div className="col col-sm-12">
+                                <ClssFence_Shape_Control />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col col-sm-12">
+                        <h5 className="text-center">Mission Plans</h5>
+                        <div className="row">
+                            <div className="col col-sm-12">
+                                <ClssMission_Container />
+                            </div>
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
 
