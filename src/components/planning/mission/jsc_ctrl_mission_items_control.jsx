@@ -45,8 +45,10 @@ export default class ClssMission_Container extends React.Component {
 
     fn_onMissionItemToggle(me, p_params) {
         if (p_params.p_switch_next) {
+            // switch to next mission
             js_mapmission_planmanager.fn_activateNextMission(p_params.p_mission.m_id);
         } else {
+            // make this the current mission
             js_mapmission_planmanager.fn_setCurrentMission(p_params.p_mission.m_id);
         }
 
@@ -54,25 +56,39 @@ export default class ClssMission_Container extends React.Component {
         me.setState({ m_update: me.state.m_update + 1 });
     }
 
+
     fn_onShapeCreated(me, p_shape) {
+        js_common.fn_console_log("fn_onShapeCreated: " + p_shape);
+
         if (p_shape.pm.m_shape_type !== 'Marker') return;
 
         let v_mission = js_mapmission_planmanager.fn_getCurrentMission();
         v_mission.fn_addMarker(p_shape);
     }
 
+
+    /**
+     * 
+     * @param {*} me 
+     * @param {*} p_event 
+     *      p_event
+            { 
+                latlng: { lat, lng}
+                target: shape
+            }
+    */
     fn_onShapeSelected(me, p_event) {
         // Handle shape selection
     }
 
     fn_onShapeEdited(me, p_shape) {
-        if (p_shape.m_main_de_mission == null) return;
+        if (p_shape.m_main_de_mission == null) return; // geo fence not mission
         p_shape.m_main_de_mission.fn_updatePath(true);
     }
 
     fn_onShapeDeleted(me, p_shape) {
-        if (p_shape == null) return;
-        if (p_shape.m_main_de_mission == null) return;
+        if (p_shape === null || p_shape === undefined ) return ;
+        if (p_shape.m_main_de_mission == null) return; // geo fence not mission
         p_shape.m_main_de_mission.fn_deleteMe(p_shape);
     }
 
@@ -83,6 +99,9 @@ export default class ClssMission_Container extends React.Component {
         this.setState({ p_plans: [...this.state.p_plans, v_missionPlan] });
     }
 
+
+
+
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onMissionItemToggle, this);
@@ -90,9 +109,11 @@ export default class ClssMission_Container extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeSelected, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeEdited, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeDeleted, this);
+
     }
 
     render() {
+
         let item = [];
         let item_header = [];
         let item_details = [];
@@ -190,4 +211,5 @@ export default class ClssMission_Container extends React.Component {
             </div>
         );
     }
-}
+};
+
