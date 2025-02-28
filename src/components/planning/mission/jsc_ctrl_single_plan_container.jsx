@@ -105,8 +105,6 @@ export  class ClssSingle_Plan_Container extends React.Component {
         const andruavSelectedUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_party_id);
 
         let item = [];
-        let item_header = [];
-        let item_details = [];
         
         if (this.props.p_missionPlan == null) {
             item.push(<h4 key="mi"></h4>);
