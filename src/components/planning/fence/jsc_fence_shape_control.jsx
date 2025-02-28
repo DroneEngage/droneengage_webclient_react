@@ -189,7 +189,7 @@ class ClssPolygonControl extends ClssShapeControl {
         return (
 
             <div key={this.props.shape.id} id="geo" className="card text-white bg-primary mb-3">
-                <h4 className="card-header text-center">Circle Fence</h4>
+                <h4 className="card-header text-center">Polygon Fence</h4>
                 <div className="card-body">
                 <div className="form-group">
                     <label>Name</label>
@@ -509,7 +509,7 @@ export default class ClssFence_Shape_Control extends React.Component {
         || ((this.state.m_shape.m_geofenceInfo !== null && this.state.m_shape.m_geofenceInfo !== undefined) && (this.state.m_shape.m_geofenceInfo.m_deleted === true))
         )
         {
-            v_unit.push (<h4 key='FCSCtrl1' >Please Select A Shape</h4>);
+            v_unit.push (<h6 key='FCSCtrl1' >Please Select A Shape</h6>);
         }
         else
         {
