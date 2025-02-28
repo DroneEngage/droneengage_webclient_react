@@ -7,12 +7,12 @@ import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { ClssSingle_Mission_Card } from './jsc_ctrl_single_mission_card.jsx'
 
-import {ClssSingle_Mission_Header} from './jsc_ctrl_single_mission_header.jsx'
+import {ClssSingle_Plan_Header} from './jsc_ctrl_single_plan_header.jsx'
 
 /**
  * Contains a Single Mission All Controls
  */
-export  class ClssSingle_Mission_Container extends React.Component {
+export  class ClssSingle_Plan_Container extends React.Component {
 
     constructor() {
         super();
@@ -105,6 +105,8 @@ export  class ClssSingle_Mission_Container extends React.Component {
         const andruavSelectedUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_party_id);
 
         let item = [];
+        let item_header = [];
+        let item_details = [];
         
         if (this.props.p_missionPlan == null) {
             item.push(<h4 key="mi"></h4>);
@@ -119,7 +121,7 @@ export  class ClssSingle_Mission_Container extends React.Component {
                 });
             }
             item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer " + c_borderStyle}>
-                <ClssSingle_Mission_Header p_mission={this.props.p_missionPlan} p_isCollapsed={this.state.m_collapsed}  p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
+                <ClssSingle_Plan_Header p_mission={this.props.p_missionPlan} p_isCollapsed={this.state.m_collapsed}  p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
                 <ClssSingle_Mission_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} p_unit={andruavSelectedUnit} />
             </div>);
         }
