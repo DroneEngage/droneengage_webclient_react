@@ -1120,6 +1120,8 @@ class CAndruavClient {
 
 
     API_requestGeoFences(p_andruavUnit, p_fenceName) {
+        if (!p_andruavUnit?.partyID) return ;
+        
         let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence
 
@@ -1133,17 +1135,14 @@ class CAndruavClient {
 
 
     API_requestGeoFencesAttachStatus(p_andruavUnit, p_fenceName) {
-        let v_msg = {
-            C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
-
-        };
-        if (p_fenceName !== null && p_fenceName !== undefined) {
-            v_msg.fn = p_fenceName;
-        }
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-
-
+        
+        const c_party = p_andruavUnit?.partyID;
+        if (!c_party) return ;
+        
+        
+        const cmd = CCommandAPI.API_requestGeoFencesAttachStatus(c_party, p_fenceName);
+        
+        this.API_sendCMD(c_party, cmd.mt, cmd.ms);
     };
 
 
@@ -1223,15 +1222,8 @@ class CAndruavClient {
 
         const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
         
-        let p_msg = {
-            C: js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA
-
-        };
-        if (p_fenceName !== null && p_fenceName !== undefined) {
-            p_msg.fn = p_fenceName;
-        }
-        
         const cmd = CCommandAPI.API_requestDeleteFenceByName(c_party, p_fenceName);
+        
         this.API_sendCMD(c_party, cmd.mt, cmd.ms);
        
     };

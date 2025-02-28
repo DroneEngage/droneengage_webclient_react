@@ -1804,6 +1804,7 @@ function fn_handleKeyBoard() {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 			js_globals.v_andruavClient.API_do_GetHomeLocation(p_andruavUnit);
 			js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit, fromFCB);
+			js_globals.v_andruavClient.API_requestGeoFencesAttachStatus(p_andruavUnit);
 		}
 
 		export function fn_clearWayPoints(p_andruavUnit) {
