@@ -82,14 +82,6 @@ export class ClssSingle_Plan_Header extends React.Component {
     fn_onClick(e) {
         if (this.props.onHeaderClick === null || this.props.onClick === undefined) return ;
 
-        // if (this.state.is_collapsed === true)
-        // {
-        //     this.setState({is_collapsed: false});
-        // }
-        // else
-        // {
-        //     this.setState({is_collapsed: true});
-        // }
         this.props.onClick(e);
     }
 
@@ -142,10 +134,6 @@ export class ClssSingle_Plan_Header extends React.Component {
 
 
     componentDidUpdate() {
-        // if ((this.props.p_mission.m_hidden === true) && (this.props.p_isCurrent === true)) {
-        //     // display path if group is ACVTIE NOW and was hidden.
-        //     //this.fn_togglePath();
-        // }
     }
 
     render() {
@@ -164,8 +152,6 @@ export class ClssSingle_Plan_Header extends React.Component {
 
 
         if (this.props.p_isCurrent === true && this.props.p_isCollapsed === false) {
-           // const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
-
 
             v_item.push(
 
@@ -175,7 +161,6 @@ export class ClssSingle_Plan_Header extends React.Component {
                 </div>
 
             );
-
 
             if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
                 v_partyIDCtrl.push(
@@ -191,9 +176,7 @@ export class ClssSingle_Plan_Header extends React.Component {
             if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
                 // overwrite with this if public version 
                 v_partyIDCtrl = [];
-
             }
-
         }
 
 

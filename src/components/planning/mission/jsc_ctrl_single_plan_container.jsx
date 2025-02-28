@@ -5,8 +5,8 @@ import * as js_common from '../../../js/js_common.js'
 
 import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
-import { ClssSingle_Mission_Card } from './jsc_ctrl_single_mission_card.jsx'
 
+import { ClssSingle_Mission_Card } from './jsc_ctrl_single_mission_card.jsx'
 import {ClssSingle_Plan_Header} from './jsc_ctrl_single_plan_header.jsx'
 
 /**
