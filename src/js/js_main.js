@@ -1805,14 +1805,14 @@ function fn_handleKeyBoard() {
 			js_globals.v_andruavClient.API_requestWayPoints(p_andruavUnit, fromFCB);
 		}
 
-		export function fn_clearWayPoints(p_andruavUnit, p_fromFCB) {
+		export function fn_clearWayPoints(p_andruavUnit) {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 	
 			fn_do_modal_confirmation("Delete Mission for " + p_andruavUnit.m_unitName,
-				"Are you sure you want to delete mission?", function (p_approved) {
+				"Are you sure you want to delete mission & geo-fences", function (p_approved) {
 					if (p_approved === false) return;
-					js_globals.v_andruavClient.API_clearWayPoints(p_andruavUnit, p_fromFCB);
-	
+					js_globals.v_andruavClient.API_requestDeleteWayPoints(p_andruavUnit);
+					js_globals.v_andruavClient.API_requestDeleteFenceByName(p_andruavUnit);
 				}, "YES", "bg-danger text-white");
 		}
 

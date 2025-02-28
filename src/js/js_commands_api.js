@@ -393,6 +393,8 @@ export class CCommandAPI
 
         return msg;
     };
+    
+    
     static API_FireDeEvent (p_andruavUnit, p_event_id) {
         const msg = 
         {
@@ -405,5 +407,33 @@ export class CCommandAPI
         return msg;
     }
 
+
+    static API_requestDeleteWayPoints(p_andruavUnit) {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_RemoteCommand_CLEAR_WAY_POINTS
+            }
+        };
+
+        return msg;
+    }
+
+    static API_requestDeleteFenceByName(p_andruavUnit, p_fenceName) {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA
+            }
+        };
+        
+        if (p_fenceName !== null && p_fenceName !== undefined) {
+            msg.fn = p_fenceName;
+        }
+
+        return msg;
+    }
 }
 

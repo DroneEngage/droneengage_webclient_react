@@ -1206,20 +1206,34 @@ class CAndruavClient {
         this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveTasks, c_msg);
     }
 
-    API_clearWayPoints(p_andruavUnit, p_enableFCB) {
+    API_requestDeleteWayPoints(p_andruavUnit) {
 
+        // DO NOT Send this command globally to all units. It is a unit specific command.
+        // TODO: Restrict this from SERVER
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        const v_msg = {
-            C: js_andruavMessages.CONST_RemoteCommand_CLEAR_WAY_POINTS
+        const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
+        
+        const cmd = CCommandAPI.API_requestDeleteWayPoints(p_andruavUnit);
+        this.API_sendCMD(c_party, cmd.mt, cmd.ms);
+    };
+
+
+    API_requestDeleteFenceByName(p_andruavUnit, p_fenceName) {
+
+        const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
+        
+        let p_msg = {
+            C: js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA
 
         };
-        if (p_enableFCB === false) 
-            return;
+        if (p_fenceName !== null && p_fenceName !== undefined) {
+            p_msg.fn = p_fenceName;
+        }
         
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-
+        const cmd = CCommandAPI.API_requestDeleteFenceByName(c_party, p_fenceName);
+        this.API_sendCMD(c_party, cmd.mt, cmd.ms);
+       
     };
 
 
@@ -1346,21 +1360,6 @@ class CAndruavClient {
         };
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
-    };
-
-
-    API_requestDeleteWayPoint(p_PartyID, p_fenceName) {
-
-        let p_msg = {
-            C: js_andruavMessages.CONST_RemoteCommand_CLEAR_WAY_POINTS
-
-        };
-        if (p_fenceName !== null && p_fenceName !== undefined) {
-            p_msg.fn = p_fenceName;
-        }
-
-
-        this.API_sendCMD(p_PartyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
     };
 
 

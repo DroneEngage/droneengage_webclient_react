@@ -305,7 +305,11 @@ export class ClssAndruavMissionPlan {
     }
   }
 
-  fn_exportToJSONAndruav(p_missionV110, p_PartyID) {
+  fn_exportToJSONAndruav(p_missionV110, p_andruavUnit) {
+
+    const c_party = p_andruavUnit!=null?p_andruavUnit.partyID:null;
+        
+        
     if (this.p_all_missions.length === 0) return;
 
     // Delete Old Shapes
@@ -315,18 +319,18 @@ export class ClssAndruavMissionPlan {
         js_globals.v_andruavClient !== undefined &&
         js_globals.v_andruavClient.fn_isRegistered() === true
       ) {
-        js_globals.v_andruavClient.API_requestDeleteWayPoint(p_PartyID, null); // deattach drones from all fences in the group
+        js_globals.v_andruavClient.API_requestDeleteFenceByName(c_party, null); // deattach drones from all fences in the group
         js_globals.v_andruavClient.API_disableWayPointTasks(
           js_andruavAuth.m_username,
           js_globals.v_andruavClient.m_groupName,
-          p_PartyID,
+          c_party,
           "_drone_",
           1
         );
         js_globals.v_andruavClient.API_saveWayPointTasks(
           js_andruavAuth.m_username,
           js_globals.v_andruavClient.m_groupName,
-          p_PartyID,
+          c_party,
           "_drone_",
           1,
           p_missionV110
