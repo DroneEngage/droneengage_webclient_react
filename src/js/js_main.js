@@ -164,7 +164,8 @@ function fn_handleKeyBoard() {
             }
         }
 		
-		if (p_event.target.type !== 'textarea')
+		if ((p_event.target.type !== 'textarea') 
+			&& (p_event.target.type !== 'text'))
 		{
 			if (p_event.key.toLowerCase() === 'm') {
 				fn_showMap();
