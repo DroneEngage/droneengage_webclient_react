@@ -98,7 +98,20 @@ class GLOBALS {
 		this.v_mission_file_extension = '.de';
 
 		// map Color Selection
-		this.v_colorDrawPathes = ['#D9524F', '#337AB7', '#62D284', '#F0AD4E'];
+		this.v_colorDrawPathes = [
+			'#FF5733', // Vivid Orange-Red (XYZ)
+			'#33FF57', // Bright Lime Green (ZYX)
+			'#5733FF', // Deep Blue-Violet (YZX)
+			'#FF33C7', // Magenta-Pink (XZY)
+			'#33C7FF', // Cyan-Blue (ZXY)
+			'#C7FF33', // Chartreuse Yellow (YXZ)
+			'#FFC733', // Golden Yellow
+			'#33FFC7', // Sea Green
+			'#C733FF', // Purple
+			'#3357FF', // Darker Blue
+			'#FF3357', // Darker Red
+			'#57FF33'  // Lighter Green
+		];
 
 		//////////////////////////////////
 		//LOCAL EVENTS

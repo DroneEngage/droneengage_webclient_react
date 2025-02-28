@@ -40,6 +40,8 @@ export class ClssSingle_Plan_Header extends React.Component {
         };
 
         this.key = Math.random().toString();
+        this.pc_Ref = React.createRef();
+        this.cp_Ref = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_globals.EE_mapMissionUpdate, this, this.fn_missionUpdated);
     }
@@ -47,6 +49,8 @@ export class ClssSingle_Plan_Header extends React.Component {
 
     componentDidMount () {
         this.state.m_update = 1;
+        this.pc_Ref.current.style.backgroundColor = this.props.p_mission.m_pathColor;
+    
     }
     
     fn_onSocketStatus(me, params) {
@@ -68,11 +72,12 @@ export class ClssSingle_Plan_Header extends React.Component {
     
     fn_changeColor() {
         if (this.props.p_ParentCtrl.props.p_missionPlan != null) {
-            const c_path_color = $('#cp_' + this.props.p_mission.m_id).val();
+            const c_path_color = this.cp_Ref.current.value; 
             this.props.p_mission.fn_drawStyle(c_path_color);
             this.props.p_mission.fn_updatePath(true);
         }
-        $('#pc_' + this.props.p_mission.m_id).css("background-color", $('#cp_' + this.props.p_mission.m_id).val());
+        this.pc_Ref.current.style.backgroundColor = this.cp_Ref.current.value;
+        this.props.p_mission.m_pathColor = this.cp_Ref.current.value;
     }
 
     /**
@@ -106,7 +111,7 @@ export class ClssSingle_Plan_Header extends React.Component {
      * @param {*} e 
      */
     fn_simClick(e) {
-        $('#cp_' + this.props.p_mission.m_id).trigger( "click" ); 
+        this.cp_Ref.current.click();
     }
 
     fn_onSelectUnit(partyID) {
@@ -128,10 +133,7 @@ export class ClssSingle_Plan_Header extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_mapMissionUpdate, this);
     }
 
-    componentDidMount() {
-        $('#pc_' + this.props.p_mission.m_id).css("background-color", this.props.p_mission.m_pathColor);
-    }
-
+    
 
     componentDidUpdate() {
     }
@@ -186,8 +188,8 @@ export class ClssSingle_Plan_Header extends React.Component {
                 <div className="form-inline  margin_zero padding_zero">
                     <div className="card-header text-center d-flex">
                         <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.props.p_isCollapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>
-                        <input type='color' className="border hidden" id={'cp_' + this.props.p_mission.m_id} onChange={(e) => this.fn_changeColor()} />
-                        <p id={'pc_' + this.props.p_mission.m_id} onClick={(e) => this.fn_simClick(e)} className={this.state.css_pc} title="Change Plan color path"  >C</p>
+                        <input type='color' className="border hidden" id={'cp_' + this.props.p_mission.m_id} ref={this.cp_Ref}  onChange={(e) => this.fn_changeColor()} />
+                        <p id={'pc_' + this.props.p_mission.m_id} ref={this.pc_Ref} onClick={(e) => this.fn_simClick(e)} className={this.state.css_pc} title="Change Plan color path"  >C</p>
                         <p id={'ph_' + this.props.p_mission.m_id} onClick={(e) => this.fn_togglePath(e)} className={this.state.css_ph} title="Hide/Display plan on Map" ref={instance => this.btn_toggle_path = instance}  >H</p>
                     </div>
                 </div>
