@@ -26,73 +26,45 @@ export class CWayPointAction extends React.Component {
     {
         let waypointType = this.m_missionTypeRef.current.value; //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
-        let icon_img = {
-            iconUrl:'./images/location_bb_32x32.png',
-            iconAnchor: [16,23], 
-            iconSize: [32,32], 
-        };
+        
+        let icon_img = 'bi bi-geo-alt-fill';
+                
         switch (waypointType)
 		{
             case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
-			    icon_img= {
-                    iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,32], 
-                    iconSize: [32,32], 
-                };
+                icon_img = 'bi bi-geo-alt-fill';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
-			    icon_img= {
-                    iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,23], 
-                    iconSize: [32,32], 
-                };
+			    icon_img = 'bi bi-dice-6';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
-			    icon_img= {
-                    iconUrl:'./images/plane_b_32x32.png',
-                    iconAnchor: [16,16], 
-                    iconSize: [32,32], 
-                };
+			    icon_img = 'bi bi-arrow-bar-up';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
-			    icon_img= {
-                    iconUrl:'./images/plane_gr_32x32.png',
-                    iconAnchor: [16,16], 
-                    scaledSize: [32,32], 
-                };
+			    icon_img = 'bi bi-download';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
-                icon_img= {
-                    iconUrl:'./images/location_bb_32x32.png',
-                    iconAnchor: [16,16], 
-                    scaledSize: [32,32], 
-                };
+                icon_img = 'bi bi-signpost-split-fill';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
-			    icon_img= {
-                    iconUrl:'./images/back_b_32x32.png',
-                    iconAnchor: [16,16], 
-                    scaledSize: [32,32], 
-                };
+			    icon_img = 'bi bi-skip-backward-circle';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
-                icon_img= {
-                    iconUrl:'./images/circle_bb_32x32.png',
-                    iconAnchor: [16,23], 
-                    scaledSize: [32,32], 
-                };
+                icon_img = 'bi bi-c-circle';
                 break;
 
             
         }
         
-        js_leafletmap.fn_createBootStrapIcon (this.props.p_shape, 'bi-geo-alt-fill', this.props.p_shape.m_main_de_mission.m_pathColor, [32, 32]);
+        this.props.p_shape.m_shape_icon = icon_img;
+        
+        js_leafletmap.fn_createBootStrapIcon (this.props.p_shape, icon_img, this.props.p_shape.m_main_de_mission.m_pathColor, [32, 32]);
         // apply on all shapes
         this.props.p_shape.m_main_de_mission.fn_updatePath(true);
         
