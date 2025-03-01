@@ -1988,8 +1988,8 @@ function fn_handleKeyBoard() {
 
 		var EVT_msgFromUnit_WayPoints = function (me, data) {
 
-			//// dont upload waypoints in map editor mode.
-			//if (js_globals.CONST_MAP_EDITOR) return ;
+			// dont upload waypoints in map editor mode. -- for now TEMP
+			if (js_globals.CONST_MAP_EDITOR) return ;
 
 			const p_andruavUnit = data.unit;
 			const wayPointArray = data.wps;
@@ -2086,7 +2086,7 @@ function fn_handleKeyBoard() {
 								}
 								else
 								{
-									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, v_mark);
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, p_event);
 								}
 							});
 							js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, v_mark)
