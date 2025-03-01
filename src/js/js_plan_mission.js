@@ -254,27 +254,42 @@ export class ClssAndruavMissionPlan {
   /**
    *	removes a single marker.
    */
-  fn_deleteMe(marker) {
-    let len = this.m_all_mission_items_shaps.length;
-    for (let i = 0; i < len; ++i) {
-      if (this.m_all_mission_items_shaps[i].id === marker.id) {
-        this.m_all_mission_items_shaps.splice(i, 1);
-        js_leafletmap.fn_hideItem(marker);
-        if (marker.m_next !== null && marker.m_next !== undefined) {
-          js_leafletmap.fn_hideItem(marker.m_next);
-          marker.m_next = undefined;
-          marker.distance = undefined;
-        }
+   fn_deleteMe(marker_id) {
+    let indexToDelete = -1;
+    let markerToDelete = null;
 
-        marker.m_main_de_mission = null;
-        this.fn_orderItems();
-        this.fn_updatePath(true);
-        break;
-      }
+    // Find the marker by ID
+    for (let i = 0; i < this.m_all_mission_items_shaps.length; ++i) {
+        if (this.m_all_mission_items_shaps[i].id === marker_id) {
+            indexToDelete = i;
+            markerToDelete = this.m_all_mission_items_shaps[i];
+            break;
+        }
     }
 
+    if (indexToDelete === -1) {
+        return; // Marker not found
+    }
+
+    // Delete the marker
+    this.m_all_mission_items_shaps.splice(indexToDelete, 1);
+    js_leafletmap.fn_hideItem(markerToDelete);
+
+    // Handle next marker
+    if (markerToDelete.m_next !== null && markerToDelete.m_next !== undefined) {
+        js_leafletmap.fn_hideItem(markerToDelete.m_next);
+        markerToDelete.m_next = undefined;
+        markerToDelete.distance = undefined;
+    }
+
+    // Update mission
+    markerToDelete.m_main_de_mission = null;
+    this.fn_orderItems();
+    this.fn_updatePath(true);
+
+    // Dispatch event
     js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
-      mission: this,
+        mission: this,
     });
   }
 

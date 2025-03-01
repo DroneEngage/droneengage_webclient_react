@@ -96,7 +96,7 @@ export default class ClssMission_Container extends React.Component {
     fn_onShapeDeleted(me, p_shape) {
         if (p_shape === null || p_shape === undefined ) return ;
         if (p_shape.m_main_de_mission == null) return; // geo fence not mission
-        p_shape.m_main_de_mission.fn_deleteMe(p_shape);
+        p_shape.m_main_de_mission.fn_deleteMe(p_shape.id);
     }
 
     fn_addNewPathPlan(e) {
