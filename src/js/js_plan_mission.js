@@ -80,6 +80,15 @@ export class ClssAndruavMissionPlan {
     this.m_pathColor = v_color;
   }
 
+  getRelatedColor(rgbColor, permutation) {
+    if (!rgbColor || rgbColor.length !== 7 || rgbColor[0] !== '#' || !permutation || permutation.length !== 3) return null;
+
+    const [r, g, b] = [rgbColor.slice(1, 3), rgbColor.slice(3, 5), rgbColor.slice(5, 7)].map(hex => parseInt(hex, 16));
+    const order = { R: r, G: g, B: b };
+    const newColor = `#${permutation.toUpperCase().split('').map(p => order[p].toString(16).padStart(2, '0')).join('')}`;
+    return newColor;
+}
+
   /**
    * Draws path between markers
    * @param {*} v_enforceRedraw
@@ -101,7 +110,7 @@ export class ClssAndruavMissionPlan {
       if (v_enforceRedraw === true) {
         this.fn_disconnectMissionItem(marker);
       }
-
+      js_leafletmap.fn_changeBootStrapIconColor(marker, this.getRelatedColor(this.m_pathColor,'bgr'));
       if (marker.m_next == null) {
         const arrowCoordinates = {
           from_pos: marker.getLatLng(),
@@ -129,6 +138,9 @@ export class ClssAndruavMissionPlan {
         );
       }
     }
+
+    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len-1], this.getRelatedColor(this.m_pathColor,'bgr'));
+      
   }
 
   fn_activateMissionItem(mission_order, direction) {
@@ -326,28 +338,38 @@ export class ClssAndruavMissionPlan {
     return module ? (module.c.length > 0 ? module.c : null) : null;
   }
 
-  fn_importAsDE_V1(p_andruavUnit, p_plan_text) {
-    if (p_plan_text['fileType'] !== 'de_plan') return;
+  fn_importAsDE_V1 (p_andruavUnit, p_plan_text)
+  {
+      if (p_plan_text['fileType'] !== 'de_plan') return ;
 
-    const me_mission = p_plan_text['de_mission'];
-    const mav_waypoints = me_mission['mav_waypoints'];
-    const modules = me_mission['modules'];
+      const me_mission = p_plan_text['de_mission'];
+      const mav_waypoints = me_mission['mav_waypoints'];
+      const modules = me_mission['modules'];
 
-    let temp_missionItem = {};
+      let temp_missionItem = {};
 
-    mav_waypoints.forEach(maypoint => {
-      const cmd = maypoint['c'];
-      const mavlink = maypoint['mv'];
+      const len = mav_waypoints.length;
+      for (let i = 0; i < len; ++i) {
+        const maypoint = mav_waypoints[i];
+        
+        const cmd = maypoint['c'];
+        const mavlink = maypoint['mv'];
+              
+        switch (cmd)
+        {
 
-      switch (cmd) {
-        case mavlink20.MAV_CMD_DO_SET_SERVO:
-          if (mavlink[0] == 16) { // FIRE EVENT
-            temp_missionItem.eventFireRequired = true;
-            temp_missionItem.eventFire = mavlink[1];
-          }
-          if (mavlink[0] == 15) { // WAIT FOR EVENT
-            temp_missionItem.eventWaitRequired = true;
-            temp_missionItem.eventWait = mavlink[1];
+          case mavlink20.MAV_CMD_DO_SET_SERVO:
+          {
+            if (mavlink[0] == 16)
+              { // FIRE EVENT
+                temp_missionItem.eventFireRequired = true;
+                temp_missionItem.eventFire = mavlink[1];
+              }
+            if (mavlink[0] == 15)
+            { // WAIT FOR EVENT
+                temp_missionItem.eventWaitRequired = true;
+                temp_missionItem.eventWait = mavlink[1];
+            }
           }
           break;
 
@@ -380,7 +402,7 @@ export class ClssAndruavMissionPlan {
           temp_missionItem.yaw = mavlink[0];
           break;
       }
-    });
+    }
   }
 
   /**
