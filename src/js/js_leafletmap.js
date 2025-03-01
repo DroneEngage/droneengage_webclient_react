@@ -281,27 +281,6 @@ class CLeafLetAndruavMap {
 
 
     /**
-         * Create a marker with image and title
-         */
-    fn_CreateMarker(p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
-        
-        const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
-
-        let v_marker = L.marker([
-            0, 0
-        ], {
-            icon: v_image,
-            title: p_title,
-            draggable: p_draggable ? true : false,
-            zIndexOffset: p_isTop ? 1000 : 0
-        }
-        
-        ).addTo(this.m_Map);
-
-        return v_marker;
-    };
-
-    /**
      * Hide a shape or a marker.
      * This is an abstract call so that other types of maps can be implemented.
      * as you alreay can call p_marker.remove()
@@ -475,6 +454,28 @@ class CLeafLetAndruavMap {
         return v_image;
     }
 
+
+    /**
+     * Create a marker with image and title
+     */
+    fn_CreateMarker(p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
+        
+        const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
+
+        let v_marker = L.marker([
+            0, 0
+        ], {
+            icon: v_image,
+            title: p_title,
+            draggable: p_draggable ? true : false,
+            zIndexOffset: p_isTop ? 1000 : 0
+        }
+        
+        ).addTo(this.m_Map);
+
+        return v_marker;
+    };
+
     fn_setVehicleIcon(p_marker, p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
         if (p_marker == null) 
             return;
@@ -487,18 +488,39 @@ class CLeafLetAndruavMap {
 
     };
 
-
-    fn_setMarkerIcon(p_marker, p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
+    fn_createBootStrapIcon(p_marker, p_bootstrap_icon_name, p_color, p_iconsize) {
         if (p_marker == null) 
             return;
-        
-        const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
-
-
+    
+        // Set default icon size if not provided
+        const iconSize = p_iconsize || [48, 48];
+    
+        // Create the icon with customizable size and color
+        const v_image = L.divIcon({
+            html: `<i class="bi ${p_bootstrap_icon_name}" style="background: none; border: none; color: ${p_color}; font-size: ${iconSize[0]}px;"></i>`,
+            className: "custom-location-icon",
+            iconSize: iconSize,
+            iconAnchor: [iconSize[0] / 2, iconSize[1]], // Center the icon horizontally and anchor it at the bottom
+            popupAnchor: [0, -iconSize[1]] // Adjust popup anchor based on icon size
+        });
+    
+        // Set the icon to the marker
         p_marker.setIcon(v_image);
     };
 
 
+    fn_changeBootStrapIconColor(p_marker, p_color) {
+        if (!p_marker) return;
+    
+        const icon = p_marker.getIcon();
+        if (icon && icon.options && icon.options.html) {
+            const iconElement = p_marker._icon.querySelector('i');
+            if (iconElement) {
+                iconElement.style.color = p_color;
+            }
+        }
+    };
+    
     /**
          * Deletes shapes created by Geoman Plugin
          */

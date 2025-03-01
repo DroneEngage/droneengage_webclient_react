@@ -91,8 +91,11 @@ export class CWayPointAction extends React.Component {
 
             
         }
-        js_leafletmap.fn_setVehicleIcon(this.props.p_shape, icon_img.iconUrl, "", icon_img.iconAnchor, null, false, "", icon_img.scaledSize);
-				
+        
+        js_leafletmap.fn_createBootStrapIcon (this.props.p_shape, 'bi-geo-alt-fill', this.props.p_shape.m_main_de_mission.m_pathColor, [32, 32]);
+        // apply on all shapes
+        this.props.p_shape.m_main_de_mission.fn_updatePath(true);
+        
         if (this.speed.fn_getValue() != null)
         {
             this.props.p_shape.m_missionItem.speed = parseFloat(this.speed.fn_getValue());
