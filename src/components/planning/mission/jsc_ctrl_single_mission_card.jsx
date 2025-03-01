@@ -150,11 +150,7 @@ export class ClssSingle_Mission_Card extends React.Component {
                             <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>Prev</button>
                         </div>
                         <div className='col-6'>
-                            <div className="form-group text-left">
-                                <label htmlFor={ordernum_id} className="text-primary">ID
-                                <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={this.mission_id_txt}/>
-                                </label>
-                            </div>
+                                <input type='text' id={ordernum_id} className="form-control css_margin_top_small input-sm" disabled="disabled" ref={this.mission_id_txt}/>
                         </div>
                         <div className='col-2'>
                             <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_nextMissionItem()}>Next</button>
