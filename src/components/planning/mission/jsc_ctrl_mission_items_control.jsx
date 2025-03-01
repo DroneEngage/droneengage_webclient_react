@@ -22,7 +22,7 @@ export default class ClssMission_Container extends React.Component {
         this.mission_file_ref = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onMissionItemToggle, this, this.fn_onMissionItemToggle);
+        js_eventEmitter.fn_subscribe(js_globals.EE_onPlanToggle, this, this.fn_onPlanToggle);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeCreated, this, this.fn_onShapeCreated);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.fn_onShapeSelected);
         js_eventEmitter.fn_subscribe(js_globals.EE_onShapeEdited, this, this.fn_onShapeEdited);
@@ -45,7 +45,7 @@ export default class ClssMission_Container extends React.Component {
         }
     }
 
-    fn_onMissionItemToggle(me, p_params) {
+    fn_onPlanToggle(me, p_params) {
         
         const c_mission = p_params.p_mission;
 
@@ -111,7 +111,7 @@ export default class ClssMission_Container extends React.Component {
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onMissionItemToggle, this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPlanToggle, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeCreated, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeSelected, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeEdited, this);
@@ -119,6 +119,14 @@ export default class ClssMission_Container extends React.Component {
 
     }
 
+    // Add this method to handle the tab switch event
+    handleTabSwitch = (planId) => {
+            //this.m_active_id = planId;
+            this.setState({}); //force re-render
+            console.log(`Tab switched to plan ID: ${planId}`);
+            // Perform any other actions you need here
+    };
+        
     render() {
 
         let item = [];
@@ -132,22 +140,36 @@ export default class ClssMission_Container extends React.Component {
                 
                 const c_id = v_plan.m_id;
                 const c_active = c_id === this.m_active_id;
-
+                const targetTabId = "#mstpd_" + c_id; // Add this line to create the target tab ID
+    
                 item_header.push(
                     <li key={"mstpt" + c_id} className="nav-item">
                         <a
                             className={`nav-link ${c_active ? 'active' : ''}`}
                             data-bs-toggle="tab"
-                            href={"#mstpd_" + c_id}
+                            data-bs-target={targetTabId} // Add this line
+                            href={targetTabId}
+                            onClick={() => this.handleTabSwitch(c_id)} // Add this line
                         >
-                            <i className="bi bi-geo-alt-fill location-icon" style={{ color: v_plan.m_pathColor }} ></i><span className={c_active?'animate_iteration_3s blink_warning':'text-light' } >{`P${v_plan.m_id}-(${(v_plan.fn_getMissionDistance() / 1000.0).toFixed(1)} km)`}</span>
+                            <i className="bi bi-geo-alt-fill location-icon" style={{ color: v_plan.m_pathColor }}></i>
+                            <span className={c_active ? 'animate_iteration_3s blink_warning' : 'text-light'}>
+                                {`P${v_plan.m_id}-(${(v_plan.fn_getMissionDistance() / 1000.0).toFixed(1)} km)`}
+                            </span>
                         </a>
                     </li>
                 );
-
+    
                 item_details.push(
-                    <div key={"mstpd" + c_id} id={"mstpd_" + c_id} className={`tab-pane fade ${c_active ? 'show active' : ''}`}>
-                        <ClssSingle_Plan_Container key={'umc' + v_plan.m_id} p_missionPlan={v_plan} p_isCurrent={v_plan.m_id === v_mission1.m_id} />
+                    <div
+                        key={"mstpd" + c_id}
+                        id={"mstpd_" + c_id}
+                        className={`tab-pane fade ${c_active ? 'show active' : ''}`}
+                    >
+                        <ClssSingle_Plan_Container
+                            key={'umc' + v_plan.m_id}
+                            p_missionPlan={v_plan}
+                            p_isCurrent={v_plan.m_id === v_mission1.m_id}
+                        />
                     </div>
                 );
             });

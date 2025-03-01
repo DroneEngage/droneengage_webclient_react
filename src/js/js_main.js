@@ -2082,7 +2082,7 @@ function fn_handleKeyBoard() {
 							v_mark.on('click', function (p_event) {
 								if (p_event.originalEvent.ctrlKey===false)
 								{
-									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event.target);
 								}
 								else
 								{
