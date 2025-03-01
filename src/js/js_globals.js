@@ -198,8 +198,7 @@ class GLOBALS {
 		this.EE_displayCameraDlgForm        		= "EVT_74";
 		this.EE_hideCameraDlgForm           		= "EVT_75";
 
-		this.EE_onMissionItemToggle         		= "EVT_76";
-
+		this.EE_onPlanToggle         				= "EVT_76";
 		this.EE_onAdvancedMode              		= "EVT_77";
 		this.EE_ErrorMessage                		= "EVT_78";
 		this.EE_adsbExpiredUpdate           		= "EVT_79";
@@ -214,6 +213,8 @@ class GLOBALS {
 		
 		this.EE_Video_State_Change           		= "EVT_86";
 		this.EE_unitGPIOUpdated             		= "EVT_87";
+		
+		this.EE_onMissionItemToggle					= "EVT_88"; 
 		
 		// EOF LOCAL EVENTS
 

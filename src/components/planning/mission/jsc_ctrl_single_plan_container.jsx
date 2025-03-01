@@ -38,27 +38,28 @@ export  class ClssSingle_Plan_Container extends React.Component {
     
     fn_displayGeoForm(me, p_event) {
         // not a marker
-        if (p_event.target.m_main_de_mission === null || p_event.target.m_main_de_mission === undefined) {
+        if (p_event.m_main_de_mission === null || p_event.m_main_de_mission === undefined) {
             js_common.fn_console_log("MISSION:NULL HERE");
             return;
         }
 
-        if (me.props.p_missionPlan.m_id !== p_event.target.m_main_de_mission.m_id) {
+        if (me.props.p_missionPlan.m_id !== p_event.m_main_de_mission.m_id) {
             js_common.fn_console_log("Not Me");
             return;
         }
 
         if (me.props.p_isCurrent === false) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_onMissionItemToggle, { p_switch_next: false, p_mission: me.props.p_missionPlan });
+            js_eventEmitter.fn_dispatch(js_globals.EE_onPlanToggle, { p_switch_next: false, p_mission: me.props.p_missionPlan });
         }
 
-        me.setState({ s_shape: p_event.target });
+        
 
 
         js_common.fn_console_log("REACT:displayGeoForm");
 
         if (me.state.m_update === 0) return ;
-        me.setState({'m_update': me.state.m_update +1});
+        me.setState({ s_shape: p_event });
+        
     }
 
     fn_resetMission(p_me)
@@ -82,7 +83,7 @@ export  class ClssSingle_Plan_Container extends React.Component {
             this.state.m_collapsed = false;
         }
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_onMissionItemToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
+        js_eventEmitter.fn_dispatch(js_globals.EE_onPlanToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
 
 
         this.setState({'m_update': this.state.m_update +1});
@@ -110,14 +111,15 @@ export  class ClssSingle_Plan_Container extends React.Component {
             item.push(<h4 key="mi"></h4>);
         }
         else {
-            if (this.state.shape != null) {
-                this.state.shape.setLabel({
-                    text: this.state.shape.order.toString(), // string
-                    color: "#977777",
-                    fontSize: "12px",
-                    fontWeight: "bold"
-                });
-            }
+            // Unused code... delete later
+            // if (this.state.shape != null) {
+            //     this.state.shape.setLabel({
+            //         text: this.state.shape.order.toString(), // string
+            //         color: "#977777",
+            //         fontSize: "12px",
+            //         fontWeight: "bold"
+            //     });
+            // }
             item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer " + c_borderStyle}>
                 <ClssSingle_Plan_Header p_mission={this.props.p_missionPlan} p_isCollapsed={this.state.m_collapsed}  p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
                 <ClssSingle_Mission_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} p_unit={andruavSelectedUnit} />

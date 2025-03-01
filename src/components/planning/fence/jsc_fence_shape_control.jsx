@@ -444,7 +444,7 @@ export default class ClssFence_Shape_Control extends React.Component {
      */
     fn_onShapeSelected (me, p_event) 
     {
-        me.setState({m_shape: p_event.target});
+        me.setState({m_shape: p_event});
     }
 
     fn_onShapeEdited(me, p_shape)

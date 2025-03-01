@@ -72,33 +72,39 @@ class ClssAndruavMissionPlanManager {
         return this.m_activePlan;
     }
 
+
+    fn_activateMissionItem(p_mission_item_id, direction){
+        let v_missionPlan = js_mapmission_planmanager.fn_getCurrentMission();
+        if (v_missionPlan === null) return;
+        return v_missionPlan.fn_activateMissionItem(p_mission_item_id, direction);
+    }
+
     /**
-     * Activates the next mission plan based on the provided ID.
-     * @param {number} v_id2 - The ID of the current mission plan.
-     * @returns {ClssAndruavMissionPlan|null} The next mission plan or null if none.
+     * Activates the next plan based on the provided ID.
+     * @param {number} v_id2 - The ID of the current plan.
+     * @returns {ClssAndruavMissionPlan|null} The next plan or null if none.
      */
     fn_activateNextMission(v_id2) {
-        let p_keys = Object.keys(this.m_missionPlans);
+        const c_mission_keys = Object.keys(this.m_missionPlans);
         
         // Check if there are any mission plans
-        if (!p_keys || p_keys.length === 0) {
+        if (!c_mission_keys.length) {
             return null; // Exit if there are none
         }
 
-        let p_len = p_keys.length;
-        let p_index = 0;
-        
-        // Find the index of the current mission plan
-        for (let i = 0; i < p_len; ++i) {
-            if (p_keys[i] === v_id2) {
-                // Calculate the index of the next mission plan
-                p_index = (i + 1) % p_keys.length;
-                let v_mission = this.m_missionPlans[p_keys[p_index]];
-                // Set the current mission to the next one
-                this.fn_setCurrentMission(v_mission.m_id);
-                return v_mission;
-            }
+        const currentIndex = c_mission_keys.indexOf(v_id2);
+    
+        if (currentIndex === -1) {
+            return null; // v_id2 not found
         }
+    
+        const nextIndex = (currentIndex + 1) % c_mission_keys.length;
+        const nextMissionId = c_mission_keys[nextIndex];
+        const nextMission = this.m_missionPlans[nextMissionId];
+    
+        this.fn_setCurrentMission(nextMission.m_id);
+        return nextMission;
+
     }
 
     /**

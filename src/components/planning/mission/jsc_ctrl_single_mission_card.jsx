@@ -1,6 +1,10 @@
 import React    from 'react';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
+
+import { js_globals } from '../../../js/js_globals.js';
+import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
+
 import {CWayPointLocation} from './jsc_ctrl_waypoint_location.jsx'
 import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
 
@@ -24,6 +28,19 @@ export class ClssSingle_Mission_Card extends React.Component {
         
     }
 
+    fn_prevMissionItem()
+    {
+        if (!this.props.p_shape) return ;
+        const c_shape = this.props.p_shape.m_main_de_mission.fn_activateMissionItem(this.props.p_shape.id, 'prev');
+        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
+    }
+
+    fn_nextMissionItem()
+    {
+        if (!this.props.p_shape) return ;
+        const c_shape = this.props.p_shape.m_main_de_mission.fn_activateMissionItem(this.props.p_shape.id, 'next');
+        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
+    }
 
     fn_editShape ()
     {
@@ -68,57 +85,51 @@ export class ClssSingle_Mission_Card extends React.Component {
         }
 
         let tabs = [];
+        let ctrl = [];
+
         tabs.push(<li id={'h' + this.key} key={'h_main' + this.key} className="nav-item nav-units">
                     <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_main" + this.key}>Action</a>
                     </li>);
         
+        ctrl.push(<div key={'tab_main' + this.key} className="tab-pane fade" id={"tab_main"+this.key}>
+            <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_actions = instance}}/>
+            </div>);
+
+
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_p2p' + this.key} className="nav-item nav-units">
                     <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_p2p" + this.key}>P2P</a>
                     </li>);
+        
+            ctrl.push(<div key={'tab_p2p' + this.key} className="tab-pane fade" id={"tab_p2p"+this.key}>
+                    <ClssP2P_Planning p_shape={this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.p2p = instance}}/>
+                    </div>);
         }
+    
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_sdr' + this.key} className="nav-item nav-units">
                     <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_sdr" + this.key}>SDR</a>
                     </li>);
+        
+            ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
+                    <ClssSDR_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.sdr = instance}}/>
+                    </div>);
         }
-
+    
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_gpio' + this.key} className="nav-item nav-units">
                     <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_gpio" + this.key}>GPIO</a>
                     </li>);
-        }
-    
-        let ctrl = [];
 
-        ctrl.push(<div key={'tab_main' + this.key} className="tab-pane fade" id={"tab_main"+this.key}>
-                    <CWayPointAction p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_actions = instance}}/>
-                    </div>);
-        
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P === false))
-        {
-            ctrl.push(<div key={'tab_p2p' + this.key} className="tab-pane fade" id={"tab_p2p"+this.key}>
-                    <ClssP2P_Planning p_shape={this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.p2p = instance}}/>
-                    </div>);
-        }
-
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR === false))
-        {
-            ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
-                    <ClssSDR_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.sdr = instance}}/>
-                    </div>);
-        }
-
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO === false))
-        {
             ctrl.push(<div key={'tab_gpio' + this.key} className="tab-pane fade" id={"tab_gpio"+this.key}>
                     <ClssGPIO_Planning p_shape= {this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.gpio = instance}}/>
                     </div>);
         }
+
     
         const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         return (
@@ -128,10 +139,20 @@ export class ClssSingle_Mission_Card extends React.Component {
                 </div>    
                 <div className="card-body">
         
-                    <div className="form-group text-left">
-                        <label htmlFor={ordernum_id} className="text-primary">ID
-                        <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={this.mission_id_txt}/>
-                        </label>
+                    <div className='row'>
+                        <div className='col-2'>
+                            <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>Prev</button>
+                        </div>
+                        <div className='col-6'>
+                            <div className="form-group text-left">
+                                <label htmlFor={ordernum_id} className="text-primary">ID
+                                <input type='text' id={ordernum_id} className="form-control input-sm" disabled="disabled" ref={this.mission_id_txt}/>
+                                </label>
+                            </div>
+                        </div>
+                        <div className='col-2'>
+                            <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_nextMissionItem()}>Next</button>
+                        </div>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_location = instance}}/>
