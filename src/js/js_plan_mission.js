@@ -30,6 +30,7 @@ export class ClssAndruavMissionPlan {
     this.m_hidden = false;
 
     this.m_missionCounter = 1;
+    this.m_active_mission_item = 0; // this is mission index
   }
 
   fn_highlight(v_high) {
@@ -138,33 +139,39 @@ export class ClssAndruavMissionPlan {
         );
       }
     }
-
+    
     js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len-1], this.getRelatedColor(this.m_pathColor,'bgr'));
+
+    js_leafletmap.fn_changeBootStrapIconColor (this.m_all_mission_items_shaps[this.m_active_mission_item], this.getRelatedColor('#ffffff00','bgr'));
+        
       
   }
 
-  fn_activateMissionItem(mission_order, direction) {
+  fn_activateMissionItem(active_mission_item, direction) {
     if (!this.m_all_mission_items_shaps || this.m_all_mission_items_shaps.length === 0) {
       return null;
     }
 
     const missionCount = this.m_all_mission_items_shaps.length;
-    if (mission_order < 1 || mission_order > missionCount) {
+    if (active_mission_item < 1 || active_mission_item > missionCount) {
       return null;
     }
 
     let nextMissionOrder;
-
+    
+    
     if (direction === 'next') {
-      nextMissionOrder = (mission_order % missionCount);
+      nextMissionOrder = (active_mission_item % missionCount);
     } else if (direction === 'prev') {
-      nextMissionOrder = ((mission_order - 2) % missionCount);
+      nextMissionOrder = ((active_mission_item - 2) % missionCount);
       if (nextMissionOrder < 0) {
         nextMissionOrder = missionCount + nextMissionOrder;
       }
     } else {
       return null; // Invalid direction
     }
+
+    this.m_active_mission_item = nextMissionOrder;
 
     return this.m_all_mission_items_shaps[nextMissionOrder];
   }
@@ -198,6 +205,7 @@ export class ClssAndruavMissionPlan {
     };
 
     this.m_missionCounter += 1;
+    this.m_active_mission_item = this.m_missionCounter;
     this.m_all_mission_items_shaps.push(p_marker);
     this.fn_orderItems();
     this.fn_updatePath();
