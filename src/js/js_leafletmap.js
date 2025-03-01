@@ -105,7 +105,7 @@ class CLeafLetAndruavMap {
                 editMode: true,
                 drawPolyline: true,
                 dragMode: true,
-                removalMode: false,  // as event is not fired om:remove
+                removalMode: true,  // as event is not fired om:remove
                 cutPolygon: false,
                 drawCircleMarker: false
             });
@@ -135,14 +135,16 @@ class CLeafLetAndruavMap {
                 js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
                 // add to shapes list.
                 js_globals.v_map_shapes.push(x.layer);
-
+                let already_deleted = false;
                 x.layer.on('click', function (p_event) {
+                        
                     if (p_event.originalEvent.ctrlKey===false)
                     {
                         js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event.target);
                     }
                     else
                     {
+                        already_deleted = true;
                         js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
                     }
                 });
@@ -154,9 +156,13 @@ class CLeafLetAndruavMap {
 
                 x.layer.on('remove', (x) => {
                     
-                    if (x.layer === null || x.layer === undefined) return ;
-
-                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
+                    // you can delete the shap by ctrl+click or use eraser.
+                    // when using ctrl you still get 'remove' event 
+                    // so we need to check if it was already deleted.
+                    
+                    if (already_deleted === true) return ;
+                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.target);
+                    already_deleted = false;
                 });
 
             });
