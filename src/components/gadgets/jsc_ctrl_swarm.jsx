@@ -218,7 +218,7 @@ export class ClssCtrlSWARM extends React.Component {
                             type="button"
                             className={"btn btn-sm " + v_leader_class}
                             title={v_leader_title_leader + " / folowing:" + v_leader_title_follower}
-                            onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_THREAD)}>Leader</button>
+                            onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_VECTOR)}>Leader</button>
                         <div key={'swr_12' + this.key} className="btn-group" role="group">
                             <button id="btnGroupDrop2"
                                 type="button"
