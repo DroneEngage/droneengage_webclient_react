@@ -310,7 +310,7 @@ export class ClssP2P_Planning extends React.Component {
             cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
         }
         else {   // make leader and set formation.
-            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_THREAD);
+            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_VECTOR);
         }
 
         return cmd;
