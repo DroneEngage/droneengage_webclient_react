@@ -165,7 +165,10 @@ function fn_handleKeyBoard() {
         }
 		
 		if ((p_event.target.type !== 'textarea') 
-			&& (p_event.target.type !== 'text'))
+			&& (p_event.target.type !== 'text')
+			&& (p_event.target.type !== 'email')
+			&& (p_event.target.type !== 'password'))
+		
 		{
 			if (p_event.key.toLowerCase() === 'm') {
 				fn_showMap();
