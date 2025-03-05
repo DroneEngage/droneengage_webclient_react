@@ -22,7 +22,11 @@ export default function App2() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="index.html"  element={<Home />} />
+          <Route path="index"  element={<Home />} />
           <Route path="home"  element={<Home />} />
+          <Route path="webclient"  element={<Home />} />
+          <Route path="planner"  element={<Planning />} />
           <Route path="planning"  element={<Planning />} />
           <Route path="mapeditor"  element={<Planning />} />
           <Route path="accounts"  element={<Accounts />} />
