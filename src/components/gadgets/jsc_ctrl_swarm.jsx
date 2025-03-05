@@ -25,7 +25,11 @@ export class ClssCtrlSWARM extends React.Component {
         this.state = {
             'm_update': 0,
             'm_waiting': false,
-
+            'm_following': this.props.p_unit.m_Swarm.m_following,
+            'm_isLeader': this.props.p_unit.m_Swarm.m_isLeader,
+            'm_formation_as_leader': this.props.p_unit.m_Swarm.m_formation_as_leader,
+            'm_formation_as_follower': this.props.p_unit.m_Swarm.m_formation_as_follower,
+            m_Swarm: this.props.p_unit.m_Swarm
         };
 
         this.key = Math.random().toString();
@@ -34,14 +38,43 @@ export class ClssCtrlSWARM extends React.Component {
 
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        const update = (this.state.m_update != nextState.m_update) && (!this.state.m_waiting);
-
-        return update;
+    // The reason you return an object containing the updated state in getDerivedStateFromProps 
+    // instead of just a boolean is that getDerivedStateFromProps is designed to update 
+    // the component's state based on changes in props.
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (
+            nextProps.p_unit.m_Swarm.m_following !== prevState.m_following ||
+            nextProps.p_unit.m_Swarm.m_isLeader !== prevState.m_isLeader ||
+            nextProps.p_unit.m_Swarm.m_formation_as_leader !== prevState.m_formation_as_leader ||
+            nextProps.p_unit.m_Swarm.m_formation_as_follower !== prevState.m_formation_as_follower
+        ) {
+            return {
+                m_following: nextProps.p_unit.m_Swarm.m_following,
+                m_isLeader: nextProps.p_unit.m_Swarm.m_isLeader,
+                m_formation_as_leader: nextProps.p_unit.m_Swarm.m_formation_as_leader,
+                m_formation_as_follower: nextProps.p_unit.m_Swarm.m_formation_as_follower,
+            };
+        }
+        return null;
     }
 
+    // The return value of getDerivedStateFromProps directly contributes to the nextState 
+    // that is passed into shouldComponentUpdate.
+    shouldComponentUpdate(nextProps, nextState) {
+        return (
+            this.state.m_update !== nextState.m_update && !nextState.m_waiting ||
+            this.state.m_following !== nextState.m_following ||
+            this.state.m_isLeader !== nextState.m_isLeader ||
+            this.state.m_formation_as_leader !== nextState.m_formation_as_leader ||
+            this.state.m_formation_as_follower !== nextState.m_formation_as_follower
+        
+        );
+    }
+
+    
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onAndruavUnitSwarmUpdated, this);
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_onAndruavUnitSwarmUpdated,this);
+        
     }
 
 
@@ -53,6 +86,8 @@ export class ClssCtrlSWARM extends React.Component {
 
 
     fn_onSwarmUpdate(p_me) {
+
+        // this event is important especially when another drone becomes a leader and you need to update the drone list.
         if (p_me.state.m_update === 0) return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
@@ -66,13 +101,16 @@ export class ClssCtrlSWARM extends React.Component {
         }
 
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {   // make not a leader
-            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
+               // demote unit
+               js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
         }
         else {   // make leader and set formation.
             js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, p_formationID);
         }
 
     }
+
+   
 
     fn_requestToFollow(p_unit) {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
@@ -92,22 +130,18 @@ export class ClssCtrlSWARM extends React.Component {
     }
 
     fn_ChangeFormation(e) {
-        
-    }
-
-
-    onChange(e) {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
-        if (e.target.value) {
-            if (e.target.value === "NA") {
-                // do not follow
-                js_globals.v_andruavClient.API_requestFromDroneToFollowAnother(this.props.p_unit, -1, null);
+        if (this.props.p_unit.m_Swarm.m_isLeader === true) {
+            
+            let newFormation = this.state.m_formation_as_leader + 1;
+            if (newFormation >= 3) {
+                newFormation = 1;
             }
-            else {
-                js_globals.v_andruavClient.API_requestFromDroneToFollowAnother(this.props.p_unit, -1, e.target.value);
-            }
+            
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation);
         }
     }
+
 
     componentDidUpdate() {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
@@ -218,7 +252,7 @@ export class ClssCtrlSWARM extends React.Component {
                             type="button"
                             className={"btn btn-sm " + v_leader_class}
                             title={v_leader_title_leader + " / folowing:" + v_leader_title_follower}
-                            onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_VECTOR)}>Leader</button>
+                            onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_THREAD)}>Leader</button>
                         <div key={'swr_12' + this.key} className="btn-group" role="group">
                             <button id="btnGroupDrop2"
                                 type="button"
@@ -233,7 +267,7 @@ export class ClssCtrlSWARM extends React.Component {
                     <div key={'swr_2' + this.key} className="row al_l css_margin_zero">
                         <div key={'swr_21' + this.key} className={' col-12   padding_zero text-warning ' + v_swarm_class}>
                             <p key={'swr_211' + this.key} className={' si-07x css_margin_zero user-select-none text-danger' + v_class_follower} title='leader I am following'><i className="bi bi-chevron-double-right text-danger"></i> {' ' + v_leader_title_follower}</p>
-                            <p key={'swr_212' + this.key} className={' si-07x css_margin_zero css_user_select_text text-warning' + v_class_formation_as_follower} title='formation of my leader'><i className="bi bi-dice-5 text-warning"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_follower]}</p>
+                            <p key={'swr_212' + this.key} className={' si-07x css_margin_zero css_user_select_text text-warning' + v_class_formation_as_follower} title='leader formation'><i className="bi bi-dice-5 text-warning"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_follower]}</p>
                             <p key={'swr_213' + this.key} className={' si-07x css_margin_zero css_user_select_text text-success cursor_hand' + v_class_formation_as_leader} title='formation as a leader' onClick={(e)=>this.fn_ChangeFormation(e)}><i className="bi bi-dice-5 text-success"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_leader]}</p>
                         </div>
                     </div>
