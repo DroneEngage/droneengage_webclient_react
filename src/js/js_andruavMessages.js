@@ -142,8 +142,9 @@ export const CONST_CAMERA_SUPPORT_FLASHING = 0x20;
 // SWARM FORMATION
 export const CONST_TASHKEEL_SERB_NO_SWARM = 0;
 export const CONST_TASHKEEL_SERB_THREAD = 1;
-export const CONST_TASHKEEL_SERB_VECTOR = 2; // requires angle
-export const CONST_TASHKEEL_SERB_VECTOR_180 = 3;
+export const CONST_TASHKEEL_SERB_ARROW = 2; // requires angle
+export const CONST_TASHKEEL_SERB_VECTOR = 3;
+export const CONST_TASHKEEL_SERB_COUNT = 2;
 
 // AndruavMessage_RemoteExecute Commands
 export const CONST_RemoteCommand_MAKETILT = 100;
@@ -372,8 +373,8 @@ export const message_names = {
 export const swarm_formation_names = {
   0: "None",
   1: "Thread",
-  2: "V-Shape",
-  3: "V-Shape2",
+  2: "V-Arrow",
+  3: "V-Shape",
 };
 
 export const TYPE_MODULE_CLASS_COMM = "comm";

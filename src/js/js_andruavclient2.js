@@ -847,24 +847,6 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
     }
 
-    // CODEBLOCK_END
-
-    // API_updateSwarm(p_andruavUnit, p_action, p_slaveIndex, p_leaderPartyID) {
-    //     if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
-        
-    //     let p_msg = {
-    //         a: p_action, // m_formation as a follower
-    //         b: p_slaveIndex, // index ... could be -1 to take available location.
-    //         c: p_leaderPartyID, // LeaderPartyID
-    //         d: p_andruavUnit.partyID // SlavePartyID
-    //     };
-
-    //     this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_UpdateSwarm, p_msg);
-    // };
-    
-
-
-    // CODEBLOCK_START
     API_requestFromDroneToFollowAnother(p_andruavUnit, slaveIndex, leaderPartyID, do_follow) {
 
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
@@ -874,7 +856,6 @@ class CAndruavClient {
 
         this.API_sendCMD(p_andruavUnit.partyID , cmd.mt, cmd.ms);
     };
-    // CODEBLOCK_END
 
 
     API_sendRXChannels(p_axes) {
