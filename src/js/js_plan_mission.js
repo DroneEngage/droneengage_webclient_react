@@ -30,7 +30,7 @@ export class ClssAndruavMissionPlan {
     this.m_hidden = false;
 
     this.m_missionCounter = 1;
-    this.m_active_mission_item = 0; // this is mission index
+    this.m_active_mission_item_id = 0; // this is mission index
   }
 
   fn_highlight(v_high) {
@@ -142,18 +142,18 @@ export class ClssAndruavMissionPlan {
     
     js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len-1], this.getRelatedColor(this.m_pathColor,'bgr'));
 
-    js_leafletmap.fn_changeBootStrapIconColor (this.m_all_mission_items_shaps[this.m_active_mission_item], this.getRelatedColor('#ffffff00','bgr'));
+    js_leafletmap.fn_changeBootStrapIconColor (this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
         
       
   }
 
-  fn_activateMissionItem(active_mission_item, direction) {
+  fn_activateMissionItem(active_mission_item_id, direction) {
     if (!this.m_all_mission_items_shaps || this.m_all_mission_items_shaps.length === 0) {
       return null;
     }
 
     const missionCount = this.m_all_mission_items_shaps.length;
-    if (active_mission_item < 1 || active_mission_item > missionCount) {
+    if (active_mission_item_id < 1 || active_mission_item_id > missionCount) {
       return null;
     }
 
@@ -161,17 +161,18 @@ export class ClssAndruavMissionPlan {
     
     
     if (direction === 'next') {
-      nextMissionOrder = (active_mission_item % missionCount);
+      nextMissionOrder = (active_mission_item_id % missionCount);
     } else if (direction === 'prev') {
-      nextMissionOrder = ((active_mission_item - 2) % missionCount);
+      nextMissionOrder = ((active_mission_item_id - 2) % missionCount);
       if (nextMissionOrder < 0) {
         nextMissionOrder = missionCount + nextMissionOrder;
       }
     } else {
-      return null; // Invalid direction
+      nextMissionOrder = active_mission_item_id - 1; // same object ... make if active
     }
 
-    this.m_active_mission_item = nextMissionOrder;
+    // activate item
+    this.m_active_mission_item_id = nextMissionOrder;
 
     return this.m_all_mission_items_shaps[nextMissionOrder];
   }
@@ -205,7 +206,8 @@ export class ClssAndruavMissionPlan {
     };
 
     this.m_missionCounter += 1;
-    this.m_active_mission_item = this.m_missionCounter;
+    // activate item
+    this.m_active_mission_item_id = this.m_missionCounter;
     this.m_all_mission_items_shaps.push(p_marker);
     this.fn_orderItems();
     this.fn_updatePath();
