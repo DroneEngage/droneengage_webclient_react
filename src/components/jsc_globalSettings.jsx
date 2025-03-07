@@ -278,7 +278,7 @@ export default class ClssGlobalSettings extends React.Component {
                       <div>
                         <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width"><small>Alt&nbsp;Step</small></label>
                         <input id="txt_defaultAltitude" type="number" min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)} className="form-control input-xs input-sm"  onChange={(e) => this.onChange(e)}  value={this.state.CONST_DEFAULT_ALTITUDE} />
-                        <button id="btn_defaultAltitude" className="btn btn-secondary btn-sm" type="button" onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
+                        <button id="btn_defaultAltitude" className="btn btn-secondary btn-sm mb-1 pt-0 pb-1" type="button" onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
                       </div>
                     </div>
                   </div>
@@ -289,7 +289,7 @@ export default class ClssGlobalSettings extends React.Component {
                         <div>
                           <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width"><small>Radius</small></label>
                           <input id="txt_defaultCircle" type="number" min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)} className="form-control input-xs input-sm"  onChange={(e) => this.onChange(e)}  value={this.state.CONST_DEFAULT_RADIUS}/>
-                          <button id="btn_defaultCircle" className="btn btn-secondary btn-sm" type="button"  onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
+                          <button id="btn_defaultCircle" className="btn btn-secondary btn-sm mb-1 pt-0 pb-1" type="button"  onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
                         </div>
                     </div>
                   </div>
