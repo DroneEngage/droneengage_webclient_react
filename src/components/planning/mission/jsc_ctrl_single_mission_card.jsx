@@ -34,7 +34,6 @@ export class ClssSingle_Mission_Card extends React.Component {
         if (!this.props.p_shape) return ;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'prev');
-        c_mission.fn_updatePath(true);
         js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
     }
 
@@ -43,7 +42,6 @@ export class ClssSingle_Mission_Card extends React.Component {
         if (!this.props.p_shape) return ;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'next');
-        c_mission.fn_updatePath(true);
         js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
     }
 

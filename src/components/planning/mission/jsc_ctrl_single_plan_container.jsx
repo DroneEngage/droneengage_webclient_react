@@ -37,6 +37,8 @@ export  class ClssSingle_Plan_Container extends React.Component {
 
     
     fn_displayGeoForm(me, p_event) {
+
+        js_common.fn_console_log("Mission Selected");
         // not a marker
         if (p_event.m_main_de_mission === null || p_event.m_main_de_mission === undefined) {
             js_common.fn_console_log("MISSION:NULL HERE");
@@ -57,6 +59,12 @@ export  class ClssSingle_Plan_Container extends React.Component {
 
         js_common.fn_console_log("REACT:displayGeoForm");
 
+        p_event.m_main_de_mission.fn_activateMissionItem(p_event.id,null)
+        if (p_event.m_main_de_mission)
+        {
+            p_event.m_main_de_mission.fn_updatePath(true);
+        }
+            
         if (me.state.m_update === 0) return ;
         me.setState({ s_shape: p_event });
         
