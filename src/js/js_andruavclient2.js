@@ -722,6 +722,15 @@ class CAndruavClient {
             DS: this.m_andruavUnit.Description,
             p: this._permissions_
         };
+
+        // embedding messages - new technique.
+        if (js_globals.myposition !== null)
+        {
+            const loc = js_globals.myposition.coords;
+            const cmd = CCommandAPI.API_do_SetHomeLocation(null, loc.latitude, loc.longitude, loc.altitude, loc.accuracy, loc.altitudeAccuracy);
+            msg[cmd.mt] = cmd.ms;
+        }
+        
         
         this.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_ID, msg);
     };
@@ -934,20 +943,13 @@ class CAndruavClient {
     }
 
 
-    API_do_SetHomeLocation(p_partyID, p_lat, p_lng, p_alt) {
+    API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
+        
         if (p_partyID === null  || p_partyID === undefined) return ;
-        if (p_alt === null || p_alt === undefined) {
-            p_alt = 0;
-        }
-
-        let p_msg = {
-            T: p_lat,
-            O: p_lng,
-            A: p_alt
-
-        };
-
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SetHomeLocation, p_msg);
+        
+        const cmd = CCommandAPI.API_do_SetHomeLocation(null, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy);
+        
+        this.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
     }
 
     API_do_GetHomeLocation (p_andruavUnit)
@@ -1811,6 +1813,7 @@ class CAndruavClient {
                 let v_trigger_on_FCB = false;
                 let v_trigger_on_flightMode = false;
                 let v_trigger_on_module_changed = false;
+                let v_trigger_on_home_point_changed = false;
                 let v_trigger_on_vehiclechanged = false;
                 let v_trigger_on_swarm_status = false;
                 let v_trigger_on_swarm_status2 = false;
@@ -1854,7 +1857,15 @@ class CAndruavClient {
                             p_unit.m_modules.addModules (p_jmsg.m1);
                         }
 
-                        
+                        if (p_unit.m_IsGCS === true) {
+                            if (p_jmsg.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation))
+                            {
+                                const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
+                                p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
+                                v_trigger_on_home_point_changed = true;
+                            }
+                        }
+
                         if (p_jmsg.hasOwnProperty('dv') === true) {
                             p_unit.m_isDE = true;
                             if(p_unit.m_version !== p_jmsg['dv'])
@@ -1984,6 +1995,13 @@ class CAndruavClient {
                         
                         if (p_jmsg.hasOwnProperty('m1') === true) {
                             p_unit.m_modules.addModules (p_jmsg.m1);
+                        }
+
+                        if (p_jmsg.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation))
+                        {
+                                const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
+                                p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
+                                v_trigger_on_home_point_changed = true;
                         }
 
                         if (p_jmsg.hasOwnProperty('dv') === true) {
@@ -2136,6 +2154,10 @@ class CAndruavClient {
                         // TODO:  not handled... please handle
                         js_eventEmitter.fn_dispatch(js_globals.EE_onModuleUpdated, p_unit);
                     } 
+
+                    if (v_trigger_on_home_point_changed) {
+                        js_eventEmitter.fn_dispatch(js_globals.EE_HomePointChanged, p_unit);
+                    }
                         
             }
             break;

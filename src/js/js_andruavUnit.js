@@ -325,6 +325,15 @@ class C_GeoTags {
     };
   }
 
+  fn_addHomePoint(p_lat, p_lng, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
+    this.p_HomePoint.lat = p_lat;
+    this.p_HomePoint.lng = p_lng;
+    this.p_HomePoint.alt = p_altitude;
+    this.p_HomePoint.radius_accuracy = p_radius_accuracy;     // Radius Accuracy in meters
+    this.p_HomePoint.altitude_accuracy = p_altitude_accuracy; // Altitude Accuracy in meters
+    this.p_HomePoint.m_isValid = true;
+  }
+
   fn_addDestinationPoint(p_lat, p_lng, p_alt, p_type) {
     if (this.p_DestinationPoint.type !== p_type) {
       // type has changed so we need a new icon.
