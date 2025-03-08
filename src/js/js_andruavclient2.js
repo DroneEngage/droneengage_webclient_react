@@ -373,7 +373,9 @@ class CAndruavClient {
         if (p_target !== null && p_target !== undefined) {
             v_rountingMsg = CMD_COMM_INDIVIDUAL;
         } else { // if you want to prevent GCS to GCS.
-            if ((p_target === null || p_target === undefined) && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true)) {
+            if ((p_target === null || p_target === undefined) 
+                && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true
+            || js_localStorage.fn_getGCSShowMe() === false)) {
                 p_target = CONST_TARGETS_DRONES;
                 v_rountingMsg = CMD_COMM_INDIVIDUAL;
             } else {
@@ -724,7 +726,9 @@ class CAndruavClient {
         };
 
         // embedding messages - new technique.
-        if (js_globals.myposition !== null)
+        if ((js_globals.myposition !== null) 
+            && (js_siteConfig.CONST_DONT_BROADCAST_GCS_LOCATION === false)
+        )
         {
             const loc = js_globals.myposition.coords;
             const cmd = CCommandAPI.API_do_SetHomeLocation(null, loc.latitude, loc.longitude, loc.altitude, loc.accuracy, loc.altitudeAccuracy);

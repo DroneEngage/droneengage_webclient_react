@@ -41,7 +41,7 @@ export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/sate
  * Location of GCS are not sent over network. Only The existence of connected GCS are shared.
  */
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
-
+export let CONST_DONT_BROADCAST_GCS_LOCATION = true;
 
 /**
  * This is for disable experimental features.
@@ -92,6 +92,8 @@ function loadConfigSync() {
             if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
             
             if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
+            if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
+            if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
             
             if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
             if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;

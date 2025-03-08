@@ -155,6 +155,16 @@ class CLocalStorage {
         return this._getValue('_vTabsDisplayEnabled', 'true') === 'true';
     }
 
+    fn_setGCSShowMe(value)
+    {
+        this._setValue('_vGCSShowMe', value.toString());
+    }
+
+    fn_getGCSShowMe()
+    {
+        return this._getValue('_vGCSShowMe', 'true') === 'true';
+    }
+
     // Unit Sort Enabled
     fn_setUnitSortEnabled(value) {
         this._setValue('_vUnitSortEnabled', value.toString());
