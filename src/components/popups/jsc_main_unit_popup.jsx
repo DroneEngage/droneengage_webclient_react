@@ -38,81 +38,75 @@ export class ClssMainUnitPopup extends React.Component {
     }
 
     generatePopup() {
-        let markerContent = [];
-        let keyCounter = 0; // Counter to generate unique keys
+        const c_unit = this.props.p_unit;
+        const markerContent = [];
+        let keyCounter = 0;
     
-        // is armed
-        let armedBadge;
-		if (this.props.p_unit.m_isArmed) armedBadge = <span className="text-danger">&nbsp;<strong>ARMED</strong>&nbsp;</span>;
-		else armedBadge = <span key={this.key + 'ar1'} className="text-success">&nbsp;disarmed&nbsp;</span>;
-		
-
-        // is flying
-        let flying;
-        if (this.props.p_unit.m_isFlying) flying = <span className="text-danger">&nbsp;flying&nbsp;</span>;
-		else flying = <span key={this.key + 'ar2'} className="text-success">&nbsp;on-ground&nbsp;</span>;
-
-
-        
-        // append is armed - flying
-        markerContent.push (<p key={this.key + 'pop111'}  className='m-0 p-0'>{armedBadge} - {flying}</p>);
-        
-        // append flying mode
-        if (this.props.p_unit.m_IsGCS === false) {
-            markerContent.push(
-                <p key={`${this.key}-flightmode-${keyCounter++}`} className='m-0 text-success'>
-                    <strong>{hlp_getFlightMode(this.props.p_unit)}</strong>
-                </p>
-            );
-        } else {
-            markerContent.push(
-                <p key={`${this.key}-gcs-${keyCounter++}`} className='m-0'>
-                    <span className='text-success'>Ground Control Station</span>
-                </p>
-            );
-        }
+        const armedBadge = c_unit.m_isArmed ? (
+            <span className="text-danger">&nbsp;<strong>ARMED</strong>&nbsp;</span>
+        ) : (
+            <span key={this.key + 'ar1'} className="text-success">&nbsp;disarmed&nbsp;</span>
+        );
     
-        // Append altitude
-        const vAlt = this.props.p_unit.m_Nav_Info.p_Location.alt_relative;
-        const vAlt_abs = this.props.p_unit.m_Nav_Info.p_Location.alt_abs;
+        const flying = c_unit.m_isFlying ? (
+            <span className="text-danger">&nbsp;flying&nbsp;</span>
+        ) : (
+            <span key={this.key + 'ar2'} className="text-success">&nbsp;on-ground&nbsp;</span>
+        );
+    
         markerContent.push(
-            <p key={`${this.key}-altitude-${keyCounter++}`} className='m-0 p-0'>
+            <p key={this.key + 'pop110'} className="m-0 p-0 text-white bg-primary text-center">
+                <strong>{c_unit.m_unitName}</strong>
+            </p>
+        );
+        markerContent.push(
+            <p key={this.key + 'pop111'} className="m-0 p-0 width_fit_max">
+                {armedBadge} - {flying}
+            </p>
+        );
+    
+        markerContent.push(
+            <p key={`${this.key}-${c_unit.m_IsGCS ? 'gcs' : 'flightmode'}-${keyCounter++}`} className="m-0">
+                {c_unit.m_IsGCS ? (
+                    <span className="text-success">Ground Control Station</span>
+                ) : (
+                    <strong className="text-success">{hlp_getFlightMode(c_unit)}</strong>
+                )}
+            </p>
+        );
+    
+        const { alt_relative: vAlt, alt_abs: vAlt_abs, ground_speed: vSpeed, air_speed: vAirSpeed } = c_unit.m_Nav_Info.p_Location;
+    
+        markerContent.push(
+            <p key={`${this.key}-altitude-${keyCounter++}`} className="m-0 p-0">
                 {vAlt !== null && vAlt !== undefined ? (
-                    <span className="text-primary">{vAlt.toFixed(0)}<span className="text-primary"> m</span></span>
+                    <span className="text-primary">
+                        {vAlt.toFixed(0)}<span className="text-primary"> m </span>
+                    </span>
                 ) : (
                     <span className="text-secondary">?</span>
                 )}
                 {vAlt_abs !== null && vAlt_abs !== undefined && (
-                    <span><span className="text-primary">abs:</span> {vAlt_abs.toFixed(0)}</span>
+                    <span>
+                        <span className="text-primary">abs:</span> {vAlt_abs.toFixed(0)}
+                    </span>
                 )}
             </p>
         );
     
-        // Append ground speed and air speed
-        const vSpeed = this.props.p_unit.m_Nav_Info.p_Location.ground_speed;
-        const vAirSpeed = this.props.p_unit.m_Nav_Info.p_Location.air_speed;
-        markerContent.push(
-            <p key={`${this.key}-speed-${keyCounter++}`} className='m-0 p-0'>
-                <span className="text-primary">GS:</span>
-                <span className="text-success">
-                    {vSpeed !== null && vSpeed !== undefined ? vSpeed.toFixed(1) : '?'}
-                </span>
-                <span className="text-primary"> m/s</span>
-            </p>
-        );
-        markerContent.push(
-            <p key={`${this.key}-airspeed-${keyCounter++}`} className='m-0 p-0'>
-                <span className="text-primary">AS:</span>
-                <span className="text-success">
-                    {vAirSpeed !== null && vAirSpeed !== undefined ? vAirSpeed.toFixed(1) : '?'}
-                </span>
+        const speedDisplay = (label, speed) => (
+            <p key={`${this.key}-${label}-${keyCounter++}`} className="m-0 p-0">
+                <span className="text-primary">{label}:</span>
+                <span className="text-success">{speed !== null && speed !== undefined ? speed.toFixed(1) : '?'}</span>
                 <span className="text-primary"> m/s</span>
             </p>
         );
     
-        // Append latitude and longitude
+        markerContent.push(speedDisplay("GS", vSpeed));
+        markerContent.push(speedDisplay("AS", vAirSpeed));
+    
         markerContent.push(
-            <p key={`${this.key}-location-${keyCounter++}`} className='m-0 p-0'>
+            <p key={`${this.key}-location-${keyCounter++}`} className="m-0 p-0 ">
                 <span className="text-primary">lat:</span>
                 <span className="text-success">{(this.props.p_lat).toFixed(6)}</span>
                 <span className="text-primary">, lng:</span>
@@ -126,7 +120,7 @@ export class ClssMainUnitPopup extends React.Component {
     render()
     {
         return (
-            <div key={this.key + 'popmu'} >
+            <div key={this.key + 'popmu'} className='width_fit_max' >
             {this.generatePopup()}
             </div>
         );
