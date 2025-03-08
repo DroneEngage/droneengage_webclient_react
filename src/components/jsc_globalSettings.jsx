@@ -26,6 +26,7 @@ class ClssPreferences extends React.Component {
       this.m_unitSortRef = React.createRef();
       this.m_advancedRef = React.createRef();
       this.m_gcsDisplayRef = React.createRef();
+      this.m_gcsShowMeRef = React.createRef();
   }
 
   componentDidMount()
@@ -36,6 +37,7 @@ class ClssPreferences extends React.Component {
     this.m_unitSortRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
     this.m_advancedRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
+    this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
   }
 
 
@@ -89,6 +91,14 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
   }
 
+  fn_GCSShowMe (e)
+  {
+    const enabled = e.currentTarget.checked;
+    js_globals.v_enable_tabs_display = enabled;
+    js_localStorage.fn_setGCSShowMe(enabled);
+    js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
+  }
+
   fn_sortUnits (e)
   {
     const enabled = e.currentTarget.checked;
@@ -131,12 +141,14 @@ class ClssPreferences extends React.Component {
               <input className="form-check-input col-sm-4 " type="checkbox" id="check_unit_sort" ref={this.m_unitSortRef} onClick={ (e) => this.fn_sortUnits(e)} />
             </div>
             <div className="row mb-12 align-items-center">
-              <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_l " >Advanced Options</label>
-              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" ref={this.m_advancedRef} onClick={ (e) => this.fn_enableAdvanced(e)} />
-            </div>
-            <div className="row mb-12 align-items-center">
               <label htmlFor="check_gcs_display" className="col-sm-4 col-form-label al_l " >Show Connected GCS</label>
               <input className="form-check-input col-sm-8 " type="checkbox" id="check_gcs_display" ref={this.m_gcsDisplayRef} onClick={ (e) => this.fn_enableGCS(e)} />
+              <label htmlFor="check_gcs_show_me" className="col-sm-4 col-form-label al_r" title='show me in GCS list'>Show Me</label>
+              <input className="form-check-input col-sm-4 " type="checkbox" id="check_gcs_show_me" ref={this.m_gcsShowMeRef} onClick={ (e) => this.fn_GCSShowMe(e)} />
+            </div>
+            <div className="row mb-12 align-items-center">
+              <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_l " >Advanced Options</label>
+              <input className="form-check-input col-sm-8 " type="checkbox" id="check_advanced" ref={this.m_advancedRef} onClick={ (e) => this.fn_enableAdvanced(e)} />
             </div>
           </fieldset>
           
