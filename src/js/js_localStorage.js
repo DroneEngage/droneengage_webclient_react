@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 import { js_globals } from './js_globals.js';
+import * as js_common from './js_common.js'
 
 class CLocalStorage {
     constructor() {
@@ -38,6 +39,22 @@ class CLocalStorage {
         }
     }
 
+
+    // Generic method to get a value from session storage
+    _getSessionValue(key, defaultValue) {
+        if (!this.isSupported()) return defaultValue;
+
+        const value = sessionStorage.getItem(key);
+        return value !== null && value !== undefined ? value : defaultValue;
+    }
+
+    // Generic method to set a value in session storage
+    _setSessionValue(key, value) {
+        if (this.isSupported()) {
+            sessionStorage.setItem(key, value);
+        }
+    }
+
     // Language
     fn_setLanguage(value) {
         this._setValue('_vLang', value);
@@ -67,11 +84,14 @@ class CLocalStorage {
 
     // Unit ID
     fn_setUnitID(value) {
-        this._setValue('_vUnitID', value);
+        this._setSessionValue('_vUnitID', value);
     }
 
+    fn_resetUnitID() {
+        this.fn_setUnitID ('WEB_GCS_' + js_common.fn_generateRandomString(3));
+    }
     fn_getUnitID() {
-        return this._getValue('_vUnitID', 'WebGCS1');
+        return this._getSessionValue('_vUnitID', 'WEB_GCS_' + js_common.fn_generateRandomString(3));
     }
 
     // Group Name
@@ -155,13 +175,11 @@ class CLocalStorage {
         return this._getValue('_vTabsDisplayEnabled', 'true') === 'true';
     }
 
-    fn_setGCSShowMe(value)
-    {
+    fn_setGCSShowMe(value) {
         this._setValue('_vGCSShowMe', value.toString());
     }
 
-    fn_getGCSShowMe()
-    {
+    fn_getGCSShowMe() {
         return this._getValue('_vGCSShowMe', 'true') === 'true';
     }
 

@@ -94,6 +94,45 @@ export var QueryString = function () {
 	return query_string; // Return the parsed query string object
   }();
 
+
+/**
+ * Retrieves the status of the current browser tab session.
+ * 
+ * This function checks if the current tab is a new session, a refreshed session,
+ * or a duplicate session based on the tab ID stored in sessionStorage and localStorage.
+ * 
+ * @returns {string} - Returns 'new' if the session is starting for the first time,
+ *                     'refresh' if the session is a refresh of an existing tab,
+ *                     or 'duplicate' if the tab ID already exists in localStorage.
+ */
+  export function getTabStatus() {
+	const tabId = sessionStorage.getItem('tabId') || js_common.fn_generateRandomString(6);
+	sessionStorage.setItem('tabId', tabId);
+  
+	const isSessionStart = sessionStorage.getItem('isSessionStart') === null;
+  
+	if (isSessionStart) {
+	  sessionStorage.setItem('isSessionStart', 'false'); // Mark session as started
+	}
+  
+	if (localStorage.getItem(tabId)) {
+	  return 'duplicate';
+	} else {
+	  localStorage.setItem(tabId, 'active');
+	  window.addEventListener('beforeunload', () => {
+		localStorage.removeItem(tabId);
+	  });
+  
+	  if (isSessionStart) {
+		return 'new';
+	  } else {
+		return 'refresh';
+	  }
+	}
+  }
+  
+   
+
 // COULD BE REMOVED I GUESS
 function enableDragging() {
 	(function ($) {
@@ -144,6 +183,22 @@ function enableDragging() {
 }
         
 
+/**
+ * Handles keyboard events for the application.
+ * 
+ * This function sets up a keydown event listener on the body element to handle
+ * various keyboard shortcuts and prevent default behaviors for specific keys.
+ * 
+ * - If the `Alt` key is pressed, no specific action is taken.
+ * - If the `Ctrl` key is pressed along with the `R` key, the default browser
+ *   refresh behavior is prevented.
+ * - If the target element is not a textarea, text input, email input, or password
+ *   input, the following shortcuts are handled:
+ *   - Pressing the `M` key (case insensitive) triggers the `fn_showMap` function.
+ *   - Pressing the `R` key (case insensitive) triggers the `fn_showVideoMainTab` function.
+ * 
+ * @function fn_handleKeyBoard
+ */
 function fn_handleKeyBoard() {
 
 	$('body').keydown(function (p_event) {
@@ -3056,7 +3111,7 @@ function fn_handleKeyBoard() {
 				}
 				js_globals.v_andruavClient = js_andruavclient2.AndruavClient;
 
-				js_globals.v_andruavClient.partyID = ($('#txtUnitID').val()+$('#txtUnitID_ext').val()).replace('#','_');
+				js_globals.v_andruavClient.partyID = $('#txtUnitID').val();
 				js_globals.v_andruavClient.unitID = $('#txtUnitID').val();
 				js_globals.v_andruavClient.m_groupName = $('#txtGroupName').val();
 				js_globals.v_andruavClient.fn_init();
@@ -3283,10 +3338,11 @@ function fn_handleKeyBoard() {
 				$('div#debugpanel').show();
 			}
 
+
 			// LOGIN		
 			if ((QueryString.email === null || QueryString.email === undefined) || (QueryString.accesscode === null || QueryString.accesscode === undefined)) {
 				// window.location.href = "http://example.com";
-				$('#txtUnitID').val('GCSMAP_' + js_common.fn_generateRandomString(3));
+				//$('#txtUnitID').val('GCSMAP_' + js_common.fn_generateRandomString(3));
 
 			}
 			else {

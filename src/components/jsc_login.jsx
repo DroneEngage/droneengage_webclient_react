@@ -9,6 +9,7 @@ import { js_localStorage } from '../js/js_localStorage'
 import { js_speak } from '../js/js_speak'
 import { js_eventEmitter } from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
+import { getTabStatus } from '../js/js_main';
 
 const CONST_NOT_CONNECTION_OFFLINE 		= 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS 	= 1;
@@ -95,6 +96,28 @@ export class ClssLoginControl extends React.Component {
 	componentDidMount() {
 		// Use setState to update m_update
 		this.setState({ m_update: 1 });
+
+		
+		const tabStatus = getTabStatus();
+
+		switch (tabStatus) {
+		case 'new':
+			console.log('This is a newly opened tab.');
+			// Perform actions for a new tab
+			break;
+		case 'refresh':
+			console.log('This tab was refreshed.');
+			// Perform actions for a refreshed tab
+			break;
+		case 'duplicate':
+			console.log('This tab is a duplicate.');
+			js_localStorage.fn_resetUnitID();
+			// Perform actions for a duplicate tab
+			break;
+		default:
+			console.log('Unknown tab status.');
+		}
+
 	  
 		// Use the QueryString function to get query parameters
 		const queryParams = QueryString;
@@ -202,7 +225,6 @@ export class ClssLoginControl extends React.Component {
 					  QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()
 					}
 				  />
-				  <input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
 				</div>
 				<br />
 			  </div>
@@ -296,7 +318,7 @@ export class ClssLoginControl extends React.Component {
 						}
 						disabled // Disable input during connection
 					  />
-					  <input type="hidden" id="txtUnitID_ext" name="txtUnitID_ext" value={"_" + js_common.fn_generateRandomString(2)} />
+					
 					</div>
 					<br />
 				  </div>
