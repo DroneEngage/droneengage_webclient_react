@@ -944,6 +944,9 @@ function fn_handleKeyBoard() {
 
 
 		function gps_showError(p_error) {
+			
+			js_globals.myposition = null;
+
 			switch (p_error.code) {
 				case p_error.PERMISSION_DENIED:
 					//x.innerHTML = "User denied the request for Geolocation."
@@ -2399,7 +2402,7 @@ function fn_handleKeyBoard() {
 
 
 				}
-				//js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName,null, false,false, null,[64,64]) ;
+				
 				js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
 				js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
 			}
@@ -2490,8 +2493,26 @@ function fn_handleKeyBoard() {
 			if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
 				const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 				let v_home = js_leafletmap.fn_CreateMarker('./images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,48], false, false, v_html, [24,24]); 
+
 				js_leafletmap.fn_setPosition(v_home,v_latlng)
-				p_andruavUnit.m_gui.m_marker_home = v_home;
+
+				// if (p_andruavUnit.m_IsGCS === true) {
+				// 	js_leafletmap.fn_createBootStrapIcon (v_home, 'bi bi-c-circle', '#ffff0000', [32, 32]);
+				// }
+
+				let v_circleMission  = null;
+				if (p_andruavUnit.m_Geo_Tags.p_HomePoint.radius_accuracy) {
+					const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat, p_andruavUnit.m_Geo_Tags.p_HomePoint.lng);
+						
+					v_circleMission = js_leafletmap.fn_drawMissionCircle(latlng,p_andruavUnit.m_Geo_Tags.p_HomePoint.radius_accuracy);
+				}
+				
+						
+				p_andruavUnit.m_gui.m_marker_home = 
+				{
+					'home_marker': v_home,
+					'radius_marker': v_circleMission
+				}
 				
 				js_leafletmap.fn_addListenerOnClickMarker(v_home, 
 					function (p_lat, p_lng) {
@@ -2502,7 +2523,9 @@ function fn_handleKeyBoard() {
 				});
 			}
 
-			js_leafletmap.fn_setPosition(p_andruavUnit.m_gui.m_marker_home,v_latlng);
+			js_leafletmap.fn_setPosition(p_andruavUnit.m_gui.m_marker_home.home_marker,v_latlng);
+			
+			
 
 		};
 
@@ -2791,7 +2814,7 @@ function fn_handleKeyBoard() {
 			let _style = "", _icon = "";
 
 
-			let v_contentString = "<p class='img-rounded bg-primary text-white" + _style + "'><strong> Home of " + p_andruavUnit.m_unitName + _icon + "</strong></p><span class='help-block'><small>lat:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat).toFixed(6) + ",lng:" + parseFloat(p_andruavUnit.m_Geo_Tags.p_HomePoint.lng).toFixed(6) + "</small></span>";
+			let v_contentString = "<p class='img-rounded bg-primary text-white" + _style + "'><strong> Home of " + p_andruavUnit.m_unitName + _icon + "</strong></p> ";
 
 			infowindow = js_leafletmap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
 		}

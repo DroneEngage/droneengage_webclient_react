@@ -377,12 +377,14 @@ class CLeafLetAndruavMap {
         }).addTo(this.m_Map);
     }
 
-    fn_drawMissionCircle(p_center, p_radius) {
+    fn_drawMissionCircle(p_center, p_radius, p_color) {
         
-        return L.polyline(p_center, {
+        const v_color = (p_color === '') ? '#3232CD' : p_color;
+
+        return L.circle(p_center, {
             radius: parseInt(p_radius),
             fill: true,
-            fillColor: '#3232CD',
+            fillColor: v_color,
             opacity: 1.0,
             weight: 0,
             fillOpacity: 0.25
