@@ -41,7 +41,7 @@ export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/sate
  * Location of GCS are not sent over network. Only The existence of connected GCS are shared.
  */
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
-export let CONST_DONT_BROADCAST_GCS_LOCATION = true;
+export let CONST_DONT_BROADCAST_GCS_LOCATION = false;
 
 /**
  * This is for disable experimental features.
