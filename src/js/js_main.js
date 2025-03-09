@@ -201,9 +201,10 @@ function enableDragging() {
  */
 function fn_handleKeyBoard() {
 
-	$('body').keydown(function (p_event) {
+	$('body').on('keydown',function (p_event) {
+		const key = p_event.key;
 		p_event = p_event || window.event;
-	if (p_event.key === null || p_event.key === undefined) return ;
+	if (key === null || key === undefined) return ;
 
 	if (p_event.type === "keydown")
 	{
@@ -222,15 +223,22 @@ function fn_handleKeyBoard() {
 		if ((p_event.target.type !== 'textarea') 
 			&& (p_event.target.type !== 'text')
 			&& (p_event.target.type !== 'email')
-			&& (p_event.target.type !== 'password'))
+			&& (p_event.target.type !== 'password')
+			&& (p_event.target.type !== 'number'))
 		
 		{
-			if (p_event.key.toLowerCase() === 'm') {
+			if (key.toLowerCase() === 'm') {
 				fn_showMap();
 			}
 			
-			if (p_event.key.toLowerCase() === 'r') {
+			if (key.toLowerCase() === 'r') {
 				fn_showVideoMainTab();
+			}
+
+			if (key >= '1' && key <= '6')
+			{
+				js_localStorage.fn_setDisplayMode(parseInt(parseInt(key)-1));
+				fn_applyControl(parseInt(key));
 			}
 		}
 	}
@@ -896,7 +904,6 @@ function fn_handleKeyBoard() {
 				js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_FEET_TO_METER;
 				js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_FEET_TO_METER;
 			}
-			eval("if (window.top !== window.self) window.top.location.replace(window.self.location.href)");
 			js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
 			js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
 		};
