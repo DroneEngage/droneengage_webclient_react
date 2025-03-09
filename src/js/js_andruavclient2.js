@@ -731,7 +731,7 @@ class CAndruavClient {
         )
         {
             const loc = js_globals.myposition.coords;
-            const cmd = CCommandAPI.API_do_SetHomeLocation(null, loc.latitude, loc.longitude, loc.altitude, loc.accuracy, loc.altitudeAccuracy);
+            const cmd = CCommandAPI.API_do_SendHomeLocation(null, loc.latitude, loc.longitude, loc.altitude, loc.accuracy, loc.altitudeAccuracy);
             msg[cmd.mt] = cmd.ms;
         }
         
@@ -947,11 +947,21 @@ class CAndruavClient {
     }
 
 
-    API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
+    API_do_SendHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
         
         if (p_partyID === null  || p_partyID === undefined) return ;
         
-        const cmd = CCommandAPI.API_do_SetHomeLocation(null, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy);
+        const cmd = CCommandAPI.API_do_SendHomeLocation(null, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy);
+        
+        this.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
+    }
+
+
+    API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude) {
+        
+        if (p_partyID === null  || p_partyID === undefined) return ;
+        
+        const cmd = CCommandAPI.API_do_SetHomeLocation(null, p_latitude, p_longitude, p_altitude);
         
         this.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
     }

@@ -83,7 +83,26 @@ export class CCommandAPI
         return msg;
     };
 
-    static API_do_SetHomeLocation(p_andruavUnit, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
+    static API_do_SetHomeLocation(p_andruavUnit, p_latitude, p_longitude, p_altitude) {
+
+        if (p_altitude === null || p_altitude === undefined) {
+            p_altitude = 0;
+        }
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SetHomeLocation,
+            'ms': {
+                    T: p_latitude,
+                    O: p_longitude,
+                    A: p_altitude,
+               }
+        };
+
+        return msg;
+    }
+
+    static API_do_SendHomeLocation(p_andruavUnit, p_latitude, p_longitude, p_altitude, p_radius_accuracy, p_altitude_accuracy) {
 
         if (p_altitude === null || p_altitude === undefined) {
             p_altitude = 0;
@@ -103,7 +122,7 @@ export class CCommandAPI
 
         return msg;
     }
-
+    
     static API_requestGPIOStatus (p_andruavUnit, p_pin_number)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
