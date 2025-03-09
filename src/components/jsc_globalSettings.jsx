@@ -157,40 +157,35 @@ class ClssPreferences extends React.Component {
 
 }
 export default class ClssGlobalSettings extends React.Component {
-  
-  constructor()
-	{
-		super ();
-		this.state = {
-		    m_unitText: 'm',
-        CONST_DEFAULT_ALTITUDE:js_globals.CONST_DEFAULT_ALTITUDE,
-        CONST_DEFAULT_RADIUS:js_globals.CONST_DEFAULT_RADIUS,
-		    'm_update': 0
-		};
+  constructor() {
+    super();
+    this.state = {
+      m_unitText: 'm',
+      CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE,
+      CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS,
+      'm_update': 0,
+    };
 
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
-    
-    if (js_localStorage.fn_getMetricSystem() === true)
-    {
+    this.altitudeInputRef = React.createRef(); // Add altitude input reference
+    this.radiusInputRef = React.createRef(); // Add radius input reference
+
+    if (js_localStorage.fn_getMetricSystem() === true) {
       this.state.m_unitText = 'm';
-    }
-    else
-    {
+    } else {
       this.state.m_unitText = 'ft';
     }
 
-    this.state.CONST_DEFAULT_ALTITUDE=js_localStorage.fn_getDefaultAltitude();
-    this.state.CONST_DEFAULT_RADIUS=js_localStorage.fn_getDefaultRadius();
-     
-    js_eventEmitter.fn_subscribe (js_globals.EE_Auth_Logined, this, this.fn_onAuthStatus);
-	 
-	}
+    this.state.CONST_DEFAULT_ALTITUDE = js_localStorage.fn_getDefaultAltitude();
+    this.state.CONST_DEFAULT_RADIUS = js_localStorage.fn_getDefaultRadius();
 
- shouldComponentUpdate(nextProps, nextState) {
-    
-    if (this.props.CONST_DEFAULT_ALTITUDE !== nextState.CONST_DEFAULT_ALTITUDE) {
-     return true;
+    js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined, this, this.fn_onAuthStatus);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.CONST_DEFAULT_ALTITUDE !== nextState.CONST_DEFAULT_ALTITUDE) {
+      return true;
     }
     if (this.state.CONST_DEFAULT_RADIUS !== nextState.CONST_DEFAULT_RADIUS) {
       return true;
@@ -198,179 +193,188 @@ export default class ClssGlobalSettings extends React.Component {
     if (this.state.m_unitText !== nextState.m_unitText) {
       return true;
     }
-     
+
     return false;
   }
-  
-  fn_handleFileChange (e)
-  {
+
+  fn_handleFileChange(e) {
     setSelectedMissionFilePathToWrite(this.mission_file_ref.current.files);
   }
 
-  clickToggleUnit (e) {
-    
-      gui_toggleUnits();
+  clickToggleUnit(e) {
+    gui_toggleUnits();
 
-      if (js_localStorage.fn_getMetricSystem() === true)
-      {
-        this.setState({m_unitText:'m'});
-      }
-      else
-      {
-        this.setState({m_unitText:'ft'});
-      }
+    if (js_localStorage.fn_getMetricSystem() === true) {
+      this.setState({ m_unitText: 'm' });
+    } else {
+      this.setState({ m_unitText: 'ft' });
+    }
 
-   
-      this.setState ({CONST_DEFAULT_ALTITUDE:js_globals.CONST_DEFAULT_ALTITUDE});
-      this.setState ({CONST_DEFAULT_RADIUS:js_globals.CONST_DEFAULT_RADIUS});
-      
-			  
+    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
+    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
   }
 
-
-  fn_onAuthStatus (me,res) {
-    if (me.state.m_update === 0) return ;
-    me.setState({'m_update': me.state.m_update +1});
+  fn_onAuthStatus(me, res) {
+    if (me.state.m_update === 0) return;
+    me.setState({ 'm_update': me.state.m_update + 1 });
   }
 
   componentDidMount() {
-    this.setState({'m_update': this.state.m_update +1});
+    this.setState({ 'm_update': this.state.m_update + 1 });
   }
 
- 
-  componentWillUnmount () {
-    
+  componentWillUnmount() {
     this.state.m_update = 0;
-
-		js_eventEmitter.fn_unsubscribe (js_globals.EE_Auth_Logined,this);
-  }
-  
-  
-
-
-  onChange (e) {
-
-    js_globals.CONST_DEFAULT_ALTITUDE = parseInt(this.mission_file_ref.current.value); // Updated this line
-    js_globals.CONST_DEFAULT_RADIUS = parseInt(this.mission_file_ref.current.value); 
- 
-    if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min) js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
-    if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)     js_globals.CONST_DEFAULT_RADIUS   = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
-
-
-    this.setState ({CONST_DEFAULT_ALTITUDE:js_globals.CONST_DEFAULT_ALTITUDE});
-    this.setState ({CONST_DEFAULT_RADIUS:js_globals.CONST_DEFAULT_RADIUS});
-
+    js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Logined, this);
   }
 
+  onChange(e) {
+    const altitudeValue = parseInt(this.altitudeInputRef.current.value);
+    const radiusValue = parseInt(this.radiusInputRef.current.value);
 
+    js_globals.CONST_DEFAULT_ALTITUDE = altitudeValue;
+    js_globals.CONST_DEFAULT_RADIUS = radiusValue;
 
-  fn_fireDeEvent(value)
-  {
-    js_andruavclient2.AndruavClient.API_FireDeEvent (null,value);
+    if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min)
+      js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
+    if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)
+      js_globals.CONST_DEFAULT_RADIUS = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
+
+    js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
+    js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
+  
+    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
+    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
   }
 
-  
-
-
+  fn_fireDeEvent(value) {
+    js_andruavclient2.AndruavClient.API_FireDeEvent(null, value);
+  }
 
   render() {
+    let v_gadgets = [];
+    let v_uploadFile = [];
+    let v_telemetryModes = [];
 
-     
-
-  //  js_common.fn_console_log ("REACT:RENDER ClssGlobalSettings" + this.state.js_globals.CONST_DEFAULT_ALTITUDE );
-  let v_gadgets = [];
-  let v_uploadFile = [];
-  let v_telemetryModes = [];
-  
-  v_gadgets.push (
-      <div key={this.key + "1"} className="row ">
-                <div className="col-xs-6 col-sm-6 col-lg-6">
-                  <div className="form-inline">
-                    <div className="form-group">
-                      <div>
-                        <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width"><small>Alt&nbsp;Step</small></label>
-                        <input id="txt_defaultAltitude" type="number" min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)} className="form-control input-xs input-sm"  onChange={(e) => this.onChange(e)}  value={this.state.CONST_DEFAULT_ALTITUDE} />
-                        <button id="btn_defaultAltitude" className="btn btn-secondary btn-sm mb-1 pt-0 pb-1" type="button" onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-xs-6 col-sm-6 col-lg-6">
-                  <div className="form-inline">
-                    <div className="form-group">
-                        <div>
-                          <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width"><small>Radius</small></label>
-                          <input id="txt_defaultCircle" type="number" min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)} className="form-control input-xs input-sm"  onChange={(e) => this.onChange(e)}  value={this.state.CONST_DEFAULT_RADIUS}/>
-                          <button id="btn_defaultCircle" className="btn btn-secondary btn-sm mb-1 pt-0 pb-1" type="button"  onClick={ (e) => this.clickToggleUnit(e) }>{this.state.m_unitText}</button>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-            
-    );
-
-
-    v_uploadFile.push (
-              <div key={this.key + 'v_uploadFile0'} className="row width_100 margin_zero css_margin_top_small ">
-                <div  key={this.key + 'v_uploadFile1'} className={"col-12 "}>
-                  <div key={this.key + 'v_uploadFile2'} className="form-inline">
-                    <div key={this.key + 'v_uploadFile3'} className="form-group">
-                        <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2"><small>Global&nbsp;Mission&nbsp;File</small></label>
-                        <input type="file" id="btn_filesWP" name="file" className="form-control input-xs input-sm css_margin_left_5 line-height-normal" ref={this.mission_file_ref} onChange={(e)=>this.fn_handleFileChange(e)}/>
-                    </div>
-                  </div>
-                </div>
+    v_gadgets.push(
+      <div key={this.key + '1'} className="row ">
+        <div className="col-xs-6 col-sm-6 col-lg-6">
+          <div className="form-inline">
+            <div className="form-group">
+              <div>
+                <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width">
+                  <small>Alt&nbsp;Step</small>
+                </label>
+                <input
+                  id="txt_defaultAltitude"
+                  type="number"
+                  min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)}
+                  className="form-control input-xs input-sm"
+                  onChange={(e) => this.onChange(e)}
+                  value={this.state.CONST_DEFAULT_ALTITUDE}
+                  ref={this.altitudeInputRef} // Add ref here
+                />
+                <button
+                  id="btn_defaultAltitude"
+                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                  type="button"
+                  onClick={(e) => this.clickToggleUnit(e)}
+                >
+                  {this.state.m_unitText}
+                </button>
               </div>
-      );
-
-    
-
-
-    v_uploadFile.push ();
-    let cls_ctrl_wp = '  ';
-    if (!js_andruavAuth.fn_do_canControlWP()) 
-    { // no permission
-      cls_ctrl_wp = ' hidden disabled ';
-    }
-        
-  
-  return (
-     <div key={this.key + 'g1'} className="row margin_zero">
-            <div className="card text-white  border-light mb-3 padding_zero" >
-              <div className="card-header  text-center user-select-none"> <strong>Settings</strong></div>
-                  <div className="card-body">
-                      <ul className="nav nav-tabs">
-                          <li className="nav-item">
-                              <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#settings_home"}>Defaults</a>
-                          </li>
-                          <li className="nav-item">
-                              <a className={"nav-link user-select-none " + cls_ctrl_wp} data-bs-toggle="tab" href={"#settings_profile"}>Mission</a>
-                          </li>
-                          <li className="nav-item">
-                              <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#settings_preference"}>Preferences</a>
-                          </li>
-                      </ul>
-                      <div id="main_settings_tab" className="tab-content">
-                          <div className="tab-pane fade  active show pt-2" id={"settings_home"}>
-                          {v_gadgets}
-                          {v_telemetryModes}      
-                          
-                          </div>
-                          <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
-                          {v_uploadFile} 
-                          <ClssFireEvent label={"Event DroneEngage No."} onClick={ (value) => this.fn_fireDeEvent(value)}/>
-                          </div>
-                          <div className="tab-pane fade" id={"settings_preference"}>
-                            <ClssPreferences/>
-                          </div>
-                      </div>
-                  
-                  </div>
             </div>
+          </div>
+        </div>
+        <div className="col-xs-6 col-sm-6 col-lg-6">
+          <div className="form-inline">
+            <div className="form-group">
+              <div>
+                <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width">
+                  <small>Radius</small>
+                </label>
+                <input
+                  id="txt_defaultCircle"
+                  type="number"
+                  min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)}
+                  className="form-control input-xs input-sm"
+                  onChange={(e) => this.onChange(e)}
+                  value={this.state.CONST_DEFAULT_RADIUS}
+                  ref={this.radiusInputRef} // Add ref here
+                />
+                <button
+                  id="btn_defaultCircle"
+                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                  type="button"
+                  onClick={(e) => this.clickToggleUnit(e)}
+                >
+                  {this.state.m_unitText}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
-  }
-};
+
+    v_uploadFile.push (
+      <div key={this.key + 'v_uploadFile0'} className="row width_100 margin_zero css_margin_top_small ">
+        <div  key={this.key + 'v_uploadFile1'} className={"col-12 "}>
+          <div key={this.key + 'v_uploadFile2'} className="form-inline">
+            <div key={this.key + 'v_uploadFile3'} className="form-group">
+                <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2"><small>Global&nbsp;Mission&nbsp;File</small></label>
+                <input type="file" id="btn_filesWP" name="file" className="form-control input-xs input-sm css_margin_left_5 line-height-normal" ref={this.mission_file_ref} onChange={(e)=>this.fn_handleFileChange(e)}/>
+            </div>
+          </div>
+        </div>
+      </div>
+);
 
 
+
+
+v_uploadFile.push ();
+let cls_ctrl_wp = '  ';
+if (!js_andruavAuth.fn_do_canControlWP()) 
+{ // no permission
+cls_ctrl_wp = ' hidden disabled ';
+}
+
+
+return (
+<div key={this.key + 'g1'} className="row margin_zero">
+    <div className="card text-white  border-light mb-3 padding_zero" >
+      <div className="card-header  text-center user-select-none"> <strong>Settings</strong></div>
+          <div className="card-body">
+              <ul className="nav nav-tabs">
+                  <li className="nav-item">
+                      <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#settings_home"}>Defaults</a>
+                  </li>
+                  <li className="nav-item">
+                      <a className={"nav-link user-select-none " + cls_ctrl_wp} data-bs-toggle="tab" href={"#settings_profile"}>Mission</a>
+                  </li>
+                  <li className="nav-item">
+                      <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#settings_preference"}>Preferences</a>
+                  </li>
+              </ul>
+              <div id="main_settings_tab" className="tab-content">
+                  <div className="tab-pane fade  active show pt-2" id={"settings_home"}>
+                  {v_gadgets}
+                  {v_telemetryModes}      
+                  
+                  </div>
+                  <div className={"tab-pane fade pt-2" + cls_ctrl_wp} id={"settings_profile"}>
+                  {v_uploadFile} 
+                  <ClssFireEvent label={"Event DroneEngage No."} onClick={ (value) => this.fn_fireDeEvent(value)}/>
+                  </div>
+                  <div className="tab-pane fade" id={"settings_preference"}>
+                    <ClssPreferences/>
+                  </div>
+              </div>
+          
+          </div>
+    </div>
+</div>
+);
+}
+}
