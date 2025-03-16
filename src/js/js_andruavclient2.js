@@ -681,30 +681,6 @@ class CAndruavClient {
     
 
 
-    API_SendTelemetryData(p_andruavUnit, data) {
-        // var msg = {};
-        // msg.src = CONST_TELEMETRY_SOURCE_GCS;
-        let me = this;
-        let reader = new FileReader();
-        reader.onload = function (event) {
-            const contents = event.target.result;
-                
-            if (me.prv_parseGCSMavlinkMessage (p_andruavUnit, contents) !== true) 
-            {
-                me.API_sendBinCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_LightTelemetry, contents);
-            }
-
-            // Cleanup the reader object
-            reader.abort();
-            reader = null;
-					
-            return;
-            
-        }
-        reader.readAsArrayBuffer(data);
-        
-
-    };
 
     /**
      * 
@@ -2806,67 +2782,7 @@ class CAndruavClient {
     };
 
 
-    /**
-     * Parse Mavlink messages received as binary messages from GCS via AndruavWebPlugin
-     * @param {*} p_unit 
-     * @param {*} p_mavlinkPacket 
-     * @returns 
-     */
-    prv_parseGCSMavlinkMessage(p_unit, p_mavlinkPacket) 
-    {
-        let p_mavlinkGCSProcessor = new MAVLink20Processor(null, 0, 0);
-        const p_mavlinkMessages = p_mavlinkGCSProcessor.parseBuffer(new Uint8Array(p_mavlinkPacket));
-        const len = p_mavlinkMessages.length;
-        for (let i = 0; i < len; ++ i) {
-            const c_mavlinkMessage = p_mavlinkMessages[i];
-            if (c_mavlinkMessage.id === -1)
-            {
-                // bad mavlink ... make sure you are using MAVLINK V2
-                // dont notify as some times GCS tries both protocols.
-                //this.EVT_BadMavlink();
-                return ;
-            }
-            js_common.fn_console_log ("PARAM_GCS:" + c_mavlinkMessage.name);
-                       
-            switch (c_mavlinkMessage.header.msgId) {
-                case mavlink20.MAVLINK_MSG_ID_HEARTBEAT:
-                    return true;
-                break;
-                
 
-                case mavlink20.MAVLINK_MSG_ID_FILE_TRANSFER_PROTOCOL:
-                {
-                    // js_common.fn_console_log ("PARAMGCS: FTP " + c_mavlinkMessage.payload);
-                    // const c_keys = Object.keys(p_unit.m_FCBParameters.m_list);
-                    // const c_len = c_keys.length;
-                    // const c_list = p_unit.m_FCBParameters.m_list;
-                    // const Me = this;
-                    // if (this.m_mavlinkFTPProtocol.parseMavlinkGCS(c_mavlinkMessage,
-                    //     function (p_payload) 
-                    //     {
-                    //         var ftp = new mavlink20.messages.file_transfer_protocol(0, -1, -66);
-                    //         ftp.payload = p_payload;
-                    //         ftp.srcSystem=1;
-                    //         ftp.srcComponent=1;
-                    //     }) === true) 
-                    // {
-                    //     return false;
-                    // }
-                    
-                    return false;
-                    
-                }
-                break;
-
-                case mavlink20.MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
-                    return true;
-                
-            }
-        }
-        js_common.fn_console_log ("PARAM----API_sendBinCMD" + p_mavlinkMessages[0]);
-            
-        return false;
-    }
 
     /**
 	* Parse mavlink messages and try to extract information similar to Andruav Protocol to save traffic.
