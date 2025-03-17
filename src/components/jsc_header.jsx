@@ -64,7 +64,7 @@ class ClssHeaderControl extends React.Component {
                                     <a className="nav-link" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">Planner</a>
                                 </li>
                                 <li key="Manual" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Manual</a>
+                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Wiki</a>
                                 </li>
                                 <li key="FAQ" className="nav-item">
                                     <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
