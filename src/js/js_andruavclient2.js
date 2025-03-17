@@ -3328,10 +3328,10 @@ class CAndruavClient {
             // f: CONST_CS_LOGIN_TEMP_KEY
             // g: CONST_CS_SERVER_PUBLIC_HOST
             // s: SID
-            url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID;
+            url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';;
 
         } else {
-            url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID;
+            url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
 
         } url = url;
 
