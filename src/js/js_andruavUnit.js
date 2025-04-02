@@ -725,6 +725,7 @@ class C_GPIO {
 
     /*
      Json_de json_gpio = {
+        {"i", gpio.plugin_id},
         {"b", gpio.pin_number},
         {"m", gpio.pin_mode},
         {"t", gpio.gpio_type},
@@ -754,6 +755,7 @@ class C_GPIO {
         }
   
         const gpio_obj = {
+          pin_module_key: gpio.i==null?0:gpio.i, 
           pin_number: gpio.b,
           pin_mode: gpio.m,
           gpio_type: gpio.t,
@@ -762,7 +764,7 @@ class C_GPIO {
           pwm_width: gpio.d==null?0:gpio.d, 
         };
   
-        this.m_gpios[gpio.b] = gpio_obj;
+        this.m_gpios[gpio.i + '-' + gpio.b] = gpio_obj;
       });
     }
 }
@@ -790,7 +792,7 @@ class C_Modules {
     // check uavos_camera_plugin
     /*
 		{"v", module_item->version},
-		{"i", module_item->module_id},
+		{"i", module_item->module_key},
 		{"c", module_item->module_class},
 		{"t", module_item->time_stamp},
 		{"d", module_item->is_dead},

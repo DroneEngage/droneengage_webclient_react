@@ -110,10 +110,10 @@ export class ClssCtrlGPIO extends React.Component {
         const gpios_buttons = [];
 
         Object.entries(gpios).forEach(([key, gpio]) => {
-            const { pin_number, pin_mode, gpio_type, pin_value, pin_name } = gpio;
+            const { pin_module_key, pin_number, pin_mode, gpio_type, pin_value, pin_name } = gpio;
 
             gpios_buttons.push(
-                <ClssCtrlGPIO_Port key={v_andruavUnit.partyID + pin_number + key} p_unit={v_andruavUnit} gpio_obj={gpio} />
+                <ClssCtrlGPIO_Port key={v_andruavUnit.partyID + pin_module_key + pin_number + key} p_unit={v_andruavUnit} gpio_obj={gpio} />
             );
         });
 

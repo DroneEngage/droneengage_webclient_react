@@ -123,7 +123,7 @@ export class CCommandAPI
         return msg;
     }
     
-    static API_requestGPIOStatus (p_andruavUnit, p_pin_number)
+    static API_requestGPIOStatus (p_andruavUnit, p_module_key, p_pin_number)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
@@ -134,6 +134,7 @@ export class CCommandAPI
         if (p_pin_number !== null && p_pin_number !== undefined)
         {
             p_msg.p = p_pin_number;
+            p_msg.i = p_module_key;
         }
 
         const msg = 
@@ -146,10 +147,11 @@ export class CCommandAPI
     }
 
     
-    static API_writeGPIO (p_andruavUnit, p_pin_number, p_pin_value_new) {
+    static API_writeGPIO (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
+            i: p_module_key,
             a: js_andruavMessages.CONST_GPIO_ACTION_PORT_WRITE,
             //n: pin_name,  // optional if pin_number exists.
             p: p_pin_number,  // optional if pin_name exists.
@@ -166,11 +168,12 @@ export class CCommandAPI
     }
 
 
-    static API_writeGPIO_PWM (p_andruavUnit, p_pin_number, p_pin_value_new, p_pin_pwm_width_new)
+    static API_writeGPIO_PWM (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new)
     {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         let p_msg = {
+            i: p_module_key,
             a: js_andruavMessages.CONST_GPIO_ACTION_PORT_WRITE,
             //n: pin_name,  // optional if pin_number exists.
             p: p_pin_number,  // optional if pin_name exists.
