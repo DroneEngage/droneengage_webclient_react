@@ -145,13 +145,13 @@ export class ClssSingle_Mission_Card extends React.Component {
         
                     <div className='row'>
                         <div className='col-2'>
-                            <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>Prev</button>
+                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>{"<<"}</button>
                         </div>
                         <div className='col-6'>
                                 <input type='text' id={ordernum_id} className="form-control css_margin_top_small input-sm" disabled="disabled" ref={this.mission_id_txt}/>
                         </div>
                         <div className='col-2'>
-                            <button className="button btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_nextMissionItem()}>Next</button>
+                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_nextMissionItem()}>{">>"}</button>
                         </div>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
