@@ -1,0 +1,71 @@
+import $ from 'jquery';
+import React from 'react';
+
+import * as js_siteConfig from '../../js/js_siteConfig.js'
+import * as js_andruavMessages from '../../js/js_andruavMessages'
+import { js_localStorage } from '../../js/js_localStorage'
+
+/**
+ * Properties:
+ * @param {boolean} p_act_as_leader  Apply logic and style of leader.
+ * @param {boolean} p_is_leader The unit I am acting for is a leader or not.
+ * @param {number} p_formation_as_leader Incomming formation
+ * @param {function} OnFormationChanged ignored if (p_act_as_leader == false) Reported Formation
+ * 
+ */
+export class ClssCtrlSWARMFormation extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            m_update: 0
+        };
+        this.m_swarmFormation = React.createRef();
+    }
+
+
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
+
+
+    fn_ChangeFormation(e) {
+        
+        if (!this.props.p_formation_as_leader) return ;
+
+        if (this.props.p_editable === true) {
+            let newFormation = this.props.p_formation_as_leader + 1;
+            if (newFormation >= 3) {
+                newFormation = 1;
+            }
+
+            if (this.props.OnFormationChanged) {
+                this.props.OnFormationChanged(newFormation);
+            }
+        }
+    }
+
+    render() {
+        if ((this.props.p_hidden===true) || (js_siteConfig.CONST_FEATURE.DISABLE_SWARM === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true)) {
+            return (
+                <div></div>
+            )
+        }
+
+        let v_class_formation_as_leader = ' text-warning ';
+        let v_title = 'formation as follower';
+        let v_class_icon = 'bi bi-dice-5 text-warning';
+        
+        let v_editable = ' user-select-none ';
+        if (this.props.p_editable === true) {
+            v_editable = ' cursor_hand ';
+            v_title = 'formation as leader';
+            v_class_formation_as_leader = ' text-danger ';
+            v_class_icon = 'bi bi-dice-5 text-danger';
+        }
+        
+        return (
+        <p key={'swr_213' + this.key} className={' si-07x css_margin_zero  ' + v_editable +  v_class_formation_as_leader} title={v_title} onClick={(e)=>this.fn_ChangeFormation(e)}>{<i className={v_class_icon}></i>} {' ' + js_andruavMessages.swarm_formation_names[this.props.p_formation_as_leader]}</p>
+        );
+    }
+}

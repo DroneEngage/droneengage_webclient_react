@@ -7,7 +7,7 @@ import { js_globals } from '../../js/js_globals.js';
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
 
-
+import { ClssCtrlSWARMFormation } from './jsc_mctrl_swarm_formation.jsx';
 
 /**
  * props:
@@ -139,6 +139,19 @@ export class ClssCtrlSWARM extends React.Component {
             }
             
             js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation);
+            
+        }
+    }
+
+    fn_handleFormationChange(newFormation) {
+        if (this.props.p_unit === null || this.props.p_unit === undefined) return;
+        if (this.props.p_unit.m_Swarm.m_isLeader === true) {
+            
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation);
+
+            if (this.state.m_update === 0) return;
+
+            this.setState({ 'm_update': this.state.m_update + 1 });
         }
     }
 
@@ -266,9 +279,9 @@ export class ClssCtrlSWARM extends React.Component {
                     </div>
                     <div key={'swr_2' + this.key} className="row al_l css_margin_zero">
                         <div key={'swr_21' + this.key} className={' col-12   padding_zero text-warning ' + v_swarm_class}>
-                            <p key={'swr_211' + this.key} className={' si-07x css_margin_zero user-select-none text-danger' + v_class_follower} title='leader I am following'><i className="bi bi-chevron-double-right text-danger"></i> {' ' + v_leader_title_follower}</p>
-                            <p key={'swr_212' + this.key} className={' si-07x css_margin_zero css_user_select_text text-warning' + v_class_formation_as_follower} title='leader formation'><i className="bi bi-dice-5 text-warning"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_follower]}</p>
-                            <p key={'swr_213' + this.key} className={' si-07x css_margin_zero css_user_select_text text-success cursor_hand' + v_class_formation_as_leader} title='formation as a leader' onClick={(e)=>this.fn_ChangeFormation(e)}><i className="bi bi-dice-5 text-success"></i> {' ' + js_andruavMessages.swarm_formation_names[this.props.p_unit.m_Swarm.m_formation_as_leader]}</p>
+                            <p key={'swr_211' + this.key} className={' si-07x css_margin_zero user-select-none text-success' + v_class_follower} title='leader I am following'><i className="bi bi-chevron-double-right text-success"></i> {' ' + v_leader_title_follower}</p>
+                            <ClssCtrlSWARMFormation key={'swr_212' + this.key} p_editable={false} p_formation_as_leader={this.props.p_unit.m_Swarm.m_formation_as_follower} />
+                            <ClssCtrlSWARMFormation key={'swr_213' + this.key} p_editable={true} p_hidden={!this.props.p_unit.m_Swarm.m_isLeader} p_formation_as_leader={this.props.p_unit.m_Swarm.m_formation_as_leader} OnFormationChanged={(newFormation)=>this.fn_handleFormationChange(newFormation)} />
                         </div>
                     </div>
                 </div>
