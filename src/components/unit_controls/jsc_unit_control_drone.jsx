@@ -19,6 +19,7 @@ import {ClssCtrlUnitDetails} from './jsc_ctrl_details_tab.jsx'
 import {ClssCtrlP2P} from '../modules/p2p/jsc_ctrl_p2p.jsx'
 import {ClssCtrlSDR} from '../modules/sdr/jsc_ctrl_sdr.jsx'
 import {ClssCtrlGPIO} from '../modules/gpio/jsc_ctrl_gpio.jsx'
+import { ClssCtrlExperimental } from '../modules/experimental/jsc_ctrl_experimental.jsx';   
 
 
 import {ClssCtrlArdupilotFlightController} from '../flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
@@ -260,7 +261,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
            
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_gpio === true)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
                 <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.partyID}>GPIO</a>
             </li>);
         }
@@ -274,6 +275,15 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>
             </li>);
+        }
+           
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL != null)
+            && (js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false)
+            && (this.state.tab_module === true))
+        {
+            container_tabs.push(<li key={v_andruavUnit.partyID + 'lie'} className="nav-item">
+                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}>Exp</a>
+                </li>);
         }
            
     
@@ -326,14 +336,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                     </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlSDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
                             <ClssCtrlSDR p_unit={v_andruavUnit}/>
                      </div>);
         }
     
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_gpio === true)) 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_gpio === true)) 
         {
                 container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlGPIO'} className="tab-pane fade pt-2" id={"gpio" + v_andruavUnit.partyID}>
                             <ClssCtrlGPIO p_unit={v_andruavUnit}/>
@@ -347,6 +357,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </div>);
         }
         
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false) && (this.state.tab_module === true) && (v_andruavUnit.m_isDE === true)) 
+        {
+                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"exp" + v_andruavUnit.partyID}>
+                    <ClssCtrlExperimental p_unit={v_andruavUnit}/>
+                </div>);
+        }
+            
         if (container_controls.length !== 0)
         {
             // Adding an empty tab
