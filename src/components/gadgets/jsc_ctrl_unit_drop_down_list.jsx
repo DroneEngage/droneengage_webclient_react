@@ -22,10 +22,10 @@ import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
 export class ClssAndruavUnit_DropDown_List extends React.Component {
 
 
-    constructor()
+    constructor(props)
 	{
-		super ();
-		this.state = {
+		super(props);
+        this.state = {
             m_update: 0,
             m_selected_party_id: "0"
         };

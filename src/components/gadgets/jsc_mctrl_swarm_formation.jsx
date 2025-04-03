@@ -7,11 +7,10 @@ import { js_localStorage } from '../../js/js_localStorage'
 
 /**
  * Properties:
- * @param {boolean} p_act_as_leader  Apply logic and style of leader.
- * @param {boolean} p_is_leader The unit I am acting for is a leader or not.
- * @param {number} p_formation_as_leader Incomming formation
- * @param {function} OnFormationChanged ignored if (p_act_as_leader == false) Reported Formation
- * 
+ * @param {number} p_formation_as_leader - 1 or 2
+ * @param {boolean} p_editable - Indicates if the formation can be changed
+ * @param {boolean} p_hidden - Indicates if the component should be hidden [for example when drone is not a leader in webclient]
+ * @param {function} OnFormationChanged - Callback function when formation changes
  */
 export class ClssCtrlSWARMFormation extends React.Component {
 

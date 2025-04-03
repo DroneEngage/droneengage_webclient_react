@@ -6,6 +6,7 @@ import * as js_andruavMessages from '../../../js/js_andruavMessages'
 import { CCommandAPI } from '../../../js/js_commands_api.js'
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 import {CTriStateChecked} from '../../micro_gadgets/jsc_mctrl_tri_state_check.jsx'
+import { ClssCtrlSWARMFormation } from '../../gadgets/jsc_mctrl_swarm_formation.jsx';
 
 
 export class ClssP2P_Planning extends React.Component {
@@ -20,7 +21,8 @@ export class ClssP2P_Planning extends React.Component {
                 m_enable_telemetry: null,
                 m_enable_servercomm: null,
                 m_follow_partyID: -1, // p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]}
-                m_swarm_leader: null
+                m_swarm_leader: null,
+                m_leader_formation: 1,
             }
         };
 
@@ -31,6 +33,12 @@ export class ClssP2P_Planning extends React.Component {
         this.servercomm_Ref = React.createRef();
         this.swarm_Ref = React.createRef();
         this.swrm_leader_Ref = React.createRef();
+        this.swrm_leader_formation_Ref = React.createRef();
+    }
+
+    fn_handleFormationChange(newFormation) {
+            
+        this.setState({ m_cmd_packet: { ...this.state.m_cmd_packet, m_leader_formation: newFormation } });
     }
 
     componentDidMount() {
@@ -129,6 +137,7 @@ export class ClssP2P_Planning extends React.Component {
                     srv: this.state.m_cmd_packet.m_enable_servercomm,
                     swr: this.state.m_cmd_packet.m_follow_partyID,
                     swr_leader: this.state.m_cmd_packet.m_swarm_leader,
+                    swr_leader_formation: this.state.m_cmd_packet.m_leader_formation
                 };
             }
             
@@ -142,6 +151,7 @@ export class ClssP2P_Planning extends React.Component {
             this.state.m_cmd_packet.m_enable_servercomm = p2p.srv;
             this.state.m_cmd_packet.m_follow_partyID = p2p.swr;
             this.state.m_cmd_packet.m_swarm_leader = p2p.swr_leader;
+            this.state.m_cmd_packet.m_leader_formation = p2p.swr_leader_formation; 
 
             this.telemetry_Ref.current.checked = p2p.tel;
             this.p2p_Ref.current.checked = p2p.p2p;
@@ -163,13 +173,15 @@ export class ClssP2P_Planning extends React.Component {
                 'p2p_cmd': null,
                 'srv_cmd': null,
                 'swr_cmd': null,
-                'swr_leader': null
+                'swr_leader': null,
+                // there is no cmd for swr_leader_formation it is stored as part of swr_leader
             },
             tel: this.state.m_cmd_packet.m_enable_telemetry,
             p2p: this.state.m_cmd_packet.m_enable_p2p,
             srv: this.state.m_cmd_packet.m_enable_servercomm,
             swr: this.state.m_cmd_packet.m_follow_partyID,
-            swr_leader: this.state.m_cmd_packet.m_swarm_leader
+            swr_leader: this.state.m_cmd_packet.m_swarm_leader,
+            swr_leader_formation: this.state.m_cmd_packet.m_leader_formation
         };
 
         const cmds = this.props.p_shape.m_missionItem.modules.p2p.cmds;
@@ -277,7 +289,12 @@ export class ClssP2P_Planning extends React.Component {
         {
             this.state.m_cmd_packet.m_swarm_leader = is_checked;
         }
-        
+        this.setState({m_update: this.state.m_update +1});
+    }
+
+    fn_setLeaderFormation(p_partyID)
+    {
+        console.log ("fn_setLeaderFormation");
     }
 
     fn_requestToFollow(p_partyID)
@@ -310,7 +327,7 @@ export class ClssP2P_Planning extends React.Component {
             cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
         }
         else {   // make leader and set formation.
-            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_VECTOR);
+            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, this.state.m_cmd_packet.m_leader_formation);
         }
 
         return cmd;
@@ -328,16 +345,19 @@ export class ClssP2P_Planning extends React.Component {
 
                         <CTriStateChecked  txtLabel='Server Comm'  disabled={this.state.m_cmd_packet.m_enable_servercomm==null?true:false} checked={this.state.m_cmd_packet.m_enable_servercomm} ref={this.servercomm_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableServerComm(is_enabled, is_checked)} />
 
-                        <CTriStateChecked  txtLabel='Enable Telemetry'  disabled={this.state.m_cmd_packet.m_enable_telemetry==null?true:false} checked={this.state.m_cmd_packet.m_enable_telemetry} ref={this.telemetry_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableTelemetry(is_enabled, is_checked)} />
+                        <CTriStateChecked  txtLabel='Swarm Leader'  disabled={this.state.m_cmd_packet.m_swarm_leader==null?true:false} checked={this.state.m_cmd_packet.m_swarm_leader} ref={this.swrm_leader_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableSwarmLeader(is_enabled, is_checked)} />
 
                     </div>
                     <div key={this.key + 'p2pp_21'} className="col-6 ">
 
                         <CTriStateChecked  txtLabel='Enable P2P'  disabled={this.state.m_cmd_packet.m_enable_p2p==null?true:false} checked={this.state.m_cmd_packet.m_enable_p2p} ref={this.p2p_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableP2P(is_enabled, is_checked)} />
 
-                        <CTriStateChecked  txtLabel='Swarm Leader'  disabled={this.state.m_cmd_packet.m_swarm_leader==null?true:false} checked={this.state.m_cmd_packet.m_swarm_leader} ref={this.swrm_leader_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableSwarmLeader(is_enabled, is_checked)} />
+                        <CTriStateChecked  txtLabel='Enable Telemetry'  disabled={this.state.m_cmd_packet.m_enable_telemetry==null?true:false} checked={this.state.m_cmd_packet.m_enable_telemetry} ref={this.telemetry_Ref}  onChange={(is_enabled, is_checked) => this.fn_enableTelemetry(is_enabled, is_checked)} />
 
                     </div>
+                </div>
+                <div key={this.key + 'p2pp_4'} className="row css_margin_zero padding_zero ">
+                        <ClssCtrlSWARMFormation key={'swr_212' + this.key} p_editable={true} p_hidden={this.state.m_cmd_packet.m_swarm_leader==null?true:false} p_formation_as_leader={this.state.m_cmd_packet.m_leader_formation} OnFormationChanged={(newFormation)=>this.fn_handleFormationChange(newFormation)}/>
                 </div>
                 <div key={this.key + 'p2pp_2'} className="row css_margin_zero padding_zero ">
                         <ClssAndruavUnit_DropDown_List className='col-12 css_margin_zero padding_zero ' p_partyID={this.state.m_cmd_packet.m_follow_partyID}  p_label={"Follow "} p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]} ref={this.swarm_Ref} onSelectUnit={(p_partyID) => this.fn_requestToFollow(p_partyID)} />
