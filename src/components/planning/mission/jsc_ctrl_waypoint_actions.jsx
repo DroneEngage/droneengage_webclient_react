@@ -40,23 +40,23 @@ export class CWayPointAction extends React.Component {
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
-			    icon_img = 'bi bi-arrow-bar-up';
+			    icon_img = 'bi-arrow-bar-up';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
-			    icon_img = 'bi bi-download';
+			    icon_img = 'bi-download';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
-                icon_img = 'bi bi-signpost-split-fill';
+                icon_img = 'bi-signpost-split-fill';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
-			    icon_img = 'bi bi-skip-backward-circle';
+			    icon_img = 'bi-skip-backward-circle';
                 break;
             
             case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
-                icon_img = 'bi bi-c-circle';
+                icon_img = 'bi-c-circle';
                 break;
 
             
