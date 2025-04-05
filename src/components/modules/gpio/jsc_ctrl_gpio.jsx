@@ -39,6 +39,11 @@ export class ClssCtrlGPIO extends React.Component {
         p_me.setState(prevState => ({ m_update: prevState.m_update + 1 }));
     }
 
+    fn_refreshGPIO (p_andruavUnit)
+    {
+        js_globals.v_andruavClient.API_requestGPIOStatus(p_andruavUnit); // retrieve the GPIO status.
+    }
+
     
 
     getActiveButtonStyle(v_andruavUnit)
@@ -119,9 +124,16 @@ export class ClssCtrlGPIO extends React.Component {
 
         let cmd_btns = [];
         
-        cmd_btns.push(<div key={v_andruavUnit.partyID + 'gpio2_'}  className='row css_margin_zero padding_zero  border-secondary'>
-         </div>
-        );
+        cmd_btns.push(<div key={v_andruavUnit.partyID + 'gpio_'}  className='row css_margin_zero padding_zero  border-top border-secondary'>
+                
+                <div key={v_andruavUnit.partyID + 'gpio_1'} className="col-12 mt-1">
+                <div key={v_andruavUnit.partyID + 'gpio_2'} className = 'row al_l css_margin_zero d-flex '>
+                    <div key={v_andruavUnit.partyID + 'gpio_21'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.partyID + 'gpio_211'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh GPIO' onClick={() => this.fn_refreshGPIO(v_andruavUnit)}>Refresh</p>
+                    </div>
+                </div>
+                </div>
+            </div>);
 
         return (
             <div key={v_andruavUnit.partyID + "_ctl_gpio"} className={this.props.className}>
