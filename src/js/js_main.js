@@ -2529,7 +2529,7 @@ function fn_handleKeyBoard() {
 				// 	js_leafletmap.fn_setZoom(14);
 				// }
 
-				js_leafletmap.fn_PanTo(location);
+				js_leafletmap.fn_PanTo_latlng(location.lat, location.lng);
 			}
 		}
 
