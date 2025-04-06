@@ -819,6 +819,9 @@ class C_Modules {
           this.has_sdr = true;	
           break;
             
+        case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
+          this.has_camera = true;
+          break;
         default:
           console.warn(`Unknown module class: ${module.c}`);
           break;

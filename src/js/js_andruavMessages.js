@@ -379,7 +379,7 @@ export const swarm_formation_names = {
 
 export const TYPE_MODULE_CLASS_COMM = "comm";
 export const TYPE_MODULE_CLASS_FCB = "fcb";
-export const TYPE_MODULE_CLASS_VIDEO = "camera";
+export const TYPE_MODULE_CLASS_CAMERA = "camera";
 export const TYPE_MODULE_CLASS_P2P = "p2p";
 export const TYPE_MODULE_CLASS_SDR = "sdr";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
