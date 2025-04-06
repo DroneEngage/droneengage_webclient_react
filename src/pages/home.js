@@ -71,7 +71,7 @@ const Home = () => {
 					</div>
 				</div>
 
-				<div id="modal_fpv"  title="image" className="localcontainer css_ontop">
+				<div id="modal_fpv"  title="image" className="card css_ontop">
 					<div className="card-header text-center">
 						<div className="row">
 						<div className="col-10">
