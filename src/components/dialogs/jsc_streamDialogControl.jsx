@@ -7,36 +7,71 @@ import {js_globals} from '../../js/js_globals.js';
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
+import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID, toggleRecrodingVideo} from '../../js/js_main.js';
 
 class ClssStreamChannel extends React.Component {
 
-    constructor ()
+    constructor (props)
     {
-        super ();
-        // this.state =
-        // {
-        //     v_track: null,
-        // };
+        super (props);
+        
+        this.state = {
+            m_update: 0
+        };
+
+        js_eventEmitter.fn_subscribe (js_globals.EE_videoStreamStarted, this, this.fn_videoStarted);
+        js_eventEmitter.fn_subscribe (js_globals.EE_videoStreamStopped, this, this.fn_videoStopped);
+
     }
+
+    componentDidMount () {
+        this.state.m_update = 1;
+    }
+
+    fn_videoStarted(p_me,p_obj)
+    {
+        // p_obj.talk
+        // p_obj.andruavUnit
+        if (p_me.props.prop_session.m_unit.partyID !== p_obj.andruavUnit.partyID) return ;
+        if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
+
+        p_me.setState({'m_update': p_me.state.m_update +1});
+
+        console.log ("video started");
+
+    }
+
+    fn_videoStopped(p_me,p_obj)
+    {
+        // p_obj.talk
+        // p_obj.andruavUnit
+        if (p_me.props.prop_session.m_unit.partyID !== p_obj.andruavUnit.partyID) return ;
+        if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
+
+        p_me.setState({'m_update': p_me.state.m_update +1});
+
+        console.log ("video stopped");
+    }
+
+   
 
     fn_videoStream()
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         fn_VIDEO_login (this.props.prop_session, v_track.id);
-        js_eventEmitter.fn_dispatch (js_globals.EE_hideStreamDlgForm); // if you do not hide then you need to request camera list status to update track video streaming
     }
 
     fn_videoRecord(p_startRecord)
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         fn_VIDEO_Record (this.props.prop_session, v_track.id, p_startRecord);
-        js_eventEmitter.fn_dispatch (js_globals.EE_hideStreamDlgForm); // if you do not hide then you need to request camera list status to update track recording status
+        toggleRecrodingVideo (this.props.prop_session.m_unit);
     }
 
-    componentDidMount () 
+    componentWillUnmount () 
     {
-        
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStarted,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStopped,this);
     }
 
     render ()  {
@@ -101,6 +136,8 @@ export default class ClssStreamDialog extends React.Component
 
         js_eventEmitter.fn_subscribe(js_globals.EE_displayStreamDlgForm,this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_globals.EE_hideStreamDlgForm,this, this.fn_closeDialog);
+
+        
     }
 
 

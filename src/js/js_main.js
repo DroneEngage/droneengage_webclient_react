@@ -1358,7 +1358,7 @@ function fn_handleKeyBoard() {
 				{
 					if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
 					{
-						if (p_session.m_unit.m_Video.m_videoTracks.length < 2) {
+						if ((p_session.m_unit.m_isDE ===false) && (p_session.m_unit.m_Video.m_videoTracks.length < 2)) {
 							fn_VIDEO_login(p_session, p_session.m_unit.m_Video.m_videoTracks[0].id);
 							return;
 						}
@@ -1384,7 +1384,7 @@ function fn_handleKeyBoard() {
         	{
 				if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) {
 					
-					if (p_session.m_unit.m_Video.m_videoTracks.length < 2) {
+					if ((p_session.m_unit.m_isDE ===false) && (p_session.m_unit.m_Video.m_videoTracks.length < 2)) {
 						// backward compatibility ANdruav style.
 						fn_VIDEO_Record(p_session, p_session.m_unit.m_Video.m_videoTracks[0].id, (p_session.m_unit.m_Video.m_videoTracks[0].r !== true));
 						return;
