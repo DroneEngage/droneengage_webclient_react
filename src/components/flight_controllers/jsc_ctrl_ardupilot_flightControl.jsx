@@ -112,7 +112,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " disabled hidden  ";
                     res.btn_pos_hold_class      = " disabled hidden  ";
                     res.btn_loiter_class	    = " btn-warning "; // used in boat only
-                    res.btn_rtl_class 		    = " btn-primary  rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-primary ";
                     res.btn_srtl_class 		    = " btn-primary  ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -141,7 +141,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " btn-danger  ";
                     res.btn_pos_hold_class      = " btn-danger  ";
                     res.btn_loiter_class 	    = " btn-danger  ";
-                    res.btn_rtl_class 		    = " btn-primary rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-primary ";
                     res.btn_srtl_class 		    = " btn-primary  ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_releaseCTRL_class 	= c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -194,7 +194,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
                     res.btn_loiter_class 	    = " btn-danger  ";
-                    res.btn_rtl_class 		    = " btn-primary rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-primary ";
                     res.btn_srtl_class 		    = " btn-primary ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -226,7 +226,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
                     res.btn_loiter_class 	    = " btn-danger  ";
-                    res.btn_rtl_class 		    = " btn-primary rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-primary ";
                     res.btn_srtl_class 		    = " btn-primary ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -257,7 +257,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden  ";
                     res.btn_loiter_class 	    = " btn-primary  ";
-                    res.btn_rtl_class 		    = " btn-primary rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-primary ";
                     res.btn_srtl_class 		    = " btn-primary  ";
                     res.btn_cruise_class  	    = " btn-primary  ";
                     res.btn_fbwa_class 	 	    = " btn-primary  ";
@@ -282,7 +282,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             res.btn_stabilize_class     = " disabled hidden ";
             res.btn_pos_hold_class      = " disabled disabled hidden  ";
             res.btn_loiter_class 		= " disabled hidden ";
-			res.btn_rtl_class 			= " btn-outline-light rounded-1 ";
+			res.btn_rtl_class 			= " btn-outline-light ";
 			res.btn_srtl_class 		    = " btn-outline-light ";
             res.btn_cruise_class  	    = " disabled hidden ";
             res.btn_fbwa_class 	 	    = " bdisabled hidden ";
@@ -413,7 +413,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
                     res.btn_loiter_class 	    = " btn-outline-light ";
-                    res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
+                    res.btn_rtl_class 		    = " btn-outline-light ";
                     res.btn_srtl_class 		    = " btn-outline-light ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_releaseCTRL_class   = c_manualTXBlockedSubAction !== js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED?" btn-danger   ":" btn-primary   ";
@@ -589,7 +589,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group ddd flex-wrap '>
-                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
                     <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
@@ -631,7 +631,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             default:
                 {
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
-                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
                     <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
