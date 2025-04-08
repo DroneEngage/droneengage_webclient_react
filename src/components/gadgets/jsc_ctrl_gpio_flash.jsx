@@ -12,10 +12,12 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
         super(props);
         this.state = {
             m_update: 0,
+            m_gpio_flashes_OnOff: false,
+            m_gpio_flashes_enabled: false,
         };
 
         this.key = Math.random().toString();
-
+        
         js_eventEmitter.fn_subscribe(js_globals.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
     }
 
@@ -27,10 +29,10 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_unitGPIOUpdated, this);
     }
-    
+
     fnl_gpioFlashChanged(p_me, p_unit) {
         const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
-        p_me.state.m_gpio_flashes_enabled = p_me.fn_isGPIOFlashAllON(gpio_flash);
+        p_me.state.m_gpio_flashes_OnOff = p_me.fn_isGPIOFlashAllON(gpio_flash);
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }
 
@@ -47,10 +49,11 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
     }
 
     fnl_gpioFlashOnOff(e) {
-        //TODO: p_obj.v_unit should be a unit not partyID 
-        
+
+        if (!this.state.m_gpio_flashes_enabled) return ;
+
         const gpio_flash = this.props.p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
-        const target_status = this.state.m_gpio_flashes_enabled? 0 : 1;
+        const target_status = this.state.m_gpio_flashes_OnOff? 0 : 1;
         gpio_flash.forEach(element => {
             if (element.pin_value) {
 
@@ -68,23 +71,24 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
         const gpio_flash = this.props.p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
 
         if (gpio_flash.length > 0) {
-            this.state.m_gpio_flashes_enabled = this.fn_isGPIOFlashAllON(gpio_flash);
+            this.state.m_gpio_flashes_enabled = true;
+            this.state.m_gpio_flashes_OnOff = this.fn_isGPIOFlashAllON(gpio_flash);
             
-            if (this.state.m_gpio_flashes_enabled === true) {
-                css_flashGPIO = " bi bi-sun-fill text-danger ";
+            if (this.state.m_gpio_flashes_OnOff === true) {
+                css_flashGPIO = " bi bi-sun-fill text-danger cursor_hand ";
             }
             else {
-                css_flashGPIO = " bi bi-sun text-success ";
+                css_flashGPIO = " bi bi-sun text-success cursor_hand ";
             }
             
         }
         else {
             css_flashGPIO = " bi bi-sun text-light ";
-            this.m_gpio_flashes_enabled = false;
+            this.state.m_gpio_flashes_enabled = false;
         }
 
         return (
-            <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_flashGPIO + " cursor_hand css_large_icon"} title={this.props.title?this.props.title:'flash light'} onClick={(e) => this.fnl_gpioFlashOnOff(e)}></i>
+            <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_flashGPIO + " css_large_icon"} title={this.props.title?this.props.title:'flash light'} onClick={(e) => this.fnl_gpioFlashOnOff(e)}></i>
         );
     }
 
