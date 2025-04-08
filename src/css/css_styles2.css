@@ -682,7 +682,7 @@ div#gimbaldiv
 
 div #css_video_ctrl_panel
 {	
-	max-width: 500px;
+	/*max-width: 500px;*/
 	margin-top: 5px !important;
 	margin-bottom: 5px !important;
 	background-color: #FFFFFF0F !important;
@@ -1037,3 +1037,22 @@ div#displays
 .leaflet-control-attribution.leaflet-control  a:first-child {
     display: none;
 }
+
+
+#css_video_ctrl_panel {
+	display: flex;
+	flex-direction: row; /* Arrange items horizontally */
+	padding: 0;
+	overflow-x: auto; /* Enable horizontal scrolling if needed */
+  }
+  
+  #css_video_ctrl_panel > div {
+	padding: 0;
+	margin: 0;
+	flex-shrink: 0; /* Prevent shrinking of individual button containers */
+  }
+  
+  #css_video_ctrl_panel img {
+	max-width: 100%;
+	height: auto;
+  }
