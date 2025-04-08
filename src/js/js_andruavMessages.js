@@ -334,6 +334,9 @@ export const CONST_SOCKET_STATUS_REGISTERED = 6; // connected and executed AddMe
 export const CONST_SOCKET_STATUS_UNREGISTERED = 7; // connected but not registred
 export const CONST_SOCKET_STATUS_ERROR = 8; // Error
 
+// GPIO Reserved Names
+export const GPIO_CAMERA_FLASH_NAME = 'camera_flash';
+
 export const message_names = {
   1002: "GPS - 1002",
   1003: "POW - 1003",

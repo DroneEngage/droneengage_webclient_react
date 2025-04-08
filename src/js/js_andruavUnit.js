@@ -767,6 +767,27 @@ class C_GPIO {
         this.m_gpios[gpio.i + '-' + gpio.b] = gpio_obj;
       });
     }
+
+    /**
+     * 
+     * @param {*} name gpio name
+     * @returns {Array} - An array of GPIO objects with the specified name.
+     */
+    getGPIOByName(name) {
+      if (typeof name !== 'string') {
+        console.error("Invalid input: name must be a string.");
+        return []; // Return an empty array for invalid input
+      }
+    
+      const foundGpios = [];
+      for (const key in this.m_gpios) {
+        if (this.m_gpios.hasOwnProperty(key) && this.m_gpios[key].pin_name === name) {
+          foundGpios.push(this.m_gpios[key]);
+        }
+      }
+    
+      return foundGpios; // Return an array of all GPIO objects with the given name
+    }
 }
 
 class C_Modules {
