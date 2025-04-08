@@ -21,11 +21,13 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
 
     componentDidMount() {
         this.setState({ m_update: 1 });
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitGPIOUpdated, this);
+
     }
 
     componentWillUnmount() {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitGPIOUpdated, this);
     }
+    
     fnl_gpioFlashChanged(p_me, p_unit) {
         const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
         p_me.state.m_gpio_flashes_enabled = p_me.fn_isGPIOFlashAllON(gpio_flash);
