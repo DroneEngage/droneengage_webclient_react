@@ -282,7 +282,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (this.state.tab_module === true))
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'lie'} className="nav-item">
-                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}>Exp</a>
+                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}>DEBUG</a>
                 </li>);
         }
            
