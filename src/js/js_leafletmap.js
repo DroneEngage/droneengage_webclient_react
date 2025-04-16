@@ -502,7 +502,7 @@ class CLeafLetAndruavMap {
             html: `<i class="bi ${p_bootstrap_icon_name}" style="background: none; border: none; color: ${p_color}; font-size: ${iconSize[0]}px;"></i>`,
             className: "custom-location-icon",
             iconSize: iconSize,
-            iconAnchor: [iconSize[0] / 2, iconSize[1]], // Center the icon horizontally and anchor it at the bottom
+            iconAnchor: [iconSize[0] / 2 - 1, iconSize[1]], // Center the icon horizontally and anchor it at the bottom
             popupAnchor: [0, -iconSize[1]] // Adjust popup anchor based on icon size
         });
     
