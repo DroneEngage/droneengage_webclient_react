@@ -223,21 +223,21 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 css += 'active ';
             }
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className={css} data-bs-toggle="tab" href={"#main" + v_andruavUnit.partyID}>Main</a>
+                        <a className={css + ' bi bi-send-fill '} data-bs-toggle="tab" href={"#main" + v_andruavUnit.partyID} title='Main'></a>
                         </li>);
         }
 
         if (this.state.tab_log === true)
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
-                        <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID}>Log</a>
+                        <a className="nav-link user-select-none bi bi-list-columns" data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID} title='Log'></a>
                         </li>);
         }
         
         if (this.state.tab_details === true)
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
-                        <a className="nav-link  user-select-none " data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID}>Details</a>
+                        <a className="nav-link  user-select-none bi bi-pci-card" data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID} title='Details'></a>
                         </li>);
         }
 
@@ -255,14 +255,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_sdr === true)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
-                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}>SDR</a>
+                <a className="nav-link user-select-none bi bi-activity" data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}  title='SDR'></a>
             </li>);
         }
            
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_gpio === true)) 
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
-                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.partyID}>GPIO</a>
+                <a className="nav-link user-select-none bi bi-arrow-down-up " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.partyID} title='GPIO'></a>
             </li>);
         }
                
@@ -282,7 +282,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (this.state.tab_module === true))
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'lie'} className="nav-item">
-                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}>DEBUG</a>
+                <a className="nav-link user-select-none bi bi-bug" data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}  title='DEBUG'></a>
                 </li>);
         }
            

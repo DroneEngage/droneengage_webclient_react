@@ -57,65 +57,70 @@ export class ClssCtrlDroneIMU extends React.Component {
     {
         let res = {
         m_gps_class: "",
+        m_gps_class2: "",
         m_gps_text: "",
         m_gps_text2: "",
         m_gps_status: "",
         m_gps_source: ""
         }
 
-        res.m_gps_class = "bg-danger text-white text-center";
+        res.m_gps_class = "bg-danger text-white text-center bi bi-globe ";
+        res.m_gps_class2= "text-white text-center";
         if (p_andruavUnit.m_GPS_Info1.m_isValid === true)
         {
             switch (p_andruavUnit.m_GPS_Info1.GPS3DFix)
             {
                 case 1:
                     res.m_gps_text = "No Fix";
-                    res.m_gps_class = "bg-danger text-white text-center";
+                    res.m_gps_class = "bg-danger text-white bi bi-globe";
                 break;
 
                 case 2:
-                    res.m_gps_class = "bg-warning";
+                    res.m_gps_class = "bg-warning text-white bi bi-globe";
                 break;
 
                 case 3:
-                    res.m_gps_class = "bg-info text-white text-center";
+                    res.m_gps_class = "bg-info text-white ";
                     res.m_gps_text  ="3D Fix";
                 break;
                 case 4:
-                    res.m_gps_class = ' bg-primary ';
-                    res.m_gps_text  =' DGPS ';
+                    res.m_gps_class = ' bg-primary text-white ';
+                    res.m_gps_text  ='DGPS';
                 break;
                 case 5:
-                    res.m_gps_class = ' bg-primary ';
-                    res.m_gps_text  =' RTK-Fl ';
+                    res.m_gps_class = ' bg-primary text-white ';
+                    res.m_gps_text  ='RTK-Fl';
                 break;
                 case 6:
-                    res.m_gps_class = ' bg-primary ';
-                    res.m_gps_text  =' RTK-Fx ';
+                    res.m_gps_class = ' bg-primary text-white ';
+                    res.m_gps_text  ='RTK-Fx';
                 break;
                 case 7:
-                    res.m_gps_class = ' bg-primary ';
-                    res.m_gps_text  =' static ';
+                    res.m_gps_class = ' bg-primary text-white ';
+                    res.m_gps_text  ='static';
                 break;
                 case 8:
-                    res.m_gps_class = ' bg-primary ';
-                    res.m_gps_text  =' ppp ';
+                    res.m_gps_class = ' bg-primary text-white ';
+                    res.m_gps_text  ='ppp';
                 break;
             }
 
             switch (p_andruavUnit.m_GPS_Info1.gpsMode)
-            {
+            { // this is where you can change GPS icons based on GPS source
                 case 0:
                     res.m_gps_status = 'GPS Auto';
-                    res.m_gps_source = "A-gps: ";
+                    res.m_gps_source = " bi bi-globe ";
                     break;
                 case 1:
                     res.m_gps_status = 'GPS From Mobile';
-                    res.m_gps_source = "M-gps: ";
+                    res.m_gps_source = " bi bi-globe ";
                     break;
                 case 2:
                     res.m_gps_status = 'GPS From FCB';
-                    res.m_gps_source = "F-gps: ";
+                    res.m_gps_source = " bi bi-globe ";
+                    break;
+                
+                default:
                     break;
         }
 
@@ -128,7 +133,7 @@ export class ClssCtrlDroneIMU extends React.Component {
             
             res.m_gps_text  =" No GPS";
             res.m_gps_status = "GPS Status";
-            res.m_gps_source = "?-gps: ";        
+            res.m_gps_source = " text-secondary text-center bi bi-globe: ";        
         }
 
        
@@ -290,7 +295,7 @@ export class ClssCtrlDroneIMU extends React.Component {
         || (target.wp_dist < 0 ))
         {
             wpdst_text = "na";
-            distanceToWP_class = ' text-light ';
+            distanceToWP_class = ' text-light bi bi-geo-alt-fill ';
             
         }
         else
@@ -313,14 +318,14 @@ export class ClssCtrlDroneIMU extends React.Component {
                 case mavlink20.MISSION_STATE_UNKNOWN:
                 case mavlink20.MISSION_STATE_NO_MISSION:
                 {
-                    distanceToWP_class = ' bg-light text-white cursor_hand ';
+                    distanceToWP_class = ' bg-light text-white cursor_hand bi bi-geo-alt-fill ';
                 }
                 break;
 
                 case mavlink20.MISSION_STATE_NOT_STARTED:
                 case mavlink20.MISSION_STATE_PAUSED:
                 {
-                    distanceToWP_class = ' bg-light text-dark-emphasis cursor_hand ';
+                    distanceToWP_class = ' bg-light text-dark-emphasis cursor_hand bi bi-geo-alt-fill ';
                 }
                 break;
     
@@ -328,15 +333,15 @@ export class ClssCtrlDroneIMU extends React.Component {
                 {
                     if (target.wp_dist > js_globals.CONST_DFM_FAR)
                     {
-                        distanceToWP_class = ' bg-danger text-white cursor_hand ';
+                        distanceToWP_class = ' bg-danger text-white cursor_hand bi bi-geo-alt-fill ';
                     }
                     else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
                     {
-                        distanceToWP_class = ' bg-warning cursor_hand ';
+                        distanceToWP_class = ' bg-warning cursor_hand bi bi-geo-alt-fill ';
                     }
                     else
                     {
-                        distanceToWP_class = ' bg-info text-white cursor_hand ';
+                        distanceToWP_class = ' bg-info text-white cursor_hand bi bi-geo-alt-fill';
                     }
                 }
                 break;
@@ -350,23 +355,23 @@ export class ClssCtrlDroneIMU extends React.Component {
 		{
 		    if ((v_andruavUnit.m_fencestatus & 0b010) === 0b010) //bad
 			{
-			    v_fence_text = 'fence - bad';
-				v_fence_class = 'bg-danger text-white';
+			    v_fence_text = ' bad';
+				v_fence_class = 'bg-danger text-white bi bi-bounding-box-circles ';
 			}
 			else if ((v_andruavUnit.m_fencestatus & 0b110) === 0b100) // good & no violation
 			{ // unknown
-			    v_fence_text = 'fence - good';
-				v_fence_class = 'bg-success text-white';
+			    v_fence_text = ' good';
+				v_fence_class = 'bg-success text-white bi bi-bounding-box-circles ';
 			}
 			else if ((v_andruavUnit.m_fencestatus  & 0b111) === 0b001) // out of greed areas .... display as bad
 			{ // unknown
-			    v_fence_text = 'fence - bad';
-				v_fence_class = 'bg-danger text-white';
+			    v_fence_text = ' bad';
+				v_fence_class = 'bg-danger text-white bi bi-bounding-box-circles ';
 			}
 			else
 			{ // good
-			    v_fence_text = 'fence - no violation';
-				v_fence_class = 'bg-warning';
+			    v_fence_text = ' no violation';
+				v_fence_class = 'bg-warning bi bi-bounding-box-circles ';
 			}
 		}
 
@@ -388,7 +393,7 @@ export class ClssCtrlDroneIMU extends React.Component {
                                 <ClssCtrlDrone_Speed_Ctrl p_unit={v_andruavUnit}/>
                         </div>
                         <div key='gps' className= 'col-6 col-md-3 user-select-none  p-1'>
-                                <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} >{gps.m_gps_source + gps.m_gps_text + ' ' + gps.m_gps_text2}</p>
+                                <p id='gps' className={' rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class + gps.m_gps_source} title ={gps.m_gps_status} onClick={ (e) => fn_switchGPS(v_andruavUnit)} ><span className={gps.m_gps_class2}>{' ' + gps.m_gps_text + ' ' + gps.m_gps_text2}</span></p>
                         </div>
                         <div key='DFM' className= 'col-6 col-md-3 user-select-none p-1'>
                                   <p id='DFM' className={' rounded-3 text-center textunit_att_btn p-1  ' + v_distanceToMe_class} title ="Unit's distance from Me (Browser Location)" >{"DFM: " + v_distanceToMe_text}</p>
@@ -409,7 +414,7 @@ export class ClssCtrlDroneIMU extends React.Component {
                                 </p>
                         </div>
                         <div key={'wpd_ctrl3' + v_andruavUnit.partyID}  className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
-                            <p id='wpd' className={' rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class} title ='Distance to next waypoint' >{'wp: '+ wpdst_text}</p>
+                            <p id='wpd' className={' rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class} title ='Distance to next waypoint' >{ ' ' + wpdst_text}</p>
                             
                         </div>
                         <div key={'fcb_mode_ctrl4'  + v_andruavUnit.partyID}className= 'col-6 col-md-3 css_margin_zero user-select-none  p-1'>
