@@ -327,7 +327,7 @@ export class CCommandAPI
     }
 
 
-    static API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration) 
+    static API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration, comm_local_on_off , comm_local_on_off_duration) 
     {
         let p_msg = {
         };
@@ -338,6 +338,16 @@ export class CCommandAPI
             if (comm_on_off_duration!=null)
             {
                 p_msg.wsd = comm_on_off_duration;
+            }
+        }
+
+
+        if (comm_local_on_off!=null)
+        {
+            p_msg.w2 = comm_local_on_off;
+            if (comm_local_on_off_duration!=null)
+            {
+                p_msg.w2d = comm_local_on_off_duration;
             }
         }
 
@@ -362,6 +372,23 @@ export class CCommandAPI
         return msg;
     }
 
+
+
+    static API_connectToLocalCommServer(p_andruavUnit, p_localCommServerIP, p_localCommServerPort) {
+        let p_msg = {
+            u: p_localCommServerIP,
+            p: p_localCommServerPort
+        };
+
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_LocalServer_ACTION,
+            'ms':  p_msg
+        };
+
+        return msg;
+    }
+    
 
 
     static API_resumeTelemetry() {
