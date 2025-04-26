@@ -188,12 +188,12 @@ export class ClssP2P_Planning extends React.Component {
 
         if (this.state.m_cmd_packet.m_enable_p2p !== null)
         {
-            cmds.p2p_cmd = CCommandAPI.API_SetCommunicationChannel(null, null, this.state.m_cmd_packet.m_enable_p2p, null, null);
+            cmds.p2p_cmd = CCommandAPI.API_SetCommunicationChannel(null, null, this.state.m_cmd_packet.m_enable_p2p, null, null, null, null);
         }
         
         if (this.state.m_cmd_packet.m_enable_servercomm !== null)
         {
-            cmds.srv_cmd = CCommandAPI.API_SetCommunicationChannel(null, this.state.m_cmd_packet.m_enable_servercomm, null, null, null);
+            cmds.srv_cmd = CCommandAPI.API_SetCommunicationChannel(null, this.state.m_cmd_packet.m_enable_servercomm, null, null, null, null, null);
         }
 
         if (this.state.m_cmd_packet.m_enable_telemetry === true) {
