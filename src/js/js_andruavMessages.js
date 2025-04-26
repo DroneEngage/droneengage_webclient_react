@@ -110,6 +110,16 @@ export const CONST_TYPE_AndruavMessage_GPIO_STATUS           = 6520;
 export const CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE   = 6521;
 
 
+/**
+ * @brief Set IP/Port of Local Communication Server.
+ * current fields are:
+ * [u]: url/ip
+ * [p]: port
+ */
+export const CONST_TYPE_AndruavMessage_LocalServer_ACTION              = 6522;
+export const CONST_TYPE_AndruavMessage_LocalServer_STATUS              = 6523;
+export const CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE      = 6524;
+
 // System Messages
 export const CONST_TYPE_AndruavSystem_LoadTasks = 9001;
 export const CONST_TYPE_AndruavSystem_SaveTasks = 9002;
@@ -117,6 +127,7 @@ export const CONST_TYPE_AndruavSystem_DeleteTasks = 9003;
 export const CONST_TYPE_AndruavSystem_DisableTasks = 9004;
 export const CONST_TYPE_AndruavSystem_LogoutCommServer = 9006;
 export const CONST_TYPE_AndruavSystem_ConnectedCommServer = 9007;
+
 
 export const CONST_TYPE_SWARM_FOLLOW = 1;
 export const CONST_TYPE_SWARM_UNFOLLOW = 2;
