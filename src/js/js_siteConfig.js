@@ -27,8 +27,9 @@ export let CONST_TITLE = 'Drone Engage';
 export let CONST_HOME_URL = "https://cloud.ardupilot.org/";
 export let CONST_MANUAL_URL = "https://cloud.ardupilot.org/";
 export let CONST_FAQ_URL = "https://cloud.ardupilot.org/de-faq.html";
-export let CONST_CONTACT_URL = "https://droneengage.com/contact.html";
-
+export let CONST_CONTACT_URL = "https://droneengage.com";
+export let CONST_ANDRUAV_URL ="https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download";
+export let CONST_ANDRUAV_URL_ENABLE = true;
 
 // CHOOSE YOUR MAP SOURCE
 export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ";

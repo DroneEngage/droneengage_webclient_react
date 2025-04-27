@@ -70,8 +70,11 @@ class ClssHeaderControl extends React.Component {
                                     <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
                                 </li>
                                 <li key="Contact" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">Contact</a>
+                                    <a className="nav-link " href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">Contact</a>
                                 </li>
+                                {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK" className="nav-item">
+                                    <a className="nav-link text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a>
+                                </li>}
                                 <li key="Account" className="nav-item">
                                     <a className="nav-link" href="./accounts" target='_blank' rel="noopener noreferrer">Account</a>
                                 </li>
