@@ -64,7 +64,7 @@ export class ClssCtrlSWARMFormation extends React.Component {
         }
         
         return (
-        <p key={'swr_213' + this.key} className={' si-07x css_margin_zero  ' + v_editable +  v_class_formation_as_leader} title={v_title} onClick={(e)=>this.fn_ChangeFormation(e)}>{<i className={v_class_icon}></i>} {' ' + js_andruavMessages.swarm_formation_names[this.props.p_formation_as_leader]}</p>
+        <p key={'swr_213' + this.key} className={' si-07x css_sub_item_margin_zero  ' + v_editable +  v_class_formation_as_leader} title={v_title} onClick={(e)=>this.fn_ChangeFormation(e)}>{<i className={v_class_icon}></i>} {' ' + js_andruavMessages.swarm_formation_names[this.props.p_formation_as_leader]}</p>
         );
     }
 }
