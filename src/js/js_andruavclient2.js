@@ -369,6 +369,7 @@ class CAndruavClient {
     };
 
     API_sendCMD(p_target, msgType, msg) {
+        try {
         let v_rountingMsg;
         if (p_target !== null && p_target !== undefined) {
             v_rountingMsg = CMD_COMM_INDIVIDUAL;
@@ -387,6 +388,10 @@ class CAndruavClient {
             const msgx_txt = this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg);
             this.ws.sendex(msgx_txt,false);
         } else { // send a warning
+            
+        }
+        } catch (e) {
+            js_common.fn_console_log("Exception API_sendCMD", e);
         }
     };
 
