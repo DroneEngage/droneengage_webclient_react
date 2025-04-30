@@ -30,21 +30,23 @@ export class ClssCtrlExperimental extends React.Component {
         this.state.m_update = 1;
     }
 
-    fn_resetP2P (p_andruavUnit)
+    fn_ConnectToLocalCommServer (p_andruavUnit)
     {
+        js_globals.v_andruavClient.API_connectToLocalCommServer(p_andruavUnit,"192.168.1.144","9967")
     }
 
     fn_scanP2P (p_andruavUnit)
     {
     }
 
-    fn_setCommunicationChannel_P2P (p_andruavUnit, exp_state)
-    {
-    }
-
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null);
+        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
+    }
+
+    fn_setCommunicationChannel_Local_WS (p_andruavUnit, local_state, duration)
+    {
+        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, null, null, null, null, local_state, duration);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)
@@ -78,8 +80,8 @@ export class ClssCtrlExperimental extends React.Component {
         }        
 
 
-        let txt_channel_exp_offline = 'P2PDC';
-        let txt_channel_ws_offline = 'WSDC';
+        let txt_channel_exp_offline = 'LWSDC';
+        let txt_channel_ws_offline = ' WSDC';
         
    
 
@@ -89,16 +91,16 @@ export class ClssCtrlExperimental extends React.Component {
                 <div key={v_andruavUnit.partyID + 'exp_1'} className="col-12 mt-1">
                 <div key={v_andruavUnit.partyID + 'exp_2'} className = 'row al_l css_margin_zero d-flex '>
                     <div key={v_andruavUnit.partyID + 'exp_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
+                    <p key={v_andruavUnit.partyID + 'exp_211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Local Comm Server' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
                     </div>
                     <div key={v_andruavUnit.partyID + 'exp_22'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
+                    <p key={v_andruavUnit.partyID + 'exp_212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c bi bi-upc-scan' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}> WIFI Scan</p>
                     </div>
                     <div key={v_andruavUnit.partyID + 'exp_23'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_213'} className={' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_P2P(v_andruavUnit, false, v_andruavUnit.m_P2P.m_exp_disabled)}>{txt_channel_exp_offline}</p>
+                    <p key={v_andruavUnit.partyID + 'exp_213'} className={' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_Local_WS(v_andruavUnit, false, 10)}>{txt_channel_exp_offline}</p>
                     </div>
                     <div key={v_andruavUnit.partyID + 'exp_24'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_214'} className={' rounded-3 text-white bg-danger cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
+                    <p key={v_andruavUnit.partyID + 'exp_214'} className={' rounded-3 text-white bg-danger cursor_hand text unit_nowidth al_c bi bi-wifi'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
                     </div>
                 </div>
                 </div>
@@ -109,8 +111,15 @@ export class ClssCtrlExperimental extends React.Component {
         
         return (
             <div key={v_andruavUnit.partyID + "_ctl_exp"} className={this.props.className}>
+
                 <div key={v_andruavUnit.partyID + 'exp_1'} className='row css_margin_zero padding_zero '>
+                    <div key={v_andruavUnit.partyID + 'sdr_112'} className='row css_margin_zero padding_zero '>
+                            <label className="col-3"><small><b>WS-Local</b></small></label>
+                            <input type="text" className="col-5" placeholder="Local Server IP:port" aria-label="IP"   />
+                            <p key={v_andruavUnit.partyID + 'exp_211'} className=' col-2 rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
                     
+                        </div>
+                        
                 </div>
                 <div key={v_andruavUnit.partyID + 'exp_3'} className='row css_margin_zero padding_zero '>
                         <div key={v_andruavUnit.partyID + 'exp_31'} className="col-12">
