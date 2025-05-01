@@ -196,7 +196,7 @@ class CAndruavAuth {
         }
 
         const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
-        const url = `${protocol}://${this.authIP}:${this.authPort}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
+        const url = `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
 
         const keyValues = {
             [js_andruavMessages.CONST_SUB_COMMAND]: js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE,
@@ -232,7 +232,7 @@ class CAndruavAuth {
         }
 
         const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
-        const url = `${protocol}://${this.authIP}:${this.authPort}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
+        const url = `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_WEB_FUNCTION}${js_andruavMessages.CONST_ACCOUNT_MANAGMENT}`;
 
         const keyValues = {
             [js_andruavMessages.CONST_SUB_COMMAND]: js_andruavMessages.CONST_CMD_REGENERATE_ACCESSCODE,
