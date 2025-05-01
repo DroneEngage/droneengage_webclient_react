@@ -76,17 +76,17 @@ const Accounts = () => {
         </div>  
 
 
-        <div id='mainBody' className='row css_mainbody' >
-			
+        <div id='mainBody' className='row css_mainbody justify-content-center' > 
+            
             <div className="container">
-                <div className="row margin_zero container ">
-                <div id="loginCtrl">
+                <div className="row margin_zero container justify-content-center">
+                <div id="loginCtrl" className='col-12 col-md-8 col-lg-6'> 
                     <ClssLoginControl />
                 </div>
                 </div>
                 <br/>
-            <div className="row margin_zero container">
-                <div id="help" className="">
+            <div className="row margin_zero container justify-content-center"> 
+                <div id="help" className='col-12 col-md-8 col-lg-6'> 
                     <h3 className="text-primary" >Quick Help</h3>
                     <ol>
                         <li> You can generate access code easily from this webpage. You can also regenerate your access code i.e. change it.</li>
@@ -103,11 +103,10 @@ const Accounts = () => {
         </div>
     </div>
     <div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
-	<ClssFooterControl />
-  	</div>
+    <ClssFooterControl />
+    </div>
   </div>
     );
   };
   
   export default Accounts;
-  
