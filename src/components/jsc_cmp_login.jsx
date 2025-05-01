@@ -59,7 +59,7 @@ export default class ClssLoginControl extends React.Component {
 
             document.getElementById('user_captcha_input').value = "";
 
-            if (callback !== null) callback();
+            
         }
 
         else {
