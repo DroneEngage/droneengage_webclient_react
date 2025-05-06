@@ -893,16 +893,27 @@ function fn_handleKeyBoard() {
 				js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_METER_TO_FEET;
 				js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_METER_TO_FEET;
 
+				js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE).toFixed(0);
+				js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE).toFixed(0);
+
+				js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN * js_helpers.CONST_METER_TO_FEET;
+				js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN * js_helpers.CONST_METER_TO_FEET;
 			}
 			else {
 				if (dontflip !== true) js_globals.v_useMetricSystem = true;
 
 				js_localStorage.fn_setMetricSystem(true);
-				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
-				js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_RADIUS).toFixed(0);
+				js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(1);
+				js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_RADIUS).toFixed(1);
 
 				js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_FEET_TO_METER;
 				js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_FEET_TO_METER;
+				
+				js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE).toFixed(1);
+				js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE).toFixed(1);
+
+				js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN * js_helpers.CONST_FEET_TO_METER;
+				js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN * js_helpers.CONST_FEET_TO_METER;
 			}
 			js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
 			js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
