@@ -11,7 +11,6 @@
 import * as js_andruavMessages from './js_andruavMessages.js';
 import * as js_common from './js_common.js'
 
-
 export class CCommandAPI
 {
 
@@ -248,10 +247,10 @@ export class CCommandAPI
     };
 
 
-    static API_makeSwarm (p_andruavUnit, p_formationID) {
+    static API_makeSwarm (p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
-        const msg = 
+        let msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_MakeSwarm,
             'ms':  {
@@ -259,6 +258,11 @@ export class CCommandAPI
                 b: p_andruavUnit.partyID // Leader
             }
         };
+
+        if (p_formationID !==0) {
+            msg.ms.h = p_horizontal_distance;
+            msg.ms.v = p_vertical_distance;
+        }
 
         return msg;
     }

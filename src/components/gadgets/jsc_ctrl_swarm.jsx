@@ -102,10 +102,12 @@ export class ClssCtrlSWARM extends React.Component {
 
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {   // make not a leader
                // demote unit
-               js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM,
+                    js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
         }
         else {   // make leader and set formation.
-            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, p_formationID);
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, p_formationID,
+                    js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
         }
 
     }
@@ -138,7 +140,8 @@ export class ClssCtrlSWARM extends React.Component {
                 newFormation = 1;
             }
             
-            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation);
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation,
+                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
             
         }
     }
@@ -147,7 +150,8 @@ export class ClssCtrlSWARM extends React.Component {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
             
-            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation);
+            js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation,
+                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
 
             if (this.state.m_update === 0) return;
 

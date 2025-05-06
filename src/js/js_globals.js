@@ -64,35 +64,40 @@ class GLOBALS {
 	
 
 
-		this.CONST_DFM_FAR                 = 3000; // more than 10 Km is far.
-		this.CONST_DFM_SAFE                = 1000; // less than 1 Km is safe.
-		this.CONST_MAX_MESSAGE_LOG         = 100; 
+		this.CONST_DFM_FAR                 					= 3000; // more than 10 Km is far.
+		this.CONST_DFM_SAFE                					= 1000; // less than 1 Km is safe.
+		this.CONST_MAX_MESSAGE_LOG         					= 100; 
 
-		this.v_displayMode                   = 0;
-		this.active_gamepad_index            = 0;
+		this.v_displayMode                   				= 0;
+		this.active_gamepad_index            				= 0;
 
 		// Metric System        
-		this.v_useMetricSystem               = true;
+		this.v_useMetricSystem               				= true;
 
-		this.CONST_DEFAULT_ALTITUDE          = 100;  // 100 m
-		this.CONST_DEFAULT_RADIUS            = 50;   // 50 m
-		this.CONST_DEFAULT_ALTITUDE_min      = 1;    //  m		
-		this.CONST_DEFAULT_ALTITUDE_STEP     = 3;    //  m		
-		this.CONST_DEFAULT_RADIUS_min        = 5;    //  m
-		this.CONST_DEFAULT_SPEED_MIN         = 5;    //  m/s
-		this.CONST_DEFAULT_SPEED_STEP        = 1;    //  m/s
-		this.CONST_DEFAULT_VOLUME            = 50;
+		this.CONST_DEFAULT_ALTITUDE          				= 100;  //  m
+		this.CONST_DEFAULT_RADIUS            				= 50;   //  m
+		this.CONST_DEFAULT_ALTITUDE_min      				= 1;    //  m		
+		this.CONST_DEFAULT_ALTITUDE_STEP     				= 3;    //  m		
+		this.CONST_DEFAULT_RADIUS_min        				= 5;    //  m
+		this.CONST_DEFAULT_SPEED_MIN         				= 5;    //  m/s
+		this.CONST_DEFAULT_SPEED_STEP        				= 1;    //  m/s
+		this.CONST_DEFAULT_VOLUME            				= 50;
+		this.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE 		= 10; // m
+		this.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE   		= 2; // m
+		this.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN 	= 10; // m
+		this.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN   	= 2; // m
+
 		// GUI 
-		this.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT = 40;
+		this.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT 			= 40;
 
 
-		this.v_EnableADSB     = false;
-		this.v_en_Drone       = true;
-		this.v_en_GCS         = true;
-		this.v_enable_tabs_display = false;
-		this.v_enable_unit_sort = true;
-		this.v_enable_gcs_display = false;
-		this.v_gamePadMode = 2;
+		this.v_EnableADSB     			= false;
+		this.v_en_Drone      			= true;
+		this.v_en_GCS         			= true;
+		this.v_enable_tabs_display 		= false;
+		this.v_enable_unit_sort 		= true;
+		this.v_enable_gcs_display 		= false;
+		this.v_gamePadMode 				= 2;
 
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';

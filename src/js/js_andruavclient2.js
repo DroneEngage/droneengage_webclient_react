@@ -812,11 +812,11 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
-    API_makeSwarm (p_andruavUnit, p_formationID) {
+    API_makeSwarm (p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         if (p_formationID === null || p_formationID === undefined) return ;
         
-        const cmd = CCommandAPI.API_makeSwarm(p_andruavUnit, p_formationID);
+        const cmd = CCommandAPI.API_makeSwarm(p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance);
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
     }
 
