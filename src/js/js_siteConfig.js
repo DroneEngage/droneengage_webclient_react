@@ -13,7 +13,7 @@
 
 
 // Default Configuration
-export let CONST_TEST_MODE = false;
+export let CONST_TEST_MODE = true;
 export let CONST_PROD_MODE_IP = 'airgap.droneengage.com';
 export let CONST_PROD_MODE_PORT = '19408';
 export let CONST_TEST_MODE_IP = '127.0.0.1';
