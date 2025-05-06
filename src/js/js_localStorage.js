@@ -148,6 +148,22 @@ class CLocalStorage {
         return parseInt(this._getValue('_vDefaultRadius', js_globals.CONST_DEFAULT_RADIUS.toString()));
     }
 
+    fn_setDefaultSwarmHorizontalDistance(value) {
+        this._setValue('_vDefaultSHD', value.toString());
+    }
+
+    fn_getDefaultSwarmHorizontalDistance() {
+        return parseInt(this._getValue('_vDefaultSHD', js_globals.CONST_DEFAULT_ALTITUDE.toString()));
+    }
+
+     fn_setDefaultSwarmVerticalDistance(value) {
+        this._setValue('_vDefaultSVD', value.toString());
+    }
+
+    fn_getDefaultSwarmVerticalDistance() {
+        return parseInt(this._getValue('_vDefaultSVD', js_globals.CONST_DEFAULT_RADIUS.toString()));
+    }
+
     // Speech Enabled
     fn_setSpeechEnabled(value) {
         this._setValue('_vv_speechEnabled', value.toString());

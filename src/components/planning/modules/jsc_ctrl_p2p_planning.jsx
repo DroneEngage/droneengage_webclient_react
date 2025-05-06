@@ -3,6 +3,7 @@ import React from 'react';
 
 import * as js_andruavMessages from '../../../js/js_andruavMessages'
 
+import { js_globals } from '../../../js/js_globals.js';
 import { CCommandAPI } from '../../../js/js_commands_api.js'
 import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 import {CTriStateChecked} from '../../micro_gadgets/jsc_mctrl_tri_state_check.jsx'
@@ -327,7 +328,8 @@ export class ClssP2P_Planning extends React.Component {
             cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
         }
         else {   // make leader and set formation.
-            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, this.state.m_cmd_packet.m_leader_formation);
+            cmd = CCommandAPI.API_makeSwarm(this.props.p_unit, this.state.m_cmd_packet.m_leader_formation,
+                                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
         }
 
         return cmd;
