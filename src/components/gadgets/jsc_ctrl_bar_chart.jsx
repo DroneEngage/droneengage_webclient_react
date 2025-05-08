@@ -148,7 +148,6 @@ class ClassBarChart extends React.Component {
         });
 
         // Draw the vertical line with three tips
-        const minY = inner_height + margin;
         const middleY = inner_height / 2 + margin;
         const maxY =  margin;
 

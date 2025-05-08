@@ -5,7 +5,7 @@ import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.
 import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
 import { js_leafletmap } from '../../../js/js_leafletmap.js';
-import { ClssSingle_Plan_Container } from './jsc_ctrl_single_plan_container.jsx';
+import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
 import { setSelectedMissionFilePathToRead } from '../../../js/js_main.js';
 
 export default class ClssMission_Container extends React.Component {
@@ -165,7 +165,7 @@ export default class ClssMission_Container extends React.Component {
                         id={"mstpd_" + c_id}
                         className={`tab-pane fade ${c_active ? 'show active' : ''}`}
                     >
-                        <ClssSingle_Plan_Container
+                        <ClssSinglePlanContainer
                             key={'umc' + v_plan.m_id}
                             p_missionPlan={v_plan}
                             p_isCurrent={v_plan.m_id === v_mission1.m_id}

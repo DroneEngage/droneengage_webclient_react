@@ -7,7 +7,7 @@ import {js_eventEmitter} from '../js/js_eventEmitter'
 
 import { js_andruavAuth } from '../js/js_andruavAuth'
 import { js_localStorage } from '../js/js_localStorage'
-import { gui_alert } from '../js/js_main_accounts'
+
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
 
 // Registration and Regeneration Control
@@ -97,12 +97,7 @@ export default class ClssLoginControl extends React.Component {
 
 
 
-    componentWillUnmount() {
-        //js_eventEmitter.fn_unsubscribe ( EE_permissionReceived,this);
-        //js_eventEmitter.fn_unsubscribe ( EE_permissionBadLogin,this);
-        //js_eventEmitter.fn_unsubscribe ( EE_permissionDeleted,this);
-    }
-
+    
     componentDidMount() {
 
         if (this.state.initialized === true) {

@@ -442,7 +442,6 @@ class ClssCVideoScreen extends React.Component {
 
         let css_switchCam;
         let css_switchCam_title;
-        const c_trackAttributes = andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index];
         if (andruavUnit.m_Video.supportCameraSwitch(this.props.obj.v_index)) {
             css_switchCam = "cursor_hand css_camera_switch";
             css_switchCam_title = "Switch between Front & Back Cameras";
@@ -470,7 +469,6 @@ class ClssCVideoScreen extends React.Component {
             css_rotateCam = 'hidden';
         }
 
-        let css_trackingBtn = "cursor_hand css_tracking_on";
 
         if (andruavUnit.m_Video.supportFlashing(this.props.obj.v_index)) {
             if (this.state.m_flash === js_andruavMessages.CONST_FLASH_ON) {
