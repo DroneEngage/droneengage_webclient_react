@@ -12,7 +12,7 @@ import {ClssSingle_Plan_Header} from './jsc_ctrl_single_plan_header.jsx'
 /**
  * Contains a Single Mission All Controls
  */
-export  class ClssSingle_Plan_Container extends React.Component {
+export  class ClssSinglePlanContainer extends React.Component {
 
     constructor() {
         super();

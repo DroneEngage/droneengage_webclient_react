@@ -266,11 +266,11 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </li>);
         }
                
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE != null) 
+        if (((js_siteConfig.CONST_FEATURE.DISABLE_VOICE != null) 
             && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false) 
             && (this.state.tab_module === true) 
-            && (v_andruavUnit.m_modules.has_sound === true)  
-            || (v_andruavUnit.m_isDE === false)) 
+            && (v_andruavUnit.m_modules.has_sound === true))
+            || (v_andruavUnit.m_isDE === false))// de already has audio
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
             <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>

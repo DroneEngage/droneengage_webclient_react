@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import React from 'react';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'

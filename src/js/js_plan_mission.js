@@ -370,12 +370,12 @@ export class ClssAndruavMissionPlan {
 
           case mavlink20.MAV_CMD_DO_SET_SERVO:
           {
-            if (mavlink[0] == 16)
+            if (mavlink[0] === 16)
               { // FIRE EVENT
                 temp_missionItem.eventFireRequired = true;
                 temp_missionItem.eventFire = mavlink[1];
               }
-            if (mavlink[0] == 15)
+            if (mavlink[0] === 15)
             { // WAIT FOR EVENT
                 temp_missionItem.eventWaitRequired = true;
                 temp_missionItem.eventWait = mavlink[1];
