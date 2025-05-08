@@ -5,7 +5,7 @@ import * as js_andruavMessages from '../../../js/js_andruavMessages'
 
 import { js_globals } from '../../../js/js_globals.js';
 import { CCommandAPI } from '../../../js/js_commands_api.js'
-import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
+import { ClssAndruavUnitDropDownList } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 import {CTriStateChecked} from '../../micro_gadgets/jsc_mctrl_tri_state_check.jsx'
 import { ClssCtrlSWARMFormation } from '../../gadgets/jsc_mctrl_swarm_formation.jsx';
 
@@ -362,7 +362,7 @@ export class ClssP2P_Planning extends React.Component {
                         <ClssCtrlSWARMFormation key={'swr_212' + this.key} p_editable={true} p_hidden={this.state.m_cmd_packet.m_swarm_leader==null?true:false} p_formation_as_leader={this.state.m_cmd_packet.m_leader_formation} OnFormationChanged={(newFormation)=>this.fn_handleFormationChange(newFormation)}/>
                 </div>
                 <div key={this.key + 'p2pp_2'} className="row css_margin_zero padding_zero ">
-                        <ClssAndruavUnit_DropDown_List className='col-12 css_margin_zero padding_zero ' p_partyID={this.state.m_cmd_packet.m_follow_partyID}  p_label={"Follow "} p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]} ref={this.swarm_Ref} onSelectUnit={(p_partyID) => this.fn_requestToFollow(p_partyID)} />
+                        <ClssAndruavUnitDropDownList className='col-12 css_margin_zero padding_zero ' p_partyID={this.state.m_cmd_packet.m_follow_partyID}  p_label={"Follow "} p_fixed_list={[[-1,'no action', 'text-white'], [0, 'unfollow', 'text-danger']]} ref={this.swarm_Ref} onSelectUnit={(p_partyID) => this.fn_requestToFollow(p_partyID)} />
                 </div>
             </div>
         );

@@ -34,7 +34,7 @@ export class ClssCtrlGPIO extends React.Component {
     
     fn_unitUpdated (p_me, p_unit)
     {
-        if (p_me.state.m_update == 0) return ;
+        if (p_me.state.m_update === 0) return ;
         
         p_me.setState(prevState => ({ m_update: prevState.m_update + 1 }));
     }

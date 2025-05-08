@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../../js/js_main.js'
+import {hlp_getFlightMode} from '../../js/js_main.js'
 
 
 // Registration and Regeneration Control

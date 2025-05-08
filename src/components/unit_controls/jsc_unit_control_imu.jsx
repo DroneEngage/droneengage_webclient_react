@@ -150,7 +150,6 @@ export class ClssCtrlDroneIMU extends React.Component {
         let v_fcb_mode_title;		
 		let v_bearing_text;
         let v_bearing_knob = [];
-        let v_bearingTarget_text;
         let v_bearingTarget_knob = [];
         let v_flight_mode_text;
         let v_flight_mode_class = ' ';
@@ -268,9 +267,6 @@ export class ClssCtrlDroneIMU extends React.Component {
         }
         else 
         {
-            const c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((v_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-            const c_pitch = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.pitch) ).toFixed(1);
-            const c_roll = ((js_helpers.CONST_RADIUS_TO_DEGREE * v_andruavUnit.m_Nav_Info.p_Orientation.roll) ).toFixed(1);
             v_yaw_text = 'HUD';
             v_yaw_knob.push(<ClssCtrlHUD key={v_andruavUnit.partyID + "_hud"} id={v_andruavUnit.partyID + "_hud"} p_unit={v_andruavUnit}   title ='Pitch: {v_pitch}'/>);
           }

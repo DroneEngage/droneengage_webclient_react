@@ -19,7 +19,7 @@ import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
  * onSelectUnit(partyID)
  * 
  */
-export class ClssAndruavUnit_DropDown_List extends React.Component {
+export class ClssAndruavUnitDropDownList extends React.Component {
 
 
     constructor(props)

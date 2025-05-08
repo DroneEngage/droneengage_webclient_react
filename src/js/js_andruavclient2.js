@@ -1924,8 +1924,8 @@ class CAndruavClient {
                         }
                         else if (typeof p_jmsg.AR === 'number')
                         {
-                            is_armed = (p_jmsg.AR & 0b0010)==0b10;
-                            is_ready_to_arm = (p_jmsg.AR & 0b0001)==0b1;
+                            is_armed = (p_jmsg.AR & 0b0010)===0b10;
+                            is_ready_to_arm = (p_jmsg.AR & 0b0001)===0b1;
                         }
                         v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
                         p_unit.m_isArmed = is_armed;
@@ -2044,8 +2044,8 @@ class CAndruavClient {
                         }
                         else if (typeof p_jmsg.AR === 'number')
                         {
-                            is_armed = (p_jmsg.AR & 0b0010)==0b10;
-                            is_ready_to_arm = (p_jmsg.AR & 0b0001)==0b1;
+                            is_armed = (p_jmsg.AR & 0b0010)===0b10;
+                            is_ready_to_arm = (p_jmsg.AR & 0b0001)===0b1;
                         }
                         
                         v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
@@ -3197,7 +3197,7 @@ class CAndruavClient {
                             v_andruavMessage = JSON.parse(out.text);
                         } catch (err) {
                             js_common.fn_console_log(err);
-                            v_andruavMessage = new Object();
+                            v_andruavMessage = {}; //new Object();
                         }
                     }
                     else

@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import React from 'react';
 
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
@@ -10,7 +8,7 @@ import { js_globals } from '../../../js/js_globals.js';
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 
 import { ClssSingleMissionControlBar } from './jsc_ctrl_single_mission_control_bar.jsx'
-import { ClssAndruavUnit_DropDown_List } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
+import { ClssAndruavUnitDropDownList } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
 
 
 
@@ -168,7 +166,7 @@ export class ClssSingle_Plan_Header extends React.Component {
                 v_partyIDCtrl.push(
                     <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
                         <div className="col-12">
-                            <ClssAndruavUnit_DropDown_List p_label={"Drone"} p_partyID={this.state.m_partyID} onSelectUnit={(partyID) => this.fn_onSelectUnit(partyID)} />
+                            <ClssAndruavUnitDropDownList p_label={"Drone"} p_partyID={this.state.m_partyID} onSelectUnit={(partyID) => this.fn_onSelectUnit(partyID)} />
                         </div>
 
                     </div>
