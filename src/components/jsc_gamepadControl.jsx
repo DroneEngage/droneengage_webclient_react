@@ -12,41 +12,8 @@ import {js_speak} from '../js/js_speak'
 
 import {fn_gotoUnit_byPartyID} from '../js/js_main'
 
-
-class ClssGamePadAxisControl extends React.Component {
-
-    render()
-    {
-        return (
-            <div >
-            <svg viewBox="-2.2 -2.2 4.4 4.4" width="128" height="128">
-                <circle cx="0" cy="0" r="2" fill="none" stroke="#888" strokeWidth="0.04"></circle>
-                <path d="M0,-2L0,2M-2,0L2,0" stroke="#888" strokeWidth="0.04"></path>
-                <circle cx={this.props.x*2} cy={this.props.y*2} r="0.22" fill="red" className="axis"></circle>
-                <text textAnchor="middle" fill="#CCC" x="0" y="2">{this.props.x + "," + this.props.y}</text>
-            </svg>
-            </div>
-        );
-    }
-}
-
-
-class ClssGamePadButton extends React.Component {
-    render()
-    {
-        const c_color = this.props.pressed === true?this.props.color_active:this.props.color_inactive;
-        js_common.fn_console_log ("buttion " + this.props.color_active);
-        return (
-            <div>
-                <svg viewBox="-2.2 -2.2 4.4 4.4" width="48" height="48">
-                    <circle cx="0" cy="0" r="1.5" fill={c_color} stroke={this.props.color_active} strokeWidth="0.2"></circle>
-                    <circle cx="0" cy="0" r="1.0" fill="none"  className="button"></circle>
-                    <text className="gp_index" dominantBaseline="central" textAnchor="middle" fill={this.props.color_active} x="0" y="0">{this.props.t}</text>
-                </svg>
-            </div>
-        );
-    }
-}
+import { ClssGamePadAxisControl } from './micro_gadgets/jsc_gamepad_axis.jsx';
+import { ClssGamePadButton } from './micro_gadgets/jsc_gamepad_button.jsx';
 
 
 class ClssGamePadAxesControl extends React.Component {
