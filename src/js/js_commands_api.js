@@ -427,6 +427,8 @@ export class CCommandAPI
     
     static API_do_FlyHere (p_latitude, p_longitude, p_altitude, p_xVel, p_yVel, p_zVel) {
         
+        if (isNaN(p_altitude)===true) p_altitude = 0;
+        
         let v_msg = {
             a: p_latitude,
             g: p_longitude,
