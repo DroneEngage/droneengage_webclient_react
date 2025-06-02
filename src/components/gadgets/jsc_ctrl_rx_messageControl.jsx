@@ -25,6 +25,14 @@ export  class ClssRX_MESSAGE  extends React.Component {
         this.state.m_update = 1;
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        // Only re-render if the 'p_unit' prop has changed, or if the internal update state has changed.
+        // You might want to do a deep comparison if p_unit.m_Messages.m_messages_in or m_messages_in_mavlink
+        // are frequently updated with new objects but the content within them doesn't change meaningfully.
+        // For simple reference equality, this is a good start.
+        return nextProps.p_unit !== this.props.p_unit || nextState.m_update !== this.state.m_update;
+    }
+
     fn_unitUpdated (p_me,p_andruavUnit)
     {
         if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
