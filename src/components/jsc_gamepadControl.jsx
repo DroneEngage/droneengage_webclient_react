@@ -94,6 +94,11 @@ class ClssGamePadButtonControl extends React.Component {
 	{
 		super ();
         
+        this.state =
+        {
+            'm_update': 0
+        };
+
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
     }
     
