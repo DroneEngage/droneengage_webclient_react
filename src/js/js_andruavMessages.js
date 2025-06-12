@@ -49,9 +49,9 @@ export const CONST_TYPE_AndruavMessage_DistinationLocation = 1037;
 export const CONST_TYPE_AndruavMessage_ChangeSpeed = 1040;
 export const CONST_TYPE_AndruavMessage_Ctrl_Camera = 1041;
 // CODEBLOCK_START
-export const CONST_TYPE_AndruavMessage_TrackingTarget = 1042;
+export const CONST_TYPE_AndruavMessage_TrackingTarget_ACTION  = 1042;
 export const CONST_TYPE_AndruavMessage_TrackingTargetLocation = 1043;
-export const CONST_TYPE_AndruavMessage_TargetLost = 1044;
+export const CONST_TYPE_AndruavMessage_TargetTarget_STATUS    = 1044;
 // CODEBLOCK_END
 export const CONST_TYPE_AndruavMessage_GimbalCtrl = 1045;
 export const CONST_TYPE_AndruavMessage_UploadWayPoints = 1046;
@@ -156,6 +156,17 @@ export const CONST_TASHKEEL_SERB_THREAD = 1;
 export const CONST_TASHKEEL_SERB_ARROW = 2; // requires angle
 export const CONST_TASHKEEL_SERB_VECTOR = 3;
 export const CONST_TASHKEEL_SERB_COUNT = 2;
+
+
+// Tracking Target Action TYPE_AndruavMessage_TrackingTarget_ACTION
+export const CONST_TrackingTarget_ACTION_TRACKING_POINT     = 0; 
+export const CONST_TrackingTarget_ACTION_TRACKING_REGION    = 1;  
+export const CONST_TrackingTarget_ACTION_TRACKING_STOP      = 2; 
+
+// Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
+export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0; 
+export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED  = 1; 
+
 
 // AndruavMessage_RemoteExecute Commands
 export const CONST_RemoteCommand_MAKETILT = 100;
@@ -364,6 +375,9 @@ export const message_names = {
   1027: "WayPoints - 1027",
   1036: "NAV_INFO - 1036",
   1037: "Distination Location - 1037",
+  1042: "TrackingTarget - 1042",
+  1042: "TrackingTargetLocation - 1043",
+  1042: "TargetLost - 1044",
   1049: "Camera Zoom - 1049",
   1050: "Camera Switch - 1050",
   1051: "Camera Flash - 1051",
@@ -391,6 +405,13 @@ export const swarm_formation_names = {
   3: "V-Shape",
 };
 
+// Pre-process message_names to ensure all keys have a value
+export const getMessageName = (key) => {
+  if (message_names[key] === undefined) { // Use undefined for a more robust check
+    message_names[key] = String(key); // Convert key to string if it's a number
+  }
+  return message_names[key];
+};
 export const TYPE_MODULE_CLASS_COMM = "comm";
 export const TYPE_MODULE_CLASS_FCB = "fcb";
 export const TYPE_MODULE_CLASS_CAMERA = "camera";
