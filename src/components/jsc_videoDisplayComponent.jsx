@@ -23,10 +23,30 @@ class ClssCVideoScreen extends React.Component {
             m_flash_enabled: false,
             m_zoom: 0.0,
             intervalId: null,
-            m_update: 0
+            // isDrawing, startX, startY, currentRect are now instance variables
+            drawnRectangles: [], // Still in state if you want to render persistent rectangles
+            m_update: 0 // Keep a dummy state update for force-re-renders if needed elsewhere.
         };
 
+        
+        // --- Mouse Drawing Instance Variables ---
+        this.isDrawing = false;
+        this.startX = 0;
+        this.startY = 0;
+        // Use an object to hold current drawing rectangle's visual properties
+        this.currentDrawingRect = {
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0
+        };
+        // --- End Mouse Drawing Instance Variables ---
+
+
+        
+
         this.key = Math.random().toString();
+        this.drawingContainerRef = React.createRef(); // Ref to your main div
 
         this.m_mirrored = false;
         this.m_transform_rotated = "";
@@ -369,9 +389,73 @@ class ClssCVideoScreen extends React.Component {
         this.m_transform_rotated = "transform: '" + this.m_local_rotations[this.m_rotation] + "'";
         this.videoRef.current.style.transform =
 
-            this.forceUpdate();
+        this.forceUpdate();
     }
 
+    fnl_div_mouseDown(e) {
+        if (e.button !== 0) return;
+
+        const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
+        this.startX = e.clientX - containerRect.left; // Store in instance variable
+        this.startY = e.clientY - containerRect.top; // Store in instance variable
+        this.isDrawing = true; // Store in instance variable
+
+        // Initialize currentDrawingRect
+        this.currentDrawingRect = {
+            left: this.startX,
+            top: this.startY,
+            width: 0,
+            height: 0
+        };
+        
+    }
+
+    
+    fnl_div_mouseUp(e) {
+        if (!this.isDrawing) return; // Use instance variable
+
+        this.isDrawing = false; // Reset instance variable
+        
+        const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
+        const currentX = e.clientX - containerRect.left;
+        const currentY = e.clientY - containerRect.top;
+
+        const newLeft = Math.min(this.startX, currentX);
+        const newTop = Math.min(this.startY, currentY);
+        const newWidth = Math.abs(currentX - this.startX);
+        const newHeight = Math.abs(currentY - this.startY);
+
+        // Update currentDrawingRect for the final position (it's what will be rendered)
+        this.currentDrawingRect = {
+            left: newLeft,
+            top: newTop,
+            width: newWidth,
+            height: newHeight
+        };
+        
+
+        // Now, you can process the finalized rectangle and send it
+        const v_x1 = (newLeft / containerRect.width).toFixed(3);
+        const v_y1 = (newTop / containerRect.height).toFixed(3);
+        const normalizedWidth = (newWidth / containerRect.width).toFixed(3);
+        const normalizedHeight = (newHeight / containerRect.height).toFixed(3);
+
+        if ((normalizedWidth < 0.01) || (normalizedHeight < 0.01)) return ;
+        
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (c_andruavUnit == null) {
+            return;
+        }
+
+        js_globals.v_andruavClient.API_SendTrackCRegion(c_andruavUnit,
+            parseFloat(v_x1),
+            parseFloat(v_y1),
+            parseFloat(normalizedWidth),
+            parseFloat(normalizedHeight)
+        );
+        
+    }
+    
     fnl_div_clicked(e) {
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
             // used to test behavior after removing code and as double check
@@ -391,7 +475,7 @@ class ClssCVideoScreen extends React.Component {
         const c_dim = e.currentTarget.getBoundingClientRect();
         const v_x1 = ((e.nativeEvent.x - c_dim.left) / c_dim.width).toFixed(3);
         const v_y1 = ((e.nativeEvent.y - c_dim.top) / c_dim.height).toFixed(3);;
-        js_globals.v_andruavClient.API_SendTrackPoint(c_andruavUnit, parseFloat(v_x1), parseFloat(v_y1), parseInt("15"));
+        js_globals.v_andruavClient.API_SendTrackPoint(c_andruavUnit, parseFloat(v_x1), parseFloat(v_y1), parseFloat("0.05"));
     }
 
     componentWillUnmount() {
@@ -666,7 +750,10 @@ class ClssCVideoScreen extends React.Component {
                     key={"tv" + talk.targetVideoTrack}
                     id={'css_tvideo-div' + talk.targetVideoTrack}
                     className="css_videoContainer"
-                    onClick={(e) => this.fnl_div_clicked(e)}
+                    //onClick={(e) => this.fnl_div_clicked(e)}
+                    ref={this.drawingContainerRef}
+                    onMouseDown={(e) => this.fnl_div_mouseDown(e)}
+                    onMouseUp={(e) => this.fnl_div_mouseUp(e)}
                 >
                     <video
                         autoPlay
