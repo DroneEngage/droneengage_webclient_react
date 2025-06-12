@@ -583,13 +583,14 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         let msg = {
-            a: p_corner1_x,
-            b: p_corner1_y,
-            c: p_corner2_x,
-            d: p_corner2_y
+            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_REGION,
+            b: p_corner1_x,
+            c: p_corner1_y,
+            d: p_corner2_x,
+            e: p_corner2_y
         };
 
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget, msg);
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
     };
     
 
@@ -597,22 +598,23 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         let msg = {
-            a: p_center_x,
-            b: p_center_y,
+            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_POINT,
+            b: p_center_x,
+            c: p_center_y,
             r: p_radius
         };
 
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget, msg);
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
     };
 
     API_StopTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         let msg = {
-            s: true
+            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_STOP
         };
 
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget, msg);
+        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
     };
     
     API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration, comm_local_on_off , comm_local_on_off_duration) {
