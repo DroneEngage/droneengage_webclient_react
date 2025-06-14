@@ -363,21 +363,21 @@ export default class ClssGlobalSettings extends React.Component {
             <div className="form-inline">
               <div className="form-group">
                 <div title='Inter-Drone Distance (SWARM)'>
-                  <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width">
+                  <label htmlFor="txt_defaultSwarmDistance" className="user-select-none text-white txt_label_width">
                     <small>H-Offset</small>
                   </label>
                   <input
-                    id="txt_defaultAltitude"
+                    id="txt_defaultSwarmDistance"
                     type="number"
                     min={parseInt(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN)}
-                    className="form-control input-xs input-sm"
+                    className="form-control input-xs input-sm ms-1"
                     onChange={(e) => this.onChangeSwarm(e)}
                     value={this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE}
                     ref={this.horizontal_distance} // Add ref here
                   />
                   <button
-                    id="btn_defaultAltitude"
-                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                    id="btn_defaultSwarmDistance"
+                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
                     type="button"
                     onClick={(e) => this.clickToggleUnit(e)}
                   >
@@ -391,21 +391,21 @@ export default class ClssGlobalSettings extends React.Component {
             <div className="form-inline">
               <div className="form-group">
                 <div title='Altitude Delta (SWARM)'>
-                  <label  htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width">
+                  <label  htmlFor="txt_defaultSwarmAltDelta" className="user-select-none text-white txt_label_width">
                     <small>V-Offset</small>
                   </label>
                   <input
-                    id="txt_defaultCircle"
+                    id="txt_defaultSwarmAltDelta"
                     type="number"
                     min={parseInt(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN)}
-                    className="form-control input-xs input-sm"
+                    className="form-control input-xs input-sm ms-1"
                     onChange={(e) => this.onChangeSwarm(e)}
                     value={this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE}
                     ref={this.vertical_distance} // Add ref here
                   />
                   <button
-                    id="btn_defaultCircle"
-                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                    id="btn_defaultSwarmAltDelta"
+                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
                     type="button"
                     onClick={(e) => this.clickToggleUnit(e)}
                   >
