@@ -162,6 +162,7 @@ export const CONST_TASHKEEL_SERB_COUNT = 2;
 export const CONST_TrackingTarget_ACTION_TRACKING_POINT     = 0; 
 export const CONST_TrackingTarget_ACTION_TRACKING_REGION    = 1;  
 export const CONST_TrackingTarget_ACTION_TRACKING_STOP      = 2; 
+export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE     = 3; 
 
 // Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
 export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0; 
@@ -419,4 +420,6 @@ export const TYPE_MODULE_CLASS_P2P = "p2p";
 export const TYPE_MODULE_CLASS_SDR = "sdr";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
 export const TYPE_MODULE_CLASS_GPIO = "gpio";
+export const TYPE_MODULE_CLASS_TRACKING = "trk";
+export const TYPE_MODULE_CLASS_AI_RECOGNITION = "aiq";
 export const TYPE_MODULE_CLASS_GENERIC = "gen";

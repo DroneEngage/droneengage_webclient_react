@@ -523,5 +523,31 @@ export class CCommandAPI
         
         return msg;
     }
+
+    static API_StopTracking(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_STOP
+            }
+        };
+        
+        return msg;
+    }
+
+    static API_PauseTracking(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_PAUSE
+            }
+        };
+        
+        return msg;
+    }
 }
 

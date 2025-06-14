@@ -617,6 +617,15 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
     };
     
+    API_PauseTracking(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
+        const cmd = CCommandAPI.API_PauseTracking(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+    
+    };
+    
+    
     API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration, comm_local_on_off , comm_local_on_off_duration) {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;

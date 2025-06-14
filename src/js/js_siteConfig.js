@@ -57,6 +57,7 @@ export let CONST_FEATURE = {
     DISABLE_SDR: false,
     DISABLE_GPIO: false,
     DISABLE_VOICE: false,
+    DISABLE_TRACKING: false,
     DISABLE_EXPERIMENTAL: false,
 };
 
