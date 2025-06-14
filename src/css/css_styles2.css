@@ -603,16 +603,27 @@ div#modal_ctrl_lidar_info
 
  input#txt_defaultCircle
  {
-	 width: 50% !important;
+	 width: 30% !important;
 	 display: -webkit-inline-box !important;
  }
 
 input#txt_defaultAltitude
  {
-	 width: 50% !important;
+	 width: 30% !important;
 	 display: -webkit-inline-box !important;
  }
 
+ input#txt_defaultSwarmAltDelta
+ {
+	 width: 30% !important;
+	 display: -webkit-inline-box !important;
+ }
+
+ input#txt_defaultSwarmDistance
+ {
+	 width: 30% !important;
+	 display: -webkit-inline-box !important;
+ }
 
 .ctrlbtn
 {
