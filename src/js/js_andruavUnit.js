@@ -122,6 +122,18 @@ export function fn_getFullName(m_groupName, p_partyID) {
 }
 
 
+class C_Tracker {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    this.m_enable_gui_tracker = false;
+  }
+
+
+  fn_enableGUITracker(enabled)
+  {
+    this.m_enable_gui_tracker = enabled;
+  }
+}
 
 class C_Obstacles {
   constructor(p_parent) {
@@ -799,6 +811,8 @@ class C_Modules {
     this.has_gpio = false;
     this.has_p2p = false;
     this.has_sdr = false;
+    this.has_tracking = false;
+    this.has_ai_recognition = false;
     this.m_list = [];
   }
 
@@ -843,6 +857,15 @@ class C_Modules {
         case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
           this.has_camera = true;
           break;
+        
+        case js_andruavMessages.TYPE_MODULE_CLASS_TRACKING:
+          this.has_tracking = true;
+          break;
+
+        case js_andruavMessages.TYPE_MODULE_CLASS_AI_RECOGNITION:
+          this.has_ai_recognition = true;
+          break;
+      
         default:
           console.warn(`Unknown module class: ${module.c}`);
           break;
@@ -995,6 +1018,7 @@ export class CAndruavUnitObject {
     this.m_Gimbal = { m_pitch: 0, m_roll: 0, m_yaw: 0 };
     this.m_Video = new C_Video(this);
     this.m_Obstacles = new C_Obstacles(this);
+    this.m_tracker = new C_Tracker(this);
     this.m_DetectedTargets = new C_DetectedTargets(this);
 
     this.m_Swarm = new C_Swarm(this);

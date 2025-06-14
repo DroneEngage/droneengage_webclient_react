@@ -13,6 +13,7 @@ import * as js_andruavMessages from '../js/js_andruavMessages'
 
 import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../js/js_main'
 import ClssCtrlGPIO_Flash from './gadgets/jsc_ctrl_gpio_flash.jsx'
+import ClssCtrlObjectTracker from './gadgets/jsc_ctrl_tracker_button.jsx'
 
 class ClssCVideoScreen extends React.Component {
 
@@ -362,6 +363,11 @@ class ClssCVideoScreen extends React.Component {
         this.state.m_flash = v_flashValue;
     }
 
+    fnl_trackOnOff (e,obj)
+    {
+        console.log(obj);
+    }
+
     fnl_rotate(v_e) {
         let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
@@ -393,6 +399,11 @@ class ClssCVideoScreen extends React.Component {
     }
 
     fnl_div_mouseDown(e) {
+        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (c_andruavUnit == null) {
+            return;
+        }
+        if (!c_andruavUnit.m_tracker.m_enable_gui_tracker) return ;
         if (e.button !== 0) return;
 
         const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
@@ -707,6 +718,9 @@ class ClssCVideoScreen extends React.Component {
                     />
                 </div>
                 <div key={key + "14"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
+                </div>
+                <div key={key + "15"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
                 </div>
             </div>
@@ -827,8 +841,6 @@ export class ClssCVideoControl extends React.Component {
         }
 
         me.forceUpdate();
-
-
     }
 
     componentWillUnmount() {
@@ -885,7 +897,6 @@ export class ClssCVideoControl extends React.Component {
             </div>
         )
     }
-
 
 }
 
