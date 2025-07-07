@@ -181,7 +181,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_VTOL:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning  ";
+                    res.btn_climb_class 	    = " btn-warning ";
                     res.btn_takeoff_class       = " btn-warning ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
@@ -213,7 +213,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_PLANE:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning  ";
+                    res.btn_climb_class 	    = " btn-warning ";
                     res.btn_takeoff_class       = " btn-warning ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
@@ -245,7 +245,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 default:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning    ";
+                    res.btn_climb_class 	    = " btn-warning  ";
                     res.btn_land_class 		    = " btn-warning  ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
@@ -348,7 +348,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_QUAD:
                     res.btn_takeoff_class       = " disabled hidden ";
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light  ";
+                    res.btn_climb_class 	    = " btn-outline-light ";
                     res.btn_land_class 		    = " btn-outline-light ";
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
@@ -371,7 +371,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
                 case js_andruavUnit.VEHICLE_VTOL:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light  ";
+                    res.btn_climb_class 	    = " btn-outline-light ";
                     res.btn_takeoff_class       = " btn-outline-light ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
@@ -401,7 +401,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
                 case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light  ";
+                    res.btn_climb_class 	    = " btn-outline-light ";
                     res.btn_takeoff_class       = " btn-outline-light ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
