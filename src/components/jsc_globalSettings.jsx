@@ -296,7 +296,7 @@ export default class ClssGlobalSettings extends React.Component {
     let v_telemetryModes = [];
 
     v_gadgets.push(
-      <div key={this.key + '1'} className="row ">
+      <div key={this.key + '1'} className="row  me-0 ms-0">
         <div className="col-xs-6 col-sm-6 col-lg-6">
           <div className="form-inline">
             <div className="form-group">
@@ -358,10 +358,10 @@ export default class ClssGlobalSettings extends React.Component {
 
     if (js_siteConfig.CONST_FEATURE.DISABLE_SWARM === false) {
       v_gadgets.push(
-        <div key={this.key + 's1'} className="row ">
-          <div className="col-xs-6 col-sm-6 col-lg-6">
-            <div className="form-inline">
-              <div className="form-group">
+        <div key={this.key + 's1'} className="row border-top pt-1 border-secondary border-bottom me-0 ms-0">
+          <div className="col-xs-6 col-sm-6 col-lg-6 ">
+            <div className="form-inline ">
+              <div className="form-group ">
                 <div title='Inter-Drone Distance (SWARM)'>
                   <label htmlFor="txt_defaultSwarmDistance" className="user-select-none text-white txt_label_width">
                     <small>H-Offset</small>
