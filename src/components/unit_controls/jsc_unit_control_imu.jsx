@@ -419,19 +419,19 @@ export class ClssCtrlDroneIMU extends React.Component {
                     </div>
 
                     <div key={'yaw_ctrl'  + v_andruavUnit.partyID} className = 'row al_l bg-gradient css_margin_zero user-select-none '>
-                        <div key='yaw_ctrl1' className= 'col-4   padding_zero'>
+                        <div key='yaw_ctrl1' className= 'col-6 col-sm-4    padding_zero'>
                                 <p id='yaw' className=' rounded-3 text-white css_margin_zero '><small>{v_yaw_text}</small></p><div id ='imu_v_yaw_knob'>{v_yaw_knob}</div>
                         </div>
-                        <div key='yaw_ctrl2' className= 'col-3  padding_zero'>
+                        <div key='yaw_ctrl2' className= 'col-6 col-sm-3   padding_zero'>
                                 <p id='bearing' className=' rounded-3 text-white css_margin_zero '><small>{v_bearing_text}</small></p>
                                 <div id='bearing_main' className='css_margin_zero'>
                                 <div id='bearingknob' >{v_bearing_knob}</div>
                                 <div id='bearingtargetknob' >{v_bearingTarget_knob}</div>
                                 </div>
                         </div>
-                        <div key={'telem' + v_andruavUnit.partyID} className= 'col-3   padding_zero css_user_select_text'>
+                        <div key={'telem' + v_andruavUnit.partyID} className= 'col-6  col-sm-3   padding_zero css_user_select_text'>
                         <ClssCtrlUDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
-                        <div key={'swarm' + v_andruavUnit.partyID} className= 'col-2   padding_zero'>
+                        <div key={'swarm' + v_andruavUnit.partyID} className= 'col-6  col-sm-2    padding_zero'>
                         <ClssCtrlSWARM   key={'cswarm' + v_andruavUnit.partyID}  className='row padding_zero' p_unit={v_andruavUnit}/>
                         </div>
                         
