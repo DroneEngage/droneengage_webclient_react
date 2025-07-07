@@ -181,7 +181,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_VTOL:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning ";
+                    res.btn_climb_class 	    = " btn-warning  ";
                     res.btn_takeoff_class       = " btn-warning ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
@@ -213,7 +213,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_PLANE:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning ";
+                    res.btn_climb_class 	    = " btn-warning  ";
                     res.btn_takeoff_class       = " btn-warning ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
@@ -245,7 +245,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 default:
                     // https://ardupilot.org/plane/docs/flight-modes.html
                     res.btn_arm_class 		    = " btn-danger ";
-                    res.btn_climb_class 	    = " btn-warning  ";
+                    res.btn_climb_class 	    = " btn-warning    ";
                     res.btn_land_class 		    = " btn-warning  ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
@@ -348,7 +348,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 case js_andruavUnit.VEHICLE_QUAD:
                     res.btn_takeoff_class       = " disabled hidden ";
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-light  ";
                     res.btn_land_class 		    = " btn-outline-light ";
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
@@ -371,7 +371,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
                 case js_andruavUnit.VEHICLE_VTOL:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-light  ";
                     res.btn_takeoff_class       = " btn-outline-light ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
@@ -401,7 +401,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
                 case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-light  ";
                     res.btn_takeoff_class       = " btn-outline-light ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-light ";
@@ -590,9 +590,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 {
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group ddd flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
-                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
                     <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
                     <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
                     <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
@@ -632,9 +632,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 {
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
-                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
                     <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
                     <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
                     <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
