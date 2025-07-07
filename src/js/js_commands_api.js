@@ -549,5 +549,31 @@ export class CCommandAPI
         
         return msg;
     }
+
+    static API_disengageRX(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'ms':  {
+                b: js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED
+            }
+        };
+        
+        return msg;
+    }
+
+    static API_engageGamePad(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControlSettings,
+            'ms':  {
+                b: js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS
+            }
+        };
+        
+        return msg;
+    }
 }
 

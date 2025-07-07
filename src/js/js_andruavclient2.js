@@ -516,24 +516,18 @@ class CAndruavClient {
     API_disengageRX(p_andruavUnit) {
         this.m_currentEngagedRX = undefined; // it might be already null and not synch-ed
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
-        this.API_TXCtrl(p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
+        const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_globals.EE_releaseGamePad, p_andruavUnit);
 
     };
 
 
     API_engageGamePad(p_andruavUnit) {
-        let p_msg = {
-            'b': js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS
-            // rcSubAction
-            // 'b':CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED
-        };
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         this.m_currentEngagedRX = p_andruavUnit;
-        // it might be already null and not synch-ed
-        // js_eventEmitter.fn_dispatch(js_globals.EE_unitTelemetryOff,p_andruavUnit);  // ????
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControlSettings, p_msg);
-
+        const cmd = CCommandAPI.API_engageGamePad(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePad, p_andruavUnit);
     }
 
