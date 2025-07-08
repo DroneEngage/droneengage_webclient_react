@@ -16,7 +16,8 @@ export default class ClssCtrlObjectTracker extends React.Component {
     
             this.key = Math.random().toString();
             
-            js_eventEmitter.fn_subscribe(js_globals.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
+            js_eventEmitter.fn_subscribe(js_globals.EE_onTrackingStatusChanged, this, this.fn_onTrackStatusUpdated);
+            
         }
     
         componentDidMount() {
@@ -25,27 +26,15 @@ export default class ClssCtrlObjectTracker extends React.Component {
         }
     
         componentWillUnmount() {
-            js_eventEmitter.fn_unsubscribe(js_globals.EE_unitGPIOUpdated, this);
+            js_eventEmitter.fn_unsubscribe (js_globals.EE_onTrackingStatusChanged,this);
         }
     
-        fnl_gpioFlashChanged(p_me, p_unit) {
-            const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
-            p_me.state.m_gpio_flashes_OnOff = p_me.fn_isGPIOFlashAllON(gpio_flash);
-            p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+        
+        fn_onTrackStatusUpdated(me,p_unit) {
+            if (me.state.m_update === 0) return;
+            me.setState({'m_update': me.state.m_update +1});
         }
-    
-        fn_isGPIOFlashAllON(gpio_flash) {
-            let count = 0;
-    
-            gpio_flash.forEach(element => {
-                if (element.pin_value === 1) {
-                    count++;
-    
-                }
-            });
-            return (count === gpio_flash.length);
-        }
-    
+        
         fnl_trackerOnOff(e) {
             if (this.props.p_unit.m_tracker.m_enable_gui_tracker===true)
             {
@@ -57,7 +46,8 @@ export default class ClssCtrlObjectTracker extends React.Component {
                 this.props.p_unit.m_tracker.m_enable_gui_tracker = true;
             }
             
-            this.setState({'m_update': this.state.m_update +1});
+            js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingStatusChanged, this.props.p_unit);
+            
         }
     
         render() {
@@ -89,7 +79,7 @@ export default class ClssCtrlObjectTracker extends React.Component {
             
                 
             return (
-                <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_Track + " css_large_icon"} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}></i>
+                <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_Track + " css_large_icon " + this.props.className} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}></i>
             );
         }
     
