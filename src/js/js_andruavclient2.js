@@ -1609,6 +1609,14 @@ class CAndruavClient {
         
         switch (msg.messageType) {
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_Target_STATUS: {
+                console.log ("CONST_TYPE_AndruavMessage_Target_STATUS");
+                p_jmsg = msg.msgPayload;
+                p_unit.m_tracker.fn_updateTrackerStatus(p_jmsg.a);
+                js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingStatusChanged, p_unit);
+            }
+            break;
+
             case js_andruavMessages.CONST_TYPE_AndruavMessage_UdpProxy_Info: {
                 p_jmsg = msg.msgPayload;
                 p_unit.m_Telemetry.m_udpProxy_ip        = p_jmsg.a;

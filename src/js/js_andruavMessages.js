@@ -51,7 +51,7 @@ export const CONST_TYPE_AndruavMessage_Ctrl_Camera = 1041;
 // CODEBLOCK_START
 export const CONST_TYPE_AndruavMessage_TrackingTarget_ACTION  = 1042;
 export const CONST_TYPE_AndruavMessage_TrackingTargetLocation = 1043;
-export const CONST_TYPE_AndruavMessage_TargetTarget_STATUS    = 1044;
+export const CONST_TYPE_AndruavMessage_Target_STATUS    = 1044;
 // CODEBLOCK_END
 export const CONST_TYPE_AndruavMessage_GimbalCtrl = 1045;
 export const CONST_TYPE_AndruavMessage_UploadWayPoints = 1046;
@@ -167,6 +167,8 @@ export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE     = 3;
 // Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
 export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0; 
 export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED  = 1; 
+export const CONST_TrackingTarget_STATUS_TRACKING_ENABLED   = 2; 
+export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED   = 3; 
 
 
 // AndruavMessage_RemoteExecute Commands
