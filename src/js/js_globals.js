@@ -220,6 +220,7 @@ class GLOBALS {
 		this.EE_unitGPIOUpdated             		= "EVT_87";
 		
 		this.EE_onMissionItemToggle					= "EVT_88"; 
+		this.EE_onTrackingStatusChanged				= "EVT_89"; 
 		
 		// EOF LOCAL EVENTS
 
