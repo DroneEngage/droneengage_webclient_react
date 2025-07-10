@@ -162,7 +162,7 @@ export class ClssSingle_Mission_Card extends React.Component {
                     <ul key={'unit_header_div'} className="nav nav-tabs mt-2">
                             {tabs}
                     </ul>
-                    <div key={'unit_details_div'} id="myTabContent" className="tab-content padding_zero"> 
+                    <div key={'unit_details_div'} id="myTabContent1" className="tab-content padding_zero"> 
                             {ctrl}
                     </div>
                 </div>

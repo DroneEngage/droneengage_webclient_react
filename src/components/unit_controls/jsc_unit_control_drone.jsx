@@ -538,7 +538,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 <ul key={id + 'ul'} className="nav nav-tabs">
                     {tabs.container_tabs}
                 </ul>
-                <div key={id + 'myTabContent'} id="myTabContent" className="tab-content padding_zero">
+                <div key={id + 'myTabContent2'} id="myTabContent2" className="tab-content padding_zero">
                     {tabs.container_controls}
                 </div>
             </div>		
