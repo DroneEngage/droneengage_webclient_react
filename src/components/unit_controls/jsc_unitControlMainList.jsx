@@ -267,7 +267,7 @@ export default class ClssAndruavUnitList extends React.Component {
         }
        
         unit.push (<ul key={'unit_header_div'} className="nav nav-tabs"> {units_header} </ul>    );
-        unit.push (<div key={'unit_details_div'} id="myTabContent" className="tab-content padding_zero"> {units_details} </div>);
+        unit.push (<div key={'unit_details_div'} id="myTabContent3" className="tab-content padding_zero"> {units_details} </div>);
         unit.push (units_gcs);
         
     return (
