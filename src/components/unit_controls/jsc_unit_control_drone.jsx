@@ -145,7 +145,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             res.btn_sendParameters_class = " btn-primary  bi bi-toggles ";
              if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null) 
                 && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false)
-                && (!this.props.p_unit.m_modules.has_tracking))
+                && (this.props.p_unit.m_modules.has_tracking))
                 {
                     res.btn_object_tracking_class = " btn-primary   ";
                 }
