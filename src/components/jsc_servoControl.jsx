@@ -1,6 +1,10 @@
 import React    from 'react';
 import * as  js_siteConfig from '../js/siteConfig.js'
 
+import {js_globals} from '../js/js_globals.js';
+import {js_eventEmitter} from '../js/js_eventEmitter.js'
+
+
 class ClssServoUnit extends React.Component {
 
     render ()
@@ -57,7 +61,7 @@ class ClssServoUnit extends React.Component {
 };
 
 
-class ClssServoControl extends React.Component {
+export default class ClssServoControl extends React.Component {
 	constructor()
 	{
 		super ();
@@ -204,11 +208,3 @@ class ClssServoControl extends React.Component {
     }
 };
 
-//CODEBLOCK_START
-       
-ReactDOM.render(
-    <ClssServoControl />,
-    window.document.getElementById('servoCtrl')
-);
-
-//CODEBLOCK_END
