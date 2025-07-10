@@ -305,18 +305,22 @@ class CAndruavGamePad {
                     c_padStatus.p_buttons[i].m_pressed = p_gamepad.buttons[i].pressed;
                     c_padStatus.p_buttons[i].m_timestamp = Date.now();
                     c_padStatus.p_buttons[i].m_longPress = false;
-                    if (v_buttonChanged === true) {
-                        let v_Packet = {};
-                        v_Packet.p_buttonIndex = i;
-                        v_Packet.p_buttons = c_padStatus.p_buttons;
-                        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-                    }
+                    const v_Packet = {
+                        p_buttonIndex: i,
+                        p_buttons: c_padStatus.p_buttons
+                    };
+                    js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
                 } else {
-                    if ((c_pressed === true) && (c_padStatus.p_buttons[i].m_longPress === false) && ((Date.now() - c_padStatus.p_buttons[i].m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS)) { // long press
-                        let v_Packet = {};
-                        v_Packet.p_buttonIndex = i;
-                        v_Packet.p_buttons = c_padStatus.p_buttons;
-                        c_padStatus.p_buttons[i].m_longPress = true;
+                    if ((c_pressed === true) && (!c_padStatus.p_buttons[i].m_longPress) 
+                        && ((Date.now() - c_padStatus.p_buttons[i].m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS)) { // long press
+                
+                        c_padStatus.p_buttons[i].m_longPress = true;  // Set long press flag
+                
+                        const v_Packet = {
+                            p_buttonIndex: i,
+                            p_buttons: c_padStatus.p_buttons
+                        };
+                        
                         js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
                         js_common.fn_console_log("button " + i + " long press");
                     }
