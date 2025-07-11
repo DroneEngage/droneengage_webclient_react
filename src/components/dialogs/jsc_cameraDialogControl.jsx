@@ -241,7 +241,7 @@ export default class ClssCameraDialog extends React.Component
     {
         let p_session;
         let v_streanms = [];
-        let v_unitName;
+        let v_unitName = 'undefined';
 
         if ((this.state.hasOwnProperty('p_session')) && (this.state.p_session !== null && this.state.p_session !== undefined))
         {
