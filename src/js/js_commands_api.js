@@ -575,5 +575,19 @@ export class CCommandAPI
         
         return msg;
     }
+
+
+    static API_do_ServoChannel(p_andruavUnit, p_channel_num, p_value)
+    {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_ServoChannel,
+            'ms':  {
+                n: parseInt(p_channel_num),
+                v: parseInt(p_value)
+            }
+        };
+        
+        return msg;
+    }
 }
 
