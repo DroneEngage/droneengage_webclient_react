@@ -286,11 +286,6 @@ class CAndruavClient {
                 break;
         }
 
-        // CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
-            return;
-        }
-
         if (p_packet.p_buttonIndex === 5) { // RB
             if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {} else { // when unpress
                 if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed === false) {
@@ -303,9 +298,9 @@ class CAndruavClient {
         if (p_packet.p_buttonIndex === 4) { // LB
             if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {} else {
                 if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed) {
-                    p_me.API_do_ServoChannel(p_me.m_gamePadUnit.partyID, "9", 9999);
+                    p_me.API_do_ServoChannel(p_me.m_gamePadUnit, "9", 9999);
                 } else {
-                    p_me.API_do_ServoChannel(p_me.m_gamePadUnit.partyID, "9", 0);
+                    p_me.API_do_ServoChannel(p_me.m_gamePadUnit, "9", 0);
                 }
             }
         }
@@ -896,15 +891,14 @@ class CAndruavClient {
 
 
     /**
-		 * 
-		 */
-    API_do_ServoChannel(p_partyID, p_channelNum, p_value) {
+	* 
+	*/
+    API_do_ServoChannel(p_andruavUnit, p_channel_num, p_value) {
 
-        let msg = {
-            n: parseInt(p_channelNum),
-            v: parseInt(p_value)
-        };
-        this.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_ServoChannel, msg);
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
+
+        const cmd = CCommandAPI.API_do_ServoChannel(p_andruavUnit, p_channel_num, p_value);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     // Very Danger to expose [emergencyDisarm]
