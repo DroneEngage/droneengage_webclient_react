@@ -563,7 +563,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_engageGamePad(p_andruavUnit)
+    static API_engageGamePad()
     {
         const msg = 
         {
@@ -577,7 +577,7 @@ export class CCommandAPI
     }
 
 
-    static API_do_ServoChannel(p_andruavUnit, p_channel_num, p_value)
+    static API_do_ServoChannel(p_channel_num, p_value)
     {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_ServoChannel,
@@ -589,5 +589,21 @@ export class CCommandAPI
         
         return msg;
     }
+
+
+    static API_requestServoChannel()
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms':  {
+                C: js_andruavMessages.CONST_TYPE_AndruavMessage_ServoChannel
+            }
+        };
+
+        return msg;
+    }
+    
+    
 }
 
