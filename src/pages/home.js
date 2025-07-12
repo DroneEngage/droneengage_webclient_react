@@ -25,7 +25,7 @@ import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogContro
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx'
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx'
 import ClssGamePadControl from '../components/jsc_gamepadControl.jsx'
-import ClssServoControlDialog from '../components/dialogs/jsc_servoDialogControl.jsx'
+import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx'
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx'
 import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx'
 import {ClssCVideoControl} from '../components/jsc_videoDisplayComponent.jsx'
@@ -97,7 +97,7 @@ const Home = () => {
 				<ClssLidarInfoDialog/>
 				<ClssYawDialog/>
 				<ClssCameraDialog/>
-				<ClssServoControlDialog/>
+				<ClssServoControl/>
 				<ClssUnitParametersList/>
 				<ClssGamePadControl p_index={js_globals.active_gamepad_index} />
 				<ClssStreamDialog/>

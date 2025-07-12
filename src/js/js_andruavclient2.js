@@ -521,7 +521,7 @@ class CAndruavClient {
     API_engageGamePad(p_andruavUnit) {
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         this.m_currentEngagedRX = p_andruavUnit;
-        const cmd = CCommandAPI.API_engageGamePad(p_andruavUnit);
+        const cmd = CCommandAPI.API_engageGamePad();
         this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePad, p_andruavUnit);
     }
@@ -897,7 +897,16 @@ class CAndruavClient {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 
-        const cmd = CCommandAPI.API_do_ServoChannel(p_andruavUnit, p_channel_num, p_value);
+        const cmd = CCommandAPI.API_do_ServoChannel(p_channel_num, p_value);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+    }
+
+
+    API_requestServoChannel(p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
+
+        const cmd = CCommandAPI.API_requestServoChannel();
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
@@ -2834,6 +2843,36 @@ class CAndruavClient {
                     }
                 }
                 break;
+
+                case mavlink20.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+                {
+
+                    let v_servoOutputs = {};
+                    v_servoOutputs.m_servo1 = c_mavlinkMessage.servo1_raw;
+                    v_servoOutputs.m_servo2 = c_mavlinkMessage.servo2_raw;
+                    v_servoOutputs.m_servo3 = c_mavlinkMessage.servo3_raw;
+                    v_servoOutputs.m_servo4 = c_mavlinkMessage.servo4_raw;
+                    v_servoOutputs.m_servo5 = c_mavlinkMessage.servo5_raw;
+                    v_servoOutputs.m_servo6 = c_mavlinkMessage.servo6_raw;
+                    v_servoOutputs.m_servo7 = c_mavlinkMessage.servo7_raw;
+                    v_servoOutputs.m_servo8 = c_mavlinkMessage.servo8_raw;
+                    v_servoOutputs.m_servo9 = c_mavlinkMessage.servo9_raw;
+                    v_servoOutputs.m_servo10 = c_mavlinkMessage.servo10_raw;
+                    v_servoOutputs.m_servo11 = c_mavlinkMessage.servo11_raw;
+                    v_servoOutputs.m_servo12 = c_mavlinkMessage.servo12_raw;
+                    v_servoOutputs.m_servo13 = c_mavlinkMessage.servo13_raw;
+                    v_servoOutputs.m_servo14 = c_mavlinkMessage.servo14_raw;
+                    v_servoOutputs.m_servo15 = c_mavlinkMessage.servo15_raw;
+                    v_servoOutputs.m_servo16 = c_mavlinkMessage.servo16_raw;
+
+                    
+                    p_unit.m_Servo.m_values = v_servoOutputs;
+
+                    js_eventEmitter.fn_dispatch(js_globals.EE_servoOutputUpdate, p_unit);
+
+                }
+                
+                break;
                 
                 case mavlink20.MAVLINK_MSG_ID_ATTITUDE:
                 {
@@ -3173,6 +3212,8 @@ class CAndruavClient {
 
             case js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_ServoOutput: 
             {
+                // OBSOLETE as a report message and has been with replaced mavlink message.
+
                 let v_servoOutputs = {};
                 /*
 							 String message could be of any length and no padding applied.
