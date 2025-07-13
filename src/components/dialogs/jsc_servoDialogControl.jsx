@@ -7,43 +7,78 @@ import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import {fn_helpPage, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
 
-
 class ClssServoUnit extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
 
         this.key = Math.random().toString();
+        this.state = {
+            pendingButton: null // Can be 'min', 'med', 'max', or null
+        };
+
+        this.handleClick = this.handleClick.bind(this); // Bind the handler
+    }
+
+    // This lifecycle method is called after every render, perfect for reacting to prop changes
+    componentDidUpdate(prevProps) {
+        // If the prop_value has changed, it means we've received an update from the vehicle.
+        // Clear the pending state.
+        if (this.props.prop_value !== prevProps.prop_value) {
+            if (this.state.pendingButton !== null) {
+                this.setState({ pendingButton: null });
+            }
+        }
+    }
+
+    handleClick(buttonType, servoValue) {
+        if (!this.btn_disabled) { // Use the render's computed btn_disabled state
+            this.setState({ pendingButton: buttonType });
+            js_globals.v_andruavClient.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
+        }
     }
 
     render() {
         let btn_min_css = '';
-        let btn_med_css = ''; // New: CSS for MED button
+        let btn_med_css = '';
         let btn_max_css = '';
 
         let btn_disabled = false; // Single disabled flag for all buttons
+        this.btn_disabled = false; // Store on instance for handleClick access
 
         // If prop_value or prop_party are null/undefined, all buttons are disabled and styled neutrally
         if ((this.props.prop_value === null || this.props.prop_value === undefined) || (this.props.prop_party === null || this.props.prop_party === undefined)) {
             btn_min_css = ' btn-outline-secondary ';
             btn_med_css = ' btn-outline-secondary ';
             btn_max_css = ' btn-outline-secondary ';
-            btn_disabled = false;
+            btn_disabled = true; // Buttons should be disabled if no valid props
+            this.btn_disabled = true;
         } else {
             // Determine active button based on prop_value
-            if (this.props.prop_value <= 1200) { // Highlight MIN for value 0
+            if (this.props.prop_value <= 1200) {
                 btn_min_css = ' css_servo_selected bg-danger text-white ';
                 btn_med_css = ' css_servo_clickable bg-success text-white ';
                 btn_max_css = ' css_servo_clickable bg-success text-white ';
-            } else if (this.props.prop_value >= 1800) { // Highlight MAX for value 9999
+            } else if (this.props.prop_value >= 1800) {
                 btn_min_css = ' css_servo_clickable bg-success text-white ';
                 btn_med_css = ' css_servo_clickable bg-success text-white ';
                 btn_max_css = ' css_servo_selected bg-danger text-white ';
-            } else { // Highlight MED for any other value (e.g., 1500 or any intermediate)
+            } else {
                 btn_min_css = ' css_servo_clickable bg-success text-white ';
                 btn_med_css = ' css_servo_selected bg-danger text-white ';
                 btn_max_css = ' css_servo_clickable bg-success text-white ';
             }
+
+            // Apply pending (yellow) state if applicable
+            if (this.state.pendingButton === 'min') {
+                btn_min_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+            } else if (this.state.pendingButton === 'med') {
+                btn_med_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+            } else if (this.state.pendingButton === 'max') {
+                btn_max_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+            }
+            
+            this.state.pendingButton= null; //resolves your rapid-click visual issue.
         }
 
         return (
@@ -54,7 +89,7 @@ class ClssServoUnit extends React.Component {
                             <p
                                 id={'min' + this.props.prop_channel}
                                 className={'label rounded-1 ' + btn_min_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={!btn_disabled ? (e) => js_globals.v_andruavClient.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, 0) : null}
+                                onClick={() => this.handleClick('min', 0)}
                             >
                                 MIN
                             </p>
@@ -65,7 +100,7 @@ class ClssServoUnit extends React.Component {
                             <p
                                 id={'med' + this.props.prop_channel}
                                 className={'label rounded-1 ' + btn_med_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={!btn_disabled ? (e) => js_globals.v_andruavClient.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, 1500) : null} 
+                                onClick={() => this.handleClick('med', 1500)}
                             >
                                 MED
                             </p>
@@ -76,7 +111,7 @@ class ClssServoUnit extends React.Component {
                             <p
                                 id={'max' + this.props.prop_channel}
                                 className={'label rounded-1 ' + btn_max_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={!btn_disabled ? (e) => js_globals.v_andruavClient.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, 9999) : null}
+                                onClick={() => this.handleClick('max', 9999)}
                             >
                                 MAX
                             </p>
@@ -91,7 +126,7 @@ class ClssServoUnit extends React.Component {
             </div>
         );
     }
-};
+}
 
 
 export default class ClssServoControl extends React.Component {
@@ -111,8 +146,7 @@ export default class ClssServoControl extends React.Component {
         this.footerRef = React.createRef();
         this.btnCloseRef = React.createRef();
         this.opaqueBtnRef = React.createRef();
-        this.btnGotoRef = React.createRef();
-        this.btnHelpRef = React.createRef();
+        
 
         js_eventEmitter.fn_subscribe(js_globals.EE_servoOutputUpdate, this, this.fn_updateData);
         js_eventEmitter.fn_subscribe(js_globals.EE_displayServoForm, this, this.fn_displayForm);
@@ -188,31 +222,7 @@ export default class ClssServoControl extends React.Component {
             };
         }
 
-        if (this.btnGotoRef.current) {
-            this.btnGotoRef.current.onclick = () => {
-                if (this.modal_ctrl_srv.current) {
-                    // Assuming fn_gotoUnit_byPartyID is a globally accessible function or imported
-                    // If it's part of js_globals, you'd access it as js_globals.fn_gotoUnit_byPartyID
-                    if (typeof fn_gotoUnit_byPartyID === 'function') {
-                        fn_gotoUnit_byPartyID(this.state.partyID);
-                    } else {
-                        console.warn('fn_gotoUnit_byPartyID is not defined or accessible.');
-                    }
-                }
-            };
-        }
-
-        if (this.btnHelpRef.current) {
-            this.btnHelpRef.current.onclick = () => {
-                // Assuming fn_helpPage is a globally accessible function or imported
-                // If it's part of js_globals, you'd access it as js_globals.fn_helpPage
-                if (typeof fn_helpPage === 'function') {
-                    fn_helpPage(js_siteConfig.CONST_MANUAL_URL);
-                } else {
-                    console.warn('fn_helpPage is not defined or accessible.');
-                }
-            };
-        }
+        
     }
 
     render() {
@@ -281,14 +291,17 @@ export default class ClssServoControl extends React.Component {
                         </div>
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
                             <div className="row">
-                                <div className="col-4">
+                                <div className="col-3">
                                     <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" ref={this.opaqueBtnRef}>opaque</button>
                                 </div>
-                                <div className="col-4">
-                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" ref={this.btnGotoRef}>Goto</button>
+                                <div className="col-3">
+                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.partyID)}>Goto</button>
                                 </div>
-                                <div className="col-4">
-                                    <button id="btnHelp" type="button" className="btn btn-sm btn-primary" ref={this.btnHelpRef}>Help</button>
+                                <div className="col-3">
+                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavClient.API_requestServoChannel(p_andruavUnit)} >Refresh</button>
+                                </div>
+                                <div className="col-3">
+                                    <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>
                                 </div>
                             </div>
                         </div>
