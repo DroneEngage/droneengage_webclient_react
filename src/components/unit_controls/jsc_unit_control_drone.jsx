@@ -30,6 +30,8 @@ import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
 import {ClssCtrlUnitMainBar} from './jsc_ctrl_unit_main_bar.jsx'
 import {ClssCtrlUnitPlanningBar} from './jsc_ctrl_unit_planning_bar.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
+import ClssCtrlObjectTrackerAI from '../gadgets/jsc_ctrl_tracker_ai_button.jsx'
+
 
 /**
  * This class is full control of Drone.
@@ -441,7 +443,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         let btn = this.hlp_getflightButtonStyles(p_andruavUnit);
         let ctrl_flight_controller=[];
-        let ctrl2=[];
+        let ctrl2_1=[];
+        let ctrl2_2=[];
         let cls_ctrl_modes = '  ';
         let cls_ctrl_wp = '  ';
         if (!js_andruavAuth.fn_do_canControlWP()) 
@@ -468,7 +471,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
 
 
-        ctrl2.push (<div key={p_andruavUnit.partyID + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+        ctrl2_1.push (<div key={p_andruavUnit.partyID + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_refreshwp' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
                     <button id='btn_writewp'  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class}   onClick={ (e) => fn_putWayPoints(p_andruavUnit,true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
                     <button id='btn_clearwp'   type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>
@@ -476,9 +479,12 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                     <button id='btn_freezerx' type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
                     <button id='btn_releaserx' type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>
                     <button id='btn_inject_param' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_displayParamsDialog(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
+                    <button id='btn_lidar_info' type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
+                    </div></div>);
+
+        ctrl2_2.push (<div key={p_andruavUnit.partyID + "rc3_1"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_tracking' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker'/></button>
-                    
-                    <button id='btn_lidar_info' type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;Lidar&nbsp;</button>
+                    <button id='btn_tracking_ai' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTrackerAI className='vstack' p_unit={p_andruavUnit} title='object AI tracker'/></button>
                     </div></div>);
 
         return (
@@ -486,8 +492,11 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             <div className= 'row'>
             {ctrl_flight_controller}
             </div>
-            <div  key={'ctrl2'} className= 'row'>
-            {ctrl2}
+            <div  key={'ctrl2_1'} className= 'row'>
+            {ctrl2_1}
+            </div>
+            <div  key={'ctrl2_2'} className= 'row'>
+            {ctrl2_2}
             </div>
             <div key={'ctrl3'} className= 'row'>
             </div>
