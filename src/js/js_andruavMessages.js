@@ -79,6 +79,10 @@ export const CONST_TYPE_AndruavMessage_Ping_Unit = 1073;
 
 export const CONST_TYPE_AndruavMessage_Upload_DE_Mission = 1075;
 
+export const CONST_TYPE_AndruavMessage_AI_Recognition_ACTION = 1076;
+export const CONST_TYPE_AndruavMessage_AI_Recognition_STATUS = 1077;
+export const CONST_TYPE_AndruavMessage_AI_Recognition_Objects= 1078;
+
 // Binary Messages
 export const CONST_TYPE_AndruavMessage_LightTelemetry = 2022;
 
@@ -169,6 +173,19 @@ export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0;
 export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED  = 1; 
 export const CONST_TrackingTarget_STATUS_TRACKING_ENABLED   = 2; 
 export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED   = 3; 
+
+
+// TYPE_AndruavMessage_AI_Recognition_ACTION
+export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT   = 0;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH  = 1;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_STOP    = 2;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE   = 3;
+
+// Tracking Target Action TYPE_AndruavMessage_AI_Recognition_STATUS
+export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST     = 0;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED = 1;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED  = 2;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_STOPPED  = 3;
 
 
 // AndruavMessage_RemoteExecute Commands
