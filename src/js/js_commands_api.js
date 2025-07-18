@@ -528,9 +528,25 @@ export class CCommandAPI
     {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
             'ms':  {
                 a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_STOP
+            }
+        };
+        
+        return msg;
+    }
+
+    static API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_POINT,
+                b: p_center_x,
+                c: p_center_y,
+                r: p_radius
             }
         };
         
@@ -550,11 +566,52 @@ export class CCommandAPI
         return msg;
     }
 
+
+    static API_SendTrackAISelect(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH
+            }
+        };
+        
+        return msg;
+    }
+
+    
+    static API_StopTrackingAI(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_STOP
+            }
+        };
+        
+        return msg;
+    }
+
+    static API_PauseTrackingAI(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE
+            }
+        };
+        
+        return msg;
+    }
+    
     static API_disengageRX(p_andruavUnit)
     {
         const msg = 
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControlSettings,
             'ms':  {
                 b: js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED
             }

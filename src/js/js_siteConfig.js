@@ -58,6 +58,7 @@ export let CONST_FEATURE = {
     DISABLE_GPIO: false,
     DISABLE_VOICE: false,
     DISABLE_TRACKING: false,
+    DISABLE_TRACKING_AI: false,
     DISABLE_EXPERIMENTAL: false,
 };
 
