@@ -14,6 +14,7 @@ import * as js_andruavMessages from '../js/js_andruavMessages'
 import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../js/js_main'
 import ClssCtrlGPIO_Flash from './gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from './gadgets/jsc_ctrl_tracker_button.jsx'
+import ClssCtrlObjectTrackerAI from './gadgets/jsc_ctrl_tracker_ai_button.jsx'
 
 class ClssCVideoScreen extends React.Component {
 
@@ -464,6 +465,8 @@ class ClssCVideoScreen extends React.Component {
             parseFloat(normalizedWidth),
             parseFloat(normalizedHeight)
         );
+
+        js_globals.v_andruavClient.API_SendTrackAISelect(c_andruavUnit);
         
     }
     
