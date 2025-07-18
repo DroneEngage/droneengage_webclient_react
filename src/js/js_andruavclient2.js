@@ -512,7 +512,7 @@ class CAndruavClient {
         this.m_currentEngagedRX = undefined; // it might be already null and not synch-ed
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
         const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_globals.EE_releaseGamePad, p_andruavUnit);
 
     };
@@ -522,7 +522,7 @@ class CAndruavClient {
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         this.m_currentEngagedRX = p_andruavUnit;
         const cmd = CCommandAPI.API_engageGamePad();
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePad, p_andruavUnit);
     }
 
@@ -586,25 +586,18 @@ class CAndruavClient {
     API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        let msg = {
-            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_POINT,
-            b: p_center_x,
-            c: p_center_y,
-            r: p_radius
-        };
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
+        const cmd = CCommandAPI.API_SendTrackPoint(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
+
 
     API_StopTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        let msg = {
-            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_STOP
-        };
-
-        this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
+        const cmd = CCommandAPI.API_StopTracking(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
+
     
     API_PauseTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
@@ -645,16 +638,16 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         const cmd = CCommandAPI.API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration, comm_local_on_off, comm_local_on_off_duration);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
-    }
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+    };
 
 
     API_connectToLocalCommServer(p_andruavUnit, p_localCommServerIP, p_localCommServerPort) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         const cmd = CCommandAPI.API_connectToLocalCommServer(p_andruavUnit, p_localCommServerIP, p_localCommServerPort);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
-    }
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+    };
 
     API_requestIMU(p_andruavUnit, on_off) {
 
@@ -673,7 +666,7 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         const cmd = CCommandAPI.API_resumeTelemetry(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
 
 
@@ -681,7 +674,7 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         const cmd = CCommandAPI.API_pauseTelemetry(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
 
     API_adjustTelemetryDataRate(p_andruavUnit, lvl) {
@@ -766,7 +759,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_requestP2P(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
 
@@ -774,7 +767,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_requestSDR(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
 
@@ -782,14 +775,14 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_scanSDRDrivers(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_scanSDRFreq(p_andruavUnit, p_on_off) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit, p_on_off);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_requestGPIOStatus (p_andruavUnit, p_module_key, p_pin_number)
@@ -797,28 +790,28 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
 
         const cmd = CCommandAPI.API_requestGPIOStatus(p_andruavUnit, p_module_key, p_pin_number);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_writeGPIO (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
 
         const cmd = CCommandAPI.API_writeGPIO(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_writeGPIO_PWM (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
 
         const cmd = CCommandAPI.API_writeGPIO_PWM(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
 
@@ -826,7 +819,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_scanP2P(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     
@@ -834,7 +827,7 @@ class CAndruavClient {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
         
         const cmd = CCommandAPI.API_resetP2P(p_andruavUnit);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_makeSwarm (p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance) {
@@ -842,7 +835,7 @@ class CAndruavClient {
         if (p_formationID === null || p_formationID === undefined) return ;
         
         const cmd = CCommandAPI.API_makeSwarm(p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance);
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_setSDRConfig (p_andruavUnit, p_fequency_center, p_fequency,
@@ -859,7 +852,7 @@ class CAndruavClient {
             p_display_bars, p_trigger_level
         );
         if (cmd === null || cmd === undefined) return;
-        this.API_sendCMD(p_andruavUnit.p_partyID, cmd.mt, cmd.ms);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     }
 
     API_activateSDR (p_andruavUnit)
