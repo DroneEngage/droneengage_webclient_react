@@ -151,7 +151,8 @@ export class ClssCtrlSWARM extends React.Component {
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
             
             js_globals.v_andruavClient.API_makeSwarm(this.props.p_unit, newFormation,
-                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE, js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
+                js_localStorage.fn_getDefaultSwarmHorizontalDistance(),
+                js_localStorage.fn_getDefaultSwarmVerticalDistance());
 
             if (this.state.m_update === 0) return;
 
