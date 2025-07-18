@@ -82,8 +82,8 @@ class GLOBALS {
 		this.CONST_DEFAULT_SPEED_MIN         				= 5;    //  m/s
 		this.CONST_DEFAULT_SPEED_STEP        				= 1;    //  m/s
 		this.CONST_DEFAULT_VOLUME            				= 50;
-		this.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE 		= 10; // m
-		this.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE   		= 2; // m
+		this.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE 		= 30; // m
+		this.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE   		= 5; // m
 		this.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN 	= 10; // m
 		this.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN   	= 2; // m
 
@@ -222,7 +222,7 @@ class GLOBALS {
 		this.EE_onMissionItemToggle					= "EVT_88"; 
 		this.EE_onTrackingStatusChanged				= "EVT_89"; 
 		this.EE_onTrackingAIStatusChanged			= "EVT_90";
-		
+
 		// EOF LOCAL EVENTS
 
 
