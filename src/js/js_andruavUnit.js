@@ -122,6 +122,38 @@ export function fn_getFullName(m_groupName, p_partyID) {
 }
 
 
+class C_TRACKER_AI {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+  }
+
+
+
+  fn_updateTrackerStatus(status)
+  {
+    this.m_valid_unit_feedback = true;
+    
+    switch(status)
+    {
+      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
+          this.m_detected = false;
+          this.m_enable_gui_tracker = false;
+        break;
+      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
+          this.m_detected = true;
+          this.m_enable_gui_tracker = true;
+        break;
+      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
+          this.m_active = true;
+        break;
+      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
+          this.m_active = false;
+        break;
+    }
+  }
+
+}
+
 class C_Tracker {
   constructor(p_parent) {
     this.m_parent = p_parent;
@@ -1048,6 +1080,7 @@ export class CAndruavUnitObject {
     this.m_Video = new C_Video(this);
     this.m_Obstacles = new C_Obstacles(this);
     this.m_tracker = new C_Tracker(this);
+    this.m_tracker_ai = new C_TRACKER_AI(this);
     this.m_DetectedTargets = new C_DetectedTargets(this);
 
     this.m_Swarm = new C_Swarm(this);
