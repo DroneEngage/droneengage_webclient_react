@@ -20,6 +20,14 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
     }
 
+
+    // --- Core Change: Preventing re-renders from parent props ---
+    shouldComponentUpdate(nextProps, nextState) {
+        // Only re-render if the internal m_update state has changed.
+        // This effectively ignores prop changes from the parent.
+        return (nextState.m_update !== this.state.m_update);
+    }
+        
     componentDidMount() {
         this.setState({ m_update: 1 });
 
