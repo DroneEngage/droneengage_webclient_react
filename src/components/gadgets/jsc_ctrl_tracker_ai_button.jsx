@@ -45,8 +45,8 @@ export default class ClssCtrlObjectTrackerAI extends React.Component {
                 this.props.p_unit.m_tracker_ai.m_enable_gui_tracker = true;
                 js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit);
             }
-            
-            js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingStatusChanged, this.props.p_unit);
+
+           js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, this.props.p_unit);
             
         }
     

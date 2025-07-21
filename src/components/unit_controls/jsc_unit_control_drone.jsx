@@ -31,7 +31,7 @@ import {ClssCtrlUnitMainBar} from './jsc_ctrl_unit_main_bar.jsx'
 import {ClssCtrlUnitPlanningBar} from './jsc_ctrl_unit_planning_bar.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAI from '../gadgets/jsc_ctrl_tracker_ai_button.jsx'
-
+import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
 
 /**
  * This class is full control of Drone.
@@ -57,7 +57,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         };
 
         this.props.p_unit.m_gui.speed_link = false;
-    
+        this.key = Math.random().toString();
     }
 
     componentDidMount () 
@@ -472,19 +472,19 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
 
         ctrl2_1.push (<div key={p_andruavUnit.partyID + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
-                    <button id='btn_refreshwp' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
-                    <button id='btn_writewp'  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class}   onClick={ (e) => fn_putWayPoints(p_andruavUnit,true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
-                    <button id='btn_clearwp'   type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>
-                    <button id='btn_webRX'      type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_rx_class}   onClick={ (e) => this.fn_webRX_toggle(p_andruavUnit)} title={`${btn.btn_rx_text}--${btn.btn_rx_title}`}>&nbsp;RX</button>
-                    <button id='btn_freezerx' type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
-                    <button id='btn_releaserx' type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>
-                    <button id='btn_inject_param' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_displayParamsDialog(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
-                    <button id='btn_lidar_info' type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
+                    <button id='btn_refreshwp' key={this.key + 'btn_refreshwp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
+                    <button id='btn_writewp'  key={this.key + 'btn_writewp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class}   onClick={ (e) => fn_putWayPoints(p_andruavUnit,true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
+                    <button id='btn_clearwp'   key={this.key + 'btn_clearwp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>
+                    <button id='btn_webRX'      key={this.key + 'btn_webRX'}  type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_rx_class}   onClick={ (e) => this.fn_webRX_toggle(p_andruavUnit)} title={`${btn.btn_rx_text}--${btn.btn_rx_title}`}>&nbsp;RX</button>
+                    <button id='btn_freezerx' key={this.key + 'btn_freezerx'}  type='button' title="Freeze RemoteControl -DANGER-" className={'hidden btn btn-sm flgtctrlbtn ' + btn.btn_takeCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_takeTXCtrl(e,p_andruavUnit)}>&nbsp;TX-Frz&nbsp;</button>
+                    <button id='btn_releaserx' key={this.key + 'btn_releaserx'}  type='button' title="Release Control" className={'btn btn-sm flgtctrlbtn ' + btn.btn_releaseCTRL_class + cls_ctrl_modes} onClick={ (e) => this.fn_releaseTXCtrl(p_andruavUnit)}>&nbsp;TX-Rel&nbsp;</button>
+                    <button id='btn_inject_param' key={this.key + 'btn_inject_param'}  type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_sendParameters_class } onClick={ (e) => this.fn_displayParamsDialog(p_andruavUnit)}>&nbsp;PARM&nbsp;</button>
+                    <button id='btn_lidar_info' key={this.key + 'btn_lidar_info'}  type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
                     </div></div>);
 
         ctrl2_2.push (<div key={p_andruavUnit.partyID + "rc3_1"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
-                    <button id='btn_tracking' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker'/></button>
-                    <button id='btn_tracking_ai' type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTrackerAI className='vstack' p_unit={p_andruavUnit} title='object AI tracker'/></button>
+                    <button id='btn_tracking' key={this.key + 'btn_tracking'} type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker'/></button>
+                    <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_tracking_class } p_unit={p_andruavUnit} title='object AI tracker'/>
                     </div></div>);
 
         return (
