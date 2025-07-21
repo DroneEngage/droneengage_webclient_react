@@ -222,6 +222,7 @@ class GLOBALS {
 		this.EE_onMissionItemToggle					= "EVT_88"; 
 		this.EE_onTrackingStatusChanged				= "EVT_89"; 
 		this.EE_onTrackingAIStatusChanged			= "EVT_90";
+		this.EE_onTrackingAIObjectListUpdate		= "EVT_91";
 
 		// EOF LOCAL EVENTS
 
