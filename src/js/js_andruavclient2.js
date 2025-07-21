@@ -608,10 +608,10 @@ class CAndruavClient {
     };
 
 
-    API_SendTrackAISelect(p_andruavUnit) {
+    API_SendTrackAISelect(p_andruavUnit, selected_object_list) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        const cmd = CCommandAPI.API_SendTrackAISelect(p_andruavUnit);
+        const cmd = CCommandAPI.API_SendTrackAISelect(selected_object_list);
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
 
