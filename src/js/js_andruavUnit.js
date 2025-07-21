@@ -125,9 +125,14 @@ export function fn_getFullName(m_groupName, p_partyID) {
 class C_TRACKER_AI {
   constructor(p_parent) {
     this.m_parent = p_parent;
+    this.m_object_list = [];
   }
 
 
+  fn_addObjectClass(objectList)
+  {
+    this.m_object_list = objectList;
+  }
 
   fn_updateTrackerStatus(status)
   {
@@ -145,6 +150,7 @@ class C_TRACKER_AI {
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
           this.m_active = true;
+          this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
           this.m_active = false;

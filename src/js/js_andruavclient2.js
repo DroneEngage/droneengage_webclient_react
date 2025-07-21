@@ -611,7 +611,7 @@ class CAndruavClient {
     API_SendTrackAISelect(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        const cmd = CCommandAPI.API_StopTrackingAI(p_andruavUnit);
+        const cmd = CCommandAPI.API_SendTrackAISelect(p_andruavUnit);
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
 
@@ -628,6 +628,15 @@ class CAndruavClient {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
         const cmd = CCommandAPI.API_PauseTrackingAI(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+    
+    };
+    
+    
+    API_GetTrackingAIClassList(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
+        const cmd = CCommandAPI.API_GetTrackingAIClassList();
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     
     };
@@ -1641,8 +1650,18 @@ class CAndruavClient {
             case js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_STATUS: {
                 console.log ("CONST_TYPE_AndruavMessage_AI_Recognition_STATUS");
                 p_jmsg = msg.msgPayload;
-                p_unit.m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a);
-                js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, p_unit);
+                switch (p_jmsg.a)
+                {
+                    case js_andruavMessages.CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST:
+                        p_unit.m_tracker_ai.fn_addObjectClass(p_jmsg.c);
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIObjectListUpdate, p_unit);
+                    break;
+
+                    default: 
+                        p_unit.m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a);
+                        js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, p_unit);
+                        break;
+                }
             }
             break;
 

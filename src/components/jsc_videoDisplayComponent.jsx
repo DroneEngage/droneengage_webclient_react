@@ -465,8 +465,6 @@ class ClssCVideoScreen extends React.Component {
             parseFloat(normalizedWidth),
             parseFloat(normalizedHeight)
         );
-
-        js_globals.v_andruavClient.API_SendTrackAISelect(c_andruavUnit);
         
     }
     

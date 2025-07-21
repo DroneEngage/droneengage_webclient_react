@@ -81,7 +81,7 @@ export const CONST_TYPE_AndruavMessage_Upload_DE_Mission = 1075;
 
 export const CONST_TYPE_AndruavMessage_AI_Recognition_ACTION = 1076;
 export const CONST_TYPE_AndruavMessage_AI_Recognition_STATUS = 1077;
-export const CONST_TYPE_AndruavMessage_AI_Recognition_Objects= 1078;
+
 
 // Binary Messages
 export const CONST_TYPE_AndruavMessage_LightTelemetry = 2022;
@@ -176,17 +176,18 @@ export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED   = 3;
 
 
 // TYPE_AndruavMessage_AI_Recognition_ACTION
-export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT   = 0;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH  = 1;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_STOP    = 2;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE   = 3;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT       = 0;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH      = 1;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_STOP        = 2;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE       = 3;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST  = 4;
 
 // Tracking Target Action TYPE_AndruavMessage_AI_Recognition_STATUS
-export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST     = 0;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED = 1;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED  = 2;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_STOPPED  = 3;
-
+export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST        = 0;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED    = 1;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED     = 2;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_STOPPED     = 3;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST  = 4;
 
 // AndruavMessage_RemoteExecute Commands
 export const CONST_RemoteCommand_MAKETILT = 100;
@@ -405,6 +406,11 @@ export const message_names = {
   1071: "UdpProxy_Info - 1071",
   1073: "Ping Unit - 1073",
   1074: "P2P Info - 1074",
+  1075: "Mission Upload - 1075",
+  1076: "P2P AI_Action - 1076",
+  1077: "AI-Status - 1077",
+  
+
   6001: "ServoChannel - 6001",
   6501: "ServoOutput - 6501",
   6502: "Mavlink - 6502",
