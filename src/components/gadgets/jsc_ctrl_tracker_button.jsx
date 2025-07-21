@@ -20,6 +20,14 @@ export default class ClssCtrlObjectTracker extends React.Component {
             
         }
     
+        // --- Core Change: Preventing re-renders from parent props ---
+        shouldComponentUpdate(nextProps, nextState) {
+            // Only re-render if the internal m_update state has changed.
+            // This effectively ignores prop changes from the parent.
+            return nextState.m_update !== this.state.m_update;
+        }
+        
+    
         componentDidMount() {
             this.setState({ m_update: 1 });
     
@@ -71,9 +79,18 @@ export default class ClssCtrlObjectTracker extends React.Component {
             }
             else
             {
-                css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand ';
-                css_Track_title += ' enable tracking ';
-                this.state.m_tracker_gui_enabled = false;
+                if (this.props.p_unit.m_tracker.m_active)
+                {
+                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand bg-warning text-white';
+                    css_Track_title += ' enable tracking ';
+                    this.state.m_tracker_gui_enabled = false;
+                }
+                else
+                {
+                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand ';
+                    css_Track_title += ' enable tracking ';
+                    this.state.m_tracker_gui_enabled = false;
+                }
                 
             }
             
