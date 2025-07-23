@@ -39,67 +39,78 @@ export class ClssCtrlHUD extends React.Component {
 
     
     componentDidMount() {
-        this.state.m_update = 1;
+        const c_canvas = this.m_hudRef.current;
+        if (c_canvas) {
+            // Set canvas dimensions once during mount
+            c_canvas.width = 50;
+            c_canvas.height = 50;
+            c_canvas.style.width = '50px';
+            c_canvas.style.height = '50px';
+
+            this.m_canvasContext = c_canvas.getContext('2d');
+            this.m_canvasDimensions = {
+                width: c_canvas.width,
+                height: c_canvas.height,
+                centerX: c_canvas.width / 2,
+                centerY: c_canvas.height / 2,
+                radius: 22,
+            };
+
+            // Initial draw with default values
+            this.draw(0, 0, 0); // pitch, roll, yaw in radians
+        }
+
+        // Set initial update state to 1 to indicate component is mounted and ready
+        this.setState({ 'm_update': 1 });
     }
 
     
     componentDidUpdate() {
                     
-        this.draw(this.c_pitch,this.c_roll ,this.c_yaw);
+        // Redraw the canvas whenever the component updates (due to m_update state change)
+        // Note: roll is negated here for correct visual rotation
+        this.draw(
+            this.c_pitch * js_helpers.CONST_DEGREE_TO_RADIUS, // Convert pitch to radians
+            -this.c_roll * js_helpers.CONST_DEGREE_TO_RADIUS,  // Convert roll to radians and negate
+            this.c_yaw * js_helpers.CONST_DEGREE_TO_RADIUS     // Convert yaw to radians
+        );
     }
 
     fn_update (p_me,p_andruavUnit)
     {
-        try
-        {
-            if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        try {
+            // Check if the update is for the correct unit
+            if (p_me.props.p_unit && p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return;
 
-            if (p_me.state.m_update === 0) return ;
-            p_me.setState({'m_update': p_me.state.m_update +1});
-        }
-        catch (ex)
-        {
+            // Update instance variables with new orientation data
+            p_me.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+            p_me.c_pitch = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.pitch).toFixed(1);
+            p_me.c_roll = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.roll).toFixed(1);
 
+            // Trigger a re-render by updating the m_update state
+            p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+        } catch (ex) {
+            console.error("Error in fn_update:", ex);
         }
     }
 
-    draw (p_pitch_deg, p_roll_deg, p_yaw_deg) 
-    {
-        const c_canvas=this.m_hudRef.current; 
-        const c_ctx = c_canvas.getContext('2d');
-        c_canvas.width  = 50;
-        c_canvas.height = 50; 
-        c_canvas.style.width  = '50px';
-        c_canvas.style.height = '50px';
+    draw(p_pitch_rad, p_roll_rad, p_yaw_rad) {
+        const c_ctx = this.m_canvasContext;
+        if (!c_ctx) return; // Ensure context is available
 
-        let centerX = c_canvas.width / 2;
-        let centerY = c_canvas.height / 2;
-        let radius = 22;
-        p_pitch_deg = 2 * p_pitch_deg;
-        let v_pitch = p_pitch_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
-        let v_roll = -p_roll_deg * js_helpers.CONST_DEGREE_TO_RADIUS;
+        const { centerX, centerY, radius, width, height } = this.m_canvasDimensions;
 
-        let v_pitch_start = v_pitch;
-        let v_pitch_end = 3.14 - v_pitch_start;
-        
-        let v_yaw_start = (p_yaw_deg-3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
-        let v_yaw_end = (p_yaw_deg+3-90)* js_helpers.CONST_DEGREE_TO_RADIUS;
-        
-        
+        c_ctx.clearRect(0, 0, width, height); // Clear the entire canvas
+        c_ctx.save(); // Save the current canvas state
 
-        c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
-        c_ctx.beginPath();
-        c_ctx.lineWidth = 1;
-        c_ctx.save();
-
-        // rotate apply roll
+        // Apply roll rotation
         c_ctx.translate(centerX, centerY);
-        c_ctx.rotate(v_roll);
+        c_ctx.rotate(p_roll_rad);
         c_ctx.translate(-centerX, -centerY);
-        
+
         // SKY
         c_ctx.beginPath();
-        c_ctx.arc(centerX, centerY, radius, 0 , 6.28);
+        c_ctx.arc(centerX, centerY, radius, 0, js_helpers.CONST_PTx2);
         c_ctx.fillStyle = '#75a4d3';
         c_ctx.fill();
         c_ctx.lineWidth = 2;
@@ -107,6 +118,10 @@ export class ClssCtrlHUD extends React.Component {
         c_ctx.stroke();
 
         // Ground
+        // Pitch is exaggerated by 2x as per original logic
+        const v_pitch_start = (2 * p_pitch_rad);
+        const v_pitch_end = Math.PI - v_pitch_start;
+
         c_ctx.beginPath();
         c_ctx.arc(centerX, centerY, radius, v_pitch_start, v_pitch_end, false);
         c_ctx.fillStyle = '#75D375';
@@ -115,11 +130,13 @@ export class ClssCtrlHUD extends React.Component {
         c_ctx.strokeStyle = '#36AB36';
         c_ctx.stroke();
 
-        
+        // Yaw Indicator
+        // Yaw arc is offset by -90 degrees to align 0 degrees with the top of the circle
+        const v_yaw_start = (p_yaw_rad - (3 * js_helpers.CONST_DEGREE_TO_RADIUS) - (90 * js_helpers.CONST_DEGREE_TO_RADIUS));
+        const v_yaw_end = (p_yaw_rad + (3 * js_helpers.CONST_DEGREE_TO_RADIUS) - (90 * js_helpers.CONST_DEGREE_TO_RADIUS));
 
-        // Yaw
         c_ctx.beginPath();
-        c_ctx.moveTo(centerX,centerY);
+        c_ctx.moveTo(centerX, centerY);
         c_ctx.arc(centerX, centerY, radius, v_yaw_start, v_yaw_end, false);
         c_ctx.fillStyle = '#F3DBE3';
         c_ctx.fill();
@@ -128,16 +145,17 @@ export class ClssCtrlHUD extends React.Component {
         c_ctx.closePath();
         c_ctx.stroke();
 
+        c_ctx.restore(); // Restore the canvas state (undoes roll rotation)
 
-        c_ctx.restore();
-
+        // Horizon Line
         c_ctx.beginPath();
-        c_ctx.moveTo(5,centerY);
-        c_ctx.lineTo(c_canvas.width-5, centerY);
+        c_ctx.moveTo(5, centerY);
+        c_ctx.lineTo(width - 5, centerY);
         c_ctx.lineWidth = 1;
-        c_ctx.fillStyle = '#F0AD4E';
+        c_ctx.strokeStyle = '#F0AD4E';
         c_ctx.stroke();
 
+        // Center Dot
         c_ctx.beginPath();
         c_ctx.arc(centerX, centerY, 2, 0, js_helpers.CONST_PTx2, false);
         c_ctx.fillStyle = '#DA7EB7';
@@ -145,7 +163,6 @@ export class ClssCtrlHUD extends React.Component {
         c_ctx.lineWidth = 2;
         c_ctx.strokeStyle = '#DA7EB7';
         c_ctx.stroke();
-        
     }
 
     
@@ -160,22 +177,21 @@ export class ClssCtrlHUD extends React.Component {
 
         return (
             <div key={this.key + 'hud'} id={this.props.id} className='css_hud_div'>
-                <div className = 'row al_l css_margin_zero'>
-                    <div className= 'col-6  css_margin_zero d-flex '>
-                        <ul className ='css_hud_bullets'>
-                            <li><span className='text-white'>R:</span><span className='text-warning'>{this.c_roll}º</span></li>
-                            <li><span className='text-white'>P:</span><span className='text-warning'>{this.c_pitch}º</span></li>
-                            <li><span className='text-white'>Y:</span><span className='text-warning'>{this.c_yaw}º</span></li>
-                        </ul>
-                    </div>
-
-                    <div className= 'col-6  css_margin_zero css_padding_zero'>
-                    <canvas key={this.key + 'chud'} id='ctrl_hud' ref={this.m_hudRef} className='css_hud'></canvas>
-                    </div>
-                   
+                <div className='col-6  css_margin_zero d-flex '>
+                    <ul className='css_hud_bullets'>
+                        <li><span className='text-white'>R:</span><span className='text-warning ml-1'>{this.c_roll}º</span></li>
+                        <li><span className='text-white'>P:</span><span className='text-warning ml-1'>{this.c_pitch}º</span></li>
+                        <li><span className='text-white'>Y:</span><span className='text-warning ml-1'>{this.c_yaw}º</span></li>
+                    </ul>
+                    <canvas
+                        key={this.key + 'chud'}
+                        id='ctrl_hud'
+                        ref={this.m_hudRef}
+                        className='col-6  css_margin_zero css_padding_zero'
+                    ></canvas>
                 </div>
             </div>
-        )
+        );
     }
 
 }
