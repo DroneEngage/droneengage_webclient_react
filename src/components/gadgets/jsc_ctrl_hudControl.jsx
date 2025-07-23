@@ -34,7 +34,7 @@ export class ClssCtrlHUD extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onProxyInfoUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_globals.EE_unitNavUpdated,this);
     }
 
     
