@@ -1,96 +1,97 @@
 import { js_globals } from "./js_globals.js";
-
 import * as js_siteConfig from "./js_siteConfig";
-import * as js_common from './js_common.js'
+import * as js_common from './js_common.js';
 
+/**
+ * Represents a single WebRTC conversation (peer connection).
+ */
 class CTalk {
   constructor(number, targetVideoTrack, cAndruavStream) {
-    this.PeerConnection =
-      window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+    this.PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 
-    this.closed = false;
-    this.received = false;
-    this.number = number;
-    this.status = "";
-    this.started = +new Date();
-    this.videoRecording = false;
-    this.parent = cAndruavStream;
-    this.onError = function () {};
-    this.onConnect = function () {};
-    this.onDisplayVideo = function () {};
-    this.onAddStream = function () {};
-    this.onRemovestream = function () {};
-    this.onClosing = function () {};
-    this.onDisconnected = function () {};
+    this.isClosed = false;
+    this.hasReceivedSdp = false; // Indicates if SDP has been received
+    this.number = number; // The peer's ID/number
+    this.targetVideoTrack = targetVideoTrack; // The specific video track ID for this conversation
+    this.status = "initializing";
+    this.startedAt = +new Date();
+    this.videoRecording = false; // Not used in provided methods, kept for completeness
+    this.parentStream = cAndruavStream; // Reference to the parent AndruavStream instance
 
-    this.targetVideoTrack = targetVideoTrack;
+    // Callback functions, initialized to no-op functions
+    this.onError = () => {};
+    this.onConnect = () => {};
+    this.onDisplayVideo = () => {};
+    this.onAddStream = () => {}; // Currently unused in provided methods
+    this.onRemoveStream = () => {};
+    this.onClosing = () => {};
+    this.onDisconnected = () => {};
 
-    this.pc = new this.PeerConnection(cAndruavStream.rtcconfig);
-    this.pc.onicecandidate = this.onicecandidate;
-    this.pc.number = number;
-    this.pc.talk = this;
+    // Initialize RTCPeerConnection
+    this.pc = new this.PeerConnection(cAndruavStream.rtcConfig);
+    this.pc.onicecandidate = this._handleIceCandidate.bind(this); // Bind 'this' to the class instance
+    this.pc.number = number; // Store number on pc for easy access in callbacks if needed
+    this.pc.talk = this; // Self-reference for convenience in pc callbacks
   }
 
-  fn_set_status(p_status) {
-    this.status = p_status;
+  /**
+   * Updates the status of the conversation.
+   * @param {string} newStatus - The new status string.
+   */
+  setStatus(newStatus) {
+    this.status = newStatus;
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // On ICE Route Candidate Discovery
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  onicecandidate(event) {
+  /**
+   * Handles ICE candidate discovery and transmits it to the peer.
+   * @param {RTCPeerConnectionIceEvent} event - The ICE candidate event.
+   */
+  _handleIceCandidate(event) {
     if (!event.candidate) {
       return;
     }
-    const talk = this.talk;
-    talk.parent.transmit(talk.number, talk.targetVideoTrack, event.candidate);
+    // Transmit using this.number and this.targetVideoTrack
+    this.parentStream.transmit(this.number, this.targetVideoTrack, event.candidate);
   }
 
-  // Disconnect and Hangup
-  hangup(p_sendToParty) {
-    if (this.closed) return;
-    this.fn_set_status("closing");
-    if (p_sendToParty === true) {
-      this.parent.transmit(this.number, this.targetVideoTrack, {
-        hangup: true,
+  /**
+   * Disconnects and hangs up the current conversation.
+   * @param {boolean} sendToParty - True if a hangup signal should be sent to the remote party.
+   */
+  hangup(sendToParty) {
+    if (this.isClosed) return;
+
+    this.setStatus("closing");
+    if (sendToParty) {
+      // Transmit using this.number and this.targetVideoTrack
+      this.parentStream.transmit(this.number, this.targetVideoTrack, {
+        hangup: true
       });
     }
 
-    this.parent.close_conversation(this.targetVideoTrack);
+    // Close conversation using targetVideoTrack as the identifier
+    this.parentStream.closeConversation(this.targetVideoTrack);
   }
 }
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// WebRTC Simple Calling API + Mobile
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+/**
+ * Manages WebRTC streams and conversations.
+ * Implements a Singleton pattern.
+ */
 class AndruavStream {
+  static instance = null; // Static property to hold the singleton instance
+
   constructor() {
+    if (AndruavStream.instance) {
+      return AndruavStream.instance;
+    }
+
     this.conversations = {};
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // RTC Peer Connection Session (one per call)
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    this.PeerConnection =
-      window.RTCPeerConnection || window.mozRTCPeerConnection;
-    // || // https://stackoverflow.com/questions/53251527/webrtc-video-is-not-displaying
-    // window.webkitRTCPeerConnection;
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // ICE (many route options per call)
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     this.IceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate;
+    this.SessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription;
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // Media Session Description (offer and answer per call)
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    this.SessionDescription =
-      window.RTCSessionDescription || window.mozRTCSessionDescription;
-    // ||  window.webkitRTCSessionDescription;
-
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // STUN Server List Configuration (public STUN list)
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    this.rtcconfig = {
+    this.rtcConfig = {
       constraints: {
         mandatory: {
           OfferToReceiveAudio: false,
@@ -107,264 +108,272 @@ class AndruavStream {
       iceServers: js_siteConfig.CONST_ICE_SERVERS,
     };
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // PHONE Events
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Ensure the singleton instance is set
+    AndruavStream.instance = this;
   }
 
+  /**
+   * Returns the singleton instance of AndruavStream.
+   * @returns {AndruavStream} The singleton instance.
+   */
   static getInstance() {
-    // Check if the instance is null, and create a new one if it is
-    if (!AndruavStream.instance) {
-      AndruavStream.instance = new AndruavStream();
+    return AndruavStream.instance || new AndruavStream();
+  }
+
+  onOrphanDisconnect() {
+    // Placeholder for future implementation
+  }
+
+  /**
+   * Logs a WebRTC error message.
+   * @param {string} msg - The error message.
+   */
+  debugError(msg) {
+    js_common.fn_console_log("WebRTC ERROR: %s", msg);
+  }
+
+  /**
+   * Logs a WebRTC callback message.
+   * @param {any} msg - The message to log.
+   */
+  debugCallback(msg) {
+    js_common.fn_console_log("WebRTC: %s", JSON.stringify(msg));
+  }
+
+  /**
+   * Gets an existing conversation or creates a new one.
+   * @param {string} number - The peer's number (used in signalling messages).
+   * @param {string} targetVideoTrack - The ID representing the target video track.
+   * @returns {CTalk} The CTalk instance for the conversation.
+   */
+  getConversation(number, targetVideoTrack = "default") {
+    // Original logic: use targetVideoTrack as the key for conversations
+    let talk = this.conversations[targetVideoTrack];
+    if (!talk) {
+      talk = new CTalk(number, targetVideoTrack, this);
+      talk.setStatus("connecting");
+      this.conversations[targetVideoTrack] = talk;
     }
-    return AndruavStream.instance;
+    return talk;
   }
 
-  onOrphanDisconnect() {}
-
-  debugerr(msg) {
-    js_common.fn_console_log("webrtc ERROR: %s", msg);
-  }
-
-  debugcb(msg) {
-    js_common.fn_console_log("webrtc: %s", JSON.stringify(msg));
-    return;
-  }
-
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Add/Get Conversation - Creates a new PC or Returns Existing PC
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  get_conversation(p_number, p_targetVideoTrack) {
-    if (p_targetVideoTrack === null || p_targetVideoTrack === undefined) {
-      p_targetVideoTrack = "default";
-    }
-    const v_talk = new CTalk(p_number, p_targetVideoTrack, this);
-
-    v_talk.fn_set_status("connecting");
-    // Return Brand New Talk Reference
-    this.conversations[v_talk.targetVideoTrack] = v_talk;
-    return v_talk;
-  }
-
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Remove Conversation
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  close_conversation(talkId) {
-    if (this.conversations[talkId] === null || this.conversations[talkId] === undefined) return;
+  /**
+   * Closes and removes a conversation.
+   * @param {string} talkId - The ID of the conversation to close (which is targetVideoTrack).
+   */
+  closeConversation(talkId) {
     const talk = this.conversations[talkId];
-    talk.closed = true;
+    if (!talk) return;
+
+    talk.isClosed = true;
     talk.onDisconnected(talk);
     talk.pc.close();
-    talk.fn_set_status("closed");
+    talk.setStatus("closed");
 
-    this.conversations[talkId] = undefined;
+    delete this.conversations[talkId]; // Use delete to remove the property
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Visually Display New Stream
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  onaddtrack(talk, mediaStreamEvent) {
+  /**
+   * Handles adding a new media track to a conversation.
+   * @param {CTalk} talk - The CTalk instance.
+   * @param {MediaStreamTrackEvent} mediaStreamEvent - The media stream track event.
+   */
+  onAddTrack(talk, mediaStreamEvent) {
     const stream = mediaStreamEvent.streams[0];
-    js_common.fn_console_log(
-      "WEBRTC: TRACK-muted:" + stream.getVideoTracks()[0].muted
-    );
+    js_common.fn_console_log(`WebRTC: TRACK-muted: ${stream.getVideoTracks()[0]?.muted}`);
 
-    const targetVideoTrack = talk.targetVideoTrack
-      .replace(/ /g, "_")
-      .toLowerCase();
-      const len = stream.getVideoTracks().length;
-      const p = [];
+    const targetTrackIdNormalized = talk.targetVideoTrack.replace(/ /g, "_").toLowerCase();
 
-    if (window.chrome === true) {
-      // Multiple tracks per stream can be implemented in Chrome.
-      // As in FireFox TrackID & Label are overwritten by new values so I cannot track them.
-      // A proposed solution is in this link https://stackoverflow.com/questions/65408744/in-webrtc-how-do-i-label-a-local-mediastream-so-that-a-remote-peer-can-identify
-      // which is to add extra data in the communication packet next to the offer.
-      for (let i = 0; i < len; ++i) {
-        if (stream.getVideoTracks()[i].id.toLowerCase() !== targetVideoTrack) {
-          p.push(stream.getVideoTracks()[i].id);
-        }
-      }
-
-      // remove tracks that are not equal to target track.
-      for (let i = 0; i < p.length; ++i) {
-        stream.removeTrack(stream.getTrackById(p[i]));
-      }
+    // Chrome specific logic to filter tracks based on ID
+    if (window.chrome) {
+      const tracksToRemove = stream.getVideoTracks().filter(track =>
+        track.id.toLowerCase() !== targetTrackIdNormalized
+      );
+      tracksToRemove.forEach(track => stream.removeTrack(track));
     }
 
     talk.stream = stream;
+    // The original code had onDisplayVideo called here from ontrack,
+    // so we maintain that flow.
+    talk.onDisplayVideo(talk);
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Ask to Join a Broadcast
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  pv_join(dialconfig) {
-    let me = this;
-    let talk = this.get_conversation(
-      dialconfig.number,
-      dialconfig.targetVideoTrack
-    );
-    // Ignore if Closed
+  /**
+   * Initiates joining a stream/conversation.
+   * @param {object} dialConfig - Configuration for the call.
+   * @param {string} dialConfig.number - The peer's number.
+   * @param {string} [dialConfig.targetVideoTrack] - The target video track ID.
+   * @param {function} [dialConfig.onError] - Error callback.
+   * @param {function} [dialConfig.onConnect] - Connect callback.
+   * @param {function} [dialConfig.onDisplayVideo] - Display video callback.
+   * @param {function} [dialConfig.onClosing] - Closing callback.
+   * @param {function} [dialConfig.onDisconnected] - Disconnected callback.
+   * @param {function} [dialConfig.onOrphanDisconnect] - Orphan disconnect callback.
+   * @param {function} [dialConfig.onRemovestream] - Remove stream callback.
+   * @returns {CTalk} The CTalk instance for the initiated call.
+   */
+  joinStream(dialConfig) {
+    // Bind EVT_andruavSignalling to this instance to maintain context
+    js_globals.v_andruavClient.EVT_andruavSignalling = this.EVT_andruavSignalling.bind(this);
 
-    talk.onError =
-      dialconfig.onError != null ? dialconfig.onError : talk.onError;
-    talk.onConnect =
-      dialconfig.onConnect != null ? dialconfig.onConnect : talk.onConnect;
-    talk.onDisplayVideo =
-      dialconfig.onDisplayVideo != null
-        ? dialconfig.onDisplayVideo
-        : talk.onDisplayVideo;
-    talk.onClosing =
-      dialconfig.onClosing != null ? dialconfig.onClosing : talk.onClosing;
-    talk.onDisconnected =
-      dialconfig.onDisconnected != null
-        ? dialconfig.onDisconnected
-        : talk.onDisconnected;
-    talk.onOrphanDisconnect =
-      dialconfig.onOrphanDisconnect != null
-        ? dialconfig.onOrphanDisconnect
-        : talk.onOrphanDisconnect;
-    talk.pc.onremovestream =
-      dialconfig.onRemovestream != null
-        ? dialconfig.onRemovestream
-        : talk.onRemovestream;
-    talk.pc.ontrack = function (mediaStreamEvent) {
-      talk.onConnect(talk);
-      me.onaddtrack(talk, mediaStreamEvent);
-      talk.onDisplayVideo(talk);
-    };
-    if (talk.closed) return;
-    this.transmit(dialconfig.number, dialconfig.targetVideoTrack, {
-      joinme: true,
-    });
-  }
+    // Determine the ID for conversation lookup, favoring targetVideoTrack
+    const conversationKey = dialConfig.targetVideoTrack ?? dialConfig.number;
+    let talk = this.conversations[conversationKey];
 
-  joinStream(dialconfig) {
-    js_globals.v_andruavClient.EVT_andruavSignalling =
-      this.EVT_andruavSignalling;
-
-    let talk;
-    let vid = dialconfig.number;
-    if (dialconfig.targetVideoTrack !== null && dialconfig.targetVideoTrack !== undefined) {
-      vid = dialconfig.targetVideoTrack;
+    // Original logic: if in "connecting" status, reset and re-initiate
+    if (talk && talk.status === "connecting") {
+      talk.setStatus("cancelled");
+      delete this.conversations[conversationKey];
+      talk = null; // Ensure a new talk is created
     }
-    if (this.conversations[vid] !== null && this.conversations[vid] !== undefined) {
-      talk = this.conversations[vid];
-      if (talk.status === "connecting") {
-        // this could be a faulty connection hat didnt start
-        talk.fn_set_status("cancelled");
-        this.conversations[talk.targetVideoTrack] = undefined;
-        this.pv_join(dialconfig);
+
+    if (!talk) {
+      // Get or create conversation, passing both number and targetVideoTrack
+      talk = this.getConversation(dialConfig.number, dialConfig.targetVideoTrack);
+
+      // Assign callbacks, defaulting to the talk's no-op functions if not provided
+      talk.onError = dialConfig.onError ?? talk.onError;
+      talk.onConnect = dialConfig.onConnect ?? talk.onConnect;
+      talk.onDisplayVideo = dialConfig.onDisplayVideo ?? talk.onDisplayVideo;
+      talk.onClosing = dialConfig.onClosing ?? talk.onClosing;
+      talk.onDisconnected = dialConfig.onDisconnected ?? talk.onDisconnected;
+      talk.onOrphanDisconnect = dialConfig.onOrphanDisconnect ?? talk.onOrphanDisconnect;
+      talk.onRemoveStream = dialConfig.onRemovestream ?? talk.onRemoveStream; // Corrected typo here
+
+      talk.pc.onremovestream = talk.onRemoveStream;
+      talk.pc.ontrack = (mediaStreamEvent) => {
+        talk.onConnect(talk); // Call onConnect immediately when a track is received
+        this.onAddTrack(talk, mediaStreamEvent); // Use instance method for processing track
+      };
+
+      if (!talk.isClosed) {
+        // Transmit the joinme signal using the dialConfig's number and targetVideoTrack
+        this.transmit(dialConfig.number, dialConfig.targetVideoTrack, { joinme: true });
+        // Status is already set to "connecting" by getConversation if it was newly created
       }
-    } else {
-      this.pv_join(dialconfig);
     }
 
     return talk;
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Send SDP Call Offers/Answers and ICE Candidates to Peer
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  transmit(phone, channel, packet, times, time) {
+  /**
+   * Send SDP Call Offers/Answers and ICE Candidates to Peer.
+   * @param {string} phone - The destination phone number.
+   * @param {string} channel - The conversation channel (which is targetVideoTrack).
+   * @param {object} packet - The SDP or ICE candidate packet.
+   */
+  transmit(phone, channel, packet) {
     if (!packet) return;
-    js_common.fn_console_log("WEBRTC:" + JSON.stringify(packet));
+    js_common.fn_console_log(`WebRTC: ${JSON.stringify(packet)}`);
+
     const message = {
       packet: packet,
-      channel: channel,
-      id: phone,
-      number: js_globals.v_andruavClient.partyID,
+      channel: channel, // This is the targetVideoTrack
+      id: phone, // This is the remote party's ID
+      number: js_globals.v_andruavClient.partyID, // This is our ID
     };
 
     js_globals.v_andruavClient.API_WebRTC_Signalling(phone, message);
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // SDP Offers & ICE Candidates Receivable Processing
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  EVT_andruavSignalling(andruavUnit, p_signal) {
-    js_common.fn_console_log("WEBRTC to WEB:" + JSON.stringify(p_signal));
+  /**
+   * Handles incoming WebRTC signalling messages (SDP offers/answers, ICE candidates, hangup).
+   * This method must be bound to the AndruavStream instance when assigned as a callback.
+   * @param {object} andruavUnit - Information about the sending unit.
+   * @param {object} p_signal - The signalling packet.
+   */
+  async EVT_andruavSignalling(andruavUnit, p_signal) {
+    js_common.fn_console_log(`WebRTC to Web: ${JSON.stringify(p_signal)}`);
 
-    const me = AndruavStream.getInstance();
+    this.debugCallback(p_signal); // 'this' refers to AndruavStream.getInstance(); due to binding
 
-    me.debugcb(p_signal);
-
-    // Get Call Reference
-    const talk = me.conversations[p_signal.channel];
-
-    if (!talk || talk.closed) return;
-
-    // If Hangup Request
-    if (p_signal.packet.hangup) return talk.hangup(false);
-
-    // If Peer Calling Inbound (Incoming) - Can determine stream + receive here.
-    if (p_signal.packet.sdp && !talk.received) {
-      talk.received = true;
-    }
-
-    // Update Peer Connection with SDP Offer or ICE Routes
-    if (p_signal.packet.sdp) {
-      me.add_sdp_offer(p_signal);
-    } else {
-      me.add_ice_route(p_signal);
-    }
-  }
-
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Add SDP Offer/Answers
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  async add_sdp_offer(p_signal) {
-    // Get Call Reference
+    // Look up conversation using p_signal.channel (which is targetVideoTrack)
     const talk = this.conversations[p_signal.channel];
+
+    if (!talk || talk.isClosed) return;
+
+    if (p_signal.packet.hangup) {
+      return talk.hangup(false); // Do not send hangup back
+    }
+
+    // Original logic for `received` flag
+    if (p_signal.packet.sdp && !talk.hasReceivedSdp) {
+      talk.hasReceivedSdp = true;
+    }
+
+    if (p_signal.packet.sdp) {
+      await this.addSdpOffer(p_signal);
+    } else {
+      await this.addIceRoute(p_signal);
+    }
+  }
+
+  /**
+   * Adds an SDP offer or answer to the peer connection.
+   * @param {object} p_signal - The signalling packet containing SDP.
+   */
+  async addSdpOffer(p_signal) {
+    // Look up conversation using p_signal.channel (which is targetVideoTrack)
+    const talk = this.conversations[p_signal.channel];
+    if (!talk) return;
+
     const pc = talk.pc;
-    const type = p_signal.packet.type === "offer" ? "offer" : "answer";
+    const sdpType = p_signal.packet.type;
 
-    // Deduplicate SDP Offerings/Answers
-    //if (type in talk) return;
-    talk[type] = true;
-    talk.dialed = true;
+    // Deduplicate SDP Offerings/Answers - check if already processed
+    // Original logic: if ('type' in talk) return;
+    if (talk[sdpType]) return;
+    talk[sdpType] = true;
+    talk.dialed = true; // 'dialed' flag name could be clearer
 
-    // Notify of Call Status
-    talk.fn_set_status("routing");
+    talk.setStatus("routing");
 
     try {
-      await pc.setRemoteDescription(
-        new this.SessionDescription(p_signal.packet)
-      );
-      // Set Connected Status
-      talk.fn_set_status("connected");
-      await this.create_answer(pc, talk);
+      await pc.setRemoteDescription(new this.SessionDescription(p_signal.packet));
+      talk.setStatus("connected");
+      if (sdpType === "offer") {
+        await this.createAnswer(pc, talk);
+      }
     } catch (e) {
-      js_common.fn_console_log(e);
+      this.debugError(e);
+      talk.onError(talk, e); // Notify error
     }
   }
 
-  async create_answer(pc, p_talk) {
+  /**
+   * Creates and sends an SDP answer.
+   * @param {RTCPeerConnection} pc - The RTCPeerConnection instance.
+   * @param {CTalk} talk - The CTalk instance.
+   */
+  async createAnswer(pc, talk) {
     try {
-      const c_answer = await pc.createAnswer();
-      await pc.setLocalDescription(c_answer);
-      this.transmit(p_talk.number, p_talk.targetVideoTrack, c_answer, 2);
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      // Transmit using talk.number and talk.targetVideoTrack
+      this.transmit(talk.number, talk.targetVideoTrack, answer);
     } catch (e) {
-      this.debugcb(e);
+      this.debugError(e);
+      talk.onError(talk, e); // Notify error
     }
   }
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // Add ICE Candidate Routes
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  async add_ice_route(p_signal) {
-    try {
-      // Leave if Non-good ICE Packet
-      if (!p_signal.packet) return;
-      if (!p_signal.packet.candidate) return;
 
-      // Get Call Reference
+  /**
+   * Adds an ICE candidate to the peer connection.
+   * @param {object} p_signal - The signalling packet containing the ICE candidate.
+   */
+  async addIceRoute(p_signal) {
+    try {
+      if (!p_signal.packet?.candidate) return; // Use optional chaining for safer access
+
+      // Look up conversation using p_signal.channel (which is targetVideoTrack)
       const talk = this.conversations[p_signal.channel];
-      const pc = talk.pc;
+      if (!talk) return;
 
-      // Add ICE Candidate Routes
+      const pc = talk.pc;
       await pc.addIceCandidate(new this.IceCandidate(p_signal.packet));
     } catch (e) {
-      this.debugcb(e);
+      this.debugError(e);
+      // Not necessarily an error that needs to stop the connection, but good to log
     }
   }
 }
