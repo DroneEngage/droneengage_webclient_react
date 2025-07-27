@@ -559,6 +559,7 @@ div#modal_ctrl_lidar_info
 	top: 200px;
 	left:100px;
 	min-width: 400px !important;
+	max-width: 600px !important;
 	opacity:0.85;
 	float:left;
  }
@@ -581,6 +582,7 @@ div#modal_ctrl_lidar_info
 	top: 200px;
 	left:100px;
 	min-width: 400px !important;
+	max-width: 600px !important;
 	opacity:0.85;
 	float:left;
  }
@@ -661,6 +663,7 @@ input#txt_defaultAltitude
 .flgtctrlbtn_icon_w
 {
 	height: 30px !important;
+	width: 70px !important;
 	font-size: 20px !important;
 	font-weight: bold !important;
 	padding: 0px !important;
