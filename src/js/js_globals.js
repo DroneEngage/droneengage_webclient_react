@@ -224,6 +224,7 @@ class GLOBALS {
 		this.EE_onTrackingAIStatusChanged			= "EVT_90";
 		this.EE_onTrackingAIObjectListUpdate		= "EVT_91";
 
+		this.EE_onWebRTC_Video_Statistics			= "EVT_92";
 		// EOF LOCAL EVENTS
 
 

@@ -15,6 +15,7 @@ import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, f
 import ClssCtrlGPIO_Flash from './gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from './gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAI from './gadgets/jsc_ctrl_tracker_ai_button.jsx'
+import ClssCtrlVideoFPS from './gadgets/jsc_ctrl_video_fps_control.jsx'
 
 class ClssCVideoScreen extends React.Component {
 
@@ -495,6 +496,7 @@ class ClssCVideoScreen extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_DetectedTarget, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_cameraFlashChanged, this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_cameraZoomChanged, this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_onWebRTC_Video_Statistics, this);
     }
 
     // drawVideoFrame (me) {
@@ -622,6 +624,9 @@ class ClssCVideoScreen extends React.Component {
 
         v_btns.push(
             <div key={key + "btn"} id="css_video_ctrl_panel" className="d-flex flex-row css_padding_zero">
+                <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <ClssCtrlVideoFPS p_unit={andruavUnit}/>
+                </div>
                 <div key={key + "1"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <img
                         id="btnclose"
@@ -843,6 +848,7 @@ export class ClssCVideoControl extends React.Component {
 
         me.forceUpdate();
     }
+
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStarted, this);

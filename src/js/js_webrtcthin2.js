@@ -1,4 +1,5 @@
 import { js_globals } from "./js_globals.js";
+import {js_eventEmitter} from './js_eventEmitter';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
 
@@ -18,6 +19,10 @@ class CTalk {
     this.videoRecording = false; // Not used in provided methods, kept for completeness
     this.parentStream = cAndruavStream; // Reference to the parent AndruavStream instance
 
+    // New properties for frame rate monitoring
+    this.actualFrameRate = 0; // Stores the latest measured frame rate
+    this.frameRateMonitorInterval = null; // Holds the setInterval ID
+
     // Callback functions, initialized to no-op functions
     this.onError = () => {};
     this.onConnect = () => {};
@@ -26,6 +31,8 @@ class CTalk {
     this.onRemoveStream = () => {};
     this.onClosing = () => {};
     this.onDisconnected = () => {};
+    
+    
 
     // Initialize RTCPeerConnection
     this.pc = new this.PeerConnection(cAndruavStream.rtcConfig);
@@ -50,7 +57,6 @@ class CTalk {
     if (!event.candidate) {
       return;
     }
-    // Transmit using this.number and this.targetVideoTrack
     this.parentStream.transmit(this.number, this.targetVideoTrack, event.candidate);
   }
 
@@ -63,14 +69,86 @@ class CTalk {
 
     this.setStatus("closing");
     if (sendToParty) {
-      // Transmit using this.number and this.targetVideoTrack
       this.parentStream.transmit(this.number, this.targetVideoTrack, {
         hangup: true
       });
     }
 
-    // Close conversation using targetVideoTrack as the identifier
+    this._stopFrameRateMonitoring(); // Stop monitoring when hanging up
     this.parentStream.closeConversation(this.targetVideoTrack);
+  }
+
+  /**
+   * Starts periodic monitoring of the video stream's actual frame rate.
+   */
+  _startFrameRateMonitoring() {
+    if (this.frameRateMonitorInterval) {
+      return; // Already monitoring
+    }
+    js_common.fn_console_log(`WEBRTC: Starting frame rate monitoring for ${this.targetVideoTrack}`);
+    // Check every second for frame rate updates
+    this.frameRateMonitorInterval = setInterval(this._updateFrameRate.bind(this), 1000);
+  }
+
+  /**
+   * Stops the frame rate monitoring.
+   */
+  _stopFrameRateMonitoring() {
+    if (this.frameRateMonitorInterval) {
+      js_common.fn_console_log(`WEBRTC: Stopping frame rate monitoring for ${this.targetVideoTrack}`);
+      clearInterval(this.frameRateMonitorInterval);
+      this.frameRateMonitorInterval = null;
+      this.actualFrameRate = 0; // Reset frame rate
+    }
+  }
+
+  /**
+   * Fetches WebRTC statistics and updates the actual frame rate.
+   */
+  async _updateFrameRate() {
+    if (!this.pc || this.isClosed) {
+      this._stopFrameRateMonitoring();
+      return;
+    }
+
+    try {
+      const stats = await this.pc.getStats();
+      let currentFrameRate = 0;
+      let bytesReceived = 0;
+      stats.forEach(report => {
+        // For received video, look for 'inbound-rtp' statistics
+        if (report.type === 'inbound-rtp' && report.kind === 'video') {
+          // 'framesPerSecond' is commonly available in modern browsers
+          if (report.bytesReceived !== undefined)
+          {
+            bytesReceived = report.bytesReceived;
+          }
+          if (report.framesPerSecond !== undefined) {
+            currentFrameRate = report.framesPerSecond;
+          } else if (report.framesDecoded !== undefined && this._lastFramesDecoded !== undefined && this._lastTimestamp !== undefined) {
+            // Fallback: calculate if framesPerSecond is not direct (less common now)
+            const timeDiff = (report.timestamp - this._lastTimestamp) / 1000; // in seconds
+            const framesDiff = report.framesDecoded - this._lastFramesDecoded;
+            if (timeDiff > 0) {
+              currentFrameRate = framesDiff / timeDiff;
+            }
+          }
+          this._lastFramesDecoded = report.framesDecoded;
+          this._lastTimestamp = report.timestamp;
+        }
+        // If sending video, you might look for 'outbound-rtp'
+      });
+
+      this.actualFrameRate = currentFrameRate;
+      js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.actualFrameRate.toFixed(2)} FPS`);
+      const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
+			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':bytesReceived}); 
+        
+
+    } catch (e) {
+      this.parentStream.debugError(`Error getting stats for ${this.targetVideoTrack}: ${e.message}`);
+      this._stopFrameRateMonitoring(); // Stop monitoring on error
+    }
   }
 }
 
@@ -98,11 +176,6 @@ class AndruavStream {
           OfferToReceiveVideo: true,
         },
         optional: [],
-      },
-      candidates: {
-        turn: true,
-        stun: true,
-        host: false,
       },
       sdpSemantics: "unified-plan",
       iceServers: js_siteConfig.CONST_ICE_SERVERS,
@@ -180,7 +253,7 @@ class AndruavStream {
    */
   onAddTrack(talk, mediaStreamEvent) {
     const stream = mediaStreamEvent.streams[0];
-    js_common.fn_console_log(`WebRTC: TRACK-muted: ${stream.getVideoTracks()[0]?.muted}`);
+    js_common.fn_console_log(`WEBRTC: TRACK-muted: ${stream.getVideoTracks()[0]?.muted}`);
 
     const targetTrackIdNormalized = talk.targetVideoTrack.replace(/ /g, "_").toLowerCase();
 
@@ -193,9 +266,11 @@ class AndruavStream {
     }
 
     talk.stream = stream;
-    // The original code had onDisplayVideo called here from ontrack,
-    // so we maintain that flow.
     talk.onDisplayVideo(talk);
+
+    // --- NEW: Start monitoring frame rate after stream is displayed ---
+    talk._startFrameRateMonitoring();
+    // -----------------------------------------------------------------
   }
 
   /**
@@ -210,46 +285,41 @@ class AndruavStream {
    * @param {function} [dialConfig.onDisconnected] - Disconnected callback.
    * @param {function} [dialConfig.onOrphanDisconnect] - Orphan disconnect callback.
    * @param {function} [dialConfig.onRemovestream] - Remove stream callback.
+   * @param {function} [dialConfig.onFrameRateUpdate] - Callback for frame rate updates.
    * @returns {CTalk} The CTalk instance for the initiated call.
    */
   joinStream(dialConfig) {
-    // Bind EVT_andruavSignalling to this instance to maintain context
     js_globals.v_andruavClient.EVT_andruavSignalling = this.EVT_andruavSignalling.bind(this);
 
-    // Determine the ID for conversation lookup, favoring targetVideoTrack
     const conversationKey = dialConfig.targetVideoTrack ?? dialConfig.number;
     let talk = this.conversations[conversationKey];
 
-    // Original logic: if in "connecting" status, reset and re-initiate
     if (talk && talk.status === "connecting") {
       talk.setStatus("cancelled");
       delete this.conversations[conversationKey];
-      talk = null; // Ensure a new talk is created
+      talk = null;
     }
 
     if (!talk) {
-      // Get or create conversation, passing both number and targetVideoTrack
       talk = this.getConversation(dialConfig.number, dialConfig.targetVideoTrack);
 
-      // Assign callbacks, defaulting to the talk's no-op functions if not provided
       talk.onError = dialConfig.onError ?? talk.onError;
       talk.onConnect = dialConfig.onConnect ?? talk.onConnect;
       talk.onDisplayVideo = dialConfig.onDisplayVideo ?? talk.onDisplayVideo;
       talk.onClosing = dialConfig.onClosing ?? talk.onClosing;
       talk.onDisconnected = dialConfig.onDisconnected ?? talk.onDisconnected;
       talk.onOrphanDisconnect = dialConfig.onOrphanDisconnect ?? talk.onOrphanDisconnect;
-      talk.onRemoveStream = dialConfig.onRemovestream ?? talk.onRemoveStream; // Corrected typo here
+      talk.onRemoveStream = dialConfig.onRemovestream ?? talk.onRemoveStream;
+      
 
       talk.pc.onremovestream = talk.onRemoveStream;
       talk.pc.ontrack = (mediaStreamEvent) => {
-        talk.onConnect(talk); // Call onConnect immediately when a track is received
-        this.onAddTrack(talk, mediaStreamEvent); // Use instance method for processing track
+        talk.onConnect(talk);
+        this.onAddTrack(talk, mediaStreamEvent);
       };
 
       if (!talk.isClosed) {
-        // Transmit the joinme signal using the dialConfig's number and targetVideoTrack
         this.transmit(dialConfig.number, dialConfig.targetVideoTrack, { joinme: true });
-        // Status is already set to "connecting" by getConversation if it was newly created
       }
     }
 
@@ -264,13 +334,13 @@ class AndruavStream {
    */
   transmit(phone, channel, packet) {
     if (!packet) return;
-    js_common.fn_console_log(`WebRTC: ${JSON.stringify(packet)}`);
+    js_common.fn_console_log(`WEBRTC: ${JSON.stringify(packet)}`);
 
     const message = {
       packet: packet,
-      channel: channel, // This is the targetVideoTrack
-      id: phone, // This is the remote party's ID
-      number: js_globals.v_andruavClient.partyID, // This is our ID
+      channel: channel,
+      id: phone,
+      number: js_globals.v_andruavClient.partyID,
     };
 
     js_globals.v_andruavClient.API_WebRTC_Signalling(phone, message);
@@ -283,20 +353,18 @@ class AndruavStream {
    * @param {object} p_signal - The signalling packet.
    */
   async EVT_andruavSignalling(andruavUnit, p_signal) {
-    js_common.fn_console_log(`WebRTC to Web: ${JSON.stringify(p_signal)}`);
+    js_common.fn_console_log(`WEBRTC to WEB: ${JSON.stringify(p_signal)}`);
 
-    this.debugCallback(p_signal); // 'this' refers to AndruavStream.getInstance(); due to binding
+    this.debugCallback(p_signal);
 
-    // Look up conversation using p_signal.channel (which is targetVideoTrack)
     const talk = this.conversations[p_signal.channel];
 
     if (!talk || talk.isClosed) return;
 
     if (p_signal.packet.hangup) {
-      return talk.hangup(false); // Do not send hangup back
+      return talk.hangup(false);
     }
 
-    // Original logic for `received` flag
     if (p_signal.packet.sdp && !talk.hasReceivedSdp) {
       talk.hasReceivedSdp = true;
     }
@@ -313,18 +381,15 @@ class AndruavStream {
    * @param {object} p_signal - The signalling packet containing SDP.
    */
   async addSdpOffer(p_signal) {
-    // Look up conversation using p_signal.channel (which is targetVideoTrack)
     const talk = this.conversations[p_signal.channel];
     if (!talk) return;
 
     const pc = talk.pc;
     const sdpType = p_signal.packet.type;
 
-    // Deduplicate SDP Offerings/Answers - check if already processed
-    // Original logic: if ('type' in talk) return;
     if (talk[sdpType]) return;
     talk[sdpType] = true;
-    talk.dialed = true; // 'dialed' flag name could be clearer
+    talk.dialed = true;
 
     talk.setStatus("routing");
 
@@ -336,7 +401,7 @@ class AndruavStream {
       }
     } catch (e) {
       this.debugError(e);
-      talk.onError(talk, e); // Notify error
+      talk.onError(talk, e);
     }
   }
 
@@ -349,11 +414,10 @@ class AndruavStream {
     try {
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      // Transmit using talk.number and talk.targetVideoTrack
       this.transmit(talk.number, talk.targetVideoTrack, answer);
     } catch (e) {
       this.debugError(e);
-      talk.onError(talk, e); // Notify error
+      talk.onError(talk, e);
     }
   }
 
@@ -363,9 +427,8 @@ class AndruavStream {
    */
   async addIceRoute(p_signal) {
     try {
-      if (!p_signal.packet?.candidate) return; // Use optional chaining for safer access
+      if (!p_signal.packet?.candidate) return;
 
-      // Look up conversation using p_signal.channel (which is targetVideoTrack)
       const talk = this.conversations[p_signal.channel];
       if (!talk) return;
 
@@ -373,7 +436,6 @@ class AndruavStream {
       await pc.addIceCandidate(new this.IceCandidate(p_signal.packet));
     } catch (e) {
       this.debugError(e);
-      // Not necessarily an error that needs to stop the connection, but good to log
     }
   }
 }
