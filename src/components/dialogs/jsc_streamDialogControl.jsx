@@ -222,7 +222,7 @@ export default class ClssStreamDialog extends React.Component
             <div
                 id="modal_ctrl_stream_dlg"
                 title="Streaming Video"
-                className="card width_fit_max css_ontop border-light p-2"
+                className="card css_ontop border-light p-2"
                 ref={this.modal_ctrl_stream_dlg} // Set the ref here
             >
                 <div className="card-header text-center">
