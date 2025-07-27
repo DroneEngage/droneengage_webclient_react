@@ -90,22 +90,25 @@ class ClssStreamChannel extends React.Component {
             let v_stream_class = 'btn-primary';
             let v_record_class = 'btn-primary';
             let v_startRecord = true;
+            let actual_fps = 0;
             const active_track_id  = v_unit.m_Video.m_videoactiveTracks[v_track.id];
+            const track_id  = v_unit.m_Video.m_videoTracks[this.props.prop_track_number];
             if ((active_track_id !== null && active_track_id !== undefined) && (active_track_id.VideoStreaming !== js_andruavUnit.CONST_VIDEOSTREAMING_OFF))
             {
+                actual_fps = track_id.a>=0?track_id.a:0;
                 v_stream_class = 'btn-danger';
             }
-            const track_id  = v_unit.m_Video.m_videoTracks[this.props.prop_track_number];
             if ((track_id.r !== null && track_id.r !== undefined) 
                 && (track_id.r === true))
             { // recording
                 v_record_class = 'btn-danger';
                 v_startRecord = false;
             }
+            
             return (
                     <div className="row al_l css_margin_zero">
                             <div className= "col-8   si-09x css_margin_zero text-white">
-                            <label>{v_track.ln}</label>
+                            <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>
                             <div className= "col-2   si-09x css_margin_zero css_padding_2">
                                 <button type="button" className={"btn btn-sm " + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
