@@ -58,7 +58,20 @@ export default class ClssCtrlVideoFPS extends React.Component {
         }
         
         return (
-                <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_Track + " css_large_icon " + this.props.className} title={css_Track_title}>{`${this.state.m_actual_fps} fps`}</i>
+                <i
+                id={this.props.id ? this.props.id : this.key}
+                key={this.key}
+                className={css_Track + " css_large_icon " + this.props.className}
+                title={css_Track_title}
+                    >
+                    {`${this.state.m_actual_fps} `}
+                    {this.state.m_update % 2 === 0 ? (
+                        <span className="text-success">.</span>
+                    ) : (
+                        <span className="text-secondary">.</span>
+                    )}
+                    {` fps`}
+                    </i>
             );
     }
 
