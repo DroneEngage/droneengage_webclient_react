@@ -115,6 +115,7 @@ class CTalk {
       const stats = await this.pc.getStats();
       let currentFrameRate = 0;
       let bytesReceived = 0;
+      let trackIdentifier = '';
       stats.forEach(report => {
         // For received video, look for 'inbound-rtp' statistics
         if (report.type === 'inbound-rtp' && report.kind === 'video') {
@@ -123,15 +124,14 @@ class CTalk {
           {
             bytesReceived = report.bytesReceived;
           }
+          if (report.trackIdentifier !== undefined)
+          {
+            trackIdentifier = report.trackIdentifier;
+          }
           if (report.framesPerSecond !== undefined) {
             currentFrameRate = report.framesPerSecond;
           } else if (report.framesDecoded !== undefined && this._lastFramesDecoded !== undefined && this._lastTimestamp !== undefined) {
-            // Fallback: calculate if framesPerSecond is not direct (less common now)
-            const timeDiff = (report.timestamp - this._lastTimestamp) / 1000; // in seconds
-            const framesDiff = report.framesDecoded - this._lastFramesDecoded;
-            if (timeDiff > 0) {
-              currentFrameRate = framesDiff / timeDiff;
-            }
+            currentFrameRate = 0;
           }
           this._lastFramesDecoded = report.framesDecoded;
           this._lastTimestamp = report.timestamp;
@@ -142,7 +142,7 @@ class CTalk {
       this.actualFrameRate = currentFrameRate;
       js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
-			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':bytesReceived}); 
+			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':bytesReceived, 'track_id': trackIdentifier}); 
         
 
     } catch (e) {
