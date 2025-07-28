@@ -343,20 +343,3 @@ export default class ClssUnitParametersList extends React.Component {
     }
 };
 
-
-// if (CONST_TEST_MODE === true)
-// {
-//    ReactDOM.render(
-//             <React.StrictMode>
-//                 <ClssUnitParametersList />
-//             </React.StrictMode>,
-//             window.document.getElementById('modal_uplCtrl')
-//     );
-// }
-// else
-// {
-//     ReactDOM.render(
-//         <ClssUnitParametersList key={'AUL'} />,
-//         window.document.getElementById('modal_uplCtrl')
-//     );
-// }   
