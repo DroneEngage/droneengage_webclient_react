@@ -37,7 +37,7 @@ class ClssAndruavMessageItem extends React.Component {
         const m_description = this.props.p_msg.m_msg.m_error.Description;
         const m_index = this.props.p_index;
         return (
-        <tr key={m_index} className = {v_text_color}>
+        <tr key={m_index} className = {'si-09x ' + v_text_color + this.props.className}>
             <td  scope="row">{m_time}</td>
             <td scope="row">{m_notification_Type}</td>
             <td scope="row">{m_description}</td>
@@ -121,7 +121,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
                  <div key='params' id="parameters_sublist" className='d-flex justify-content-end'>
                             <button type="button" className='btn btn-success btn-sm ctrlbtn me-5'  title='Clear Messages' onClick={(e) => this.fn_clear(e)}>Clear</button>
                  </div>
-                 <table className = "table table-dark css_table_log">
+                 <table className = "table table-dark css_table_log si-09x ">
                     <thead>
                         <tr>
                         <th data-sort-type="text" className="w-25" scope="col">Time</th>
