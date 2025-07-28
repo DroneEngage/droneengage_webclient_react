@@ -625,7 +625,7 @@ class ClssCVideoScreen extends React.Component {
         v_btns.push(
             <div key={key + "btn"} id="css_video_ctrl_panel" className="d-flex flex-row css_padding_zero">
                 <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
-                    <ClssCtrlVideoFPS p_unit={andruavUnit}/>
+                    <ClssCtrlVideoFPS p_unit={andruavUnit} track_id={this.props.obj.v_track}/>
                 </div>
                 <div key={key + "1"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <img
