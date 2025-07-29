@@ -56,8 +56,6 @@ export  class ClssCtrlUnitLog  extends React.Component {
 		    'm_update': 0
         };
         
-        this._isMounted = false;
-        
         js_eventEmitter.fn_subscribe (js_globals.EE_onMessage, this, this.fn_onMessage);
     }
 
@@ -83,20 +81,18 @@ export  class ClssCtrlUnitLog  extends React.Component {
             time: (new Date()).toLocaleTimeString()
         });
 
-        if (p_me._isMounted !== true) return ;
-    
+        
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
-        //p_me.state.m_update += 1;
-        //me.forceUpdate();
     }
 
     componentDidMount() {
-        this._isMounted = true;
-    
+        this.state.m_update = 1;
     }
 
     fn_clear (e)
     {
+        if (this.state.m_update === 0) return ;
         this.setState({'m_message':[], 'm_update': this.state.m_update +1});
     }
 

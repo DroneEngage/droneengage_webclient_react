@@ -12,8 +12,20 @@ const DEFAULT_DISTANCE = 10;
 class ClssFenceAction extends React.Component {
 
 
-    
+    constructor(props)
+    {
+        super(props);
+        this.state={
+            m_update: 0
+        };
+    }
 
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
+    }
+
+    
     /**
      * When checkbox item is selected.
      * @param {*} e 
@@ -21,7 +33,9 @@ class ClssFenceAction extends React.Component {
     fn_onSelect(e)
     {
         this.props.shape.m_geofenceInfo.isHardFence=e.target.value; 
-        this.forceUpdate();
+        
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_update ()
@@ -31,14 +45,10 @@ class ClssFenceAction extends React.Component {
     }
     
 
-    componentDidMount ()
-    {
-        this.fn_update();
-    }
-
     componentDidUpdate()
     {
-         this.fn_update();
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     render ()

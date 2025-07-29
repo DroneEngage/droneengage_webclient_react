@@ -9,11 +9,18 @@ export class ClssCtrlVibration extends React.Component {
     constructor()
 	{
 		super ();
-		    this.state = {
-                warning_level :  0,
-                is_compact : true
+		this.state = {
+            warning_level :  0,
+            is_compact : true,
+		    m_update: 0
 		};
+
         js_eventEmitter.fn_subscribe(js_globals.EE_EKFViewToggle,this,this.fn_toggle_global);
+    }
+
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
     }
 
     childcomponentWillUnmount () 
@@ -21,10 +28,12 @@ export class ClssCtrlVibration extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_EKFViewToggle,this);
     }
 
-    fn_toggle_global(me,p_compact)
+    fn_toggle_global(p_me,p_compact)
     {
-        me.state.is_compact = p_compact;
-        me.forceUpdate();
+        p_me.state.is_compact = p_compact;
+        
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_toggle()
@@ -33,7 +42,8 @@ export class ClssCtrlVibration extends React.Component {
         else
         this.state.is_compact = false;
 
-        this.forceUpdate();
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
     
     getVibrationCss (value)

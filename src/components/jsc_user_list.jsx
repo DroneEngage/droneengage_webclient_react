@@ -7,7 +7,10 @@ class ClssUserEntry extends  React.Component {
     constructor()
     {
         super();
-        this.state={new_item: false};
+        this.state={
+            new_item: false,
+            m_update: 0
+        };
     }
 
     /**
@@ -65,7 +68,8 @@ class ClssUserEntry extends  React.Component {
             }
         }
 
-        this.forceUpdate();
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_saveParameter(e)

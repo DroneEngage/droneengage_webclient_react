@@ -23,6 +23,12 @@ export class ClssCtrlLidarDevice extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarInfo,this,this.fn_update_lidar);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        // Only re-render if m_update state has changed
+        const update = (this.state.m_update !== nextState.m_update);
+        return update;
+    }
+    
     componentDidMount () 
     {
         this.state.m_update = 1;

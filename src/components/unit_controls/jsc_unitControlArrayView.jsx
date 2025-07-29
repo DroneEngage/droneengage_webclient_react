@@ -807,7 +807,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 		super ();
 		this.state = {
 			andruavUnitPartyIDs : [],
-		    'm_update': 0
+		    m_update: 0
 		};
         
         
@@ -857,7 +857,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
     {
         if (me.state.m_update === 0) return ;
         
-        me.forceUpdate();
+        me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_updateMapStatus(p_andruavUnit)

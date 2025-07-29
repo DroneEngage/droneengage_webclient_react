@@ -167,7 +167,8 @@ export default class ClssUnitParametersList extends React.Component {
     {
         super ();
 		this.state = {
-            m_search: ""
+            m_search: "",
+		    m_update: 0
 		};
 	
         js_eventEmitter.fn_subscribe (js_globals.EE_displayParameters, this, this.fn_displayForm);
@@ -186,9 +187,15 @@ export default class ClssUnitParametersList extends React.Component {
         if (p_me.state.p_unit === null || p_me.state.p_unit === undefined) return ;
         if (p_andruavUnit.partyID !== p_me.state.p_unit.partyID) return ;
         
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
+
+    componentDidMount () 
+    {
+        this.state.m_update = 1;
+    }
 
     componentWillUnmount () {
         js_eventEmitter.fn_unsubscribe (js_globals.EE_displayParameters,this);
@@ -223,7 +230,9 @@ export default class ClssUnitParametersList extends React.Component {
                 c_parameter_message.is_dirty = false;
             }
         }
-        this.forceUpdate();
+        
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_resetAll()
