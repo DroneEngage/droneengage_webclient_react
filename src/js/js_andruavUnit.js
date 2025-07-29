@@ -219,6 +219,7 @@ class C_Video {
     this.m_parent = p_parent;
     this.m_videoactiveTracks = {};
     this.m_videoTracks = [];
+    this.m_total_transfer_bytes = 0;
   }
 
   // returns CONST_VIDEOSTREAMING_OFF is ALL tracks are OFF

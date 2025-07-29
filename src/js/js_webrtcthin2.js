@@ -20,7 +20,7 @@ class CTalk {
     this.parentStream = cAndruavStream; // Reference to the parent AndruavStream instance
 
     // New properties for frame rate monitoring
-    this.actualFrameRate = 0; // Stores the latest measured frame rate
+    this.m_actualFrameRate = 0; // Stores the latest measured frame rate
     this.frameRateMonitorInterval = null; // Holds the setInterval ID
 
     // Callback functions, initialized to no-op functions
@@ -98,7 +98,7 @@ class CTalk {
       js_common.fn_console_log(`WEBRTC: Stopping frame rate monitoring for ${this.targetVideoTrack}`);
       clearInterval(this.frameRateMonitorInterval);
       this.frameRateMonitorInterval = null;
-      this.actualFrameRate = 0; // Reset frame rate
+      this.m_actualFrameRate = 0; // Reset frame rate
     }
   }
 
@@ -114,7 +114,6 @@ class CTalk {
     try {
       const stats = await this.pc.getStats();
       let currentFrameRate = 0;
-      let bytesReceived = 0;
       let trackIdentifier = '';
       stats.forEach(report => {
         // For received video, look for 'inbound-rtp' statistics
@@ -122,7 +121,7 @@ class CTalk {
           // 'framesPerSecond' is commonly available in modern browsers
           if (report.bytesReceived !== undefined)
           {
-            bytesReceived = report.bytesReceived;
+            this.m_bytesReceived = report.bytesReceived;
           }
           if (report.trackIdentifier !== undefined)
           {
@@ -138,11 +137,14 @@ class CTalk {
         }
         // If sending video, you might look for 'outbound-rtp'
       });
+      
+      
 
-      this.actualFrameRate = currentFrameRate;
-      js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.actualFrameRate.toFixed(2)} FPS`);
+      this.m_actualFrameRate = currentFrameRate;
+      js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
-			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':bytesReceived, 'track_id': trackIdentifier}); 
+      v_andruavUnit.m_Video.m_total_transfer_bytes += this.m_bytesReceived;
+			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':this.m_bytesReceived , 'track_id': trackIdentifier}); 
         
 
     } catch (e) {
