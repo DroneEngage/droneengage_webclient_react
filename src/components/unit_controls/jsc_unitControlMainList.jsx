@@ -101,7 +101,6 @@ export default class ClssAndruavUnitList extends React.Component {
         {				
                 me.state.andruavUnitPartyIDs = [];
                 me.setState({'m_update': me.state.m_update +1});
-                //me.forceUpdate();
         }
     }
 
