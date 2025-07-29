@@ -12,15 +12,22 @@ export class ClssFireEvent extends React.Component {
       {
             super ();
             this.state = {
+              m_update: 0
             };
             this.edit_Ref = React.createRef();
       
       js_eventEmitter.fn_subscribe(js_globals.EE_onAdvancedMode,this,this.fn_advancedMode);
     }
   
-    fn_advancedMode (me)
+    componentDidMount () 
     {
-      me.forceUpdate();
+      this.state.m_update = 1;
+    }
+
+    fn_advancedMode (p_me)
+    {
+      if (p_me.state.m_update === 0) return ;
+      p_me.setState({'m_update': p_me.state.m_update +1});
     }
   
     fn_fireEvent()

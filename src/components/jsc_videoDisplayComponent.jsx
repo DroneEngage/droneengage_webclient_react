@@ -146,7 +146,9 @@ class ClssCVideoScreen extends React.Component {
         v_talk.hangup(true);
         js_globals.v_andruavClient.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
         v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-        this.forceUpdate();
+        
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
@@ -158,7 +160,8 @@ class ClssCVideoScreen extends React.Component {
         if (p_me.props.obj.v_track !== p_obj.v_track) {
             return;
         }
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
 
@@ -189,7 +192,8 @@ class ClssCVideoScreen extends React.Component {
 
         p_me.state.m_flash = p_obj.p_jmsg['f'];
         js_common.fn_console_log("Flash Updated", p_me.state.m_flash);
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_zoomChanged(p_me, p_obj) {
@@ -203,7 +207,8 @@ class ClssCVideoScreen extends React.Component {
 
         p_me.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
         js_common.fn_console_log("Zoom Updated", p_me.state.m_zoom);
-        p_me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_opacity() {
@@ -387,7 +392,8 @@ class ClssCVideoScreen extends React.Component {
             this.m_transform_mirrored = "scaleX(-1)";
         }
 
-        this.forceUpdate();
+        if (this.state.m_update === 0) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fnl_rotate_local(v_e) {
@@ -397,7 +403,7 @@ class ClssCVideoScreen extends React.Component {
         this.m_transform_rotated = "transform: '" + this.m_local_rotations[this.m_rotation] + "'";
         this.videoRef.current.style.transform =
 
-        this.forceUpdate();
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fnl_div_mouseDown(e) {
@@ -499,23 +505,12 @@ class ClssCVideoScreen extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_onWebRTC_Video_Statistics, this);
     }
 
-    // drawVideoFrame (me) {
-    //     const ctx = me.canvasRef.current.getContext('2d');
-    //     ctx.drawImage(me.videoRef.current, 0, 0, v_canvas.width, v_canvas.height);
-    //     ctx.scale(-1,-1); //flip the image horizontally
-
-    //   };
-
     componentDidMount() {
         this.fn_lnkVideo();
         const me = this;
 
         this.state.m_update = 1;
-
-        //const intervalId = window.setInterval(this.drawVideoFrame, 1000 / 30,this); // 30 FPS
-        //this.setState({ intervalId });
-
-
+   
     }
 
     componentDidUpdate() {
@@ -809,28 +804,29 @@ export class ClssCVideoControl extends React.Component {
     }
 
 
-    fn_videoStarted(me, p_obj) {
+    fn_videoStarted(p_me, p_obj) {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
         let vid = p_obj.andruavUnit.partyID + p_obj.talk.targetVideoTrack;
-        if (me.state.m_videoScreens.hasOwnProperty(vid) === false) {
-            me.state.m_videoScreens[vid] = {};
-            const c_screen = me.state.m_videoScreens[vid];
+        if (p_me.state.m_videoScreens.hasOwnProperty(vid) === false) {
+            p_me.state.m_videoScreens[vid] = {};
+            const c_screen = p_me.state.m_videoScreens[vid];
             c_screen.v_unit = p_obj.andruavUnit.partyID;
             c_screen.v_track = p_obj.talk.targetVideoTrack;
             c_screen.v_index = js_helpers.fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks, "id", p_obj.talk.targetVideoTrack);
-            me.state.lastadded = vid;
+            p_me.state.lastadded = vid;
         }
 
         fn_showVideoMainTab();
 
-        me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
 
         // SIMULATE a click to activate the link.
         // bug: if the tab is already selected then click will not be effective.
         // you need to deactivate the tab in case it is active
         // eq(0) is another bug as using [0] will return a DOM object and you need a JQuery object.
-        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
+        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + p_me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
 
         // simulate click
         //$('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + me.state.m_videoScreens[vid].v_track + '"]')[0].click();
@@ -839,14 +835,15 @@ export class ClssCVideoControl extends React.Component {
     }
 
 
-    fn_videoStopped(me, obj) {
+    fn_videoStopped(p_me, obj) {
 
         obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-        if (me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.partyID) === false) {
-            me.state.m_videoScreens[obj.andruavUnit.partyID] = undefined;
+        if (p_me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.partyID) === false) {
+            p_me.state.m_videoScreens[obj.andruavUnit.partyID] = undefined;
         }
 
-        me.forceUpdate();
+        if (p_me.state.m_update === 0) return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
 
