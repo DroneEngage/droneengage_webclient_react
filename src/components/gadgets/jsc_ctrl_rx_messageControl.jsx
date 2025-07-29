@@ -56,7 +56,7 @@ export  class ClssRX_MESSAGE  extends React.Component {
                 js_andruavMessages.message_names[key] = key;
             }
             msg.push(
-                <tr key={key + i}>
+                <tr key={key + i} className='si-09x'>
                     <td>
                         <small>{js_andruavMessages.message_names[key]}</small>
                     </td>
@@ -73,8 +73,8 @@ export  class ClssRX_MESSAGE  extends React.Component {
             }
             
             msg.push(
-                <tr key={key + i}>
-                    <td className="text-success">
+                <tr key={key + i} className='si-09x'>
+                    <td className='text-success'>
                         <small>{"MAV >> " + js_andruavMessages.message_names[key]}</small>
                     </td>
                     <td>
@@ -84,7 +84,7 @@ export  class ClssRX_MESSAGE  extends React.Component {
           });
 
         return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.partyID } className=" h-100 overflow-scroll">
-            <table className = "table table-dark table-striped">
+            <table className = "table table-dark table-striped si-09x">
                 <thead>
                     <tr key={'ClssRX_MESSAGE1' + this.props.p_unit.partyID }>
                         <th scope="col">MSG&nbsp;ID</th>
