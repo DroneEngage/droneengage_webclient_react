@@ -2201,7 +2201,6 @@ function fn_handleKeyBoard() {
 		function EVT_andruavUnitFCBUpdated(me, p_andruavUnit) {
 			if (p_andruavUnit.m_useFCBIMU === true) {
 				js_speak.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
-				js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
 			}
 			else {
 				js_speak.fn_speak(p_andruavUnit.m_unitName + ' disconnected from flying board');
