@@ -108,13 +108,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     hlp_getflightButtonStyles (p_andruavUnit)
 	{
 	    let res = {};
-        res.btn_takeCTRL_class          = "";
-        res.btn_releaseCTRL_class       = "";
-        res.btn_sendParameters_class    = " disabled hidden ";
-        res.btn_lidar_info_class        = ""
-        res.btn_tele_class              = "";
-        res.btn_load_wp_class           = "";
-        res.btn_object_tracking_class   = " disabled hidden ";
+        res.btn_takeCTRL_class              = "";
+        res.btn_releaseCTRL_class           = "";
+        res.btn_sendParameters_class        = " disabled hidden ";
+        res.btn_lidar_info_class            = ""
+        res.btn_tele_class                  = "";
+        res.btn_load_wp_class               = "";
+        res.btn_object_tracking_class       = " disabled hidden ";
+        res.btn_object_ai_tracking_class    = " disabled hidden ";
 
         
         res.btn_servo_class         = " btn-success ";
@@ -146,11 +147,20 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         {
             res.btn_sendParameters_class = " btn-primary  bi bi-toggles ";
              if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null) 
-                && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false)
-                && (this.props.p_unit.m_modules.has_tracking))
+                && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false))
+            {
+                if(this.props.p_unit.m_modules.has_tracking)
                 {
                     res.btn_object_tracking_class = " btn-primary   ";
                 }
+
+                if(this.props.p_unit.m_modules.has_ai_recognition)
+                {
+                    res.btn_object_ai_tracking_class = " btn-primary   ";
+                }
+
+                
+            }
         }
         
         if ((p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() !== js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS)
@@ -484,7 +494,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         ctrl2_2.push (<div key={p_andruavUnit.partyID + "rc3_1"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_tracking' key={this.key + 'btn_tracking'} type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker'/></button>
-                    <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_tracking_class } p_unit={p_andruavUnit} title='object AI tracker'/>
+                    <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class } p_unit={p_andruavUnit} title='object AI tracker'/>
                     </div></div>);
 
         return (
