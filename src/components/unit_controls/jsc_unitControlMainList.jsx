@@ -148,9 +148,13 @@ export default class ClssAndruavUnitList extends React.Component {
      */
     getHeaderInfo(v_andruavUnit)
     {
-        const bad_fcb = ((v_andruavUnit.m_useFCBIMU === false) 
-        ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
-            && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)));
+        const bad_fcb = (
+            (v_andruavUnit.m_modules.has_fcb === true)
+            &&
+            ((v_andruavUnit.m_useFCBIMU === false)
+            ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
+            && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
+            );
 
         let classes = "";
         let text = v_andruavUnit.m_unitName;
