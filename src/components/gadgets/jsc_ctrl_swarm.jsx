@@ -272,11 +272,11 @@ export class ClssCtrlSWARM extends React.Component {
                             title={v_leader_title_leader + " / folowing:" + v_leader_title_follower}
                             onClick={() => this.fn_toggleMakeSwarm(js_andruavMessages.CONST_TASHKEEL_SERB_THREAD)}>Leader</button>
                         <div key={'swr_12' + this.key} className="btn-group" role="group">
-                            <button id="btnGroupDrop2"
+                            <button id={"btnGroupDrop2"+ this.key}
                                 type="button"
                                 className={"btn  btn-sm dropdown-toggle " + v_follower_class}
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div key={'swr_121' + this.key} className="dropdown-menu" aria-labelledby="btnGroupDrop2">
+                            <div key={'swr_121' + this.key} className="dropdown-menu" aria-labelledby={"btnGroupDrop2"+ this.key}>
                                 {c_items}
                                 <a className="dropdown-item " href="#" onClick={() => this.fn_requestToFollow()}>unfollow</a>
                             </div>
