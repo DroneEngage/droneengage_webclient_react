@@ -34,7 +34,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_onTrackingAIStatusChanged, this, this.fn_onTrackingAIStatusChanged);
         js_eventEmitter.fn_subscribe(js_globals.EE_onTrackingAIObjectListUpdate, this, this.fn_onTrackingAIObjectListUpdate);
 
-        js_globals.v_andruavClient.API_GetTrackingAIClassList(this.props.p_unit,this.state.m_selectedUnits);
+        js_globals.v_andruavClient.API_GetTrackingAIClassList(this.props.p_unit);
 
     }
 
@@ -66,51 +66,49 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
         }
     }
 
-    fn_onTrackingAIStatusChanged(p_me) {
+    fn_onTrackingAIStatusChanged(p_me, p_unit) {
 
-        // this event is important especially when another drone becomes a leader and you need to update the drone list.
+        if (p_me.props.p_unit.partyID !== p_unit.partyID) return ;
         if (p_me.state.m_update === 0) return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }
 
-    fn_onTrackingAIObjectListUpdate(p_me) {
+    fn_onTrackingAIObjectListUpdate(p_me, p_unit) {
+        
+        if (p_me.props.p_unit.partyID !== p_unit.partyID) return ;
         if (p_me.state.m_update === 0) return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }
 
 
-    EE_onTrackingAIObjectListUpdate(p_me)
-    {
-        if (p_me.state.m_update === 0) return;
-
-
-    }
-
-    fnl_trackerAISearch(e) {
-
-    }
-
-    fnl_trackerAIOff(e) {
-        this.props.p_unit.m_tracker_ai.m_enable_gui_tracker = false;
-        js_globals.v_andruavClient.API_PauseTrackingAI(this.props.p_unit);
+    fnl_trackerAIOff() {
+        js_globals.v_andruavClient.API_DisableTrackingAI(this.props.p_unit);
     }
 
     fnl_trackerAIOnOff(e) {
-        if (this.props.p_unit.m_tracker_ai.m_enable_gui_tracker===true)
+        if (this.props.p_unit.m_tracker_ai.m_active===true)
         {
-            this.fnl_trackerAIOff(e);
+            this.fnl_trackerAIOff();
         }
         else
         {
+            js_globals.v_andruavClient.API_EnableTrackingAI(this.props.p_unit);
             if (this.state.m_selectedUnits.length == 0) return ; // nothing to select
-            this.props.p_unit.m_tracker_ai.m_enable_gui_tracker = true;
             js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
         }
 
         js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, this.props.p_unit);
 
+    }
+
+    fnl_unSelectAll()
+    {
+        const { m_selectedUnits } = this.state;
+        const newSelectedUnits = [];
+
+        this.fnl_trackerAIOff();
     }
 
     fnl_selectAll(e) {
@@ -127,7 +125,6 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
         if (newSelectedUnits.length === 0) return; // nothing to select
 
-        this.props.p_unit.m_tracker_ai.m_enable_gui_tracker = true;
         js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, newSelectedUnits);
 
 
@@ -154,7 +151,6 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
             m_selected_units_updated: true
         }, () => { // Callback function executed after state update
             if (newSelectedUnits.length > 0) { // Only send if there are selected units
-                this.props.p_unit.m_tracker_ai.m_enable_gui_tracker = true;
                 js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
             } else {
                 // Optionally, if no items are selected, you might want to pause tracking
@@ -185,15 +181,25 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
         let css_Track = '';
         let css_Track_title = this.props.title?this.props.title :'object tracker';
-        if (this.props.p_unit.m_tracker_ai.m_enable_gui_tracker)
+        if (this.props.p_unit.m_tracker_ai.m_active === true)
         {
-            css_Track = ' text-danger ';
-            css_Track_title += ' disable tracking ';
-            this.state.m_tracker_ai_gui_enabled = true;
+            if (this.props.p_unit.m_tracker_ai.m_detected)
+            {
+                css_Track = ' text-danger ';
+                css_Track_title += ' disable tracking ';
+                this.state.m_tracker_ai_gui_enabled = true;
+            }
+            else
+            {
+                css_Track = ' text-warning ';
+                css_Track_title += ' disable tracking ';
+                this.state.m_tracker_ai_gui_enabled = true;
+            }
+            
         }
-        else
+        else 
         {
-            css_Track = '  ';
+            css_Track = ' text-white ';
             css_Track_title += ' enable tracking ';
             this.state.m_tracker_ai_gui_enabled = false;
         }
@@ -240,6 +246,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
                                 aria-labelledby={"btnGroupDrop2"+ this.key}
                                 style={{ maxHeight: '200px', overflowY: 'auto' }}
                             >
+                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_unSelectAll(e)}>Unselect all</a>
                                 {c_items}
                                 <a className="dropdown-item " href="#" onClick={(e) => this.fnl_selectAll(e)}>select all</a>
                             </div>
