@@ -30,7 +30,6 @@ import {ClssAndruavUnitBase} from './jsc_unit_control_base.jsx'
 import {ClssCtrlUnitMainBar} from './jsc_ctrl_unit_main_bar.jsx'
 import {ClssCtrlUnitPlanningBar} from './jsc_ctrl_unit_planning_bar.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
-import ClssCtrlObjectTrackerAI from '../gadgets/jsc_ctrl_tracker_ai_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
 
 /**

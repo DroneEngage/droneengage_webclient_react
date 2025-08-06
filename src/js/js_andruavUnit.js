@@ -142,18 +142,18 @@ class C_TRACKER_AI {
     {
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
           this.m_detected = false;
-          this.m_enable_gui_tracker = false;
+          this.m_active = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
           this.m_detected = true;
-          this.m_enable_gui_tracker = true;
+          this.m_active = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
           this.m_active = true;
-          this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
           this.m_active = false;
+          this.m_detected = false;
         break;
     }
   }
@@ -186,17 +186,22 @@ class C_Tracker {
     {
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
           this.m_detected = false;
-          this.m_enable_gui_tracker = false;
+          this.m_active = true;
+          this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
           this.m_detected = true;
+          this.m_active = true;
           this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
           this.m_active = true;
+          this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
           this.m_active = false;
+          this.m_detected = false;
+          this.m_enable_gui_tracker = false;
         break;
     }
   }
