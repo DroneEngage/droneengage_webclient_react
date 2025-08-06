@@ -167,6 +167,7 @@ export const CONST_TrackingTarget_ACTION_TRACKING_POINT     = 0;
 export const CONST_TrackingTarget_ACTION_TRACKING_REGION    = 1;  
 export const CONST_TrackingTarget_ACTION_TRACKING_STOP      = 2; 
 export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE     = 3; 
+export const CONST_TrackingTarget_ACTION_TRACKING_ENABLE    = 4; 
 
 // Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
 export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0; 
@@ -178,15 +179,15 @@ export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED   = 3;
 // TYPE_AndruavMessage_AI_Recognition_ACTION
 export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT       = 0;
 export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH      = 1;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_STOP        = 2;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE       = 3;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE     = 2;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE      = 3;
 export const CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST  = 4;
 
 // Tracking Target Action TYPE_AndruavMessage_AI_Recognition_STATUS
 export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST        = 0;
 export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED    = 1;
 export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED     = 2;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_STOPPED     = 3;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_DISABLED    = 3;
 export const CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST  = 4;
 
 // AndruavMessage_RemoteExecute Commands

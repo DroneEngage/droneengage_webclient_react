@@ -607,6 +607,13 @@ class CAndruavClient {
     
     };
 
+    API_EnableTracking(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
+
+        const cmd = CCommandAPI.API_EnableTracking(p_andruavUnit);
+        this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+    }
+
 
     API_SendTrackAISelect(p_andruavUnit, selected_object_list) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
@@ -616,23 +623,24 @@ class CAndruavClient {
     };
 
 
-    API_StopTrackingAI(p_andruavUnit) {
+    API_DisableTrackingAI(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        const cmd = CCommandAPI.API_StopTrackingAI(p_andruavUnit);
+        const cmd = CCommandAPI.API_DisableTrackingAI(p_andruavUnit);
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     };
 
     
-    API_PauseTrackingAI(p_andruavUnit) {
+    
+    API_EnableTrackingAI(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 
-        const cmd = CCommandAPI.API_PauseTrackingAI(p_andruavUnit);
+        const cmd = CCommandAPI.API_EnableTrackingAI();
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
     
     };
     
-    
+
     API_GetTrackingAIClassList(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined)return ;
 

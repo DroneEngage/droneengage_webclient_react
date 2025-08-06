@@ -567,6 +567,20 @@ export class CCommandAPI
     }
 
 
+    static API_EnableTracking(p_andruavUnit)
+    {
+        const msg = 
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'ms':  {
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_ENABLE
+            }
+        };
+        
+        return msg;
+    }
+
+
     static API_SendTrackAISelect(selected_object_list)
     {
         const msg = 
@@ -582,32 +596,33 @@ export class CCommandAPI
     }
 
     
-    static API_StopTrackingAI(p_andruavUnit)
+    static API_DisableTrackingAI(p_andruavUnit)
     {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms':  {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_STOP
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE
             }
         };
         
         return msg;
     }
 
-    static API_PauseTrackingAI(p_andruavUnit)
+    
+    static API_EnableTrackingAI()
     {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms':  {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_PAUSE
+                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE
             }
         };
         
         return msg;
     }
-    
+
     static API_GetTrackingAIClassList()
     {
         const msg = 

@@ -38,20 +38,22 @@ export default class ClssCtrlObjectTracker extends React.Component {
         }
     
         
-        fn_onTrackStatusUpdated(me,p_unit) {
-            if (me.state.m_update === 0) return;
-            me.setState({'m_update': me.state.m_update +1});
+        fn_onTrackStatusUpdated(p_me,p_unit) {
+            
+            if (p_me.props.p_unit.partyID !== p_unit.partyID) return ;
+            if (p_me.state.m_update === 0) return;
+            
+            p_me.setState({'m_update': p_me.state.m_update +1});
         }
         
         fnl_trackerOnOff(e) {
             if (this.props.p_unit.m_tracker.m_enable_gui_tracker===true)
             {
-                this.props.p_unit.m_tracker.m_enable_gui_tracker = false;
                 js_globals.v_andruavClient.API_PauseTracking(this.props.p_unit);
             }
             else
             {
-                this.props.p_unit.m_tracker.m_enable_gui_tracker = true;
+                js_globals.v_andruavClient.API_EnableTracking(this.props.p_unit);
             }
             
             js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingStatusChanged, this.props.p_unit);
@@ -81,7 +83,7 @@ export default class ClssCtrlObjectTracker extends React.Component {
             {
                 if (this.props.p_unit.m_tracker.m_active)
                 {
-                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand bg-warning text-white';
+                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand text-warning text-white';
                     css_Track_title += ' enable tracking ';
                     this.state.m_tracker_gui_enabled = false;
                 }
