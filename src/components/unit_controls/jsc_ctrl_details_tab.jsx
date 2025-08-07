@@ -128,15 +128,28 @@ export  class ClssCtrlUnitDetails   extends React.Component {
             <div key={v_andruavUnit.partyID + 'settings'}>
             <div key={v_andruavUnit.partyID + 'settings_1'} className='row css_margin_zero padding_zero '>
                 <div key={v_andruavUnit.partyID + 'settings_01'} className="col-4 cursor_hand">
-                    <p key={v_andruavUnit.partyID + 'settings_011'}className="textunit_w135 user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{parseFloat(v_andruavUnit.m_Messages.m_received_bytes/1024).toFixed(2)} </span> KB</b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_011'}className="textunit_w135 user-select-all m-0 no-wrap" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received&nbsp;
+                        <span className='text-warning'>
+                                    {v_andruavUnit.m_Messages.m_received_bytes > 1024 * 1024 
+                                    ? (v_andruavUnit.m_Messages.m_received_bytes / (1024 * 1024)).toFixed(2) + ' MB'
+                                    : (v_andruavUnit.m_Messages.m_received_bytes / 1024).toFixed(2) + ' KB'} 
+                        </span></b></small></span>
+                    </p>
                 </div>
                 
                 <div key={v_andruavUnit.partyID + 'settings_11'} className="col-4 cursor_hand">
-                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit_w135 user-select-all m-0" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Video Data <span className='text-warning'>{parseFloat(v_andruavUnit.m_Video.m_total_transfer_bytes/1024).toFixed(2)} </span> KB</b></small></span></p>
+                    <p key={v_andruavUnit.partyID + 'settings_111'}className="textunit_w135 user-select-all m-0 no-wrap" onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Video Data&nbsp; 
+                                <span className='text-warning'>
+                                    {v_andruavUnit.m_Video.m_total_transfer_bytes > 1024 * 1024 
+                                    ? (v_andruavUnit.m_Video.m_total_transfer_bytes / (1024 * 1024)).toFixed(2) + ' MB'
+                                    : (v_andruavUnit.m_Video.m_total_transfer_bytes / 1024).toFixed(2) + ' KB'} 
+                                </span>
+                                </b></small></span>
+                    </p>
                 </div>
 
                 <div key={v_andruavUnit.partyID + 'settings_12'} className="col-4 cursor_hand">
-                    <p className="textunit_w135 user-select-all m-0" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{v_andruavUnit.m_Messages.m_received_msg} </span>msgs</b></small></span></p>
+                    <p className="textunit_w135 user-select-all m-0 no-wrap" key={v_andruavUnit.partyID + 'SC_51'} onClick={(e) => this.fn_toggleTrafficMonitor(e)}><span><small><b>Received <span className='text-warning'>{v_andruavUnit.m_Messages.m_received_msg} </span>msgs</b></small></span></p>
                 </div>
             </div>
             <div key={v_andruavUnit.partyID + 'settings_2'} className='row css_margin_zero padding_zero '>

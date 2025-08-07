@@ -34,6 +34,10 @@ body.no-zoom {
 	border-width: 2px;
 }
 
+
+.no-wrap {
+    white-space: nowrap;
+}
 css_cur_alias {cursor: alias;}
 css_cur_all-scroll {cursor: all-scroll;}
 css_cur_auto {cursor: auto;}
