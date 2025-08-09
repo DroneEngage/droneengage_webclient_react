@@ -82,18 +82,8 @@ class ClssCVideoScreen extends React.Component {
 
     fnl_takeLocalImage(e) {
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-        if (c_andruavUnit === null || c_andruavUnit === undefined) {
-            return;
-        }
-
-
-        if ((c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track].mmRTC !== null)) {
-            fn_takeLocalImage(c_andruavUnit, this.props.obj.v_track);
-        }
-        else {
-            fn_takeLocalImage(c_andruavUnit, this.props.obj.v_track);
-        }
-
+        if (!c_andruavUnit) return;
+        fn_takeLocalImage(c_andruavUnit, this.props.obj.v_track);
     }
 
 
