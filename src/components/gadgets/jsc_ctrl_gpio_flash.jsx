@@ -73,6 +73,10 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
 
     render() {
 
+        if (this.props.p_unit.m_isDE === false) {
+            return ("");
+        }
+
         let css_flashGPIO = ' bi bi-sun ';
      
         const gpio_flash = this.props.p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
