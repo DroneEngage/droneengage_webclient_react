@@ -293,7 +293,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             || (v_andruavUnit.m_isDE === false))// de already has audio
         {
             container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
-            <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID}>Audio</a>
+            <a className="nav-link user-select-none bi bi-megaphone-fill" data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID} title='Audio'></a>
             </li>);
         }
            
