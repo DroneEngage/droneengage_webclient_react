@@ -210,15 +210,6 @@ class ClssCVideoScreen extends React.Component {
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
-    fn_opacity() {
-        $('#css_video_ctrl_panel').on("mouseover", function () {
-            $('#css_video_ctrl_panel').css('opacity', '1.0');
-        });
-        $('#css_video_ctrl_panel').mouseout(function () {
-            $('#css_video_ctrl_panel').css('opacity', '0.2');
-        });
-
-    }
 
     fn_lnkVideo() {
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
@@ -229,19 +220,15 @@ class ClssCVideoScreen extends React.Component {
     }
 
     fnl_canvas(p_targets) {
-        //CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
-            // used to test behavior after removing code and as double check
-            return;
-        }
+        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) return;
 
-        if (this.m_timerID !== null && this.m_timerID !== undefined) {
-            clearTimeout(this.m_timerID);
-        }
+        if (this.m_timerID) cancelAnimationFrame(this.m_timerID);
+
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const c_canvas = $('canvas#canvasoObject' + c_talk.targetVideoTrack)[0];
-        if (c_canvas == null) return;
+        if (!c_canvas) return;
+
         const c_ctx = c_canvas.getContext('2d');
         c_ctx.font = "8px Arial";
         c_ctx.textAlign = "center";
@@ -249,25 +236,22 @@ class ClssCVideoScreen extends React.Component {
 
         c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
 
-        this.m_timerID = setTimeout(function () {
-            c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
-        }, 2000);
-
         const c_list = p_targets.m_list;
         const c_len = c_list.length;
         for (let i = 0; i < c_len; ++i) {
-
             const p_target = c_list[i];
             const c_x1 = p_target.x1 * c_canvas.width;
             const c_y1 = p_target.y1 * c_canvas.height;
-            const c_x2 = (p_target.x2) * c_canvas.width;
-            const c_y2 = (p_target.y2) * c_canvas.height;
+            const c_x2 = p_target.x2 * c_canvas.width;
+            const c_y2 = p_target.y2 * c_canvas.height;
             c_ctx.strokeStyle = 'rgb(200, 0, 0)';
             c_ctx.strokeRect(c_x1, c_y1, c_x2, c_y2);
             c_ctx.fillText(p_target.m_name, c_x1 + c_x2 / 2, c_y1 + c_y2 / 2);
         }
 
-        //CODEBLOCK_END
+        this.m_timerID = requestAnimationFrame(() => {
+            c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
+        });
     }
 
     fnl_requestPictureInPicture(p_andruavUnit, videoTrackID) {
@@ -486,9 +470,6 @@ class ClssCVideoScreen extends React.Component {
             return;
         }
 
-        // first strop tracking
-        //js_globals.v_andruavClient.API_StopTracking (c_andruavUnit);
-
         // send new points
         const c_dim = e.currentTarget.getBoundingClientRect();
         const v_x1 = ((e.nativeEvent.x - c_dim.left) / c_dim.width).toFixed(3);
@@ -514,7 +495,6 @@ class ClssCVideoScreen extends React.Component {
 
     componentDidUpdate() {
         this.fn_lnkVideo();
-        this.fn_opacity();
         js_common.fn_console_log("componentDidUpdate");
     }
 
