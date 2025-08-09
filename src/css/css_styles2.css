@@ -1075,6 +1075,12 @@ div#displays
 	flex-direction: row; /* Arrange items horizontally */
 	padding: 0;
 	overflow-x: auto; /* Enable horizontal scrolling if needed */
+	opacity: 0.5;
+  	transition: opacity 0.3s ease;
+  }
+
+  #css_video_ctrl_panel:hover {
+  	opacity: 1.0;
   }
   
   #css_video_ctrl_panel > div {
