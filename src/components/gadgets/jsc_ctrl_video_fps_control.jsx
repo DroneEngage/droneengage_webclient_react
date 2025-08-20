@@ -42,8 +42,6 @@ export default class ClssCtrlVideoFPS extends React.Component {
         (p_me.props.track_id !== p_obj.track_id))
         return ;
         
-        console.log("m_actual_fps:", p_me.state.m_actual_fps);
-
         if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
