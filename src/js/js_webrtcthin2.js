@@ -176,6 +176,9 @@ class AndruavStream {
         mandatory: {
           OfferToReceiveAudio: false,
           OfferToReceiveVideo: true,
+          codec: {
+            // mimeType: 'video/H264' // or 'video/VP8', 'video/VP9'
+          }
         },
         optional: [],
       },
