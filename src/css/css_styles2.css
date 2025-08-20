@@ -817,6 +817,7 @@ input#txt_defaultAltitude
 	margin: 0px;
 	position: relative;
     z-index: 1;
+	will-change: transform;
 }
 
 
