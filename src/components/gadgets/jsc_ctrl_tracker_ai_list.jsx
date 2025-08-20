@@ -163,8 +163,8 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
     render() {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING_AI != null)
-                                && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING_AI === false)
-                                && (!this.props.p_unit.m_modules.has_ai_recognition))
+            || ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING_AI === false)
+               && (!this.props.p_unit.m_modules.has_ai_recognition)))
         {
             return (
                         <div className="disabled hidden"/>
