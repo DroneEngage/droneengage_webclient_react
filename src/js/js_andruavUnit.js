@@ -879,13 +879,21 @@ class C_Modules {
   constructor(p_parent) {
     this.m_parent = p_parent;
     this.has_fcb = false;
+    this.has_fcb_alive = false;
     this.has_camera = false;
+    this.has_camera_alive = false;
     this.has_sound = false;
+    this.has_sound_alive = false;
     this.has_gpio = false;
+    this.has_gpio_alive = false;
     this.has_p2p = false;
+    this.has_p2p_alive = false;
     this.has_sdr = false;
+    this.has_sdr_alive = false;
     this.has_tracking = false;
+    this.has_tracking_alive = false;
     this.has_ai_recognition = false;
+    this.has_ai_recognition_alive = false;
     this.m_list = [];
   }
 
@@ -909,34 +917,42 @@ class C_Modules {
       switch (module.c.toLowerCase()) {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
           this.has_fcb = true;
+          this.has_fcb_alive = module.d === false;
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_GPIO:
           this.has_gpio = true;
+          this.has_gpio_alive = module.d === false;
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
           this.has_sound = true;
+          this.has_sound_alive = module.d === false;
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_P2P:
 					this.has_p2p = true;	
+          this.has_p2p_alive = module.d === false;
 				  break;
           
         case js_andruavMessages.TYPE_MODULE_CLASS_SDR:
           this.has_sdr = true;	
+          this.has_sdr_alive = module.d === false;
           break;
             
         case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
           this.has_camera = true;
+          this.has_camera_alive = module.d === false;
           break;
         
         case js_andruavMessages.TYPE_MODULE_CLASS_TRACKING:
           this.has_tracking = true;
+          this.has_tracking_alive = module.d === false;
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_AI_RECOGNITION:
           this.has_ai_recognition = true;
+          this.has_ai_recognition_alive = module.d === false;
           break;
       
         default:
@@ -1050,6 +1066,8 @@ export class CAndruavUnitObject {
   }
 
   fn_canCamera() {
+    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive===false)) return false;
+    
     if (this.m_Permissions[10] === "C") {
       return true;
     }
@@ -1058,6 +1076,8 @@ export class CAndruavUnitObject {
   }
 
   fn_canVideo() {
+    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive===false)) return false;
+    
     if (this.m_Permissions[8] === "V") {
       return true;
     }
