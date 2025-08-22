@@ -220,7 +220,14 @@ export class ClssCtrlUnitMainBar extends React.Component {
             }
             if (v_andruavUnit.m_Video.fn_getVideoStreaming() === js_andruavUnit.CONST_VIDEOSTREAMING_ON)
             {
-                video_class = "cursor_hand video_active";
+                if (v_andruavUnit.fn_canVideo() === true)
+                {
+                  video_class = "cursor_hand video_active";
+                }
+                else
+                {
+                    video_class = "cursor_hand video_semi_active";
+                }
             }
             else
             {

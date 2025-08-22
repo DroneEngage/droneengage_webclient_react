@@ -51,6 +51,24 @@ img.video_active:before
 	padding: 1px;
 }
 
+
+img.video_semi_active
+{
+	content:url('/images/camera-movie_w.png');
+    display: inline-flex;
+    width: 32px;
+	padding: 1px;
+}
+
+/* fire fox */
+img.video_semi_active:before
+{
+	content:url('/images/camera-movie_w.png');
+    display: inline-flex;
+    width: 32px;
+	padding: 1px;
+}
+
 img.video_inactive
 {
 	content:url('/images/camera-movie_gr.png');
