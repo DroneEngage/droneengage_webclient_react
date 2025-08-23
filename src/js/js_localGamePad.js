@@ -14,18 +14,21 @@
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_helpers from '../js/js_helpers'
 import {js_globals} from './js_globals'
+import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 import * as js_common from './js_common.js'
 
+const GAME_GENERIC = 0;
 const GAME_XBOX_360_MICROSOFT   = 1;
 const GAME_XBOX_360_MICROSOFT_VENDOR  = ["045e","054c","054c","054c"];
 const GAME_XBOX_360_MICROSOFT_PRODUCT = ["028e","0ce6","09cc","05c4"];
 const GAME_PAD_WAILLY_PPM       = 2;
 const GAME_COR_CTRL_MICROSOFT   = 3;
+
 class fn_Obj_padStatus {
     constructor() 
     {
-    this.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
+    this.p_ctrl_type = GAME_GENERIC;
     this.p_axes = [-1, 0, 0, 0];
 
     this.p_buttons = [];
@@ -52,23 +55,37 @@ class CAndruavGamePad {
         this.v_controllers = {};
         this.v_animationFrameId = null; // Add a property to store the animation frame ID
 
+        this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
+        
+        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Config_Index_Changed,this, this.fn_gamePadConfigChanged);
+
         if (this.c_haveEvents) {
             window.addEventListener('gamepadconnected', this.fn_onConnect);
             window.addEventListener('gamepaddisconnected', this.fn_onDisconnect);
             
         } else {
-            setInterval(this.fn_scangamepads, 500);
+            setTimeout(this.fn_scangamepads, 500);
         }
 
     }
 
-    
+    componentWillUnmount ()
+    {
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Config_Index_Changed, this);
+    }
 
     static getInstance() {
         if (!CAndruavGamePad.instance) {
             CAndruavGamePad.instance = new CAndruavGamePad();
         }
         return CAndruavGamePad.instance;
+    }
+
+    fn_gamePadConfigChanged(p_me)
+    {
+        console.log ("INDEX CHANGED");
+        this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
+        
     }
 
     fn_getGamePad(index) {
@@ -164,35 +181,33 @@ class CAndruavGamePad {
 
         js_common.fn_console_log("vendorNumber:" + vendorNumber + " ::: productNumber:" + productNumber);
 
-        if ((vendorNumber === '06f7') && (productNumber === '0003'))
-        {
-            v_padStatus.p_ctrl_type = GAME_PAD_WAILLY_PPM;
-        }else
-        if ((vendorNumber === '0e6f') && (productNumber === 'f501'))
-        {
-            if (p_gamepad.axes.length === 4)
-            {  // just in case this 'bug' exists
-                v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
-            }
-            else
-            {   
-                v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
-            }
+        // if ((vendorNumber === '06f7') && (productNumber === '0003'))
+        // {
+        //     v_padStatus.p_ctrl_type = GAME_PAD_WAILLY_PPM;
+        // }else
+        // if ((vendorNumber === '0e6f') && (productNumber === 'f501'))
+        // {
+        //     if (p_gamepad.axes.length === 4)
+        //     {  // just in case this 'bug' exists
+        //         v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
+        //     }
+        //     else
+        //     {   
+        //         v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
+        //     }
 
-        }else
-        if ((GAME_XBOX_360_MICROSOFT_VENDOR.includes(vendorNumber) === true) && (GAME_XBOX_360_MICROSOFT_PRODUCT.includes(productNumber) === true))
-        {
-            if (p_gamepad.axes.length === 4)
-            {
-                v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
-            }
-            else
-            {   // on firefox I found it can be detected as GAME_COR_CTRL_MICROSOFT
-                v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
-            }
-            
-            
-        }
+        // }else
+        // if ((GAME_XBOX_360_MICROSOFT_VENDOR.includes(vendorNumber) === true) && (GAME_XBOX_360_MICROSOFT_PRODUCT.includes(productNumber) === true))
+        // {
+        //     if (p_gamepad.axes.length === 4)
+        //     {
+        //         v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
+        //     }
+        //     else
+        //     {   // on firefox I found it can be detected as GAME_COR_CTRL_MICROSOFT
+        //         v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
+        //     }
+        // }
         
         v_padStatus.id = p_gamepad.id;
         
@@ -245,8 +260,12 @@ class CAndruavGamePad {
 
         let v_axesChanged = false;
         const c_now = Date.now();
-        //console.log ("xx",p_gamepad.axes);
-        if (c_padStatus.p_ctrl_type === GAME_PAD_WAILLY_PPM)
+        
+        if (c_padStatus.p_ctrl_type ===  GAME_GENERIC)
+        {
+
+        }
+        else if (c_padStatus.p_ctrl_type === GAME_PAD_WAILLY_PPM)
         {
             // Rudder
             let val = (p_gamepad.axes[5]*2).toFixed(2);
