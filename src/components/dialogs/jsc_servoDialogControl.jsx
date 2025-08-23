@@ -239,7 +239,7 @@ export default class ClssServoControl extends React.Component {
             v_unitName = p_andruavUnit.m_unitName;
             const servo_values = p_andruavUnit.m_Servo.m_values;
             servos.push(
-                        <div className='row margin_zero pt-2'>
+                        <div className='row margin_zero pt-2' key={this.key + 'srvs-keys'} >
                             <div className='row mt-1'>
                                 <div className='col-3 margi'>
                                     <ClssServoUnit prop_party={p_andruavUnit} prop_channel='9' prop_value={servo_values.m_servo9} prop_name='AP-Srv 9' key={this.key + 'Key 1'}/>
