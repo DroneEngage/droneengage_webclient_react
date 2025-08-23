@@ -50,7 +50,7 @@ class CAndruavGamePad {
         this.c_haveEvents = 'GamepadEvent'; 
         this.v_lastUpdateSent = Date.now();
         this.v_controllers = {};
-        
+        this.v_animationFrameId = null; // Add a property to store the animation frame ID
 
         if (this.c_haveEvents) {
             window.addEventListener('gamepadconnected', this.fn_onConnect);
@@ -126,7 +126,9 @@ class CAndruavGamePad {
 
     fn_updateStatus() {
         CAndruavGamePad.getInstance().fn_scangamepads();
-        window.requestAnimationFrame(CAndruavGamePad.getInstance().fn_updateStatus);
+        // The previous requestAnimationFrame call is cancelled before a new one is made.
+        // This ensures that the function is only scheduled once per frame.
+        CAndruavGamePad.getInstance().v_animationFrameId = window.requestAnimationFrame(CAndruavGamePad.getInstance().fn_updateStatus);
     }
 
     fn_addgamepad(me, p_gamepad) {
@@ -197,12 +199,22 @@ class CAndruavGamePad {
         me.v_controllers[p_gamepad.index] = v_padStatus;
         v_padStatus.p_connected = true;
         v_padStatus.p_vibration = (p_gamepad.vibrationActuator !== null && p_gamepad.vibrationActuator !== undefined);
-        window.requestAnimationFrame(me.fn_updateStatus);
+        
+        // Start the animation frame loop
+        if (!me.v_animationFrameId) {
+            me.v_animationFrameId = window.requestAnimationFrame(me.fn_updateStatus);
+        }
     }
 
     fn_removeGamepad(me, p_gamepad) {
         if ((p_gamepad !== null && p_gamepad !== undefined) && (me.v_controllers[p_gamepad.index] !== null && me.v_controllers[p_gamepad.index] !== undefined)) {
             delete me.v_controllers[p_gamepad.index];
+        }
+
+        // Cancel the animation frame loop if no gamepads are connected
+        if (Object.keys(me.v_controllers).length === 0 && me.v_animationFrameId) {
+            window.cancelAnimationFrame(me.v_animationFrameId);
+            me.v_animationFrameId = null;
         }
     }
 
@@ -211,7 +223,7 @@ class CAndruavGamePad {
         for (let i = 0; i < c_gamepads.length; i++) {
             if (c_gamepads[i]) {
                 if (!(c_gamepads[i].index in this.v_controllers)) {
-                    this.addgamepad(this,c_gamepads[i]);
+                    this.fn_addgamepad(this, c_gamepads[i]);
                 } else {
                     let v_ctrl = this.v_controllers[c_gamepads[i].index];
                     if (v_ctrl === null || v_ctrl === undefined) {
@@ -381,23 +393,6 @@ class CAndruavGamePad {
 
         }
     }
-
-
 };
-
-// var AndruavLibs = AndruavLibs || {
-//     REVISION: 'BETA'
-// };
-
-// (function (lib) {
-//     "use strict";
-//     if (typeof module === "undefined" || typeof module.exports === "undefined") {
-//         CAndruavGamePad.getInstance() = lib; // in ordinary browser attach library to window
-//     } else {
-//         module.exports = lib; // in nodejs
-//     }
-// })(new CAndruavGamePad());
-
-
 
 export var js_localGamePad= CAndruavGamePad.getInstance();
