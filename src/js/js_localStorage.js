@@ -39,6 +39,12 @@ class CLocalStorage {
         }
     }
 
+    // Generic method to remove a value from local storage
+    _removeValue(key) {
+        if (this.isSupported()) {
+            localStorage.removeItem(key);
+        }
+    }
 
     // Generic method to get a value from session storage
     _getSessionValue(key, defaultValue) {
@@ -54,6 +60,7 @@ class CLocalStorage {
             sessionStorage.setItem(key, value);
         }
     }
+
 
     // Language
     fn_setLanguage(value) {
@@ -75,23 +82,23 @@ class CLocalStorage {
 
     // Access Code
     fn_setAccessCode(value) {
-        this._setValue('_vAccessCode', value);
+        this._setValue(js_globals.LS_ACCESS_CODE, value);
     }
 
     fn_getAccessCode() {
-        return this._getValue('_vAccessCode', '');
+        return this._getValue(js_globals.LS_ACCESS_CODE, '');
     }
 
     // Unit ID
     fn_setUnitID(value) {
-        this._setSessionValue('_vUnitID', value);
+        this._setSessionValue(js_globals.LS_UNIT_ID, value);
     }
 
     fn_resetUnitID() {
         this.fn_setUnitID ('WEB_GCS_' + js_common.fn_generateRandomString(3));
     }
     fn_getUnitID() {
-        return this._getSessionValue('_vUnitID', 'WEB_GCS_' + js_common.fn_generateRandomString(3));
+        return this._getSessionValue(js_globals.LS_UNIT_ID, 'WEB_GCS_' + js_common.fn_generateRandomString(3));
     }
 
     // Group Name
@@ -105,11 +112,11 @@ class CLocalStorage {
 
     // Display Mode
     fn_setDisplayMode(value) {
-        this._setValue('_vDisplayMode', value);
+        this._setValue(js_globals.LS_DISPLAY_MODE, value);
     }
 
     fn_getDisplayMode() {
-        return parseInt(this._getValue('_vDisplayMode', 0));
+        return parseInt(this._getValue(js_globals.LS_DISPLAY_MODE, 0));
     }
 
     // Metric System
@@ -123,20 +130,39 @@ class CLocalStorage {
 
     // Game Pad Mode
     fn_setGamePadMode(value) {
-        this._setValue('_vv_gamePadMode', value.toString());
+        this._setValue(js_globals.LS_GAME_PAD_MODE, value.toString());
     }
 
     fn_getGamePadMode() {
-        return parseInt(this._getValue('_vv_gamePadMode', '2'));
+        return parseInt(this._getValue(js_globals.LS_GAME_PAD_MODE, '2'));
+    }
+
+    fn_setGamePadConfig(config_index, value) {
+        this._setValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, value);
+    }
+
+
+    fn_getGamePadConfig(config_index) {
+        const value = js_localStorage._getValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, null);
+        return value;
+    }
+
+
+    fn_setGamePadConfigIndex(value) {
+        this._setValue(js_globals.LS_GAME_PAD_CONFIG_INDEX, value.toString());
+    }
+
+    fn_getGamePadConfigIndex() {
+        return parseInt(this._getValue(js_globals.LS_GAME_PAD_CONFIG_INDEX, '0'));
     }
 
     // Default Altitude
     fn_setDefaultAltitude(value) {
-        this._setValue('_vDefaultAltitude', value.toString());
+        this._setValue(js_globals.LS_DEFAULT_ALT, value.toString());
     }
 
     fn_getDefaultAltitude() {
-        return parseInt(this._getValue('_vDefaultAltitude', js_globals.CONST_DEFAULT_ALTITUDE.toString()));
+        return parseInt(this._getValue(js_globals.LS_DEFAULT_ALT, js_globals.CONST_DEFAULT_ALTITUDE.toString()));
     }
 
     // Default Radius
@@ -166,55 +192,46 @@ class CLocalStorage {
 
     // Speech Enabled
     fn_setSpeechEnabled(value) {
-        this._setValue('_vv_speechEnabled', value.toString());
+        this._setValue(js_globals.LS_ENABLE_SPEECH, value.toString());
     }
 
     fn_getSpeechEnabled() {
-        return this._getValue('_vv_speechEnabled', 'true') === 'true';
+        return this._getValue(js_globals.LS_ENABLE_SPEECH, 'true') === 'true';
     }
 
     // Volume
     fn_setVolume(value) {
-        this._setValue('_vDefaultVolume', value.toString());
+        this._setValue(js_globals.LS_DEFAULT_VOLUME, value.toString());
     }
 
     fn_getVolume() {
-        return parseInt(this._getValue('_vDefaultVolume', js_globals.CONST_DEFAULT_VOLUME.toString()));
+        return parseInt(this._getValue(js_globals.LS_DEFAULT_VOLUME, js_globals.CONST_DEFAULT_VOLUME.toString()));
     }
 
     // Tabs Display Enabled
     fn_setTabsDisplayEnabled(value) {
-        this._setValue('_vTabsDisplayEnabled', value.toString());
+        this._setValue(js_globals.LS_TAB_DISPLAY_ENABLED, value.toString());
     }
 
     fn_getTabsDisplayEnabled() {
-        return this._getValue('_vTabsDisplayEnabled', 'true') === 'true';
+        return this._getValue(js_globals.LS_TAB_DISPLAY_ENABLED, 'true') === 'true';
     }
 
     fn_setGCSShowMe(value) {
-        this._setValue('_vGCSShowMe', value.toString());
+        this._setValue(js_globals.LS_SHOW_ME_GCS, value.toString());
     }
 
     fn_getGCSShowMe() {
-        return this._getValue('_vGCSShowMe', 'true') === 'true';
+        return this._getValue(js_globals.LS_SHOW_ME_GCS, 'true') === 'true';
     }
 
     // Unit Sort Enabled
     fn_setUnitSortEnabled(value) {
-        this._setValue('_vUnitSortEnabled', value.toString());
+        this._setValue(js_globals.LS_UNIT_SORTED_ENABLED, value.toString());
     }
 
     fn_getUnitSortEnabled() {
-        return this._getValue('_vUnitSortEnabled', 'true') === 'true';
-    }
-
-    // Google Map Key
-    fn_setGoogleMapKey(value) {
-        this._setValue('_vGoogleMapKey', value);
-    }
-
-    fn_getGoogleMapKey() {
-        return this._getValue('_vGoogleMapKey', '');
+        return this._getValue(js_globals.LS_UNIT_SORTED_ENABLED, 'true') === 'true';
     }
 
     // Advanced Options Enabled

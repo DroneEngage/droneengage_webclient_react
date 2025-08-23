@@ -101,6 +101,7 @@ class GLOBALS {
 
 		// GamePad Functions Assignment
 		this.v_gamepad_function_array = ["undefined", "thr", "roll", "yaw", "pitch", "aux1", "aux2"];
+		this.v_gamepad_configuration = ["Config1", "Config2", "Config3", "Config4", "Config5"];
 
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';
@@ -121,7 +122,20 @@ class GLOBALS {
 			'#57FF33'  // Lighter Green
 		];
 
-		//////////////////////////////////
+		// LOCAL STORAGE
+		this.LS_UNIT_ID = '_vUnitID';
+		this.LS_ACCESS_CODE = '_vAccessCode';
+		this.LS_DISPLAY_MODE = '_vDisplayMode';
+		this.LS_GAME_PAD_MODE = 'gamepad_mode_';
+		this.LS_GAME_PAD_CONFIG_PREFIX = 'gamepad_config_';
+		this.LS_GAME_PAD_CONFIG_INDEX = '_vv_gamePadConfigIndex';
+		this.LS_DEFAULT_ALT = '_vDefaultAltitude';
+		this.LS_ENABLE_SPEECH = '_vv_speechEnabled';
+		this.LS_DEFAULT_VOLUME = '_vDefaultVolume';
+		this.LS_TAB_DISPLAY_ENABLED = '_vTabsDisplayEnabled';
+		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
+		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
+
 		//LOCAL EVENTS
 		this.EE_WS_OPEN                            	= "EVT_1";
 		this.EE_WS_CLOSE                           	= "EVT_2";
@@ -197,7 +211,8 @@ class GLOBALS {
 		this.EE_GamePad_Disconnected        		= "EVT_68";
 		this.EE_GamePad_Axes_Updated		 		= "EVT_69";
 		this.EE_GamePad_Button_Updated		 		= "EVT_70";
-
+		this.EE_GamePad_Config_Index_Changed		= "EVT_677";
+		
 
 		this.EE_displayStreamDlgForm        		= "EVT_71";
 		this.EE_hideStreamDlgForm           		= "EVT_72";
