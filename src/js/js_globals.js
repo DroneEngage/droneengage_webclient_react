@@ -99,6 +99,9 @@ class GLOBALS {
 		this.v_enable_gcs_display 		= false;
 		this.v_gamePadMode 				= 2;
 
+		// GamePad Functions Assignment
+		this.v_gamepad_function_array = ["undefined", "thr", "roll", "yaw", "pitch", "aux1", "aux2"];
+
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';
 
