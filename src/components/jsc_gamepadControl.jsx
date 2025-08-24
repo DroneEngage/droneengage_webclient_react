@@ -48,7 +48,7 @@ class ClssGamePadAxesControl extends React.Component {
     render()
     {
         const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
-        if (c_padStatus== null)
+        if ((c_padStatus== null))
         {
             return (
             <div className='gp_axes'>
@@ -57,12 +57,16 @@ class ClssGamePadAxesControl extends React.Component {
                 
             );
         }
-        let v_axis = [0,1,2,3];
-        
+        const c_mode = js_globals.m_gamepad_mode_index;
+        const v_axis = [js_globals.STICK_MODE_MAPPING[c_mode].RUD,
+                        js_globals.STICK_MODE_MAPPING[c_mode].THR,
+                        js_globals.STICK_MODE_MAPPING[c_mode].ALE,
+                        js_globals.STICK_MODE_MAPPING[c_mode].ELE];  // Stick Left Horiz, Stick Left Vert, Stick Right Horiz, Stick Right Vert
+        const labels = js_globals.STICK_MODE_MAPPING_NAMES[c_mode]
         return (
             <div className='gp_axes'>
-                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></ClssGamePadAxisControl>
-                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
             </div>
                 
         );
@@ -135,7 +139,6 @@ export default class ClssGamePadControl extends React.Component {
         {
             m_gamepad_index: this.props.p_index,
             m_andruavUnit: null,
-            m_mode: js_localStorage.fn_getGamePadMode(),
             'm_update': 0
         };
 
@@ -145,7 +148,9 @@ export default class ClssGamePadControl extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Disconnected,this, this.fn_gamePadDisconnected);
         js_eventEmitter.fn_subscribe(js_globals.EE_requestGamePad,this, this.fn_requestGamePad);
         js_eventEmitter.fn_subscribe(js_globals.EE_releaseGamePad,this, this.fn_releaseGamePad);
+        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Control_Update,this, this.fn_onChangeConfig);
     }
+
     
     fn_renderMainOutput(p_connected)
     {
@@ -182,15 +187,9 @@ export default class ClssGamePadControl extends React.Component {
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
-    fn_changeMode (p_mode)
+    fn_onChangeConfig (p_me)
     {
-        if (this.state.m_update === 0) return ;
-        if (isNaN(p_mode)) return ;
-
-        js_localStorage.fn_setGamePadMode(p_mode);
-        js_speak.fn_speak ('Game pad mode is set to ' + p_mode.toString());
-        
-        this.setState({'m_update': this.state.m_update +1});
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_changeConfig (p_config_index)
@@ -202,9 +201,10 @@ export default class ClssGamePadControl extends React.Component {
         
         this.m_config_index = p_config_index;
 
+        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);
+
         this.setState({'m_update': this.state.m_update +1});
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);
     }
 
     fn_changeGamePad(p_index)
@@ -253,6 +253,7 @@ export default class ClssGamePadControl extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Disconnected,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_requestGamePad,this);
         js_eventEmitter.fn_unsubscribe(js_globals.EE_releaseGamePad,this);
+        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Control_Update,this);
     }   
 
 
@@ -330,20 +331,10 @@ export default class ClssGamePadControl extends React.Component {
 					<div id="modal_gamepad_footer" className="form-group text-center localcontainer bg-dark">
                         <div className = "row">
                             <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
-                                {/* <button type="button" className="btn btn-sm btn-danger dropdown-btn text-nowrap">Mode {c_mode} </button> */}
-                                <div className="" role="group">
-                                    <button id="btnRXModeDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mode {c_mode}</button>
-                                    <div className="dropdown-menu" aria-labelledby="btnRXModeDrop">
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeMode(1)}>Mode 1</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeMode(2)}>Mode 2</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeMode(3)}>Mode 3</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeMode(4)}>Mode 4</a>
-                                    </div>
-                                </div>
+                                
                             </div>
-                            <div className="col-1 " />
+                            <div className="col-4 " />
                             <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
-                                {/* <button type="button" className="btn btn-sm btn-danger dropdown-btn text-nowrap">Mode {c_mode} </button> */}
                                 <div className="" role="group">
                                     <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Config {c_config_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">

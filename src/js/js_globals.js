@@ -99,11 +99,39 @@ class GLOBALS {
 		this.v_gamePadMode 				= 2;
 
 		// GamePad Functions Assignment
-		this.v_gamepad_function_array 			= ["undefined", "thr", "roll", "yaw", "pitch", "aux1", "aux2"];
+		this.v_gamepad_function_array 			= ["undefined", "THR", "ALE", "RUD", "ELE"];
 		this.v_gamepad_button_function_array 	= ["undefined", "arm", "RTL", "Land", "Auto", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
 		this.active_gamepad_index           	= 0;
 		this.v_total_gampad_buttons				= 12;
+		this.m_gamepad_mode_index 				= 0;
+		this.CONST_RUD_CHANNEL					= 0;
+		this.CONST_THR_CHANNEL					= 1;
+		this.CONST_ALE_CHANNEL					= 2;
+		this.CONST_ELE_CHANNEL					= 3;
+
+		this.STICK_LEFT_HORIZONTAL				= 0;						
+		this.STICK_LEFT_VERTICAL				= 1;
+		this.STICK_RIGHT_HORIZONTAL				= 2;
+		this.STICK_RIGHT_VERTICAL				= 3;
+
+		this.STICK_MODE_MAPPING					= 
+		[
+			{"RUD": 0, "ELE": 1, "ALE": 2, "THR":3},	// MODE 1
+			{"RUD": 0, "THR": 1, "ALE": 2, "ELE":3},    // MODE 2
+			{"ALE": 0, "ELE": 1, "RUD": 2, "THR":3},	// MODE 3
+			{"ALE": 0, "THR": 1, "RUD": 2, "ELE":3}		// MODE 4
+			
+		];
+		
+		this.STICK_MODE_MAPPING_NAMES					= 
+		[
+			["RUD", "ELE", "ALE", "THR"],    	// MODE 1
+			["RUD", "THR", "ALE", "ELE"],		// MODE 2
+			["ALE", "ELE", "RUD", "THR"],		// MODE 3
+			["ALE", "THR", "RUD", "ELE"]		// MODE 4
+			
+		];	
 
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';
@@ -214,6 +242,7 @@ class GLOBALS {
 		this.EE_GamePad_Axes_Updated		 		= "EVT_69";
 		this.EE_GamePad_Button_Updated		 		= "EVT_70";
 		this.EE_GamePad_Config_Index_Changed		= "EVT_677";
+		this.EE_GamePad_Control_Update				= "EVT_678";
 		
 
 		this.EE_displayStreamDlgForm        		= "EVT_71";

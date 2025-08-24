@@ -55,7 +55,15 @@ class CAndruavGamePad {
         this.v_controllers = {};
         this.v_animationFrameId = null; // Add a property to store the animation frame ID
 
+        /**
+         * m_channel_routing represents input source index - 
+         *                  where [0] contains the index of the input axis that streams data to STICK LEFT - HORIZONTAL
+         *                  where [1] contains the index of the input axis that streams data to STICK LEFT - VERTICAL
+         *                  where [2] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
+         *                  where [3] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
+         */
         this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
+        this.m_channel_axis_reverse = [1, 1, 1, 1, 1, 1, 1];
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         this.fn_extractGamePadConfigMapping();
 
@@ -68,6 +76,12 @@ class CAndruavGamePad {
         } else {
             setTimeout(this.fn_scangamepads, 500);
         }
+
+        window.addEventListener('storage', (event) => {
+        // Check if the event is related to the specific field you care about
+        if (event.key.includes ('gamepad_config')) {
+            js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);        }
+        });
         
     }
 
@@ -83,9 +97,22 @@ class CAndruavGamePad {
         return CAndruavGamePad.instance;
     }
 
+    /**
+     * Reads GamePad configurations from app storage and parses them.
+     * @returns 
+     */
     fn_extractGamePadConfigMapping()
     {
-        this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
+          
+            // Check if js_globals and STICK_MODE_MAPPING are defined
+    if (!js_globals || !js_globals.STICK_MODE_MAPPING) {
+        console.error("js_globals.STICK_MODE_MAPPING is not defined");
+        return false;
+    }
+
+    
+
+        this.m_channel_routing = [-1,-1,-1,-1]; // regardless of mode this maps sticks. ()
         this.m_channel_axis_reverse = [1, 1, 1, 1, 1, 1, 1];
         const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
         if (!config) return;
@@ -94,24 +121,27 @@ class CAndruavGamePad {
         {
             const function_mappings = json_config["functionMappings"];
             
+            js_globals.m_gamepad_mode_index = json_config.mode - 1;
             this.m_channel_axis_reverse = json_config.axisReversed;
             // yaw is always index 
-            const yaw = function_mappings.yaw
-            if (yaw) this.m_channel_routing[0] = yaw.index;
+            const yaw = function_mappings.RUD
+            if (yaw && yaw.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD] = yaw.index; // copy index of rudder gamepad input axis to Rudder Slot based on RX-MODE (1,2,3,4).
 
             // thr is always index 
-            const thr = function_mappings.thr
-            if (thr) this.m_channel_routing[1] = thr.index;
+            const thr = function_mappings.THR
+            if (thr && thr.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR] = thr.index; // copy index of THR gamepad input axis to THR Slot based on RX-MODE (1,2,3,4).
 
             // roll is always index 
-            const roll = function_mappings.roll
-            if (roll) this.m_channel_routing[2] = roll.index;
+            const roll = function_mappings.ALE
+            if (roll && roll.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE] = roll.index; // copy index of ALE gamepad input axis to ALE Slot based on RX-MODE (1,2,3,4).
 
             // pitch is always index 
-            const pitch = function_mappings.pitch;
-            if (pitch) this.m_channel_routing[3] = pitch.index;
+            const pitch = function_mappings.ELE;
+            if (pitch && pitch.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE] = pitch.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
 
+            // so m_channel_routing contains the input axis index that corresponds to each STICK in the remote based on RX-MODE and Function.
         }
+        
         return true;
     }
 
@@ -120,6 +150,7 @@ class CAndruavGamePad {
         console.log ("INDEX CHANGED");
         p_me.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         p_me.fn_extractGamePadConfigMapping();
+        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Control_Update);
     }
 
     fn_getGamePad(index) {
@@ -298,6 +329,12 @@ class CAndruavGamePad {
         
         if (c_padStatus.p_ctrl_type ===  GAME_GENERIC)
         {
+            /**
+             * RDR - 0 
+             * THR - 1
+             * ALE - 2
+             * ELE - 3
+             */
             const channel_routing = this.m_channel_routing;
             // Ensure axes and channel routing are valid
             if (!p_gamepad.axes || channel_routing[0] === undefined || channel_routing[1] === undefined ||
@@ -307,32 +344,32 @@ class CAndruavGamePad {
             
             
             // Rudder
-            let val = p_gamepad.axes[channel_routing[0]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[0]]; // Clamp and format
-            if (c_padStatus.p_axes[0] !== val) {
+            let val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.CONST_RUD_CHANNEL]]; // Clamp and format
+            if (c_padStatus.p_axes[js_globals.STICK_LEFT_HORIZONTAL] !== val) {
                 v_axesChanged = true;
-                c_padStatus.p_axes[0] = val;
+                c_padStatus.p_axes[js_globals.STICK_LEFT_HORIZONTAL] = val;
             }
             // Throttle
-            val = p_gamepad.axes[channel_routing[1]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[1]];
-            if (c_padStatus.p_axes[1] !== val) {
+            val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.CONST_THR_CHANNEL]];
+            if (c_padStatus.p_axes[js_globals.STICK_LEFT_VERTICAL] !== val) {
                 v_axesChanged = true;
-                c_padStatus.p_axes[1] = val;
+                c_padStatus.p_axes[js_globals.STICK_LEFT_VERTICAL] = val;
             }
-            // Roll Stick
-            val = p_gamepad.axes[channel_routing[2]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[2]];
-            if (c_padStatus.p_axes[2] !== val) {
+            // Aleron-Roll Stick
+            val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.CONST_ALE_CHANNEL]];
+            if (c_padStatus.p_axes[js_globals.STICK_RIGHT_HORIZONTAL] !== val) {
                 v_axesChanged = true;
-                c_padStatus.p_axes[2] = val;
+                c_padStatus.p_axes[js_globals.STICK_RIGHT_HORIZONTAL] = val;
             }
-            // Pitch Stick
-            val = p_gamepad.axes[channel_routing[3]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[3]];
-            if (c_padStatus.p_axes[3] !== val) {
+            // Elevator-Pitch Stick
+            val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.CONST_ELE_CHANNEL]];
+            if (c_padStatus.p_axes[js_globals.STICK_RIGHT_VERTICAL] !== val) {
                 v_axesChanged = true;
-                c_padStatus.p_axes[3] = val;
+                c_padStatus.p_axes[js_globals.STICK_RIGHT_VERTICAL] = val;
             }
 
 
