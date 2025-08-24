@@ -69,8 +69,7 @@ class GLOBALS {
 		this.CONST_MAX_MESSAGE_LOG         					= 100; 
 
 		this.v_displayMode                   				= 0;
-		this.active_gamepad_index            				= 0;
-
+		
 		// Metric System        
 		this.v_useMetricSystem               				= true;
 
@@ -100,8 +99,11 @@ class GLOBALS {
 		this.v_gamePadMode 				= 2;
 
 		// GamePad Functions Assignment
-		this.v_gamepad_function_array = ["undefined", "thr", "roll", "yaw", "pitch", "aux1", "aux2"];
-		this.v_gamepad_configuration = ["Config1", "Config2", "Config3", "Config4", "Config5"];
+		this.v_gamepad_function_array 			= ["undefined", "thr", "roll", "yaw", "pitch", "aux1", "aux2"];
+		this.v_gamepad_button_function_array 	= ["undefined", "arm", "RTL", "Land", "Auto", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
+		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
+		this.active_gamepad_index           	= 0;
+		this.v_total_gampad_buttons				= 12;
 
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';

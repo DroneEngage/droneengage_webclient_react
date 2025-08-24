@@ -13,13 +13,13 @@ export default class ClssGamepadTester extends React.Component {
       buttons: [],
       axisFunctions: [],
       buttonFunctions: [],
-      selectedConfig: 'Config1', // Default configuration
+      selectedConfig: '1',
       configPreferences: {
-        Config1: { axisMappings: {}, buttonMappings: {} },
-        Config2: { axisMappings: {}, buttonMappings: {} },
-        Config3: { axisMappings: {}, buttonMappings: {} },
-        Config4: { axisMappings: {}, buttonMappings: {} },
-        Config5: { axisMappings: {}, buttonMappings: {} },
+        "1": { functionMappings: {} },
+        "2": { functionMappings: {} },
+        "3": { functionMappings: {} },
+        "4": { functionMappings: {} },
+        "5": { functionMappings: {} },
       },
     };
   }
@@ -41,17 +41,18 @@ export default class ClssGamepadTester extends React.Component {
   }
 
   loadSavedConfigurations = () => {
-    
     const updatedConfigs = { ...this.state.configPreferences };
 
-    js_globals.v_gamepad_function_array.forEach(config => {
+    js_globals.v_gamepad_configuration.forEach(config => {
       const savedConfig = js_localStorage.fn_getGamePadConfig(config);
       if (savedConfig) {
         updatedConfigs[config] = JSON.parse(savedConfig);
       }
     });
 
-    this.setState({ configPreferences: updatedConfigs });
+    this.setState({ configPreferences: updatedConfigs }, () => {
+      this.checkGamepads();
+    });
   };
 
   saveConfiguration = () => {
@@ -61,22 +62,24 @@ export default class ClssGamepadTester extends React.Component {
 
   checkGamepads = () => {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
-    const connectedGamepads = gamepads.filter(gamepad => gamepad);
+    const connectedGamepads = Array.from(gamepads).filter(gamepad => gamepad);
     if (connectedGamepads.length > 0) {
       const firstGamepad = connectedGamepads[0];
       const newAxisFunctions = new Array(firstGamepad.axes.length).fill('undefined');
       const newButtonFunctions = new Array(firstGamepad.buttons.length).fill('undefined');
       const { selectedConfig, configPreferences } = this.state;
-      const currentConfig = configPreferences[selectedConfig];
+      const currentConfig = configPreferences[selectedConfig].functionMappings;
 
-      // Initialize with saved values from configPreferences, mapping indices to function names
-      firstGamepad.axes.forEach((_, i) => {
-        const savedIndex = currentConfig.axisMappings[`axis_${i}`];
-        newAxisFunctions[i] = savedIndex !== undefined ? js_globals.v_gamepad_function_array[savedIndex] || 'undefined' : 'undefined';
-      });
-      firstGamepad.buttons.forEach((_, i) => {
-        const savedIndex = currentConfig.buttonMappings[`button_${i}`];
-        newButtonFunctions[i] = savedIndex !== undefined ? js_globals.v_gamepad_function_array[savedIndex] || 'undefined' : 'undefined';
+      // Map saved function indices to axes/buttons
+      Object.entries(currentConfig).forEach(([functionName, mapping]) => {
+        const funcIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
+        if (funcIndex !== -1) {
+          if (mapping.type === 'axis') {
+            newAxisFunctions[mapping.index] = functionName;
+          } else if (mapping.type === 'button') {
+            newButtonFunctions[mapping.index] = functionName;
+          }
+        }
       });
 
       const newState = {
@@ -115,7 +118,8 @@ export default class ClssGamepadTester extends React.Component {
   handleConfigChange = (event) => {
     const newConfig = event.target.value;
     this.setState({ selectedConfig: newConfig }, () => {
-      this.checkGamepads(); // Reload configurations for the new selected config
+ inscrutable:
+      this.checkGamepads();
     });
   };
 
@@ -124,63 +128,97 @@ export default class ClssGamepadTester extends React.Component {
     this.setState(prevState => ({
       configPreferences: {
         ...prevState.configPreferences,
-        [selectedConfig]: { axisMappings: {}, buttonMappings: {} },
+        [selectedConfig]: { functionMappings: {} },
       },
       axisFunctions: prevState.axisFunctions.map(() => 'undefined'),
       buttonFunctions: prevState.buttonFunctions.map(() => 'undefined'),
     }), () => {
-      js_localStorage._removeValue(`gamepad_config_${selectedConfig}`);
+      js_localStorage._removeValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${selectedConfig}`);
       this.checkGamepads();
     });
   };
 
-  fn_assignFunctionToAxis = (axisIndex, functionIndex) => {
-    const newFunction = js_globals.v_gamepad_function_array[functionIndex];
+  fn_assignFunctionToAxis = (axisIndex, functionName) => {
+    const functionIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
+    if (functionIndex === -1) return;
+
     this.setState(prevState => {
       const newAxisFunctions = [...prevState.axisFunctions];
-      newAxisFunctions[axisIndex] = newFunction;
-      const newConfigPreferences = {
-        ...prevState.configPreferences,
-        [prevState.selectedConfig]: {
-          ...prevState.configPreferences[prevState.selectedConfig],
-          axisMappings: {
-            ...prevState.configPreferences[prevState.selectedConfig].axisMappings,
-            [`axis_${axisIndex}`]: functionIndex, // Store index instead of function name
-          },
-        },
-      };
+      const prevFunction = prevState.axisFunctions[axisIndex];
+      newAxisFunctions[axisIndex] = functionName;
+      const newConfigPreferences = { ...prevState.configPreferences };
+      const currentMappings = { ...newConfigPreferences[prevState.selectedConfig].functionMappings };
+
+      // Remove any existing mapping for this function
+      Object.keys(currentMappings).forEach(key => {
+        if (key === functionName) {
+          delete currentMappings[key];
+        }
+      });
+
+      // Remove any existing mapping for this axis
+      Object.keys(currentMappings).forEach(key => {
+        if (currentMappings[key].type === 'axis' && currentMappings[key].index === axisIndex) {
+          delete currentMappings[key];
+        }
+      });
+
+      // Add new mapping if not undefined
+      if (functionName !== 'undefined') {
+        currentMappings[functionName] = { type: 'axis', index: axisIndex };
+      }
+
+      newConfigPreferences[prevState.selectedConfig].functionMappings = currentMappings;
+
       return { axisFunctions: newAxisFunctions, configPreferences: newConfigPreferences };
     }, () => {
       this.saveConfiguration();
-      console.log(`Assigning function ${newFunction} (index ${functionIndex}) to axis ${axisIndex} in ${this.state.selectedConfig}`);
+      console.log(`Assigning function ${functionName} to axis ${axisIndex} in ${this.state.selectedConfig}`);
     });
   };
 
-  fn_assignFunctionToButton = (buttonIndex, functionIndex) => {
-    const newFunction = js_globals.v_gamepad_function_array[functionIndex];
+  fn_assignFunctionToButton = (buttonIndex, functionName) => {
+    const functionIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
+    if (functionIndex === -1) return;
+
     this.setState(prevState => {
       const newButtonFunctions = [...prevState.buttonFunctions];
-      newButtonFunctions[buttonIndex] = newFunction;
-      const newConfigPreferences = {
-        ...prevState.configPreferences,
-        [prevState.selectedConfig]: {
-          ...prevState.configPreferences[prevState.selectedConfig],
-          buttonMappings: {
-            ...prevState.configPreferences[prevState.selectedConfig].buttonMappings,
-            [`button_${buttonIndex}`]: functionIndex, // Store index instead of function name
-          },
-        },
-      };
+      const prevFunction = prevState.buttonFunctions[buttonIndex];
+      newButtonFunctions[buttonIndex] = functionName;
+      const newConfigPreferences = { ...prevState.configPreferences };
+      const currentMappings = { ...newConfigPreferences[prevState.selectedConfig].functionMappings };
+
+      // Remove any existing mapping for this function
+      Object.keys(currentMappings).forEach(key => {
+        if (key === functionName) {
+          delete currentMappings[key];
+        }
+      });
+
+      // Remove any existing mapping for this button
+      Object.keys(currentMappings).forEach(key => {
+        if (currentMappings[key].type === 'button' && currentMappings[key].index === buttonIndex) {
+          delete currentMappings[key];
+        }
+      });
+
+      // Add new mapping if not undefined
+      if (functionName !== 'undefined') {
+        currentMappings[functionName] = { type: 'button', index: buttonIndex };
+      }
+
+      newConfigPreferences[prevState.selectedConfig].functionMappings = currentMappings;
+
       return { buttonFunctions: newButtonFunctions, configPreferences: newConfigPreferences };
     }, () => {
       this.saveConfiguration();
-      console.log(`Assigning function ${newFunction} (index ${functionIndex}) to button ${buttonIndex} in ${this.state.selectedConfig}`);
+      console.log(`Assigning function ${functionName} to button ${buttonIndex} in ${this.state.selectedConfig}`);
     });
   };
 
   render() {
     const { gamepads, axes, buttons, axisFunctions, buttonFunctions, selectedConfig } = this.state;
-    const fadeDuration = 1000; // Fade out duration in milliseconds (1 second)
+    const fadeDuration = 1000;
     const currentTime = new Date().getTime();
     
     return (
@@ -227,7 +265,7 @@ export default class ClssGamepadTester extends React.Component {
                         <span style={{ ...colorStyle, marginRight: '10px' }}>Axis {i}: {value}</span>
                         <select
                           value={axisFunctions[i] || 'undefined'}
-                          onChange={(e) => this.fn_assignFunctionToAxis(i, js_globals.v_gamepad_function_array.indexOf(e.target.value))}
+                          onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
                           className={`form-control ${axisFunctions[i] === 'undefined' ? '' : 'bg-warning text-dark'}`}
                           style={{ marginRight: '10px', width: '150px' }}
                         >
@@ -256,11 +294,11 @@ export default class ClssGamepadTester extends React.Component {
                         <span style={{ ...colorStyle, marginRight: '10px' }}>Button {i}: {value}</span>
                         <select
                           value={buttonFunctions[i] || 'undefined'}
-                          onChange={(e) => this.fn_assignFunctionToButton(i, js_globals.v_gamepad_function_array.indexOf(e.target.value))}
+                          onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}
                           className={`form-control ${buttonFunctions[i] === 'undefined' ? '' : 'bg-warning text-dark'}`}
                           style={{ marginRight: '10px' }}
                         >
-                          {js_globals.v_gamepad_function_array.map((func, idx) => (
+                          {js_globals.v_gamepad_button_function_array.map((func, idx) => (
                             <option key={idx} value={func}>
                               {func}
                             </option>

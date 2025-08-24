@@ -37,7 +37,7 @@ class fn_Obj_padStatus {
 
     this.p_vibration = false;
 
-    for (let i = 0; i < 6; ++ i) {
+    for (let i = 0; i < js_globals.v_total_gampad_buttons; ++ i) {
         let v_obj = {};
         v_obj.m_pressed = false;
         v_obj.m_timestamp = 0;
@@ -55,8 +55,10 @@ class CAndruavGamePad {
         this.v_controllers = {};
         this.v_animationFrameId = null; // Add a property to store the animation frame ID
 
+        this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
-        
+        this.fn_extractGamePadConfigMapping();
+
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Config_Index_Changed,this, this.fn_gamePadConfigChanged);
 
         if (this.c_haveEvents) {
@@ -66,7 +68,7 @@ class CAndruavGamePad {
         } else {
             setTimeout(this.fn_scangamepads, 500);
         }
-
+        
     }
 
     componentWillUnmount ()
@@ -81,11 +83,46 @@ class CAndruavGamePad {
         return CAndruavGamePad.instance;
     }
 
+    fn_extractGamePadConfigMapping()
+    {
+        this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
+    
+        const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
+        if (!config) return;
+        const json_config = JSON.parse(config);
+        if (json_config["functionMappings"])
+        {
+            const function_mappings = json_config["functionMappings"];
+            
+            // yaw is always index 
+            const yaw = function_mappings.yaw
+            if (!yaw)  this.m_yaw = - 1
+            this.m_channel_routing[0] = yaw.index;
+
+            // thr is always index 
+            const thr = function_mappings.thr
+            if (!thr)  this.m_thr = - 1
+            this.m_channel_routing[1] = thr.index;
+
+            // roll is always index 
+            const roll = function_mappings.roll
+            if (roll)  
+            this.m_channel_routing[2] = roll.index;
+
+            // pitch is always index 
+            const pitch = function_mappings.pitch;
+            if (pitch) this.m_pitch = - 1
+            this.m_channel_routing[3] = pitch.index;
+
+        }
+        return true;
+    }
+
     fn_gamePadConfigChanged(p_me)
     {
         console.log ("INDEX CHANGED");
-        this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
-        
+        p_me.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
+        p_me.fn_extractGamePadConfigMapping();
     }
 
     fn_getGamePad(index) {
@@ -263,6 +300,66 @@ class CAndruavGamePad {
         
         if (c_padStatus.p_ctrl_type ===  GAME_GENERIC)
         {
+            const channel_routing = this.m_channel_routing;
+            // Rudder
+            let val = (p_gamepad.axes[channel_routing[0]]).toFixed(2);
+            if (val>1) val = 1;
+            if (val<-1) val = -1;
+            if (c_padStatus.p_axes[0] !== val) {
+                v_axesChanged = true;
+                c_padStatus.p_axes[0] = val;
+                
+            }
+            // Throttlr
+            val = (p_gamepad.axes[channel_routing[1]]).toFixed(2);
+            if (val>1) val = 1;
+            if (val<-1) val = -1;
+            if (c_padStatus.p_axes[1] !== val) {
+                v_axesChanged = true;
+                c_padStatus.p_axes[1] = val;
+                
+            }
+
+            // ROLL STCK
+            val = (p_gamepad.axes[channel_routing[2]]).toFixed(2);
+            if (val>1) val = 1;
+            if (val<-1) val = -1;
+            if (c_padStatus.p_axes[2] !== val) {
+                v_axesChanged = true;
+                c_padStatus.p_axes[2] = val;
+                
+            }
+            // PITCH STICK
+            val = (p_gamepad.axes[channel_routing[3]]).toFixed(2);
+            if (val>1) val = 1;
+            if (val<-1) val = -1;
+            if (c_padStatus.p_axes[3] !== val) {
+                v_axesChanged = true;
+                c_padStatus.p_axes[3] = val;
+                
+            }
+
+
+            if ((v_axesChanged === true) ) {
+                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Axes_Updated);
+                this.v_lastUpdateSent = c_now;
+            }
+
+
+            let v_buttonChanged = false;
+
+
+            c_padStatus.p_buttons[0].m_pressed = true; // p_gamepad.buttons[i].pressed;
+            c_padStatus.p_buttons[0].m_timestamp = Date.now();
+            c_padStatus.p_buttons[0].m_longPress = false;
+            v_buttonChanged = true;
+            
+            if (v_buttonChanged === true) {
+                let v_Packet = {};
+                v_Packet.p_buttonIndex = 0;
+                v_Packet.p_buttons = c_padStatus.p_buttons;
+                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
+            }
 
         }
         else if (c_padStatus.p_ctrl_type === GAME_PAD_WAILLY_PPM)

@@ -1,4 +1,8 @@
-import '../css/bootstrap.min.css';  // my theme
+import '../css/bootstrap.min.css'; 
+import '../css/bootstrap-icons/font/bootstrap-icons.css'
+import '../css/css_styles.css';
+import '../css/css_styles2.css';
+import '../css/css_gamepad.css';
 
 import React , { useEffect } from 'react';
 
@@ -7,8 +11,14 @@ import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssGamepadTester from "../components/jsc_gamepadTester"
 
+import {fn_on_ready} from '../js/js_gamepad_tester'
+
 const GamePadTesterPage = () => {
-     return (
+    useEffect(() => {
+        fn_on_ready();
+        });
+       
+    return (
         <div>
 		<div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
 			<ClssHeaderControl no_login no_layout_ctrl/>

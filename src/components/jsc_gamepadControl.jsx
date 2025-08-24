@@ -59,24 +59,6 @@ class ClssGamePadAxesControl extends React.Component {
         }
         let v_axis = [0,1,2,3];
         
-        // KEEP GUI as Sticks ... dont change it that is why we comment below code
-        // switch(js_localStorage.fn_getGamePadMode())
-        // {
-        //     case 1:
-        //         v_axis = [0,3,2,1];
-        //         break;
-        //     case 2:
-        //         v_axis = [0,1,2,3];
-        //         break;
-        //     case 3:
-        //         v_axis = [2,3,0,1];
-        //         break;
-        //     case 4:
-        //         v_axis = [2,1,0,3];
-        //         break;
-                            
-        // }
-
         return (
             <div className='gp_axes'>
                 <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]}></ClssGamePadAxisControl>
@@ -126,12 +108,17 @@ class ClssGamePadButtonControl extends React.Component {
 
         return (
             <div className='gp_buttons'>
-                <ClssGamePadButton id='btn4' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn0' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn1' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn2' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn3' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn0' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn1' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn2' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn3' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn4' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
                 <ClssGamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn6' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[6].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn7' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[7].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn8' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[8].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn9' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[9].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn10' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[10].m_pressed}></ClssGamePadButton>
             </div>
         );
     }
@@ -151,6 +138,9 @@ export default class ClssGamePadControl extends React.Component {
             m_mode: js_localStorage.fn_getGamePadMode(),
             'm_update': 0
         };
+
+        this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
+
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Connected,this, this.fn_gamePadConnected);
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Disconnected,this, this.fn_gamePadDisconnected);
         js_eventEmitter.fn_subscribe(js_globals.EE_requestGamePad,this, this.fn_requestGamePad);
@@ -201,6 +191,20 @@ export default class ClssGamePadControl extends React.Component {
         js_speak.fn_speak ('Game pad mode is set to ' + p_mode.toString());
         
         this.setState({'m_update': this.state.m_update +1});
+    }
+
+    fn_changeConfig (p_config_index)
+    {
+        if (this.state.m_update === 0) return ;
+        if (isNaN(p_config_index)) return ;
+
+        js_localStorage.fn_setGamePadConfigIndex(p_config_index);
+        
+        this.m_config_index = p_config_index;
+
+        this.setState({'m_update': this.state.m_update +1});
+
+        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);
     }
 
     fn_changeGamePad(p_index)
@@ -276,16 +280,21 @@ export default class ClssGamePadControl extends React.Component {
                 $('#modal_ctrl_gamepad').attr('opacity', null);
             }
         });
-        $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
-            fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr('partyID'));
-        });
+        
         this.state.m_update = 1;
     }
 
+    fn_gotoUnitPressed()
+    {
+        if (this.state.m_update === 0) return ;
+        fn_gotoUnit_byPartyID(this.state.m_andruavUnit.partyID);
+    
+    }
     
     render()
     {
         const c_mode = js_localStorage.fn_getGamePadMode();
+        const c_config_index = js_localStorage.fn_getGamePadConfigIndex();
     
         this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
         
@@ -301,14 +310,7 @@ export default class ClssGamePadControl extends React.Component {
             {
                 function add (Me,p_index)
                 {
-                    /*
-                    As per AI
-                    I should use 
-                    gamepads.push(
-                    <button key={'gppu'+gamepad.id} className="dropdown-item" onClick={(e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</button>
-                    );
-                    */
-                    gamepads.push(
+                   gamepads.push(
                         <a key={'gppu'+gamepad.id} className="dropdown-item" href="#" onClick={ (e) => Me.fn_changeGamePad(p_index)}>{gamepad.id}</a>
                     );
                 };
@@ -327,14 +329,7 @@ export default class ClssGamePadControl extends React.Component {
                     {this.m_output}
 					<div id="modal_gamepad_footer" className="form-group text-center localcontainer bg-dark">
                         <div className = "row">
-                            <div className = "col-2">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
-                            </div>    
-                            <div className = "col-2">
-                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success">Goto</button>
-                            </div>
-                            
-                            <div className="col-4 " role="group" aria-label="Button group with nested dropdown">
+                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
                                 {/* <button type="button" className="btn btn-sm btn-danger dropdown-btn text-nowrap">Mode {c_mode} </button> */}
                                 <div className="" role="group">
                                     <button id="btnRXModeDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mode {c_mode}</button>
@@ -346,15 +341,37 @@ export default class ClssGamePadControl extends React.Component {
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="col-4 " role="group" aria-label="Button group with nested dropdown">
+                            <div className="col-1 " />
+                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
+                                {/* <button type="button" className="btn btn-sm btn-danger dropdown-btn text-nowrap">Mode {c_mode} </button> */}
+                                <div className="" role="group">
+                                    <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Config {c_config_index}</button>
+                                    <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(1)}>Config 1</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(2)}>Config 2</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(3)}>Config 3</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(4)}>Config 4</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-1 " />
+                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
                                 {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
                                 <div className="" role="group">
-                                    <button id="btnGamePadDrop" key={js_globals.active_gamepad_index} type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">GamePad {js_globals.active_gamepad_index}</button>
+                                    <button id="btnGamePadDrop" key={js_globals.active_gamepad_index} type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">G-Pad {js_globals.active_gamepad_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnGamePadDrop">
                                         {gamepads}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div className = "row">
+                            <div className = "col-2">
+                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
+                            </div>    
+                            <div className = "col-6"></div>
+                            <div className = "col-2">
+                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_gotoUnitPressed()}>Goto</button>
                             </div>
                         </div>
                     </div>
