@@ -86,7 +86,7 @@ class CAndruavGamePad {
     fn_extractGamePadConfigMapping()
     {
         this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
-    
+        this.m_channel_axis_reverse = [1, 1, 1, 1, 1, 1, 1];
         const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
         if (!config) return;
         const json_config = JSON.parse(config);
@@ -94,25 +94,22 @@ class CAndruavGamePad {
         {
             const function_mappings = json_config["functionMappings"];
             
+            this.m_channel_axis_reverse = json_config.axisReversed;
             // yaw is always index 
             const yaw = function_mappings.yaw
-            if (!yaw)  this.m_yaw = - 1
-            this.m_channel_routing[0] = yaw.index;
+            if (yaw) this.m_channel_routing[0] = yaw.index;
 
             // thr is always index 
             const thr = function_mappings.thr
-            if (!thr)  this.m_thr = - 1
-            this.m_channel_routing[1] = thr.index;
+            if (thr) this.m_channel_routing[1] = thr.index;
 
             // roll is always index 
             const roll = function_mappings.roll
-            if (roll)  
-            this.m_channel_routing[2] = roll.index;
+            if (roll) this.m_channel_routing[2] = roll.index;
 
             // pitch is always index 
             const pitch = function_mappings.pitch;
-            if (pitch) this.m_pitch = - 1
-            this.m_channel_routing[3] = pitch.index;
+            if (pitch) this.m_channel_routing[3] = pitch.index;
 
         }
         return true;
@@ -295,48 +292,47 @@ class CAndruavGamePad {
         const c_padStatus = this.v_controllers[p_gamepad.index];
         c_padStatus.p_connected = true;
 
+        
         let v_axesChanged = false;
         const c_now = Date.now();
         
         if (c_padStatus.p_ctrl_type ===  GAME_GENERIC)
         {
             const channel_routing = this.m_channel_routing;
+            // Ensure axes and channel routing are valid
+            if (!p_gamepad.axes || channel_routing[0] === undefined || channel_routing[1] === undefined ||
+                channel_routing[2] === undefined || channel_routing[3] === undefined) {
+                return; // Skip processing if axes or routing is invalid
+            }
+            
+            
             // Rudder
-            let val = (p_gamepad.axes[channel_routing[0]]).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
+            let val = p_gamepad.axes[channel_routing[0]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[0]]; // Clamp and format
             if (c_padStatus.p_axes[0] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[0] = val;
-                
             }
-            // Throttlr
-            val = (p_gamepad.axes[channel_routing[1]]).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
+            // Throttle
+            val = p_gamepad.axes[channel_routing[1]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[1]];
             if (c_padStatus.p_axes[1] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[1] = val;
-                
             }
-
-            // ROLL STCK
-            val = (p_gamepad.axes[channel_routing[2]]).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
+            // Roll Stick
+            val = p_gamepad.axes[channel_routing[2]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[2]];
             if (c_padStatus.p_axes[2] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[2] = val;
-                
             }
-            // PITCH STICK
-            val = (p_gamepad.axes[channel_routing[3]]).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
+            // Pitch Stick
+            val = p_gamepad.axes[channel_routing[3]];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[3]];
             if (c_padStatus.p_axes[3] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[3] = val;
-                
             }
 
 

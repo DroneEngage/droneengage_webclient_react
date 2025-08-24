@@ -15,11 +15,11 @@ export default class ClssGamepadTester extends React.Component {
       buttonFunctions: [],
       selectedConfig: '1',
       configPreferences: {
-        "1": { functionMappings: {} },
-        "2": { functionMappings: {} },
-        "3": { functionMappings: {} },
-        "4": { functionMappings: {} },
-        "5": { functionMappings: {} },
+        "1": { functionMappings: {}, axisReversed: [] },
+        "2": { functionMappings: {}, axisReversed: [] },
+        "3": { functionMappings: {}, axisReversed: [] },
+        "4": { functionMappings: {}, axisReversed: [] },
+        "5": { functionMappings: {}, axisReversed: [] },
       },
     };
   }
@@ -69,22 +69,27 @@ export default class ClssGamepadTester extends React.Component {
       const newButtonFunctions = new Array(firstGamepad.buttons.length).fill('undefined');
       const { selectedConfig, configPreferences } = this.state;
       const currentConfig = configPreferences[selectedConfig].functionMappings;
+      const axisReversed = configPreferences[selectedConfig].axisReversed || [];
 
       // Map saved function indices to axes/buttons
       Object.entries(currentConfig).forEach(([functionName, mapping]) => {
-        const funcIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
-        if (funcIndex !== -1) {
-          if (mapping.type === 'axis') {
-            newAxisFunctions[mapping.index] = functionName;
-          } else if (mapping.type === 'button') {
-            newButtonFunctions[mapping.index] = functionName;
-          }
+        const isAxisFunction = js_globals.v_gamepad_function_array.includes(functionName);
+        const isButtonFunction = js_globals.v_gamepad_button_function_array.includes(functionName);
+        if (isAxisFunction && mapping.type === 'axis') {
+          newAxisFunctions[mapping.index] = functionName;
+        } else if (isButtonFunction && mapping.type === 'button') {
+          newButtonFunctions[mapping.index] = functionName;
         }
       });
 
+      // Apply axis reversal (1 for normal, -1 for reversed)
+      const transformedAxes = firstGamepad.axes.map((value, i) => 
+        (value * (axisReversed[i] !== undefined ? axisReversed[i] : 1)).toFixed(4)
+      );
+
       const newState = {
         gamepads: connectedGamepads,
-        axes: firstGamepad.axes.map(value => value.toFixed(4)),
+        axes: transformedAxes,
         buttons: firstGamepad.buttons.map(button => button.value.toFixed(2)),
         axisFunctions: newAxisFunctions,
         buttonFunctions: newButtonFunctions,
@@ -93,7 +98,8 @@ export default class ClssGamepadTester extends React.Component {
       // Check for changes and update last update times
       firstGamepad.axes.forEach((value, i) => {
         const prevValue = this.state.axes[i];
-        if (prevValue !== value.toFixed(4)) {
+        const transformedValue = (value * (axisReversed[i] !== undefined ? axisReversed[i] : 1)).toFixed(4);
+        if (prevValue !== transformedValue) {
           this.setState({ [`axisLastUpdate_${i}`]: new Date().getTime() });
         }
       });
@@ -118,7 +124,6 @@ export default class ClssGamepadTester extends React.Component {
   handleConfigChange = (event) => {
     const newConfig = event.target.value;
     this.setState({ selectedConfig: newConfig }, () => {
- inscrutable:
       this.checkGamepads();
     });
   };
@@ -128,7 +133,7 @@ export default class ClssGamepadTester extends React.Component {
     this.setState(prevState => ({
       configPreferences: {
         ...prevState.configPreferences,
-        [selectedConfig]: { functionMappings: {} },
+        [selectedConfig]: { functionMappings: {}, axisReversed: [] },
       },
       axisFunctions: prevState.axisFunctions.map(() => 'undefined'),
       buttonFunctions: prevState.buttonFunctions.map(() => 'undefined'),
@@ -138,13 +143,44 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
+  toggleAxisReverse = (axisIndex) => {
+    this.setState(prevState => {
+      // 1. Create a copy of configPreferences to avoid mutating state directly
+      const newConfigPreferences = { ...prevState.configPreferences };
+      // 2. Copy the config for the current selectedConfig
+      const currentConfig = { ...newConfigPreferences[prevState.selectedConfig] };
+      // 3. Copy the axisReversed array, defaulting to empty if undefined
+      const axisReversed = [...(currentConfig.axisReversed || [])];
+      
+      // 4. Toggle the value at axisIndex between 1 (normal) and -1 (reversed)
+      axisReversed[axisIndex] = axisReversed[axisIndex] === -1 ? 1 : -1;
+      // Ensure all indices are populated with 1 if null or undefined
+      const maxAxisIndex = prevState.gamepads[0]?.axes.length || axisReversed.length;
+      for (let i = 0; i < maxAxisIndex; i++) {
+        if (axisReversed[i] === null || axisReversed[i] === undefined) {
+          axisReversed[i] = 1;
+        }
+      }
+      // 5. Update the currentConfig with the new axisReversed array
+      currentConfig.axisReversed = axisReversed;
+      // 6. Update newConfigPreferences with the modified currentConfig
+      newConfigPreferences[prevState.selectedConfig] = currentConfig;
+
+      // 7. Return the new state to update
+      return { configPreferences: newConfigPreferences };
+    }, () => {
+      this.saveConfiguration();
+      this.checkGamepads();
+      console.log(`Toggled reverse for axis ${axisIndex} to ${this.state.configPreferences[this.state.selectedConfig].axisReversed[axisIndex]} in ${this.state.selectedConfig}`);
+    });
+  };
+
   fn_assignFunctionToAxis = (axisIndex, functionName) => {
     const functionIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
-    if (functionIndex === -1) return;
+    if (functionIndex === -1 && functionName !== 'undefined') return;
 
     this.setState(prevState => {
       const newAxisFunctions = [...prevState.axisFunctions];
-      const prevFunction = prevState.axisFunctions[axisIndex];
       newAxisFunctions[axisIndex] = functionName;
       const newConfigPreferences = { ...prevState.configPreferences };
       const currentMappings = { ...newConfigPreferences[prevState.selectedConfig].functionMappings };
@@ -178,12 +214,11 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   fn_assignFunctionToButton = (buttonIndex, functionName) => {
-    const functionIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
-    if (functionIndex === -1) return;
+    const functionIndex = js_globals.v_gamepad_button_function_array.indexOf(functionName);
+    if (functionIndex === -1 && functionName !== 'undefined') return;
 
     this.setState(prevState => {
       const newButtonFunctions = [...prevState.buttonFunctions];
-      const prevFunction = prevState.buttonFunctions[buttonIndex];
       newButtonFunctions[buttonIndex] = functionName;
       const newConfigPreferences = { ...prevState.configPreferences };
       const currentMappings = { ...newConfigPreferences[prevState.selectedConfig].functionMappings };
@@ -217,7 +252,7 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   render() {
-    const { gamepads, axes, buttons, axisFunctions, buttonFunctions, selectedConfig } = this.state;
+    const { gamepads, axes, buttons, axisFunctions, buttonFunctions, selectedConfig, configPreferences } = this.state;
     const fadeDuration = 1000;
     const currentTime = new Date().getTime();
     
@@ -259,6 +294,7 @@ export default class ClssGamepadTester extends React.Component {
                       color: opacity > 0 ? `rgba(255, 0, 0, ${opacity})` : 'inherit',
                       transition: 'color 0.5s ease-out',
                     };
+                    const isReversed = (configPreferences[selectedConfig].axisReversed?.[i] || 1) === -1;
 
                     return (
                       <div key={i} className="axis-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
@@ -275,6 +311,14 @@ export default class ClssGamepadTester extends React.Component {
                             </option>
                           ))}
                         </select>
+                        <label style={{ marginRight: '10px' }}>
+                          <input
+                            type="checkbox"
+                            checked={isReversed}
+                            onChange={() => this.toggleAxisReverse(i)}
+                          />
+                          Reverse
+                        </label>
                       </div>
                     );
                   })}
