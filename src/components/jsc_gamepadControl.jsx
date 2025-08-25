@@ -325,16 +325,12 @@ export default class ClssGamePadControl extends React.Component {
             gamepad_title = v_controller.id.toString();
         }
 
-        return (<div id="modal_ctrl_gamepad" title="GamePad Control" className="localcontainer css_ontop">
+        return (<div id="modal_ctrl_gamepad" title="GamePad Control" className=" css_ontop">
                     <h4 id="title" className="modal-title text-warning">GamePad of {v_title} </h4>
                     {this.m_output}
-					<div id="modal_gamepad_footer" className="form-group text-center localcontainer bg-dark">
-                        <div className = "row">
-                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
-                                
-                            </div>
-                            <div className="col-4 " />
-                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
+					<div id="modal_gamepad_footer" className="form-group bg-dark  p-1">
+                        <div className='row'>
+                            <div className="col-2 " role="group" aria-label="Button group with nested dropdown">
                                 <div className="" role="group">
                                     <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Config {c_config_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
@@ -345,8 +341,8 @@ export default class ClssGamePadControl extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-1 " />
-                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
+                            <div className="col-7 " />
+                            <div className="col-1 " role="group" aria-label="Button group with nested dropdown">
                                 {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
                                 <div className="" role="group">
                                     <button id="btnGamePadDrop" key={js_globals.active_gamepad_index} type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">G-Pad {js_globals.active_gamepad_index}</button>
@@ -356,12 +352,12 @@ export default class ClssGamePadControl extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className = "row">
+                        <div className = "row mt-1">
                             <div className = "col-2">
                                 <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                             </div>    
-                            <div className = "col-6"></div>
-                            <div className = "col-2">
+                            <div className = "col-8"></div>
+                            <div className = "col-1 ps-1">
                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_gotoUnitPressed()}>Goto</button>
                             </div>
                         </div>
