@@ -37,7 +37,7 @@ class ClssPreferences extends React.Component {
     this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
     this.m_tabsDisplayeRef.current.checked = js_localStorage.fn_getTabsDisplayEnabled();
     this.m_unitSortRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
-    this.m_advancedRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
+    this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
   }
