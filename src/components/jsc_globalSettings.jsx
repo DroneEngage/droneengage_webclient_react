@@ -13,6 +13,234 @@ import {js_andruavAuth} from '../js/js_andruavAuth';
 import {ClssFireEvent} from  './micro_gadgets/jsc_mctrl_fire_event.jsx';
 import {setSelectedMissionFilePathToWrite} from '../js/js_main.js'
 
+class ClssDefault extends React.Component {
+  constructor()
+	{
+      super ();
+
+      this.state = {
+        m_unitText: 'm',
+        CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE,
+        CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS,
+        'm_update': 0,
+      };
+
+      this.key = Math.random().toString();
+    
+      this.altitudeInputRef = React.createRef(); 
+      this.radiusInputRef = React.createRef(); 
+
+      this.horizontal_distance = React.createRef(); 
+      this.vertical_distance = React.createRef(); 
+
+
+      if (js_localStorage.fn_getMetricSystem() === true) {
+        this.state.m_unitText = 'm';
+      } else {
+        this.state.m_unitText = 'ft';
+      }
+
+      this.state.CONST_DEFAULT_ALTITUDE = js_localStorage.fn_getDefaultAltitude();
+      this.state.CONST_DEFAULT_RADIUS = js_localStorage.fn_getDefaultRadius();
+
+      this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = js_localStorage.fn_getDefaultSwarmHorizontalDistance();
+      this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = js_localStorage.fn_getDefaultSwarmVerticalDistance();
+
+      js_eventEmitter.fn_subscribe(js_globals.EE_onAdvancedMode,this,this.fn_advancedMode);
+          
+  }
+
+
+  componentDidMount () 
+  {
+    this.state.m_update = 1;
+  }
+
+    
+  componentWillUnmount () 
+  {
+    js_eventEmitter.fn_unsubscribe(js_globals.EE_onAdvancedMode,this);
+  }
+
+
+  fn_advancedMode (p_me)
+  {
+    if (p_me.state.m_update === 0) return ;
+    p_me.setState({'m_update': p_me.state.m_update +1});
+  }
+    
+
+  onChange(e) {
+    const altitudeValue = parseInt(this.altitudeInputRef.current.value);
+    const radiusValue = parseInt(this.radiusInputRef.current.value);
+
+    js_globals.CONST_DEFAULT_ALTITUDE = altitudeValue;
+    js_globals.CONST_DEFAULT_RADIUS = radiusValue;
+
+    if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min)
+      js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
+    if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)
+      js_globals.CONST_DEFAULT_RADIUS = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
+
+    js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
+    js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
+  
+    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
+    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
+  }
+
+
+  onChangeSwarm(e) {
+    const swarm_horizontal_value = parseInt(this.horizontal_distance.current.value);
+    const swarm_virtual_value = parseInt(this.vertical_distance.current.value);
+
+    js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = swarm_horizontal_value;
+    js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = swarm_virtual_value;
+
+    if (js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE < js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN)
+      js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = parseInt(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN);
+    
+    if (js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE < js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN)
+      js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = parseInt(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN);
+
+    js_localStorage.fn_setDefaultSwarmHorizontalDistance(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE);
+    js_localStorage.fn_setDefaultSwarmVerticalDistance(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
+  
+    this.setState({ CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE });
+    this.setState({ CONST_DEFAULT_SWARM_VERTICAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE });
+  }
+
+  render()
+  {
+    let v_gadgets = [];
+    v_gadgets.push(
+      <div key={this.key + '1'} className="row  me-0 ms-0">
+        <div className="col-xs-6 col-sm-6 col-lg-6">
+          <div className="form-inline">
+            <div className="form-group">
+              <div title='Default altitude for climb command.'>
+                <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width">
+                  <small>Alt&nbsp;Step&nbsp;&nbsp;</small>
+                </label>
+                <input
+                  id="txt_defaultAltitude"
+                  type="number"
+                  min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)}
+                  className="form-control input-xs input-sm"
+                  onChange={(e) => this.onChange(e)}
+                  value={this.state.CONST_DEFAULT_ALTITUDE}
+                  ref={this.altitudeInputRef} // Add ref here
+                />
+                <button
+                  id="btn_defaultAltitude"
+                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                  type="button"
+                  onClick={(e) => this.clickToggleUnit(e)}
+                >
+                  {this.state.m_unitText}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-xs-6 col-sm-6 col-lg-6">
+          <div className="form-inline">
+            <div className="form-group">
+              <div title='Default radius for circle'>
+                <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width">
+                  <small>Radius &nbsp;&nbsp;&nbsp;</small>
+                </label>
+                <input
+                  id="txt_defaultCircle"
+                  type="number"
+                  min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)}
+                  className="form-control input-xs input-sm"
+                  onChange={(e) => this.onChange(e)}
+                  value={this.state.CONST_DEFAULT_RADIUS}
+                  ref={this.radiusInputRef} // Add ref here
+                />
+                <button
+                  id="btn_defaultCircle"
+                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                  type="button"
+                  onClick={(e) => this.clickToggleUnit(e)}
+                >
+                  {this.state.m_unitText}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    if ((js_siteConfig.CONST_FEATURE.DISABLE_SWARM === false) && (js_localStorage.fn_getAdvancedOptionsEnabled() === true)) {
+      v_gadgets.push(
+        <div key={this.key + 's1'} className="row border-top pt-1 border-secondary border-bottom me-0 ms-0">
+          <div className="col-xs-6 col-sm-6 col-lg-6 ">
+            <div className="form-inline ">
+              <div className="form-group ">
+                <div title='Inter-Drone Distance (SWARM)'>
+                  <label htmlFor="txt_defaultSwarmDistance" className="user-select-none text-white txt_label_width">
+                    <small>H-Offset</small>
+                  </label>
+                  <input
+                    id="txt_defaultSwarmDistance"
+                    type="number"
+                    min={parseInt(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN)}
+                    className="form-control input-xs input-sm ms-1"
+                    onChange={(e) => this.onChangeSwarm(e)}
+                    value={this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE}
+                    ref={this.horizontal_distance} // Add ref here
+                  />
+                  <button
+                    id="btn_defaultSwarmDistance"
+                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
+                    type="button"
+                    onClick={(e) => this.clickToggleUnit(e)}
+                  >
+                    {this.state.m_unitText}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-xs-6 col-sm-6 col-lg-6">
+            <div className="form-inline">
+              <div className="form-group">
+                <div title='Altitude Delta (SWARM)'>
+                  <label  htmlFor="txt_defaultSwarmAltDelta" className="user-select-none text-white txt_label_width">
+                    <small>V-Offset</small>
+                  </label>
+                  <input
+                    id="txt_defaultSwarmAltDelta"
+                    type="number"
+                    min={parseInt(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN)}
+                    className="form-control input-xs input-sm ms-1"
+                    onChange={(e) => this.onChangeSwarm(e)}
+                    value={this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE}
+                    ref={this.vertical_distance} // Add ref here
+                  />
+                  <button
+                    id="btn_defaultSwarmAltDelta"
+                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
+                    type="button"
+                    onClick={(e) => this.clickToggleUnit(e)}
+                  >
+                    {this.state.m_unitText}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return v_gadgets;
+  }
+}
+
 class ClssPreferences extends React.Component {
   constructor()
 	{
@@ -162,33 +390,14 @@ export default class ClssGlobalSettings extends React.Component {
   constructor() {
     super();
     this.state = {
-      m_unitText: 'm',
-      CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE,
-      CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS,
       'm_update': 0,
     };
 
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
-    this.altitudeInputRef = React.createRef(); 
-    this.radiusInputRef = React.createRef(); 
+    
 
-    this.horizontal_distance = React.createRef(); 
-    this.vertical_distance = React.createRef(); 
-
-
-    if (js_localStorage.fn_getMetricSystem() === true) {
-      this.state.m_unitText = 'm';
-    } else {
-      this.state.m_unitText = 'ft';
-    }
-
-    this.state.CONST_DEFAULT_ALTITUDE = js_localStorage.fn_getDefaultAltitude();
-    this.state.CONST_DEFAULT_RADIUS = js_localStorage.fn_getDefaultRadius();
-
-    this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = js_localStorage.fn_getDefaultSwarmHorizontalDistance();
-    this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = js_localStorage.fn_getDefaultSwarmVerticalDistance();
-
+    
     js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined, this, this.fn_onAuthStatus);
   }
 
@@ -206,6 +415,10 @@ export default class ClssGlobalSettings extends React.Component {
       return true;
     }
     if (this.state.m_unitText !== nextState.m_unitText) {
+      return true;
+    }
+
+    if (this.state.m_update !== nextState.m_update) {
       return true;
     }
 
@@ -246,45 +459,10 @@ export default class ClssGlobalSettings extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Logined, this);
   }
 
-  onChange(e) {
-    const altitudeValue = parseInt(this.altitudeInputRef.current.value);
-    const radiusValue = parseInt(this.radiusInputRef.current.value);
-
-    js_globals.CONST_DEFAULT_ALTITUDE = altitudeValue;
-    js_globals.CONST_DEFAULT_RADIUS = radiusValue;
-
-    if (js_globals.CONST_DEFAULT_ALTITUDE < js_globals.CONST_DEFAULT_ALTITUDE_min)
-      js_globals.CONST_DEFAULT_ALTITUDE = parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min);
-    if (js_globals.CONST_DEFAULT_RADIUS < js_globals.CONST_DEFAULT_RADIUS_min)
-      js_globals.CONST_DEFAULT_RADIUS = parseInt(js_globals.CONST_DEFAULT_RADIUS_min);
-
-    js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
-    js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
   
-    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
-    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
-  }
 
 
-  onChangeSwarm(e) {
-    const swarm_horizontal_value = parseInt(this.horizontal_distance.current.value);
-    const swarm_virtual_value = parseInt(this.vertical_distance.current.value);
-
-    js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = swarm_horizontal_value;
-    js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = swarm_virtual_value;
-
-    if (js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE < js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN)
-      js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = parseInt(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN);
-    
-    if (js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE < js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN)
-      js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = parseInt(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN);
-
-    js_localStorage.fn_setDefaultSwarmHorizontalDistance(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE);
-    js_localStorage.fn_setDefaultSwarmVerticalDistance(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE);
   
-    this.setState({ CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE });
-    this.setState({ CONST_DEFAULT_SWARM_VERTICAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE });
-  }
 
   fn_fireDeEvent(value) {
     js_andruavclient2.AndruavClient.API_FireDeEvent(null, value);
@@ -295,129 +473,7 @@ export default class ClssGlobalSettings extends React.Component {
     let v_uploadFile = [];
     let v_telemetryModes = [];
 
-    v_gadgets.push(
-      <div key={this.key + '1'} className="row  me-0 ms-0">
-        <div className="col-xs-6 col-sm-6 col-lg-6">
-          <div className="form-inline">
-            <div className="form-group">
-              <div title='Default altitude for climb command.'>
-                <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width">
-                  <small>Alt&nbsp;Step&nbsp;&nbsp;</small>
-                </label>
-                <input
-                  id="txt_defaultAltitude"
-                  type="number"
-                  min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)}
-                  className="form-control input-xs input-sm"
-                  onChange={(e) => this.onChange(e)}
-                  value={this.state.CONST_DEFAULT_ALTITUDE}
-                  ref={this.altitudeInputRef} // Add ref here
-                />
-                <button
-                  id="btn_defaultAltitude"
-                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
-                  type="button"
-                  onClick={(e) => this.clickToggleUnit(e)}
-                >
-                  {this.state.m_unitText}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-xs-6 col-sm-6 col-lg-6">
-          <div className="form-inline">
-            <div className="form-group">
-              <div title='Default radius for circle'>
-                <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width">
-                  <small>Radius &nbsp;&nbsp;&nbsp;</small>
-                </label>
-                <input
-                  id="txt_defaultCircle"
-                  type="number"
-                  min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)}
-                  className="form-control input-xs input-sm"
-                  onChange={(e) => this.onChange(e)}
-                  value={this.state.CONST_DEFAULT_RADIUS}
-                  ref={this.radiusInputRef} // Add ref here
-                />
-                <button
-                  id="btn_defaultCircle"
-                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
-                  type="button"
-                  onClick={(e) => this.clickToggleUnit(e)}
-                >
-                  {this.state.m_unitText}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-
-    if (js_siteConfig.CONST_FEATURE.DISABLE_SWARM === false) {
-      v_gadgets.push(
-        <div key={this.key + 's1'} className="row border-top pt-1 border-secondary border-bottom me-0 ms-0">
-          <div className="col-xs-6 col-sm-6 col-lg-6 ">
-            <div className="form-inline ">
-              <div className="form-group ">
-                <div title='Inter-Drone Distance (SWARM)'>
-                  <label htmlFor="txt_defaultSwarmDistance" className="user-select-none text-white txt_label_width">
-                    <small>H-Offset</small>
-                  </label>
-                  <input
-                    id="txt_defaultSwarmDistance"
-                    type="number"
-                    min={parseInt(js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN)}
-                    className="form-control input-xs input-sm ms-1"
-                    onChange={(e) => this.onChangeSwarm(e)}
-                    value={this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE}
-                    ref={this.horizontal_distance} // Add ref here
-                  />
-                  <button
-                    id="btn_defaultSwarmDistance"
-                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
-                    type="button"
-                    onClick={(e) => this.clickToggleUnit(e)}
-                  >
-                    {this.state.m_unitText}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-xs-6 col-sm-6 col-lg-6">
-            <div className="form-inline">
-              <div className="form-group">
-                <div title='Altitude Delta (SWARM)'>
-                  <label  htmlFor="txt_defaultSwarmAltDelta" className="user-select-none text-white txt_label_width">
-                    <small>V-Offset</small>
-                  </label>
-                  <input
-                    id="txt_defaultSwarmAltDelta"
-                    type="number"
-                    min={parseInt(js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN)}
-                    className="form-control input-xs input-sm ms-1"
-                    onChange={(e) => this.onChangeSwarm(e)}
-                    value={this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE}
-                    ref={this.vertical_distance} // Add ref here
-                  />
-                  <button
-                    id="btn_defaultSwarmAltDelta"
-                    className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
-                    type="button"
-                    onClick={(e) => this.clickToggleUnit(e)}
-                  >
-                    {this.state.m_unitText}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+    
 
     v_uploadFile.push (
       <div key={this.key + 'v_uploadFile0'} className="row width_100 margin_zero css_margin_top_small ">
@@ -461,7 +517,7 @@ return (
               </ul>
               <div id="main_settings_tab" className="tab-content">
                   <div className="tab-pane fade  active show pt-2" id={"settings_home"}>
-                  {v_gadgets}
+                  <ClssDefault/>
                   {v_telemetryModes}      
                   
                   </div>
