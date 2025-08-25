@@ -7,7 +7,6 @@ class CLocalStorage {
         if (this.isSupported()) {
             // Initialize global settings with saved values if they exist
             js_globals.v_useMetricSystem = this.fn_getMetricSystem();
-            js_globals.v_gamePadMode = this.fn_getGamePadMode();
             js_globals.CONST_DEFAULT_ALTITUDE = this.fn_getDefaultAltitude();
             js_globals.CONST_DEFAULT_RADIUS = this.fn_getDefaultRadius();
         }
@@ -128,15 +127,6 @@ class CLocalStorage {
         return this._getValue('_vv_useMetricSystem', js_globals.v_useMetricSystem.toString()) === 'true';
     }
 
-    // Game Pad Mode
-    fn_setGamePadMode(value) {
-        this._setValue(js_globals.LS_GAME_PAD_MODE, value.toString());
-    }
-
-    fn_getGamePadMode() {
-        return parseInt(this._getValue(js_globals.LS_GAME_PAD_MODE, '2'));
-    }
-
     fn_setGamePadConfig(config_index, value) {
         this._setValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, value);
     }
@@ -155,6 +145,33 @@ class CLocalStorage {
     fn_getGamePadConfigIndex() {
         return parseInt(this._getValue(js_globals.LS_GAME_PAD_CONFIG_INDEX, '0'));
     }
+
+    fn_exportGamePadConfigs() {
+        const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
+        const configs = {};
+        
+        // Iterate through localStorage to find all game pad configs
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith(configPrefix)) {
+                const configIndex = key.substring(configPrefix.length);
+                configs[configIndex] = localStorage.getItem(key);
+            }
+        }
+        
+        // Create JSON string and trigger download
+        const jsonString = JSON.stringify(configs, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gamepad_configs_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
 
     // Default Altitude
     fn_setDefaultAltitude(value) {

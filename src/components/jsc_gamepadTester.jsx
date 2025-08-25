@@ -34,16 +34,12 @@ export default class ClssGamepadTester extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('gamepadconnected', this.handleGamepadConnect);
-    window.addEventListener('gamepaddisconnected', this.handleGamepadDisconnect);
     this.loadSavedConfigurations();
     this.checkGamepads();
     this.gameLoop = requestAnimationFrame(this.updateGamepadState);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('gamepadconnected', this.handleGamepadConnect);
-    window.removeEventListener('gamepaddisconnected', this.handleGamepadDisconnect);
     if (this.gameLoop) {
       cancelAnimationFrame(this.gameLoop);
     }
@@ -68,9 +64,7 @@ export default class ClssGamepadTester extends React.Component {
   return required.every(val => array.includes(val));
   }
 
-  saveConfiguration = () => {
-    // const { selectedConfig, configPreferences } = this.state;
-    // js_localStorage.fn_setGamePadConfig(selectedConfig, JSON.stringify(configPreferences[selectedConfig]));
+  onDataChanged = () => {
     const valid_axis = this.isItemExist(this.state.axisFunctions, [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE , js_globals.STICK_MODE_THR]);
     if (valid_axis)
     {
@@ -97,6 +91,68 @@ export default class ClssGamepadTester extends React.Component {
     }
   };
 
+
+  fn_importData = (event) => {
+   const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const configs = JSON.parse(e.target.result);
+            const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
+            
+            // Clear existing game pad configs
+            for (let i = js_localStorage.length - 1; i >= 0; i--) {
+                const key = js_localStorage.key(i);
+                if (key.startsWith(configPrefix)) {
+                    js_localStorage.removeItem(key);
+                }
+            }
+            
+            // Set new configs
+            Object.entries(configs).forEach(([index, value]) => {
+                    js_localStorage.fn_setGamePadConfig(index, value);
+            });
+            
+            this.loadSavedConfigurations();
+            this.checkGamepads();
+            
+            console.log('Game pad configurations imported successfully');
+        } catch (error) {
+            console.error('Error importing configurations:', error);
+            alert('Failed to import configurations. Invalid JSON file.');
+        }
+    }.bind(this); // Bind to maintain context of this.isSupported()
+    
+    reader.readAsText(file);
+  }
+
+
+  // Dynamically create file input and trigger file selection
+ fn_triggerGamePadConfigImport() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none'; // Hide the input element
+    
+    // Attach the import handler
+    fileInput.addEventListener('change', this.fn_importData);
+    
+    // Append to document and trigger click
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    
+    // Clean up after selection
+    fileInput.addEventListener('change', () => {
+        document.body.removeChild(fileInput);
+    });
+}
+
+
+  fn_exportData = () => {
+    js_localStorage.fn_exportGamePadConfigs();
+  }
 
   checkGamepads = () => {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -196,7 +252,7 @@ export default class ClssGamepadTester extends React.Component {
 
       return { configPreferences: newConfigPreferences };
     }, () => {
-      this.saveConfiguration();
+      this.onDataChanged();
       this.checkGamepads();
       console.log(`Toggled reverse for axis ${axisIndex} to ${this.state.configPreferences[this.state.selectedConfig].axisReversed[axisIndex]} in ${this.state.selectedConfig}`);
     });
@@ -232,7 +288,7 @@ export default class ClssGamepadTester extends React.Component {
 
       return { axisFunctions: newAxisFunctions, configPreferences: newConfigPreferences };
     }, () => {
-      this.saveConfiguration();
+      this.onDataChanged();
       console.log(`Assigning function ${functionName} to axis ${axisIndex} in ${this.state.selectedConfig}`);
     });
   };
@@ -267,7 +323,7 @@ export default class ClssGamepadTester extends React.Component {
 
       return { buttonFunctions: newButtonFunctions, configPreferences: newConfigPreferences };
     }, () => {
-      this.saveConfiguration();
+      this.onDataChanged();
       console.log(`Assigning function ${functionName} to button ${buttonIndex} in ${this.state.selectedConfig}`);
     });
   };
@@ -287,10 +343,17 @@ export default class ClssGamepadTester extends React.Component {
         m_update: prevState.m_update + 1
       };
     }, () => {
-      this.saveConfiguration();
+      this.onDataChanged();
       js_speak.fn_speak('Game pad mode is set to ' + p_mode.toString());
       console.log(`Game pad mode set to ${p_mode} for config ${this.state.selectedConfig}`);
     });
+  };
+
+  // Function to format a number with a sign and fixed width
+  formatNumberWithSign = (number, totalWidth, decimalPlaces) => {
+    const formattedNumber = Math.abs(number).toFixed(decimalPlaces);
+    const sign = number >= 0 ? '+' : '-';
+    return (sign + formattedNumber).padStart(totalWidth, ' ');
   };
 
   render() {
@@ -301,7 +364,7 @@ export default class ClssGamepadTester extends React.Component {
     
     return (
       <div className="container">
-        <h2 className='pt-5'>Gamepad Tester</h2>
+        <h2 className='pt-5 ' >Gamepad Tester</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
             <label>Select Configuration: </label>
@@ -322,7 +385,7 @@ export default class ClssGamepadTester extends React.Component {
               <button
                 id="btnRXModeDrop"
                 type="button"
-                className="btn btn-sm btn-warning dropdown-toggle"
+                className="btn btn-sm btn-warning dropdown-toggle font-monospace"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
@@ -339,20 +402,33 @@ export default class ClssGamepadTester extends React.Component {
 
             <button
               onClick={this.handleReset}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn"
+              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn font-monospace"
             >
               Reset
             </button>
             <button
               onClick={this.saveConfiguration2}
-              className="ms-3 p-1 px-2 btn btn-sm  border-danger ctrlbtn"
+              className="ms-3 p-1 px-2 btn btn-sm  border-danger ctrlbtn font-monospace"
               ref={this.txtSaveRef}
             >
               Save
             </button>
             <button
+              onClick={(e)=>this.fn_triggerGamePadConfigImport(e)}
+              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn font-monospace"
+            >
+              Import
+            </button>
+            
+            <button
+              onClick={(e)=>this.fn_exportData()}
+              className="ms-3 p-1 px-2 btn btn-sm  btn-success ctrlbtn font-monospace"
+            >
+              Export
+            </button>
+            <button
               onClick={(e)=>fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-primary ctrlbtn"
+              className="ms-3 p-1 px-2 btn btn-sm  btn-primary ctrlbtn font-monospace"
             >
               Help
             </button>
@@ -375,7 +451,9 @@ export default class ClssGamepadTester extends React.Component {
 
                   return (
                     <div key={i} className="axis-row d-flex align-items-center mb-3">
-                      <span style={{ ...colorStyle, marginRight: '10px' }}>Axis {i}: {value}</span>
+                      <span className={`me-2 font-monospace`} style={{ color: colorStyle.color, transition: colorStyle.transition }}>
+                        Axis {i}: {this.formatNumberWithSign(value, 8, 3)}
+                      </span>
                       <select
                         value={axisFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
@@ -388,7 +466,7 @@ export default class ClssGamepadTester extends React.Component {
                           </option>
                         ))}
                       </select>
-                      <label style={{ marginRight: '10px' }}>
+                      <label style={{ marginRight: '10px', fontFamily: 'Courier New, monospace'  }}>
                         <input
                           type="checkbox"
                           checked={isReversed}
@@ -412,7 +490,7 @@ export default class ClssGamepadTester extends React.Component {
 
                   return (
                     <div key={i} className="button-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ ...colorStyle, marginRight: '10px' }}>Button {i}: {value}</span>
+                      <span style={{ ...colorStyle, marginRight: '10px' }}>Button {i} : {value}</span>
                       <select
                         value={buttonFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}

@@ -294,7 +294,6 @@ export default class ClssGamePadControl extends React.Component {
     
     render()
     {
-        const c_mode = js_localStorage.fn_getGamePadMode();
         const c_config_index = js_localStorage.fn_getGamePadConfigIndex();
     
         this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
@@ -330,7 +329,7 @@ export default class ClssGamePadControl extends React.Component {
                     {this.m_output}
 					<div id="modal_gamepad_footer" className="form-group bg-dark  p-1">
                         <div className='row'>
-                            <div className="col-2 " role="group" aria-label="Button group with nested dropdown">
+                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
                                 <div className="" role="group">
                                     <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Config {c_config_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
@@ -341,7 +340,7 @@ export default class ClssGamePadControl extends React.Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-7 " />
+                            <div className="col-6 " />
                             <div className="col-1 " role="group" aria-label="Button group with nested dropdown">
                                 {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
                                 <div className="" role="group">
