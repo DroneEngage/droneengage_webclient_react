@@ -367,7 +367,7 @@ export default class ClssGamepadTester extends React.Component {
         <h2 className='pt-5 ' >Gamepad Tester</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
-            <label>Select Configuration: </label>
+            <label>Settings Template: </label>
             <select
               value={selectedConfig}
               onChange={this.handleConfigChange}

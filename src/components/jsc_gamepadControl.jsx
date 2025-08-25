@@ -292,6 +292,11 @@ export default class ClssGamePadControl extends React.Component {
     
     }
     
+    fn_callConfigGamePad()
+    {
+        window.open('/gamepad','_blank');
+    }
+
     render()
     {
         const c_config_index = js_localStorage.fn_getGamePadConfigIndex();
@@ -331,16 +336,20 @@ export default class ClssGamePadControl extends React.Component {
                         <div className='row'>
                             <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
                                 <div className="" role="group">
-                                    <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Config {c_config_index}</button>
+                                    <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings {c_config_index}</button>
                                     <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(1)}>Config 1</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(2)}>Config 2</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(3)}>Config 3</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(4)}>Config 4</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(1)}>Settings 1</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(2)}>Settings 2</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(3)}>Settings 3</a>
+                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(4)}>Settings 4</a>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-6 " />
+                            <div className="col-2 " />
+                            <div className="col-2">
+
+                            </div>
+                            <div className="col-2" />
                             <div className="col-1 " role="group" aria-label="Button group with nested dropdown">
                                 {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
                                 <div className="" role="group">
@@ -355,7 +364,11 @@ export default class ClssGamePadControl extends React.Component {
                             <div className = "col-2">
                                 <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
                             </div>    
-                            <div className = "col-8"></div>
+                            <div className = "col-3"></div>
+                            <div className = "col-2">
+                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_callConfigGamePad()}>Configure</button>
+                            </div>    
+                            <div className = "col-3"></div>
                             <div className = "col-1 ps-1">
                                 <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_gotoUnitPressed()}>Goto</button>
                             </div>
