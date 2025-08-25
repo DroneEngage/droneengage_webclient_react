@@ -345,28 +345,28 @@ class CAndruavGamePad {
             
             // Rudder
             let val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD]; // Clamp and format
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD]]; // Clamp and format
             if (c_padStatus.p_axes[js_globals.STICK_LEFT_HORIZONTAL] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[js_globals.STICK_LEFT_HORIZONTAL] = val;
             }
             // Throttle
             val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR]];
             if (c_padStatus.p_axes[js_globals.STICK_LEFT_VERTICAL] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[js_globals.STICK_LEFT_VERTICAL] = val;
             }
             // Aleron-Roll Stick
             val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE]];
             if (c_padStatus.p_axes[js_globals.STICK_RIGHT_HORIZONTAL] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[js_globals.STICK_RIGHT_HORIZONTAL] = val;
             }
             // Elevator-Pitch Stick
             val = p_gamepad.axes[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE]];
-            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE];
+            val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE]];
             if (c_padStatus.p_axes[js_globals.STICK_RIGHT_VERTICAL] !== val) {
                 v_axesChanged = true;
                 c_padStatus.p_axes[js_globals.STICK_RIGHT_VERTICAL] = val;
