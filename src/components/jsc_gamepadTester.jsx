@@ -494,7 +494,7 @@ export default class ClssGamepadTester extends React.Component {
                       <select
                         value={buttonFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}
-                        className={`form-control ${buttonFunctions[i] === 'undefined' ? '' : 'bg-warning text-dark'}`}
+                        className={`form-control ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success text-dark'}`}
                         style={{ marginRight: '10px' }}
                       >
                         {js_globals.v_gamepad_button_function_array.map((func, idx) => (

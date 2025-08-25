@@ -224,7 +224,7 @@ class CAndruavClient {
             return;
         
         // read gamepad values
-        p_me.v_axes = c_controller.p_axes;
+        p_me.v_axes = c_controller.p_unified_virtual_axis;
         p_me.v_sendAxes = true;
 
         js_common.fn_console_log("fn_sendAxes");
@@ -894,7 +894,7 @@ class CAndruavClient {
     };
 
 
-    API_sendRXChannels(p_axes) {
+    API_sendRXChannels(p_unified_virtual_axis) {
         let v_axis = [0, 1, 2, 3];
         if ((this.m_gamePadUnit === null || this.m_gamePadUnit === undefined) || (this.m_gamePadUnit.partyID === null || this.m_gamePadUnit.partyID === undefined)) 
             return;
@@ -914,10 +914,10 @@ class CAndruavClient {
 
         // IMPORTANT: Convert [-1,1] to [0,1000] IMPORTANT: -1 means channel release so min is 0
         let p_msg = {
-            'R': parseInt(parseFloat(p_axes[v_axis[0]]) * 500 + 500),  // Rudder
-            'T': parseInt(-parseFloat(p_axes[v_axis[1]]) * 500 + 500), // Throttle
-            'A': parseInt(parseFloat(p_axes[v_axis[2]]) * 500 + 500),  // Aileron
-            'E': parseInt(parseFloat(p_axes[v_axis[3]]) * 500 + 500),  // Elevator
+            'R': parseInt(parseFloat(p_unified_virtual_axis[v_axis[0]]) * 500 + 500),  // Rudder
+            'T': parseInt(-parseFloat(p_unified_virtual_axis[v_axis[1]]) * 500 + 500), // Throttle
+            'A': parseInt(parseFloat(p_unified_virtual_axis[v_axis[2]]) * 500 + 500),  // Aileron
+            'E': parseInt(parseFloat(p_unified_virtual_axis[v_axis[3]]) * 500 + 500),  // Elevator
         };
 
         js_common.fn_console_log(p_msg);

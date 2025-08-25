@@ -65,8 +65,8 @@ class ClssGamePadAxesControl extends React.Component {
         const labels = js_globals.STICK_MODE_MAPPING_NAMES[c_mode]
         return (
             <div className='gp_axes'>
-                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_axes[v_axis[0]]} y={c_padStatus.p_axes[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
-                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_axes[v_axis[2]]} y={c_padStatus.p_axes[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_unified_virtual_axis[v_axis[0]]} y={c_padStatus.p_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_unified_virtual_axis[v_axis[2]]} y={c_padStatus.p_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
             </div>
                 
         );
