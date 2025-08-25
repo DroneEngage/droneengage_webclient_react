@@ -100,7 +100,7 @@ class GLOBALS {
 
 		// GamePad Functions Assignment
 		this.v_gamepad_function_array 			= ["undefined", "THR", "ALE", "RUD", "ELE"];
-		this.v_gamepad_button_function_array 	= ["undefined", "arm", "RTL", "Land", "Auto", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
+		this.v_gamepad_button_function_array 	= ["undefined", "ARM", "RTL", "Land", "Auto", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
 		this.active_gamepad_index           	= 0;
 		this.v_total_gampad_buttons				= 12;
@@ -114,6 +114,11 @@ class GLOBALS {
 		this.STICK_LEFT_VERTICAL				= 1;
 		this.STICK_RIGHT_HORIZONTAL				= 2;
 		this.STICK_RIGHT_VERTICAL				= 3;
+
+		this.STICK_MODE_RUD = "RUD";
+		this.STICK_MODE_ELE = "ELE";
+		this.STICK_MODE_ALE = "ALE";
+		this.STICK_MODE_THR = "THR";
 
 		this.STICK_MODE_MAPPING					= 
 		[

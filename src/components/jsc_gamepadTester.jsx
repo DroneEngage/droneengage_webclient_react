@@ -1,10 +1,15 @@
 import React from 'react';
 import * as js_helpers from '../js/js_helpers';
 import { js_globals } from '../js/js_globals';
+import * as js_siteConfig from '../js/js_siteConfig.js'
+
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_localStorage } from '../js/js_localStorage';
 import { js_speak } from '../js/js_speak';
+import {fn_helpPage} from '../js/js_main.js';
 
+const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
+const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';
 export default class ClssGamepadTester extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +29,8 @@ export default class ClssGamepadTester extends React.Component {
         "5": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
       },
     };
+
+    this.txtSaveRef = React.createRef();
   }
 
   componentDidMount() {
@@ -57,10 +64,39 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
+  isItemExist = (array, required = [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE , js_globals.STICK_MODE_THR]) => {
+  return required.every(val => array.includes(val));
+  }
+
   saveConfiguration = () => {
+    // const { selectedConfig, configPreferences } = this.state;
+    // js_localStorage.fn_setGamePadConfig(selectedConfig, JSON.stringify(configPreferences[selectedConfig]));
+    const valid_axis = this.isItemExist(this.state.axisFunctions, [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE , js_globals.STICK_MODE_THR]);
+    if (valid_axis)
+    {
+      this.txtSaveRef.current.className = css_to_save;
+      this.m_invalid_settings = false;
+    }
+    else
+    {
+      this.txtSaveRef.current.className = css_normal;
+      this.m_invalid_settings = true;
+    }
+  };
+  
+  saveConfiguration2 = () => {
     const { selectedConfig, configPreferences } = this.state;
     js_localStorage.fn_setGamePadConfig(selectedConfig, JSON.stringify(configPreferences[selectedConfig]));
+
+    // Toggle class based on a condition (e.g., success)
+    const currentClass = this.txtSaveRef.current.className;
+    if (currentClass.includes('btn-danger')) {
+      this.txtSaveRef.current.className = css_normal;
+    } else {
+      this.txtSaveRef.current.className = css_to_save;
+    }
   };
+
 
   checkGamepads = () => {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -265,14 +301,28 @@ export default class ClssGamepadTester extends React.Component {
     
     return (
       <div className="container">
-        <h2>Gamepad Tester</h2>
+        <h2 className='pt-5'>Gamepad Tester</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
+            <label>Select Configuration: </label>
+            <select
+              value={selectedConfig}
+              onChange={this.handleConfigChange}
+              className="ms-3 form-control-sm"
+            >
+              {js_globals.v_gamepad_configuration.map((config, idx) => (
+                <option key={idx} value={config}>
+                  {config}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-6">
             <div className="btn-group" role="group">
               <button
                 id="btnRXModeDrop"
                 type="button"
-                className="btn btn-sm btn-danger dropdown-toggle"
+                className="btn btn-sm btn-warning dropdown-toggle"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
@@ -286,26 +336,25 @@ export default class ClssGamepadTester extends React.Component {
                 <a className="dropdown-item" href="#" onClick={(e) => this.handleModeChange(4)}>Mode 4</a>
               </div>
             </div>
-          </div>
-          <div className="col-3">
-            <label>Select Configuration: </label>
-            <select
-              value={selectedConfig}
-              onChange={this.handleConfigChange}
-              className="function-select"
-              style={{ marginLeft: '10px' }}
-            >
-              {js_globals.v_gamepad_configuration.map((config, idx) => (
-                <option key={idx} value={config}>
-                  {config}
-                </option>
-              ))}
-            </select>
+
             <button
               onClick={this.handleReset}
-              style={{ marginLeft: '10px', padding: '5px 10px' }}
+              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn"
             >
               Reset
+            </button>
+            <button
+              onClick={this.saveConfiguration2}
+              className="ms-3 p-1 px-2 btn btn-sm  border-danger ctrlbtn"
+              ref={this.txtSaveRef}
+            >
+              Save
+            </button>
+            <button
+              onClick={(e)=>fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}
+              className="ms-3 p-1 px-2 btn btn-sm  btn-primary ctrlbtn"
+            >
+              Help
             </button>
           </div>
         </div>
@@ -325,12 +374,12 @@ export default class ClssGamepadTester extends React.Component {
                   const isReversed = (configPreferences[selectedConfig].axisReversed?.[i] || 1) === -1;
 
                   return (
-                    <div key={i} className="axis-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <div key={i} className="axis-row d-flex align-items-center mb-3">
                       <span style={{ ...colorStyle, marginRight: '10px' }}>Axis {i}: {value}</span>
                       <select
                         value={axisFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
-                        className={`form-control ${axisFunctions[i] === 'undefined' ? '' : 'bg-warning text-dark'}`}
+                        className={`form-control ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success' : 'bg-warning text-dark'}`}
                         style={{ marginRight: '10px', width: '150px' }}
                       >
                         {js_globals.v_gamepad_function_array.map((func, idx) => (
@@ -352,7 +401,7 @@ export default class ClssGamepadTester extends React.Component {
                 })}
               </div>
               <hr />
-              <div className="buttons-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              <div className="buttons-container d-flex flex-wrap gap-3">
                 {buttons.map((value, i) => {
                   const lastUpdate = this.state[`buttonLastUpdate_${i}`] || 0;
                   const opacity = lastUpdate ? Math.max(0, 1 - (currentTime - lastUpdate) / fadeDuration) : 0;
