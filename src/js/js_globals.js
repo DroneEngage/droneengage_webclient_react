@@ -104,11 +104,7 @@ class GLOBALS {
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
 		this.active_gamepad_index           	= 0;
 		this.v_total_gampad_buttons				= 12;
-		this.CONST_RUD_CHANNEL					= 0;
-		this.CONST_THR_CHANNEL					= 1;
-		this.CONST_ALE_CHANNEL					= 2;
-		this.CONST_ELE_CHANNEL					= 3;
-
+		
 		this.STICK_LEFT_HORIZONTAL				= 0;						
 		this.STICK_LEFT_VERTICAL				= 1;
 		this.STICK_RIGHT_HORIZONTAL				= 2;
@@ -118,22 +114,24 @@ class GLOBALS {
 		this.STICK_MODE_ELE = "ELE";
 		this.STICK_MODE_ALE = "ALE";
 		this.STICK_MODE_THR = "THR";
+		this.STICK_MODE_AX1 = "AX1";
+		this.STICK_MODE_AX2 = "AX2";
 
 		this.STICK_MODE_MAPPING					= 
 		[
-			{"RUD": 0, "ELE": 1, "ALE": 2, "THR":3},	// MODE 1
-			{"RUD": 0, "THR": 1, "ALE": 2, "ELE":3},    // MODE 2
-			{"ALE": 0, "ELE": 1, "RUD": 2, "THR":3},	// MODE 3
-			{"ALE": 0, "THR": 1, "RUD": 2, "ELE":3}		// MODE 4
+			{"RUD": 0, "ELE": 1, "ALE": 2, "THR":3, "AX1":4, "AX2":5},		// MODE 1
+			{"RUD": 0, "THR": 1, "ALE": 2, "ELE":3, "AX1":4, "AX2":5},    	// MODE 2
+			{"ALE": 0, "ELE": 1, "RUD": 2, "THR":3, "AX1":4, "AX2":5},		// MODE 3
+			{"ALE": 0, "THR": 1, "RUD": 2, "ELE":3, "AX1":4, "AX2":5}		// MODE 4
 			
 		];
 		
 		this.STICK_MODE_MAPPING_NAMES					= 
 		[
-			["RUD", "ELE", "ALE", "THR"],    	// MODE 1
-			["RUD", "THR", "ALE", "ELE"],		// MODE 2
-			["ALE", "ELE", "RUD", "THR"],		// MODE 3
-			["ALE", "THR", "RUD", "ELE"]		// MODE 4
+			["RUD", "ELE", "ALE", "THR", "AX1", "AX2"],    	// MODE 1
+			["RUD", "THR", "ALE", "ELE", "AX1", "AX2"],		// MODE 2
+			["ALE", "ELE", "RUD", "THR", "AX1", "AX2"],		// MODE 3
+			["ALE", "THR", "RUD", "ELE", "AX1", "AX2"]		// MODE 4
 			
 		];	
 

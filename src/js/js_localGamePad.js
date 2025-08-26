@@ -29,8 +29,11 @@ class fn_Obj_padStatus {
     constructor() 
     {
     this.p_ctrl_type = GAME_GENERIC;
+    /**
+     * IMPORTANT
+     * THIS IS TRUE VALUES OF VIRTUAL GAMEPAD REGARDLESS OF MODE [RUD, THR, ALE, ELE]
+     */
     this.p_unified_virtual_axis = [-1, 0, 0, 0];
-    this.m_button_routing = [0, 0, 0, 0];
     
     this.m_gamepad_mode_index 				= 0;  
 		
@@ -123,11 +126,11 @@ class CAndruavGamePad {
         /**
          * Based on TX mode 1,2,3,4
          * the cells into m_channel_routing changes its function.
-         * for example in mode-2 mapping is [RUD, THR, ALE, ELE]
+         * for example in mode-2 mapping is [RUD, THR, ALE, ELE, AXI1, AXI2]
          * and the value of each cell represents the Axis index of the source 
          * of the gamepad.
          */
-        this.m_channel_routing = [-1,-1,-1,-1]; // regardless of mode this maps sticks. ()
+        this.m_channel_routing = [-1,-1,-1,-1,-1,-1]; // regardless of mode this maps sticks. ()
         
         /**
          * m_button_routing index represents buttons on the virtual GamePad on screen.
@@ -166,6 +169,18 @@ class CAndruavGamePad {
             const pitch = function_mappings.ELE;
             if (pitch && pitch.type=="axis") this.m_channel_routing[functions_per_mode.ELE] = pitch.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
 
+            
+            if (function_mappings.AX1)
+            {
+                const axis1 = function_mappings.AX1;
+                if (pitch && pitch.type=="axis") this.m_channel_routing[functions_per_mode.ELE] = axis1.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            }
+
+            if (function_mappings.AX2)
+            {
+                const axis2 = function_mappings.AX2;
+                if (pitch && pitch.type=="axis") this.m_channel_routing[functions_per_mode.ELE] = axis2.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            }
             // so m_channel_routing contains the input axis index that corresponds to each STICK in the remote based on RX-MODE and Function.
 
             // // arm is always index 
