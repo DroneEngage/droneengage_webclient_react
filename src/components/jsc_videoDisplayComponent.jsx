@@ -23,14 +23,20 @@ export class ClssCVideoControl extends React.Component {
         super();
         this.state = {
             m_videoScreens: {},
-            lastadded: null
+            lastadded: null,
+            'm_update': 0
         };
 
         js_eventEmitter.fn_subscribe(js_globals.EE_videoStreamStarted, this, this.fn_videoStarted);
         js_eventEmitter.fn_subscribe(js_globals.EE_videoStreamStopped, this, this.fn_videoStopped);
     }
 
-
+    
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
+    
+    
     fn_videoStarted(p_me, p_obj) {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
