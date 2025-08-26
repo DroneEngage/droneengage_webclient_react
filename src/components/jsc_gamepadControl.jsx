@@ -147,6 +147,8 @@ export default class ClssGamePadControl extends React.Component {
             'm_update': 0
         };
 
+        this.key = Math.random().toString();
+
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
 
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Connected,this, this.fn_gamePadConnected);
@@ -166,7 +168,7 @@ export default class ClssGamePadControl extends React.Component {
         if (p_connected === true)
         {
             this.m_output = (
-                <div className='gp_input'>
+                <div key={this.key} className='gp_input'>
                     <div className="row  margin_2px css_padding_zero">
                         <div className='col-12'>
                             <ClssGamePadAxesControl p_index={js_globals.active_gamepad_index}></ClssGamePadAxesControl>
@@ -339,52 +341,89 @@ export default class ClssGamePadControl extends React.Component {
             gamepad_title = v_controller.id.toString();
         }
 
-        return (<div id="modal_ctrl_gamepad" title="GamePad Control" className=" css_ontop">
-                    <h4 id="title" className="modal-title text-warning">GamePad of {v_title} </h4>
-                    {this.m_output}
-					<div id="modal_gamepad_footer" className="form-group bg-dark  p-1">
-                        <div className='row'>
-                            <div className="col-3 " role="group" aria-label="Button group with nested dropdown">
-                                <div className="" role="group">
-                                    <button id="btnRXIndexDrop" type="button" className="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings {c_config_index}</button>
-                                    <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(1)}>Settings 1</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(2)}>Settings 2</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(3)}>Settings 3</a>
-                                    <a className="dropdown-item" href="#" onClick={ (e) => this.fn_changeConfig(4)}>Settings 4</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-2 " />
-                            <div className="col-2">
-
-                            </div>
-                            <div className="col-2" />
-                            <div className="col-1 " role="group" aria-label="Button group with nested dropdown">
-                                {/* <button type="button" className="btn-sm btn-danger text-nowrap" title={gamepad_title}>GamePad {js_globals.active_gamepad_index} </button> */}
-                                <div className="" role="group">
-                                    <button id="btnGamePadDrop" key={js_globals.active_gamepad_index} type="button" className="btn btn-sm btn-danger dropdown-toggle" title={gamepad_title} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">G-Pad {js_globals.active_gamepad_index}</button>
-                                    <div className="dropdown-menu" aria-labelledby="btnGamePadDrop">
-                                        {gamepads}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className = "row mt-1">
-                            <div className = "col-2">
-                                <button id="opaque_btn" type="button" className="btn  btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off">opaque</button>
-                            </div>    
-                            <div className = "col-3"></div>
-                            <div className = "col-2">
-                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_callConfigGamePad()}>Configure</button>
-                            </div>    
-                            <div className = "col-3"></div>
-                            <div className = "col-1 ps-1">
-                                <button id="btnGoto" type="button" className="btn  btn-sm btn-success" onClick={ (e) => this.fn_gotoUnitPressed()}>Goto</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>);
+        return (<div id="modal_ctrl_gamepad" key={"m1_" + this.key} title="GamePad Control" className="css_ontop">
+  <h4 id="title" className="modal-title text-warning">GamePad of {v_title}</h4>
+  {this.m_output}
+  <div id="modal_gamepad_footer" className="form-group bg-dark">
+    <div>
+      <button
+        id="opaque_btn"
+        type="button"
+        className="btn btn-sm btn-primary"
+        data-bs-toggle="button"
+        aria-pressed="false"
+        autoComplete="off"
+      >
+        opaque
+      </button>
+    </div>
+    <div role="group" aria-label="Button group with nested dropdown">
+      <div role="group">
+        <button
+          id="btnRXIndexDrop"
+          type="button"
+          className="btn btn-sm btn-danger dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Settings {c_config_index}
+        </button>
+        <div className="dropdown-menu" aria-labelledby="btnRXIndexDrop">
+          <a className="dropdown-item" href="#" onClick={(e) => this.fn_changeConfig(1)}>
+            Settings 1
+          </a>
+          <a className="dropdown-item" href="#" onClick={(e) => this.fn_changeConfig(2)}>
+            Settings 2
+          </a>
+          <a className="dropdown-item" href="#" onClick={(e) => this.fn_changeConfig(3)}>
+            Settings 3
+          </a>
+          <a className="dropdown-item" href="#" onClick={(e) => this.fn_changeConfig(4)}>
+            Settings 4
+          </a>
+        </div>
+      </div>
+    </div>
+    <div role="group" aria-label="Button group with nested dropdown">
+      <div role="group">
+        <button
+          id="btnGamePadDrop"
+          key={js_globals.active_gamepad_index}
+          type="button"
+          className="btn btn-sm btn-danger dropdown-toggle"
+          title={gamepad_title}
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          G-Pad {js_globals.active_gamepad_index}
+        </button>
+        <div className="dropdown-menu" aria-labelledby="btnGamePadDrop">{gamepads}</div>
+      </div>
+    </div>
+    <div>
+      <button
+        id="btnConfig"
+        type="button"
+        className="btn btn-sm btn-success"
+        onClick={(e) => this.fn_callConfigGamePad()}
+      >
+        Configure
+      </button>
+    </div>
+    <div>
+      <button
+        id="btnGoto"
+        type="button"
+        className="btn btn-sm btn-success"
+        onClick={(e) => this.fn_gotoUnitPressed()}
+      >
+        Goto
+      </button>
+    </div>
+  </div>
+</div>);
     }
 }
 

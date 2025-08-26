@@ -616,10 +616,18 @@ div#modal_ctrl_lidar_info
 	float:left;
  }
 
- div#modal_gamepad_footer
- {
-	 
- }
+ #modal_gamepad_footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #343a40; /* Matches bg-dark */
+  }
+
+  #modal_gamepad_footer > div {
+    flex: 0 0 auto; /* Allow buttons to take their natural width */
+  }
+
 
  input#txt_defaultCircle
  {
