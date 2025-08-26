@@ -14,6 +14,7 @@ import {fn_gotoUnit_byPartyID} from '../js/js_main'
 
 import { ClssGamePadAxisControl } from './micro_gadgets/jsc_gamepad_axis.jsx';
 import { ClssGamePadButton } from './micro_gadgets/jsc_gamepad_button.jsx';
+import {ClssSingleAxisProgressControl} from './micro_gadgets/jsc_gamepad_single_axis.jsx';
 
 
 class ClssGamePadAxesControl extends React.Component {
@@ -63,10 +64,14 @@ class ClssGamePadAxesControl extends React.Component {
                         js_globals.STICK_MODE_MAPPING[c_mode].ALE,
                         js_globals.STICK_MODE_MAPPING[c_mode].ELE];  // Stick Left Horiz, Stick Left Vert, Stick Right Horiz, Stick Right Vert
         const labels = js_globals.STICK_MODE_MAPPING_NAMES[c_mode]
+        const c_unified_virtual_axis = c_padStatus.p_unified_virtual_axis;
         return (
             <div className='gp_axes'>
-                <ClssGamePadAxisControl id='axes1' x={c_padStatus.p_unified_virtual_axis[v_axis[0]]} y={c_padStatus.p_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
-                <ClssGamePadAxisControl id='axes2' x={c_padStatus.p_unified_virtual_axis[v_axis[2]]} y={c_padStatus.p_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
+                <ClssSingleAxisProgressControl id='axes0' label={"axis1"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/>
+                <ClssGamePadAxisControl id='axes1' x={c_unified_virtual_axis[v_axis[0]]} y={c_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
+                <ClssGamePadAxisControl id='axes2' x={c_unified_virtual_axis[v_axis[2]]} y={c_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
+                <ClssSingleAxisProgressControl id='axes3' label={"axis2"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#00bc8cff"} min={-1.0} max={1.0}/>
+                
             </div>
                 
         );
@@ -159,9 +164,6 @@ export default class ClssGamePadControl extends React.Component {
     }
 
 
-    componentDidMount() {
-        this.state.m_update = 1;
-    }
     
     fn_renderMainOutput(p_connected)
     {
@@ -200,7 +202,7 @@ export default class ClssGamePadControl extends React.Component {
 
     fn_onChangeConfig (p_me)
     {
-        if (this.state.m_update === 0) return ;
+        if (p_me.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -272,6 +274,7 @@ export default class ClssGamePadControl extends React.Component {
     
 
     componentDidMount () {
+
         $('#modal_ctrl_gamepad').hide();
         $('#modal_ctrl_gamepad').draggable();
         $('#modal_ctrl_gamepad').on("mouseover", function () {
