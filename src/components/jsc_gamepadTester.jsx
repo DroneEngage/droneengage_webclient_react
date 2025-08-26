@@ -2,14 +2,14 @@ import React from 'react';
 import * as js_helpers from '../js/js_helpers';
 import { js_globals } from '../js/js_globals';
 import * as js_siteConfig from '../js/js_siteConfig.js'
-
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_localStorage } from '../js/js_localStorage';
 import { js_speak } from '../js/js_speak';
-import {fn_helpPage} from '../js/js_main.js';
+import { fn_helpPage } from '../js/js_main.js';
 
 const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
 const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';
+
 export default class ClssGamepadTester extends React.Component {
   constructor(props) {
     super(props);
@@ -18,15 +18,14 @@ export default class ClssGamepadTester extends React.Component {
       axes: [],
       buttons: [],
       axisFunctions: [],
-      buttonFunctions: [],
       selectedConfig: '1',
       m_update: 1,
       configPreferences: {
-        "1": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
-        "2": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
-        "3": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
-        "4": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
-        "5": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], mode: 1 },
+        "1": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
+        "2": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
+        "3": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
+        "4": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
+        "5": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
       },
     };
 
@@ -52,6 +51,10 @@ export default class ClssGamepadTester extends React.Component {
       const savedConfig = js_localStorage.fn_getGamePadConfig(config);
       if (savedConfig) {
         updatedConfigs[config] = JSON.parse(savedConfig);
+        // Ensure buttonsFunction exists in loaded config
+        if (!updatedConfigs[config].buttonsFunction) {
+          updatedConfigs[config].buttonsFunction = [];
+        }
       }
     });
 
@@ -60,29 +63,25 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
-  isItemExist = (array, required = [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE , js_globals.STICK_MODE_THR]) => {
-  return required.every(val => array.includes(val));
-  }
+  isItemExist = (array, required = [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE, js_globals.STICK_MODE_THR]) => {
+    return required.every(val => array.includes(val));
+  };
 
   onDataChanged = () => {
-    const valid_axis = this.isItemExist(this.state.axisFunctions, [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE , js_globals.STICK_MODE_THR]);
-    if (valid_axis)
-    {
+    const valid_axis = this.isItemExist(this.state.axisFunctions, [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE, js_globals.STICK_MODE_THR]);
+    if (valid_axis) {
       this.txtSaveRef.current.className = css_to_save;
       this.m_invalid_settings = false;
-    }
-    else
-    {
+    } else {
       this.txtSaveRef.current.className = css_normal;
       this.m_invalid_settings = true;
     }
   };
-  
+
   saveConfiguration2 = () => {
     const { selectedConfig, configPreferences } = this.state;
     js_localStorage.fn_setGamePadConfig(selectedConfig, JSON.stringify(configPreferences[selectedConfig]));
 
-    // Toggle class based on a condition (e.g., success)
     const currentClass = this.txtSaveRef.current.className;
     if (currentClass.includes('btn-danger')) {
       this.txtSaveRef.current.className = css_normal;
@@ -91,68 +90,58 @@ export default class ClssGamepadTester extends React.Component {
     }
   };
 
-
   fn_importData = (event) => {
-   const file = event.target.files[0];
+    const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        try {
-            const configs = JSON.parse(e.target.result);
-            const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
-            
-            // Clear existing game pad configs
-            for (let i = js_localStorage.length - 1; i >= 0; i--) {
-                const key = js_localStorage.key(i);
-                if (key.startsWith(configPrefix)) {
-                    js_localStorage.removeItem(key);
-                }
-            }
-            
-            // Set new configs
-            Object.entries(configs).forEach(([index, value]) => {
-                    js_localStorage.fn_setGamePadConfig(index, value);
-            });
-            
-            this.loadSavedConfigurations();
-            this.checkGamepads();
-            
-            console.log('Game pad configurations imported successfully');
-        } catch (error) {
-            console.error('Error importing configurations:', error);
-            alert('Failed to import configurations. Invalid JSON file.');
+      try {
+        const configs = JSON.parse(e.target.result);
+        const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
+
+        for (let i = js_localStorage.length - 1; i >= 0; i--) {
+          const key = js_localStorage.key(i);
+          if (key.startsWith(configPrefix)) {
+            js_localStorage.removeItem(key);
+          }
         }
-    }.bind(this); // Bind to maintain context of this.isSupported()
-    
+
+        Object.entries(configs).forEach(([index, value]) => {
+          js_localStorage.fn_setGamePadConfig(index, value);
+        });
+
+        this.loadSavedConfigurations();
+        this.checkGamepads();
+
+        console.log('Game pad configurations imported successfully');
+      } catch (error) {
+        console.error('Error importing configurations:', error);
+        alert('Failed to import configurations. Invalid JSON file.');
+      }
+    }.bind(this);
+
     reader.readAsText(file);
-  }
+  };
 
-
-  // Dynamically create file input and trigger file selection
- fn_triggerGamePadConfigImport() {
+  fn_triggerGamePadConfigImport() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.json';
-    fileInput.style.display = 'none'; // Hide the input element
-    
-    // Attach the import handler
+    fileInput.style.display = 'none';
+
     fileInput.addEventListener('change', this.fn_importData);
-    
-    // Append to document and trigger click
     document.body.appendChild(fileInput);
     fileInput.click();
-    
-    // Clean up after selection
-    fileInput.addEventListener('change', () => {
-        document.body.removeChild(fileInput);
-    });
-}
 
+    fileInput.addEventListener('change', () => {
+      document.body.removeChild(fileInput);
+    });
+  }
 
   fn_exportData = () => {
     js_localStorage.fn_exportGamePadConfigs();
-  }
+  };
 
   checkGamepads = () => {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -175,6 +164,8 @@ export default class ClssGamepadTester extends React.Component {
         }
       });
 
+      configPreferences[selectedConfig].buttonsFunction = newButtonFunctions;
+
       const transformedAxes = firstGamepad.axes.map((value, i) => 
         (value * (axisReversed[i] !== undefined ? axisReversed[i] : 1)).toFixed(4)
       );
@@ -184,7 +175,6 @@ export default class ClssGamepadTester extends React.Component {
         axes: transformedAxes,
         buttons: firstGamepad.buttons.map(button => button.value.toFixed(2)),
         axisFunctions: newAxisFunctions,
-        buttonFunctions: newButtonFunctions,
       };
 
       firstGamepad.axes.forEach((value, i) => {
@@ -203,7 +193,7 @@ export default class ClssGamepadTester extends React.Component {
 
       this.setState(newState);
     } else {
-      this.setState({ gamepads: [], axes: [], buttons: [], axisFunctions: [], buttonFunctions: [] });
+      this.setState({ gamepads: [], axes: [], buttons: [], axisFunctions: [] });
     }
   };
 
@@ -224,10 +214,9 @@ export default class ClssGamepadTester extends React.Component {
     this.setState(prevState => ({
       configPreferences: {
         ...prevState.configPreferences,
-        [selectedConfig]: { functionMappings: {}, axisReversed: [], mode: 1 },
+        [selectedConfig]: { functionMappings: {}, axisReversed: [], buttonsFunction: [], mode: 1 },
       },
       axisFunctions: prevState.axisFunctions.map(() => 'undefined'),
-      buttonFunctions: prevState.buttonFunctions.map(() => 'undefined'),
     }), () => {
       js_localStorage._removeValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${selectedConfig}`);
       this.checkGamepads();
@@ -298,10 +287,11 @@ export default class ClssGamepadTester extends React.Component {
     if (functionIndex === -1 && functionName !== 'undefined') return;
 
     this.setState(prevState => {
-      const newButtonFunctions = [...prevState.buttonFunctions];
-      newButtonFunctions[buttonIndex] = functionName;
       const newConfigPreferences = { ...prevState.configPreferences };
-      const currentMappings = { ...newConfigPreferences[prevState.selectedConfig].functionMappings };
+      const currentConfig = { ...newConfigPreferences[prevState.selectedConfig] };
+      const newButtonFunctions = [...(currentConfig.buttonsFunction || [])];
+      newButtonFunctions[buttonIndex] = functionName;
+      const currentMappings = { ...currentConfig.functionMappings };
 
       Object.keys(currentMappings).forEach(key => {
         if (key === functionName) {
@@ -319,9 +309,11 @@ export default class ClssGamepadTester extends React.Component {
         currentMappings[functionName] = { type: 'button', index: buttonIndex };
       }
 
-      newConfigPreferences[prevState.selectedConfig].functionMappings = currentMappings;
+      currentConfig.functionMappings = currentMappings;
+      currentConfig.buttonsFunction = newButtonFunctions;
+      newConfigPreferences[prevState.selectedConfig] = currentConfig;
 
-      return { buttonFunctions: newButtonFunctions, configPreferences: newConfigPreferences };
+      return { configPreferences: newConfigPreferences };
     }, () => {
       this.onDataChanged();
       console.log(`Assigning function ${functionName} to button ${buttonIndex} in ${this.state.selectedConfig}`);
@@ -349,7 +341,6 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
-  // Function to format a number with a sign and fixed width
   formatNumberWithSign = (number, totalWidth, decimalPlaces) => {
     const formattedNumber = Math.abs(number).toFixed(decimalPlaces);
     const sign = number >= 0 ? '+' : '-';
@@ -357,14 +348,15 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   render() {
-    const { gamepads, axes, buttons, axisFunctions, buttonFunctions, selectedConfig, configPreferences } = this.state;
+    const { gamepads, axes, buttons, axisFunctions, selectedConfig, configPreferences } = this.state;
     const fadeDuration = 1000;
     const currentTime = new Date().getTime();
     const currentMode = configPreferences[selectedConfig].mode || 1;
-    
+    const buttonFunctions = configPreferences[selectedConfig].buttonsFunction || [];
+
     return (
       <div className="container">
-        <h2 className='pt-5 ' >Gamepad Tester</h2>
+        <h2 className='pt-5'>Gamepad Tester</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
             <label>Settings Template: </label>
@@ -399,36 +391,34 @@ export default class ClssGamepadTester extends React.Component {
                 <a className="dropdown-item" href="#" onClick={(e) => this.handleModeChange(4)}>Mode 4</a>
               </div>
             </div>
-
             <button
               onClick={this.handleReset}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn font-monospace"
+              className="ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn font-monospace"
             >
               Reset
             </button>
             <button
               onClick={this.saveConfiguration2}
-              className="ms-3 p-1 px-2 btn btn-sm  border-danger ctrlbtn font-monospace"
+              className="ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn font-monospace"
               ref={this.txtSaveRef}
             >
               Save
             </button>
             <button
-              onClick={(e)=>this.fn_triggerGamePadConfigImport(e)}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-danger ctrlbtn font-monospace"
+              onClick={(e) => this.fn_triggerGamePadConfigImport(e)}
+              className="ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn font-monospace"
             >
               Import
             </button>
-            
             <button
-              onClick={(e)=>this.fn_exportData()}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-success ctrlbtn font-monospace"
+              onClick={(e) => this.fn_exportData()}
+              className="ms-3 p-1 px-2 btn btn-sm btn-success ctrlbtn font-monospace"
             >
               Export
             </button>
             <button
-              onClick={(e)=>fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}
-              className="ms-3 p-1 px-2 btn btn-sm  btn-primary ctrlbtn font-monospace"
+              onClick={(e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}
+              className="ms-3 p-1 px-2 btn btn-sm btn-primary ctrlbtn font-monospace"
             >
               Help
             </button>
@@ -466,7 +456,7 @@ export default class ClssGamepadTester extends React.Component {
                           </option>
                         ))}
                       </select>
-                      <label style={{ marginRight: '10px', fontFamily: 'Courier New, monospace'  }}>
+                      <label style={{ marginRight: '10px', fontFamily: 'Courier New, monospace' }}>
                         <input
                           type="checkbox"
                           checked={isReversed}

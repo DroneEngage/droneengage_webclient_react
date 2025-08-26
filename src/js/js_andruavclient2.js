@@ -900,7 +900,7 @@ class CAndruavClient {
             return;
         
 
-        switch (js_globals.m_gamepad_mode_index) {
+        switch (js_localGamePad.m_gamepad_mode_index) {
             case 0: v_axis = [0, 3, 2, 1]; // PITCH3  _ RUDD0        #    THR1    _  ROLL2
                 break;
             case 1: v_axis = [0, 1, 2, 3]; // THR1    _ RUDD0        #    PITCH3  _  ROLL2

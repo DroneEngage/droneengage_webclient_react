@@ -57,7 +57,7 @@ class ClssGamePadAxesControl extends React.Component {
                 
             );
         }
-        const c_mode = js_globals.m_gamepad_mode_index;
+        const c_mode = js_localGamePad.m_gamepad_mode_index;
         const v_axis = [js_globals.STICK_MODE_MAPPING[c_mode].RUD,
                         js_globals.STICK_MODE_MAPPING[c_mode].THR,
                         js_globals.STICK_MODE_MAPPING[c_mode].ALE,
@@ -88,6 +88,10 @@ class ClssGamePadButtonControl extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
     }
     
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
+
     fn_gamePadButtonUpdated(p_me,p_obj)
     {
         if (p_me.state.m_update === 0) return ;
@@ -103,6 +107,7 @@ class ClssGamePadButtonControl extends React.Component {
 
     render()
     {
+        const button_routing = js_localGamePad.m_button_routing;
         const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
         if (c_padStatus== null)
         {
@@ -112,17 +117,17 @@ class ClssGamePadButtonControl extends React.Component {
 
         return (
             <div className='gp_buttons'>
-                <ClssGamePadButton id='btn0' t='L' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn1' t='A' color_active='green'     color_inactive='none' pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn2' t='B' color_active='red'       color_inactive='none' pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn3' t='X' color_active='blue'      color_inactive='none' pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn4' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn5' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn6' t='Y' color_active='yellow'    color_inactive='none' pressed={c_padStatus.p_buttons[6].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn7' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[7].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn8' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[8].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn9' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[9].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn10' t='R' color_active='white'     color_inactive='none' pressed={c_padStatus.p_buttons[10].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn0'  btn={c_padStatus.p_buttons[0]}  t='A' title={button_routing[0]}     color_active='red'       color_inactive='none' p_pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn1'  btn={c_padStatus.p_buttons[1]}  t='R' title={button_routing[1]}     color_active='blue'      color_inactive='none' p_pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn2'  btn={c_padStatus.p_buttons[2]}  t='L' title={button_routing[2]}    color_active='yellow'     color_inactive='none' p_pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn3'  btn={c_padStatus.p_buttons[3]}  t='X' title={button_routing[3]}    color_active='blue'       color_inactive='none' p_pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn4'  btn={c_padStatus.p_buttons[4]}  t='Y' title={button_routing[4]}     color_active='yellow'    color_inactive='none' p_pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn5'  btn={c_padStatus.p_buttons[5]}  t='R' title={button_routing[5]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn6'  btn={c_padStatus.p_buttons[6]}  t='Y' title={button_routing[6]}     color_active='yellow'    color_inactive='none' p_pressed={c_padStatus.p_buttons[6].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn7'  btn={c_padStatus.p_buttons[7]}  t='R' title={button_routing[7]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[7].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn8'  btn={c_padStatus.p_buttons[8]}  t='R' title={button_routing[8]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[8].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn9'  btn={c_padStatus.p_buttons[9]}  t='R' title={button_routing[9]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[9].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn10' btn={c_padStatus.p_buttons[10]} t='R' title={button_routing[10]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[10].m_pressed}></ClssGamePadButton>
             </div>
         );
     }
@@ -151,6 +156,10 @@ export default class ClssGamePadControl extends React.Component {
         js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Control_Update,this, this.fn_onChangeConfig);
     }
 
+
+    componentDidMount() {
+        this.state.m_update = 1;
+    }
     
     fn_renderMainOutput(p_connected)
     {
@@ -189,6 +198,7 @@ export default class ClssGamePadControl extends React.Component {
 
     fn_onChangeConfig (p_me)
     {
+        if (this.state.m_update === 0) return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 

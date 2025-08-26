@@ -104,7 +104,6 @@ class GLOBALS {
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
 		this.active_gamepad_index           	= 0;
 		this.v_total_gampad_buttons				= 12;
-		this.m_gamepad_mode_index 				= 0;
 		this.CONST_RUD_CHANNEL					= 0;
 		this.CONST_THR_CHANNEL					= 1;
 		this.CONST_ALE_CHANNEL					= 2;
@@ -137,6 +136,11 @@ class GLOBALS {
 			["ALE", "THR", "RUD", "ELE"]		// MODE 4
 			
 		];	
+
+		this.BUTTON_FUNTION_UNUSED	= 0;
+		this.BUTTON_FUNTION_ARM		= 1;
+		this.BUTTON_FUNTION_RTL		= 2;
+		this.BUTTON_FUNTION_LAND    = 3;
 
 	    // Mission File Extension
 		this.v_mission_file_extension = '.de';

@@ -30,7 +30,17 @@ class fn_Obj_padStatus {
     {
     this.p_ctrl_type = GAME_GENERIC;
     this.p_unified_virtual_axis = [-1, 0, 0, 0];
-
+    this.m_button_routing = [0, 0, 0, 0];
+    
+    this.m_gamepad_mode_index 				= 0;  
+		
+    /**
+    * m_button_routing index represents buttons on the virtual GamePad on screen.
+    * each cell value represents the source button of the Button index of 
+    * the source physical GamePad.
+    */
+    this.m_button_routing = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        
     this.p_buttons = [];
 
     this.p_connected = false;
@@ -110,10 +120,21 @@ class CAndruavGamePad {
         return false;
     }
 
-    
-
+        /**
+         * Based on TX mode 1,2,3,4
+         * the cells into m_channel_routing changes its function.
+         * for example in mode-2 mapping is [RUD, THR, ALE, ELE]
+         * and the value of each cell represents the Axis index of the source 
+         * of the gamepad.
+         */
         this.m_channel_routing = [-1,-1,-1,-1]; // regardless of mode this maps sticks. ()
-        this.m_channel_axis_reverse = [1, 1, 1, 1, 1, 1, 1];
+        
+        /**
+         * m_button_routing index represents buttons on the virtual GamePad on screen.
+         * each cell value represents the source button of the Button index of 
+         * the source physical GamePad.
+         */
+        this.m_button_routing = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
         if (!config) return;
         const json_config = JSON.parse(config);
@@ -121,26 +142,50 @@ class CAndruavGamePad {
         {
             const function_mappings = json_config["functionMappings"];
             
-            js_globals.m_gamepad_mode_index = json_config.mode - 1;
-            this.m_channel_axis_reverse = json_config.axisReversed;
+            this.m_gamepad_mode_index = json_config.mode - 1;
+
+            const functions_per_mode = js_globals.STICK_MODE_MAPPING[this.m_gamepad_mode_index];
+            
+            this.m_channel_axis_reverse  = json_config.axisReversed.length>0?json_config.axisReversed:[1, 1, 1, 1, 1, 1, 1];
+            
+            this.m_button_routing = json_config.buttonsFunction;
+
             // yaw is always index 
             const yaw = function_mappings.RUD
-            if (yaw && yaw.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].RUD] = yaw.index; // copy index of rudder gamepad input axis to Rudder Slot based on RX-MODE (1,2,3,4).
+            if (yaw && yaw.type=="axis") this.m_channel_routing[functions_per_mode.RUD] = yaw.index; // copy index of rudder gamepad input axis to Rudder Slot based on RX-MODE (1,2,3,4).
 
             // thr is always index 
             const thr = function_mappings.THR
-            if (thr && thr.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].THR] = thr.index; // copy index of THR gamepad input axis to THR Slot based on RX-MODE (1,2,3,4).
+            if (thr && thr.type=="axis") this.m_channel_routing[functions_per_mode.THR] = thr.index; // copy index of THR gamepad input axis to THR Slot based on RX-MODE (1,2,3,4).
 
             // roll is always index 
             const roll = function_mappings.ALE
-            if (roll && roll.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ALE] = roll.index; // copy index of ALE gamepad input axis to ALE Slot based on RX-MODE (1,2,3,4).
+            if (roll && roll.type=="axis") this.m_channel_routing[functions_per_mode.ALE] = roll.index; // copy index of ALE gamepad input axis to ALE Slot based on RX-MODE (1,2,3,4).
 
             // pitch is always index 
             const pitch = function_mappings.ELE;
-            if (pitch && pitch.type=="axis") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE] = pitch.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            if (pitch && pitch.type=="axis") this.m_channel_routing[functions_per_mode.ELE] = pitch.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
 
             // so m_channel_routing contains the input axis index that corresponds to each STICK in the remote based on RX-MODE and Function.
+
+            // // arm is always index 
+            // const arm = function_mappings.ARM;
+            // if (arm && arm.type=="button") this.m_channel_routing[0] = arm.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            
+            // const rtl = function_mappings.RTL;
+            // if (rtl && rtl.type=="button") this.m_channel_routing[1] = rtl.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            
+            // const arm = function_mappings.ARM;
+            // if (arm && arm.type=="button") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE] = arm.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            
+            // const arm = function_mappings.ARM;
+            // if (arm && arm.type=="button") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE] = arm.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            
+            // const arm = function_mappings.ARM;
+            // if (arm && arm.type=="button") this.m_channel_routing[js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index].ELE] = arm.index; // copy index of ELE gamepad input axis to ELE Slot based on RX-MODE (1,2,3,4).
+            
         }
+
         
         return true;
     }
@@ -246,34 +291,6 @@ class CAndruavGamePad {
 
         js_common.fn_console_log("vendorNumber:" + vendorNumber + " ::: productNumber:" + productNumber);
 
-        // if ((vendorNumber === '06f7') && (productNumber === '0003'))
-        // {
-        //     v_padStatus.p_ctrl_type = GAME_PAD_WAILLY_PPM;
-        // }else
-        // if ((vendorNumber === '0e6f') && (productNumber === 'f501'))
-        // {
-        //     if (p_gamepad.axes.length === 4)
-        //     {  // just in case this 'bug' exists
-        //         v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
-        //     }
-        //     else
-        //     {   
-        //         v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
-        //     }
-
-        // }else
-        // if ((GAME_XBOX_360_MICROSOFT_VENDOR.includes(vendorNumber) === true) && (GAME_XBOX_360_MICROSOFT_PRODUCT.includes(productNumber) === true))
-        // {
-        //     if (p_gamepad.axes.length === 4)
-        //     {
-        //         v_padStatus.p_ctrl_type = GAME_XBOX_360_MICROSOFT;
-        //     }
-        //     else
-        //     {   // on firefox I found it can be detected as GAME_COR_CTRL_MICROSOFT
-        //         v_padStatus.p_ctrl_type = GAME_COR_CTRL_MICROSOFT;
-        //     }
-        // }
-        
         v_padStatus.id = p_gamepad.id;
         
         me.v_controllers[p_gamepad.index] = v_padStatus;
@@ -336,13 +353,14 @@ class CAndruavGamePad {
              * ELE - 3
              */
             const channel_routing = this.m_channel_routing;
+            const functions_per_mode = js_globals.STICK_MODE_MAPPING[this.m_gamepad_mode_index];
+            
             // Ensure axes and channel routing are valid
             if (!p_gamepad.axes || channel_routing[0] === undefined || channel_routing[1] === undefined ||
                 channel_routing[2] === undefined || channel_routing[3] === undefined) {
                 return; // Skip processing if axes or routing is invalid
             }
             
-            const functions_per_mode = js_globals.STICK_MODE_MAPPING[js_globals.m_gamepad_mode_index];
             // Rudder
             let val = p_gamepad.axes[channel_routing[functions_per_mode.RUD]];
             val = Math.max(-1, Math.min(1, val)).toFixed(2) * this.m_channel_axis_reverse[channel_routing[functions_per_mode.RUD]]; // Clamp and format
@@ -381,141 +399,8 @@ class CAndruavGamePad {
 
             let v_buttonChanged = false;
 
-
-            c_padStatus.p_buttons[0].m_pressed = true; // p_gamepad.buttons[i].pressed;
-            c_padStatus.p_buttons[0].m_timestamp = Date.now();
-            c_padStatus.p_buttons[0].m_longPress = false;
-            v_buttonChanged = true;
-            
-            if (v_buttonChanged === true) {
-                let v_Packet = {};
-                v_Packet.p_buttonIndex = 0;
-                v_Packet.p_buttons = c_padStatus.p_buttons;
-                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-            }
-
-        }
-        else if (c_padStatus.p_ctrl_type === GAME_PAD_WAILLY_PPM)
-        {
-            // Rudder
-            let val = (p_gamepad.axes[5]*2).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
-            if (c_padStatus.p_unified_virtual_axis[0] !== val) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[0] = val;
-                
-            }
-            // Throttlr
-            val = (p_gamepad.axes[2]*2).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
-            if (c_padStatus.p_unified_virtual_axis[1] !== val) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[1] = val;
-                
-            }
-            // ROLL
-            val = (p_gamepad.axes[0]*2).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
-            if (c_padStatus.p_unified_virtual_axis[2] !== val) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[2] = val;
-                
-            }
-            // PITCH
-            val = -(p_gamepad.axes[1]*2).toFixed(2);
-            if (val>1) val = 1;
-            if (val<-1) val = -1;
-            if (c_padStatus.p_unified_virtual_axis[3] !== val) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[3] = val;
-                
-            }
-
-            // send if there are changes or not sending for more than a second then send to avoid timeout from vehicle.
-            // the 1000 defines the maximum delay between messages. 
-            // minimum delay between messages are defined in js_andruavclient2.js CONST_sendRXChannels_Interval
-            if ((v_axesChanged === true) || ((c_now - this.v_lastUpdateSent) > 1000)) {
-                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Axes_Updated);
-                this.v_lastUpdateSent = c_now;
-            }
-        }
-        else if (c_padStatus.p_ctrl_type === GAME_XBOX_360_MICROSOFT)
-        {
-
-            for (let j = 0; j < 4; ++ j) {
-                if (c_padStatus.p_unified_virtual_axis[j] !== p_gamepad.axes[j]) {
-                    v_axesChanged = true;
-                    c_padStatus.p_unified_virtual_axis[j] = p_gamepad.axes[j].toFixed(2);
-                }
-            }
-
-            if ((v_axesChanged === true) ) {
-                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Axes_Updated);
-                this.v_lastUpdateSent = c_now;
-            }
-
-            let v_buttonChanged = false;
-
-            for (let i = 0; i <= 5; ++ i) {
-                const c_pressed = p_gamepad.buttons[i].pressed;
-                if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
-                    v_buttonChanged = true;
-                    c_padStatus.p_buttons[i].m_pressed = p_gamepad.buttons[i].pressed;
-                    c_padStatus.p_buttons[i].m_timestamp = Date.now();
-                    c_padStatus.p_buttons[i].m_longPress = false;
-                    const v_Packet = {
-                        p_buttonIndex: i,
-                        p_buttons: c_padStatus.p_buttons
-                    };
-                    js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-                } else {
-                    if ((c_pressed === true) && (!c_padStatus.p_buttons[i].m_longPress) 
-                        && ((Date.now() - c_padStatus.p_buttons[i].m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS)) { // long press
-                
-                        c_padStatus.p_buttons[i].m_longPress = true;  // Set long press flag
-                
-                        const v_Packet = {
-                            p_buttonIndex: i,
-                            p_buttons: c_padStatus.p_buttons
-                        };
-                        
-                        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, v_Packet);
-                        js_common.fn_console_log("button " + i + " long press");
-                    }
-                }
-            }
-        }
-        else if (c_padStatus.p_ctrl_type === GAME_COR_CTRL_MICROSOFT)
-        {
-
-            if (c_padStatus.p_unified_virtual_axis[0] !== p_gamepad.axes[0]) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[0] = p_gamepad.axes[0].toFixed(2);
-            }
-            if (c_padStatus.p_unified_virtual_axis[1] !== p_gamepad.axes[1]) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[1] = p_gamepad.axes[1].toFixed(2);
-            }
-            if (c_padStatus.p_unified_virtual_axis[2] !== p_gamepad.axes[3]) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[2] = p_gamepad.axes[3].toFixed(2);
-            }
-            if (c_padStatus.p_unified_virtual_axis[3] !== p_gamepad.axes[4]) {
-                v_axesChanged = true;
-                c_padStatus.p_unified_virtual_axis[3] = p_gamepad.axes[4].toFixed(2);
-            }
-
-            if ((v_axesChanged === true) ) {
-                js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Axes_Updated);
-                this.v_lastUpdateSent = c_now;
-            }
-
-            let v_buttonChanged = false;
-
-            for (let i = 0; i <= 5; ++ i) {
+            const len = p_gamepad.buttons.length;
+            for (let i = 0; i < len; ++ i) {
                 const c_pressed = p_gamepad.buttons[i].pressed;
                 if (c_padStatus.p_buttons[i].m_pressed !== c_pressed) {
                     v_buttonChanged = true;
@@ -544,4 +429,4 @@ class CAndruavGamePad {
     }
 };
 
-export var js_localGamePad= CAndruavGamePad.getInstance();
+export const js_localGamePad= CAndruavGamePad.getInstance();
