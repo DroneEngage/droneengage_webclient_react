@@ -116,18 +116,18 @@ class ClssGamePadButtonControl extends React.Component {
         }
 
         return (
-            <div className='gp_buttons'>
-                <ClssGamePadButton id='btn0'  btn={c_padStatus.p_buttons[0]}  t='A' title={button_routing[0]}     color_active='red'       color_inactive='none' p_pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn1'  btn={c_padStatus.p_buttons[1]}  t='R' title={button_routing[1]}     color_active='blue'      color_inactive='none' p_pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn2'  btn={c_padStatus.p_buttons[2]}  t='L' title={button_routing[2]}    color_active='yellow'     color_inactive='none' p_pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn3'  btn={c_padStatus.p_buttons[3]}  t='X' title={button_routing[3]}    color_active='blue'       color_inactive='none' p_pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn4'  btn={c_padStatus.p_buttons[4]}  t='Y' title={button_routing[4]}     color_active='yellow'    color_inactive='none' p_pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn5'  btn={c_padStatus.p_buttons[5]}  t='R' title={button_routing[5]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn6'  btn={c_padStatus.p_buttons[6]}  t='Y' title={button_routing[6]}     color_active='yellow'    color_inactive='none' p_pressed={c_padStatus.p_buttons[6].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn7'  btn={c_padStatus.p_buttons[7]}  t='R' title={button_routing[7]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[7].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn8'  btn={c_padStatus.p_buttons[8]}  t='R' title={button_routing[8]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[8].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn9'  btn={c_padStatus.p_buttons[9]}  t='R' title={button_routing[9]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[9].m_pressed}></ClssGamePadButton>
-                <ClssGamePadButton id='btn10' btn={c_padStatus.p_buttons[10]} t='R' title={button_routing[10]}     color_active='white'     color_inactive='none' p_pressed={c_padStatus.p_buttons[10].m_pressed}></ClssGamePadButton>
+            <div className='gp_buttons bg-dark opacity-75'>
+                <ClssGamePadButton id='btn0'  btn={c_padStatus.p_buttons[0]}  t='A' function={button_routing[0]}     color_active={"#FF4444"}        color_inactive='none' p_pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn1'  btn={c_padStatus.p_buttons[1]}  t='R' function={button_routing[1]}     color_active={"#375a7f"}        color_inactive='none' p_pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn2'  btn={c_padStatus.p_buttons[2]}  t='L' function={button_routing[2]}     color_active='yellow'             color_inactive='none' p_pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn3'  btn={c_padStatus.p_buttons[3]}  t='X' function={button_routing[3]}     color_active={"#375a7f"}        color_inactive='none' p_pressed={c_padStatus.p_buttons[3].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn4'  btn={c_padStatus.p_buttons[4]}  t='Y' function={button_routing[4]}     color_active='yellow'             color_inactive='none' p_pressed={c_padStatus.p_buttons[4].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn5'  btn={c_padStatus.p_buttons[5]}  t='R' function={button_routing[5]}     color_active='white'              color_inactive='none' p_pressed={c_padStatus.p_buttons[5].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn6'  btn={c_padStatus.p_buttons[6]}  t='Y' function={button_routing[6]}     color_active='yellow'             color_inactive='none' p_pressed={c_padStatus.p_buttons[6].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn7'  btn={c_padStatus.p_buttons[7]}  t='R' function={button_routing[7]}     color_active='white'              color_inactive='none' p_pressed={c_padStatus.p_buttons[7].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn8'  btn={c_padStatus.p_buttons[8]}  t='R' function={button_routing[8]}     color_active='white'              color_inactive='none' p_pressed={c_padStatus.p_buttons[8].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn9'  btn={c_padStatus.p_buttons[9]}  t='R' function={button_routing[9]}     color_active='white'              color_inactive='none' p_pressed={c_padStatus.p_buttons[9].m_pressed}></ClssGamePadButton>
+                <ClssGamePadButton id='btn10' btn={c_padStatus.p_buttons[10]} t='R' function={button_routing[10]}    color_active='white'              color_inactive='none' p_pressed={c_padStatus.p_buttons[10].m_pressed}></ClssGamePadButton>
             </div>
         );
     }
