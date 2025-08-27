@@ -39,22 +39,22 @@ export class ClssCtrlP2P extends React.Component {
 
     fn_resetP2P (p_andruavUnit)
     {
-        js_globals.v_andruavClient.API_resetP2P(p_andruavUnit);
+        js_globals.v_andruavFacade.API_resetP2P(p_andruavUnit);
     }
 
     fn_scanP2P (p_andruavUnit)
     {
-        js_globals.v_andruavClient.API_scanP2P(p_andruavUnit);
+        js_globals.v_andruavFacade.API_scanP2P(p_andruavUnit);
     }
 
     fn_setCommunicationChannel_P2P (p_andruavUnit, p2p_state)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, null, p2p_state, null, null, null, null);
+        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, null, p2p_state, null, null, null, null);
     }
 
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
+        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)

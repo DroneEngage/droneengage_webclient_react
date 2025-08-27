@@ -33,7 +33,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
         js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIStatusChanged, this, this.fn_onTrackingAIStatusChanged);
         js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIObjectListUpdate, this, this.fn_onTrackingAIObjectListUpdate);
 
-        js_globals.v_andruavClient.API_GetTrackingAIClassList(this.props.p_unit);
+        js_globals.v_andruavFacade.API_GetTrackingAIClassList(this.props.p_unit);
 
     }
 
@@ -83,7 +83,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
 
     fnl_trackerAIOff() {
-        js_globals.v_andruavClient.API_DisableTrackingAI(this.props.p_unit);
+        js_globals.v_andruavFacade.API_DisableTrackingAI(this.props.p_unit);
     }
 
     fnl_trackerAIOnOff(e) {
@@ -93,9 +93,9 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
         }
         else
         {
-            js_globals.v_andruavClient.API_EnableTrackingAI(this.props.p_unit);
+            js_globals.v_andruavFacade.API_EnableTrackingAI(this.props.p_unit);
             if (this.state.m_selectedUnits.length == 0) return ; // nothing to select
-            js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
+            js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
         }
 
         js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, this.props.p_unit);
@@ -124,7 +124,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
         if (newSelectedUnits.length === 0) return; // nothing to select
 
-        js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, newSelectedUnits);
+        js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, newSelectedUnits);
 
 
         this.setState({
@@ -150,7 +150,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
             m_selected_units_updated: true
         }, () => { // Callback function executed after state update
             if (newSelectedUnits.length > 0) { // Only send if there are selected units
-                js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
+                js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
             } else {
                 // Optionally, if no items are selected, you might want to pause tracking
                 this.fnl_trackerAIOff();

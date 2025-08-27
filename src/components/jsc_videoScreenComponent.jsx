@@ -100,7 +100,7 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     fnl_switchcam(e, p_obj) {
-        js_globals.v_andruavClient.API_SwitchCamera(this.props.obj.v_unit, p_obj.v_track);
+        js_globals.v_andruavFacade.API_SwitchCamera(this.props.obj.v_unit, p_obj.v_track);
     }
 
 
@@ -157,7 +157,7 @@ export default class ClssCVideoScreen extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         v_talk.hangup(true);
-        js_globals.v_andruavClient.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
         v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         
         if (this.state.m_update === 0) return ;
@@ -343,7 +343,7 @@ export default class ClssCVideoScreen extends React.Component {
 
     fnl_zoomInOut(e, p_zoomIn, p_obj) {
         js_common.fn_console_log("p_cameraIndex: " + JSON.stringify(p_obj));
-        js_globals.v_andruavClient.API_CONST_RemoteCommand_zoomCamera(p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_zoomCamera(p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
     }
 
     fnl_flashOnOff (e, p_obj)
@@ -362,7 +362,7 @@ export default class ClssCVideoScreen extends React.Component {
             return ; 
         }
         js_common.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
-        js_globals.v_andruavClient.API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
+        js_globals.v_andruavFacade.API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
 
         this.state.m_flash = v_flashValue;
     }
@@ -376,7 +376,7 @@ export default class ClssCVideoScreen extends React.Component {
         let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         this.m_rotation = (this.m_rotation + 1) % 4;
-        js_globals.v_andruavClient.API_CONST_RemoteCommand_rotateVideo(v_andruavUnit, this.m_rotations[this.m_rotation], this.props.obj.v_track);
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_rotateVideo(v_andruavUnit, this.m_rotations[this.m_rotation], this.props.obj.v_track);
     }
 
     fnl_mirror_local(v_e) {
@@ -463,7 +463,7 @@ export default class ClssCVideoScreen extends React.Component {
             return;
         }
 
-        js_globals.v_andruavClient.API_SendTrackCRegion(c_andruavUnit,
+        js_globals.v_andruavFacade.API_SendTrackCRegion(c_andruavUnit,
             parseFloat(v_x1),
             parseFloat(v_y1),
             parseFloat(normalizedWidth),
@@ -488,7 +488,7 @@ export default class ClssCVideoScreen extends React.Component {
         const c_dim = e.currentTarget.getBoundingClientRect();
         const v_x1 = ((e.nativeEvent.x - c_dim.left) / c_dim.width).toFixed(3);
         const v_y1 = ((e.nativeEvent.y - c_dim.top) / c_dim.height).toFixed(3);;
-        js_globals.v_andruavClient.API_SendTrackPoint(c_andruavUnit, parseFloat(v_x1), parseFloat(v_y1), parseFloat("0.05"));
+        js_globals.v_andruavFacade.API_SendTrackPoint(c_andruavUnit, parseFloat(v_x1), parseFloat(v_y1), parseFloat("0.05"));
     }
 
     render() {

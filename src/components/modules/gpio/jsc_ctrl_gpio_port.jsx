@@ -79,7 +79,7 @@ export class ClssCtrlGPIO_Port extends React.Component {
         this.setState({ gpio_obj: newGpioObj });
 
         // Update unit only when mouse is up to avoid multiple updates when scrolling.
-        js_globals.v_andruavClient.API_writeGPIO_PWM(this.props.p_unit, newGpioObj.pin_module_key, newGpioObj.pin_number, newGpioObj.pin_value, newGpioObj.pwm_width);
+        js_globals.v_andruavFacade.API_writeGPIO_PWM(this.props.p_unit, newGpioObj.pin_module_key, newGpioObj.pin_number, newGpioObj.pin_value, newGpioObj.pwm_width);
     }
 
     fn_onPWMFrequencyChange(e) {
@@ -90,7 +90,7 @@ export class ClssCtrlGPIO_Port extends React.Component {
     fn_onApplyFrequency = () => {
         const newGpioObj = { ...this.state.gpio_obj, pin_value: parseInt(this.state.pwm_freq_input) }; // Create a copy!
         this.setState({ gpio_obj: newGpioObj }, () => {
-            js_globals.v_andruavClient.API_writeGPIO_PWM(this.props.p_unit, newGpioObj.pin_module_key, newGpioObj.pin_number, newGpioObj.pin_value, newGpioObj.pwm_width);
+            js_globals.v_andruavFacade.API_writeGPIO_PWM(this.props.p_unit, newGpioObj.pin_module_key, newGpioObj.pin_number, newGpioObj.pin_value, newGpioObj.pwm_width);
         });
     }
 
@@ -98,7 +98,7 @@ export class ClssCtrlGPIO_Port extends React.Component {
         const checked = e.currentTarget.checked;
         if (this.props.gpio_obj.pin_mode >= 2) return;
 
-        js_globals.v_andruavClient.API_writeGPIO(this.props.p_unit, this.props.gpio_obj.pin_module_key, this.props.gpio_obj.pin_number, checked ? 1 : 0);
+        js_globals.v_andruavFacade.API_writeGPIO(this.props.p_unit, this.props.gpio_obj.pin_module_key, this.props.gpio_obj.pin_number, checked ? 1 : 0);
     };
 
     render() {

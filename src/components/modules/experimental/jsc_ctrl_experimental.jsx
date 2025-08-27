@@ -32,7 +32,7 @@ export class ClssCtrlExperimental extends React.Component {
 
     fn_ConnectToLocalCommServer (p_andruavUnit)
     {
-        js_globals.v_andruavClient.API_connectToLocalCommServer(p_andruavUnit,"192.168.1.144","9967")
+        js_globals.v_andruavFacade.API_connectToLocalCommServer(p_andruavUnit,"192.168.1.144","9967")
     }
 
     fn_scanP2P (p_andruavUnit)
@@ -41,12 +41,12 @@ export class ClssCtrlExperimental extends React.Component {
 
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
+        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
     }
 
     fn_setCommunicationChannel_Local_WS (p_andruavUnit, local_state, duration)
     {
-        js_globals.v_andruavClient.API_SetCommunicationChannel (p_andruavUnit, null, null, null, null, local_state, duration);
+        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, null, null, null, null, local_state, duration);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)

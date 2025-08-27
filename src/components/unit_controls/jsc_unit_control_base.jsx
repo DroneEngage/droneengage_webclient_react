@@ -119,7 +119,7 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_takeTXCtrl (e,p_andruavUnit)
     {
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
-        js_globals.v_andruavClient.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_TX_SIGNAL_FREEZE_ALL);
+        js_globals.v_andruavFacade.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_TX_SIGNAL_FREEZE_ALL);
         js_eventEmitter.fn_dispatch (js_event.EE_requestGamePad, p_andruavUnit);
             
     }
@@ -127,7 +127,7 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_releaseTXCtrl (p_andruavUnit)
     {
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
-        js_globals.v_andruavClient.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
+        js_globals.v_andruavFacade.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
         js_eventEmitter.fn_dispatch (js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             
     }

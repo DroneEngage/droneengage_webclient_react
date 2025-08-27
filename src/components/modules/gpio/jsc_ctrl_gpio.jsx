@@ -29,7 +29,7 @@ export class ClssCtrlGPIO extends React.Component {
 
     componentDidMount() {
         this.setState({ m_update: 1 });
-        js_globals.v_andruavClient.API_requestGPIOStatus(this.props.p_unit); // retrieve the GPIO status.
+        js_globals.v_andruavFacade.API_requestGPIOStatus(this.props.p_unit); // retrieve the GPIO status.
     }
 
     
@@ -42,7 +42,7 @@ export class ClssCtrlGPIO extends React.Component {
 
     fn_refreshGPIO (p_andruavUnit)
     {
-        js_globals.v_andruavClient.API_requestGPIOStatus(p_andruavUnit); // retrieve the GPIO status.
+        js_globals.v_andruavFacade.API_requestGPIOStatus(p_andruavUnit); // retrieve the GPIO status.
     }
 
     

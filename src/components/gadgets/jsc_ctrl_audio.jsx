@@ -44,7 +44,7 @@ export class ClssCtrlAUDIO extends React.Component {
         const p_language = this.state.m_currentLanguage;
         const p_pitch = parseInt(this.m_pitchRef.current.value); // parseInt($('#'+ p_andruavUnit.partyID + 'prng')[0].value);
         const p_volume = parseInt(this.m_volumeRef.current.value); // parseInt($('#'+ p_andruavUnit.partyID + 'vrng')[0].value);
-        js_globals.v_andruavClient.API_soundTextToSpeech (p_andruavUnit, p_text, p_language, p_pitch, p_volume);
+        js_globals.v_andruavFacade.API_soundTextToSpeech (p_andruavUnit, p_text, p_language, p_pitch, p_volume);
     }
 
     render ()

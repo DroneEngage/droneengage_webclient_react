@@ -42,13 +42,13 @@ export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
         {
             v_speak = "change depth to " + v_speak;
 
-            js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, -p_AltitudeInMeter);
+            js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, -p_AltitudeInMeter);
         }
         else
         {
             v_speak = "change altitude to " + v_speak;
             
-            js_globals.v_andruavClient.API_do_ChangeAltitude(p_andruavUnit, p_AltitudeInMeter);
+            js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, p_AltitudeInMeter);
         }
 
         js_speak.fn_speak(v_speak);

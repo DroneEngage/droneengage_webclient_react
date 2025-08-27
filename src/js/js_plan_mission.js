@@ -318,21 +318,21 @@ export class ClssAndruavMissionPlan {
     // Delete Old Shapes
     if (p_missionV110 !== null && p_missionV110 !== undefined) {
       if (
-        js_globals.v_andruavClient !== null &&
-        js_globals.v_andruavClient !== undefined &&
-        js_globals.v_andruavClient.fn_isRegistered() === true
+        js_globals.v_andruavWS !== null &&
+        js_globals.v_andruavWS !== undefined &&
+        js_globals.v_andruavWS.fn_isRegistered() === true
       ) {
-        js_globals.v_andruavClient.API_requestDeleteFenceByName(c_party, null); // deattach drones from all fences in the group
-        js_globals.v_andruavClient.API_disableWayPointTasks(
+        js_globals.v_andruavFacade.API_requestDeleteFenceByName(c_party, null); // deattach drones from all fences in the group
+        js_globals.v_andruavFacade.API_disableWayPointTasks(
           js_andruavAuth.m_username,
-          js_globals.v_andruavClient.m_groupName,
+          js_globals.v_andruavWS.m_groupName,
           c_party,
           "_drone_",
           1
         );
-        js_globals.v_andruavClient.API_saveWayPointTasks(
+        js_globals.v_andruavFacade.API_saveWayPointTasks(
           js_andruavAuth.m_username,
-          js_globals.v_andruavClient.m_groupName,
+          js_globals.v_andruavWS.m_groupName,
           c_party,
           "_drone_",
           1,

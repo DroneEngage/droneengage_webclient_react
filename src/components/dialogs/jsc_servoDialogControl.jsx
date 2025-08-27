@@ -35,7 +35,7 @@ class ClssServoUnit extends React.Component {
     handleClick(buttonType, servoValue) {
         if (!this.btn_disabled) { // Use the render's computed btn_disabled state
             this.setState({ pendingButton: buttonType });
-            js_globals.v_andruavClient.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
+            js_globals.v_andruavFacade.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
         }
     }
 
@@ -161,7 +161,7 @@ export default class ClssServoControl extends React.Component {
 
             const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
             if (!p_andruavUnit) return ;
-            js_globals.v_andruavClient.API_requestServoChannel(p_andruavUnit);
+            js_globals.v_andruavFacade.API_requestServoChannel(p_andruavUnit);
         }
     }
 
@@ -299,7 +299,7 @@ export default class ClssServoControl extends React.Component {
                                     <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.partyID)}>Goto</button>
                                 </div>
                                 <div className="col-3">
-                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavClient.API_requestServoChannel(p_andruavUnit)} >Refresh</button>
+                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestServoChannel(p_andruavUnit)} >Refresh</button>
                                 </div>
                                 <div className="col-3">
                                     <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>

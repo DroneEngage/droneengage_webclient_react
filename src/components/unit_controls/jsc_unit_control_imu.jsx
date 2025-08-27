@@ -50,7 +50,7 @@ export class ClssCtrlDroneIMU extends React.Component {
     fn_connectToFCB (p_andruavUnit)
 	{
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-		js_globals.v_andruavClient.API_connectToFCB(p_andruavUnit);
+		js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
 	}
 
     hlp_getGPS (p_andruavUnit)

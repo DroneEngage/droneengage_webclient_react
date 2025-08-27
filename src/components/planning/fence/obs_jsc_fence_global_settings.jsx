@@ -64,7 +64,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
         setTimeout (function ()
 		{
-		    js_globals.v_andruavClient.API_requestReloadLocalGroupGeoFenceTasks (null);
+		    js_globals.v_andruavFacade.API_requestReloadLocalGroupGeoFenceTasks (null);
 		}, 3000);
     }
 
@@ -74,7 +74,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
         setTimeout (function ()
 		{
-		    js_globals.v_andruavClient.API_requestReloadLocalGroupGeoFenceTasks (null);
+		    js_globals.v_andruavFacade.API_requestReloadLocalGroupGeoFenceTasks (null);
 		}, 3000);
     }
     

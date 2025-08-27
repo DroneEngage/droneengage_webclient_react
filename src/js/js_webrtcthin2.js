@@ -349,7 +349,7 @@ class AndruavStream {
       number: js_globals.v_andruavClient.partyID,
     };
 
-    js_globals.v_andruavClient.API_WebRTC_Signalling(phone, message);
+    js_globals.v_andruavFacade.API_WebRTC_Signalling(phone, message);
   }
 
   /**

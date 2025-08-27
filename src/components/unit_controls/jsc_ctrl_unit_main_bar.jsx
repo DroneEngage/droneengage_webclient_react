@@ -62,7 +62,7 @@ export class ClssCtrlUnitMainBar extends React.Component {
             }
         }
         
-        js_globals.v_andruavClient.API_requestCameraList(p_andruavUnit, fn_callback);
+        js_globals.v_andruavFacade.API_requestCameraList(p_andruavUnit, fn_callback);
 
     }
     

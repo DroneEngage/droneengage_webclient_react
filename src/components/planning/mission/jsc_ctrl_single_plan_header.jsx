@@ -125,7 +125,7 @@ export class ClssSingle_Plan_Header extends React.Component {
     fn_requestWayPoints(fromFCB) {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
-        js_globals.v_andruavClient.API_requestWayPoints(v_andruavUnit, fromFCB);
+        js_globals.v_andruavFacade.API_requestWayPoints(v_andruavUnit, fromFCB);
     }
 
     componentWillUnmount() {

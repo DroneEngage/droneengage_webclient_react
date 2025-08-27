@@ -50,11 +50,11 @@ export default class ClssCtrlObjectTracker extends React.Component {
         fnl_trackerOnOff(e) {
             if (this.props.p_unit.m_tracker.m_enable_gui_tracker===true)
             {
-                js_globals.v_andruavClient.API_PauseTracking(this.props.p_unit);
+                js_globals.v_andruavFacade.API_PauseTracking(this.props.p_unit);
             }
             else
             {
-                js_globals.v_andruavClient.API_EnableTracking(this.props.p_unit);
+                js_globals.v_andruavFacade.API_EnableTracking(this.props.p_unit);
             }
             
             js_eventEmitter.fn_dispatch(js_event.EE_onTrackingStatusChanged, this.props.p_unit);

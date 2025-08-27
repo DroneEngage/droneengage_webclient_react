@@ -68,7 +68,7 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
             } else {
 
             }
-            js_globals.v_andruavClient.API_writeGPIO(this.props.p_unit, element.pin_module_key, element.pin_number, target_status);
+            js_globals.v_andruavFacade.API_writeGPIO(this.props.p_unit, element.pin_module_key, element.pin_number, target_status);
         });
     }
 

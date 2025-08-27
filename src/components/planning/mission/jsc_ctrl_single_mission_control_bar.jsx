@@ -55,7 +55,7 @@ export class ClssSingleMissionControlBar extends React.Component {
             "Are you sure you want to upload mission?", function (p_approved) {
                 if (p_approved === false) return;
                 
-                js_globals.v_andruavClient.API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
+                js_globals.v_andruavFacade.API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
 
             }, "YES", "bg-danger text-white");
         
@@ -89,7 +89,7 @@ export class ClssSingleMissionControlBar extends React.Component {
 
     fn_deleteDBMission()
     {
-        js_globals.v_andruavClient.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavClient.m_groupName,this.props.m_selected_unit);
+        js_globals.v_andruavFacade.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavWS.m_groupName,this.props.m_selected_unit);
     }
 
     fn_deleteMission() {

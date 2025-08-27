@@ -50,7 +50,7 @@ export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
     
     fn_requestUdpProxyStatus(p_andruavUnit)
     {
-        js_globals.v_andruavClient.API_requestUdpProxyStatus(p_andruavUnit);
+        js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
     }
 
     fn_changeTelemetryOptimizationLevel(p_andruavUnit, step)
@@ -59,8 +59,8 @@ export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
         let next_step = (p_andruavUnit.m_Telemetry.m_telemetry_level + step);
         if (next_step<0) next_step = 0;
         if (next_step>3) next_step = 3;
-        js_globals.v_andruavClient.API_adjustTelemetryDataRate(p_andruavUnit, next_step);
-        js_globals.v_andruavClient.API_requestUdpProxyStatus(p_andruavUnit);
+        js_globals.v_andruavFacade.API_adjustTelemetryDataRate(p_andruavUnit, next_step);
+        js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
         p_andruavUnit.m_Telemetry.m_telemetry_level = next_step;
     }
 
@@ -68,15 +68,15 @@ export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
     fn_pauseTelemetry(p_andruavUnit)
     {
         if (p_andruavUnit==null) return;
-        js_globals.v_andruavClient.API_pauseTelemetry(p_andruavUnit);
-        js_globals.v_andruavClient.API_requestUdpProxyStatus(p_andruavUnit);
+        js_globals.v_andruavFacade.API_pauseTelemetry(p_andruavUnit);
+        js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
     }
 
     fn_startTelemetry(p_andruavUnit)
     {
         if (p_andruavUnit==null) return;
-        js_globals.v_andruavClient.API_resumeTelemetry(p_andruavUnit);
-        js_globals.v_andruavClient.API_requestUdpProxyStatus(p_andruavUnit);
+        js_globals.v_andruavFacade.API_resumeTelemetry(p_andruavUnit);
+        js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
     }
     
     renderUdpProxy()

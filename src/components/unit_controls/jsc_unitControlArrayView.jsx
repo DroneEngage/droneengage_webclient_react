@@ -189,7 +189,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     fn_gotoUnit_byPartyID (e,p_partyID)
     {
-        js_globals.v_andruavClient.API_requestID(p_partyID);
+        js_globals.v_andruavFacade.API_requestID(p_partyID);
         fn_gotoUnit_byPartyID(p_partyID);
     }
 

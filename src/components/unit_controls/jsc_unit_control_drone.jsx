@@ -89,14 +89,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         if (p_andruavUnit.m_Telemetry.m_rxEngaged === true)
         {
-            js_globals.v_andruavClient.API_disengageRX(p_andruavUnit);        
+            js_globals.v_andruavFacade.API_disengageRX(p_andruavUnit);        
             js_eventEmitter.fn_dispatch (js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             p_andruavUnit.m_Telemetry.m_rxEngaged = false;
             
         }
         else
         {
-            js_globals.v_andruavClient.API_engageRX(p_andruavUnit);	
+            js_globals.v_andruavFacade.API_engageRX(p_andruavUnit);	
         }
     }
     

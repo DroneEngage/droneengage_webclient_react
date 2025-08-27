@@ -69,7 +69,7 @@ class ClssParameterItem extends  React.Component {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
-            js_globals.v_andruavClient.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
+            js_globals.v_andruavFacade.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
             js_eventEmitter.fn_dispatch(js_event.EE_displayParameters, me.props.prop_unit);
         }, "YES");
 
@@ -255,7 +255,7 @@ export default class ClssUnitParametersList extends React.Component {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Release all parameters from FCB?", function (p_approved) {
             if (p_approved === false) return;
-            js_globals.v_andruavClient.API_requestParamList(me.state.p_unit);
+            js_globals.v_andruavFacade.API_requestParamList(me.state.p_unit);
         }, "YES");
     }
 
@@ -265,7 +265,7 @@ export default class ClssUnitParametersList extends React.Component {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
-            js_globals.v_andruavClient.API_WriteAllParameters(me.state.p_unit);
+            js_globals.v_andruavFacade.API_WriteAllParameters(me.state.p_unit);
         }, "YES");
     }
     
@@ -275,7 +275,7 @@ export default class ClssUnitParametersList extends React.Component {
         if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (Object.keys(p_andruavUnit.m_FCBParameters.m_list_by_index_shadow).length === 0))
         {
             // Maybe parameters are not loaded ... send reload request.
-            js_globals.v_andruavClient.API_requestParamList(p_andruavUnit);
+            js_globals.v_andruavFacade.API_requestParamList(p_andruavUnit);
         }
 
         

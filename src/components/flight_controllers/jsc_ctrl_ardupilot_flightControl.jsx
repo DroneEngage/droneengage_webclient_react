@@ -456,13 +456,13 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 "OVERRIDE ARM .. Are You SURE?", function (p_approved) {
                     if (p_approved === false) 
                     {
-                        js_globals.v_andruavClient.API_do_Arm(v_andruavUnit, true, false);
+                        js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, true, false);
                         return;
                     }
                     else
                     {
 					    js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
-                        js_globals.v_andruavClient.API_do_Arm(v_andruavUnit, true, true);
+                        js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, true, true);
                         return ;
                     }
                 }, "FORCED-ARM", "bg-danger text-white", "ARM");
@@ -475,7 +475,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 "STOP all MOTORS and if vehicle in air will CRASH. Are You SURE?", function (p_approved) {
                     if (p_approved === false) return;
 					js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
-                    js_globals.v_andruavClient.API_do_Arm(v_andruavUnit, false, true);
+                    js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, false, true);
                 }, "KILL-MOTORS", "bg-danger text-white");
 
 
@@ -483,93 +483,93 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     }
 
     fn_doTakeOffPlane(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
     }
 
     fn_doLand(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_Land(v_andruavUnit);
+        js_globals.v_andruavFacade.API_do_Land(v_andruavUnit);
     }
 
     fn_doSurface(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
     }
 
     fn_doManual(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
     }
 
     fn_doAcro(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
     }
 
     fn_doStabilize(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
     }
 
     fn_doRTL(v_andruavUnit, smart) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
     }
 
 
     fn_doCruise(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
     }
 
 
     fn_doCircle(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
     }
 
     fn_doFBWA(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
     }
 
     fn_doFBWB(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
     }
 
 
     fn_doQStabilize(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
     }
     fn_doQLoiter(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
     }
     fn_doQHover(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
     }
     fn_doQLand(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
     }
     fn_doQRTL(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
     }
 
     
     
 
     fn_doGuided(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
     }
 
     fn_doAuto(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
     }
 
     fn_doPosHold(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
     }
 
     fn_doLoiter(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
     }
 
     fn_doBrake(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
     }
 
     fn_doHold(v_andruavUnit) {
-        js_globals.v_andruavClient.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
+        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
     }
 
     fn_ServoControl(p_andruavUnit)
