@@ -12,7 +12,7 @@ import { js_localStorage } from './js_localStorage.js'
 import { js_eventEmitter } from './js_eventEmitter.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
-import * as js_andruav_parser from './js_andruavclient2.js'
+import * as js_andruav_parser from './js_andruav_parser.js'
 
 // Command Types either System or Communication
 const CMDTYPE_SYS = 's'; // system command
@@ -63,7 +63,7 @@ class CAndruavClientWS {
         this.partyID = null;
         this.unitID = null;
         this.m_groupName = null;
-        
+
         this.m_server_ip = null;
         this.m_server_port = null;
         this.m_server_port_ss = null;
@@ -74,7 +74,7 @@ class CAndruavClientWS {
         this.socketStatus = js_andruavMessages.CONST_SOCKET_STATUS_FREASH;
         this.socketConnectionDone = false;
         this.m_andruavUnit = null;
-        
+
         this.timerID = null;
     }
 
@@ -97,53 +97,53 @@ class CAndruavClientWS {
 
         return JSON.stringify(p_jmsg);
     };
-    
+
     API_sendCMD(p_target, msgType, msg) {
-            try {
+        try {
             let v_rountingMsg;
             if (p_target !== null && p_target !== undefined) {
                 v_rountingMsg = CMD_COMM_INDIVIDUAL;
             } else { // if you want to prevent GCS to GCS.
-                if ((p_target === null || p_target === undefined) 
+                if ((p_target === null || p_target === undefined)
                     && (js_siteConfig.CONST_DONT_BROADCAST_TO_GCSs === true
-                || js_localStorage.fn_getGCSShowMe() === false)) {
+                        || js_localStorage.fn_getGCSShowMe() === false)) {
                     p_target = CONST_TARGETS_DRONES;
                     v_rountingMsg = CMD_COMM_INDIVIDUAL;
                 } else {
                     v_rountingMsg = CMD_COMM_GROUP;
                 }
             }
-    
-            
-                const msgx_txt = this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg);
-                this.sendex(msgx_txt,false);
-                
-            } catch (e) {
-                // js_common.fn_console_log("Exception API_sendCMD", e); // Disable in production for perf
-            }
-        };
-    
-    
-        API_sendBinCMD(targetName, msgType, data) {
-            let v_msgRouting;
-            if (targetName !== null && targetName !== undefined) {
-                v_msgRouting = CMD_COMM_INDIVIDUAL;
-            } else {
-                v_msgRouting = CMD_COMM_GROUP;
-            }
-    
-            let h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
-            let ws = this.ws;
-            
-            const msgx_bin = js_helpers.fn_concatBuffers(h, data, true);
-            this.sendex(msgx_bin, true);
-        };
-    
-    
-        API_addMe2() {
-        if ((this.partyID === null || this.partyID === undefined) || (this.m_groupName === null || this.m_groupName === undefined)) 
+
+
+            const msgx_txt = this.fn_generateJSONMessage(this.partyID, p_target, v_rountingMsg, msgType, msg);
+            this.sendex(msgx_txt, false);
+
+        } catch (e) {
+            // js_common.fn_console_log("Exception API_sendCMD", e); // Disable in production for perf
+        }
+    };
+
+
+    API_sendBinCMD(targetName, msgType, data) {
+        let v_msgRouting;
+        if (targetName !== null && targetName !== undefined) {
+            v_msgRouting = CMD_COMM_INDIVIDUAL;
+        } else {
+            v_msgRouting = CMD_COMM_GROUP;
+        }
+
+        let h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
+        let ws = this.ws;
+
+        const msgx_bin = js_helpers.fn_concatBuffers(h, data, true);
+        this.sendex(msgx_bin, true);
+    };
+
+
+    API_addMe2() {
+        if ((this.partyID === null || this.partyID === undefined) || (this.m_groupName === null || this.m_groupName === undefined))
             return;
-        
+
 
         const v_unit = new js_andruavUnit.CAndruavUnitObject();
         v_unit.m_IsMe = true;
@@ -155,26 +155,25 @@ class CAndruavClientWS {
         v_unit.m_VehicleType = js_andruavUnit.CONST_VEHICLE_GCS;
 
         this.m_andruavUnit = v_unit;
-        };
+    };
 
-        API_delMe() {
+    API_delMe() {
         const c_msg = {};
-        this.socketConnectionDone  = false;
-            
+        this.socketConnectionDone = false;
+
         this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer, c_msg);
-        };
+    };
 
-        _API_sendSYSCMD(p_msgID, p_msg) {
-            this.sendex(this.fn_generateJSONMessage(this.partyID, null, CMDTYPE_SYS, p_msgID, p_msg));
-        };
+    _API_sendSYSCMD(p_msgID, p_msg) {
+        this.sendex(this.fn_generateJSONMessage(this.partyID, null, CMDTYPE_SYS, p_msgID, p_msg));
+    };
 
 
-    sendex(msg,is_binary) {
+    sendex(msg, is_binary) {
         try {
-        if (!!this.ws)
-        {
-            this.ws.sendex(msg,is_binary);
-        }
+            if (!!this.ws) {
+                this.ws.sendex(msg, is_binary);
+            }
         } catch (e) {
             // js_common.fn_console_log("Exception API_sendCMD", e); // Disable in production for perf
         }
@@ -188,120 +187,118 @@ class CAndruavClientWS {
     };
 
     prv_parseSystemMessage(Me, msg) {
-            if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_ConnectedCommServer) {
-                if (msg.msgPayload.s.indexOf('OK:connected') !== -1) {
-                    Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
-                    Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
-                    
-                } else { /*Me.onLog ("connection refused");*/
-                }
-    
-                return;
-            }
-    
-            if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer) {
-                if (msg.msgPayload.s.indexOf('OK:del') !== -1) {
-                    Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_FREASH);
-                    //Me.EVT_onDeleted();
-                    js_eventEmitter.fn_dispatch(js_event.EE_onDeleted);
-    
-                } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
-                }
-                return;
-            }
-        };
-    
-        setSocketStatus(status) {
-                // MOVE LOGIC TO js_main 
-                this.socketStatus = status;
-        
-                if (status === js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED) {
-                    this.API_addMe2(); // (v_andruavClient.groupname,v_andruavClient.unitID);
-                }
-        
-                if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
-                    this.socketConnectionDone  = true;
-                    js_andruav_facade.AndruavClientFacade.API_sendID(); // send now important
-                    const Me = this;
-                    this.timerID = setInterval(function () {
-                        js_andruav_facade.AndruavClientFacade.API_sendID();
-                        js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, null);
-                    }, js_andruavMessages.CONST_sendID_Interverl);
-        
-                    // request IDfrom all units
-                    js_andruav_facade.AndruavClientFacade.API_requestID();
-        
-                } else {
-                    clearInterval(this.timerID);
-                }
-                js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus2, {status:status, name: c_SOCKET_STATUS[status - 1]});
-            };
-        
-            getSocketStatus()
-            {
-                return this.socketStatus;
-            }
-        
-            isSocketConnectionDone()
-            {
-                return this.socketConnectionDone;
-            } 
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_ConnectedCommServer) {
+            if (msg.msgPayload.s.indexOf('OK:connected') !== -1) {
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
 
-    prv_parseJSONMessage(JsonMessage) {
-    
-            const p_jmsg = JSON.parse(JsonMessage); // PHP sends Json data
-    
-            const message = {
-                _ty: p_jmsg.ty,
-                // command type
-                // _cd 		: p_jmsg.cm,                 //main-command DEPRECATED
-                groupID: p_jmsg.gr, // group name
-                senderName: p_jmsg.sd, // sender name
-                msgPayload: p_jmsg.ms
-            };
-    
-            if (p_jmsg.hasOwnProperty('mt')) {
-                message.messageType = p_jmsg.mt;
+            } else { /*Me.onLog ("connection refused");*/
             }
-    
-            return message;
-        };
 
-   prv_extractBinaryPacket(evt) {
-    const Me = this;
+            return;
+        }
 
-    // Directly handle ArrayBuffer
-    if (!(evt.data instanceof ArrayBuffer)) {
-        console.warn("Invalid data received, expected ArrayBuffer");
-        return;
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer) {
+            if (msg.msgPayload.s.indexOf('OK:del') !== -1) {
+                Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_FREASH);
+                //Me.EVT_onDeleted();
+                js_eventEmitter.fn_dispatch(js_event.EE_onDeleted);
+
+            } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
+            }
+            return;
+        }
+    };
+
+    setSocketStatus(status) {
+        // MOVE LOGIC TO js_main 
+        this.socketStatus = status;
+
+        if (status === js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED) {
+            this.API_addMe2();
+        }
+
+        if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
+            js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
+            this.socketConnectionDone = true;
+            js_andruav_facade.AndruavClientFacade.API_sendID(); // send now important
+            const Me = this;
+            this.timerID = setInterval(function () {
+                js_andruav_facade.AndruavClientFacade.API_sendID();
+                js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, null);
+            }, js_andruavMessages.CONST_sendID_Interverl);
+
+            // request IDfrom all units
+            js_andruav_facade.AndruavClientFacade.API_requestID();
+
+        } else {
+            clearInterval(this.timerID);
+        }
+        js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus2, { status: status, name: c_SOCKET_STATUS[status - 1] });
+    };
+
+    getSocketStatus() {
+        return this.socketStatus;
     }
 
-    Me.handleBinaryData(evt.data);
-}
-    
+    isSocketConnectionDone() {
+        return this.socketConnectionDone;
+    }
+
+    prv_parseJSONMessage(JsonMessage) {
+
+        const p_jmsg = JSON.parse(JsonMessage); // PHP sends Json data
+
+        const message = {
+            _ty: p_jmsg.ty,
+            // command type
+            // _cd 		: p_jmsg.cm,                 //main-command DEPRECATED
+            groupID: p_jmsg.gr, // group name
+            senderName: p_jmsg.sd, // sender name
+            msgPayload: p_jmsg.ms
+        };
+
+        if (p_jmsg.hasOwnProperty('mt')) {
+            message.messageType = p_jmsg.mt;
+        }
+
+        return message;
+    };
+
+    prv_extractBinaryPacket(evt) {
+        const Me = this;
+
+        // Directly handle ArrayBuffer
+        if (!(evt.data instanceof ArrayBuffer)) {
+            console.warn("Invalid data received, expected ArrayBuffer");
+            return;
+        }
+
+        Me.handleBinaryData(evt.data);
+    }
+
     handleBinaryData(contents) {
         const Me = this;
-    
+
         try {
             // Convert binary data to Uint8Array
             const data = new Uint8Array(contents);
             const byteLength = contents.byteLength;
-    
+
             // Extract JSON command from binary data
             const out = js_helpers.prv_extractString(data, 0, byteLength);
             if (!out.text) {
                 throw new Error("No JSON command found in binary data");
             }
-    
+
             // Parse JSON command
             const andruavCMD = JSON.parse(out.text);
             const p_jmsg = Me.prv_parseJSONMessage(out.text);
-    
+
             // Find or create the unit
             const unitName = js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName);
             let v_unit = js_globals.m_andruavUnitList.fn_getUnit(unitName);
-    
+
             if (!v_unit) {
                 v_unit = new js_andruavUnit.CAndruavUnitObject();
                 v_unit.m_IsMe = false;
@@ -309,7 +306,7 @@ class CAndruavClientWS {
                 v_unit.partyID = p_jmsg.senderName;
                 v_unit.m_index = js_globals.m_andruavUnitList.count;
                 js_globals.m_andruavUnitList.Add(v_unit.partyID, v_unit);
-    
+
                 // Request unit ID if allowed
                 if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
                     Me.API_requestID(p_jmsg.senderName);
@@ -322,13 +319,13 @@ class CAndruavClientWS {
                     // console.log("Skipping ID request (rate-limited)"); // Disable in production for perf
                 }
             }
-    
+
             // Update message statistics
             v_unit.m_Messages.fn_addMsg(p_jmsg.messageType);
             v_unit.m_Messages.m_received_msg++;
             v_unit.m_Messages.m_received_bytes += data.length;
             v_unit.m_Messages.m_lastActiveTime = Date.now();
-    
+
             // Process the binary message
             js_globals.v_andruavClient.prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
         } catch (error) {
@@ -430,10 +427,10 @@ class CAndruavClientWS {
     };
 
 
-fn_isRegistered() {
-        return(this.socketStatus === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
+    fn_isRegistered() {
+        return (this.socketStatus === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
 
     }
 
-    };
+};
 export const AndruavClientWS = CAndruavClientWS.getInstance();

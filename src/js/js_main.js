@@ -18,7 +18,9 @@ import {EVENTS as js_event} from './js_eventList.js'
 import {js_speak} from './js_speak'
 import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
-import * as js_andruavclient2 from './js_andruavclient2'
+import * as js_andruav_ws from './js_andruav_ws.js'
+import * as js_andruav_parser from './js_andruav_parser'
+import * as js_andruav_facade from './js_andruav_facade.js'
 import {ClssAndruavFencePlan} from './js_plan_fence.js' 
 import {js_andruavAuth} from './js_andruavAuth'
 import {js_leafletmap} from './js_leafletmap'
@@ -31,8 +33,6 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import {ClssMainContextMenu} from '../components/popups/jsc_main_context_menu.jsx'
 import {ClssWaypointStepContextMenu} from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import {ClssMainUnitPopup} from '../components/popups/jsc_main_unit_popup.jsx'
-import * as js_andruav_ws from './js_andruav_ws.js'
-import * as js_andruav_facade from './js_andruav_facade.js'
 
 var oldAppend = $.fn.append;
 
@@ -3129,7 +3129,7 @@ function fn_handleKeyBoard() {
 					js_common.fn_console_log ("js_andruavAuth.fn_logined() === false");
 					return;
 				}
-				js_globals.v_andruavClient = js_andruavclient2.AndruavClient;
+				js_globals.v_andruavClient = js_andruav_parser.AndruavClient;
 				js_globals.v_andruavFacade = js_andruav_facade.AndruavClientFacade;
 				js_globals.v_andruavWS = js_andruav_ws.AndruavClientWS;
 				
@@ -3170,7 +3170,7 @@ function fn_handleKeyBoard() {
 				
 				
 				
-				js_common.fn_console_log(js_andruavclient2.c_SOCKET_STATUS);
+				js_common.fn_console_log(js_andruav_ws.c_SOCKET_STATUS);
 
 				js_globals.v_andruavWS.fn_connect(js_andruavAuth.fn_getSessionID());
 			}

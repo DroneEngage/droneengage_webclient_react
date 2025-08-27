@@ -346,7 +346,7 @@ class AndruavStream {
       packet: packet,
       channel: channel,
       id: phone,
-      number: js_globals.v_andruavClient.partyID,
+      number: js_globals.v_andruavWS.partyID,
     };
 
     js_globals.v_andruavFacade.API_WebRTC_Signalling(phone, message);

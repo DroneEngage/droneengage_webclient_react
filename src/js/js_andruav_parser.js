@@ -1289,7 +1289,7 @@ class CAndruavClient {
                     p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                 }
                 let signal = p_jmsg.w || p_jmsg;
-                Me.EVT_andruavSignalling(p_unit, signal);
+                this.EVT_andruavSignalling(p_unit, signal);
             }
                 break;
 

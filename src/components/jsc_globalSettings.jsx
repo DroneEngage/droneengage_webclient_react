@@ -1,8 +1,7 @@
 import React    from 'react';
 
 import * as js_siteConfig from '../js/js_siteConfig.js'
-import * as js_andruavclient2 from '../js/js_andruavclient2'
-
+import * as js_andruav_facade from '../js/js_andruav_facade.js'
 import {js_globals} from '../js/js_globals.js';
 import {EVENTS as js_event} from '../js/js_eventList.js'
 import {js_eventEmitter} from '../js/js_eventEmitter';
@@ -466,7 +465,7 @@ export default class ClssGlobalSettings extends React.Component {
   
 
   fn_fireDeEvent(value) {
-    js_andruavclient2.AndruavClient.API_FireDeEvent(null, value);
+    js_andruav_facade.AndruavClientFacade.API_FireDeEvent(null, value);
   }
 
   render() {
