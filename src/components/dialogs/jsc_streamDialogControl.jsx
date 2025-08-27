@@ -4,6 +4,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
@@ -19,8 +20,8 @@ class ClssStreamChannel extends React.Component {
             m_update: 0
         };
 
-        js_eventEmitter.fn_subscribe (js_globals.EE_videoStreamStarted, this, this.fn_videoStarted);
-        js_eventEmitter.fn_subscribe (js_globals.EE_videoStreamStopped, this, this.fn_videoStopped);
+        js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
+        js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
 
     }
 
@@ -70,8 +71,8 @@ class ClssStreamChannel extends React.Component {
 
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStarted,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStopped,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped,this);
     }
 
     render ()  {
@@ -137,8 +138,8 @@ export default class ClssStreamDialog extends React.Component
         
         this.modal_ctrl_stream_dlg  = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_displayStreamDlgForm,this, this.fn_displayDialog);
-        js_eventEmitter.fn_subscribe(js_globals.EE_hideStreamDlgForm,this, this.fn_closeDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_displayStreamDlgForm,this, this.fn_displayDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_hideStreamDlgForm,this, this.fn_closeDialog);
 
         
     }
@@ -146,8 +147,8 @@ export default class ClssStreamDialog extends React.Component
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayStreamDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideStreamDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_displayStreamDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_hideStreamDlgForm,this);
     } 
 
     componentDidMount () {

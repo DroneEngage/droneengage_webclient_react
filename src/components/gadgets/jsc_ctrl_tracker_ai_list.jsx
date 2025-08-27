@@ -2,9 +2,8 @@ import $ from 'jquery';
 import React from 'react';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
 import { js_globals } from '../../js/js_globals.js';
-import { js_localStorage } from '../../js/js_localStorage'
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
 
 
@@ -31,8 +30,8 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_onTrackingAIStatusChanged, this, this.fn_onTrackingAIStatusChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onTrackingAIObjectListUpdate, this, this.fn_onTrackingAIObjectListUpdate);
+        js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIStatusChanged, this, this.fn_onTrackingAIStatusChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIObjectListUpdate, this, this.fn_onTrackingAIObjectListUpdate);
 
         js_globals.v_andruavClient.API_GetTrackingAIClassList(this.props.p_unit);
 
@@ -46,8 +45,8 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onTrackingAIStatusChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onTrackingAIObjectListUpdate,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onTrackingAIStatusChanged,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onTrackingAIObjectListUpdate,this);
     }
 
 
@@ -99,7 +98,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
             js_globals.v_andruavClient.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
         }
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, this.props.p_unit);
+        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, this.props.p_unit);
 
     }
 
@@ -156,7 +155,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
                 // Optionally, if no items are selected, you might want to pause tracking
                 this.fnl_trackerAIOff();
             }
-            js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, this.props.p_unit);
+            js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, this.props.p_unit);
         });
     };
 

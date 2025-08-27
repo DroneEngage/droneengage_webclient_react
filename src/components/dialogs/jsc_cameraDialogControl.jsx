@@ -5,6 +5,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 import * as js_common from '../../js/js_common.js'
@@ -26,7 +27,7 @@ class ClssCameraDevice extends React.Component {
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         fn_VIDEO_login (this.props.prop_session, v_track.id);
-        js_eventEmitter.fn_dispatch (js_globals.EE_hideStreamDlgForm);
+        js_eventEmitter.fn_dispatch (js_event.EE_hideStreamDlgForm);
     }
 
     fn_videoRecord(p_startRecord)
@@ -132,8 +133,8 @@ export default class ClssCameraDialog extends React.Component
         this.txt_ShootingInterval = React.createRef();
         
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_displayCameraDlgForm,this, this.fn_displayDialog);
-        js_eventEmitter.fn_subscribe(js_globals.EE_hideCameraDlgForm,this, this.fn_closeDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_displayCameraDlgForm,this, this.fn_displayDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_hideCameraDlgForm,this, this.fn_closeDialog);
     }
 
 
@@ -149,8 +150,8 @@ export default class ClssCameraDialog extends React.Component
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayCameraDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_hideCameraDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_displayCameraDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_hideCameraDlgForm,this);
     } 
 
     

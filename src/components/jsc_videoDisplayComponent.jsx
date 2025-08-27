@@ -6,15 +6,11 @@ import FileSaver from 'file-saver';
 
 import { js_globals } from '../js/js_globals.js';
 import { js_eventEmitter } from '../js/js_eventEmitter'
-import * as js_common from '../js/js_common.js'
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import * as js_helpers from '../js/js_helpers'
 import * as js_andruavUnit from '../js/js_andruavUnit'
-import * as js_andruavMessages from '../js/js_andruavMessages'
 
 import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../js/js_main'
-import ClssCtrlGPIO_Flash from './gadgets/jsc_ctrl_gpio_flash.jsx'
-import ClssCtrlObjectTracker from './gadgets/jsc_ctrl_tracker_button.jsx'
-import ClssCtrlVideoFPS from './gadgets/jsc_ctrl_video_fps_control.jsx'
 import ClssCVideoScreen from './jsc_videoScreenComponent.jsx'
 
 
@@ -27,8 +23,8 @@ export class ClssCVideoControl extends React.Component {
             'm_update': 0
         };
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_videoStreamStarted, this, this.fn_videoStarted);
-        js_eventEmitter.fn_subscribe(js_globals.EE_videoStreamStopped, this, this.fn_videoStopped);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
     }
 
     
@@ -77,8 +73,8 @@ export class ClssCVideoControl extends React.Component {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStarted, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamStopped, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped, this);
     }
 
 

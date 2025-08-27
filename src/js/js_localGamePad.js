@@ -14,6 +14,7 @@
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_helpers from '../js/js_helpers'
 import {js_globals} from './js_globals'
+import {EVENTS as js_event} from './js_eventList.js'
 import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 import * as js_common from './js_common.js'
@@ -70,7 +71,7 @@ class CAndruavGamePad {
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         this.fn_extractGamePadConfigMapping();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Config_Index_Changed,this, this.fn_gamePadConfigChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Config_Index_Changed,this, this.fn_gamePadConfigChanged);
 
         if (this.c_haveEvents) {
             window.addEventListener('gamepadconnected', (e) => this.fn_onConnect(e));
@@ -82,13 +83,13 @@ class CAndruavGamePad {
         window.addEventListener('storage', (event) => {
         // Check if the event is related to the specific field you care about
         if (event.key.includes ('gamepad_config')) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);        }
+            js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Config_Index_Changed);        }
         });
         
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Config_Index_Changed, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Config_Index_Changed, this);
         if (this.v_animationFrameId) {
             window.cancelAnimationFrame(this.v_animationFrameId);
             this.v_animationFrameId = null;
@@ -161,7 +162,8 @@ class CAndruavGamePad {
     fn_gamePadConfigChanged(p_me) {
         p_me.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         p_me.fn_extractGamePadConfigMapping();
-        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Control_Update);
+        console.log ("js_event.EE_GAMEPAD_CONTROL_UPDATE:", js_event.EE_GAMEPAD_CONTROL_UPDATE);
+        js_eventEmitter.fn_dispatch(js_event.EE_GAMEPAD_CONTROL_UPDATE);
     }
 
     fn_getGamePad(index) {
@@ -190,12 +192,12 @@ class CAndruavGamePad {
         js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", 
             e.gamepad.index, e.gamepad.id, e.gamepad.buttons.length, e.gamepad.axes.length);
         this.fn_addgamepad(this, e.gamepad);
-        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Connected, e.gamepad);
+        js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Connected, e.gamepad);
     }
 
     fn_onDisconnect(e) {
         this.fn_removeGamepad(this, e.gamepad);
-        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Disconnected, e.gamepad);
+        js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Disconnected, e.gamepad);
     }
 
     fn_updateStatus() {
@@ -290,7 +292,7 @@ class CAndruavGamePad {
         });
 
         if (v_axesChanged) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Axes_Updated);
+            js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Axes_Updated);
             this.v_lastUpdateSent = c_now;
         }
 
@@ -312,7 +314,7 @@ class CAndruavGamePad {
         }
 
         if (button_indicies.length > 0) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Button_Updated, {
+            js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Button_Updated, {
                 p_buttonIndex: button_indicies,
                 p_buttons: c_padStatus.p_buttons
             });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { js_globals } from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
 
 
@@ -14,7 +14,7 @@ export default class ClssCtrlVideoFPS extends React.Component {
 
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_onWebRTC_Video_Statistics, this, this.fn_videoStatistics);
+        js_eventEmitter.fn_subscribe(js_event.EE_onWebRTC_Video_Statistics, this, this.fn_videoStatistics);
     }
 
 
@@ -30,7 +30,7 @@ export default class ClssCtrlVideoFPS extends React.Component {
     
         
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onWebRTC_Video_Statistics, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
 
     }
 

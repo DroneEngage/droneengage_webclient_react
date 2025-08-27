@@ -1,6 +1,6 @@
 import React    from 'react';
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 export class ClssCtrlArdupilotEkf extends React.Component {
@@ -13,12 +13,12 @@ export class ClssCtrlArdupilotEkf extends React.Component {
             m_update: 0
         
 		};
-        js_eventEmitter.fn_subscribe(js_globals.EE_EKFViewToggle,this,this.fn_toggle_global);
+        js_eventEmitter.fn_subscribe(js_event.EE_EKFViewToggle,this,this.fn_toggle_global);
     }
 
     childcomponentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_EKFViewToggle,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_EKFViewToggle,this);
     }
 
     componentDidMount () 

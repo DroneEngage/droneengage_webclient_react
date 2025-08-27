@@ -1,6 +1,6 @@
 import React    from 'react';
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
@@ -22,7 +22,7 @@ export class ClssCtrlHUD extends React.Component {
         this.c_pitch = 0;
         this.c_roll = 0;
 
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitNavUpdated,this,this.fn_update);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitNavUpdated,this,this.fn_update);
         
     }
 
@@ -34,7 +34,7 @@ export class ClssCtrlHUD extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_unitNavUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_unitNavUpdated,this);
     }
 
     

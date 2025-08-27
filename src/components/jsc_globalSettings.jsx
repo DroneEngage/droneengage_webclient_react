@@ -4,6 +4,7 @@ import * as js_siteConfig from '../js/js_siteConfig.js'
 import * as js_andruavclient2 from '../js/js_andruavclient2'
 
 import {js_globals} from '../js/js_globals.js';
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import {js_eventEmitter} from '../js/js_eventEmitter';
 
 import {js_speak} from '../js/js_speak';
@@ -46,7 +47,7 @@ class ClssDefault extends React.Component {
       this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = js_localStorage.fn_getDefaultSwarmHorizontalDistance();
       this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = js_localStorage.fn_getDefaultSwarmVerticalDistance();
 
-      js_eventEmitter.fn_subscribe(js_globals.EE_onAdvancedMode,this,this.fn_advancedMode);
+      js_eventEmitter.fn_subscribe(js_event.EE_onAdvancedMode,this,this.fn_advancedMode);
           
   }
 
@@ -59,7 +60,7 @@ class ClssDefault extends React.Component {
     
   componentWillUnmount () 
   {
-    js_eventEmitter.fn_unsubscribe(js_globals.EE_onAdvancedMode,this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_onAdvancedMode,this);
   }
 
 
@@ -310,7 +311,7 @@ class ClssPreferences extends React.Component {
   {
     const enabled = e.currentTarget.checked;
     js_localStorage.fn_setAdvancedOptionsEnabled(enabled);
-    js_eventEmitter.fn_dispatch (js_globals.EE_onAdvancedMode);
+    js_eventEmitter.fn_dispatch (js_event.EE_onAdvancedMode);
   }
 
   fn_enableTabsDisplay (e)
@@ -318,7 +319,7 @@ class ClssPreferences extends React.Component {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setTabsDisplayEnabled(enabled);
-    js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
+    js_eventEmitter.fn_dispatch (js_event.EE_onPreferenceChanged);
   }
 
   fn_GCSShowMe (e)
@@ -326,7 +327,7 @@ class ClssPreferences extends React.Component {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setGCSShowMe(enabled);
-    js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
+    js_eventEmitter.fn_dispatch (js_event.EE_onPreferenceChanged);
   }
 
   fn_sortUnits (e)
@@ -334,7 +335,7 @@ class ClssPreferences extends React.Component {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setUnitSortEnabled(enabled);
-    js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
+    js_eventEmitter.fn_dispatch (js_event.EE_onPreferenceChanged);
   }
 
   fn_enableGCS (e)
@@ -342,7 +343,7 @@ class ClssPreferences extends React.Component {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_gcs_display = enabled;
     js_localStorage.fn_setGCSDisplayEnabled(enabled);
-    js_eventEmitter.fn_dispatch (js_globals.EE_onPreferenceChanged);
+    js_eventEmitter.fn_dispatch (js_event.EE_onPreferenceChanged);
   }
 
 
@@ -398,7 +399,7 @@ export default class ClssGlobalSettings extends React.Component {
     
 
     
-    js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined, this, this.fn_onAuthStatus);
+    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, this.fn_onAuthStatus);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -456,7 +457,7 @@ export default class ClssGlobalSettings extends React.Component {
 
   componentWillUnmount() {
     this.state.m_update = 0;
-    js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Logined, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Logined, this);
   }
 
   

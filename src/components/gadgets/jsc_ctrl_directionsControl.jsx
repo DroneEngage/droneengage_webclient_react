@@ -1,6 +1,6 @@
 import React    from 'react';
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
@@ -29,7 +29,7 @@ export class ClssCtrlDirections extends React.Component {
         this.fn_update = this.fn_update.bind(this);
 
         // Subscribe to navigation updates
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated, this, this.fn_update);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated, this, this.fn_update);
 
         // Interval for mock data updates
         this.mockDataInterval = null;
@@ -75,7 +75,7 @@ export class ClssCtrlDirections extends React.Component {
     componentWillUnmount() {
         // Unsubscribe from event emitter to prevent memory leaks
         // Corrected: unsubscribe from EE_unitNavUpdated, not EE_onProxyInfoUpdated
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated, this);
         // Clear the mock data interval
         if (this.mockDataInterval) {
             clearInterval(this.mockDataInterval);

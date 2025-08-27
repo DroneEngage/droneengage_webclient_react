@@ -11,7 +11,7 @@
 
 
 import React from 'react';
-import {js_globals} from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 
 import ClassBarChart from '../../gadgets/jsc_ctrl_bar_chart'
@@ -23,7 +23,7 @@ class ClassSDRSpectrumVisualizer extends React.Component {
             m_update : 0
         };
 
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitSDRSpectrum,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitSDRSpectrum,this,this.fn_unitUpdated);
     
     }
 

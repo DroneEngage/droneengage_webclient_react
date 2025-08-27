@@ -1,4 +1,5 @@
 import { js_globals } from "./js_globals.js";
+import {EVENTS as js_event} from './js_eventList.js'
 import {js_eventEmitter} from './js_eventEmitter';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
@@ -144,7 +145,7 @@ class CTalk {
       js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
       v_andruavUnit.m_Video.m_total_transfer_bytes += this.m_bytesReceived;
-			js_eventEmitter.fn_dispatch (js_globals.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':this.m_bytesReceived , 'track_id': trackIdentifier}); 
+			js_eventEmitter.fn_dispatch (js_event.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':this.m_bytesReceived , 'track_id': trackIdentifier}); 
         
 
     } catch (e) {

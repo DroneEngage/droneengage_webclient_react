@@ -5,7 +5,7 @@ import React    from 'react';
 
 import {Class_Radar_Screen} from '../micro_gadgets/jsc_mctrl_radar_screen.jsx'
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 export class ClssCtrlLidarDevice extends React.Component {
@@ -20,7 +20,7 @@ export class ClssCtrlLidarDevice extends React.Component {
         this.key = Math.random().toString();
         
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarInfo,this,this.fn_update_lidar);
+        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitLidarInfo,this,this.fn_update_lidar);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -40,7 +40,7 @@ export class ClssCtrlLidarDevice extends React.Component {
 
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitLidarInfo,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitLidarInfo,this);
     }
 
     fn_update_lidar (p_me, p_andruavUnit)

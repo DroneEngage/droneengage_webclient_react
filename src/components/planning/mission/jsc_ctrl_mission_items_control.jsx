@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js';
 import * as js_common from '../../../js/js_common.js';
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js';
-import { js_globals } from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
 import { js_leafletmap } from '../../../js/js_leafletmap.js';
 import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
@@ -21,12 +21,12 @@ export default class ClssMission_Container extends React.Component {
         
         this.mission_file_ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onPlanToggle, this, this.fn_onPlanToggle);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeCreated, this, this.fn_onShapeCreated);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.fn_onShapeSelected);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeEdited, this, this.fn_onShapeEdited);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeDeleted, this, this.fn_onShapeDeleted);
+        js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
+        js_eventEmitter.fn_subscribe(js_event.EE_onPlanToggle, this, this.fn_onPlanToggle);
+        js_eventEmitter.fn_subscribe(js_event.EE_onShapeCreated, this, this.fn_onShapeCreated);
+        js_eventEmitter.fn_subscribe(js_event.EE_onShapeSelected, this, this.fn_onShapeSelected);
+        js_eventEmitter.fn_subscribe(js_event.EE_onShapeEdited, this, this.fn_onShapeEdited);
+        js_eventEmitter.fn_subscribe(js_event.EE_onShapeDeleted, this, this.fn_onShapeDeleted);
     }
 
     componentDidMount() {
@@ -110,12 +110,12 @@ export default class ClssMission_Container extends React.Component {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPlanToggle, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeCreated, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeSelected, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeEdited, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeDeleted, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onPlanToggle, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeCreated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeSelected, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeEdited, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeDeleted, this);
 
     }
 

@@ -2,6 +2,7 @@ import React    from 'react';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import {js_andruavAuth} from '../../../js/js_andruavAuth.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
@@ -95,7 +96,7 @@ export class ClssSingleMissionControlBar extends React.Component {
         if (this.props.p_mission == null) return;
         js_mapmission_planmanager.fn_deleteMission(this.props.p_mission.m_id);
         this.setState({ m_deleted: true });
-        js_eventEmitter.fn_dispatch(js_globals.EE_onMissionReset);
+        js_eventEmitter.fn_dispatch(js_event.EE_onMissionReset);
     }
 
     render ()

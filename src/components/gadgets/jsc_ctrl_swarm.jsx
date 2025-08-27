@@ -4,6 +4,7 @@ import React from 'react';
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 import { js_globals } from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
 
@@ -34,7 +35,7 @@ export class ClssCtrlSWARM extends React.Component {
 
         this.key = Math.random().toString();
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
+        js_eventEmitter.fn_subscribe(js_event.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
 
     }
 
@@ -73,7 +74,7 @@ export class ClssCtrlSWARM extends React.Component {
 
     
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onAndruavUnitSwarmUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onAndruavUnitSwarmUpdated,this);
         
     }
 

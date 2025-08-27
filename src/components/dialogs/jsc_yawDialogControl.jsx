@@ -4,7 +4,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {fn_gotoUnit_byPartyID, fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
@@ -24,7 +24,7 @@ export default class ClssYawDialog extends React.Component
         this.modal_ctrl_yaw = React.createRef();
         this.yaw_knob = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_displayYawDlgForm,this, this.fn_displayDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_displayYawDlgForm,this, this.fn_displayDialog);
         
     }
 
@@ -39,7 +39,7 @@ export default class ClssYawDialog extends React.Component
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayYawDlgForm,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_displayYawDlgForm,this);
     } 
 
     

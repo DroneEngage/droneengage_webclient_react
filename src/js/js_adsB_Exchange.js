@@ -123,7 +123,7 @@ import $ from 'jquery';
 
             this.adsbObjectList = {};
 
-            js_eventEmitter.fn_subscribe (js_globals.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
+            js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
 
             const me = this;
             setInterval(function () {
@@ -205,7 +205,7 @@ import $ from 'jquery';
                 
 				success: function(p_res) {
                     this.parseData (p_res,p_alt);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_adsbExchangeReady,v_adsbObject.getInstance());
+                    js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady,v_adsbObject.getInstance());
                 },
                 error: function ( jqXHR, textStatus, errorThrown)
 				{
@@ -220,7 +220,7 @@ import $ from 'jquery';
         {
             if (js_globals.v_EnableADSB === false)
             {
-                js_eventEmitter.fn_dispatch(js_globals.EE_adsbExchangeReady,js_eventEmitter.adsbObjectList);
+                js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady,js_eventEmitter.adsbObjectList);
             }
         }
         

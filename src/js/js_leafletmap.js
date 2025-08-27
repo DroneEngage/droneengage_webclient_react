@@ -12,6 +12,7 @@ import 'leaflet-rotatedmarker';
 
 import * as js_siteConfig from './js_siteConfig'
 import {js_globals} from './js_globals.js';
+import {EVENTS as js_event} from './js_eventList.js'
 import {js_eventEmitter} from './js_eventEmitter'
 
 import {fn_contextMenu} from './js_main'
@@ -132,7 +133,7 @@ class CLeafLetAndruavMap {
               
             this.m_Map.on('pm:create' , (x) => {
                 x.layer.pm.m_shape_type = x.shape;
-                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, x.layer)
+                js_eventEmitter.fn_dispatch(js_event.EE_onShapeCreated, x.layer)
                 // add to shapes list.
                 js_globals.v_map_shapes.push(x.layer);
                 let already_deleted = false;
@@ -140,18 +141,18 @@ class CLeafLetAndruavMap {
                         
                     if (p_event.originalEvent.ctrlKey===false)
                     {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event.target);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, p_event.target);
                     }
                     else
                     {
                         already_deleted = true;
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.layer);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, x.layer);
                     }
                 });
 
                 x.layer.on('pm:edit', (x) => {
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeEdited, x.target);
+                    js_eventEmitter.fn_dispatch(js_event.EE_onShapeEdited, x.target);
                 });
 
                 x.layer.on('remove', (x) => {
@@ -161,7 +162,7 @@ class CLeafLetAndruavMap {
                     // so we need to check if it was already deleted.
                     
                     if (already_deleted === true) return ;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, x.target);
+                    js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, x.target);
                     already_deleted = false;
                 });
 
@@ -218,15 +219,14 @@ class CLeafLetAndruavMap {
         marker.on('click', function (p_event) {
             if (p_event.originalEvent.ctrlKey===false)
             {
-                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event);
+                js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, p_event);
             }
             else
             {
-                js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, marker);
+                js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, marker);
             }
         });
 
-        //js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, marker)
         return marker;
     }
 

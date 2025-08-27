@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 
 class CEventEmitter {
-
     constructor() {
         // m_v_events will store event names as keys,
         // and Maps of (listener -> callback) as values.
@@ -30,7 +29,7 @@ class CEventEmitter {
 
         // subscribers is a Map: (listener -> callback)
         // Iterating over map entries [listener, callback]
-        for (const [listner, callback] of subscribers) { 
+        for (const [listner, callback] of subscribers.entries()) { 
             try {
                 callback(listner, p_data); // Pass listener and data to the callback
             } catch (e) {
@@ -54,16 +53,9 @@ class CEventEmitter {
             return -1;
         }
 
-        let index = 0;
-        // Iterate over the keys (listeners) of the Map in their insertion order.
-        const keys = subscribers.keys();
-        for (const listnerKey of keys) {
-            if (listnerKey === p_listner) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
+        // Use Array.from to convert keys to an array and find index
+        // More concise than manual iteration, though still O(n)
+        return Array.from(subscribers.keys()).indexOf(p_listner);
     }
 
     /**
@@ -122,6 +114,14 @@ class CEventEmitter {
             this.m_v_events.delete(p_event);
         }
     }
+
+    /**
+     * Clears all events and subscribers.
+     * Useful for cleanup to prevent memory leaks.
+     */
+    fn_clear() {
+        this.m_v_events.clear(); // Removes all events and their subscribers
+    }
 }
 
-export var js_eventEmitter = CEventEmitter.getInstance();
+export const js_eventEmitter = CEventEmitter.getInstance();

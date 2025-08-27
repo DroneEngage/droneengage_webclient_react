@@ -2,6 +2,7 @@ import React    from 'react';
 
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_andruavMessages from '../../js/js_andruavMessages.js'
@@ -21,10 +22,10 @@ export class ClssAndruavUnitBase extends React.Component {
 		};
 
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitTelemetryOn,this,this.fn_unitTelemetryOn);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitTelemetryOff,this,this.fn_unitTelemetryOFF);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOn,this,this.fn_unitTelemetryOn);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOff,this,this.fn_unitTelemetryOFF);
         
     }
 
@@ -45,7 +46,7 @@ export class ClssAndruavUnitBase extends React.Component {
         {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
             
-            js_eventEmitter.fn_dispatch(js_globals.EE_unitAdded,p_andruavUnit);
+            js_eventEmitter.fn_dispatch(js_event.EE_unitAdded,p_andruavUnit);
 	    }
 
         const v_date = p_andruavUnit.date;
@@ -104,10 +105,10 @@ export class ClssAndruavUnitBase extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOn,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitTelemetryOff,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelemetryOn,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelemetryOff,this);
         this.childcomponentWillUnmount();
     }
 
@@ -119,7 +120,7 @@ export class ClssAndruavUnitBase extends React.Component {
     {
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         js_globals.v_andruavClient.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_TX_SIGNAL_FREEZE_ALL);
-        js_eventEmitter.fn_dispatch (js_globals.EE_requestGamePad, p_andruavUnit);
+        js_eventEmitter.fn_dispatch (js_event.EE_requestGamePad, p_andruavUnit);
             
     }
 
@@ -127,7 +128,7 @@ export class ClssAndruavUnitBase extends React.Component {
     {
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
         js_globals.v_andruavClient.API_TXCtrl (p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
-        js_eventEmitter.fn_dispatch (js_globals.EE_requestGamePadreleaseGamePad, p_andruavUnit);
+        js_eventEmitter.fn_dispatch (js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             
     }
 
@@ -136,14 +137,14 @@ export class ClssAndruavUnitBase extends React.Component {
     {
         if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
         
-        js_eventEmitter.fn_dispatch(js_globals.EE_displayParameters, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_event.EE_displayParameters, p_andruavUnit);
     }
 
     fn_displayLidarDialog(p_andruavUnit)
     {
         if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
         
-        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitLidarShow, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitLidarShow, p_andruavUnit);
     }
     
 

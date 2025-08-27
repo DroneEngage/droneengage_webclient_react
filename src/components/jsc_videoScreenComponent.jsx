@@ -7,7 +7,7 @@ import FileSaver from 'file-saver';
 import { js_globals } from '../js/js_globals.js';
 import { js_eventEmitter } from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
-import * as js_helpers from '../js/js_helpers'
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import * as js_andruavUnit from '../js/js_andruavUnit'
 import * as js_andruavMessages from '../js/js_andruavMessages'
 
@@ -61,10 +61,10 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_local_rotations = ["rotate(0deg)", "rotate(90deg)", "rotate(180deg)", "rotate(270deg)"];
         this.m_timerID = null;
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_videoStreamRedraw, this, this.fn_videoRedraw);
-        js_eventEmitter.fn_subscribe(js_globals.EE_DetectedTarget, this, this.fn_targetDetected);
-        js_eventEmitter.fn_subscribe(js_globals.EE_cameraFlashChanged, this, this.fn_flashChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_cameraZoomChanged, this, this.fn_zoomChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
+        js_eventEmitter.fn_subscribe(js_event.EE_DetectedTarget, this, this.fn_targetDetected);
+        js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_cameraZoomChanged, this, this.fn_zoomChanged);
         
     }
 
@@ -85,11 +85,11 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_videoStreamRedraw, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_DetectedTarget, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_cameraFlashChanged, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_cameraZoomChanged, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onWebRTC_Video_Statistics, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamRedraw, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_DetectedTarget, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_cameraFlashChanged, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_cameraZoomChanged, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
     }
 
     
@@ -122,7 +122,7 @@ export default class ClssCVideoScreen extends React.Component {
         FileSaver.saveAs(p_blob, filename);
         let talk = p_andruavUnit.m_Video.m_videoactiveTracks[p_activeTrack];
         talk.videoRecording = false;
-        js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': p_andruavUnit, 'v_track': p_activeTrack });
+        js_eventEmitter.fn_dispatch(js_event.EE_videoStreamRedraw, { 'andruavUnit': p_andruavUnit, 'v_track': p_activeTrack });
     }
 
 

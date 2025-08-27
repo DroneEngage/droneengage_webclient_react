@@ -6,6 +6,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
@@ -33,8 +34,8 @@ export class ClssCtrlUnitMainBar extends React.Component {
             'm_update': 0
         };
         
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated, this, this.fn_onUpdate);
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitPowUpdated, this, this.fn_onUpdate);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitUpdated, this, this.fn_onUpdate);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitPowUpdated, this, this.fn_onUpdate);
 
     }
 
@@ -46,8 +47,8 @@ export class ClssCtrlUnitMainBar extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitPowUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
     }
 
 
@@ -57,7 +58,7 @@ export class ClssCtrlUnitMainBar extends React.Component {
         {
             if ((p_session !== null && p_session !== undefined) && (p_session.status === 'connected')) 
             {
-                js_eventEmitter.fn_dispatch(js_globals.EE_displayCameraDlgForm, p_session);
+                js_eventEmitter.fn_dispatch(js_event.EE_displayCameraDlgForm, p_session);
             }
         }
         

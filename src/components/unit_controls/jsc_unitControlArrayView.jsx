@@ -4,6 +4,7 @@ import React    from 'react';
 
 import * as js_helpers from '../../js/js_helpers.js'
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_leafletmap} from '../../js/js_leafletmap.js'
@@ -39,7 +40,7 @@ class ClssAndruavUnitDroneHeader extends React.Component{
         else
         this.state.is_compact = false;
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_BattViewToggle, this.state.is_compact);
+        js_eventEmitter.fn_dispatch(js_event.EE_BattViewToggle, this.state.is_compact);
     }
 
     fn_toggleEKF()
@@ -48,7 +49,7 @@ class ClssAndruavUnitDroneHeader extends React.Component{
         else
         this.state.is_compact_ekf = false;
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_EKFViewToggle, this.state.is_compact_ekf);
+        js_eventEmitter.fn_dispatch(js_event.EE_EKFViewToggle, this.state.is_compact_ekf);
     }
 
     render()
@@ -126,9 +127,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
         this.props.p_unit.m_gui.speed_link = false;
 
 		this.telemetry_level=["OFF","1","2","3"];
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitNavUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitUpdated);
     }
 
      
@@ -137,9 +138,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
     }
 
     childcomponentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitNavUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
     }
 
 
@@ -812,10 +813,10 @@ export default class ClssAndruavUnitListArray extends React.Component {
         
         
         
-        js_eventEmitter.fn_subscribe (js_globals.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
-        js_eventEmitter.fn_subscribe (js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
+        js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
 	}
 
 
@@ -826,10 +827,10 @@ export default class ClssAndruavUnitListArray extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
     }
 
     

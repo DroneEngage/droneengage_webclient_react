@@ -1,6 +1,6 @@
 import React    from 'react';
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
@@ -14,11 +14,11 @@ export  class ClssRX_MESSAGE  extends React.Component {
             m_message: [],
 		    'm_update': 0
         };
-        js_eventEmitter.fn_subscribe (js_globals.EE_unitUpdated,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitUpdated,this,this.fn_unitUpdated);
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_unitUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_unitUpdated,this);
     }
     componentDidMount () 
     {

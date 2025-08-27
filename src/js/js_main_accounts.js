@@ -3,9 +3,8 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 
 import  * as js_common from './js_common.js'
 import * as js_andruavMessages from './js_andruavMessages'
-import {js_globals} from './js_globals.js';
+import {EVENTS as js_event} from './js_eventList.js'
 import * as js_siteConfig from './js_siteConfig'
-import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 
 
@@ -63,7 +62,7 @@ export function gui_alert(title,message,level)
             $(e.currentTarget).attr('pwdid',pwdid);
         });
 
-        js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_Created,  this, 
+        js_eventEmitter.fn_subscribe ( js_event.EE_Auth_Account_Created,  this, 
         function (p_sender,p_msg)
         {
         let v_Message = "<p className='text-success'>Access Code Created Successfully.</p>";
@@ -75,7 +74,7 @@ export function gui_alert(title,message,level)
         $('#modal_saveConfirmation').children().find('div.modal-body p#res').html(v_Message);          
         });
 
-        js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_Regenerated,  this, 
+        js_eventEmitter.fn_subscribe ( js_event.EE_Auth_Account_Regenerated,  this, 
         function (p_sender,p_msg)
         {
         let v_Message = "<p className='text-success'>New Access Code Created Successfully.";
@@ -89,7 +88,7 @@ export function gui_alert(title,message,level)
         });
 
 
-        js_eventEmitter.fn_subscribe ( js_globals.EE_Auth_Account_BAD_Operation,  this, 
+        js_eventEmitter.fn_subscribe ( js_event.EE_Auth_Account_BAD_Operation,  this, 
         function (p_sender,p_msg)
         {
         if (p_msg !== null && p_msg !== undefined)

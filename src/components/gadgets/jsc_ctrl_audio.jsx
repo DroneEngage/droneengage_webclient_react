@@ -1,6 +1,7 @@
 import React    from 'react';
 
 import {js_globals} from '../../js/js_globals';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 
 export class ClssCtrlAUDIO extends React.Component {
@@ -21,7 +22,7 @@ export class ClssCtrlAUDIO extends React.Component {
         this.m_volumeRef = React.createRef();
         this.m_languageRef = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_BattViewToggle,this,this.fn_toggle_global);
+        js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle,this,this.fn_toggle_global);
     }
 
 

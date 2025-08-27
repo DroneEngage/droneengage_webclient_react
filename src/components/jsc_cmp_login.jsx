@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 import React from 'react';
 
-import {js_globals} from '../js/js_globals.js';
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import {js_eventEmitter} from '../js/js_eventEmitter'
 
 import { js_andruavAuth } from '../js/js_andruavAuth'
@@ -25,16 +25,16 @@ export default class ClssLoginControl extends React.Component {
         this.m_chk_fullctrl = React.createRef();
         this.m_chk_readonlyctrl = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Account_Created, this, this.fn_EE_permissionReceived);
-        js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Account_BAD_Operation, this, this.fn_EE_permissionBadLogin);
-		js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
+        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_EE_permissionReceived);
+        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_EE_permissionBadLogin);
+		js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
     }
 
 	componentWillUnmount ()
     {
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Account_Created, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Account_BAD_Operation, this);
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_Auth_Account_Regenerated, this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_BAD_Operation, this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
 	}
 
     fn_EE_permissionReceived(me, params) {

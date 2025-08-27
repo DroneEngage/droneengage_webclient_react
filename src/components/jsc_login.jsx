@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { js_globals } from '../js/js_globals.js';
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import { QueryString, fn_connect, fn_logout } from '../js/js_main';
 import * as js_andruavMessages from '../js/js_andruavMessages';
 import { js_localStorage } from '../js/js_localStorage'
@@ -31,8 +31,8 @@ export class ClssLoginControl extends React.Component {
 		this.btnConnectRef = React.createRef();
 		this.txtGroupNameRef = React.createRef();
 		
-		js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
-		js_eventEmitter.fn_subscribe (js_globals.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
+		js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
+		js_eventEmitter.fn_subscribe (js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
 	}
 
 
@@ -89,8 +89,8 @@ export class ClssLoginControl extends React.Component {
 	}
 
 	componentWillUnmount() {
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_onSocketStatus, this);
-		js_eventEmitter.fn_unsubscribe (js_globals.EE_Auth_Login_In_Progress, this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
+		js_eventEmitter.fn_unsubscribe (js_event.EE_Auth_Login_In_Progress, this);
     }
 
 	componentDidMount() {

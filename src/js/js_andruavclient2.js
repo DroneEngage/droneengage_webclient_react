@@ -16,6 +16,7 @@
 
 /*jshint esversion: 6 */
 import {js_globals} from './js_globals.js';
+import {EVENTS as js_event} from './js_eventList.js'
 import * as js_helpers from './js_helpers.js';
 import * as js_siteConfig from './js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
@@ -29,7 +30,6 @@ import {js_eventEmitter} from './js_eventEmitter'
 import {CCommandAPI} from './js_commands_api.js'
 
 import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js'
-
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
@@ -111,7 +111,7 @@ class CAndruavClient {
                 if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
                     if (!unit.m_IsDisconnectedFromGCS) {
                         unit.m_IsDisconnectedFromGCS = true;
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, unit);
                     }
                 }
             }
@@ -119,7 +119,7 @@ class CAndruavClient {
             // Check for disconnection regardless of shutdown status
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1 && !unit.m_IsDisconnectedFromGCS) {
                 unit.m_IsDisconnectedFromGCS = true;
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, unit);
             }
         });
     }
@@ -204,10 +204,10 @@ class CAndruavClient {
             }, js_andruavMessages.CONST_sendRXChannels_Interval);
         }
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Axes_Updated, this, this.fn_sendAxes);
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Button_Updated, this, this.fn_sendButtons);
-        js_eventEmitter.fn_subscribe(js_globals.EE_requestGamePad, this, this.fn_requestGamePad);
-        js_eventEmitter.fn_subscribe(js_globals.EE_releaseGamePad, this, this.fn_releaseGamePad);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated, this, this.fn_sendAxes);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated, this, this.fn_sendButtons);
+        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad, this, this.fn_requestGamePad);
+        js_eventEmitter.fn_subscribe(js_event.EE_releaseGamePad, this, this.fn_releaseGamePad);
 
 
     };
@@ -234,6 +234,15 @@ class CAndruavClient {
         if (p_me.m_gamePadUnit === null || p_me.m_gamePadUnit === undefined) 
             return;
         
+        if (!!p_packet.p_buttonIndex)
+        {
+            p_packet.p_buttonIndex.forEach(i => 
+                {
+                    const btn_task = js_localGamePad.m_button_routing[i];
+                    console.log(i, ":", btn_task);
+                });
+            
+        }
 
         js_common.fn_console_log("fn_sendButtons ", p_packet.p_buttonIndex);
         const c_now = Date.now();
@@ -513,7 +522,7 @@ class CAndruavClient {
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
         const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
-        js_eventEmitter.fn_dispatch(js_globals.EE_releaseGamePad, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_event.EE_releaseGamePad, p_andruavUnit);
 
     };
 
@@ -523,7 +532,7 @@ class CAndruavClient {
         this.m_currentEngagedRX = p_andruavUnit;
         const cmd = CCommandAPI.API_engageGamePad();
         this.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
-        js_eventEmitter.fn_dispatch(js_globals.EE_requestGamePad, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_event.EE_requestGamePad, p_andruavUnit);
     }
 
 
@@ -722,7 +731,7 @@ class CAndruavClient {
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
 
         p_andruavUnit.m_Telemetry._isActive = false;
-        js_eventEmitter.fn_dispatch(js_globals.EE_unitTelemetryOff, p_andruavUnit);
+        js_eventEmitter.fn_dispatch(js_event.EE_unitTelemetryOff, p_andruavUnit);
     };
 
     
@@ -1070,7 +1079,7 @@ class CAndruavClient {
         }
 
         this.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: p_andruavUnit, onff:p_OnOff});
+        js_eventEmitter.fn_dispatch(js_event.EE_Video_State_Change, {unit: p_andruavUnit, onff:p_OnOff});
 
     };
 
@@ -1486,7 +1495,7 @@ class CAndruavClient {
             Act: v_OnOff
         };
         this.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
-        js_eventEmitter.fn_dispatch(js_globals.EE_Video_State_Change, {unit: v_unit, onff:v_OnOff});
+        js_eventEmitter.fn_dispatch(js_event.EE_Video_State_Change, {unit: v_unit, onff:v_OnOff});
     };
 
 
@@ -1541,7 +1550,7 @@ class CAndruavClient {
         geoFenceInfo.m_maximumDistance = v_maximumDistance;
 
         geoFenceInfo.isEditable = (p_andruavUnit === null || p_andruavUnit === undefined);
-        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitGeoFenceUpdated, {unit: p_andruavUnit, fence: geoFenceInfo});
+        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitGeoFenceUpdated, {unit: p_andruavUnit, fence: geoFenceInfo});
     };
 
     // please move it out side
@@ -1639,7 +1648,7 @@ class CAndruavClient {
                 console.log ("CONST_TYPE_AndruavMessage_Target_STATUS");
                 p_jmsg = msg.msgPayload;
                 p_unit.m_tracker.fn_updateTrackerStatus(p_jmsg.a);
-                js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingStatusChanged, p_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_onTrackingStatusChanged, p_unit);
             }
             break;
 
@@ -1650,12 +1659,12 @@ class CAndruavClient {
                 {
                     case js_andruavMessages.CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST:
                         p_unit.m_tracker_ai.fn_addObjectClass(p_jmsg.c);
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIObjectListUpdate, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIObjectListUpdate, p_unit);
                     break;
 
                     default: 
                         p_unit.m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a);
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onTrackingAIStatusChanged, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, p_unit);
                         break;
                 }
             }
@@ -1675,7 +1684,7 @@ class CAndruavClient {
                     p_unit.m_Telemetry.m_udpProxy_paused = false;
                 }
                 
-                js_eventEmitter.fn_dispatch(js_globals.EE_onProxyInfoUpdated, p_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_onProxyInfoUpdated, p_unit);
                 
                 }
                 break;
@@ -1722,7 +1731,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Location.bearing = parseFloat(p_jmsg.b); // can be null
                 }
                 
-                js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                 
                 break;
 
@@ -1734,7 +1743,7 @@ class CAndruavClient {
                     const c_obj = {};
                     c_obj.p_unit = p_unit;
                     c_obj.p_jmsg = p_jmsg;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_cameraFlashChanged, c_obj);
+                    js_eventEmitter.fn_dispatch(js_event.EE_cameraFlashChanged, c_obj);
                 }
                 break;
 
@@ -1746,7 +1755,7 @@ class CAndruavClient {
                     const c_obj = {};
                     c_obj.p_unit = p_unit;
                     c_obj.p_jmsg = p_jmsg;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_cameraZoomChanged, c_obj);
+                    js_eventEmitter.fn_dispatch(js_event.EE_cameraZoomChanged, c_obj);
                 }
                 break;
 
@@ -1810,7 +1819,7 @@ class CAndruavClient {
                         console.log(e);
                     }
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitP2PUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
                 }
                 break;
             
@@ -1835,7 +1844,7 @@ class CAndruavClient {
                         console.log(e);
                     }
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitP2PUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
                 }
                 break;
 
@@ -2031,7 +2040,7 @@ class CAndruavClient {
                         } 
 
                         js_globals.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
                     } else {
                         p_unit.m_defined = true;
                         p_unit.m_Messages.m_lastActiveTime = Date.now();
@@ -2068,7 +2077,7 @@ class CAndruavClient {
                             p_unit.m_isDE = true;
                             p_unit.m_version = p_jmsg['dv'];
                             setTimeout(function () {
-                                js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitError, {unit: p_unit, err:{
+                                js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {unit: p_unit, err:{
                                     notification_Type:5,
                                     Description: "DE SW ver:" + p_unit.m_version
                                 }});
@@ -2146,7 +2155,7 @@ class CAndruavClient {
                         js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
                         this._fn_onNewUnitAdded(p_unit);
 
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitAdded, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
 
                     }
                     
@@ -2178,45 +2187,45 @@ class CAndruavClient {
                     }
     
                     if (v_trigger_on_swarm_status) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onAndruavUnitSwarmUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onAndruavUnitSwarmUpdated, p_unit);
                     }
                     
                     if (v_trigger_on_swarm_status2) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onAndruavUnitSwarmUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onAndruavUnitSwarmUpdated, p_unit);
                     }
                     
                     // CODEBLOCK_END
                     if (v_trigger_on_FCB) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFCBUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFCBUpdated, p_unit);
                     }
                     
                     if (v_trigger_on_armed) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitArmedUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitArmedUpdated, p_unit);
                     }
                     
                     if (v_trigger_on_flying){
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFlyingUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFlyingUpdated, p_unit);
                     }
                     
                     if (v_trigger_on_flightMode) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFightModeUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFightModeUpdated, p_unit);
                     }
                     if (v_trigger_on_vehiclechanged) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitVehicleTypeUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitVehicleTypeUpdated, p_unit);
                     } 
 
                     if (v_trigger_on_back_online) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitOnlineChanged, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, p_unit);
                     }
 
                         
                     if (v_trigger_on_module_changed) {
                         // TODO:  not handled... please handle
-                        js_eventEmitter.fn_dispatch(js_globals.EE_onModuleUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_onModuleUpdated, p_unit);
                     } 
 
                     if (v_trigger_on_home_point_changed) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_HomePointChanged, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_HomePointChanged, p_unit);
                     }
                         
             }
@@ -2243,7 +2252,7 @@ class CAndruavClient {
                         p_unit.m_SDR.m_interval                 = p_jmsg.t;
                         p_unit.m_SDR.m_trigger_level            = p_jmsg.l;
                         
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRUpdated, p_unit);
                     break;
 
                     case js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES:
@@ -2255,7 +2264,7 @@ class CAndruavClient {
                         {
                         p_unit.m_SDR.m_available_drivers = p_jmsg.dr;
                         }
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRUpdated, p_unit);
                     break;
 
                     case js_andruavMessages.CONST_SDR_ACTION_TRIGGER:
@@ -2267,7 +2276,7 @@ class CAndruavClient {
                             p_jmsg.r,
                             p_jmsg.d
                         )
-                        js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRTrigger, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRTrigger, p_unit);
                     break;
                 }
                 
@@ -2302,7 +2311,7 @@ class CAndruavClient {
                     p_unit.m_P2P.m_p2p_disabled             = false;
                 }
                 
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitP2PUpdated, p_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
                     
             }
             break;
@@ -2336,7 +2345,7 @@ class CAndruavClient {
 
                     //         for (var i = 0; i < size; ++ i) {
                     //             if (keys[i] === fenceName) {
-                    //                 js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitGeoFenceBeforeDelete, Me.m_andruavGeoFences[keys[i]]);
+                    //                 js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitGeoFenceBeforeDelete, Me.m_andruavGeoFences[keys[i]]);
 
                     //                 Me.m_andruavGeoFences.splice(i, 1);
                     //                 break;
@@ -2384,7 +2393,7 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.p_hasPowerInfo = false;
                 }
 
-                js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
             }
             break;
             case js_andruavMessages.CONST_TYPE_AndruavMessage_ExternalGeoFence: {
@@ -2412,7 +2421,7 @@ class CAndruavClient {
                     p_unit.m_Geo_Tags.p_HomePoint.lng = p_jmsg.O;
                     p_unit.m_Geo_Tags.p_HomePoint.alt = p_jmsg.A;
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_HomePointChanged, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_HomePointChanged, p_unit);
 
                 }
                 break;
@@ -2433,7 +2442,7 @@ class CAndruavClient {
                     
                     p_unit.m_Geo_Tags.fn_addDestinationPoint(p_jmsg.T, p_jmsg.O, p_jmsg.A, destination_type);
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_DistinationPointChanged, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_DistinationPointChanged, p_unit);
                     
                 }
                 break;
@@ -2524,7 +2533,7 @@ class CAndruavClient {
                     else 
                         geoFenceHitInfo.distance = Number.NaN;
                         
-                    js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitGeoFenceHit, {unit: p_unit, fenceHit: geoFenceHitInfo});
+                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitGeoFenceHit, {unit: p_unit, fenceHit: geoFenceHitInfo});
                 }
                 break;
 
@@ -2550,7 +2559,7 @@ class CAndruavClient {
                         } p_unit.m_DetectedTargets.m_searchable_targets[c_search_target.m_name] = c_search_target;
                     }
                     js_common.fn_console_log(JSON.stringify(p_jmsg));
-                    js_eventEmitter.fn_dispatch(js_globals.EE_SearchableTarget, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_SearchableTarget, p_unit);
                 }
                 // CODEBLOCK_END
 
@@ -2586,7 +2595,7 @@ class CAndruavClient {
                         p_unit.m_DetectedTargets.m_targets.m_list.push(c_target);
                     }
                     js_common.fn_console_log(JSON.stringify(p_jmsg));
-                    js_eventEmitter.fn_dispatch(js_globals.EE_DetectedTarget, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_DetectedTarget, p_unit);
                 }
                 break;
                 // CODEBLOCK_END
@@ -2597,7 +2606,7 @@ class CAndruavClient {
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
                     
-                    js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_WayPointsUpdated, {unit: p_unit, mir: p_jmsg.P, status: p_jmsg.R});
+                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPointsUpdated, {unit: p_unit, mir: p_jmsg.P, status: p_jmsg.R});
                 }
                 break;
 
@@ -2606,7 +2615,7 @@ class CAndruavClient {
                     // sub data is used to update a single port status.
                     p_jmsg = msg.msgPayload;
                     p_unit.m_GPIOs.addGPIO(p_jmsg.s);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitGPIOUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitGPIOUpdated, p_unit);
                 }
                 break;
         
@@ -2632,7 +2641,7 @@ class CAndruavClient {
                     v_error.infoType = p_jmsg.IT;
                     v_error.notification_Type = p_jmsg.NT;
                     v_error.Description = p_jmsg.DS;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitError,{unit:p_unit, err:v_error});
+                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError,{unit:p_unit, err:v_error});
 
 
                 }
@@ -2754,9 +2763,9 @@ class CAndruavClient {
                         }
                     }
                     if (v_isChunck === WAYPOINT_NO_CHUNK) { // old format message is not a chunk
-                        js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_WayPoints, {unit: p_unit, wps: wayPoint});
+                        js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, {unit: p_unit, wps: wayPoint});
                     } else if (v_isChunck === WAYPOINT_LAST_CHUNK) { // end of chunks
-                        js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_WayPoints, {unit: p_unit, wps: wayPoint});
+                        js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, {unit: p_unit, wps: wayPoint});
                         delete this.v_waypointsCache[p_unit.partyID];
                     }
                 }
@@ -2782,7 +2791,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Orientation.yaw = parseFloat(p_jmsg.y);
                     p_unit.m_Nav_Info._Target.alt_error = parseFloat(p_jmsg.f);
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                 }
                 break;
 
@@ -2799,13 +2808,13 @@ class CAndruavClient {
         }
 
         if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
+            js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
             this.socketConnectionDone  = true;
             this.API_sendID(); // send now important
             const Me = this;
             this.timerID = setInterval(function () {
                 Me.API_sendID();
-                js_eventEmitter.fn_dispatch(js_globals.EE_adsbExpiredUpdate, null);
+                js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, null);
             }, js_andruavMessages.CONST_sendID_Interverl);
 
             // request IDfrom all units
@@ -2814,7 +2823,7 @@ class CAndruavClient {
         } else {
             clearInterval(this.timerID);
         }
-        js_eventEmitter.fn_dispatch(js_globals.EE_onSocketStatus2, {status:status, name: c_SOCKET_STATUS[status - 1]});
+        js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus2, {status:status, name: c_SOCKET_STATUS[status - 1]});
     };
 
     getSocketStatus()
@@ -2843,7 +2852,7 @@ class CAndruavClient {
             if (msg.msgPayload.s.indexOf('OK:del') !== -1) {
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_FREASH);
                 //Me.EVT_onDeleted();
-                js_eventEmitter.fn_dispatch(js_globals.EE_onDeleted);
+                js_eventEmitter.fn_dispatch(js_event.EE_onDeleted);
 
             } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
             }
@@ -2880,7 +2889,7 @@ class CAndruavClient {
                     p_unit.m_FCBParameters.m_systemID = c_mavlinkMessage.header.srcSystem;
                     p_unit.m_FCBParameters.m_componentID = c_mavlinkMessage.header.srcComponent;
                     if (v_trigger_on_FCB === true) {
-                        js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitFCBUpdated, p_unit);
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFCBUpdated, p_unit);
                     }
                 }
                 break;
@@ -2909,7 +2918,7 @@ class CAndruavClient {
                     
                     p_unit.m_Servo.m_values = v_servoOutputs;
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_servoOutputUpdate, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_servoOutputUpdate, p_unit);
 
                 }
                 
@@ -2924,7 +2933,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Orientation.roll_speed = c_mavlinkMessage.rollspeed; // in radiuas
                     p_unit.m_Nav_Info.p_Orientation.pitch_speed = c_mavlinkMessage.pitchspeed; // in radiuas
                     p_unit.m_Nav_Info.p_Orientation.yaw_speed = c_mavlinkMessage.yawspeed;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
 
                 }
                 break;
@@ -2938,7 +2947,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info._Target.target_bearing = c_mavlinkMessage.target_bearing;
                     p_unit.m_Nav_Info._Target.wp_dist = c_mavlinkMessage.wp_dist;
                     p_unit.m_Nav_Info._Target.alt_error = c_mavlinkMessage.alt_error;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                 }
                     break;
 
@@ -2959,7 +2968,7 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery.FCB_BatteryTemprature = c_mavlinkMessage.temperature;
                     p_unit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed = c_mavlinkMessage.current_consumed;
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                 }
                 break;
                 case mavlink20.MAVLINK_MSG_ID_BATTERY2:
@@ -2968,7 +2977,7 @@ class CAndruavClient {
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryVoltage = c_mavlinkMessage.voltage;
                     p_unit.m_Power._FCB.p_Battery2.FCB_BatteryCurrent = c_mavlinkMessage.current_battery * 10;
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                     
                 }
                 break;
@@ -3037,7 +3046,7 @@ class CAndruavClient {
                 case mavlink20.MAVLINK_MSG_ID_DISTANCE_SENSOR:
                 {
                     p_unit.m_lidar_info.update(c_mavlinkMessage);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_andruavUnitLidarInfo, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitLidarInfo, p_unit);
                 }
                 break;
     
@@ -3057,7 +3066,7 @@ class CAndruavClient {
                     p_unit.m_Nav_Info.p_Location.lng = (c_mavlinkMessage.lon * 0.0000001);
                     p_unit.m_Nav_Info.p_Location.alt_abs = c_mavlinkMessage.alt * 0.001;
                     p_unit.m_Nav_Info.p_Location.alt_relative = c_mavlinkMessage.relative_alt * 0.001;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                 }
                 break;
 
@@ -3121,7 +3130,7 @@ class CAndruavClient {
                     
                 //     adsb_object.m_last_access   = new Date();
 
-                //     js_eventEmitter.fn_dispatch(js_globals.EE_adsbExchangeReady, adsb_object);
+                //     js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, adsb_object);
                 // }
                 // break;
 
@@ -3147,7 +3156,7 @@ class CAndruavClient {
                         if (now - this.m_lastparamatersUpdateTime > js_andruavMessages.CONST_PARAMETER_REPEATED)
                         {
                             this.m_lastparamatersUpdateTime = now;
-                            js_eventEmitter.fn_dispatch(js_globals.EE_updateParameters, p_unit);
+                            js_eventEmitter.fn_dispatch(js_event.EE_updateParameters, p_unit);
                         }
                         
                     }
@@ -3181,9 +3190,9 @@ class CAndruavClient {
                     
                     p_unit.m_GPS_Info1.m_isValid = true;
 
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                 }
                     break;
 
@@ -3203,9 +3212,9 @@ class CAndruavClient {
                     
                     p_unit.m_GPS_Info1.m_isValid = true;
                     
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitNavUpdated, p_unit);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitPowUpdated, p_unit);
-                    js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_GPS, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                 }
                     break;
                 
@@ -3231,7 +3240,7 @@ class CAndruavClient {
                     // Extract the float data
                     let floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
                     v_unit.m_SDR.addSpectrumData(andruavCMD.ms,floatData)
-                    js_eventEmitter.fn_dispatch(js_globals.EE_unitSDRSpectrum, v_unit);
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitSDRSpectrum, v_unit);
                     
                     for (let i = 0; i < floatData.length; i++) {
                         js_common.fn_console_log(`Float value at index ${i}: ${floatData[i]}`);
@@ -3273,7 +3282,7 @@ class CAndruavClient {
                 v_servoOutputs.m_servo7 = v_values[6];
                 v_servoOutputs.m_servo8 = v_values[7];
                 v_unit.m_Servo.m_values = v_servoOutputs;
-                js_eventEmitter.fn_dispatch(js_globals.EE_servoOutputUpdate, v_unit);
+                js_eventEmitter.fn_dispatch(js_event.EE_servoOutputUpdate, v_unit);
             }
                 break;
 
@@ -3303,7 +3312,7 @@ class CAndruavClient {
                     const spd=v_andruavMessage.spd!=null?v_andruavMessage.spd:0;
                     const ber=v_andruavMessage.des!=null?v_andruavMessage.ber:0;
                     const acc=v_andruavMessage.des!=null?v_andruavMessage.acc:-1;
-                    js_eventEmitter.fn_dispatch(js_globals.EE_msgFromUnit_IMG, 
+                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_IMG, 
                         {v_unit: v_unit, img:v_andruavMessage.img, des:des, lat:v_andruavMessage.lat, lng:v_andruavMessage.lng, prv:prv, tim:v_andruavMessage.tim, alt:v_andruavMessage.alt, spd:spd, ber:ber, acc:acc});
 
                 }
@@ -3459,7 +3468,7 @@ class CAndruavClient {
             // OnOpen callback of Websocket
             const Me = this;
             this.ws.onopen = function () {
-                // js_eventEmitter.fn_dispatch(js_globals.EE_WS_OPEN, null);
+                // js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
 
             };
 
@@ -3486,7 +3495,7 @@ class CAndruavClient {
             // OnClose callback of websocket
             this.ws.onclose = function () {
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_DISCONNECTED);
-                js_eventEmitter.fn_dispatch(js_globals.EE_WS_CLOSE, null);
+                js_eventEmitter.fn_dispatch(js_event.EE_WS_CLOSE, null);
             };
 
             this.ws.onerror = function (err) {

@@ -4,6 +4,7 @@
 *****************************************************/
 import * as js_helpers from "./js_helpers.js";
 import { js_globals } from "./js_globals.js";
+import {EVENTS as js_event} from './js_eventList.js'
 import { js_eventEmitter } from "./js_eventEmitter.js";
 import { js_leafletmap } from "./js_leafletmap.js";
 
@@ -212,7 +213,7 @@ export class ClssAndruavMissionPlan {
     this.fn_orderItems();
     this.fn_updatePath();
 
-    js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+    js_eventEmitter.fn_dispatch(js_event.EE_mapMissionUpdate, {
       mission: this,
     });
   }
@@ -228,7 +229,7 @@ export class ClssAndruavMissionPlan {
     this.fn_orderItems();
     this.fn_updatePath();
 
-    js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+    js_eventEmitter.fn_dispatch(js_event.EE_mapMissionUpdate, {
       mission: this,
     });
   }
@@ -256,7 +257,7 @@ export class ClssAndruavMissionPlan {
     this.fn_orderItems();
     this.fn_updatePath(true);
 
-    js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+    js_eventEmitter.fn_dispatch(js_event.EE_mapMissionUpdate, {
       mission: this,
     });
   }
@@ -275,7 +276,7 @@ export class ClssAndruavMissionPlan {
 
     this.m_all_mission_items_shaps = [];
 
-    js_eventEmitter.fn_dispatch(js_globals.EE_mapMissionUpdate, {
+    js_eventEmitter.fn_dispatch(js_event.EE_mapMissionUpdate, {
       mission: this,
     });
   }

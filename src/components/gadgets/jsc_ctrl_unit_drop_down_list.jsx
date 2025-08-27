@@ -4,6 +4,7 @@ import React    from 'react';
 import * as js_common from '../../js/js_common.js'
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
@@ -32,8 +33,8 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
         this.key = Math.random().toString();
             
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
 
     }
 
@@ -70,8 +71,8 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
     componentWillUnmount () {
         this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this);
 
     }
 

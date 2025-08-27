@@ -5,6 +5,7 @@ import * as js_common from '../../../js/js_common.js'
 
 
 import { js_globals } from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 
 import { ClssSingleMissionControlBar } from './jsc_ctrl_single_mission_control_bar.jsx'
@@ -41,7 +42,7 @@ export class ClssSingle_Plan_Header extends React.Component {
         this.pc_Ref = React.createRef();
         this.cp_Ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_mapMissionUpdate, this, this.fn_missionUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_mapMissionUpdate, this, this.fn_missionUpdated);
     }
 
 
@@ -128,7 +129,7 @@ export class ClssSingle_Plan_Header extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_mapMissionUpdate, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_mapMissionUpdate, this);
     }
 
     

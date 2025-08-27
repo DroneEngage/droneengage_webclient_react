@@ -8,6 +8,7 @@ import * as js_common from '../../js/js_common.js'
 import Modal from 'bootstrap/js/dist/modal';
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import {fn_do_modal_confirmation, fn_gotoUnit, fn_helpPage} from '../../js/js_main.js'
@@ -69,7 +70,7 @@ class ClssParameterItem extends  React.Component {
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (p_approved === false) return;
             js_globals.v_andruavClient.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
-            js_eventEmitter.fn_dispatch(js_globals.EE_displayParameters, me.props.prop_unit);
+            js_eventEmitter.fn_dispatch(js_event.EE_displayParameters, me.props.prop_unit);
         }, "YES");
 
 
@@ -171,8 +172,8 @@ export default class ClssUnitParametersList extends React.Component {
 		    m_update: 0
 		};
 	
-        js_eventEmitter.fn_subscribe (js_globals.EE_displayParameters, this, this.fn_displayForm);
-        js_eventEmitter.fn_subscribe (js_globals.EE_updateParameters, this, this.fn_updateParameters);
+        js_eventEmitter.fn_subscribe (js_event.EE_displayParameters, this, this.fn_displayForm);
+        js_eventEmitter.fn_subscribe (js_event.EE_updateParameters, this, this.fn_updateParameters);
         
     }
 
@@ -198,8 +199,8 @@ export default class ClssUnitParametersList extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_displayParameters,this);
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_updateParameters,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_displayParameters,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_updateParameters,this);
     }
 
     fn_onSearch (e)

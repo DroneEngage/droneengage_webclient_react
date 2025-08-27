@@ -3,6 +3,7 @@ import React    from 'react';
 
 
 import {js_globals} from '../js/js_globals.js';
+import {EVENTS as js_event} from '../js/js_eventList.js'
 import {js_localStorage} from '../js/js_localStorage'
 import {js_eventEmitter} from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
@@ -27,7 +28,7 @@ class ClssGamePadAxesControl extends React.Component {
             m_update: 0
         };
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Axes_Updated,this, this.fn_gamePadAxesUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated,this, this.fn_gamePadAxesUpdated);
     }
     
     componentDidMount () {
@@ -43,7 +44,7 @@ class ClssGamePadAxesControl extends React.Component {
     
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Axes_Updated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated,this);
     }
 
     render()
@@ -90,7 +91,7 @@ class ClssGamePadButtonControl extends React.Component {
             'm_update': 0
         };
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
     }
     
     componentDidMount() {
@@ -106,7 +107,7 @@ class ClssGamePadButtonControl extends React.Component {
     
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Button_Updated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated,this);
     }
 
 
@@ -156,11 +157,11 @@ export default class ClssGamePadControl extends React.Component {
 
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Connected,this, this.fn_gamePadConnected);
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Disconnected,this, this.fn_gamePadDisconnected);
-        js_eventEmitter.fn_subscribe(js_globals.EE_requestGamePad,this, this.fn_requestGamePad);
-        js_eventEmitter.fn_subscribe(js_globals.EE_releaseGamePad,this, this.fn_releaseGamePad);
-        js_eventEmitter.fn_subscribe(js_globals.EE_GamePad_Control_Update,this, this.fn_onChangeConfig);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Connected,this, this.fn_gamePadConnected);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Disconnected,this, this.fn_gamePadDisconnected);
+        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad,this, this.fn_requestGamePad);
+        js_eventEmitter.fn_subscribe(js_event.EE_releaseGamePad,this, this.fn_releaseGamePad);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Control_Update,this, this.fn_onChangeConfig);
     }
 
 
@@ -215,7 +216,7 @@ export default class ClssGamePadControl extends React.Component {
         
         this.m_config_index = p_config_index;
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_GamePad_Config_Index_Changed);
+        js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Config_Index_Changed);
 
         this.setState({'m_update': this.state.m_update +1});
 
@@ -263,11 +264,11 @@ export default class ClssGamePadControl extends React.Component {
         
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Connected,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Disconnected,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_requestGamePad,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_releaseGamePad,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_GamePad_Control_Update,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Connected,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Disconnected,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_releaseGamePad,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Control_Update,this);
     }   
 
 

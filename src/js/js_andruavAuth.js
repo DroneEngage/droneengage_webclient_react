@@ -6,7 +6,7 @@
 *********************************************************************************** */
 import $ from 'jquery'; 
 import * as  js_siteConfig from './js_siteConfig.js'
-import {js_globals} from './js_globals.js';
+import {EVENTS as js_event} from './js_eventList.js'
 import * as js_andruavMessages from './js_andruavMessages'
 import {js_eventEmitter} from './js_eventEmitter'
 
@@ -109,11 +109,11 @@ class CAndruavAuth {
 
 	async fn_do_loginAccount(p_userName, p_accessCode) {
         
-        js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Login_In_Progress, null);
+        js_eventEmitter.fn_dispatch(js_event.EE_Auth_Login_In_Progress, null);
                 
         if (!p_userName || !p_userName.length || !p_accessCode) {
             this._m_logined = false;
-            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: -1, em: "Invalid username or password" }); // Dispatch an error event
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, { e: -1, em: "Invalid username or password" }); // Dispatch an error event
             return false;
         }
 
@@ -148,12 +148,12 @@ class CAndruavAuth {
                 this.m_username = p_userName;
                 this._m_permissions_ = response.per;
                 this._m_perm = response.prm ?? DEFAULT_PERMISSIONS; // Provide default if prm is missing
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Logined, response);
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logined, response);
                 return true;
             } else {
                 this._m_logined = false;
                 const errorMessage = response?.em || "Login failed"; // Extract error message or provide a default
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, { e: response?.e || -2, em: errorMessage }); // Dispatch error event with details
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, { e: response?.e || -2, em: errorMessage }); // Dispatch error event with details
             }
         } catch (error) {
             this._m_logined = false;
@@ -161,7 +161,7 @@ class CAndruavAuth {
             // Check for SSL-related errors
             if (error.status === 0 || error.message.includes("ERR_CERT") || error.message.includes("SSL")) {
                 // Dispatch a specific event for SSL errors
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                     e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE,
                     em: "SSL Error: Unable to establish a secure connection.",
                     error: error.message,
@@ -169,7 +169,7 @@ class CAndruavAuth {
                 });
             } else {
                 // Dispatch a generic error event for other types of errors
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_BAD_Logined, {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                     e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE,
                     em: AUTH_ERROR_BAD_CONNECTION,
                     error: error.message,
@@ -215,13 +215,13 @@ class CAndruavAuth {
             });
 
             if (response && response.e === 0) {
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Created, response);
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Created, response);
             } else {
                 const errorMessage = response?.em || "Generate Access Code failed"; // Get the error message from response or set default
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: response?.e || -4, em: errorMessage }); // Dispatch error event with details
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: response?.e || -4, em: errorMessage }); // Dispatch error event with details
             }
         } catch (error) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message}); // Dispatch error event with error message
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message}); // Dispatch error event with error message
             console.error("Generate Access Code error:", error);
         }
     }
@@ -251,13 +251,13 @@ class CAndruavAuth {
             });
 
             if (response && response.e === 0) {
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_Regenerated, response);
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Regenerated, response);
             } else {
                 const errorMessage = response?.em || "Regenerate Access Code failed";
-                js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: response?.e || -3, em: errorMessage });
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: response?.e || -3, em: errorMessage });
             }
         } catch (error) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message });
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message });
             console.error("Regenerate Access Code error:", error);
         }
     }

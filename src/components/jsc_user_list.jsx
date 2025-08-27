@@ -239,7 +239,7 @@ class ClssUserList extends React.Component {
             users: [],
 		};
 	
-        window.StreamSensLibs.EventEmitter.fn_subscribe (js_globals.EE_Update_Users, this, this.fn_displayForm);
+        window.StreamSensLibs.EventEmitter.fn_subscribe (js_event.EE_Update_Users, this, this.fn_displayForm);
         
     }
 
@@ -257,7 +257,7 @@ class ClssUserList extends React.Component {
     }
 
     componentWillUnmount () {
-        window.StreamSensLibs.EventEmitter.fn_unsubscribe (js_globals.EE_Update_Users,this);
+        window.StreamSensLibs.EventEmitter.fn_unsubscribe (js_event.EE_Update_Users,this);
     }
 
       

@@ -2,9 +2,8 @@ import React    from 'react';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 
-import { js_globals } from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
-import {js_leafletmap} from '../../../js/js_leafletmap.js'
 
 import {CWayPointLocation} from './jsc_ctrl_waypoint_location.jsx'
 import {CWayPointAction} from './jsc_ctrl_waypoint_actions.jsx'
@@ -34,7 +33,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         if (!this.props.p_shape) return ;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'prev');
-        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
+        js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, c_shape);
     }
 
     fn_nextMissionItem()
@@ -42,7 +41,7 @@ export class ClssSingle_Mission_Card extends React.Component {
         if (!this.props.p_shape) return ;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'next');
-        js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, c_shape);
+        js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, c_shape);
     }
 
     fn_editShape ()

@@ -3,10 +3,11 @@ import React from 'react';
 
 import * as js_common from '../../../js/js_common.js'
 
-import { js_globals } from '../../../js/js_globals.js';
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
+import {js_globals} from '../../../js/js_globals.js';
+import {EVENTS as js_event} from '../../../js/js_eventList.js'
+import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 
-import { ClssSingle_Mission_Card } from './jsc_ctrl_single_mission_card.jsx'
+import {ClssSingle_Mission_Card} from './jsc_ctrl_single_mission_card.jsx'
 import {ClssSingle_Plan_Header} from './jsc_ctrl_single_plan_header.jsx'
 
 /**
@@ -22,8 +23,8 @@ export  class ClssSinglePlanContainer extends React.Component {
             m_party_id: 0,
         };
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_onShapeSelected, this, this.fn_displayGeoForm);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onMissionReset, this, this.fn_resetMission);
+        js_eventEmitter.fn_subscribe(js_event.EE_onShapeSelected, this, this.fn_displayGeoForm);
+        js_eventEmitter.fn_subscribe(js_event.EE_onMissionReset, this, this.fn_resetMission);
     }
 
     componentDidMount () {
@@ -31,8 +32,8 @@ export  class ClssSinglePlanContainer extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onShapeSelected, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onMissionReset, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeSelected, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onMissionReset, this);
     }
 
     
@@ -51,7 +52,7 @@ export  class ClssSinglePlanContainer extends React.Component {
         }
 
         if (me.props.p_isCurrent === false) {
-            js_eventEmitter.fn_dispatch(js_globals.EE_onPlanToggle, { p_switch_next: false, p_mission: me.props.p_missionPlan });
+            js_eventEmitter.fn_dispatch(js_event.EE_onPlanToggle, { p_switch_next: false, p_mission: me.props.p_missionPlan });
         }
 
         
@@ -91,7 +92,7 @@ export  class ClssSinglePlanContainer extends React.Component {
             this.state.m_collapsed = false;
         }
 
-        js_eventEmitter.fn_dispatch(js_globals.EE_onPlanToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
+        js_eventEmitter.fn_dispatch(js_event.EE_onPlanToggle, { p_isCurrent: this.props.p_isCurrent, p_mission: this.props.p_missionPlan });
 
 
         this.setState({'m_update': this.state.m_update +1});

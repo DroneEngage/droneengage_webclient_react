@@ -1,6 +1,7 @@
 import React    from 'react';
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 class ClssAndruavMessageItem extends React.Component {
@@ -56,7 +57,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
 		    'm_update': 0
         };
         
-        js_eventEmitter.fn_subscribe (js_globals.EE_onMessage, this, this.fn_onMessage);
+        js_eventEmitter.fn_subscribe (js_event.EE_onMessage, this, this.fn_onMessage);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -98,7 +99,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
 
     componentWillUnmount () {
         this._isMounted = false;
-		js_eventEmitter.fn_unsubscribe (js_globals.EE_onMessage,this);
+		js_eventEmitter.fn_unsubscribe (js_event.EE_onMessage,this);
     }
 
     render () {

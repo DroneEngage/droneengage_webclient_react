@@ -1,5 +1,6 @@
 import React    from 'react';
 import {js_globals} from '../../js/js_globals';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
@@ -573,7 +574,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_ServoControl(p_andruavUnit)
     {
-        js_eventEmitter.fn_dispatch (js_globals.EE_displayServoForm, p_andruavUnit.partyID);
+        js_eventEmitter.fn_dispatch (js_event.EE_displayServoForm, p_andruavUnit.partyID);
     }
 
     

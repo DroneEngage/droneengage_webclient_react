@@ -3,6 +3,7 @@ import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 import { js_globals } from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import {fn_helpPage, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
 
@@ -148,8 +149,8 @@ export default class ClssServoControl extends React.Component {
         this.opaqueBtnRef = React.createRef();
         
 
-        js_eventEmitter.fn_subscribe(js_globals.EE_servoOutputUpdate, this, this.fn_updateData);
-        js_eventEmitter.fn_subscribe(js_globals.EE_displayServoForm, this, this.fn_displayForm);
+        js_eventEmitter.fn_subscribe(js_event.EE_servoOutputUpdate, this, this.fn_updateData);
+        js_eventEmitter.fn_subscribe(js_event.EE_displayServoForm, this, this.fn_displayForm);
     }
 
 
@@ -169,8 +170,8 @@ export default class ClssServoControl extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_servoOutputUpdate, this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_displayServoForm, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_servoOutputUpdate, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_displayServoForm, this);
     }
 
     componentDidMount() {

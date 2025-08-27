@@ -3,6 +3,7 @@ import React    from 'react';
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_andruavAuth} from '../../js/js_andruavAuth.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
@@ -89,7 +90,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         if (p_andruavUnit.m_Telemetry.m_rxEngaged === true)
         {
             js_globals.v_andruavClient.API_disengageRX(p_andruavUnit);        
-            js_eventEmitter.fn_dispatch (js_globals.EE_requestGamePadreleaseGamePad, p_andruavUnit);
+            js_eventEmitter.fn_dispatch (js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             p_andruavUnit.m_Telemetry.m_rxEngaged = false;
             
         }
@@ -415,11 +416,11 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     
    
     childcomponentWillMount () {
-        js_eventEmitter.fn_subscribe(js_globals.EE_requestGamePad,this,this.fn_requestGamePad);
+        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad,this,this.fn_requestGamePad);
     }
 
     childcomponentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_requestGamePad,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad,this);
     }
 
     

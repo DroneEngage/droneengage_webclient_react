@@ -53,7 +53,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 		};
 
     
-        js_eventEmitter.fn_subscribe (js_globals.EE_onSocketStatus, this, this.fn_onSocketStatus);
+        js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     }
 
     fn_deleteShapesinDB ()
@@ -139,7 +139,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
     }
 
     componentWillUnmount () {
-    		js_eventEmitter.fn_unsubscribe (js_globals.EE_onSocketStatus,this);
+    		js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
 	}
 
     

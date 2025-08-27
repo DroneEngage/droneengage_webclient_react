@@ -3,7 +3,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
@@ -25,7 +25,7 @@ export default class ClssLidarInfoDialog extends React.Component
         
         this.modal_ctrl_lidar_info = React.createRef(); // Assuming you need this ref as well
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitLidarShow,this, this.fn_displayDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitLidarShow,this, this.fn_displayDialog);
         
         
     
@@ -41,7 +41,7 @@ export default class ClssLidarInfoDialog extends React.Component
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitLidarShow,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitLidarShow,this);
     } 
 
 

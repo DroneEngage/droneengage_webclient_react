@@ -1,5 +1,6 @@
 import React    from 'react';
 import {js_globals} from '../../js/js_globals';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_andruavAuth} from '../../js/js_andruavAuth'
 
@@ -13,7 +14,7 @@ export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
             m_message: [],
             'm_update': 0
         };
-        js_eventEmitter.fn_subscribe (js_globals.EE_onProxyInfoUpdated,this,this.fn_onProxyInfoUpdated);
+        js_eventEmitter.fn_subscribe (js_event.EE_onProxyInfoUpdated,this,this.fn_onProxyInfoUpdated);
 
     }
 
@@ -24,7 +25,7 @@ export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_onProxyInfoUpdated,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_onProxyInfoUpdated,this);
     }
 
     componentDidMount () 

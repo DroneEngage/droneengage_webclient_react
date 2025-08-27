@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { js_globals } from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
 
@@ -17,7 +18,7 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
 
         this.key = Math.random().toString();
         
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
     }
 
 
@@ -34,7 +35,7 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitGPIOUpdated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitGPIOUpdated, this);
     }
 
     fnl_gpioFlashChanged(p_me, p_unit) {

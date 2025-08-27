@@ -14,6 +14,7 @@ import * as js_andruavMessages from './js_andruavMessages'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import {js_globals} from './js_globals.js';
+import {EVENTS as js_event} from './js_eventList.js'
 import {js_speak} from './js_speak'
 import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
@@ -333,7 +334,7 @@ function fn_handleKeyBoard() {
 
 			v_talk.videoRecording = true;
 			v_talk.recorderObject = recorder;
-			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
+			js_eventEmitter.fn_dispatch(js_event.EE_videoStreamRedraw, { 'andruavUnit': v_andruavUnit, 'v_track': v_videoTrackID });
 
 		}
 
@@ -585,23 +586,23 @@ function fn_handleKeyBoard() {
 		function onWEBRTCSessionStarted(c_talk) {
 			let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
-			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 		}
 
 		function onWEBRTCSessionEnded(c_talk) {
 			let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
 			
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			js_eventEmitter.fn_dispatch(js_globals.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
-			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
+			js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 		}
 
 
 		function onWEBRTCSessionOrphanEnded(c_number) {
 			let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_number);
 			v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-			js_eventEmitter.fn_dispatch(js_globals.EE_unitUpdated, v_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 		}
 
 
@@ -1099,7 +1100,7 @@ function fn_handleKeyBoard() {
 				return;
 			}
 
-			js_eventEmitter.fn_dispatch(js_globals.EE_displayYawDlgForm,p_andruavUnit);
+			js_eventEmitter.fn_dispatch(js_event.EE_displayYawDlgForm,p_andruavUnit);
         
 			let ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
 			ctrl_yaw.unbind("click");
@@ -1375,7 +1376,7 @@ function fn_handleKeyBoard() {
 						}
 						else
 						{
-							js_eventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+							js_eventEmitter.fn_dispatch (js_event.EE_displayStreamDlgForm, p_session);
 						}
 					}
 				}
@@ -1402,7 +1403,7 @@ function fn_handleKeyBoard() {
 					}
 					else
 					{
-						js_eventEmitter.fn_dispatch (js_globals.EE_displayStreamDlgForm, p_session);
+						js_eventEmitter.fn_dispatch (js_event.EE_displayStreamDlgForm, p_session);
 					}
 				}
         	}
@@ -1864,7 +1865,7 @@ function fn_handleKeyBoard() {
 		function fn_onSocketStatus(me,event) {
 			const name = event.name;
 			const status = event.status;
-			js_eventEmitter.fn_dispatch( js_globals.EE_onSocketStatus, event);
+			js_eventEmitter.fn_dispatch( js_event.EE_onSocketStatus, event);
 			
 			if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 				js_speak.fn_speak('Connected');
@@ -2161,14 +2162,14 @@ function fn_handleKeyBoard() {
 							v_mark.on('click', function (p_event) {
 								if (p_event.originalEvent.ctrlKey===false)
 								{
-									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeSelected, p_event.target);
+									js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, p_event.target);
 								}
 								else
 								{
-									js_eventEmitter.fn_dispatch(js_globals.EE_onShapeDeleted, p_event);
+									js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, p_event);
 								}
 							});
-							js_eventEmitter.fn_dispatch(js_globals.EE_onShapeCreated, v_mark)
+							js_eventEmitter.fn_dispatch(js_event.EE_onShapeCreated, v_mark)
 							js_globals.v_map_shapes.push(v_mark);
 							
 						}
@@ -2272,7 +2273,7 @@ function fn_handleKeyBoard() {
 				js_speak.fn_speak('Disarmed');
 			}
 
-			js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_event.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -2397,7 +2398,7 @@ function fn_handleKeyBoard() {
 					js_leafletmap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
 							
-							js_eventEmitter.fn_dispatch(js_globals.EE_unitHighlighted, p_andruavUnit); 
+							js_eventEmitter.fn_dispatch(js_event.EE_unitHighlighted, p_andruavUnit); 
 							
 							fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, true);
 
@@ -2476,7 +2477,7 @@ function fn_handleKeyBoard() {
 				}
 				
 				js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
-				js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+				js_eventEmitter.fn_dispatch( js_event.EE_unitUpdated, p_andruavUnit);
 			}
 			else {
 
@@ -2555,7 +2556,7 @@ function fn_handleKeyBoard() {
 			
 			js_speak.fn_speak(p_andruavUnit.m_unitName + " unit added");
 
-			js_eventEmitter.fn_dispatch( js_globals.EE_unitAdded, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_event.EE_unitAdded, p_andruavUnit);
 		}	
 
 
@@ -2708,7 +2709,7 @@ function fn_handleKeyBoard() {
 			c_msg.m_notification_Type = v_notification_Type;
 			c_msg.m_cssclass = v_cssclass;
 			c_msg.m_error = p_error;
-			js_eventEmitter.fn_dispatch( js_globals.EE_onMessage, c_msg);
+			js_eventEmitter.fn_dispatch( js_event.EE_onMessage, c_msg);
 		
 			
 
@@ -3065,7 +3066,7 @@ function fn_handleKeyBoard() {
 				js_speak.fn_speak("unit " + p_andruavUnit.m_unitName + " " + msg);
 			}
 
-			js_eventEmitter.fn_dispatch( js_globals.EE_unitUpdated, p_andruavUnit);
+			js_eventEmitter.fn_dispatch( js_event.EE_unitUpdated, p_andruavUnit);
 		}
 
 
@@ -3137,31 +3138,31 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavClient.m_server_port_ss = js_andruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
 				js_globals.v_andruavClient.server_AuthKey = js_andruavAuth.server_AuthKey;
 				js_globals.v_andruavClient._permissions_ = js_andruavAuth.fn_getPermission();
-				js_eventEmitter.fn_subscribe(js_globals.EE_WS_OPEN,this,EVT_onOpen);
-				js_eventEmitter.fn_subscribe(js_globals.EE_WS_CLOSE,this,EVT_onClose);
-				js_eventEmitter.fn_subscribe(js_globals.EE_onSocketStatus2,this,fn_onSocketStatus);
-				js_eventEmitter.fn_subscribe(js_globals.EE_onDeleted,this,EVT_onDeleted);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_GPS,this,EVT_msgFromUnit_GPS);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_IMG,this,EVT_msgFromUnit_IMG);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitAdded,this,EVT_andruavUnitAdded);
-				js_eventEmitter.fn_subscribe(js_globals.EE_HomePointChanged,this,EVT_HomePointChanged);
-				js_eventEmitter.fn_subscribe(js_globals.EE_DistinationPointChanged,this,EVT_DistinationPointChanged);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitError,this,EVT_andruavUnitError);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceUpdated,this,EVT_andruavUnitGeoFenceUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceHit,this,EVT_andruavUnitGeoFenceHit);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPoints,this,EVT_msgFromUnit_WayPoints);
-				js_eventEmitter.fn_subscribe(js_globals.EE_msgFromUnit_WayPointsUpdated,this,EVT_msgFromUnit_WayPointsUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,EVT_andruavUnitArmedUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitGeoFenceBeforeDelete,this,EVT_andruavUnitGeoFenceBeforeDelete);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,EVT_andruavUnitFCBUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_WS_OPEN,this,EVT_onOpen);
+				js_eventEmitter.fn_subscribe(js_event.EE_WS_CLOSE,this,EVT_onClose);
+				js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus2,this,fn_onSocketStatus);
+				js_eventEmitter.fn_subscribe(js_event.EE_onDeleted,this,EVT_onDeleted);
+				js_eventEmitter.fn_subscribe(js_event.EE_msgFromUnit_GPS,this,EVT_msgFromUnit_GPS);
+				js_eventEmitter.fn_subscribe(js_event.EE_msgFromUnit_IMG,this,EVT_msgFromUnit_IMG);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitAdded,this,EVT_andruavUnitAdded);
+				js_eventEmitter.fn_subscribe(js_event.EE_HomePointChanged,this,EVT_HomePointChanged);
+				js_eventEmitter.fn_subscribe(js_event.EE_DistinationPointChanged,this,EVT_DistinationPointChanged);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitError,this,EVT_andruavUnitError);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitGeoFenceUpdated,this,EVT_andruavUnitGeoFenceUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitGeoFenceHit,this,EVT_andruavUnitGeoFenceHit);
+				js_eventEmitter.fn_subscribe(js_event.EE_msgFromUnit_WayPoints,this,EVT_msgFromUnit_WayPoints);
+				js_eventEmitter.fn_subscribe(js_event.EE_msgFromUnit_WayPointsUpdated,this,EVT_msgFromUnit_WayPointsUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated,this,EVT_andruavUnitArmedUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitGeoFenceBeforeDelete,this,EVT_andruavUnitGeoFenceBeforeDelete);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated,this,EVT_andruavUnitFCBUpdated);
 				
 				
 				
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFlyingUpdated,this,EVT_andruavUnitFlyingUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFightModeUpdated,this,EVT_andruavUnitFightModeUpdated);
-				js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitVehicleTypeUpdated,this,EVT_andruavUnitVehicleTypeUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFlyingUpdated,this,EVT_andruavUnitFlyingUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFightModeUpdated,this,EVT_andruavUnitFightModeUpdated);
+				js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitVehicleTypeUpdated,this,EVT_andruavUnitVehicleTypeUpdated);
 				
-				js_eventEmitter.fn_subscribe(js_globals.EE_unitSDRTrigger,this,EVT_andruavUnitSDRTrigger);
+				js_eventEmitter.fn_subscribe(js_event.EE_unitSDRTrigger,this,EVT_andruavUnitSDRTrigger);
 				
 				
 				
@@ -3276,8 +3277,8 @@ function fn_handleKeyBoard() {
 
 			if (js_globals.v_EnableADSB === true)
 			{
-				js_eventEmitter.fn_subscribe(js_globals.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
-				js_eventEmitter.fn_subscribe(js_globals.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+				js_eventEmitter.fn_subscribe(js_event.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
+				js_eventEmitter.fn_subscribe(js_event.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
 			}
 			
 
@@ -3375,6 +3376,6 @@ function fn_handleKeyBoard() {
 
 			fn_handleKeyBoard();
 			
-			js_eventEmitter.fn_subscribe(js_globals.EE_Auth_Logined,this,fn_connectWebSocket);
+			js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined,this,fn_connectWebSocket);
 				
 		};  // end of onReady

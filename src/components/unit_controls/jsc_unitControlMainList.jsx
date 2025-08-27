@@ -5,6 +5,7 @@ import React    from 'react';
 
 import * as js_common from '../../js/js_common.js'
 import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 
@@ -45,14 +46,14 @@ export default class ClssAndruavUnitList extends React.Component {
 		    'm_update': 0
 		};
 
-        js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
-        js_eventEmitter.fn_subscribe (js_globals.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_globals.EE_unitHighlighted,this,this.fn_unitOnUnitHighlighted);
+        js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
+        js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted,this,this.fn_unitOnUnitHighlighted);
         
     }
 
@@ -130,14 +131,14 @@ export default class ClssAndruavUnitList extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_globals.EE_requestGamePadonSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitOnlineChanged,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitArmedUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_andruavUnitFCBUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_onPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe(js_globals.EE_unitHighlighted,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonSocketStatus,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitArmedUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitFCBUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitHighlighted,this);
         
     }
 
