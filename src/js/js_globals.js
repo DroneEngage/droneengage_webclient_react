@@ -161,6 +161,10 @@ class GLOBALS {
 
 		// LOCAL STORAGE
 		this.LS_UNIT_ID = '_vUnitID';
+		this.LS_EMAIL = '_vEmail;'
+		this.LS_GROUP_NAME = '_vGroupName;'
+		this.LS_LANG = '_vLang';
+		this.LS_WEB_GCS = 'WEB_GCS_';
 		this.LS_ACCESS_CODE = '_vAccessCode';
 		this.LS_DISPLAY_MODE = '_vDisplayMode';
 		this.LS_GAME_PAD_MODE = 'gamepad_mode_';
@@ -170,6 +174,7 @@ class GLOBALS {
 		this.LS_ENABLE_SPEECH = '_vv_speechEnabled';
 		this.LS_DEFAULT_VOLUME = '_vDefaultVolume';
 		this.LS_TAB_DISPLAY_ENABLED = '_vTabsDisplayEnabled';
+		this.LS_METRIC_SYS = '_vv_useMetricSystem';
 		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
 

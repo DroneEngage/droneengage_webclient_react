@@ -63,20 +63,20 @@ class CLocalStorage {
 
     // Language
     fn_setLanguage(value) {
-        this._setValue('_vLang', value);
+        this._setValue(js_globals.LS_LANG, value);
     }
 
     fn_getLanguage() {
-        return this._getValue('_vLang', 'en');
+        return this._getValue(js_globals.LS_LANG, 'en');
     }
 
     // Email
     fn_setEmail(value) {
-        this._setValue('_vEmail', value);
+        this._setValue(js_globals.LS_EMAIL, value);
     }
 
     fn_getEmail() {
-        return this._getValue('_vEmail', '');
+        return this._getValue(js_globals.LS_EMAIL, '');
     }
 
     // Access Code
@@ -94,19 +94,19 @@ class CLocalStorage {
     }
 
     fn_resetUnitID() {
-        this.fn_setUnitID ('WEB_GCS_' + js_common.fn_generateRandomString(3));
+        this.fn_setUnitID (js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
     fn_getUnitID() {
-        return this._getSessionValue(js_globals.LS_UNIT_ID, 'WEB_GCS_' + js_common.fn_generateRandomString(3));
+        return this._getSessionValue(js_globals.LS_UNIT_ID, js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
 
     // Group Name
     fn_setGroupName(value) {
-        this._setValue('_vGroupName', value);
+        this._setValue(js_globals.LS_GROUP_NAME, value);
     }
 
     fn_getGroupName() {
-        return this._getValue('_vGroupName', '1');
+        return this._getValue(js_globals.LS_GROUP_NAME, '1');
     }
 
     // Display Mode
@@ -120,11 +120,11 @@ class CLocalStorage {
 
     // Metric System
     fn_setMetricSystem(value) {
-        this._setValue('_vv_useMetricSystem', value.toString());
+        this._setValue(js_globals.LS_METRIC_SYS, value.toString());
     }
 
     fn_getMetricSystem() {
-        return this._getValue('_vv_useMetricSystem', js_globals.v_useMetricSystem.toString()) === 'true';
+        return this._getValue(js_globals.LS_METRIC_SYS, js_globals.v_useMetricSystem.toString()) === 'true';
     }
 
     fn_setGamePadConfig(config_index, value) {
