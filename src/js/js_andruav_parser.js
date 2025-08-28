@@ -260,22 +260,18 @@ class CAndruavClient {
         let p_jmsg;
         let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 
-        if (p_unit === null || p_unit === undefined) {
-
+        if (!p_unit) {
             p_unit = new js_andruavUnit.CAndruavUnitObject();
-            // p_unit.m_defined = false; define it as incomplete
             p_unit.m_IsMe = false;
             p_unit.m_defined = false;
             p_unit.partyID = msg.senderName;
             p_unit.m_index = js_globals.m_andruavUnitList.count;
             js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
             if (msg.messageType !== js_andruavMessages.CONST_TYPE_AndruavMessage_ID) {
-                if (p_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID) === true) {
-                    // it is already identifying itself.
+                if (p_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
                     js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
-                    p_unit.m_Messages.fn_doNotRepeatMessageBefore(js_andruavMessages.CONST_TYPE_AndruavMessage_ID, 1000, new Date())
-                }
-                else {
+                    p_unit.m_Messages.fn_doNotRepeatMessageBefore(js_andruavMessages.CONST_TYPE_AndruavMessage_ID, 1000, new Date());
+                } else {
                     js_common.fn_console_log("skip");
                 }
             }
