@@ -103,7 +103,7 @@ class CAndruavClient {
 
         this.m_andruavGeoFences = {}; // list of fences each fence ha s list of attached units.
         this.videoFrameCount = 0;
-
+        this.mavlinkProcessor = new MAVLink20Processor(null, 0, 0);
 
 
 
@@ -251,7 +251,7 @@ class CAndruavClient {
         //js_andruav_facade.AndruavClientFacade.API_requestIMU (target,true);  // NOT USED
 
 
-        
+
     };
 
 
@@ -1248,15 +1248,10 @@ class CAndruavClient {
     * @param p_mavlinkPacket: should be a mavlink message.
     */
     prv_parseUnitMavlinkMessage(p_unit, p_mavlinkPacket) {
-        const p_mavlinkProcessor = new MAVLink20Processor(null, 0, 0);
-        const p_mavlinkMessages = p_mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
-        const len = p_mavlinkMessages.length;
-        for (let i = 0; i < len; ++i) {
-            let c_mavlinkMessage = p_mavlinkMessages[i];
+        const messages = this.mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
+        for (const c_mavlinkMessage of messages) {
             if (c_mavlinkMessage.id === -1) {
-                // bad mavlink ... make sure you are using MAVLINK V2
-                //this.EVT_BadMavlink();
-                js_common.fn_console_log("BAD MAVLINK");
+               js_common.fn_console_log("BAD MAVLINK");
                 continue;
             }
             p_unit.m_Messages.fn_addMavlinkMsg(c_mavlinkMessage);
