@@ -1796,7 +1796,7 @@ function fn_handleKeyBoard() {
 				js_globals.m_markGuided = null;
 			}
 			
-            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('/public/images/waypoint_bg_32x32.png', 'target', [16,32], true, true);
+            js_globals.m_markGuided = js_leafletmap.fn_CreateMarker ('/images/waypoint_bg_32x32.png', 'target', [16,32], true, true);
             js_leafletmap.fn_setPosition(js_globals.m_markGuided , p_position);
 			
 			js_leafletmap.fn_addListenerOnClickMarker (js_globals.m_markGuided,
@@ -2286,7 +2286,7 @@ function fn_handleKeyBoard() {
 			switch (c_point_type)
 			{
 				case js_andruavMessages.CONST_DESTINATION_GUIDED_POINT:
-				return '/public/images/destination_bg_32x32.png';
+				return '/images/destination_bg_32x32.png';
 				case js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION:
 				{
 					switch (p_andruavUnit.m_VehicleType)
@@ -2307,10 +2307,10 @@ function fn_handleKeyBoard() {
 		
 		export function getVehicleIcon(p_andruavUnit, applyBearing) {
 			if (p_andruavUnit === null || p_andruavUnit === undefined) {
-				return '/public/images/drone_3_32x32.png';
+				return '/images/drone_3_32x32.png';
 			}
 			if (p_andruavUnit.m_IsGCS === true) {
-				return '/public/images/map_gcs_3_32x32.png';
+				return '/images/map_gcs_3_32x32.png';
 			} else {
 				switch (p_andruavUnit.m_VehicleType) {
 				case js_andruavUnit.VEHICLE_TRI:
@@ -2327,7 +2327,7 @@ function fn_handleKeyBoard() {
 					return js_globals.planes_icon[p_andruavUnit.m_index % 4];
 				case js_andruavUnit.VEHICLE_HELI:
 					p_andruavUnit.m_VehicleType_TXT = "Heli";
-					return '/public/images/heli_1_32x32.png';
+					return '/images/heli_1_32x32.png';
 				case js_andruavUnit.VEHICLE_ROVER:
 					p_andruavUnit.m_VehicleType_TXT = "Rover";
 					return js_globals.rover_icon[p_andruavUnit.m_index % 4];
@@ -2336,12 +2336,12 @@ function fn_handleKeyBoard() {
 					return js_globals.boat_icon[p_andruavUnit.m_index % 4];
 				case js_andruavUnit.VEHICLE_SUBMARINE:
 					p_andruavUnit.m_VehicleType_TXT = "Submarine";
-					return '/public/images/submarine_gb_32x32.png';
+					return '/images/submarine_gb_32x32.png';
 				case js_andruavUnit.CONTROL_UNIT:
 					p_andruavUnit.m_VehicleType_TXT = "Control Unit";
-					return '/public/images/tower_cl_32x32.png';
+					return '/images/tower_cl_32x32.png';
 				default:
-					return '/public/images/drone_3_32x32.png';
+					return '/images/drone_3_32x32.png';
 				}
 			}
 			}
@@ -2620,7 +2620,7 @@ function fn_handleKeyBoard() {
 			let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 			if (gui.m_marker_destination === null || gui.m_marker_destination === undefined) {
-				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('/public/images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,48], false,false, "", [32,32]);
+				gui.m_marker_destination = js_leafletmap.fn_CreateMarker('/images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16,48], false,false, "", [32,32]);
 			}
 			
 			if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true)

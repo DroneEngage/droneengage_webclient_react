@@ -418,7 +418,7 @@ class CLeafLetAndruavMap {
     fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
         if ((p_image === null || p_image === undefined || p_image===""))
         {
-            p_image = '/public/images/destination_g_32x32.png';
+            p_image = '/images/destination_g_32x32.png';
             anchor = [16,32];
         }
         let v_image;

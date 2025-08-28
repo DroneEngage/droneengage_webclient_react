@@ -157,7 +157,7 @@ export class ClssSingle_Plan_Header extends React.Component {
             v_item.push(
 
 
-                <div id="geofence" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
+                <div id="geofence1" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
                     <ClssSingleMissionControlBar p_mission={this.props.p_mission} m_selected_unit={this.state.m_partyID} />
                 </div>
 
@@ -165,7 +165,7 @@ export class ClssSingle_Plan_Header extends React.Component {
 
             if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
                 v_partyIDCtrl.push(
-                    <div id="geofence" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
+                    <div id="geofence2" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
                         <div className="col-12">
                             <ClssAndruavUnitDropDownList p_label={"Drone"} p_partyID={this.state.m_partyID} onSelectUnit={(partyID) => this.fn_onSelectUnit(partyID)} />
                         </div>
