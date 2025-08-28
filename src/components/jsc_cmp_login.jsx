@@ -5,7 +5,7 @@ import React from 'react';
 import {EVENTS as js_event} from '../js/js_eventList.js'
 import {js_eventEmitter} from '../js/js_eventEmitter'
 
-import { js_andruavAuth } from '../js/js_andruavAuth'
+import { js_andruavAuth } from '../js/js_andruav_auth'
 import { js_localStorage } from '../js/js_localStorage'
 
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';

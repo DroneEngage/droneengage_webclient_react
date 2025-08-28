@@ -5,7 +5,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js'
 import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {js_andruavAuth} from '../../js/js_andruavAuth.js'
+import {js_andruavAuth} from '../../js/js_andruav_auth.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {fn_requestWayPoints,

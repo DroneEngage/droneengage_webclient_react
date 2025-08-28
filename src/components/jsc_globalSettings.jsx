@@ -9,7 +9,7 @@ import {js_eventEmitter} from '../js/js_eventEmitter';
 import {js_speak} from '../js/js_speak';
 import {gui_toggleUnits} from '../js/js_main';
 import {js_localStorage} from '../js/js_localStorage';
-import {js_andruavAuth} from '../js/js_andruavAuth';
+import {js_andruavAuth} from '../js/js_andruav_auth';
 import {ClssFireEvent} from  './micro_gadgets/jsc_mctrl_fire_event.jsx';
 import {setSelectedMissionFilePathToWrite} from '../js/js_main.js'
 

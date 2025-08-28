@@ -9,7 +9,7 @@ import { js_eventEmitter } from "./js_eventEmitter.js";
 import { js_leafletmap } from "./js_leafletmap.js";
 
 import * as js_andruavMessages from "./js_andruavMessages.js";
-import { js_andruavAuth } from "./js_andruavAuth.js";
+import { js_andruavAuth } from "./js_andruav_auth.js";
 import { ClssAndruavFencePlan } from "./js_plan_fence.js";
 import { mavlink20 } from "./js_mavlink_v2.js";
 
