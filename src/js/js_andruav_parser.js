@@ -73,34 +73,24 @@ class CAndruavClient {
         const units = js_globals.m_andruavUnitList.fn_getUnitValues();
         if (!units) return;
 
-        units.forEach((unit) => {
-            if (unit.m_IsDisconnectedFromGCS) return; // Skip self.
-
+        for (const unit of units) {
+            if (unit.m_IsDisconnectedFromGCS) continue;
             const timeSinceLastActive = now - unit.m_Messages.m_lastActiveTime;
 
             if (!unit.m_IsShutdown) {
-                if (unit.m_Geo_Tags.p_HomePoint.m_isValid !== true) {
-                    js_globals.v_andruavFacade.API_do_GetHomeLocation(unit);
+                if (!unit.m_Geo_Tags.p_HomePoint.m_isValid) {
+                    js_andruav_facade.AndruavClientFacade.API_do_GetHomeLocation(unit);
                 }
-
                 if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
                     js_andruav_facade.AndruavClientFacade.API_requestID(unit.partyID);
                 }
-            } else { // Handle shutdown units
-                if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1) {
-                    if (!unit.m_IsDisconnectedFromGCS) {
-                        unit.m_IsDisconnectedFromGCS = true;
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, unit);
-                    }
-                }
             }
 
-            // Check for disconnection regardless of shutdown status
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1 && !unit.m_IsDisconnectedFromGCS) {
                 unit.m_IsDisconnectedFromGCS = true;
                 js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, unit);
             }
-        });
+        }
     }
 
 
@@ -254,16 +244,14 @@ class CAndruavClient {
 
 
 
-    _fn_onNewUnitAdded(target) {
+    prv_onNewUnitAdded(target) {
         js_andruav_facade.AndruavClientFacade.API_requestGeoFencesAttachStatus(target);
         js_andruav_facade.AndruavClientFacade.API_requestUdpProxyStatus(target);
         js_andruav_facade.AndruavClientFacade.API_requestWayPoints(target);
         //js_andruav_facade.AndruavClientFacade.API_requestIMU (target,true);  // NOT USED
 
 
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
-            return;
-        }
+        
     };
 
 
@@ -522,353 +510,10 @@ class CAndruavClient {
 
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_ID: {
-                let v_trigger_on_vehicleblocked = false;
-                let v_trigger_on_flying = false;
-                let v_trigger_on_armed = false;
-                let v_trigger_on_FCB = false;
-                let v_trigger_on_flightMode = false;
-                let v_trigger_on_module_changed = false;
-                let v_trigger_on_home_point_changed = false;
-                let v_trigger_on_vehiclechanged = false;
-                let v_trigger_on_swarm_status = false;
-                let v_trigger_on_swarm_status2 = false;
-                let v_trigger_on_back_online = false;
-
-
                 p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-
-                if ((p_unit !== null && p_unit !== undefined) && (p_unit.m_defined === true)) {
-                    p_unit.m_IsMe = false;
-                    p_unit.m_IsGCS = p_jmsg.GS;
-                    p_unit.m_unitName = p_jmsg.UD;
-                    p_unit.Description = p_jmsg.DS;
-                    v_trigger_on_vehiclechanged = (p_unit.m_VehicleType !== p_jmsg.VT);
-                    p_unit.m_VehicleType = p_jmsg.VT;
-                    p_unit.m_Video.VideoRecording = p_jmsg.VR; // ON DRONE RECORDING
-                    p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
-                    p_unit.m_Permissions = p_jmsg.p;
-                    p_unit.m_IsDisconnectedFromGCS = false;
-
-                    if (p_jmsg.hasOwnProperty('FI') !== true) {
-                        p_jmsg.FI = false;
-                    }
-                    v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
-                    p_unit.m_useFCBIMU = p_jmsg.FI;
-                    p_unit.m_telemetry_protocol = p_jmsg.TP;
-
-
-                    if (p_unit.hasOwnProperty('T') !== true) {
-                        p_unit.m_time_sync = p_jmsg.T;
-                    }
-
-                    if (p_jmsg.hasOwnProperty('m1') === true) {
-                        if (p_jmsg.m1.length !== p_unit.m_modules.m_list.length) {
-                            v_trigger_on_module_changed = true;
-                        }
-                        p_unit.m_modules.addModules(p_jmsg.m1);
-                    }
-
-                    if (p_unit.m_IsGCS === true) {
-                        if (p_jmsg.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation)) {
-                            const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
-                            p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
-                            v_trigger_on_home_point_changed = true;
-                        }
-                    }
-
-                    if (p_jmsg.hasOwnProperty('dv') === true) {
-                        p_unit.m_isDE = true;
-                        if (p_unit.m_version !== p_jmsg['dv']) {
-                            p_unit.m_version = p_jmsg['dv'];
-                            Me.EVT_andruavUnitError({
-                                unit: p_unit, err: {
-                                    notification_Type: 5,
-                                    Description: "DE SW ver:" + p_unit.m_version
-                                }
-                            });
-                        }
-                    }
-
-                    if (p_jmsg.hasOwnProperty('B') === true) {
-                        v_trigger_on_vehicleblocked = (p_unit.m_Telemetry.m_isGCSBlocked !== p_jmsg.B)
-
-                        p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
-                    }
-
-                    if (p_jmsg.hasOwnProperty('C') === true) {
-                        p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
-                    }
-
-                    if (p_jmsg.hasOwnProperty('SD') !== true) {
-                        p_jmsg.SD = false;
-                    }
-
-                    if (p_unit.m_IsShutdown !== p_jmsg.SD) {
-                        v_trigger_on_back_online = (p_unit.m_IsShutdown !== p_jmsg.SD);
-                        p_unit.m_IsShutdown = p_jmsg.SD;
-                    }
-
-                    if (p_jmsg.hasOwnProperty('AP') === true) {
-                        p_unit.m_autoPilot = p_jmsg.AP;
-                    }
-
-
-                    if (p_jmsg.hasOwnProperty('FM') !== true) {
-                        p_jmsg.FM = false;
-                    }
-                    v_trigger_on_flightMode = (p_unit.m_flightMode !== p_jmsg.FM);
-                    p_unit.m_flightMode = p_jmsg.FM;
-
-
-                    if (p_jmsg.hasOwnProperty('AR') !== true) {
-                        p_jmsg.AR = 0;
-                    }
-
-                    let is_armed = false;
-                    let is_ready_to_arm = false;
-                    if (typeof p_jmsg.AR === 'boolean') {   // backword compatibility/
-                        is_armed = p_jmsg.AR;
-                        is_ready_to_arm = p_jmsg.AR;
-                    }
-                    else if (typeof p_jmsg.AR === 'number') {
-                        is_armed = (p_jmsg.AR & 0b0010) === 0b10;
-                        is_ready_to_arm = (p_jmsg.AR & 0b0001) === 0b1;
-                    }
-                    if (p_unit.m_isDE !== true) is_ready_to_arm = true
-                    v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
-                    p_unit.m_isArmed = is_armed;
-                    p_unit.m_is_ready_to_arm = is_ready_to_arm;
-
-
-                    if (p_jmsg.hasOwnProperty('FL') !== true) {
-                        p_jmsg.FL = false;
-                    }
-                    v_trigger_on_flying = (p_unit.m_isFlying !== p_jmsg.FL);
-                    p_unit.m_isFlying = p_jmsg.FL;
-
-                    if (p_jmsg.hasOwnProperty('z') === true) {
-                        p_unit.m_FlyingLastStartTime = p_jmsg.z / 1000; // to seconds
-                    }
-
-                    if (p_jmsg.hasOwnProperty('a') === true) {
-                        p_unit.m_FlyingTotalDuration = p_jmsg.a / 1000; // to seconds
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('n') === true) && (p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
-                        v_trigger_on_swarm_status = (p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
-                        p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
-                    } else {
-                        v_trigger_on_swarm_status = (p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM);
-                        p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
-                        v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== true);
-                        p_unit.m_Swarm.m_isLeader = true;
-                        p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
-                    } else {
-                        v_trigger_on_swarm_status = (p_unit.m_Swarm.m_isLeader !== false);
-                        p_unit.m_Swarm.m_isLeader = false;
-                        p_unit.m_Swarm.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('q') === true) && (p_jmsg.q !== "")) {
-                        v_trigger_on_swarm_status2 = (p_unit.m_Swarm.m_following !== p_jmsg.q);
-                        p_unit.m_Swarm.m_following = p_jmsg.q;
-                    } else {
-                        v_trigger_on_swarm_status2 = (p_unit.m_Swarm.m_following !== null && p_unit.m_Swarm.m_following !== undefined);
-                        p_unit.m_Swarm.m_following = null;
-                    }
-
-                    js_globals.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
-                    js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
-                } else {
-                    p_unit.m_defined = true;
-                    p_unit.m_Messages.m_lastActiveTime = Date.now();
-                    p_unit.m_IsMe = false;
-                    p_unit.m_IsGCS = p_jmsg.GS;
-                    p_unit.m_unitName = p_jmsg.UD;
-                    p_unit.partyID = msg.senderName;
-                    p_unit.Description = p_jmsg.DS;
-                    p_unit.m_VehicleType = p_jmsg.VT;
-                    p_unit.m_Video.VideoRecording = p_jmsg.VR;
-                    p_unit.m_Permissions = p_jmsg.p;
-                    p_unit.m_IsDisconnectedFromGCS = false;
-
-                    p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
-                    if (p_jmsg.hasOwnProperty('FL') !== true) {
-                        p_jmsg.FL = false;
-                    }
-                    v_trigger_on_FCB = (p_unit.m_useFCBIMU !== p_jmsg.FI) || (p_unit.m_telemetry_protocol !== p_jmsg.TP);
-                    p_unit.m_useFCBIMU = p_jmsg.FI;
-                    p_unit.m_telemetry_protocol = p_jmsg.TP;
-
-                    if (p_jmsg.hasOwnProperty('m1') === true) {
-                        p_unit.m_modules.addModules(p_jmsg.m1);
-                    }
-
-                    if (p_jmsg.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation)) {
-                        const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
-                        p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
-                        v_trigger_on_home_point_changed = true;
-                    }
-
-                    if (p_jmsg.hasOwnProperty('dv') === true) {
-                        p_unit.m_isDE = true;
-                        p_unit.m_version = p_jmsg['dv'];
-                        setTimeout(function () {
-                            js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
-                                unit: p_unit, err: {
-                                    notification_Type: 5,
-                                    Description: "DE SW ver:" + p_unit.m_version
-                                }
-                            });
-
-                        }, 1000);
-                    }
-
-                    if (p_jmsg.hasOwnProperty('B') === true) {
-                        p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
-                    }
-
-                    if (p_unit.m_IsShutdown !== p_jmsg.SD) {
-                        v_trigger_on_back_online = (p_unit.m_IsShutdown !== p_jmsg.SD);
-                        p_unit.m_IsShutdown = p_jmsg.SD;
-                    }
-
-                    if (p_jmsg.hasOwnProperty('FM') === true) {
-                        v_trigger_on_flightMode = (p_unit.m_flightMode !== p_jmsg.FM);
-                        p_unit.m_flightMode = p_jmsg.FM;
-                    }
-                    if (p_jmsg.hasOwnProperty('AP') === true) {
-                        p_unit.m_autoPilot = p_jmsg.AP;
-                    }
-
-                    let is_armed = false;
-                    let is_ready_to_arm = false;
-                    if (typeof p_jmsg.AR === 'boolean') {   // backword compatibility/
-                        is_armed = p_jmsg.AR;
-                        is_ready_to_arm = p_jmsg.AR;
-                    }
-                    else if (typeof p_jmsg.AR === 'number') {
-                        is_armed = (p_jmsg.AR & 0b0010) === 0b10;
-                        is_ready_to_arm = (p_jmsg.AR & 0b0001) === 0b1;
-                    }
-
-                    v_trigger_on_armed = (p_unit.m_isArmed !== is_armed) || (p_unit.m_is_ready_to_arm !== is_ready_to_arm);
-                    p_unit.m_isArmed = is_armed;
-                    p_unit.m_is_ready_to_arm = is_ready_to_arm;
-
-                    if (p_jmsg.hasOwnProperty('FL') === true) {
-                        v_trigger_on_flying = (p_unit.m_isFlying !== p_jmsg.FL);
-                        p_unit.m_isFlying = p_jmsg.FL;
-                    }
-                    if (p_jmsg.hasOwnProperty('z') === true) {
-                        p_unit.m_FlyingLastStartTime = p_jmsg.z;
-                    }
-                    if (p_jmsg.hasOwnProperty('a') === true) {
-                        p_unit.m_FlyingTotalDuration = p_jmsg.a;
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('n') === true) && (p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM)) { // SwarmMemberLeaderFormation
-                        p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
-                    } else {
-                        p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('o') === true) && (p_jmsg.o !== 0)) { // SwarmMemberLeaderFormation
-                        p_unit.m_Swarm.m_isLeader = true;
-                        p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
-                    } else {
-                        p_unit.m_Swarm.m_isLeader = false;
-                        p_unit.m_Swarm.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-
-                    }
-
-                    if ((p_jmsg.hasOwnProperty('q') === true) && (p_jmsg.q !== "")) {
-                        p_unit.m_Swarm.m_following = p_jmsg.q;
-                    } else {
-                        p_unit.m_Swarm.m_following = null;
-                    }
-
-
-                    js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
-                    this._fn_onNewUnitAdded(p_unit);
-
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
-
-                }
-
-
-                if ((p_unit.m_modules.has_p2p === true) && (p_unit.m_P2P.m_initialized === false)) {
-                    // retrieve p2p data if exists.
-                    if (p_unit.m_delayedTimeout !== null && p_unit.m_delayedTimeout !== undefined) {
-                        clearTimeout(p_unit.m_delayedTimeout);
-                        p_unit.m_delayedTimeout = null;
-                    }
-                    p_unit.m_delayedTimeout = setTimeout(function () {
-                        Me.API_requestP2P(p_unit);
-                    }, 1000);
-                }
-
-                if ((p_unit.m_modules.has_sdr === true) && (p_unit.m_SDR.m_initialized === false)) {
-                    // retrieve SDR data if exists.
-                    if (p_unit.m_delayedTimeout !== null && p_unit.m_delayedTimeout !== undefined) {
-                        clearTimeout(p_unit.m_delayedTimeout);
-                        p_unit.m_delayedTimeout = null;
-                    }
-                    p_unit.m_delayedTimeout = setTimeout(function () {
-                        Me.API_requestSDR(p_unit.partyID);
-                    }, 1000);
-                }
-
-                if (v_trigger_on_swarm_status) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_onAndruavUnitSwarmUpdated, p_unit);
-                }
-
-                if (v_trigger_on_swarm_status2) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_onAndruavUnitSwarmUpdated, p_unit);
-                }
-
-                // CODEBLOCK_END
-                if (v_trigger_on_FCB) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFCBUpdated, p_unit);
-                }
-
-                if (v_trigger_on_armed) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitArmedUpdated, p_unit);
-                }
-
-                if (v_trigger_on_flying) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFlyingUpdated, p_unit);
-                }
-
-                if (v_trigger_on_flightMode) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFightModeUpdated, p_unit);
-                }
-                if (v_trigger_on_vehiclechanged) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitVehicleTypeUpdated, p_unit);
-                }
-
-                if (v_trigger_on_back_online) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, p_unit);
-                }
-
-
-                if (v_trigger_on_module_changed) {
-                    // TODO:  not handled... please handle
-                    js_eventEmitter.fn_dispatch(js_event.EE_onModuleUpdated, p_unit);
-                }
-
-                if (v_trigger_on_home_point_changed) {
-                    js_eventEmitter.fn_dispatch(js_event.EE_HomePointChanged, p_unit);
-                }
-
-            }
+                this._handleUnitIDMessage(p_unit, { ...p_jmsg, senderName: msg.senderName }, !p_unit.m_defined);
                 break;
+            }
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION: {
                 if (p_unit === null || p_unit === undefined) { // p_unit not defined here ... send a request for ID
@@ -1436,7 +1081,169 @@ class CAndruavClient {
 
 
 
+    _handleUnitIDMessage(p_unit, p_jmsg, isNewUnit) {
+        const triggers = {
+            onVehicleBlocked: false,
+            onFlying: false,
+            onArmed: false,
+            onFCB: false,
+            onFlightMode: false,
+            onModuleChanged: false,
+            onHomePointChanged: false,
+            onVehicleChanged: false,
+            onSwarmStatus: false,
+            onSwarmStatus2: false,
+            onBackOnline: false
+        };
 
+        p_unit.m_IsMe = false;
+        p_unit.m_IsGCS = p_jmsg.GS;
+        p_unit.m_unitName = p_jmsg.UD;
+        p_unit.Description = p_jmsg.DS;
+        p_unit.m_VehicleType = p_jmsg.VT;
+        p_unit.m_Video.VideoRecording = p_jmsg.VR;
+        p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
+        p_unit.m_Permissions = p_jmsg.p;
+        p_unit.m_IsDisconnectedFromGCS = false;
+        p_unit.m_useFCBIMU = p_jmsg.FI ?? false;
+        p_unit.m_telemetry_protocol = p_jmsg.TP ?? js_andruavMessages.CONST_Unknown_Telemetry;
+        p_unit.m_time_sync = p_jmsg.T ?? p_unit.m_time_sync;
+        p_unit.m_autoPilot = p_jmsg.AP ?? p_unit.m_autoPilot;
+
+        if (isNewUnit) {
+            p_unit.m_defined = true;
+            p_unit.partyID = p_jmsg.senderName;
+            js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
+            this.prv_onNewUnitAdded(p_unit);
+            js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
+        } else {
+            triggers.onVehicleChanged = p_unit.m_VehicleType !== p_jmsg.VT;
+            triggers.onFCB = p_unit.m_useFCBIMU !== p_jmsg.FI || p_unit.m_telemetry_protocol !== p_jmsg.TP;
+        }
+
+        if (p_jmsg.m1) {
+            triggers.onModuleChanged = p_jmsg.m1.length !== p_unit.m_modules.m_list.length;
+            p_unit.m_modules.addModules(p_jmsg.m1);
+        }
+
+        if (p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation]) {
+            const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
+            p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
+            triggers.onHomePointChanged = true;
+        }
+
+        if (p_jmsg.dv) {
+            p_unit.m_isDE = true;
+            if (p_unit.m_version !== p_jmsg.dv) {
+                p_unit.m_version = p_jmsg.dv;
+                setTimeout(() => {
+                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
+                        unit: p_unit,
+                        err: { notification_Type: 5, Description: `DE SW ver: ${p_unit.m_version}` }
+                    });
+                }, 1000);
+            }
+        }
+
+        if (p_jmsg.hasOwnProperty('B')) {
+            triggers.onVehicleBlocked = p_unit.m_Telemetry.m_isGCSBlocked !== p_jmsg.B;
+            p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
+        }
+
+        if (p_jmsg.C) {
+            p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
+        }
+
+        if (p_jmsg.hasOwnProperty('SD')) {
+            triggers.onBackOnline = p_unit.m_IsShutdown !== p_jmsg.SD;
+            p_unit.m_IsShutdown = p_jmsg.SD;
+        }
+
+        if (p_jmsg.hasOwnProperty('FM')) {
+            triggers.onFlightMode = p_unit.m_flightMode !== p_jmsg.FM;
+            p_unit.m_flightMode = p_jmsg.FM;
+        }
+
+        let is_armed = false;
+        let is_ready_to_arm = p_unit.m_isDE ? true : false;
+        if (typeof p_jmsg.AR === 'boolean') {
+            is_armed = p_jmsg.AR;
+            is_ready_to_arm = p_jmsg.AR;
+        } else if (typeof p_jmsg.AR === 'number') {
+            is_armed = (p_jmsg.AR & 0b0010) === 0b10;
+            is_ready_to_arm = (p_jmsg.AR & 0b0001) === 0b1;
+        }
+        triggers.onArmed = p_unit.m_isArmed !== is_armed || p_unit.m_is_ready_to_arm !== is_ready_to_arm;
+        p_unit.m_isArmed = is_armed;
+        p_unit.m_is_ready_to_arm = is_ready_to_arm;
+
+        if (p_jmsg.hasOwnProperty('FL')) {
+            triggers.onFlying = p_unit.m_isFlying !== p_jmsg.FL;
+            p_unit.m_isFlying = p_jmsg.FL;
+        }
+
+        if (p_jmsg.z) p_unit.m_FlyingLastStartTime = p_jmsg.z / 1000;
+        if (p_jmsg.a) p_unit.m_FlyingTotalDuration = p_jmsg.a / 1000;
+
+        if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
+            triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== p_jmsg.n;
+            p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
+        } else {
+            triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
+            p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
+        }
+
+        if (p_jmsg.o && p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
+            triggers.onSwarmStatus = p_unit.m_Swarm.m_isLeader !== true;
+            p_unit.m_Swarm.m_isLeader = true;
+            p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
+        } else {
+            triggers.onSwarmStatus = p_unit.m_Swarm.m_isLeader !== false;
+            p_unit.m_Swarm.m_isLeader = false;
+            p_unit.m_Swarm.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
+        }
+
+        if (p_jmsg.q && p_jmsg.q !== '') {
+            triggers.onSwarmStatus2 = p_unit.m_Swarm.m_following !== p_jmsg.q;
+            p_unit.m_Swarm.m_following = p_jmsg.q;
+        } else {
+            triggers.onSwarmStatus2 = p_unit.m_Swarm.m_following != null;
+            p_unit.m_Swarm.m_following = null;
+        }
+
+        if (!isNewUnit) {
+            js_globals.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
+            js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
+        }
+
+        if (p_unit.m_modules.has_p2p && !p_unit.m_P2P.m_initialized) {
+            if (p_unit.m_delayedTimeout) clearTimeout(p_unit.m_delayedTimeout);
+            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestP2P(p_unit), 1000);
+        }
+
+        if (p_unit.m_modules.has_sdr && !p_unit.m_SDR.m_initialized) {
+            if (p_unit.m_delayedTimeout) clearTimeout(p_unit.m_delayedTimeout);
+            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestSDR(p_unit.partyID), 1000);
+        }
+
+        const eventMap = {
+            onSwarmStatus: js_event.EE_onAndruavUnitSwarmUpdated,
+            onSwarmStatus2: js_event.EE_onAndruavUnitSwarmUpdated,
+            onFCB: js_event.EE_andruavUnitFCBUpdated,
+            onArmed: js_event.EE_andruavUnitArmedUpdated,
+            onFlying: js_event.EE_andruavUnitFlyingUpdated,
+            onFlightMode: js_event.EE_andruavUnitFightModeUpdated,
+            onVehicleChanged: js_event.EE_andruavUnitVehicleTypeUpdated,
+            onBackOnline: js_event.EE_unitOnlineChanged,
+            onModuleChanged: js_event.EE_onModuleUpdated,
+            onHomePointChanged: js_event.EE_HomePointChanged
+        };
+        Object.keys(triggers).forEach(key => {
+            if (triggers[key] && eventMap[key]) {
+                js_eventEmitter.fn_dispatch(eventMap[key], p_unit);
+            }
+        });
+    }
 
 
     /**
