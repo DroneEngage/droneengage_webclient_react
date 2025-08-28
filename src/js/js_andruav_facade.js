@@ -48,7 +48,58 @@ const CONST_TASK_SCOPE_LOCALGROUP = 2;
 const CONST_TASK_SCOPE_PARTYID = 3;
 
 
-
+const buttonActions = {
+        [js_andruavUnit.VEHICLE_TRI]: {
+            2: { // BLUE
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            0: { // GREEN
+                longPress: (unit, facade) => facade.API_do_Land(unit),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            1: { // RED
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            3: { // YELLOW
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            5: { // RB
+                onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
+            },
+            4: { // LB
+                onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
+                onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
+            }
+        },
+        [js_andruavUnit.VEHICLE_QUAD]: {
+            2: { // BLUE
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            0: { // GREEN
+                longPress: (unit, facade) => facade.API_do_Land(unit),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            1: { // RED
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            3: { // YELLOW
+                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+            },
+            5: { // RB
+                onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
+            },
+            4: { // LB
+                onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
+                onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
+            }
+        }
+    };
 class CAndruavClientFacade {
     constructor() {
 
@@ -57,13 +108,7 @@ class CAndruavClientFacade {
         this.v_sendAxes = false;
         this.v_sendAxes_skip = 0;
 
-        const Me = this;
-        if (this.fn_timerID_sendRXChannels === null || this.fn_timerID_sendRXChannels === undefined) {
-            this.fn_timerID_sendRXChannels = setInterval(function () {
-                Me._fn_sendRXChannels(Me)
-            }, js_andruavMessages.CONST_sendRXChannels_Interval);
-        }
-
+        this.fn_init();
 
         js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad, this, this.fn_requestGamePad);
         js_eventEmitter.fn_subscribe(js_event.EE_releaseGamePad, this, this.fn_releaseGamePad);
@@ -77,6 +122,41 @@ class CAndruavClientFacade {
             CAndruavClientFacade.instance = new CAndruavClientFacade();
         }
         return CAndruavClientFacade.instance;
+    }
+
+
+    fn_init() {
+        const Me = this;
+        if (this.fn_timerID_sendRXChannels === null || this.fn_timerID_sendRXChannels === undefined) {
+            this.fn_timerID_sendRXChannels = setInterval(function () {
+                Me._fn_sendRXChannels(Me)
+            }, js_andruavMessages.CONST_sendRXChannels_Interval);
+        }
+
+    }
+
+
+    fn_destroy() {
+        // Clear timer if it exists
+        if (this.fn_timerID_sendRXChannels) {
+            clearInterval(this.fn_timerID_sendRXChannels);
+            this.fn_timerID_sendRXChannels = null;
+        }
+
+        // Safely unsubscribe from events
+        try {
+            this.eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad, this.fn_requestGamePad);
+            this.eventEmitter.fn_unsubscribe(js_event.EE_releaseGamePad, this.fn_releaseGamePad);
+            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated, this.fn_sendAxes);
+            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated, this.fn_sendButtons);
+        } catch (error) {
+            this.common.fn_console_log(`Error during unsubscription: ${error.message}`);
+        }
+
+        // Reset other resources
+        this.m_gamePadUnit = null;
+        this.v_axes = null;
+        this.v_sendAxes = false;
     }
 
     // EVENT HANDLER AREA
@@ -1165,92 +1245,39 @@ class CAndruavClientFacade {
         js_common.fn_console_log("fn_sendAxes");
     }
 
-    fn_sendButtons(p_me, p_packet) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit === null || p_me.m_gamePadUnit === undefined)
-            return;
+    
+    fn_sendButtons(p_me, p_packet) {
+        if (!p_me.m_gamePadUnit) return;
 
-        if (!!p_packet.p_buttonIndex) {
-            p_packet.p_buttonIndex.forEach(i => {
-                const btn_task = js_localGamePad.m_button_routing[i];
-                console.log(i, ":", btn_task);
-            });
+        const vehicleType = p_me.m_gamePadUnit.m_VehicleType;
+        const buttonIndex = p_packet.p_buttonIndex;
+        const buttonConfig = buttonActions[vehicleType]?.[buttonIndex];
+        if (!buttonConfig) return;
 
-        }
+        const now = Date.now();
+        const button = p_packet.p_buttons[buttonIndex];
 
-        js_common.fn_console_log("fn_sendButtons ", p_packet.p_buttonIndex);
-        const c_now = Date.now();
-
-        switch (p_me.m_gamePadUnit.m_VehicleType) {
-            case js_andruavUnit.VEHICLE_TRI:
-            case js_andruavUnit.VEHICLE_QUAD:
-
-                if (p_packet.p_buttonIndex === 2) { // BLUE
-                    if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
-                        if (c_now - p_me.m_lastgamePadCommandTime[2] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
-                            this.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
-                            p_me.m_lastgamePadCommandTime[2] = c_now;
-                            return;
-                        }
-
-                    }
-                }
-
-                if (p_packet.p_buttonIndex === 0) { // Green
-                    if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
-                        if (c_now - p_me.m_lastgamePadCommandTime[0] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
-                            this.API_do_Land(p_me.m_gamePadUnit);
-                            p_me.m_lastgamePadCommandTime[0] = c_now;
-                            return;
-                        }
-                    }
-                }
-
-                if (p_packet.p_buttonIndex === 1) { // RED
-                    if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
-                        if (c_now - p_me.m_lastgamePadCommandTime[1] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
-                            this.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
-                            p_me.m_lastgamePadCommandTime[1] = c_now;
-                            return;
-                        }
-                    }
-                }
-
-                if (p_packet.p_buttonIndex === 3) { // Yellow
-                    if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) {
-                        if (c_now - p_me.m_lastgamePadCommandTime[3] > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
-                            this.API_do_FlightMode(p_me.m_gamePadUnit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
-                            p_me.m_lastgamePadCommandTime[3] = c_now;
-                            return;
-                        }
-                    }
-                }
-
-                break;
-        }
-
-        if (p_packet.p_buttonIndex === 5) { // RB
-            if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) { } else { // when unpress
-                if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed === false) {
-                    this.API_SendTrackPoint(p_me.m_gamePadUnit, 0.5, 0.5, 30);
-                }
+        if (button.m_longPress && buttonConfig.longPress) {
+            if (now - (p_me.m_lastgamePadCommandTime[buttonIndex] || 0) > buttonConfig.debounceTime) {
+                buttonConfig.longPress(p_me.m_gamePadUnit, p_me);
+                p_me.m_lastgamePadCommandTime[buttonIndex] = now;
             }
+        } else if (!button.m_longPress && buttonConfig.onPress && button.m_pressed) {
+            buttonConfig.onPress(p_me.m_gamePadUnit, p_me);
+        } else if (!button.m_longPress && buttonConfig.onRelease && !button.m_pressed) {
+            buttonConfig.onRelease(p_me.m_gamePadUnit, p_me);
         }
 
-
-        if (p_packet.p_buttonIndex === 4) { // LB
-            if (p_packet.p_buttons[p_packet.p_buttonIndex].m_longPress === true) { } else {
-                if (p_packet.p_buttons[p_packet.p_buttonIndex].m_pressed) {
-                    this.API_do_ServoChannel(p_me.m_gamePadUnit, "9", 9999);
-                } else {
-                    this.API_do_ServoChannel(p_me.m_gamePadUnit, "9", 0);
-                }
-            }
-        }
-        // CODEBLOCK_END
+        this.common.fn_console_log("fn_sendButtons", buttonIndex);
     }
 
 
+
     fn_requestGamePad(p_me, p_andruavUnit) {
+        if (!p_andruavUnit?.partyID) {
+            p_me.common.fn_console_log("Invalid unit provided for gamepad");
+            return;
+        }
         p_me.m_gamePadUnit = p_andruavUnit;
     }
 

@@ -3170,8 +3170,6 @@ function fn_handleKeyBoard() {
 				
 				
 				
-				js_common.fn_console_log(js_andruav_ws.c_SOCKET_STATUS);
-
 				js_globals.v_andruavWS.fn_connect(js_andruavAuth.fn_getSessionID());
 			}
 		}

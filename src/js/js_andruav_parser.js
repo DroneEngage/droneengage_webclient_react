@@ -37,25 +37,6 @@ const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
 
-// Command Types either System or Communication
-const CMDTYPE_SYS = 's'; // system command
-const CMDTYPE_COMM = 'c';// 'c';
-
-// Communication Commands
-const CMD_COMM_GROUP = 'g'; // group broadcast
-const CMD_COMM_INDIVIDUAL = 'i';
-// individual broadcast
-
-// System Commands:
-const CMD_SYS_PING = 'ping'; //'ping'; // group broadcast
-const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
-
-const CONST_TARGETS_GCS = '_GCS_';
-const CONST_TARGETS_DRONES = '_AGN_';
-
-
-
-
 
 // Tasks Scope
 const CONST_TASK_SCOPE_GLOBAL = 0;
@@ -179,17 +160,7 @@ class CAndruavClient {
             }, js_andruavMessages.CONST_checkStatus_Interverl0);
         }
 
-
-
-
-
     };
-
-
-
-
-
-
 
 
 
@@ -1921,9 +1892,6 @@ class CAndruavClient {
 
 
 };
-
-
-
 
 Object.seal(CAndruavClient.prototype);
 export const AndruavClient = CAndruavClient.getInstance();

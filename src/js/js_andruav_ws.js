@@ -14,6 +14,12 @@ import { js_eventEmitter } from './js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
 
+
+export const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
+
+export const CONST_TARGETS_GCS = '_GCS_';
+export const CONST_TARGETS_DRONES = '_AGN_';
+
 // Command Types either System or Communication
 const CMDTYPE_SYS = 's'; // system command
 const CMDTYPE_COMM = 'c';// 'c';
@@ -21,17 +27,11 @@ const CMDTYPE_COMM = 'c';// 'c';
 // Communication Commands
 const CMD_COMM_GROUP = 'g'; // group broadcast
 const CMD_COMM_INDIVIDUAL = 'i';
-// individual broadcast
 
 // System Commands:
 const CMD_SYS_PING = 'ping'; //'ping'; // group broadcast
-export const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
 
-export const CONST_TARGETS_GCS = '_GCS_';
-export const CONST_TARGETS_DRONES = '_AGN_';
-
-
-export const c_SOCKET_STATUS = [
+const c_SOCKET_STATUS = [
     'Fresh',
     'Connecting',
     'Disconnecting',
@@ -43,6 +43,8 @@ export const c_SOCKET_STATUS = [
 ];
 
 class CAndruavClientWS {
+
+
     constructor() {
 
         this.fn_init();
@@ -75,7 +77,35 @@ class CAndruavClientWS {
         this.socketConnectionDone = false;
         this.m_andruavUnit = null;
 
-        this.timerID = null;
+        this.m_timer_id = null;
+
+        js_andruav_parser.AndruavClient.fn_init();
+        js_andruav_facade.AndruavClientFacade.fn_init();
+    }
+
+    fn_destroy() {
+        // Close WebSocket if open
+        if (this.ws) {
+            try {
+                this.ws.close();
+            } catch (error) {
+                js_common.fn_console_log(`Error closing WebSocket: ${error.message}`);
+            }
+            this.ws = null;
+        }
+
+        // Clear timer if active
+        this._clearTimer();
+
+
+    }
+
+
+    _clearTimer() {
+        if (this.m_timer_id) {
+            clearInterval(this.m_timer_id);
+            this.m_timer_id = null;
+        }
     }
 
     // please move it out side
@@ -223,7 +253,7 @@ class CAndruavClientWS {
             this.socketConnectionDone = true;
             js_andruav_facade.AndruavClientFacade.API_sendID(); // send now important
             const Me = this;
-            this.timerID = setInterval(function () {
+            this.m_timer_id = setInterval(function () {
                 js_andruav_facade.AndruavClientFacade.API_sendID();
                 js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, null);
             }, js_andruavMessages.CONST_sendID_Interverl);
@@ -232,7 +262,7 @@ class CAndruavClientWS {
             js_andruav_facade.AndruavClientFacade.API_requestID();
 
         } else {
-            clearInterval(this.timerID);
+            clearInterval(this.m_timer_id);
         }
         js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus2, { status: status, name: c_SOCKET_STATUS[status - 1] });
     };
@@ -309,7 +339,7 @@ class CAndruavClientWS {
 
                 // Request unit ID if allowed
                 if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
-                    Me.API_requestID(p_jmsg.senderName);
+                    js_andruav_facade.AndruavClientFacade.API_requestID(p_jmsg.senderName);
                     v_unit.m_Messages.fn_doNotRepeatMessageBefore(
                         js_andruavMessages.CONST_TYPE_AndruavMessage_ID,
                         1000,
