@@ -133,7 +133,7 @@ class CLocalStorage {
 
 
     fn_getGamePadConfig(config_index) {
-        const value = js_localStorage._getValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, null);
+        const value = js_localStorage._getValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, `{"functionMappings":{"THR":{"type":"axis","index":1},"ALE":{"type":"axis","index":3},"ELE":{"type":"axis","index":4},"RUD":{"type":"axis","index":0},"ARM":{"type":"button","index":2},"RTL":{"type":"button","index":0},"Land":{"type":"button","index":3},"Auto":{"type":"button","index":1}},"axisReversed":[1,1,1,1,1,1,1,1],"buttonsFunction":["RTL","Auto","ARM","Land","undefined","undefined","undefined","undefined","undefined","undefined","undefined"],"mode":1}`);
         return value;
     }
 

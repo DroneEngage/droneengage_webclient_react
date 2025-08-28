@@ -68,6 +68,7 @@ class CAndruavGamePad {
          */
         this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
         this.m_channel_axis_reverse = new Array(10).fill(1);
+        this.m_gamepad_mode_index = 0;
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         this.fn_extractGamePadConfigMapping();
 
