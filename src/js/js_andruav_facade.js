@@ -25,7 +25,6 @@ import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
 
 import * as js_common from './js_common.js'
-import { js_localStorage } from './js_localStorage.js'
 import { js_eventEmitter } from './js_eventEmitter.js'
 import { CCommandAPI } from './js_commands_api.js'
 
@@ -33,7 +32,7 @@ import * as js_andruav_ws from './js_andruav_ws.js';
 import * as js_andruav_parser from './js_andruav_parser.js'
 
 
-import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js'
+import { mavlink20 } from './js_mavlink_v2.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
@@ -654,7 +653,7 @@ class CAndruavClientFacade {
             t: { 'a': p_missionV110 }
         }
 
-        this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveTasks, c_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveTasks, c_msg);
     }
 
     API_requestDeleteWayPoints(p_andruavUnit) {
@@ -938,7 +937,7 @@ class CAndruavClientFacade {
             t: m_geofenceInfo
         }
 
-        this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveTasks, c_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveTasks, c_msg);
     }
 
 
@@ -959,7 +958,7 @@ class CAndruavClientFacade {
             ip: isPermanent
         }
 
-        this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LoadTasks, c_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LoadTasks, c_msg);
     }
 
     API_disableGeoFenceTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent) {
@@ -981,7 +980,7 @@ class CAndruavClientFacade {
             enabled: 1
         }
 
-        this._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, c_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, c_msg);
     };
 
 

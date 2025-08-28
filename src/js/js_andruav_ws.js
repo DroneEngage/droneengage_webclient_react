@@ -2,8 +2,6 @@ import { js_globals } from './js_globals.js';
 import { EVENTS as js_event } from './js_eventList.js'
 import * as js_helpers from './js_helpers.js';
 import * as js_siteConfig from './js_siteConfig.js';
-//import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
-import { js_localGamePad } from './js_localGamePad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
 
@@ -112,8 +110,6 @@ class CAndruavClientWS {
     fn_generateJSONMessage(p_senderID, p_targetID, p_msgRouting, p_msgID, p_msg) { // prepare json data
         const p_jmsg = {
             ty: p_msgRouting,
-            // MSGRrouting,
-            // cm: cm, //cmd, DEPRECATED
             sd: p_senderID, // p_senderID,
             st: 'w', // senderType Web,
             tg: p_targetID,
@@ -162,9 +158,8 @@ class CAndruavClientWS {
             v_msgRouting = CMD_COMM_GROUP;
         }
 
-        let h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
-        let ws = this.ws;
-
+        const h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
+        
         const msgx_bin = js_helpers.fn_concatBuffers(h, data, true);
         this.sendex(msgx_bin, true);
     };
@@ -216,7 +211,7 @@ class CAndruavClientWS {
 
     };
 
-    prv_parseSystemMessage(Me, msg) {
+    #prv_parseSystemMessage(Me, msg) {
         if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_ConnectedCommServer) {
             if (msg.msgPayload.s.indexOf('OK:connected') !== -1) {
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
@@ -252,7 +247,6 @@ class CAndruavClientWS {
             js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
             this.socketConnectionDone = true;
             js_andruav_facade.AndruavClientFacade.API_sendID(); // send now important
-            const Me = this;
             this.m_timer_id = setInterval(function () {
                 js_andruav_facade.AndruavClientFacade.API_sendID();
                 js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, null);
@@ -275,14 +269,12 @@ class CAndruavClientWS {
         return this.socketConnectionDone;
     }
 
-    prv_parseJSONMessage(JsonMessage) {
+    #prv_parseJSONMessage(JsonMessage) {
 
         const p_jmsg = JSON.parse(JsonMessage); // PHP sends Json data
 
         const message = {
             _ty: p_jmsg.ty,
-            // command type
-            // _cd 		: p_jmsg.cm,                 //main-command DEPRECATED
             groupID: p_jmsg.gr, // group name
             senderName: p_jmsg.sd, // sender name
             msgPayload: p_jmsg.ms
@@ -295,7 +287,7 @@ class CAndruavClientWS {
         return message;
     };
 
-    prv_extractBinaryPacket(evt) {
+    #prv_extractBinaryPacket(evt) {
         const Me = this;
 
         // Directly handle ArrayBuffer
@@ -304,10 +296,10 @@ class CAndruavClientWS {
             return;
         }
 
-        Me.handleBinaryData(evt.data);
+        Me.#handleBinaryData(evt.data);
     }
 
-    handleBinaryData(contents) {
+    #handleBinaryData(contents) {
         const Me = this;
 
         try {
@@ -323,7 +315,7 @@ class CAndruavClientWS {
 
             // Parse JSON command
             const andruavCMD = JSON.parse(out.text);
-            const p_jmsg = Me.prv_parseJSONMessage(out.text);
+            const p_jmsg = Me.#prv_parseJSONMessage(out.text);
 
             // Find or create the unit
             const unitName = js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName);
@@ -357,7 +349,7 @@ class CAndruavClientWS {
             v_unit.m_Messages.m_lastActiveTime = Date.now();
 
             // Process the binary message
-            js_globals.v_andruavClient.prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
+            js_globals.v_andruavClient.parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
         } catch (error) {
             console.error("Error processing binary message:", error.message);
         }
@@ -384,7 +376,7 @@ class CAndruavClientWS {
             } else {
                 url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
 
-            } url = url;
+            }
 
             if ("WebSocket" in window) {
                 //TODO: HANDLE if WS is not responding.
@@ -415,20 +407,20 @@ class CAndruavClientWS {
                 // OnMessage callback of websocket
                 this.ws.onmessage = function (evt) {
                     if (typeof evt.data === "string") { // This is a text message
-                        const p_jmsg = Me.prv_parseJSONMessage(evt.data);
+                        const p_jmsg = Me.#prv_parseJSONMessage(evt.data);
                         switch (p_jmsg._ty) {
-                            case CMDTYPE_SYS: Me.prv_parseSystemMessage(Me, p_jmsg);
+                            case CMDTYPE_SYS: Me.#prv_parseSystemMessage(Me, p_jmsg);
                                 break;
 
                             case CMD_COMM_GROUP:
                             case CMD_COMM_INDIVIDUAL:
-                                js_andruav_parser.AndruavClient.prv_parseCommunicationMessage(Me, p_jmsg, evt);
+                                js_andruav_parser.AndruavClient.parseCommunicationMessage(Me, p_jmsg, evt);
                                 break;
                         }
                         // js_common.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // Disable in production for perf
                     } else {
 
-                        Me.prv_extractBinaryPacket(evt);
+                        Me.#prv_extractBinaryPacket(evt);
                     } // else-if
                 };
 

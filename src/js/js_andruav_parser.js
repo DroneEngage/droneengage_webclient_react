@@ -18,17 +18,11 @@
 import { js_globals } from './js_globals.js';
 import { EVENTS as js_event } from './js_eventList.js'
 import * as js_helpers from './js_helpers.js';
-import * as js_siteConfig from './js_siteConfig.js';
-//import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
-import { js_localGamePad } from './js_localGamePad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
 
 import * as js_common from './js_common.js'
-import { js_localStorage } from './js_localStorage'
 import { js_eventEmitter } from './js_eventEmitter'
-import { CCommandAPI } from './js_commands_api.js'
-import { AndruavClientWS } from './js_andruav_ws.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
 
 
@@ -187,7 +181,7 @@ class CAndruavClient {
 
 
 
-    prv_parseFenceInfo(p_andruavUnit, p_jmsg) {
+    #prv_parseFenceInfo(p_andruavUnit, p_jmsg) {
         let fencetype;
         let m_shouldKeepOutside = false;
         // var jmsg 				= msg.msgPayload;
@@ -244,7 +238,7 @@ class CAndruavClient {
 
 
 
-    prv_onNewUnitAdded(target) {
+    #prv_onNewUnitAdded(target) {
         js_andruav_facade.AndruavClientFacade.API_requestGeoFencesAttachStatus(target);
         js_andruav_facade.AndruavClientFacade.API_requestUdpProxyStatus(target);
         js_andruav_facade.AndruavClientFacade.API_requestWayPoints(target);
@@ -255,7 +249,7 @@ class CAndruavClient {
     };
 
 
-    prv_parseCommunicationMessage(Me, msg, evt) {
+    parseCommunicationMessage(Me, msg, evt) {
 
         let p_jmsg;
         let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
@@ -680,7 +674,7 @@ class CAndruavClient {
                 if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                     p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                 }
-                this.prv_parseFenceInfo(null, p_jmsg);
+                this.#prv_parseFenceInfo(null, p_jmsg);
 
             }
                 break;
@@ -727,7 +721,7 @@ class CAndruavClient {
                     if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
                         p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
                     }
-                    this.prv_parseFenceInfo(p_unit, p_jmsg); //msg.msgPayload);
+                    this.#prv_parseFenceInfo(p_unit, p_jmsg); //msg.msgPayload);
                 }
                 break;
 
@@ -1110,7 +1104,7 @@ class CAndruavClient {
             p_unit.m_defined = true;
             p_unit.partyID = p_jmsg.senderName;
             js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
-            this.prv_onNewUnitAdded(p_unit);
+            this.#prv_onNewUnitAdded(p_unit);
             js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
         } else {
             triggers.onVehicleChanged = p_unit.m_VehicleType !== p_jmsg.VT;
@@ -1247,7 +1241,7 @@ class CAndruavClient {
     * @param p_unit: never equal null.
     * @param p_mavlinkPacket: should be a mavlink message.
     */
-    prv_parseUnitMavlinkMessage(p_unit, p_mavlinkPacket) {
+    #prv_parseUnitMavlinkMessage(p_unit, p_mavlinkPacket) {
         const messages = this.mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
         for (const c_mavlinkMessage of messages) {
             if (c_mavlinkMessage.id === -1) {
@@ -1600,7 +1594,7 @@ class CAndruavClient {
      * @param {*} v_internalCommandIndexByteBased 
      * @param {*} byteLength 
      */
-    prv_parseBinaryAndruavMessage(v_unit, andruavCMD, data, v_internalCommandIndexByteBased, byteLength) {
+    parseBinaryAndruavMessage(v_unit, andruavCMD, data, v_internalCommandIndexByteBased, byteLength) {
 
 
         switch (andruavCMD.mt) {
@@ -1625,7 +1619,7 @@ class CAndruavClient {
                     'data': data.buffer.slice(v_internalCommandIndexByteBased)
                 };
 
-                this.prv_parseUnitMavlinkMessage(v_unit, v_andruavMessage.data);
+                this.#prv_parseUnitMavlinkMessage(v_unit, v_andruavMessage.data);
             }
                 break;
 
