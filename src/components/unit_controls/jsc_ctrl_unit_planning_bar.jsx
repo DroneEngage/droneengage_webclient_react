@@ -42,33 +42,33 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
         const p_Power = p_andruavUnit.m_Power;
 
         if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_Power._Mobile.p_Battery.p_hasPowerInfo === false)) 
-            return { v_battery_src:"./images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:' ', temp:' '};
+            return { v_battery_src:"/public/images/battery_gy_32x32.png", css:"battery_inactive",level:0, charging:' ', temp:' '};
         
         let v_bat = p_Power._Mobile.p_Battery.PlugStatus + " ";
 		const batteryLevel = p_Power._Mobile.p_Battery.BatteryLevel;
-        let v_battery_src = "./images/battery_gy_32x32.png";
+        let v_battery_src = "/public/images/battery_gy_32x32.png";
 
         if (parseInt(batteryLevel,0) > 80)
 		{
             v_bat += ' battery_4 ';
-            v_battery_src = "./images/battery_g_32x32.png";
+            v_battery_src = "/public/images/battery_g_32x32.png";
 		}
 		else if (parseInt(batteryLevel,0) > 50)
 		{
 		    v_bat += ' battery_3 ';
-            v_battery_src = "./images/battery_rg_32x32.png";
+            v_battery_src = "/public/images/battery_rg_32x32.png";
 		
 		}
 		else if (parseInt(batteryLevel,0) > 25)
 		{
 		    v_bat += ' battery_2 ';
-            v_battery_src = "./images/battery_rg_3_32x32.png";
+            v_battery_src = "/public/images/battery_rg_3_32x32.png";
 		
 		}
 		else 
 		{
 		    v_bat += ' battery_1 ';
-            v_battery_src = "./images/battery_r_32x32.png";
+            v_battery_src = "/public/images/battery_r_32x32.png";
 		
 		}
 			 
@@ -90,7 +90,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
     hlp_getFCBBatteryCSSClass (p_andruavUnit)
 	{
         let v_battery_display_fcb_div = "";
-        let v_battery_src = "./images/battery_gy_32x32.png";
+        let v_battery_src = "/public/images/battery_gy_32x32.png";
         const p_Power = p_andruavUnit.m_Power;
 
 	    let v_remainingBat = p_Power._FCB.p_Battery.FCB_BatteryRemaining;
@@ -99,7 +99,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
 		if ((p_andruavUnit.m_IsDisconnectedFromGCS === true) || (p_andruavUnit.m_IsShutdown === true) || (p_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === false))
         {
             v_battery_display_fcb_div = " hidden ";
-            return { v_battery_src:"./images/battery_gy_32x32.png", css:v_bat,level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div};
+            return { v_battery_src:"/public/images/battery_gy_32x32.png", css:v_bat,level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div};
         }
 
 		if (p_Power._FCB.p_Battery.p_hasPowerInfo === false) return null;
@@ -107,22 +107,22 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
         if (parseInt(v_remainingBat,0) > 80)
 		{
 		    v_bat += ' battery_4 ';
-            v_battery_src = "./images/battery_g_32x32.png";
+            v_battery_src = "/public/images/battery_g_32x32.png";
 		}
 		else if (parseInt(v_remainingBat,0) > 50)
 		{
 		    v_bat += ' battery_3 ';
-            v_battery_src = "./images/battery_rg_32x32.png";
+            v_battery_src = "/public/images/battery_rg_32x32.png";
 		}
 		else if (parseInt(v_remainingBat,0) > 25)
 		{
 		    v_bat += ' battery_2 ';
-            v_battery_src = "./images/battery_rg_3_32x32.png";
+            v_battery_src = "/public/images/battery_rg_3_32x32.png";
 		}
 		else 
 		{
 		    v_bat += ' battery_1 ';
-            v_battery_src = "./images/battery_r_32x32.png";
+            v_battery_src = "/public/images/battery_r_32x32.png";
 		}
 			 
 	    return { m_battery_src:v_battery_src, css:v_bat, level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div}; 

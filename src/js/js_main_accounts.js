@@ -47,7 +47,7 @@ export function gui_alert(title,message,level)
     export function fn_on_account_ready()
     {
         $(function () {
-            $('head').append('<link href="./images/de/favicon.ico" rel="shortcut icon" type="image/x-icon" />');
+            $('head').append('<link href="/images/de/favicon.ico" rel="shortcut icon" type="image/x-icon" />');
             $(document).prop('title', js_siteConfig.CONST_TITLE);
         });
 

@@ -504,7 +504,7 @@ export default class ClssGamepadTester extends React.Component {
         )}
         <div className="image-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
           <img
-            src={`images/mode${currentMode}.png`}
+            src={`/images/mode${currentMode}.png`}
             alt={`Mode ${currentMode}`}
             className='rounded-5 img-fluid max-height-300'
           />

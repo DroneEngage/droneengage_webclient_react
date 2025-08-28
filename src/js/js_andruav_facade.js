@@ -49,57 +49,57 @@ const CONST_TASK_SCOPE_PARTYID = 3;
 
 
 const buttonActions = {
-        [js_andruavUnit.VEHICLE_TRI]: {
-            2: { // BLUE
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            0: { // GREEN
-                longPress: (unit, facade) => facade.API_do_Land(unit),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            1: { // RED
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            3: { // YELLOW
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            5: { // RB
-                onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
-            },
-            4: { // LB
-                onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
-                onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
-            }
+    [js_andruavUnit.VEHICLE_TRI]: {
+        2: { // BLUE
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
         },
-        [js_andruavUnit.VEHICLE_QUAD]: {
-            2: { // BLUE
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            0: { // GREEN
-                longPress: (unit, facade) => facade.API_do_Land(unit),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            1: { // RED
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            3: { // YELLOW
-                longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
-                debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-            },
-            5: { // RB
-                onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
-            },
-            4: { // LB
-                onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
-                onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
-            }
+        0: { // GREEN
+            longPress: (unit, facade) => facade.API_do_Land(unit),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        1: { // RED
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        3: { // YELLOW
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        5: { // RB
+            onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
+        },
+        4: { // LB
+            onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
+            onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
         }
-    };
+    },
+    [js_andruavUnit.VEHICLE_QUAD]: {
+        2: { // BLUE
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        0: { // GREEN
+            longPress: (unit, facade) => facade.API_do_Land(unit),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        1: { // RED
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        3: { // YELLOW
+            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+        },
+        5: { // RB
+            onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
+        },
+        4: { // LB
+            onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
+            onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
+        }
+    }
+};
 class CAndruavClientFacade {
     constructor() {
 
@@ -182,9 +182,9 @@ class CAndruavClientFacade {
 
 
     /**
-         * 
-         * @param {*} p_target is partyID not a unit object.
-         */
+    * 
+    * @param {*} p_target is partyID not a unit object.
+    */
     API_sendID(p_target) {
         let msg = {
             VT: js_andruavUnit.CONST_VEHICLE_GCS, // VehicleType
@@ -1245,7 +1245,7 @@ class CAndruavClientFacade {
         js_common.fn_console_log("fn_sendAxes");
     }
 
-    
+
     fn_sendButtons(p_me, p_packet) {
         if (!p_me.m_gamePadUnit) return;
 

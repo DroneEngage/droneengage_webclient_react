@@ -113,7 +113,7 @@ class CLeafLetAndruavMap {
 
             // Define your custom marker icon
             const myIcon = L.icon({
-                iconUrl: 'images/myicon.png',
+                iconUrl: '/public/images/myicon.png',
                 iconSize: [32, 32], // size of the icon
                 iconAnchor: [16, 32], // point of the icon which will correspond to marker's location
             });
@@ -128,7 +128,7 @@ class CLeafLetAndruavMap {
               
             this.m_Map.on("pm:dragstart", function (e) {
                 console.log("dragstart", e);
-                e.workingLayer.setIcon(L.icon({iconUrl:'images/mode-portrait_b.png'}))
+                e.workingLayer.setIcon(L.icon({iconUrl:'/public/images/mode-portrait_b.png'}))
               });
               
             this.m_Map.on('pm:create' , (x) => {
@@ -418,7 +418,7 @@ class CLeafLetAndruavMap {
     fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
         if ((p_image === null || p_image === undefined || p_image===""))
         {
-            p_image = './images/destination_g_32x32.png';
+            p_image = '/public/images/destination_g_32x32.png';
             anchor = [16,32];
         }
         let v_image;

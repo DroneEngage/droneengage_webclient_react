@@ -7,18 +7,18 @@ div.css_mainbody
 
 img.camera_switch
 {
-	content:url('/images/mode-portrait_b.png');
+	content:url('/public/images/mode-portrait_b.png');
 }
 
 /* fire fox */
 img.camera_switch:after  
 {
-	content:url('/images/mode-portrait_b.png');
+	content:url('/public/images/mode-portrait_b.png');
 }
 
 img.video_ready
 {
-	content:url('/images/camera-movie_b.png');
+	content:url('/public/images/camera-movie_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -27,7 +27,7 @@ img.video_ready
 /* fire fox */
 img.video_ready:before
 {
-	content:url('/images/camera-movie_b.png');
+	content:url('/public/images/camera-movie_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -36,7 +36,7 @@ img.video_ready:before
 
 img.video_active
 {
-	content:url('/images/camera-movie_r.png');
+	content:url('/public/images/camera-movie_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -45,7 +45,7 @@ img.video_active
 /* fire fox */
 img.video_active:before
 {
-	content:url('/images/camera-movie_r.png');
+	content:url('/public/images/camera-movie_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -54,7 +54,7 @@ img.video_active:before
 
 img.video_semi_active
 {
-	content:url('/images/camera-movie_w.png');
+	content:url('/public/images/camera-movie_w.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -63,7 +63,7 @@ img.video_semi_active
 /* fire fox */
 img.video_semi_active:before
 {
-	content:url('/images/camera-movie_w.png');
+	content:url('/public/images/camera-movie_w.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -71,7 +71,7 @@ img.video_semi_active:before
 
 img.video_inactive
 {
-	content:url('/images/camera-movie_gr.png');
+	content:url('/public/images/camera-movie_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -80,7 +80,7 @@ img.video_inactive
 /* fire fox */
 img.video_inactive:before
 {
-	content:url('/images/camera-movie_gr.png');
+	content:url('/public/images/camera-movie_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -88,25 +88,25 @@ img.video_inactive:before
 
 img.css_video_close
 {
-	content:url('/images/back_b_32x32.png');
+	content:url('/public/images/back_b_32x32.png');
 }
 
 
 
 img.css_goto_drone   
 {
-	content:url('/images/gps_fix_32x32.png');
+	content:url('/public/images/gps_fix_32x32.png');
 }
 
 /* fire fox */
 img.css_goto_drone:before  
 {
-	content:url('/images/gps_fix_32x32.png');
+	content:url('/public/images/gps_fix_32x32.png');
 }
 
 img.css_camera_switch   
 {
-	content:url('/images/mode-portrait_b.png');
+	content:url('/public/images/mode-portrait_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -115,7 +115,7 @@ img.css_camera_switch
 /* fire fox */
 img.css_camera_switch:after  
 {
-	content:url('/images/mode-portrait_b.png');
+	content:url('/public/images/mode-portrait_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -123,7 +123,7 @@ img.css_camera_switch:after
 
 img.css_video_ready
 {
-	content:url('/images/camera-movie_b.png');
+	content:url('/public/images/camera-movie_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -131,7 +131,7 @@ img.css_video_ready
 
 img.css_video_ready:after
 {
-	content:url('/images/camera-movie_b.png');
+	content:url('/public/images/camera-movie_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -139,24 +139,24 @@ img.css_video_ready:after
 
 img.css_video_pip
 {
-	content:url('/images/mirror_bg_32x32.png');
+	content:url('/public/images/mirror_bg_32x32.png');
 }
 
 
 img.css_fullscreen
 {
-	content:url('/images/fullscreen_gb_32x32.png');
+	content:url('/public/images/fullscreen_gb_32x32.png');
 }
 
 img.css_fullscreen_active
 {
-	content:url('/images/fullscreen_rb_32x32.png');
+	content:url('/public/images/fullscreen_rb_32x32.png');
 }
 
 /* fire fox */
 img.css_video_ready:before
 {
-	content:url('/images/camera-movie_b.png');
+	content:url('/public/images/camera-movie_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -165,7 +165,7 @@ img.css_video_ready:before
 
 img.css_camera_ready  
 {
-	content:url('/images/camera_g.png');
+	content:url('/public/images/camera_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -175,7 +175,7 @@ img.css_camera_ready
 /* fire fox */
 img.css_camera_ready:after  
 {
-	content:url('/images/camera_g.png');
+	content:url('/public/images/camera_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -183,7 +183,7 @@ img.css_camera_ready:after
 
 img.css_recvideo_ready  
 {
-	content:url('/images/tape_b.png');
+	content:url('/public/images/tape_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -192,7 +192,7 @@ img.css_recvideo_ready
 /* fire fox */
 img.css_recvideo_ready:after 
 {
-	content:url('/images/tape_g.png');
+	content:url('/public/images/tape_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -201,7 +201,7 @@ img.css_recvideo_ready:after
 
 img.css_recvideo_active
 {
-	content:url('/images/tape_r.png');
+	content:url('/public/images/tape_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -210,7 +210,7 @@ img.css_recvideo_active
 /* fire fox */
 img.css_recvideo_active:after
 {
-	content:url('/images/tape_r.png');
+	content:url('/public/images/tape_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -218,7 +218,7 @@ img.css_recvideo_active:after
 
 img.recvideo_inactive  
 {
-	content:url('/images/tape_gr.png');
+	content:url('/public/images/tape_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -228,26 +228,26 @@ img.recvideo_inactive
 /* fire fox */
 img.recvideo_inactive:after  
 {
-	content:url('/images/video_recording_disabled_32x32.png');
+	content:url('/public/images/video_recording_disabled_32x32.png');
 }
 
 img.camera_ready  
 {
-	content:url('/images/camera_bg_32x32.png');
+	content:url('/public/images/camera_bg_32x32.png');
 }
 
 
 /* fire fox */
 img.camera_ready:after  
 {
-	content:url('/images/camera_bg_32x32.png');
+	content:url('/public/images/camera_bg_32x32.png');
 }
 
 
 
 img.camera_active
 {
-	content:url('/images/camera_g.png');
+	content:url('/public/images/camera_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -257,7 +257,7 @@ img.camera_active
 /* fire fox */
 img.camera_active:before
 {
-	content:url('/images/camera_g.png');
+	content:url('/public/images/camera_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -265,7 +265,7 @@ img.camera_active:before
 
 img.camera_active:after
 {
-	content:url('/images/camera_g.png');
+	content:url('/public/images/camera_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -273,7 +273,7 @@ img.camera_active:after
 
 img.camera_inactive
 {
-	content:url('/images/camera_gr.png');
+	content:url('/public/images/camera_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -282,7 +282,7 @@ img.camera_inactive
 /* fire fox */
 img.camera_inactive:before
 {
-	content:url('/images/camera_gr.png');
+	content:url('/public/images/camera_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -291,7 +291,7 @@ img.camera_inactive:before
 
 img.css_camera_zoom_in  
 {
-	content:url('/images/zoom-in_b.png');
+	content:url('/public/images/zoom-in_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -301,7 +301,7 @@ img.css_camera_zoom_in
 /* fire fox */
 img.css_camera_zoom_in:after  
 {
-	content:url('/images/zoom-in_b.png');
+	content:url('/public/images/zoom-in_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -309,7 +309,7 @@ img.css_camera_zoom_in:after
 
 img.css_camera_zoom_out  
 {
-	content:url('/images/zoom-out_g.png');
+	content:url('/public/images/zoom-out_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -319,7 +319,7 @@ img.css_camera_zoom_out
 /* fire fox */
 img.css_camera_zoom_out:after  
 {
-	content:url('/images/zoom-out_g.png');
+	content:url('/public/images/zoom-out_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -329,7 +329,7 @@ img.css_camera_zoom_out:after
 
 img.css_camera_mirrorX
 {
-	content:url('/images/flip-horizontal_b.png');
+	content:url('/public/images/flip-horizontal_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -338,7 +338,7 @@ img.css_camera_mirrorX
 
 img.css_camera_mirrorX:after 
 {
-	content:url('/images/flip-horizontal_b.png');
+	content:url('/public/images/flip-horizontal_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -347,7 +347,7 @@ img.css_camera_mirrorX:after
 
 img.css_camera_rotate
 {
-	content:url('/images/camera-rotate_g.png');
+	content:url('/public/images/camera-rotate_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -356,7 +356,7 @@ img.css_camera_rotate
 
 img.css_camera_rotate:after 
 {
-	content:url('/images/camera-rotate_g.png');
+	content:url('/public/images/camera-rotate_g.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -364,7 +364,7 @@ img.css_camera_rotate:after
 
 img.css_camera_flash_off  
 {
-	content:url('/images/circle-bolt_b.png');
+	content:url('/public/images/circle-bolt_b.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -372,7 +372,7 @@ img.css_camera_flash_off
 
 img.css_camera_flash_off:after  
 {
-	content:url('/images/circle-bolt_gr.png');
+	content:url('/public/images/circle-bolt_gr.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -380,12 +380,12 @@ img.css_camera_flash_off:after
 
 img.css_tracking_on
 {
-	content:url('/images/following_enabled_32x32.png');
+	content:url('/public/images/following_enabled_32x32.png');
 }
 
 img.css_tracking_off
 {
-	content:url('/images/following_inactive_32x32.png');
+	content:url('/public/images/following_inactive_32x32.png');
 }
 
 /* fire fox */
@@ -394,7 +394,7 @@ img.css_tracking_off
 
 img.css_camera_flash_on  
 {
-	content:url('/images/circle-bolt_r.png');
+	content:url('/public/images/circle-bolt_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -404,7 +404,7 @@ img.css_camera_flash_on
 /* fire fox */
 img.css_camera_flash_on:after  
 {
-	content:url('/images/circle-bolt_r.png');
+	content:url('/public/images/circle-bolt_r.png');
     display: inline-flex;
     width: 32px;
 	padding: 1px;
@@ -413,71 +413,71 @@ img.css_camera_flash_on:after
 
 img.battery_inactive
 {
-	content:url('/images/battery_gy_32x32.png');
+	content:url('/public/images/battery_gy_32x32.png');
 }
 
 /* fire fox */
 img.battery_inactive:before
 {
-	content:url('/images/battery_gy_32x32.png');
+	content:url('/public/images/battery_gy_32x32.png');
 }
 
 
 img.battery_4
 {
-	content:url('/images/battery_g_32x32.png');
+	content:url('/public/images/battery_g_32x32.png');
 }
 
 /* fire fox */
 img.battery_4:before
 {
-	content:url('/images/battery_g_32x32.png');
+	content:url('/public/images/battery_g_32x32.png');
 }
 
 
 img.battery_3
 {
-	content:url('/images/battery_rg_32x32.png');
+	content:url('/public/images/battery_rg_32x32.png');
 }
 
 /* fire fox */
 img.battery_3:before
 {
-	content:url('/images/battery_rg_32x32.png');
+	content:url('/public/images/battery_rg_32x32.png');
 }
 
 img.battery_2
 {
-	content:url('/images/battery_rg_3_32x32.png');
+	content:url('/public/images/battery_rg_3_32x32.png');
 }
 
 /* fire fox */
 img.battery_2:before
 {
-	content:url('/images/battery_rg_3_32x32.png');
+	content:url('/public/images/battery_rg_3_32x32.png');
 }
 
 img.battery_1
 {
-	content:url('/images/battery_r_32x32.png');
+	content:url('/public/images/battery_r_32x32.png');
 }
 
 /* fire fox */
 img.battery_1:before
 {
-	content:url('/images/battery_r_32x32.png');
+	content:url('/public/images/battery_r_32x32.png');
 }
 
 
 img.battery_charging
 {
-	content:url('/images/battery_bg_32x32.png');
+	content:url('/public/images/battery_bg_32x32.png');
 }
 
 /* fire fox */
 img.battery_charging:before
 {
-	content:url('/images/battery_bg_32x32.png');
+	content:url('/public/images/battery_bg_32x32.png');
 }
 
 div#mainbody 

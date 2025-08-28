@@ -567,7 +567,7 @@ div #main_btn_group
 
 tr.IsShutdown_false td.recvideo.m_IsGCS_false.run img  
 {
-	content:url('/images/video_recording_active_32x32.png');
+	content:url('/public/images/video_recording_active_32x32.png');
 }
 
 
@@ -575,7 +575,7 @@ tr.IsShutdown_false td.recvideo.m_IsGCS_false.run img
 
 tr.IsShutdown_false td.recvideo.m_IsGCS_false.ready img  
 {
-	content:url('/images/video_recording_enabled_32x32.png');
+	content:url('/public/images/video_recording_enabled_32x32.png');
 }
 
 
@@ -595,24 +595,24 @@ tr.IsShutdown_false td.recvideo.m_IsGCS_false
 
 tr.IsShutdown_false td.recvideo.m_IsGCS_true img  
 {
-	content:url('/images/video_recording_disabled_32x32.png');
+	content:url('/public/images/video_recording_disabled_32x32.png');
 }
 
 tr.IsShutdown_true td.recvideo img  
 {
-	content:url('/images/video_recording_disabled_32x32.png');
+	content:url('/public/images/video_recording_disabled_32x32.png');
 }
 
 
 tr.IsShutdown_false td.video.m_IsGCS_false.run img  
 {
-	content:url('/images/videocam_active_32x32.png');
+	content:url('/public/images/videocam_active_32x32.png');
 }
 
 
 tr.IsShutdown_false td.video.m_IsGCS_false.ready img  
 {
-	content:url('/images/videocam_gb_32x32.png');
+	content:url('/public/images/videocam_gb_32x32.png');
 }
 
 tr.IsShutdown_true td.video
@@ -622,7 +622,7 @@ tr.IsShutdown_true td.video
 
 tr.IsShutdown_true td.video img  
 {
-	content:url('/images/videocam_gr_32x32.png');
+	content:url('/public/images/videocam_gr_32x32.png');
 }
 
 td.video.m_IsGCS_true
@@ -632,7 +632,7 @@ td.video.m_IsGCS_true
 
 td.video.m_IsGCS_true img  
 {
-	content:url('/images/videocam_gr_32x32.png');
+	content:url('/public/images/videocam_gr_32x32.png');
 }
 
 tr.IsShutdown_false td.video.m_IsGCS_false
@@ -645,28 +645,28 @@ tr.IsShutdown_false td.video.m_IsGCS_false
 
 tr.IsShutdown_false td.gcs.m_IsGCS_true img 
 {
-	content:url('/images/gcs_b_32x32.png');
+	content:url('/public/images/gcs_b_32x32.png');
 }
 
 tr.IsShutdown_false td.gcs.m_IsGCS_false img 
 {
-	content:url('/images/plane_b_32x32.png');
+	content:url('/public/images/plane_b_32x32.png');
 }
 
 tr.IsShutdown_true td.gcs.m_IsGCS_true img 
 {
-	content:url('/images/gcs_gr_32x32.png');
+	content:url('/public/images/gcs_gr_32x32.png');
 }
 
 tr.IsShutdown_true td.gcs.m_IsGCS_false img 
 {
-	content:url('/images/plane_gr_32x32.png');
+	content:url('/public/images/plane_gr_32x32.png');
 }
 
 
 tr.IsShutdown_false td.camera.m_IsGCS_false img  
 {
-	content:url('/images/camera_bg_32x32.png');
+	content:url('/public/images/camera_bg_32x32.png');
 }
 
 
@@ -678,44 +678,44 @@ tr.IsShutdown_true td.camera
 
 tr.IsShutdown_true td.camera img  
 {
-	content:url('/images/camera_gy_32x32.png');
+	content:url('/public/images/camera_gy_32x32.png');
 }
 
 
 tr.IsShutdown_false td.battery
 {
-	content:url('/images/battery_gy_32x32.png');
+	content:url('/public/images/battery_gy_32x32.png');
 }
 
 tr.IsShutdown_true td.battery
 {
-	content:url('/images/battery_gy_32x32.png');
+	content:url('/public/images/battery_gy_32x32.png');
 }
 
 
 tr.IsShutdown_false td.battery.bat_4
 {
-	content:url('/images/battery_g_32x32.png');
+	content:url('/public/images/battery_g_32x32.png');
 }
 
 tr.IsShutdown_false td.battery.bat_3
 {
-	content:url('/images/battery_rg_32x32.png');
+	content:url('/public/images/battery_rg_32x32.png');
 }
 
 tr.IsShutdown_false td.battery.bat_2
 {
-	content:url('/images/battery_rg_3_32x32.png');
+	content:url('/public/images/battery_rg_3_32x32.png');
 }
 
 tr.IsShutdown_false td.battery.bat_1
 {
-	content:url('/images/battery_r_32x32.png');
+	content:url('/public/images/battery_r_32x32.png');
 }
 
 tr.IsShutdown_false td.battery.Charging
 {
-	content:url('/images/battery_bg_32x32.png');
+	content:url('/public/images/battery_bg_32x32.png');
 }
 
 td.camera.m_IsGCS_true
@@ -725,7 +725,7 @@ td.camera.m_IsGCS_true
 
 td.camera.m_IsGCS_true img  
 {
-	content:url('/images/camera_gy_32x32.png');
+	content:url('/public/images/camera_gy_32x32.png');
 }
 
 tr.IsShutdown_false td.camera.m_IsGCS_false

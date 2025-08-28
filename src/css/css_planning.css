@@ -1,10 +1,10 @@
 img.leaflet-marker-icon
 {
-	content:url('../images/marker-icon.png') !important;
+	content:url('/public/images/marker-icon.png') !important;
 }
 
 .leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
-	background-image: url(../images/marker-icon.png);
+	background-image: url(/public/images/marker-icon.png);
 }
 
 .leaflet-div-icon {

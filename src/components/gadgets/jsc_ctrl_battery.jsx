@@ -75,7 +75,7 @@ export class ClssCtrlBattery extends React.Component {
     hlp_getFCBBatteryCSSClass (v_battery)
 	{
         let v_battery_display_fcb_div = "";
-        let v_battery_src = "./images/battery_gy_32x32.png";
+        let v_battery_src = "/public/images/battery_gy_32x32.png";
         
 	    let v_remainingBat = v_battery.FCB_BatteryRemaining;
 		let v_bat1 = " ";
@@ -83,7 +83,7 @@ export class ClssCtrlBattery extends React.Component {
 		if (v_battery.p_hasPowerInfo === false)
         {
             v_battery_display_fcb_div = " hidden ";
-            v_battery_src = "./images/battery_gy_32x32.png";
+            v_battery_src = "/public/images/battery_gy_32x32.png";
             
         }
 
@@ -92,22 +92,22 @@ export class ClssCtrlBattery extends React.Component {
         if (parseInt(v_remainingBat,0) > 80)
 		{
 		    v_bat1 += ' battery_4 ';
-            v_battery_src = "./images/battery_g_32x32.png";
+            v_battery_src = "/public/images/battery_g_32x32.png";
 		}
 		else if (parseInt(v_remainingBat,0) > 50)
 		{
 		    v_bat1 += ' battery_3 ';
-            v_battery_src = "./images/battery_rg_32x32.png";
+            v_battery_src = "/public/images/battery_rg_32x32.png";
 		}
 		else if (parseInt(v_remainingBat,0) > 25)
 		{
 		    v_bat1 += ' battery_2 ';
-            v_battery_src = "./images/battery_rg_3_32x32.png";
+            v_battery_src = "/public/images/battery_rg_3_32x32.png";
 		}
 		else 
 		{
 		    v_bat1 += ' battery_1 ';
-            v_battery_src = "./images/battery_r_32x32.png";
+            v_battery_src = "/public/images/battery_r_32x32.png";
 		}
 			 
 	    let bat = { m_battery_src: v_battery_src, css:v_bat1, level:v_remainingBat, charging: 'unknown', v_battery_display_fcb_div: v_battery_display_fcb_div}; 

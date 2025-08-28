@@ -15,28 +15,28 @@ class GLOBALS {
 		this.m_markGuided = null;
 
 		this.v_waypointsCache = {};
-		this.planes_icon = [ './images/planetracker_r_0d_.png',
-							'./images/planetracker_y_0d_.png',
-							'./images/planetracker_g_0d_.png',
-							'./images/planetracker_b_0d_.png'];
+		this.planes_icon = [ '/images/planetracker_r_0d_.png',
+							'/images/planetracker_y_0d_.png',
+							'/images/planetracker_g_0d_.png',
+							'/images/planetracker_b_0d_.png'];
 							
 
-		this.quad_icon   = [ './images/drone_qq_1_0d.png',
-							'./images/drone_qq_2_0d.png',
-							'./images/drone_qq_3_0d.png',
-							'./images/drone_qq_4_0d.png'];
+		this.quad_icon   = [ '/images/drone_qq_1_0d.png',
+							'/images/drone_qq_2_0d.png',
+							'/images/drone_qq_3_0d.png',
+							'/images/drone_qq_4_0d.png'];
 
 
-		this.rover_icon  = [ './images/car1.png',
-							'./images/car2.png',
-							'./images/car3.png',
-							'./images/car4.png'];
+		this.rover_icon  = [ '/images/car1.png',
+							'/images/car2.png',
+							'/images/car3.png',
+							'/images/car4.png'];
 
 
-		this.boat_icon  = [ './images/boat1.png',
-							'./images/boat2.png',
-							'./images/boat3.png',
-							'./images/boat4.png'];
+		this.boat_icon  = [ '/images/boat1.png',
+							'/images/boat2.png',
+							'/images/boat3.png',
+							'/images/boat4.png'];
 
 
 		this.flightPath_colors = [
@@ -50,17 +50,17 @@ class GLOBALS {
 
 
 		this.swarm_quad_location_icon = [
-						'./images/drone_q1_32x32.png',
-						'./images/drone_q2_32x32.png',
-						'./images/drone_q3_32x32.png',
-						'./images/drone_q4_32x32.png',
+						'/images/drone_q1_32x32.png',
+						'/images/drone_q2_32x32.png',
+						'/images/drone_q3_32x32.png',
+						'/images/drone_q4_32x32.png',
 						];
 		
 		this.swarm_plane_location_icon = [
-							'./images/drone_1_32x32.png',
-							'./images/drone_2_32x32.png',
-							'./images/drone_3_32x32.png',
-							'./images/drone_4_32x32.png',
+							'/images/drone_1_32x32.png',
+							'/images/drone_2_32x32.png',
+							'/images/drone_3_32x32.png',
+							'/images/drone_4_32x32.png',
 							];
 	
 

@@ -84,7 +84,7 @@ const Home = () => {
 						</div>
 					</div>
 					<div id="modal_fpv_img" className="form-group text-center">
-						<img id='unitImg' className="img-rounded" alt='camera' src='images/camera_img.png' />
+						<img id='unitImg' className="img-rounded" alt='camera' src='/public/images/camera_img.png' />
 					</div>
 					
 					<div id="modal_fpv_footer" className="form-group text-center localcontainer">
