@@ -112,6 +112,21 @@ class ClssDefault extends React.Component {
     this.setState({ CONST_DEFAULT_SWARM_VERTICAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE });
   }
 
+  clickToggleUnit(e) {
+    gui_toggleUnits();
+
+    if (js_localStorage.fn_getMetricSystem() === true) {
+      this.setState({ m_unitText: 'm' });
+    } else {
+      this.setState({ m_unitText: 'ft' });
+    }
+
+    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
+    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
+    
+    this.setState({ CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE });
+    this.setState({ CONST_DEFAULT_SWARM_VERTICAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE });
+  }
   render()
   {
     let v_gadgets = [];
@@ -431,21 +446,7 @@ export default class ClssGlobalSettings extends React.Component {
     setSelectedMissionFilePathToWrite(this.mission_file_ref.current.files);
   }
 
-  clickToggleUnit(e) {
-    gui_toggleUnits();
 
-    if (js_localStorage.fn_getMetricSystem() === true) {
-      this.setState({ m_unitText: 'm' });
-    } else {
-      this.setState({ m_unitText: 'ft' });
-    }
-
-    this.setState({ CONST_DEFAULT_ALTITUDE: js_globals.CONST_DEFAULT_ALTITUDE });
-    this.setState({ CONST_DEFAULT_RADIUS: js_globals.CONST_DEFAULT_RADIUS });
-    
-    this.setState({ CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE });
-    this.setState({ CONST_DEFAULT_SWARM_VERTICAL_DISTANCE: js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE });
-  }
 
   fn_onAuthStatus(me, res) {
     if (me.m_flag_mounted === false)return;
