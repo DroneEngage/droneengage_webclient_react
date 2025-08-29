@@ -1,4 +1,6 @@
 import {js_eventEmitter} from './js_eventEmitter'
+import { EVENTS as js_event } from './js_eventList.js'
+import * as js_common from './js_common.js'
 import {js_globals} from './js_globals.js'
 import * as js_helpers from './js_helpers'
 import $ from 'jquery'; 
@@ -125,7 +127,7 @@ import $ from 'jquery';
 
             js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
 
-            const me = this;
+            const Me = this;
             setInterval(function () {
                 // dont call 
                 if ((Me.lat === null || Me.lat === undefined) || (Me.radius === 0)) return ;
@@ -196,7 +198,7 @@ import $ from 'jquery';
             const _v_url =  this.v_url + 'lat=' + p_lat.toString() + '&lng=' + p_lng.toString() + '&fDstL=0&fDstU=' + p_radius.toString();
             js_common.fn_console_log ("ADSB URL: %s", _v_url);
             let res=null;
-            const me = this;
+            const Me = this;
 			$.ajax({
 				url: _v_url,
                 type: 'GET',

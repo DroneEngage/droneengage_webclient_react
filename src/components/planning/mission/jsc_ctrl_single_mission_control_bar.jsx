@@ -6,12 +6,12 @@ import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import {js_andruavAuth} from '../../../js/js_andruav_auth.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
-import {fn_readMissionFile} from '../../../js/js_main.js'
 
 import {
     fn_requestWayPoints,
     fn_clearWayPoints, 
     fn_do_modal_confirmation,
+    fn_readMissionFile
     } from '../../../js/js_main.js'
 
 

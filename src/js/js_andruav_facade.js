@@ -47,58 +47,7 @@ const CONST_TASK_SCOPE_LOCALGROUP = 2;
 const CONST_TASK_SCOPE_PARTYID = 3;
 
 
-const buttonActions = {
-    [js_andruavUnit.VEHICLE_TRI]: {
-        2: { // BLUE
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        0: { // GREEN
-            longPress: (unit, facade) => facade.API_do_Land(unit),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        1: { // RED
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        3: { // YELLOW
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        5: { // RB
-            onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
-        },
-        4: { // LB
-            onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
-            onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
-        }
-    },
-    [js_andruavUnit.VEHICLE_QUAD]: {
-        2: { // BLUE
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        0: { // GREEN
-            longPress: (unit, facade) => facade.API_do_Land(unit),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        1: { // RED
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        3: { // YELLOW
-            longPress: (unit, facade) => facade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
-            debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
-        },
-        5: { // RB
-            onRelease: (unit, facade) => facade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
-        },
-        4: { // LB
-            onPress: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 9999),
-            onRelease: (unit, facade) => facade.API_do_ServoChannel(unit, "9", 0)
-        }
-    }
-};
+
 class CAndruavClientFacade {
     constructor() {
 
@@ -109,11 +58,7 @@ class CAndruavClientFacade {
 
         this.fn_init();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad, this, this.fn_requestGamePad);
-        js_eventEmitter.fn_subscribe(js_event.EE_releaseGamePad, this, this.fn_releaseGamePad);
         js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated, this, this.fn_sendAxes);
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated, this, this.fn_sendButtons);
-
     }
 
     static getInstance() {
@@ -144,16 +89,12 @@ class CAndruavClientFacade {
 
         // Safely unsubscribe from events
         try {
-            this.eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad, this.fn_requestGamePad);
-            this.eventEmitter.fn_unsubscribe(js_event.EE_releaseGamePad, this.fn_releaseGamePad);
             this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated, this.fn_sendAxes);
-            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated, this.fn_sendButtons);
         } catch (error) {
             this.common.fn_console_log(`Error during unsubscription: ${error.message}`);
         }
 
         // Reset other resources
-        this.m_gamePadUnit = null;
         this.v_axes = null;
         this.v_sendAxes = false;
     }
@@ -332,10 +273,7 @@ class CAndruavClientFacade {
 
 
     API_sendRXChannels(p_unified_virtual_axis) {
-        if ((this.m_gamePadUnit === null || this.m_gamePadUnit === undefined) || (this.m_gamePadUnit.partyID === null || this.m_gamePadUnit.partyID === undefined))
-            return;
-
-
+        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
 
         // IMPORTANT: Convert [-1,1] to [0,1000] IMPORTANT: -1 means channel release so min is 0
         let p_msg = {
@@ -346,7 +284,7 @@ class CAndruavClientFacade {
         };
 
         js_common.fn_console_log(p_msg);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(this.m_gamePadUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(c_currentEngagedUnitRX.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
     };
 
 
@@ -1001,8 +939,10 @@ class CAndruavClientFacade {
     * Tell drone I will send you control -gamepad- info.
     */
     API_engageRX(p_andruavUnit) {
-        if ((this.m_currentEngagedRX !== null && this.m_currentEngagedRX !== undefined) && (this.m_currentEngagedRX.partyID !== p_andruavUnit.partyID)) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
-            this.API_disengageRX(this.m_currentEngagedRX);
+        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        if ((c_currentEngagedUnitRX) &&
+            (c_currentEngagedUnitRX.partyID !== p_andruavUnit.partyID)) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+            this.API_disengageRX(c_currentEngagedUnitRX);
         }
 
         this.API_engageGamePad(p_andruavUnit);
@@ -1013,18 +953,18 @@ class CAndruavClientFacade {
     * @param {*} p_andruavUnit 
     */
     API_disengageRX(p_andruavUnit) {
-        this.m_currentEngagedRX = undefined; // it might be already null and not synch-ed
-        p_andruavUnit.m_Telemetry.m_rxEngaged = false;
+        
+        js_globals.m_andruavUnitList.disengageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        
         js_eventEmitter.fn_dispatch(js_event.EE_releaseGamePad, p_andruavUnit);
-
     };
 
 
     API_engageGamePad(p_andruavUnit) {
-        p_andruavUnit.m_Telemetry.m_rxEngaged = true;
-        this.m_currentEngagedRX = p_andruavUnit;
+        
+        js_globals.m_andruavUnitList.engageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_engageGamePad();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_event.EE_requestGamePad, p_andruavUnit);
@@ -1229,7 +1169,8 @@ class CAndruavClientFacade {
 
     // receives event from gamepad and store it for sending.
     fn_sendAxes(p_me) { // game pad should be attached to a unit.
-        if (p_me.m_gamePadUnit === null || p_me.m_gamePadUnit === undefined)
+        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        if (!c_currentEngagedUnitRX)
             return;
 
 
@@ -1243,47 +1184,6 @@ class CAndruavClientFacade {
 
         js_common.fn_console_log("fn_sendAxes");
     }
-
-
-    fn_sendButtons(p_me, p_packet) {
-        if (!p_me.m_gamePadUnit) return;
-
-        const vehicleType = p_me.m_gamePadUnit.m_VehicleType;
-        const buttonIndex = p_packet.p_buttonIndex;
-        const buttonConfig = buttonActions[vehicleType]?.[buttonIndex];
-        if (!buttonConfig) return;
-
-        const now = Date.now();
-        const button = p_packet.p_buttons[buttonIndex];
-
-        if (button.m_longPress && buttonConfig.longPress) {
-            if (now - (p_me.m_lastgamePadCommandTime[buttonIndex] || 0) > buttonConfig.debounceTime) {
-                buttonConfig.longPress(p_me.m_gamePadUnit, p_me);
-                p_me.m_lastgamePadCommandTime[buttonIndex] = now;
-            }
-        } else if (!button.m_longPress && buttonConfig.onPress && button.m_pressed) {
-            buttonConfig.onPress(p_me.m_gamePadUnit, p_me);
-        } else if (!button.m_longPress && buttonConfig.onRelease && !button.m_pressed) {
-            buttonConfig.onRelease(p_me.m_gamePadUnit, p_me);
-        }
-
-        this.common.fn_console_log("fn_sendButtons", buttonIndex);
-    }
-
-
-
-    fn_requestGamePad(p_me, p_andruavUnit) {
-        if (!p_andruavUnit?.partyID) {
-            p_me.common.fn_console_log("Invalid unit provided for gamepad");
-            return;
-        }
-        p_me.m_gamePadUnit = p_andruavUnit;
-    }
-
-    fn_releaseGamePad(p_me, p_andruavUnit) {
-        p_me.m_gamePadUnit = null;
-    }
-
 }
 
 Object.seal(CAndruavClientFacade.prototype);

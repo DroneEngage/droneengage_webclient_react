@@ -51,7 +51,8 @@
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=$WEB_SSL_KEY SSL_KEY_FILE=$WEB_SSL_KEY react-scripts start",
     "build": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=$WEB_SSL_CRT SSL_KEY_FILE=$WEB_SSL_KEY react-scripts build --mode production --config-overrides ./webpack.config.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src"
   },
   "eslintConfig": {
     "extends": [
@@ -69,7 +70,20 @@
           "args": "after-used",
           "ignoreRestSiblings": false
         }
-      ]
+      ],
+      "no-const-assign": "error",
+      "no-undef": "error",
+      "no-dupe-else-if": "error",
+      "no-dupe-class-members": "error",
+      "no-dupe-keys": "error",
+      "no-duplicate-case": "error",
+      "no-duplicate-imports": "error",
+      "no-empty-pattern": "warn",
+      "no-fallthrough": "warn",
+      "no-self-assign": "warn",
+      "no-empty": "warn",
+      "no-labels": "error",
+      "no-magic-numbers": "warn"
     }
   },
   "browserslist": {

@@ -1049,14 +1049,6 @@ function fn_handleKeyBoard() {
 				save.download = fileName || 'unknown';
 				save.click();
 			}
-
-			// for IE
-			else if (!window.ActiveXObject && document.execCommand) {
-				var _window = window.open(fileURL, '_blank');
-				_window.document.close();
-				_window.document.execCommand('SaveAs', true, fileName || fileURL);
-				_window.close();
-			}
 		}
 
 
@@ -2734,47 +2726,6 @@ function fn_handleKeyBoard() {
 		let infowindowADSB = null;
 
 		function fn_showAdSBInfo(event, _adsb) {
-			// var armedBadge = "";
-			// //if (p_andruavUnit.m_isArmed) armedBadge = '<span class="text-danger">&nbsp;armed&nbsp;</span>';
-			// //else armedBadge = '<span class="text-success">&nbsp;disarmed&nbsp;</span>';
-			// //if (p_andruavUnit.m_isFlying) armedBadge += '<span class="text-danger">&nbsp;flying&nbsp;</span>';
-			// //else armedBadge += '<span class="text-success">&nbsp;on-ground&nbsp;</span>';
-
-			// var markerContent = "<p class='img-rounded bg-primary'><strong> Icao " + _adsb.Icao + "</strong></p>\
-			//   	<p class='img-rounded help-block'>" + _adsb.ModelDescription + "</p>";
-
-			// markerContent += "<p> <span class='text-success'>Speed: " + Number(_adsb.Speed.toFixed(0)).toLocaleString() + " Km/hr </span> </p>";
-
-			// var alt;
-			// if (js_globals.v_useMetricSystem === true) {
-			// 	alt = Number(_adsb.Altitude.toFixed(0)).toLocaleString() + ' m';
-			// }
-			// else {
-			// 	alt = Number(_adsb.Altitude.toFixed(0) * js_helpers.CONST_METER_TO_FEET).toFixed(0).toLocaleString() + ' ft';
-			// }
-
-			// markerContent += '<p>lat:' + _adsb.Latitude.toFixed(6) + ', lng:' + _adsb.Longitude.toFixed(6) + '<br>  alt:' + alt + ' </p>';
-
-
-			// if (infowindowADSB !== null && infowindowADSB !== undefined) infowindowADSB.close();
-
-
-			// elevator.getElevationForLocations({
-			// 	'locations': [event.latLng]
-			// }, function (results, status) {
-
-
-			// 	infowindowADSB = new google.maps.InfoWindow(
-			// 		{
-			// 		});
-
-
-			// 	infowindowADSB.setContent(markerContent);
-			// 	infowindowADSB.setPosition(event.latLng);
-			// 	infowindowADSB.open(map);
-			// });
-
-
 		}
 
 

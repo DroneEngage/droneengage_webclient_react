@@ -41,7 +41,7 @@ const CONST_TASK_SCOPE_PARTYID = 3;
 
 
 
-class CAndruavClient {
+class CAndruavClientParser {
     constructor() {
         js_globals.v_waypointsCache = {};
         this.v_callbackListeners = {};
@@ -54,10 +54,10 @@ class CAndruavClient {
     }
 
     static getInstance() {
-        if (!CAndruavClient.instance) {
-            CAndruavClient.instance = new CAndruavClient();
+        if (!CAndruavClientParser.instance) {
+            CAndruavClientParser.instance = new CAndruavClientParser();
         }
-        return CAndruavClient.instance;
+        return CAndruavClientParser.instance;
     }
 
 
@@ -91,8 +91,7 @@ class CAndruavClient {
 
 
     fn_init() {
-        this.m_gamePadUnit = null;
-        this.m_lastgamePadCommandTime = [0, 0, 0, 0];
+        
         this.m_lastparamatersUpdateTime = 0;
 
         this.m_andruavGeoFences = {}; // list of fences each fence ha s list of attached units.
@@ -133,7 +132,7 @@ class CAndruavClient {
         this.EVT_andruavUnitGeoFenceDeleted = function () { };
 
 
-        js_globals.m_andruavUnitList = new js_andruavUnit.CAndruavUnitList();
+        js_globals.m_andruavUnitList = js_andruavUnit.AndruavUnitList;
         js_globals.m_andruavUnitList.fn_resetList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
         const Me = this;
@@ -974,10 +973,6 @@ class CAndruavClient {
                                 wayPointStep.m_Sequence = p_jmsg[i].s;
                                 break;
 
-                            case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                break;
-
                             case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
                                 wayPointStep.m_Sequence = p_jmsg[i].s;
                                 break;
@@ -1653,7 +1648,7 @@ class CAndruavClient {
                 let v_andruavMessage;
                 if (andruavCMD.hasOwnProperty('ms') === false) {   // backward compatibility with ANDRUAV   
                     try {
-                        let out = js_helpers.prv_extractString(data, v_internalCommandIndexByteBased, byteLength);
+                        let out = js_helpers.fn_extractString(data, v_internalCommandIndexByteBased, byteLength);
                         v_internalCommandIndexByteBased = out.nextIndex;
                         v_andruavMessage = JSON.parse(out.text);
                     } catch (err) {
@@ -1685,5 +1680,5 @@ class CAndruavClient {
 
 };
 
-Object.seal(CAndruavClient.prototype);
-export const AndruavClient = CAndruavClient.getInstance();
+Object.seal(CAndruavClientParser.prototype);
+export const AndruavClient = CAndruavClientParser.getInstance();

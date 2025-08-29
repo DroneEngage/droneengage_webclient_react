@@ -250,7 +250,7 @@ export function  fn_concatBuffers(a, b, addzero) {
     ).buffer;
 }
 
-export function  prv_extractString(data,startIndex,endIndex)
+export function  fn_extractString(data,startIndex,endIndex)
 {
         let out = {}; // {'text':"", 'nextIndex': startIndex};
 		
@@ -357,11 +357,11 @@ export function  fn_findWithAttributeIndex(array, attr, value) {
 }
 
 export function  fn_saveAs(data, filename, type) {
-    let file = new Blob([data], {type: type});
+    const file = new Blob([data], {type: type});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
-        let a = document.createElement("a"),
+        const a = document.createElement("a"),
                 url = URL.createObjectURL(file);
         a.href = url;
         a.download = filename;
@@ -383,14 +383,6 @@ export function  fn_saveData (fileURL, fileName) {
         save.target = '_blank';
         save.download = fileName || 'unknown';
         save.click();
-    }
-
-    // for IE
-    else if (!window.ActiveXObject && document.execCommand)     {
-        let _window = window.open(fileURL, '_blank');
-        _window.document.close();
-        _window.document.execCommand('SaveAs', true, fileName || fileURL);
-        _window.close();
     }
 }
 

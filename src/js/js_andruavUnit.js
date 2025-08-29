@@ -1159,11 +1159,21 @@ export class CAndruavUnitObject {
   }
 }
 
-export class CAndruavUnitList {
+class CAndruavUnitList {
   constructor() {
     this.List = new Map();
     this.count = 0;
+
+    this.m_currentEngagedUnitRX = null;
+    Object.seal(this);
   }
+
+  static getInstance() {
+        if (!CAndruavUnitList.instance) {
+            CAndruavUnitList.instance = new CAndruavUnitList();
+        }
+        return CAndruavUnitList.instance;
+    }
 
   fn_resetList() {
     this.List.clear();
@@ -1197,14 +1207,15 @@ export class CAndruavUnitList {
           return  idA - idB;
       });
   }
- /**
-     * Finds a unit by P2P MAC address.
-     * @param {string} mac The MAC address to search for.
-     * @returns {CAndruavUnitObject|null} The unit with the specified MAC address, or null if not found.
-     */
- fn_getUnitByP2PMac(mac) {
-  return Array.from(this.List.values()).find(unit => unit.m_P2P.fn_isMyMac(mac)) || null;
-}
+
+  /**
+       * Finds a unit by P2P MAC address.
+       * @param {string} mac The MAC address to search for.
+       * @returns {CAndruavUnitObject|null} The unit with the specified MAC address, or null if not found.
+       */
+  fn_getUnitByP2PMac(mac) {
+    return Array.from(this.List.values()).find(unit => unit.m_P2P.fn_isMyMac(mac)) || null;
+  }
 
   Add(partyID, andruavUnit) {
     if (this.List.has(partyID)) return;
@@ -1242,4 +1253,49 @@ export class CAndruavUnitList {
   putUnit(unitFullName, andruavUnit) {
     this.List.set(unitFullName, andruavUnit);
   }
+
+  attachGamePadToUnit(p_andruavUnit)
+  {
+      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.partyID !== p_andruavUnit.partyID)) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+        this.API_disengageRX(this.m_currentEngagedUnitRX);
+      }
+
+      this.API_engageGamePad(p_andruavUnit);
+  }
+
+  getEngagedUnitRX()
+  {
+    return this.m_currentEngagedUnitRX;
+  }
+
+  disengageUnitRX(p_andruavUnit)
+  {
+    if (!p_andruavUnit)  {
+      this.m_currentEngagedUnitRX = undefined;
+      return ;
+    }
+   
+    p_andruavUnit.m_Telemetry.m_rxEngaged = false;
+
+    if (!this.m_currentEngagedUnitRX) return ;
+
+    p_andruavUnit.partyID  = this.ANYTHING;
+    if (p_andruavUnit.partyID == this.m_currentEngagedUnitRX.partyID) {
+      this.m_currentEngagedUnitRX = undefined;
+    }
+    
+  }
+
+  engageUnitRX(p_andruavUnit)
+  {
+    if (!p_andruavUnit) return ;
+
+    p_andruavUnit.m_Telemetry.m_rxEngaged = true;
+    this.m_currentEngagedUnitRX = p_andruavUnit;
+  }
+
+  
 }
+
+Object.seal(CAndruavUnitList.prototype);
+export const AndruavUnitList = CAndruavUnitList.getInstance();

@@ -32,6 +32,8 @@ class ClssAndruavUnitDroneHeader extends React.Component{
                 is_compact_ekf : false
 		};
 
+        this.key = Math.random().toString();
+
     }
 
     fn_toggleBattery()

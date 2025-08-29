@@ -6,7 +6,8 @@
  * 
  *   Date:   06 March 2020
  * 
- * 
+ *  Description: This class handles gamepad technically reading raw data 
+ *              and translates it to correct virtual channels.
  * 
  *************************************************************************************/
 
@@ -18,6 +19,8 @@ import {EVENTS as js_event} from './js_eventList.js'
 import {js_localStorage} from './js_localStorage'
 import {js_eventEmitter} from './js_eventEmitter'
 import * as js_common from './js_common.js'
+import {js_gamepadButtonFunctions} from './js_gamepad_button_functions.js'
+
 
 const GAME_GENERIC = 0;
 const GAME_XBOX_360_MICROSOFT   = 1;
@@ -30,6 +33,8 @@ class fn_Obj_padStatus {
     constructor() {
     this.p_ctrl_type = GAME_GENERIC;
     
+    js_gamepadButtonFunctions.fn_init();
+
     /**
      * IMPORTANT
      * THIS IS TRUE VALUES OF VIRTUAL GAMEPAD REGARDLESS OF MODE [RUD, THR, ALE, ELE]
@@ -78,7 +83,7 @@ class CAndruavGamePad {
             window.addEventListener('gamepadconnected', (e) => this.fn_onConnect(e));
             window.addEventListener('gamepaddisconnected', (e) => this.fn_onDisconnect(e));
         } else {
-            setTimeout(() => this.fn_scangamepads(), 500);
+            setTimeout(() => this.fn_scanGamePads(), 500);
         }
 
         window.addEventListener('storage', (event) => {
@@ -177,22 +182,32 @@ class CAndruavGamePad {
 
     fn_makeVibration(p_duration) {
         if (isNaN(p_duration)) return;
-        p_duration = Math.min(Math.max(p_duration, 0), 2000);
+        p_duration = Math.min(Math.max(p_duration, 0), 2000); // Clamp duration between 0 and 2000ms
+
         const pads = navigator.getGamepads();
-        if (pads[0]?.vibrationActuator) {
-            pads[0].vibrationActuator.playEffect("dual-rumble", {
+        const gamepad = pads[0]; // Get the first connected gamepad
+
+        if (!gamepad) return; // Exit if no gamepad is connected
+
+        // Try the modern vibrationActuator API (Chrome, Edge, etc.)
+        if (gamepad.vibrationActuator) {
+            gamepad.vibrationActuator.playEffect("dual-rumble", {
                 startDelay: 0,
                 duration: p_duration,
                 weakMagnitude: 0.5,
                 strongMagnitude: 0.5
-            });
+            }).catch(() => {}); // Handle potential errors silently
+        }
+        // Fallback to the older vibrate API (some older browsers)
+        else if (gamepad.vibrate) {
+            gamepad.vibrate(p_duration);
         }
     }
 
     fn_onConnect(e) {
         js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", 
             e.gamepad.index, e.gamepad.id, e.gamepad.buttons.length, e.gamepad.axes.length);
-        this.fn_addgamepad(this, e.gamepad);
+        this.fn_addGamePad(this, e.gamepad);
         js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Connected, e.gamepad);
     }
 
@@ -202,11 +217,11 @@ class CAndruavGamePad {
     }
 
     fn_updateStatus() {
-        this.fn_scangamepads();
+        this.fn_scanGamePads();
         this.v_animationFrameId = window.requestAnimationFrame(() => this.fn_updateStatus());
     }
 
-    fn_addgamepad(me, p_gamepad) {
+    fn_addGamePad(me, p_gamepad) {
         const v_padStatus = new fn_Obj_padStatus();
         let vendorNumber, productNumber;
 
@@ -243,13 +258,13 @@ class CAndruavGamePad {
         }
     }
 
-    fn_scangamepads() {
+    fn_scanGamePads() {
         const c_gamepads = navigator.getGamepads?.() || navigator.webkitGetGamepads?.() || [];
         for (let i = 0, len = c_gamepads.length; i < len; i++) {
             const gamepad = c_gamepads[i];
             if (gamepad) {
                 if (!(gamepad.index in this.v_controllers)) {
-                    this.fn_addgamepad(this, gamepad);
+                    this.fn_addGamePad(this, gamepad);
                 } else if (i === js_globals.active_gamepad_index && gamepad) {
                     this.fn_universalPad(gamepad);
                 }

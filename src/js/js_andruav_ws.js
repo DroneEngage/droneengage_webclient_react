@@ -196,7 +196,7 @@ class CAndruavClientWS {
 
     sendex(msg, is_binary) {
         try {
-            if (!!this.ws) {
+            if (this.ws) {
                 this.ws.sendex(msg, is_binary);
             }
         } catch (e) {
@@ -308,7 +308,7 @@ class CAndruavClientWS {
             const byteLength = contents.byteLength;
 
             // Extract JSON command from binary data
-            const out = js_helpers.prv_extractString(data, 0, byteLength);
+            const out = js_helpers.fn_extractString(data, 0, byteLength);
             if (!out.text) {
                 throw new Error("No JSON command found in binary data");
             }
