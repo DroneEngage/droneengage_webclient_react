@@ -45,7 +45,6 @@ $.fn.append = function($el){
     return oldAppend.apply(this,arguments)
 }
 
-var v_contextMenuOpen = false;
 var v_context_busy = false;
 
 var info_unit_context_popup = null;
@@ -1823,7 +1822,7 @@ function fn_handleKeyBoard() {
 			js_leafletmap.setZoom(2);
 		}
 
-		/////////////////////////////////////////////////////////////////////////////// Events from AndruavClient
+		/////////////////////////////////////////////////////////////////////////////// Events from AndruavClientParser
 
 		// Websocket Connection established
 		var EVT_onOpen = function () {
