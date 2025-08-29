@@ -46,6 +46,8 @@ export default class ClssAndruavUnitList extends React.Component {
 		    'm_update': 0
 		};
 
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
@@ -59,7 +61,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
     fn_unitOnUnitHighlighted (p_me, p_andruavUnit)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false) return ;
 
         p_me.setState({m_active_partyID: p_andruavUnit.partyID});
         // const id = '#h'+p_andruavUnit.partyID +' a';
@@ -71,7 +73,7 @@ export default class ClssAndruavUnitList extends React.Component {
       
     fn_unitOnlineChanged(me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false) return ;
         
         // render is initiated via updating state
         me.setState({ 'm_update': me.state.m_update+1});
@@ -79,7 +81,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false) return ;
     
         js_common.fn_console_log ("REACT:fn_unitAdded" );
 
@@ -92,7 +94,7 @@ export default class ClssAndruavUnitList extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false) return ;
     
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
@@ -106,12 +108,12 @@ export default class ClssAndruavUnitList extends React.Component {
     }
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_onPreferenceChanged(me)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false) return ;
         me.setState({'m_update': me.state.m_update +1});
     }
 
