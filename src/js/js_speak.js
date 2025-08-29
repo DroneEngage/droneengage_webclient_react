@@ -38,13 +38,13 @@ class CSpeakEngine {
             const voices = await this.fn_setSpeech();
             this._v_speakmsg.voice = voices.find(voice => voice.lang === 'en-US') || voices[0]; // Default to first voice if no English voice is found
             this._v_speakmsg.voiceURI = 'native';
-            this._v_speakmsg.volume = this._validateVolume(js_localStorage.fn_getVolume() / 100); // Ensure volume is between 0 and 1
+            this._v_speakmsg.volume = this.#validateVolume(js_localStorage.fn_getVolume() / 100); // Ensure volume is between 0 and 1
             this._v_speakmsg.rate = 1; // 0.1 to 10
             this._v_speakmsg.pitch = 1; // 0 to 2
             this._v_speakmsg.lang = 'en-US';
 
-            this._v_speakmsg.onend = () => this._onSpeechEnd();
-            this._v_speakmsg.onerror = (e) => this._onSpeechError(e);
+            this._v_speakmsg.onend = () => this.#onSpeechEnd();
+            this._v_speakmsg.onerror = (e) => this.#onSpeechError(e);
         } catch (error) {
             console.error('Failed to initialize speech synthesis:', error);
         }
@@ -64,8 +64,9 @@ class CSpeakEngine {
     }
 
     fn_updateSettings() {
+        const VOLUME_SCALE = 100;
         this._v_enable_speak = js_localStorage.fn_getSpeechEnabled() === true;
-        this._v_speakmsg.volume = this._validateVolume(js_localStorage.fn_getVolume() / 100);
+        this._v_speakmsg.volume = this.#validateVolume(js_localStorage.fn_getVolume() / VOLUME_SCALE);
     }
 
     fn_speakNow(text) {
@@ -84,7 +85,7 @@ class CSpeakEngine {
         }
     }
 
-    stopSpeaking() {
+    fn_stopSpeaking() {
         // Cancel any ongoing speech
         // speechSynthesis.cancel(); DONT uncomment.
 
@@ -116,7 +117,7 @@ class CSpeakEngine {
         speechSynthesis.speak(this._v_speakmsg);
     }
 
-    _onSpeechEnd() {
+    #onSpeechEnd() {
         js_common.fn_console_log('Finished speaking.');
         if (this._v_to_speak.length > 0) {
             const nextText = this._v_to_speak.shift(); // Get next text from queue
@@ -125,12 +126,12 @@ class CSpeakEngine {
         }
     }
 
-    _onSpeechError(event) {
+    #onSpeechError(event) {
         console.error('Speech synthesis error:', event.error);
         this._v_to_speak = []; // Clear queue on error
     }
 
-    _validateVolume(volume) {
+    #validateVolume(volume) {
         return Math.min(Math.max(volume, 0), 1); // Ensure volume is between 0 and 1
     }
 }

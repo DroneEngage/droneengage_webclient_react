@@ -301,7 +301,7 @@ class ClssPreferences extends React.Component {
     } 
     else 
     {
-      js_speak.stopSpeaking();
+      js_speak.fn_stopSpeaking();
       this.m_volumeRangeRef.current.setAttribute('disabled', 'disabled'); // Updated this line
     }
   }
@@ -359,7 +359,7 @@ class ClssPreferences extends React.Component {
               <label htmlFor="check_enable_speech" className="col-sm-4 col-form-label al_l" >Enable Speech</label>
               <input className="form-check-input col-sm-4 " ref={this.m_enableSpeechRef} type="checkbox" id="check_enable_speech" onClick={ (e) => this.fn_enableSpeech(e)} />
               <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r" >Volume</label>
-              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" ref={this.m_volumeRangeRef} disabled={v_speech_disabled==='true'}  
+              <input type="range" className="form-range col-sm-4 width_fit ps-5 " id="volume_range" ref={this.m_volumeRangeRef} 
               onChange={ (e) => this.fn_changeVolume(e)}
               onMouseUp= {(e) => this.fn_handleMouseUp(e)}
               />
