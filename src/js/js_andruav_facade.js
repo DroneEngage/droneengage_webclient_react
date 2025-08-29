@@ -727,7 +727,7 @@ class CAndruavClientFacade {
     API_requestCameraList(p_andruavUnit, p_callback) {
         if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
         if (p_callback !== null && p_callback !== undefined) {
-            js_andruav_parser.AndruavClient.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList);
+            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList);
         }
 
         let p_msg = {

@@ -3076,7 +3076,7 @@ function fn_handleKeyBoard() {
 					js_common.fn_console_log ("js_andruavAuth.fn_logined() === false");
 					return;
 				}
-				js_globals.v_andruavClient = js_andruav_parser.AndruavClient;
+				js_globals.v_andruavClient = js_andruav_parser.AndruavClientParser;
 				js_globals.v_andruavFacade = js_andruav_facade.AndruavClientFacade;
 				js_globals.v_andruavWS = js_andruav_ws.AndruavClientWS;
 				

@@ -77,7 +77,7 @@ class CAndruavClientWS {
 
         this.m_timer_id = null;
 
-        js_andruav_parser.AndruavClient.fn_init();
+        js_andruav_parser.AndruavClientParser.fn_init();
         js_andruav_facade.AndruavClientFacade.fn_init();
     }
 
@@ -414,7 +414,7 @@ class CAndruavClientWS {
 
                             case CMD_COMM_GROUP:
                             case CMD_COMM_INDIVIDUAL:
-                                js_andruav_parser.AndruavClient.parseCommunicationMessage(Me, p_jmsg, evt);
+                                js_andruav_parser.AndruavClientParser.parseCommunicationMessage(Me, p_jmsg, evt);
                                 break;
                         }
                         // js_common.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // Disable in production for perf
