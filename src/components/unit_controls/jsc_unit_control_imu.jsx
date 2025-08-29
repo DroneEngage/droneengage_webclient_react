@@ -238,11 +238,19 @@ export class ClssCtrlDroneIMU extends React.Component {
             const distance = js_helpers.fn_calcDistance (js_globals.myposition.coords.latitude,js_globals.myposition.coords.longitude,v_lat2,v_lng2) ;
             if (js_globals.v_useMetricSystem === true) 
             {
-                v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + " m";
+                if (distance >= 1000) {
+                    v_distanceToMe_text = Number((distance / 1000).toFixed(1)).toLocaleString() + " km";
+                } else {
+                    v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + " m";
+                }
             }
             else
             {
-                v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + " ft";
+                if (distance * js_helpers.CONST_METER_TO_FEET >= 5280) {
+                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / 5280).toFixed(1)).toLocaleString() + " mi";
+                } else {
+                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + " ft";
+                }
             }
 
             if (distance > js_globals.CONST_DFM_FAR)
