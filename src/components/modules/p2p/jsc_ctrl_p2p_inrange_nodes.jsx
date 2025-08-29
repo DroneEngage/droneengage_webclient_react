@@ -81,13 +81,13 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_unitUpdated (p_me,p_andruavUnit)
     {
         if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 

@@ -18,12 +18,15 @@ export class ClssCtrlSWARMFormation extends React.Component {
         this.state = {
             m_update: 0
         };
+
+        this.m_flag_mounted = false;
+        
         this.m_swarmFormation = React.createRef();
     }
 
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 

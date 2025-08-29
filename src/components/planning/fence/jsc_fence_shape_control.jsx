@@ -18,11 +18,14 @@ class ClssFenceAction extends React.Component {
         this.state={
             m_update: 0
         };
+
+        this.m_flag_mounted = false;
+        
     }
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     
@@ -34,7 +37,7 @@ class ClssFenceAction extends React.Component {
     {
         this.props.shape.m_geofenceInfo.isHardFence=e.target.value; 
         
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 
@@ -47,7 +50,7 @@ class ClssFenceAction extends React.Component {
 
     componentDidUpdate()
     {
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 

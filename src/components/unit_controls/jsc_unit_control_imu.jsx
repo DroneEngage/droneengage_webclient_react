@@ -35,6 +35,8 @@ export class ClssCtrlDroneIMU extends React.Component {
             m_update : 0
         };
         
+        this.m_flag_mounted = false;
+
         this.telemetry_level=["OFF","1","2","3"];
     };
 
@@ -43,7 +45,7 @@ export class ClssCtrlDroneIMU extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 

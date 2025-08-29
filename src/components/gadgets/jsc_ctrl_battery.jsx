@@ -13,6 +13,8 @@ export class ClssCtrlBattery extends React.Component {
                 m_update: 0
 		};
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         
         js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle,this,this.fn_toggle_global);
@@ -29,7 +31,7 @@ export class ClssCtrlBattery extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     componentWillUnmount () 
@@ -40,14 +42,14 @@ export class ClssCtrlBattery extends React.Component {
 
     fn_update (me)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
     
     fn_toggle_global(me,p_compact)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         // Use setState to update multiple state variables
         me.setState((prevState) => ({
@@ -67,7 +69,7 @@ export class ClssCtrlBattery extends React.Component {
             this.state.is_compact = false;
         }
 
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 

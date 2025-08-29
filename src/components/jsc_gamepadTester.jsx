@@ -321,7 +321,7 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   handleModeChange = (p_mode) => {
-    if (this.state.m_update === 0) return;
+    if (this.m_flag_mounted === false)return;
     if (isNaN(p_mode)) return;
 
     this.setState(prevState => {

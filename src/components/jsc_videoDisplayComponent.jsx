@@ -23,13 +23,16 @@ export class ClssCVideoControl extends React.Component {
             'm_update': 0
         };
 
+
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
     }
 
     
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
     
     
@@ -48,7 +51,7 @@ export class ClssCVideoControl extends React.Component {
 
         fn_showVideoMainTab();
 
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
 
         // SIMULATE a click to activate the link.
@@ -67,7 +70,7 @@ export class ClssCVideoControl extends React.Component {
             p_me.state.m_videoScreens[obj.andruavUnit.partyID] = undefined;
         }
 
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 

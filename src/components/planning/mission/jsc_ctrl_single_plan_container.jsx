@@ -23,12 +23,14 @@ export  class ClssSinglePlanContainer extends React.Component {
             m_party_id: 0,
         };
         
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe(js_event.EE_onShapeSelected, this, this.fn_displayGeoForm);
         js_eventEmitter.fn_subscribe(js_event.EE_onMissionReset, this, this.fn_resetMission);
     }
 
     componentDidMount () {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     componentWillUnmount() {
@@ -66,7 +68,7 @@ export  class ClssSinglePlanContainer extends React.Component {
             p_event.m_main_de_mission.fn_updatePath(true);
         }
             
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         me.setState({ s_shape: p_event });
         
     }
@@ -79,7 +81,7 @@ export  class ClssSinglePlanContainer extends React.Component {
 
     fn_onCollapse(e)
     {
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         
 
         if (this.props.p_isCurrent===true)

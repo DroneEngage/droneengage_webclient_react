@@ -172,6 +172,8 @@ export default class ClssUnitParametersList extends React.Component {
 		    m_update: 0
 		};
 	
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe (js_event.EE_displayParameters, this, this.fn_displayForm);
         js_eventEmitter.fn_subscribe (js_event.EE_updateParameters, this, this.fn_updateParameters);
         
@@ -188,14 +190,14 @@ export default class ClssUnitParametersList extends React.Component {
         if (p_me.state.p_unit === null || p_me.state.p_unit === undefined) return ;
         if (p_andruavUnit.partyID !== p_me.state.p_unit.partyID) return ;
         
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     componentWillUnmount () {
@@ -232,7 +234,7 @@ export default class ClssUnitParametersList extends React.Component {
             }
         }
         
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 

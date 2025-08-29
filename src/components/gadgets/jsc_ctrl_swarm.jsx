@@ -33,6 +33,8 @@ export class ClssCtrlSWARM extends React.Component {
             m_Swarm: this.props.p_unit.m_Swarm
         };
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         
         js_eventEmitter.fn_subscribe(js_event.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
@@ -82,14 +84,14 @@ export class ClssCtrlSWARM extends React.Component {
 
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 
     fn_onSwarmUpdate(p_me) {
 
         // this event is important especially when another drone becomes a leader and you need to update the drone list.
-        if (p_me.state.m_update === 0) return;
+        if (p_me.m_flag_mounted === false)return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }
@@ -155,7 +157,7 @@ export class ClssCtrlSWARM extends React.Component {
                 js_localStorage.fn_getDefaultSwarmHorizontalDistance(),
                 js_localStorage.fn_getDefaultSwarmVerticalDistance());
 
-            if (this.state.m_update === 0) return;
+            if (this.m_flag_mounted === false)return;
 
             this.setState({ 'm_update': this.state.m_update + 1 });
         }

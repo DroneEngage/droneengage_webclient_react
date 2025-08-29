@@ -39,6 +39,8 @@ export class ClssCtrlSDR extends React.Component {
                 }
 		};
 
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe (js_event.EE_unitSDRUpdated,this,this.fn_unitUpdated);
     }
 
@@ -48,7 +50,7 @@ export class ClssCtrlSDR extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         const  v_andruavUnit = this.props.p_unit;
         this.fn_copyData(this,v_andruavUnit);
     }

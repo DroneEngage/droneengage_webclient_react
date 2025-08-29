@@ -42,7 +42,7 @@ export class ClssCtrlUnitMainBar extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 
@@ -68,7 +68,7 @@ export class ClssCtrlUnitMainBar extends React.Component {
     
     fn_onUpdate(me, p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         me.setState({'m_update': me.state.m_update +1});
     }
 

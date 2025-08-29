@@ -27,6 +27,8 @@ export class ClssP2P_Planning extends React.Component {
             }
         };
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         
         this.p2p_Ref = React.createRef();
@@ -43,7 +45,7 @@ export class ClssP2P_Planning extends React.Component {
     }
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         if (this.props.p_shape.m_missionItem.modules.p2p === undefined) {
             this.props.p_shape.m_missionItem.modules.p2p = {
                 cmds: {

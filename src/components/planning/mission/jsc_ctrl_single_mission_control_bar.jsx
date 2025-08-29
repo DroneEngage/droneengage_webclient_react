@@ -27,13 +27,15 @@ export class ClssSingleMissionControlBar extends React.Component {
             m_update: 0,
         };
 
+        this.m_flag_mounted = false;
+        
         this.key = Math.random().toString();
         
     }
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 

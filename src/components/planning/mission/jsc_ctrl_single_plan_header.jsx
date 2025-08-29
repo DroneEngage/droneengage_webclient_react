@@ -38,6 +38,8 @@ export class ClssSingle_Plan_Header extends React.Component {
             css_ph: "btn  btn-sm  text-success border border-success rounded text-center cursor_hand"
         };
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         this.pc_Ref = React.createRef();
         this.cp_Ref = React.createRef();
@@ -47,7 +49,7 @@ export class ClssSingle_Plan_Header extends React.Component {
 
 
     componentDidMount () {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         this.pc_Ref.current.style.backgroundColor = this.props.p_mission.m_pathColor;
     
     }
@@ -64,7 +66,7 @@ export class ClssSingle_Plan_Header extends React.Component {
 
 
     fn_missionUpdated(me) {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         me.setState({'m_update': me.state.m_update +1});
     }
 

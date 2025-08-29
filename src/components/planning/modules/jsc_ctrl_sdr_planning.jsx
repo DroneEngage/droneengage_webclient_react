@@ -13,6 +13,8 @@ export class ClssSDR_Planning extends React.Component {
             m_cmd_packet: {},
         };
 
+        this.m_flag_mounted = false;
+        
         this.key = Math.random().toString();
         this.m_enabled_ctrl = false;
         this.enable_Ref = React.createRef();
@@ -21,7 +23,7 @@ export class ClssSDR_Planning extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         
         if (this.props.p_shape.m_missionItem.modules.sdr === undefined) {
             // load compiled data [compiled_cmds] -loaded missions-.

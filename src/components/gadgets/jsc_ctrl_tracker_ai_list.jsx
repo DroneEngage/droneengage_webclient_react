@@ -68,7 +68,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
     fn_onTrackingAIStatusChanged(p_me, p_unit) {
 
         if (p_me.props.p_unit.partyID !== p_unit.partyID) return ;
-        if (p_me.state.m_update === 0) return;
+        if (p_me.m_flag_mounted === false)return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }
@@ -76,7 +76,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
     fn_onTrackingAIObjectListUpdate(p_me, p_unit) {
         
         if (p_me.props.p_unit.partyID !== p_unit.partyID) return ;
-        if (p_me.state.m_update === 0) return;
+        if (p_me.m_flag_mounted === false)return;
 
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
     }

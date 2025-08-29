@@ -20,13 +20,15 @@ class ClssStreamChannel extends React.Component {
             m_update: 0
         };
 
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
         js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
 
     }
 
     componentDidMount () {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_videoStarted(p_me,p_obj)
@@ -134,6 +136,8 @@ export default class ClssStreamDialog extends React.Component
 			'm_update': 0,
 		};
     
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         
         this.modal_ctrl_stream_dlg  = React.createRef();
@@ -152,13 +156,13 @@ export default class ClssStreamDialog extends React.Component
     } 
 
     componentDidMount () {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         this.fn_initDialog();
     }
 
     fn_displayDialog (p_me, p_session)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         
         p_me.state.p_session = p_session;
         

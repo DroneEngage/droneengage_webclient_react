@@ -17,6 +17,8 @@ export class ClssCtrlLidarDevice extends React.Component {
                 m_update: 0
 		};
         
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
         
         
@@ -31,7 +33,7 @@ export class ClssCtrlLidarDevice extends React.Component {
     
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
     
     componentDidUpdate(prevProps) {
@@ -50,7 +52,7 @@ export class ClssCtrlLidarDevice extends React.Component {
         if (p_me.props.p_unit === null || p_me.props.p_unit === undefined) return ;
         if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
 
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
 
         
         p_me.setState({'m_update': p_me.state.m_update +1});

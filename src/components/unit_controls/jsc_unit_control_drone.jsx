@@ -56,6 +56,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             tab_collapsed: this.props.tab_collapsed
         };
 
+        this.m_flag_mounted = false;
+        
         this.props.p_unit.m_gui.speed_link = false;
         this.key = Math.random().toString();
     }
@@ -63,7 +65,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     componentDidMount () 
     {
         super.componentDidMount();
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 
@@ -80,7 +82,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
         
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         me.setState({'m_update': me.state.m_update +1});
     }
 

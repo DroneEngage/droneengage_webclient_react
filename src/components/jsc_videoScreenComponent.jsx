@@ -31,6 +31,9 @@ export default class ClssCVideoScreen extends React.Component {
         };
 
         
+        this.m_flag_mounted = false;
+
+        
         // --- Mouse Drawing Instance Variables ---
         this.isDrawing = false;
         this.startX = 0;
@@ -73,7 +76,7 @@ export default class ClssCVideoScreen extends React.Component {
         this.fn_lnkVideo();
         const me = this;
 
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
    
     }
 
@@ -160,7 +163,7 @@ export default class ClssCVideoScreen extends React.Component {
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
         v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 
@@ -173,7 +176,7 @@ export default class ClssCVideoScreen extends React.Component {
         if (p_me.props.obj.v_track !== p_obj.v_track) {
             return;
         }
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -205,7 +208,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         p_me.state.m_flash = p_obj.p_jmsg['f'];
         js_common.fn_console_log("Flash Updated", p_me.state.m_flash);
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -220,7 +223,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         p_me.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
         js_common.fn_console_log("Zoom Updated", p_me.state.m_zoom);
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -389,7 +392,7 @@ export default class ClssCVideoScreen extends React.Component {
             this.m_transform_mirrored = "scaleX(-1)";
         }
 
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 

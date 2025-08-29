@@ -31,6 +31,8 @@ export class ClssAndruavUnitDropDownList extends React.Component {
             m_selected_party_id: "0"
         };
 
+        this.m_flag_mounted = false;
+        
         this.key = Math.random().toString();
             
         js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
@@ -41,7 +43,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
        
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         this.state.m_selected_party_id = this.props.p_partyID;
         if (this.state.m_selected_party_id === null || this.state.m_selected_party_id === undefined)
         {
@@ -65,7 +67,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
     fn_onPreferenceChanged(me)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         me.setState({'m_update': me.state.m_update +1});
     }
 
@@ -79,7 +81,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
     
     fn_unitOnlineChanged (me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         // render is initiated via updating state
         me.setState({ 'm_update': me.state.m_update+1});
@@ -87,7 +89,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
     
         js_common.fn_console_log ("REACT:fn_unitAdded" );
 

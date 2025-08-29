@@ -21,6 +21,8 @@ export default class ClssMain_Control_Buttons extends React.Component {
             activeTab: 'missions', // Track the active tab
         };
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
 
 
@@ -31,7 +33,7 @@ export default class ClssMain_Control_Buttons extends React.Component {
     }
 
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
 

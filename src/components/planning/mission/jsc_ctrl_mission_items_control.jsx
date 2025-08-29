@@ -59,7 +59,7 @@ export default class ClssMission_Container extends React.Component {
             me.m_active_id = c_mission.m_id;
         }
 
-        if (me.state.m_update === 0) return;
+        if (me.m_flag_mounted === false)return;
         me.setState({ m_update: me.state.m_update + 1 });
     }
 

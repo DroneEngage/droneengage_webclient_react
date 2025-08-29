@@ -68,7 +68,7 @@ class ClssUserEntry extends  React.Component {
             }
         }
 
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 

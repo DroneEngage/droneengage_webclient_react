@@ -15,6 +15,8 @@ export class ClssCtrlAUDIO extends React.Component {
                 
 		};
 
+        this.m_flag_mounted = false;
+
         this.m_langs = ['en','ar','es','ru']
         
         this.m_textRef = React.createRef();
@@ -28,7 +30,7 @@ export class ClssCtrlAUDIO extends React.Component {
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_setLanguage(en)

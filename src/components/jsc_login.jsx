@@ -39,7 +39,7 @@ export class ClssLoginControl extends React.Component {
 	fn_onSocketStatus(me, params) {
 		js_common.fn_console_log('REACT:' + JSON.stringify(params));
 
-		if (me.state.m_update === 0) return ;
+		if (me.m_flag_mounted === false)return ;
         
 		if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 			me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
@@ -57,7 +57,7 @@ export class ClssLoginControl extends React.Component {
 	}
 
 	fn_onAuthInProgress(me) {
-		if (me.state.m_update === 0) return ;
+		if (me.m_flag_mounted === false)return ;
 		me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
 		me.setState({'m_update': me.state.m_update +1});
 	}

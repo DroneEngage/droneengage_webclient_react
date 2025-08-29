@@ -25,6 +25,8 @@ class ClssDefault extends React.Component {
         'm_update': 0,
       };
 
+      this.m_flag_mounted = false;
+
       this.key = Math.random().toString();
     
       this.altitudeInputRef = React.createRef(); 
@@ -53,7 +55,7 @@ class ClssDefault extends React.Component {
 
   componentDidMount () 
   {
-    this.state.m_update = 1;
+    this.m_flag_mounted = true;
   }
 
     
@@ -65,7 +67,7 @@ class ClssDefault extends React.Component {
 
   fn_advancedMode (p_me)
   {
-    if (p_me.state.m_update === 0) return ;
+    if (p_me.m_flag_mounted === false)return ;
     p_me.setState({'m_update': p_me.state.m_update +1});
   }
     
@@ -446,7 +448,7 @@ export default class ClssGlobalSettings extends React.Component {
   }
 
   fn_onAuthStatus(me, res) {
-    if (me.state.m_update === 0) return;
+    if (me.m_flag_mounted === false)return;
     me.setState({ 'm_update': me.state.m_update + 1 });
   }
 

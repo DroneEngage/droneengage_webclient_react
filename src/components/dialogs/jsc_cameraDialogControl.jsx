@@ -125,6 +125,8 @@ export default class ClssCameraDialog extends React.Component
 			'm_update': 0,
 		};
         
+        this.m_flag_mounted = false;
+        
         this.key = Math.random().toString();
         
         this.opaque_clicked = false;
@@ -140,7 +142,7 @@ export default class ClssCameraDialog extends React.Component
 
     componentDidMount () {
         
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
         
         this.txt_ShootingInterval.current.value = 1;
         this.txt_TotalImages.current.value = 1;
@@ -162,7 +164,7 @@ export default class ClssCameraDialog extends React.Component
 		    return;
 		}
         
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         
         p_me.state.p_session = p_session;
 		
@@ -173,7 +175,7 @@ export default class ClssCameraDialog extends React.Component
 
     fn_gotoUnitPressed()
     {
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         fn_gotoUnit_byPartyID(this.state.p_session.m_unit.partyID);
 
     }

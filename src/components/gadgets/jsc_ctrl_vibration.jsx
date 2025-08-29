@@ -15,12 +15,14 @@ export class ClssCtrlVibration extends React.Component {
 		    m_update: 0
 		};
 
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe(js_event.EE_EKFViewToggle,this,this.fn_toggle_global);
     }
 
     componentDidMount () 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     childcomponentWillUnmount () 
@@ -32,7 +34,7 @@ export class ClssCtrlVibration extends React.Component {
     {
         p_me.state.is_compact = p_compact;
         
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -42,7 +44,7 @@ export class ClssCtrlVibration extends React.Component {
         else
         this.state.is_compact = false;
 
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
     

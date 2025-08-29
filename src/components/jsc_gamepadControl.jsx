@@ -27,17 +27,19 @@ class ClssGamePadAxesControl extends React.Component {
         this.state = {
             m_update: 0
         };
+
+        this.m_flag_mounted = false;
         
         js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated,this, this.fn_gamePadAxesUpdated);
     }
     
     componentDidMount () {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_gamePadAxesUpdated(p_me,p_obj)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -91,16 +93,18 @@ class ClssGamePadButtonControl extends React.Component {
             'm_update': 0
         };
 
+        this.m_flag_mounted = false;
+                       
         js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
     }
     
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_gamePadButtonUpdated(p_me,p_obj)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
@@ -153,6 +157,8 @@ export default class ClssGamePadControl extends React.Component {
             'm_update': 0
         };
 
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
 
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
@@ -191,25 +197,25 @@ export default class ClssGamePadControl extends React.Component {
 
     fn_gamePadConnected(p_me,p_obj)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_gamePadDisconnected(p_me,p_obj)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_onChangeConfig (p_me)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     fn_changeConfig (p_config_index)
     {
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         if (isNaN(p_config_index)) return ;
 
         js_localStorage.fn_setGamePadConfigIndex(p_config_index);
@@ -228,7 +234,7 @@ export default class ClssGamePadControl extends React.Component {
         
         js_globals.active_gamepad_index = p_index;
         
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
 
@@ -237,7 +243,7 @@ export default class ClssGamePadControl extends React.Component {
      */
     fn_requestGamePad(p_me,p_andruavUnit)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         p_me.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
@@ -252,7 +258,7 @@ export default class ClssGamePadControl extends React.Component {
     
     fn_releaseGamePad(p_me,p_andruavUnit)
     {
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         
         p_me.state.m_andruavUnit = null;
         $('#modal_ctrl_gamepad').hide();  
@@ -298,12 +304,12 @@ export default class ClssGamePadControl extends React.Component {
             }
         });
         
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     fn_gotoUnitPressed()
     {
-        if (this.state.m_update === 0) return ;
+        if (this.m_flag_mounted === false)return ;
         fn_gotoUnit_byPartyID(this.state.m_andruavUnit.partyID);
     
     }

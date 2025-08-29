@@ -124,6 +124,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
         this.state={
             'm_update': 0
         };
+
+        this.m_flag_mounted = false;
+
         this.key = Math.random().toString();
 
         this.props.p_unit.m_gui.speed_link = false;
@@ -136,7 +139,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
      
     componentDidMount() {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     childcomponentWillUnmount () {
@@ -149,7 +152,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
     fn_unitUpdated(p_me,p_andruavUnit)
     {
         if (p_andruavUnit.partyID !== p_me.props.p_unit.partyID) return ;
-        if (p_me.state.m_update === 0) return ;
+        if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         
     }
@@ -814,6 +817,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 		};
         
         
+        this.m_flag_mounted = false;
         
         js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -825,7 +829,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
     componentDidMount() 
     {
-        this.state.m_update = 1;
+        this.m_flag_mounted = true;
     }
 
     componentWillUnmount () {
@@ -840,14 +844,14 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
     fn_unitUpdated(me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
 
     fn_unitAdded (me,p_andruavUnit)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         js_common.fn_console_log ("REACT:fn_unitAdded" );
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
@@ -858,7 +862,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
     
     fn_onPreferenceChanged(me)
     {
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
         
         me.setState({'m_update': me.state.m_update +1});
     }
@@ -887,7 +891,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
 
     fn_onSocketStatus (me,params) {
        
-        if (me.state.m_update === 0) return ;
+        if (me.m_flag_mounted === false)return ;
 
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {				
