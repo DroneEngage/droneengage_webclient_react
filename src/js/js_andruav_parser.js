@@ -429,27 +429,29 @@ class CAndruavClientParser {
                 break;
 
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_Node: {
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_Node:
                 p_jmsg = msg.msgPayload;
-                if (!p_jmsg) break;
+                if (!p_jmsg || typeof p_jmsg !== 'object') break;
+                p_unit.m_P2P = p_unit.m_P2P || {};
+                p_unit.m_P2P.m_detected_node = p_unit.m_P2P.m_detected_node || {};
                 try {
                     Object.entries(p_jmsg).forEach(([partyID, inrange_node]) => {
-                        if (inrange_node.t === null || inrange_node.t === undefined) inrange_node.t = 0;
+                        inrange_node.t = inrange_node.t ?? 0;
                         p_unit.m_P2P.m_detected_node[partyID] = {
-                            'mac': inrange_node.m,
-                            'partyID': inrange_node.p,  // can be null
-                            'connected': inrange_node.c,
-                            'last_time': inrange_node.t
+                            mac: inrange_node.m,
+                            partyID: inrange_node.p,
+                            connected: inrange_node.c,
+                            last_time: inrange_node.t
                         };
                     });
                 }
                 catch (e) {
-                    console.log(e);
+                    console.log('Error processing P2P message:', e);
                 }
 
                 js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
-            }
                 break;
+                
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_BSSID: {
                 p_jmsg = msg.msgPayload;
@@ -1681,4 +1683,4 @@ class CAndruavClientParser {
 };
 
 Object.seal(CAndruavClientParser.prototype);
-export const AndruavClient = CAndruavClientParser.getInstance();
+export const AndruavClientParser = CAndruavClientParser.getInstance();
