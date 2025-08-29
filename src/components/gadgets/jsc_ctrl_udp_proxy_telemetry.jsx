@@ -4,7 +4,7 @@ import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_andruavAuth} from '../../js/js_andruav_auth'
 
-export  class ClssCtrlUDP_PROXY_TELEMETRY   extends React.Component {
+export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
 
     constructor(props)
     {

@@ -440,7 +440,7 @@ export class ClssCtrlDroneIMU extends React.Component {
                                 </div>
                         </div>
                         <div key={'telem' + v_andruavUnit.partyID} className= 'col-6  col-sm-3   padding_zero css_user_select_text'>
-                        <ClssCtrlUDP_PROXY_TELEMETRY key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
+                        <ClssCtrlUDPPoxyTelemetry key={'ctele' + v_andruavUnit.partyID} p_unit={v_andruavUnit} /> </div>
                         <div key={'swarm' + v_andruavUnit.partyID} className= 'col-6  col-sm-2    padding_zero'>
                         <ClssCtrlSWARM   key={'cswarm' + v_andruavUnit.partyID}  className='row padding_zero' p_unit={v_andruavUnit}/>
                         </div>
