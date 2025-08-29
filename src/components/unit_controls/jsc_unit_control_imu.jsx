@@ -16,7 +16,7 @@ import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
 
 
-import {ClssCtrlUDP_PROXY_TELEMETRY} from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
+import {ClssCtrlUDPPoxyTelemetry} from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx'
 import {ClssCtrlHUD} from '../gadgets/jsc_ctrl_hudControl.jsx'
 import {ClssCtrlDirections} from '../gadgets/jsc_ctrl_directionsControl.jsx'
 import {ClssCtrlSWARM} from '../gadgets/jsc_ctrl_swarm.jsx'
@@ -238,7 +238,8 @@ export class ClssCtrlDroneIMU extends React.Component {
             const distance = js_helpers.fn_calcDistance (js_globals.myposition.coords.latitude,js_globals.myposition.coords.longitude,v_lat2,v_lng2) ;
             if (js_globals.v_useMetricSystem === true) 
             {
-                if (distance >= 1000) {
+                const KM_1 = 1000;
+                if (distance >= KM_1) {
                     v_distanceToMe_text = Number((distance / 1000).toFixed(1)).toLocaleString() + " km";
                 } else {
                     v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + " m";
@@ -246,8 +247,9 @@ export class ClssCtrlDroneIMU extends React.Component {
             }
             else
             {
-                if (distance * js_helpers.CONST_METER_TO_FEET >= 5280) {
-                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / 5280).toFixed(1)).toLocaleString() + " mi";
+                const MILE_1 = 5280;
+                if (distance * js_helpers.CONST_METER_TO_FEET >= MILE_1) {
+                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / MILE_1).toFixed(1)).toLocaleString() + " mi";
                 } else {
                     v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + " ft";
                 }
