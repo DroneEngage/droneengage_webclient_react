@@ -4,6 +4,8 @@ import {js_eventEmitter} from './js_eventEmitter';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
 
+const SEC_1 = 1000;
+    
 /**
  * Represents a single WebRTC conversation (peer connection).
  */
@@ -88,7 +90,7 @@ class CTalk {
     }
     js_common.fn_console_log(`WEBRTC: Starting frame rate monitoring for ${this.targetVideoTrack}`);
     // Check every second for frame rate updates
-    this.frameRateMonitorInterval = setInterval(this._updateFrameRate.bind(this), 1000);
+    this.frameRateMonitorInterval = setInterval(this._updateFrameRate.bind(this), SEC_1);
   }
 
   /**
