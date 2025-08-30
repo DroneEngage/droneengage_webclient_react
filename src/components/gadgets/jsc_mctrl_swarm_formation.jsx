@@ -19,6 +19,8 @@ export class ClssCtrlSWARMFormation extends React.Component {
             m_update: 0
         };
 
+        this.key = Math.random().toString();
+        
         this.m_flag_mounted = false;
         
         this.m_swarmFormation = React.createRef();

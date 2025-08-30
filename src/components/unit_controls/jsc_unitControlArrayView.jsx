@@ -817,6 +817,8 @@ export default class ClssAndruavUnitListArray extends React.Component {
 		};
         
         
+        this.key = Math.random().toString();
+
         this.m_flag_mounted = false;
         
         js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);

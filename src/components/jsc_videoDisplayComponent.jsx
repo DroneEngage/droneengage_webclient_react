@@ -24,6 +24,8 @@ export class ClssCVideoControl extends React.Component {
         };
 
 
+        this.key = Math.random().toString();
+        
         this.m_flag_mounted = false;
 
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStarted);

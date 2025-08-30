@@ -12,7 +12,8 @@ export class ClssCtrlGPIO_Port extends React.Component {
         };
 
         this.m_pwm_update = false;
-        this.key = `${props.gpio_obj.pin_module_key}-${props.gpio_obj.pin_number}`; // Unique key
+        this.key = Math.random().toString();
+        //this.key = `${props.gpio_obj.pin_module_key}-${props.gpio_obj.pin_number}`; // Unique key
         this.m_onoff_checkRef = React.createRef();
         this.m_pwm_freqRef = React.createRef();
         this.m_pwm_duty_cycleRef = React.createRef();
