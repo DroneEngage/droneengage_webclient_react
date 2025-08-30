@@ -682,7 +682,7 @@ function fn_handleKeyBoard() {
 		
 		function fn_getadsbIcon(_obj, droneAltitude) {
 			if (_obj.Help) {
-				return '/public/images/station-in-action-icon.png';
+				return '/images/station-in-action-icon.png';
 			}
 
 			var degIndex = parseInt(_obj.Heading / 22);
@@ -692,30 +692,30 @@ function fn_handleKeyBoard() {
 				switch (degIndex) {
 					case 15:
 					case 0:
-						return '/public/images/blure/adrone_gr_32x32.png';
+						return '/images/blure/adrone_gr_32x32.png';
 					case 1:
 					case 2:
-						return '/public/images/blure/adrone_gr_32x32x45d.png';
+						return '/images/blure/adrone_gr_32x32x45d.png';
 					case 3:
 					case 4:
-						return '/public/images/blure/adrone_gr_32x32x90d.png';
+						return '/images/blure/adrone_gr_32x32x90d.png';
 					case 5:
 					case 6:
-						return '/public/images/blure/adrone_gr_32x32x135d.png';
+						return '/images/blure/adrone_gr_32x32x135d.png';
 					case 7:
 					case 8:
-						return '/public/images/blure/adrone_gr_32x32x180d.png';
+						return '/images/blure/adrone_gr_32x32x180d.png';
 					case 9:
 					case 10:
-						return '/public/images/blure/adrone_gr_32x32x225d.png';
+						return '/images/blure/adrone_gr_32x32x225d.png';
 					case 11:
 					case 12:
-						return '/public/images/blure/adrone_gr_32x32x270d.png';
+						return '/images/blure/adrone_gr_32x32x270d.png';
 					case 13:
 					case 14:
-						return '/public/images/blure/adrone_gr_32x32x315d.png';
+						return '/images/blure/adrone_gr_32x32x315d.png';
 					default: // NAN if Heading is null
-						return '/public/images/blure/adrone_gr_32x32.png';
+						return '/images/blure/adrone_gr_32x32.png';
 				}
 			}
 
@@ -726,60 +726,60 @@ function fn_handleKeyBoard() {
 				switch (degIndex) {
 					case 15:
 					case 0:
-						return '/public/images/blure/adrone_br_32x32.png';
+						return '/images/blure/adrone_br_32x32.png';
 					case 1:
 					case 2:
-						return '/public/images/blure/adrone_br_32x32x45d.png';
+						return '/images/blure/adrone_br_32x32x45d.png';
 					case 3:
 					case 4:
-						return '/public/images/blure/adrone_br_32x32x90d.png';
+						return '/images/blure/adrone_br_32x32x90d.png';
 					case 5:
 					case 6:
-						return '/public/images/blure/adrone_br_32x32x135d.png';
+						return '/images/blure/adrone_br_32x32x135d.png';
 					case 7:
 					case 8:
-						return '/public/images/blure/adrone_br_32x32x180d.png';
+						return '/images/blure/adrone_br_32x32x180d.png';
 					case 9:
 					case 10:
-						return '/public/images/blure/adrone_br_32x32x225d.png';
+						return '/images/blure/adrone_br_32x32x225d.png';
 					case 11:
 					case 12:
-						return '/public/images/blure/adrone_br_32x32x270d.png';
+						return '/images/blure/adrone_br_32x32x270d.png';
 					case 13:
 					case 14:
-						return '/public/images/blure/adrone_br_32x32x315d.png';
+						return '/images/blure/adrone_br_32x32x315d.png';
 					default: // NAN if Heading is null
-						return '/public/images/blure/adrone_br_32x32.png';
+						return '/images/blure/adrone_br_32x32.png';
 				}
 			}
 			else {
 				switch (degIndex) {
 					case 15:
 					case 0:
-						return '/public/images/blure/adrone_bk_32x32.png';
+						return '/images/blure/adrone_bk_32x32.png';
 					case 1:
 					case 2:
-						return '/public/images/blure/adrone_bk_32x32x45d.png';
+						return '/images/blure/adrone_bk_32x32x45d.png';
 					case 3:
 					case 4:
-						return '/public/images/blure/adrone_bk_32x32x90d.png';
+						return '/images/blure/adrone_bk_32x32x90d.png';
 					case 5:
 					case 6:
-						return '/public/images/blure/adrone_bk_32x32x135d.png';
+						return '/images/blure/adrone_bk_32x32x135d.png';
 					case 7:
 					case 8:
-						return '/public/images/blure/adrone_bk_32x32x180d.png';
+						return '/images/blure/adrone_bk_32x32x180d.png';
 					case 9:
 					case 10:
-						return '/public/images/blure/adrone_bk_32x32x225d.png';
+						return '/images/blure/adrone_bk_32x32x225d.png';
 					case 11:
 					case 12:
-						return '/public/images/blure/adrone_bk_32x32x270d.png';
+						return '/images/blure/adrone_bk_32x32x270d.png';
 					case 13:
 					case 14:
-						return '/public/images/blure/adrone_bk_32x32x315d.png';
+						return '/images/blure/adrone_bk_32x32x315d.png';
 					default: // NAN if Heading is null
-						return '/public/images/blure/adrone_bk_32x32.png';
+						return '/images/blure/adrone_bk_32x32.png';
 				}
 			}
 		}
@@ -818,7 +818,7 @@ function fn_handleKeyBoard() {
 				switch (parseInt(p_adsbObject.m_emitter_type))
 				{
 					case mavlink20.ADSB_EMITTER_TYPE_NO_INFO:
-						icon = '/public/images/ufo.png';
+						icon = '/images/ufo.png';
 						break;
 					case mavlink20.ADSB_EMITTER_TYPE_LIGHT:
 					case mavlink20.ADSB_EMITTER_TYPE_SMALL:
@@ -838,10 +838,10 @@ function fn_handleKeyBoard() {
 					case mavlink20.ADSB_EMITTER_TYPE_EMERGENCY_SURFACE:
 					case mavlink20.ADSB_EMITTER_TYPE_SERVICE_SURFACE:
 					case mavlink20.ADSB_EMITTER_TYPE_POINT_OBSTACLE:
-						icon = '/public/images/Plane_Track.png';
+						icon = '/images/Plane_Track.png';
 						break;
 					case mavlink20.ADSB_EMITTER_TYPE_ROTOCRAFT:
-						icon = '/public/images/Quad_Track.png';
+						icon = '/images/Quad_Track.png';
 						break;
 					default:
 						// display nothing
@@ -1121,10 +1121,6 @@ function fn_handleKeyBoard() {
 		}
 
 
-		// function fn_doCircle(p_partyID) {
-		// 	js_globals.v_andruavFacade.API_do_FlightMode(p_partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
-		// }
-		
 		export function fn_doCircle2(p_partyID, latitude, longitude, altitude, radius, turns) {
 
 			let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
@@ -2030,13 +2026,13 @@ function fn_handleKeyBoard() {
 					|| (p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index] === js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL)) {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/camera_24x24.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/camera_24x24.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/camera_gy_32x32.png', null, null, false, false, null, [16,16]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/camera_bg_32x32.png', null,  null, false, false, null, [16,16]);
 								break;
 						}
 					}
@@ -2044,13 +2040,13 @@ function fn_handleKeyBoard() {
 						switch (status) {
 							case js_andruavMessages.CONST_Report_NAV_ItemReached:
 								p_andruavUnit.m_Nav_Info._Target.wp_num = c_mission_index + 1;
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/location_gy_32x32.png', null, [16,24], false, false, null, [32,32]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/location_gy_32x32.png', null, [16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemUnknown:
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/location_bb_32x32.png',   null,[16,24], false, false, null, [32,32]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/location_bb_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 							case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
-								js_leafletmap.fn_setVehicleIcon(v_marker, '/public/images/location_bg_32x32.png',   null,[16,24], false, false, null, [32,32]);
+								js_leafletmap.fn_setVehicleIcon(v_marker, '/images/location_bg_32x32.png',   null,[16,24], false, false, null, [32,32]);
 								break;
 
 						}
@@ -2078,20 +2074,19 @@ function fn_handleKeyBoard() {
 			for (let i = 0; i < wayPointArray.length; ++i) {
 				let subIcon = false;	
 				let wayPointStep = wayPointArray[i];
-				let icon_img = '/public/images/location_bb_32x32.png';
+				let icon_img = '/images/location_bb_32x32.png';
 				switch (wayPointStep.waypointType) {
 					case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
-						icon_img = '/public/images/location_bb_32x32.png';
+						icon_img = '/images/location_bb_32x32.png';
 						wayPointStep.m_label = "WP";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
-						icon_img = '/public/images/location_bb_32x32.png';
+						icon_img = '/images/location_bb_32x32.png';
 						wayPointStep.m_label = "Spline";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
-						//icon_img = '/public/images/plane_b_32x32.png';
 						wayPointStep.m_label = "Takeoff";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
@@ -2105,19 +2100,19 @@ function fn_handleKeyBoard() {
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_TRIGGER:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
-						icon_img = '/public/images/camera_gy_32x32.png';
+						icon_img = '/images/camera_gy_32x32.png';
 						subIcon = true;
 						wayPointStep.m_label = "CAM";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(latlng.lat+0.00001, latlng.lng+0.00001);
-						icon_img = '/public/images/camera_gy_32x32.png';
+						icon_img = '/images/camera_gy_32x32.png';
 						subIcon = true;
 						wayPointStep.m_label = "CAM";
 						break;
 					case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
 						latlng = js_leafletmap.fn_getLocationObjectBy_latlng(wayPointStep.Latitude, wayPointStep.Longitude);
-						icon_img = '/public/images/location_bb_32x32.png';
+						icon_img = '/images/location_bb_32x32.png';
 						wayPointStep.m_label = "Loiter in Circles";
 						var v_circleMission = js_leafletmap.fn_drawMissionCircle(latlng,wayPointStep.m_Radius);
 						// var circleMission = new google.maps.Circle({
@@ -2250,8 +2245,7 @@ function fn_handleKeyBoard() {
 			if (detected_signal === null || detected_signal === undefined) return ;
 			//const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + detected_signal.frequency + 
 			//"</p> <p class='text-white margin_zero fs-6'>" + detected_signal.signal_value + "</p>";
-			//js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, '/public/images/signal_r_512.png', p_andruavUnit.m_unitName,null, false,false, v_htmlTitle,[64,64]) ;
-			const v_marker = js_leafletmap.fn_CreateMarker('/public/images/signal_r_32.png', 'image');
+			const v_marker = js_leafletmap.fn_CreateMarker('/images/signal_r_32.png', 'image');
 			const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(detected_signal.latitude, detected_signal.longitude);
 			js_leafletmap.fn_setPosition(v_marker,latlng);
 		}
@@ -2511,7 +2505,7 @@ function fn_handleKeyBoard() {
 		}
 
 		function fn_showCameraIcon(latlng) {
-			const v_marker = js_leafletmap.fn_CreateMarker('/public/images/camera_24x24.png', 'image');
+			const v_marker = js_leafletmap.fn_CreateMarker('/images/camera_24x24.png', 'image');
 			js_leafletmap.fn_setPosition(v_marker,latlng);
 		}
 
@@ -2554,7 +2548,7 @@ function fn_handleKeyBoard() {
 
 			if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
 				const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-				let v_home = js_leafletmap.fn_CreateMarker('/public/images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,48], false, false, v_html, [24,24]); 
+				let v_home = js_leafletmap.fn_CreateMarker('/images/home_b_24x24.png', p_andruavUnit.m_unitName, [16,48], false, false, v_html, [24,24]); 
 
 				js_leafletmap.fn_setPosition(v_home,v_latlng)
 
