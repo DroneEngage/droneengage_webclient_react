@@ -14,39 +14,39 @@
 
 import * as js_andruavMessages from './js_andruavMessages'
 import * as js_helpers from '../js/js_helpers'
-import {js_globals} from './js_globals'
-import {EVENTS as js_event} from './js_eventList.js'
-import {js_localStorage} from './js_localStorage'
-import {js_eventEmitter} from './js_eventEmitter'
+import { js_globals } from './js_globals'
+import { EVENTS as js_event } from './js_eventList.js'
+import { js_localStorage } from './js_localStorage'
+import { js_eventEmitter } from './js_eventEmitter'
 import * as js_common from './js_common.js'
-import {js_gamepadButtonFunctions} from './js_gamepad_button_functions.js'
+import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js'
 
 
 const GAME_GENERIC = 0;
-const GAME_XBOX_360_MICROSOFT   = 1;
-const GAME_XBOX_360_MICROSOFT_VENDOR  = ["045e","054c","054c","054c"];
-const GAME_XBOX_360_MICROSOFT_PRODUCT = ["028e","0ce6","09cc","05c4"];
-const GAME_PAD_WAILLY_PPM       = 2;
-const GAME_COR_CTRL_MICROSOFT   = 3;
+const GAME_XBOX_360_MICROSOFT = 1;
+const GAME_XBOX_360_MICROSOFT_VENDOR = ["045e", "054c", "054c", "054c"];
+const GAME_XBOX_360_MICROSOFT_PRODUCT = ["028e", "0ce6", "09cc", "05c4"];
+const GAME_PAD_WAILLY_PPM = 2;
+const GAME_COR_CTRL_MICROSOFT = 3;
 
 class fn_Obj_padStatus {
     constructor() {
-    this.p_ctrl_type = GAME_GENERIC;
-    
-    js_gamepadButtonFunctions.fn_init();
+        this.p_ctrl_type = GAME_GENERIC;
 
-    /**
-     * IMPORTANT
-     * THIS IS TRUE VALUES OF VIRTUAL GAMEPAD REGARDLESS OF MODE [RUD, THR, ALE, ELE]
-     */
-    this.p_unified_virtual_axis = [-1, 0, 0, 0]; // Rudder, Throttle, Aileron, Elevator
+        js_gamepadButtonFunctions.fn_init();
+
+        /**
+         * IMPORTANT
+         * THIS IS TRUE VALUES OF VIRTUAL GAMEPAD REGARDLESS OF MODE [RUD, THR, ALE, ELE]
+         */
+        this.p_unified_virtual_axis = [-1, 0, 0, 0]; // Rudder, Throttle, Aileron, Elevator
         this.m_gamepad_mode_index = 0;
-    /**
-    * m_button_routing index represents buttons on the virtual GamePad on screen.
-    * each cell value represents the source button of the Button index of 
-    * the source physical GamePad.
-    */
-    this.m_button_routing = new Array(10).fill(0); // Preallocate and initialize
+        /**
+        * m_button_routing index represents buttons on the virtual GamePad on screen.
+        * each cell value represents the source button of the Button index of 
+        * the source physical GamePad.
+        */
+        this.m_button_routing = new Array(10).fill(0); // Preallocate and initialize
         this.p_buttons = new Array(js_globals.v_total_gampad_buttons).fill().map(() => ({
             m_pressed: false,
             m_timestamp: 0,
@@ -71,13 +71,13 @@ class CAndruavGamePad {
          *                  where [2] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          *                  where [3] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          */
-        this.m_channel_routing = [-1,-1,-1,-1]; // RUD,THR,ROLL,PITCH
+        this.m_channel_routing = [-1, -1, -1, -1]; // RUD,THR,ROLL,PITCH
         this.m_channel_axis_reverse = new Array(10).fill(1);
         this.m_gamepad_mode_index = 0;
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         this.fn_extractGamePadConfigMapping();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Config_Index_Changed,this, this.fn_gamePadConfigChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Config_Index_Changed, this, this.fn_gamePadConfigChanged);
 
         if (this.c_haveEvents) {
             window.addEventListener('gamepadconnected', (e) => this.fn_onConnect(e));
@@ -87,11 +87,12 @@ class CAndruavGamePad {
         }
 
         window.addEventListener('storage', (event) => {
-        // Check if the event is related to the specific field you care about
-        if (event.key.includes ('gamepad_config')) {
-            js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Config_Index_Changed);        }
+            // Check if the event is related to the specific field you care about
+            if (event.key.includes('gamepad_config')) {
+                js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Config_Index_Changed);
+            }
         });
-        
+
     }
 
     componentWillUnmount() {
@@ -127,7 +128,7 @@ class CAndruavGamePad {
          * of the gamepad.
          */
         this.m_channel_routing = [-1, -1, -1, -1];
-        
+
         /**
          * m_button_routing index represents buttons on the virtual GamePad on screen.
          * each cell value represents the source button of the Button index of 
@@ -135,7 +136,7 @@ class CAndruavGamePad {
          */
         this.m_button_routing = new Array(10).fill(0);
         const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
-        
+
         if (!config) return false;
 
         const json_config = JSON.parse(config);
@@ -147,6 +148,7 @@ class CAndruavGamePad {
 
         this.m_channel_axis_reverse = axisReversed?.length ? axisReversed : (new Array(10).fill(1));
         this.m_button_routing = buttonsFunction || this.m_button_routing;
+        this.m_button_routing = this.m_button_routing.map(item => item === 'undefined' ? 0 : item);
 
         const mappings = [
             { key: 'RUD', index: functions_per_mode.RUD },
@@ -168,7 +170,7 @@ class CAndruavGamePad {
     fn_gamePadConfigChanged(p_me) {
         p_me.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         p_me.fn_extractGamePadConfigMapping();
-        console.log ("js_event.EE_GAMEPAD_CONTROL_UPDATE:", js_event.EE_GAMEPAD_CONTROL_UPDATE);
+        console.log("js_event.EE_GAMEPAD_CONTROL_UPDATE:", js_event.EE_GAMEPAD_CONTROL_UPDATE);
         js_eventEmitter.fn_dispatch(js_event.EE_GAMEPAD_CONTROL_UPDATE);
     }
 
@@ -196,7 +198,7 @@ class CAndruavGamePad {
                 duration: p_duration,
                 weakMagnitude: 0.5,
                 strongMagnitude: 0.5
-            }).catch(() => {}); // Handle potential errors silently
+            }).catch(() => { }); // Handle potential errors silently
         }
         // Fallback to the older vibrate API (some older browsers)
         else if (gamepad.vibrate) {
@@ -205,7 +207,7 @@ class CAndruavGamePad {
     }
 
     fn_onConnect(e) {
-        js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.", 
+        js_common.fn_console_log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
             e.gamepad.index, e.gamepad.id, e.gamepad.buttons.length, e.gamepad.axes.length);
         this.fn_addGamePad(this, e.gamepad);
         js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Connected, e.gamepad);
@@ -315,8 +317,10 @@ class CAndruavGamePad {
         const len = p_gamepad.buttons.length;
         let button_indicies = [];
         for (let i = 0; i < len; ++i) {
+            if (this.m_button_routing[i] === 0) continue; // skip unmapped button.
             const c_pressed = p_gamepad.buttons[i].pressed;
             const button = c_padStatus.p_buttons[i];
+            button.m_assigned_function = this.m_button_routing[i];
             if (button.m_pressed !== c_pressed) {
                 button.m_pressed = c_pressed;
                 button.m_timestamp = c_now;

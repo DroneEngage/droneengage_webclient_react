@@ -106,7 +106,6 @@ class CAndruavClientFacade {
             if (p_me.v_sendAxes_skip % 4 !== 0) return;
         }
 
-
         p_me.v_sendAxes = false;
         if (this.v_axes !== null) this.API_sendRXChannels(this.v_axes);
     }
@@ -274,7 +273,7 @@ class CAndruavClientFacade {
 
     API_sendRXChannels(p_unified_virtual_axis) {
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
-
+        if (!c_currentEngagedUnitRX) return ;
         // IMPORTANT: Convert [-1,1] to [0,1000] IMPORTANT: -1 means channel release so min is 0
         let p_msg = {
             'R': parseInt(parseFloat(p_unified_virtual_axis[0]) * 500 + 500),  // Rudder

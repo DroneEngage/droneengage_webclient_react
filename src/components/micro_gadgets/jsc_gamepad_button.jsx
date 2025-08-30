@@ -15,7 +15,7 @@ export class ClssGamePadButton extends React.Component {
     }
 
     render() {
-        if (this.props.function == 'undefined')
+        if ((this.props.function == 'undefined') || (this.props.function == 0))
         {
             return (
                 <div className='hidden'></div>
