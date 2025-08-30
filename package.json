@@ -82,8 +82,7 @@
       "no-fallthrough": "warn",
       "no-self-assign": "warn",
       "no-empty": "warn",
-      "no-labels": "error",
-      "no-magic-numbers": "warn"
+      "no-labels": "error"
     }
   },
   "browserslist": {
