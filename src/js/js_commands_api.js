@@ -124,7 +124,7 @@ export class CCommandAPI
     
     static API_requestGPIOStatus (p_andruavUnit, p_module_key, p_pin_number)
     {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
         
         let p_msg = {
             a: js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_STATUS,
@@ -147,7 +147,7 @@ export class CCommandAPI
 
     
     static API_writeGPIO (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
         
         let p_msg = {
             i: p_module_key,
@@ -169,7 +169,7 @@ export class CCommandAPI
 
     static API_writeGPIO_PWM (p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new)
     {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
         
         let p_msg = {
             i: p_module_key,
@@ -191,7 +191,7 @@ export class CCommandAPI
 
 
     static API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
         
         let p_msg = {
             t: p_text
@@ -248,14 +248,14 @@ export class CCommandAPI
 
 
     static API_makeSwarm (p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
         
         let msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_MakeSwarm,
             'ms':  {
                 a: p_formationID, // m_formation_as_leader
-                b: p_andruavUnit.partyID // Leader
+                b: p_andruavUnit.getPartyID() // Leader
             }
         };
 
@@ -268,7 +268,7 @@ export class CCommandAPI
     }
 
     static API_requestFromDroneToFollowAnother (p_andruavUnit, slaveIndex, leaderPartyID, do_follow) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return ;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return ;
 
         if ((do_follow === null || do_follow === undefined)
         && (leaderPartyID === null || leaderPartyID === undefined))
@@ -276,7 +276,7 @@ export class CCommandAPI
             do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
         }
         
-        const partyID = p_andruavUnit.partyID;
+        const partyID = p_andruavUnit.getPartyID();
         let p_msg = {
             a: slaveIndex, // index ... could be -1 to take available location.
             c: partyID, // slave
@@ -303,7 +303,7 @@ export class CCommandAPI
         p_display_bars, p_trigger_level
     )
     {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return null;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return null;
         
         let p_msg = {
             'a': js_andruavMessages.CONST_SDR_ACTION_SET_CONFIG

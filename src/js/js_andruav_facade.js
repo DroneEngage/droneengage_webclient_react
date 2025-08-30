@@ -153,85 +153,85 @@ class CAndruavClientFacade {
     };
 
     API_requestP2P(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_requestP2P(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
     API_requestSDR(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_requestSDR(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
     API_scanSDRDrivers(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_scanSDRDrivers(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_scanSDRFreq(p_andruavUnit, p_on_off) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit, p_on_off);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_requestGPIOStatus(p_andruavUnit, p_module_key, p_pin_number) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_requestGPIOStatus(p_andruavUnit, p_module_key, p_pin_number);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_writeGPIO(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_writeGPIO(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_writeGPIO_PWM(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_writeGPIO_PWM(p_andruavUnit, p_module_key, p_pin_number, p_pin_value_new, p_pin_pwm_width_new);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
     API_scanP2P(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_scanP2P(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
     API_resetP2P(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_resetP2P(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_makeSwarm(p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         if (p_formationID === null || p_formationID === undefined) return;
 
         const cmd = CCommandAPI.API_makeSwarm(p_andruavUnit, p_formationID, p_horizontal_distance, p_vertical_distance);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_setSDRConfig(p_andruavUnit, p_fequency_center, p_fequency,
@@ -239,7 +239,7 @@ class CAndruavClientFacade {
         p_decode_mode, p_driver_index, p_interval,
         p_display_bars, p_trigger_level
     ) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_setSDRConfig(p_andruavUnit, p_fequency_center, p_fequency,
             p_gain, p_sample_rate,
@@ -247,27 +247,27 @@ class CAndruavClientFacade {
             p_display_bars, p_trigger_level
         );
         if (cmd === null || cmd === undefined) return;
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     API_activateSDR(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         let p_msg = {
             'a': js_andruavMessages.CONST_SDR_ACTION_CONNECT
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION, p_msg);
     }
 
     API_requestFromDroneToFollowAnother(p_andruavUnit, slaveIndex, leaderPartyID, do_follow) {
 
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const cmd = CCommandAPI.API_requestFromDroneToFollowAnother(p_andruavUnit, slaveIndex, leaderPartyID, do_follow);
 
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -295,7 +295,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_do_ServoChannel(p_channel_num, p_value);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
@@ -303,31 +303,31 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_requestServoChannel();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     // Very Danger to expose [emergencyDisarm]
     API_do_Arm(p_andruavUnit, param_toArm, param_emergencyDisarm) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let msg = {
             A: param_toArm,
             D: param_emergencyDisarm
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Arm, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_Arm, msg);
     }
 
 
     API_do_ChangeAltitude(p_andruavUnit, param_altitude) {
-        if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined)) return;
+        if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
         let msg = {
             a: parseInt(param_altitude)
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude, msg);
     }
 
 
     API_do_YAW(p_andruavUnit, var_targetAngle, var_turnRate, var_isClockwise, var_isRelative) {
-        if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined)) return;
+        if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
         let msg = {
             A: parseFloat(var_targetAngle),
             R: parseFloat(var_turnRate),
@@ -335,7 +335,7 @@ class CAndruavClientFacade {
             L: var_isRelative
 
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW, msg);
     }
 
 
@@ -359,17 +359,17 @@ class CAndruavClientFacade {
     }
 
     API_do_GetHomeLocation(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
     };
 
 
 
     API_do_GimbalCtrl(p_andruavUnit, p_pitch, p_roll, p_yaw, p_isAbsolute) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             A: Math.round(p_pitch),
             B: Math.round(p_roll),
@@ -378,12 +378,12 @@ class CAndruavClientFacade {
 
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_GimbalCtrl, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_GimbalCtrl, v_msg);
     }
 
 
     API_do_ChangeSpeed2(p_andruavUnit, p_speed, p_isGroundSpeed, p_throttle, p_isRelative) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             a: p_speed,
             b: (p_isGroundSpeed === null || p_isGroundSpeed === undefined) ? true : p_isGroundSpeed,
@@ -391,13 +391,13 @@ class CAndruavClientFacade {
             d: (p_isRelative === null || p_isRelative === undefined) ? false : p_isRelative
 
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeSpeed, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeSpeed, v_msg);
     }
 
     API_do_Land(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {};
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Land, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_Land, v_msg);
     }
 
     //TODO: change p_partyID to p_andruavUnit
@@ -411,12 +411,12 @@ class CAndruavClientFacade {
 
     API_setGPSSource(p_andruavUnit, p_source) { // (p_andruavUnit,OnOff)
 
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_SET_GPS_SOURCE,
             s: p_source
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
     };
 
 
@@ -430,7 +430,7 @@ class CAndruavClientFacade {
 
     API_CONST_RemoteCommand_streamVideo(p_andruavUnit, p_OnOff, p_number, p_channel) {
 
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_STREAMVIDEO,
             Act: p_OnOff
@@ -441,21 +441,21 @@ class CAndruavClientFacade {
             v_msg.N = p_number;
         }
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
         js_eventEmitter.fn_dispatch(js_event.EE_Video_State_Change, { unit: p_andruavUnit, onff: p_OnOff });
 
     };
 
     API_CONST_RemoteCommand_rotateVideo(p_andruavUnit, p_rotation_angle, p_channel) {
 
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let v_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_ROTATECAM,
             r: p_rotation_angle,
             a: p_channel
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
 
     };
 
@@ -518,7 +518,7 @@ class CAndruavClientFacade {
             v_msg.fn = p_fenceName;
         }
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
     };
 
 
@@ -546,30 +546,30 @@ class CAndruavClientFacade {
         }
 
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD((p_andruavUnit !== null && p_andruavUnit !== undefined) ? p_andruavUnit.partyID : null, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD((p_andruavUnit !== null && p_andruavUnit !== undefined) ? p_andruavUnit.getPartyID() : null, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, v_msg);
     };
 
 
     API_uploadWayPoints(p_andruavUnit, p_eraseFirst, p_textMission) { // eraseFirst NOT IMPLEMENTED YET
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const v_msg = {
             a: p_textMission
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_UploadWayPoints, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_UploadWayPoints, v_msg);
     };
 
 
     API_uploadDEMission(p_andruavUnit, p_eraseFirst, p_jsonMission) { // eraseFirst NOT IMPLEMENTED YET
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         const v_msg = {
             j: p_jsonMission,
             e: p_eraseFirst
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Upload_DE_Mission, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_Upload_DE_Mission, v_msg);
     };
 
     API_saveWayPointTasks(p_accountID, m_groupName, p_partyID, p_receiver, isPermanent, p_missionV110) {
@@ -597,9 +597,9 @@ class CAndruavClientFacade {
 
         // DO NOT Send this command globally to all units. It is a unit specific command.
         // TODO: Restrict this from SERVER
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
-        const c_party = p_andruavUnit != null ? p_andruavUnit.partyID : null;
+        const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
         const cmd = CCommandAPI.API_requestDeleteWayPoints(p_andruavUnit);
         js_andruav_ws.AndruavClientWS.API_sendCMD(c_party, cmd.mt, cmd.ms);
@@ -608,7 +608,7 @@ class CAndruavClientFacade {
 
     API_requestDeleteFenceByName(p_andruavUnit, p_fenceName) {
 
-        const c_party = p_andruavUnit != null ? p_andruavUnit.partyID : null;
+        const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
         const cmd = CCommandAPI.API_requestDeleteFenceByName(c_party, p_fenceName);
 
@@ -624,7 +624,7 @@ class CAndruavClientFacade {
          */
     API_do_StartMissionFrom(p_andruavUnit, p_missionNumber) {
 
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         if (p_missionNumber < 0)
             p_missionNumber = 0;
@@ -635,14 +635,14 @@ class CAndruavClientFacade {
             n: p_missionNumber
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
 
 
     };
 
 
     API_FireDeEvent(p_andruavUnit, p_event_id) {
-        const c_party = p_andruavUnit != null ? p_andruavUnit.partyID : null;
+        const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
@@ -654,49 +654,49 @@ class CAndruavClientFacade {
 
     // CODEBLOCK_START
     API_requestSearchableTargets(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
         }
 
         let p_msg = {};
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_SearchTargetList, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_SearchTargetList, p_msg);
     }
     // CODEBLOCK_END
 
     API_requestUdpProxyStatus(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         const msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_UdpProxy_Info
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
 
     }
 
     API_setUdpProxyClientPort(p_andruavUnit, p_clientPort) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         const msg = {
             C: js_andruavMessages.CONST_RemoteCommand_SET_UDPPROXY_CLIENT_PORT,
             P: p_clientPort
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
 
     }
 
     API_requestMissionCount(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         const msg = {
             C: js_andruavMessages.CONST_RemoteCommand_MISSION_COUNT
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
 
     }
 
     API_requestWayPoints(p_andruavUnit, p_enableFCB) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let msg = {};
         if (p_enableFCB === true) {
             msg.C = js_andruavMessages.CONST_RemoteCommand_RELOAD_WAY_POINTS_FROM_FCB;
@@ -704,27 +704,27 @@ class CAndruavClientFacade {
             msg.C = js_andruavMessages.CONST_RemoteCommand_GET_WAY_POINTS;
         }
 
-        if (js_globals.v_waypointsCache.hasOwnProperty(p_andruavUnit.partyID) === true) {
+        if (js_globals.v_waypointsCache.hasOwnProperty(p_andruavUnit.getPartyID()) === true) {
             // ! due to disconnection or repeated request this array could be filled of an incomplete previous request.
             // ! this value will be reset each time load wp is called.
-            delete js_globals.v_waypointsCache[p_andruavUnit.partyID];
+            delete js_globals.v_waypointsCache[p_andruavUnit.getPartyID()];
         }
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
 
     API_requestParamList(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
         let msg = {};
         msg.C = js_andruavMessages.CONST_RemoteCommand_REQUEST_PARAM_LIST;
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
 
     API_requestCameraList(p_andruavUnit, p_callback) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         if (p_callback !== null && p_callback !== undefined) {
             js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList);
         }
@@ -733,7 +733,7 @@ class CAndruavClientFacade {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
     };
 
 
@@ -763,23 +763,23 @@ class CAndruavClientFacade {
 
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let p_msg = {
             b: p_subAction
 
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControlSettings, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControlSettings, p_msg);
 
     }
 
 
     API_connectToFCB(p_andruavUnit) {
-        if (p_andruavUnit.partyID === null || p_andruavUnit.partyID === undefined) return;
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         let p_msg = {
             C: js_andruavMessages.CONST_RemoteCommand_CONNECT_FCB
 
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
     }
 
 
@@ -931,7 +931,7 @@ class CAndruavClientFacade {
             PR: true // reset partyID
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_Unit_Name, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_Unit_Name, msg);
     }
 
     /***
@@ -940,7 +940,7 @@ class CAndruavClientFacade {
     API_engageRX(p_andruavUnit) {
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
         if ((c_currentEngagedUnitRX) &&
-            (c_currentEngagedUnitRX.partyID !== p_andruavUnit.partyID)) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+            (c_currentEngagedUnitRX.partyID !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
             this.API_disengageRX(c_currentEngagedUnitRX);
         }
 
@@ -955,7 +955,7 @@ class CAndruavClientFacade {
         
         js_globals.m_andruavUnitList.disengageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
         
         js_eventEmitter.fn_dispatch(js_event.EE_releaseGamePad, p_andruavUnit);
     };
@@ -965,7 +965,7 @@ class CAndruavClientFacade {
         
         js_globals.m_andruavUnitList.engageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_engageGamePad();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_event.EE_requestGamePad, p_andruavUnit);
     }
 
@@ -1003,7 +1003,7 @@ class CAndruavClientFacade {
         );
         let x = p_param_set.pack(p_param_set);
         let z = js_helpers.array_to_ArrayBuffer(x);
-        this.API_sendBinCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink, z);
+        this.API_sendBinCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink, z);
         p_mavlink_param.is_dirty = false;
     };
 
@@ -1019,7 +1019,7 @@ class CAndruavClientFacade {
             e: p_corner2_y
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
     };
 
 
@@ -1027,7 +1027,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_SendTrackPoint(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1035,7 +1035,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_StopTracking(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1043,7 +1043,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_PauseTracking(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     };
 
@@ -1051,7 +1051,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_EnableTracking(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
@@ -1059,7 +1059,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_SendTrackAISelect(selected_object_list);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1067,7 +1067,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_DisableTrackingAI(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1076,7 +1076,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_EnableTrackingAI();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     };
 
@@ -1085,7 +1085,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_GetTrackingAIClassList();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     };
 
@@ -1095,7 +1095,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_SetCommunicationChannel(p_andruavUnit, comm_on_off, p2p_on_off, comm_on_off_duration, p2p_on_off_duration, comm_local_on_off, comm_local_on_off_duration);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1103,7 +1103,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_connectToLocalCommServer(p_andruavUnit, p_localCommServerIP, p_localCommServerPort);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
     API_requestIMU(p_andruavUnit, on_off) {
@@ -1113,7 +1113,7 @@ class CAndruavClientFacade {
             Act: on_off
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     }
 
 
@@ -1123,7 +1123,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_resumeTelemetry(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
 
@@ -1131,7 +1131,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_pauseTelemetry(p_andruavUnit);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, cmd.mt, cmd.ms);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
     API_adjustTelemetryDataRate(p_andruavUnit, lvl) {
@@ -1146,7 +1146,7 @@ class CAndruavClientFacade {
             msg.LVL = lvl;
         }
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
 
@@ -1159,7 +1159,7 @@ class CAndruavClientFacade {
         };
 
         this.currentTelemetryUnit = undefined; // it might be already null and not synch-ed
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
 
         p_andruavUnit.m_Telemetry._isActive = false;
         js_eventEmitter.fn_dispatch(js_event.EE_unitTelemetryOff, p_andruavUnit);

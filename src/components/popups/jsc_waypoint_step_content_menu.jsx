@@ -44,7 +44,7 @@ export class ClssWaypointStepContextMenu extends React.Component {
 			
 			const v_footerMenu = (<div key={this.key + 'wp'} className='row'>
                 <div className= 'col-12 flex justify-content-start'><p key={this.key + 'f1'} className='bg-success text-nowrap'>{this.props.p_unit.m_unitName + "   " + this.props.p_unit.m_VehicleType_TXT }</p></div>
-                <div className= 'col-6'><p key={this.key + 'f2'} className='cursor_hand text-primary text-nowrap' onClick={() =>fn_doStartMissionFrom(this.props.p_unit.partyID , this.props.p_waypoint.m_Sequence)}>Start Here</p></div>
+                <div className= 'col-6'><p key={this.key + 'f2'} className='cursor_hand text-primary text-nowrap' onClick={() =>fn_doStartMissionFrom(this.props.p_unit.getPartyID() , this.props.p_waypoint.m_Sequence)}>Start Here</p></div>
                 </div>);
 			
 

@@ -99,7 +99,7 @@ export class ClssCtrlGPIO extends React.Component {
         { 
             const driver = c_list[c_keys[i]];
             driver_names.push(
-                <option key={"op" + v_andruavUnit.partyID + driver.index + driver.driver} value={driver.index}>{driver.driver}</option>
+                <option key={"op" + v_andruavUnit.getPartyID() + driver.index + driver.driver} value={driver.index}>{driver.driver}</option>
             );
         }
 
@@ -119,32 +119,32 @@ export class ClssCtrlGPIO extends React.Component {
             const { pin_module_key, pin_number, pin_mode, gpio_type, pin_value, pin_name } = gpio;
 
             gpios_buttons.push(
-                <ClssCtrlGPIO_Port key={v_andruavUnit.partyID + pin_module_key + pin_number + key} p_unit={v_andruavUnit} gpio_obj={gpio} />
+                <ClssCtrlGPIO_Port key={v_andruavUnit.getPartyID() + pin_module_key + pin_number + key} p_unit={v_andruavUnit} gpio_obj={gpio} />
             );
         });
 
         let cmd_btns = [];
         
-        cmd_btns.push(<div key={v_andruavUnit.partyID + 'gpio_'}  className='row css_margin_zero padding_zero  border-top border-secondary'>
+        cmd_btns.push(<div key={v_andruavUnit.getPartyID() + 'gpio_'}  className='row css_margin_zero padding_zero  border-top border-secondary'>
                 
-                <div key={v_andruavUnit.partyID + 'gpio_1'} className="col-12 mt-1">
-                <div key={v_andruavUnit.partyID + 'gpio_2'} className = 'row al_l css_margin_zero d-flex '>
-                    <div key={v_andruavUnit.partyID + 'gpio_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'gpio_211'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh GPIO' onClick={() => this.fn_refreshGPIO(v_andruavUnit)}>Refresh</p>
+                <div key={v_andruavUnit.getPartyID() + 'gpio_1'} className="col-12 mt-1">
+                <div key={v_andruavUnit.getPartyID() + 'gpio_2'} className = 'row al_l css_margin_zero d-flex '>
+                    <div key={v_andruavUnit.getPartyID() + 'gpio_21'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'gpio_211'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh GPIO' onClick={() => this.fn_refreshGPIO(v_andruavUnit)}>Refresh</p>
                     </div>
                 </div>
                 </div>
             </div>);
 
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_gpio"} className={this.props.className}>
+            <div key={v_andruavUnit.getPartyID() + "_ctl_gpio"} className={this.props.className}>
                 
                 
                 {gpios_buttons}
 
-                <div key={v_andruavUnit.partyID + 'gpio_3'} className='row css_margin_zero padding_zero '>
-                        <div key={v_andruavUnit.partyID + 'gpio_31'} className="col-12">
-                            <p key={v_andruavUnit.partyID + 'gpio_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                <div key={v_andruavUnit.getPartyID() + 'gpio_3'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'gpio_31'} className="col-12">
+                            <p key={v_andruavUnit.getPartyID() + 'gpio_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                         </div>
                 </div>
 

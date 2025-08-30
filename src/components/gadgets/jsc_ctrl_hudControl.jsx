@@ -80,7 +80,7 @@ export class ClssCtrlHUD extends React.Component {
     {
         try {
             // Check if the update is for the correct unit
-            if (p_me.props.p_unit && p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return;
+            if (p_me.props.p_unit && p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
 
             // Update instance variables with new orientation data
             p_me.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);

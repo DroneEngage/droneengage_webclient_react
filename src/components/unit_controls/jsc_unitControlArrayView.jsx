@@ -151,7 +151,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     fn_unitUpdated(p_me,p_andruavUnit)
     {
-        if (p_andruavUnit.partyID !== p_me.props.p_unit.partyID) return ;
+        if (p_andruavUnit.getPartyID() !== p_me.props.p_unit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
         
@@ -674,7 +674,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 ctrl_ekf.push(<div>EKF-PX4</div>);
             break;
             default:
-                ctrl_ekf.push(<ClssCtrlArdupilotEkf key={v_andruavUnit.partyID + "_ctrl_ekf"} id={v_andruavUnit.partyID + "_ctrl_ekf"} p_unit={v_andruavUnit}/>);
+                ctrl_ekf.push(<ClssCtrlArdupilotEkf key={v_andruavUnit.getPartyID() + "_ctrl_ekf"} id={v_andruavUnit.getPartyID() + "_ctrl_ekf"} p_unit={v_andruavUnit}/>);
             break;
         }
 
@@ -718,7 +718,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         
         return (
             <div key={this.key+'1'} className = 'row  mt-0 me-0 ms-0 mb-2 text-nowrap border-bottom bg-gradient'>
-                <div key={this.key+'2'} className = {'col-2  col-lg-1   css_margin_zero text-center cursor_hand  si-09x  ' + v_id_class} onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit.partyID)}>
+                <div key={this.key+'2'} className = {'col-2  col-lg-1   css_margin_zero text-center cursor_hand  si-09x  ' + v_id_class} onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit.getPartyID())}>
                     <div key={this.key+'23'} className = 'row  css_margin_zero '>
                         <div key={this.key+'24'} className = {'col-12  css_margin_zero css_padding_zero '+ v_id_icon}>{v_id_text}</div>
                     </div>
@@ -739,7 +739,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                             {ctrl_ekf}
                         </div>
                         <div key={this.key+'42'} className = 'row  css_margin_zero  '>
-                            <ClssCtrlVibration key={v_andruavUnit.partyID + "_ctrl_vib"} id={v_andruavUnit.partyID + "_ctrl_vib"} p_unit={v_andruavUnit}/>
+                            <ClssCtrlVibration key={v_andruavUnit.getPartyID() + "_ctrl_vib"} id={v_andruavUnit.getPartyID() + "_ctrl_vib"} p_unit={v_andruavUnit}/>
                         </div>
                     
                 </div>
@@ -751,8 +751,8 @@ class ClssAndruavUnitDroneRow extends React.Component{
                         </ul>
                 </div>
                 <div key={this.key+'6'} className = {'col-4  col-lg-2   d-grid css_margin_zero  si-07x  css_dotted_border  ' + css_battery_enabled}>
-                        <ClssCtrlBattery key={v_andruavUnit.partyID + "_ctrl_bat1"} id={v_andruavUnit.partyID + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
-                        <ClssCtrlBattery key={v_andruavUnit.partyID + "_ctrl_bat2"} id={v_andruavUnit.partyID + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat1"} id={v_andruavUnit.getPartyID() + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat2"} id={v_andruavUnit.getPartyID() + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
                 </div>
                 <div key={this.key+'7'} className = 'col-4  col-lg-2   d-none d-lg-grid css_margin_zero css_padding_zero css_dotted_border  '>
                     <div className = 'row  css_margin_zero css_padding_zero'>
@@ -858,7 +858,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
         js_common.fn_console_log ("REACT:fn_unitAdded" );
          // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
          me.setState({ 
-            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.partyID])
+            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
         });
     }
     
@@ -955,7 +955,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
                 }
                 sortedPartyIDs.map(function (object)
                 {
-                    const partyID = object.partyID;
+                    const partyID = object.getPartyID();
                     const v_andruavUnit = object;
                 
                     if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;

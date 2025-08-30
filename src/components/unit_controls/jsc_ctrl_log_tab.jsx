@@ -77,7 +77,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
 			c_msg.m_error = p_error
 		*/
 
-        if (p_me.props.p_unit.partyID !== p_msg.m_unit.partyID) return ;
+        if (p_me.props.p_unit.getPartyID() !== p_msg.m_unit.getPartyID()) return ;
         
         p_me.state.m_message.push ({
             m_msg: p_msg,
@@ -112,11 +112,11 @@ export  class ClssCtrlUnitLog  extends React.Component {
         let min = Math.max(len - js_globals.CONST_MAX_MESSAGE_LOG,0);
         for (let i=len-1; i>=min; --i) 
         {
-            v_messages.push(<ClssAndruavMessageItem key={this.props.p_unit.partyID + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
+            v_messages.push(<ClssAndruavMessageItem key={this.props.p_unit.getPartyID() + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)
         }
         
         return (
-            <div key={this.props.p_unit.partyID + "_msgctrl"} className="">
+            <div key={this.props.p_unit.getPartyID() + "_msgctrl"} className="">
                  <div key='params' id="parameters_sublist" className='d-flex justify-content-end'>
                             <button type="button" className='btn btn-success btn-sm ctrlbtn me-5'  title='Clear Messages' onClick={(e) => this.fn_clear(e)}>Clear</button>
                  </div>

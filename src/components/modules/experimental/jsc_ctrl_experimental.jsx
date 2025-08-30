@@ -53,7 +53,7 @@ export class ClssCtrlExperimental extends React.Component {
     
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
@@ -88,21 +88,21 @@ export class ClssCtrlExperimental extends React.Component {
    
 
         let cmd_btns = [];
-            cmd_btns.push(<div key={v_andruavUnit.partyID + 'exp_'}  className='row css_margin_zero padding_zero  border-secondary'>
+            cmd_btns.push(<div key={v_andruavUnit.getPartyID() + 'exp_'}  className='row css_margin_zero padding_zero  border-secondary'>
                 
-                <div key={v_andruavUnit.partyID + 'exp_1'} className="col-12 mt-1">
-                <div key={v_andruavUnit.partyID + 'exp_2'} className = 'row al_l css_margin_zero d-flex '>
-                    <div key={v_andruavUnit.partyID + 'exp_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Local Comm Server' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
+                <div key={v_andruavUnit.getPartyID() + 'exp_1'} className="col-12 mt-1">
+                <div key={v_andruavUnit.getPartyID() + 'exp_2'} className = 'row al_l css_margin_zero d-flex '>
+                    <div key={v_andruavUnit.getPartyID() + 'exp_21'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'exp_211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Local Comm Server' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'exp_22'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c bi bi-upc-scan' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}> WIFI Scan</p>
+                    <div key={v_andruavUnit.getPartyID() + 'exp_22'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'exp_212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c bi bi-upc-scan' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}> WIFI Scan</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'exp_23'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_213'} className={' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_Local_WS(v_andruavUnit, false, 10)}>{txt_channel_exp_offline}</p>
+                    <div key={v_andruavUnit.getPartyID() + 'exp_23'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'exp_213'} className={' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_Local_WS(v_andruavUnit, false, 10)}>{txt_channel_exp_offline}</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'exp_24'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'exp_214'} className={' rounded-3 text-white bg-danger cursor_hand text unit_nowidth al_c bi bi-wifi'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
+                    <div key={v_andruavUnit.getPartyID() + 'exp_24'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'exp_214'} className={' rounded-3 text-white bg-danger cursor_hand text unit_nowidth al_c bi bi-wifi'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
                     </div>
                 </div>
                 </div>
@@ -112,26 +112,26 @@ export class ClssCtrlExperimental extends React.Component {
         const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_exp"} className={this.props.className}>
+            <div key={v_andruavUnit.getPartyID() + "_ctl_exp"} className={this.props.className}>
 
-                <div key={v_andruavUnit.partyID + 'exp_1'} className='row css_margin_zero padding_zero '>
-                    <div key={v_andruavUnit.partyID + 'sdr_112'} className='row css_margin_zero padding_zero '>
+                <div key={v_andruavUnit.getPartyID() + 'exp_1'} className='row css_margin_zero padding_zero '>
+                    <div key={v_andruavUnit.getPartyID() + 'sdr_112'} className='row css_margin_zero padding_zero '>
                             <label className="col-3"><small><b>WS-Local</b></small></label>
                             <input type="text" className="col-5" placeholder="Local Server IP:port" aria-label="IP"   />
-                            <p key={v_andruavUnit.partyID + 'exp_211'} className=' col-2 rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
+                            <p key={v_andruavUnit.getPartyID() + 'exp_211'} className=' col-2 rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_ConnectToLocalCommServer(v_andruavUnit)}>LWSC</p>
                     
                         </div>
                         
                 </div>
-                <div key={v_andruavUnit.partyID + 'exp_3'} className='row css_margin_zero padding_zero '>
-                        <div key={v_andruavUnit.partyID + 'exp_31'} className="col-12">
-                            <p key={v_andruavUnit.partyID + 'exp_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                <div key={v_andruavUnit.getPartyID() + 'exp_3'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'exp_31'} className="col-12">
+                            <p key={v_andruavUnit.getPartyID() + 'exp_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                         </div>
                 </div>
                     {cmd_btns}
-                <div key={v_andruavUnit.partyID + 'exp_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                <div key={v_andruavUnit.getPartyID() + 'exp_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                 </div> 
-                <div key={v_andruavUnit.partyID + 'exp_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                <div key={v_andruavUnit.getPartyID() + 'exp_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                 </div>    
             </div>
         );

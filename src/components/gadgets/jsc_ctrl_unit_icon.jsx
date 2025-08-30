@@ -28,7 +28,7 @@ export class ClssCtrlUnitIcon extends React.Component {
         }
 
         const is_GCS = false;
-        const id = v_andruavUnit.partyID + "__u_i";
+        const id = v_andruavUnit.getPartyID() + "__u_i";
         const module_version = v_andruavUnit.module_version();
         
         if (is_GCS === false)

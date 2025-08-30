@@ -32,13 +32,13 @@ class ClssCtrlP2PInRangeNodeInfo  extends React.Component {
         const unit = js_globals.m_andruavUnitList.fn_getUnit(v_inrange_node.partyID);
         let txt_node_name;
 
-        let p2 = v_andruavUnit.partyID;
+        let p2 = v_andruavUnit.getPartyID();
         if (unit!=null)
         {
-            p2 = unit.partyID;
+            p2 = unit.getPartyID();
             txt_node_name = "  " + unit.m_unitName;
         }
-        const p1 = v_andruavUnit.partyID;
+        const p1 = v_andruavUnit.getPartyID();
         
 
         
@@ -86,7 +86,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
 
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }

@@ -83,7 +83,7 @@ export default class ClssYawDialog extends React.Component
 
     fn_gotoUnit()
     {
-        fn_gotoUnit_byPartyID(this.p_andruavUnit.partyID)
+        fn_gotoUnit_byPartyID(this.p_andruavUnit.getPartyID())
     }
 
     fn_onYaw(e)

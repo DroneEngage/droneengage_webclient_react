@@ -127,7 +127,7 @@ export class ClssCtrlSWARM extends React.Component {
         let v_partyID = null;
         let v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_UNFOLLOW;
         if (p_unit !== null && p_unit !== undefined) {
-            v_partyID = p_unit.partyID;
+            v_partyID = p_unit.getPartyID();
             v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_FOLLOW;
         }
         js_globals.v_andruavFacade.API_requestFromDroneToFollowAnother(this.props.p_unit, -1, v_partyID, v_do_follow);
@@ -169,14 +169,14 @@ export class ClssCtrlSWARM extends React.Component {
         if (this.props.p_unit.m_Swarm.m_following !== null && this.props.p_unit.m_Swarm.m_following !== undefined) {
             const leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
             if (leaderUnit !== null && leaderUnit !== undefined) {
-                $("#" + this.props.p_unit.partyID + "dldrselsel").val(leaderUnit.partyID);
+                $("#" + this.props.p_unit.getPartyID() + "dldrselsel").val(leaderUnit.getPartyID());
             }
             else {
-                $("#" + this.props.p_unit.partyID + "dldrselsel").val("NA");
+                $("#" + this.props.p_unit.getPartyID() + "dldrselsel").val("NA");
             }
         }
         else {
-            $("#" + this.props.p_unit.partyID + "dldrselsel").val("NA");
+            $("#" + this.props.p_unit.getPartyID() + "dldrselsel").val("NA");
         }
     }
 
@@ -253,9 +253,9 @@ export class ClssCtrlSWARM extends React.Component {
                     It is not following me. -as leaders can be followers but should not be following me-.
                     Notice: deeper circulaar error can be made and not handled here.
                 */
-                if ((this.props.p_unit.partyID !== v_unit.partyID)
+                if ((this.props.p_unit.getPartyID() !== v_unit.getPartyID())
                     && (v_unit.m_Swarm.m_isLeader === true)
-                    && (this.props.p_unit.m_Swarm.m_following !== v_unit.partyID)) {
+                    && (this.props.p_unit.m_Swarm.m_following !== v_unit.getPartyID())) {
                     // var v_out = v_unit; // need a local copy 
                     // list drones that are not me and are leaders.
                     c_items.push(
@@ -269,7 +269,7 @@ export class ClssCtrlSWARM extends React.Component {
             return (
                 <div key={'swr_' + this.key} className={this.props.className} >
                     <div key={'swr_1' + this.key} className="btn-group" role="group" aria-label="Button group with nested dropdown">
-                        <button key={'swr_11' + this.key}  id={this.props.p_unit.partyID + "_ldr"}
+                        <button key={'swr_11' + this.key}  id={this.props.p_unit.getPartyID() + "_ldr"}
                             type="button"
                             className={"btn btn-sm " + v_leader_class}
                             title={v_leader_title_leader + " / folowing:" + v_leader_title_follower}

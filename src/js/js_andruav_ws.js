@@ -174,7 +174,7 @@ class CAndruavClientWS {
         v_unit.m_IsMe = true;
         v_unit.m_IsGCS = true;
         v_unit.m_unitName = this.unitID;
-        v_unit.partyID = this.partyID;
+        v_unit.setPartyID(this.partyID);
         v_unit.m_groupName = this.m_groupName;
         v_unit.m_telemetry_protocol = js_andruavMessages.CONST_Unknown_Telemetry;
         v_unit.m_VehicleType = js_andruavUnit.CONST_VEHICLE_GCS;
@@ -325,9 +325,9 @@ class CAndruavClientWS {
                 v_unit = new js_andruavUnit.CAndruavUnitObject();
                 v_unit.m_IsMe = false;
                 v_unit.m_defined = false;
-                v_unit.partyID = p_jmsg.senderName;
+                v_unit.setPartyID(p_jmsg.senderName);
                 v_unit.m_index = js_globals.m_andruavUnitList.count;
-                js_globals.m_andruavUnitList.Add(v_unit.partyID, v_unit);
+                js_globals.m_andruavUnitList.Add(v_unit.getPartyID(), v_unit);
 
                 // Request unit ID if allowed
                 if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {

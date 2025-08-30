@@ -38,7 +38,7 @@ export  class ClssRX_MESSAGE  extends React.Component {
 
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
@@ -86,10 +86,10 @@ export  class ClssRX_MESSAGE  extends React.Component {
                 </tr>);
           });
 
-        return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.partyID } className=" h-100 overflow-scroll">
+        return  (<div key={'ClssRX_MESSAGE' + this.props.p_unit.getPartyID() } className=" h-100 overflow-scroll">
             <table className = "table table-dark table-striped si-09x">
                 <thead>
-                    <tr key={'ClssRX_MESSAGE1' + this.props.p_unit.partyID }>
+                    <tr key={'ClssRX_MESSAGE1' + this.props.p_unit.getPartyID() }>
                         <th scope="col">MSG&nbsp;ID</th>
                         <th scope="col">Count</th>
                     </tr>

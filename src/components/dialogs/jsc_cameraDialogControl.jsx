@@ -49,7 +49,7 @@ class ClssCameraDevice extends React.Component {
         }
 
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.partyID,
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
             1,
             0, 
@@ -67,7 +67,7 @@ class ClssCameraDevice extends React.Component {
             camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.partyID, 
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(), 
             this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
             this.props.prop_parent.fn_getNumOfShots(),
             this.props.prop_parent.fn_getInterval(), 
@@ -159,7 +159,7 @@ export default class ClssCameraDialog extends React.Component
     
     fn_displayDialog (p_me, p_session)
     {
-        const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.partyID);
+        const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.getPartyID());
 		if (p_andruavUnit == null) {
 		    return;
 		}
@@ -176,7 +176,7 @@ export default class ClssCameraDialog extends React.Component
     fn_gotoUnitPressed()
     {
         if (this.m_flag_mounted === false)return ;
-        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.partyID);
+        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
 
     }
 

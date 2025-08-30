@@ -35,7 +35,7 @@ class ClssStreamChannel extends React.Component {
     {
         // p_obj.talk
         // p_obj.andruavUnit
-        if (p_me.props.prop_session.m_unit.partyID !== p_obj.andruavUnit.partyID) return ;
+        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
         if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
 
         p_me.setState({'m_update': p_me.state.m_update +1});
@@ -48,7 +48,7 @@ class ClssStreamChannel extends React.Component {
     {
         // p_obj.talk
         // p_obj.andruavUnit
-        if (p_me.props.prop_session.m_unit.partyID !== p_obj.andruavUnit.partyID) return ;
+        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
         if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
 
         p_me.setState({'m_update': p_me.state.m_update +1});
@@ -187,7 +187,7 @@ export default class ClssStreamDialog extends React.Component
 
     fn_gotoUnitPressed()
     {
-        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.partyID);
+        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
 
     }
 
@@ -220,7 +220,7 @@ export default class ClssStreamDialog extends React.Component
         let p_andruavUnit = null;
         
         if (this.state.p_session) {
-            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.partyID);
+            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID());
         }
 
         const isNoStreams = p_andruavUnit === null;

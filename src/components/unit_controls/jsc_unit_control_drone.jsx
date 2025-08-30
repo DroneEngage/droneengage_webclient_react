@@ -74,7 +74,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     fn_requestGamePad(me,p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.partyID !== me.props.p_unit.partyID) 
+        if (p_andruavUnit.getPartyID() !== me.props.p_unit.getPartyID()) 
         {
            // someone else wanta GamePad, I will release it if I have it.
             return ; // not me
@@ -245,22 +245,22 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             {
                 css += 'active ';
             }
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li1'} className="nav-item">
-                        <a className={css + ' bi bi-send-fill '} data-bs-toggle="tab" href={"#main" + v_andruavUnit.partyID} title='Main'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li1'} className="nav-item">
+                        <a className={css + ' bi bi-send-fill '} data-bs-toggle="tab" href={"#main" + v_andruavUnit.getPartyID()} title='Main'></a>
                         </li>);
         }
 
         if (this.state.tab_log === true)
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li2'} className="nav-item">
-                        <a className="nav-link user-select-none bi bi-list-columns" data-bs-toggle="tab" href={"#log" + v_andruavUnit.partyID} title='Log'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li2'} className="nav-item">
+                        <a className="nav-link user-select-none bi bi-list-columns" data-bs-toggle="tab" href={"#log" + v_andruavUnit.getPartyID()} title='Log'></a>
                         </li>);
         }
         
         if (this.state.tab_details === true)
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li3'} className="nav-item">
-                        <a className="nav-link  user-select-none bi bi-pci-card" data-bs-toggle="tab" href={"#details" + v_andruavUnit.partyID} title='Details'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li3'} className="nav-item">
+                        <a className="nav-link  user-select-none bi bi-pci-card" data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
                         </li>);
         }
 
@@ -270,22 +270,22 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (this.state.tab_module === true) 
             && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li4'} className="nav-item">
-            <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.partyID}>P2P</a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li4'} className="nav-item">
+            <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.getPartyID()}>P2P</a>
             </li>);
         }
        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_sdr === true)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li5'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-activity" data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.partyID}  title='SDR'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li5'} className="nav-item">
+                <a className="nav-link user-select-none bi bi-activity" data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.getPartyID()}  title='SDR'></a>
             </li>);
         }
            
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO!=null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) &&(v_andruavUnit.m_modules.has_gpio === true)) 
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-arrow-down-up " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.partyID} title='GPIO'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
+                <a className="nav-link user-select-none bi bi-arrow-down-up " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.getPartyID()} title='GPIO'></a>
             </li>);
         }
                
@@ -295,8 +295,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (v_andruavUnit.m_modules.has_sound === true))
             || (v_andruavUnit.m_isDE === false))// de already has audio
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'li6'} className="nav-item">
-            <a className="nav-link user-select-none bi bi-megaphone-fill" data-bs-toggle="tab" href={"#audio" + v_andruavUnit.partyID} title='Audio'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
+            <a className="nav-link user-select-none bi bi-megaphone-fill" data-bs-toggle="tab" href={"#audio" + v_andruavUnit.getPartyID()} title='Audio'></a>
             </li>);
         }
            
@@ -304,8 +304,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false)
             && (this.state.tab_module === true))
         {
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'lie'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-bug" data-bs-toggle="tab" href={"#exp" + v_andruavUnit.partyID}  title='DEBUG'></a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'lie'} className="nav-item">
+                <a className="nav-link user-select-none bi bi-bug" data-bs-toggle="tab" href={"#exp" + v_andruavUnit.getPartyID()}  title='DEBUG'></a>
                 </li>);
         }
            
@@ -319,8 +319,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             {
                 css += 'active ';
             }
-            container_tabs.push(<li key={v_andruavUnit.partyID + 'liempty'} className="nav-item">  
-                        <a className={css} data-bs-toggle="tab" href={"#empty" + v_andruavUnit.partyID}>Collapse</a>
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'liempty'} className="nav-item">  
+                        <a className={css} data-bs-toggle="tab" href={"#empty" + v_andruavUnit.getPartyID()}>Collapse</a>
                         </li>);
         }
         
@@ -333,56 +333,56 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 css += 'active show ';
             }
                 
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabContent_1'} className={css} id={"main" + v_andruavUnit.partyID}>
+            container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabContent_1'} className={css} id={"main" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlDroneIMU p_unit={v_andruavUnit} />
                             {this.renderControl(v_andruavUnit)}
                     </div>);
         }
         if (this.state.tab_log === true)
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.partyID}>
+                container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssMESSAGE_LOG'} className="tab-pane fade pt-2" id={"log" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlUnitLog  p_unit={v_andruavUnit} />
                     </div>);
         }
         
         if (this.state.tab_details === true)
         {
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlSETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.partyID}>
+            container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlSETTINGS'} className="tab-pane fade  pt-2" id={"details" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlUnitDetails p_unit={v_andruavUnit}/>
                     </div>);
         }
        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_p2p === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlP2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.partyID}>
+                container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlP2P'} className="tab-pane fade pt-2" id={"p2p" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlP2P p_unit={v_andruavUnit}/>
                     </div>);
         }
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlSDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.partyID}>
+                container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlSDR'} className="tab-pane fade pt-2" id={"sdr" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlSDR p_unit={v_andruavUnit}/>
                      </div>);
         }
     
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_gpio === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlGPIO'} className="tab-pane fade pt-2" id={"gpio" + v_andruavUnit.partyID}>
+                container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlGPIO'} className="tab-pane fade pt-2" id={"gpio" + v_andruavUnit.getPartyID()}>
                             <ClssCtrlGPIO p_unit={v_andruavUnit}/>
                 </div>);
         }
         
         if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE===false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) 
         {
-            container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.partyID}>
+            container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAUDIO p_unit={v_andruavUnit}/>
             </div>);
         }
         
         if ((js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false) && (this.state.tab_module === true) && (v_andruavUnit.m_isDE === true)) 
         {
-                container_controls.push(<div key={v_andruavUnit.partyID + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"exp" + v_andruavUnit.partyID}>
+                container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"exp" + v_andruavUnit.getPartyID()}>
                     <ClssCtrlExperimental p_unit={v_andruavUnit}/>
                 </div>);
         }
@@ -396,7 +396,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 css += 'active show ';
             }
                 
-            container_controls.push(<div className={css} key={v_andruavUnit.partyID + 'myTabClssCtrlempty'} id={"empty" + v_andruavUnit.partyID}>
+            container_controls.push(<div className={css} key={v_andruavUnit.getPartyID() + 'myTabClssCtrlempty'} id={"empty" + v_andruavUnit.getPartyID()}>
                     </div>);
         }
 
@@ -468,10 +468,10 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             switch (p_andruavUnit.m_autoPilot)
             {
                 case mavlink20.MAV_AUTOPILOT_PX4:
-                    ctrl_flight_controller.push(<ClssCtrlPx4FlightControl  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
+                    ctrl_flight_controller.push(<ClssCtrlPx4FlightControl  key={p_andruavUnit.getPartyID() + "_ctrl_fc"} id={p_andruavUnit.getPartyID() + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
                 break;
                 default:
-                    ctrl_flight_controller.push(<ClssCtrlArdupilotFlightController  key={p_andruavUnit.partyID + "_ctrl_fc"} id={p_andruavUnit.partyID + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
+                    ctrl_flight_controller.push(<ClssCtrlArdupilotFlightController  key={p_andruavUnit.getPartyID() + "_ctrl_fc"} id={p_andruavUnit.getPartyID() + "_ctrl_fc"} v_andruavUnit={p_andruavUnit}/>);
                 break;
             }
         }
@@ -483,7 +483,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
 
 
-        ctrl2_1.push (<div key={p_andruavUnit.partyID + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+        ctrl2_1.push (<div key={p_andruavUnit.getPartyID() + "rc3"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_refreshwp' key={this.key + 'btn_refreshwp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class}   onClick={ (e) => fn_requestWayPoints(p_andruavUnit,true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
                     <button id='btn_writewp'  key={this.key + 'btn_writewp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class}   onClick={ (e) => fn_putWayPoints(p_andruavUnit,true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
                     <button id='btn_clearwp'   key={this.key + 'btn_clearwp'}  type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class}   onClick={ (e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>
@@ -494,7 +494,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                     <button id='btn_lidar_info' key={this.key + 'btn_lidar_info'}  type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class } onClick={ (e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
                     </div></div>);
 
-        ctrl2_2.push (<div key={p_andruavUnit.partyID + "rc3_1"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+        ctrl2_2.push (<div key={p_andruavUnit.getPartyID() + "rc3_1"}  id='rc33' className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_tracking' key={this.key + 'btn_tracking'} type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class } ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker'/></button>
                     <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class } p_unit={p_andruavUnit} title='object AI tracker'/>
                     </div></div>);
@@ -545,7 +545,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
    
         if (v_andruavUnit === null || v_andruavUnit === undefined) return ;
 
-        const id = v_andruavUnit.partyID + "__u_c_d";
+        const id = v_andruavUnit.getPartyID() + "__u_c_d";
         
         const tabs = this.createTabs();
 

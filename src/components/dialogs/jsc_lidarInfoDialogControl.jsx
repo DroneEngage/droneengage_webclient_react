@@ -106,7 +106,7 @@ export default class ClssLidarInfoDialog extends React.Component
 
     fn_gotoUnit()
     {
-        fn_gotoUnit_byPartyID(this.p_andruavUnit.partyID)
+        fn_gotoUnit_byPartyID(this.p_andruavUnit.getPartyID())
     }
 
     

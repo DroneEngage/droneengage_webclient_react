@@ -170,7 +170,7 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     fn_videoRedraw(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.andruavUnit.partyID) {
+        if (p_me.props.obj.v_unit !== p_obj.andruavUnit.getPartyID()) {
             return;
         }
         if (p_me.props.obj.v_track !== p_obj.v_track) {
@@ -189,7 +189,7 @@ export default class ClssCVideoScreen extends React.Component {
             return;
         }
 
-        if (p_me.props.obj.v_unit !== p_unit.partyID) {
+        if (p_me.props.obj.v_unit !== p_unit.getPartyID()) {
             return;
         }
 
@@ -198,7 +198,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fn_flashChanged(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.p_unit.partyID) {
+        if (p_me.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
             return;
         }
 
@@ -213,7 +213,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fn_zoomChanged(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.p_unit.partyID) {
+        if (p_me.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
             return;
         }
 
@@ -497,7 +497,7 @@ export default class ClssCVideoScreen extends React.Component {
     render() {
         const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        const divID = "cam_" + andruavUnit.partyID + this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
+        const divID = "cam_" + andruavUnit.getPartyID() + this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
         if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"tab-pane fade in " + this.props.first}>

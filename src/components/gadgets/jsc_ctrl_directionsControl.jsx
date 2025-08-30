@@ -85,7 +85,7 @@ export class ClssCtrlDirections extends React.Component {
     fn_update(p_me, p_andruavUnit) {
         try {
             // Check if the update is for the correct unit
-            if (p_me.props.p_unit && p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return;
+            if (p_me.props.p_unit && p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
 
             // Update instance variables with new bearing data
             p_me.c_target_bearing = p_andruavUnit.m_Nav_Info._Target.target_bearing;

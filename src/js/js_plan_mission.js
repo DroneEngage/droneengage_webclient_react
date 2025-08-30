@@ -311,7 +311,7 @@ export class ClssAndruavMissionPlan {
   }
 
   fn_exportToJSONAndruav(p_missionV110, p_andruavUnit) {
-    const c_party = p_andruavUnit != null ? p_andruavUnit.partyID : null;
+    const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
     if (this.m_all_mission_items_shaps.length === 0) return;
 
@@ -449,7 +449,7 @@ export class ClssAndruavMissionPlan {
     };
 
     if (andruavUnit != null) {
-      output_plan["unit"]["partyID"] = andruavUnit.partyID;
+      output_plan["unit"]["partyID"] = andruavUnit.getPartyID();
       output_plan["unit"]["unitName"] = andruavUnit.m_unitName;
       output_plan["unit"]["vehichleType"] = andruavUnit.m_VehicleType;
       const home_point = andruavUnit.m_Geo_Tags.p_HomePoint;

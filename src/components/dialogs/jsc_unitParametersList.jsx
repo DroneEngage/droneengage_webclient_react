@@ -188,7 +188,7 @@ export default class ClssUnitParametersList extends React.Component {
     fn_updateParameters(p_me, p_andruavUnit)
     {
         if (p_me.state.p_unit === null || p_me.state.p_unit === undefined) return ;
-        if (p_andruavUnit.partyID !== p_me.state.p_unit.partyID) return ;
+        if (p_andruavUnit.getPartyID() !== p_me.state.p_unit.getPartyID()) return ;
         
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});

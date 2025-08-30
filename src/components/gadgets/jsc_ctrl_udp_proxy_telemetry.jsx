@@ -40,7 +40,7 @@ export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
     {
         try
         {
-            if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+            if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
 
             if (p_me.m_flag_mounted === false)return ;
             p_me.setState({'m_update': p_me.state.m_update +1});
@@ -110,7 +110,7 @@ export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
                     {
                         v_telemetry_lvl_class = ' text-warning';
                         v_udp_on_off.push(
-                            <span key={v_andruavUnit.partyID + 'pause'} title="Pause Telemetry" onClick={ (e) => this.fn_pauseTelemetry(v_andruavUnit)}>
+                            <span key={v_andruavUnit.getPartyID() + 'pause'} title="Pause Telemetry" onClick={ (e) => this.fn_pauseTelemetry(v_andruavUnit)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-power " viewBox="0 0 16 16">
                                         <path d="M7.5 1v7h1V1h-1z"/>
                                         <path d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/>
@@ -122,7 +122,7 @@ export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
                     {
                         v_telemetry_lvl_class = ' text-light';
                         v_udp_on_off.push(
-                            <span key={v_andruavUnit.partyID + 'active'} title="Activate Telemetry" onClick={ (e) => this.fn_startTelemetry(v_andruavUnit)}>
+                            <span key={v_andruavUnit.getPartyID() + 'active'} title="Activate Telemetry" onClick={ (e) => this.fn_startTelemetry(v_andruavUnit)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-power text-light" viewBox="0 0 16 16">
                                         <path d="M7.5 1v7h1V1h-1z"/>
                                         <path d="M3 8.812a4.999 4.999 0 0 1 2.578-4.375l-.485-.874A6 6 0 1 0 11 3.616l-.501.865A5 5 0 1 1 3 8.812z"/>
@@ -132,7 +132,7 @@ export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
                     }
 
                     v_udp_data.push(
-                        <div key={v_andruavUnit.partyID + 'txt'} className= {' col-12   padding_zero css_user_select_text ' + v_telemetry_lvl_class}>
+                        <div key={v_andruavUnit.getPartyID() + 'txt'} className= {' col-12   padding_zero css_user_select_text ' + v_telemetry_lvl_class}>
                             <p id='udpproxy_t' className={ ' si-07x css_margin_zero user-select-none'}>Smart Telemetry</p>
                             <p id='udpproxy_a' className={ ' si-07x css_margin_zero css_user_select_text'}>{v_udpproxy_text_ip}</p>
                             <p id='udpproxy_p' className={ ' si-07x css_margin_zero css_user_select_text'}>{v_udpproxy_text_port}</p>
@@ -142,7 +142,7 @@ export  class ClssCtrlUDPPoxyTelemetry   extends React.Component {
                 {
                     v_telemetry_lvl_class = ' text-light';
                     v_udp_data.push(
-                        <div key={v_andruavUnit.partyID + 'refresh'} className= 'col-12   padding_zero css_user_select_text'>
+                        <div key={v_andruavUnit.getPartyID() + 'refresh'} className= 'col-12   padding_zero css_user_select_text'>
                             <div className= 'css_margin_zero user-select-none '>
                                 <p id='udp_get' className={' bg-warning cursor_hand rounded-3 textunit_w135 text-center  user-select-none text-white '} title ='Click to get UDP Info' onClick={ (e) => this.fn_requestUdpProxyStatus(v_andruavUnit)} > UDP Refresh</p>
                             </div>

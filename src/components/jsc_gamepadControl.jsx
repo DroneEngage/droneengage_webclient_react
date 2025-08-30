@@ -70,10 +70,10 @@ class ClssGamePadAxesControl extends React.Component {
         const c_unified_virtual_axis = c_padStatus.p_unified_virtual_axis;
         return (
             <div className='gp_axes'>
-                <ClssSingleAxisProgressControl id='axes0' label={"axis1"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/>
+                {/* <ClssSingleAxisProgressControl id='axes0' label={"axis1"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/> */}
                 <ClssGamePadAxisControl id='axes1' x={c_unified_virtual_axis[v_axis[0]]} y={c_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
                 <ClssGamePadAxisControl id='axes2' x={c_unified_virtual_axis[v_axis[2]]} y={c_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
-                <ClssSingleAxisProgressControl id='axes3' label={"axis2"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#00bc8cff"} min={-1.0} max={1.0}/>
+                {/* <ClssSingleAxisProgressControl id='axes3' label={"axis2"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#00bc8cff"} min={-1.0} max={1.0}/> */}
                 
             </div>
                 
@@ -248,7 +248,7 @@ export default class ClssGamePadControl extends React.Component {
         p_me.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
         $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
-            fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.partyID));
+            fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.getPartyID()));
         });
         $('#modal_ctrl_gamepad').show();
 
@@ -310,7 +310,7 @@ export default class ClssGamePadControl extends React.Component {
     fn_gotoUnitPressed()
     {
         if (this.m_flag_mounted === false)return ;
-        fn_gotoUnit_byPartyID(this.state.m_andruavUnit.partyID);
+        fn_gotoUnit_byPartyID(this.state.m_andruavUnit.getPartyID());
     
     }
     

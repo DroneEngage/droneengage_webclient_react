@@ -227,7 +227,7 @@ export class ClssCtrlSDR extends React.Component {
         { 
             const driver = c_list[c_keys[i]];
             driver_names.push(
-                <option key={"op" + v_andruavUnit.partyID + driver.index + driver.driver} value={driver.index}>{driver.driver}</option>
+                <option key={"op" + v_andruavUnit.getPartyID() + driver.index + driver.driver} value={driver.index}>{driver.driver}</option>
             );
         }
 
@@ -243,21 +243,21 @@ export class ClssCtrlSDR extends React.Component {
 
         let cmd_btns = [];
         let driver_names = this.getDriverNames(v_andruavUnit);
-        cmd_btns.push(<div key={v_andruavUnit.partyID + 'sdr2_'}  className='row css_margin_zero padding_zero  border-secondary'>
+        cmd_btns.push(<div key={v_andruavUnit.getPartyID() + 'sdr2_'}  className='row css_margin_zero padding_zero  border-secondary'>
                 
-            <div key={v_andruavUnit.partyID + 'sdr2_1'} className="col-12 mt-1">
-            <div key={v_andruavUnit.partyID + 'sdr2_2'} className = 'row al_l css_margin_zero d-flex '>
-                <div key={v_andruavUnit.partyID + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_211'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
+            <div key={v_andruavUnit.getPartyID() + 'sdr2_1'} className="col-12 mt-1">
+            <div key={v_andruavUnit.getPartyID() + 'sdr2_2'} className = 'row al_l css_margin_zero d-flex '>
+                <div key={v_andruavUnit.getPartyID() + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_211'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
                 </div>
-                <div key={v_andruavUnit.partyID + 'sdr2_221'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_221'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
+                <div key={v_andruavUnit.getPartyID() + 'sdr2_221'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_221'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
                 </div>
-                <div key={v_andruavUnit.partyID + 'sdr2_23'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_231'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.s}  title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit, true)}>Scan Freq</p>
+                <div key={v_andruavUnit.getPartyID() + 'sdr2_23'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_231'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.s}  title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit, true)}>Scan Freq</p>
                 </div>
-                <div key={v_andruavUnit.partyID + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'sdr2_241'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.p}  title ='Pause Scaning' onClick={() => this.fn_scanSDR(v_andruavUnit, false)}>Stop Scan</p>
+                <div key={v_andruavUnit.getPartyID() + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_241'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.p}  title ='Pause Scaning' onClick={() => this.fn_scanSDR(v_andruavUnit, false)}>Stop Scan</p>
                 </div>
             </div>
             </div>
@@ -266,58 +266,58 @@ export class ClssCtrlSDR extends React.Component {
 
 
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_sdr"} className={this.props.className}>
-                <div key={v_andruavUnit.partyID + 'sdr_1'} className='row css_margin_zero padding_zero '>
-                    <div key={v_andruavUnit.partyID + 'sdr_11'} className="col-6 col-md-6 ">
-                        <div key={v_andruavUnit.partyID + 'sdr_111'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dr_name'} className="col-5"><small><b>SDR Driver</b></small></label>
-                            <select multiple="" className="col-5" id={v_andruavUnit.partyID + 'sdr_dr_name'} defaultValue={this.getDriverNameByIndex(v_andruavUnit, this.state.m_driver_index)} onChange={(e) => this.fn_onDriver(e)}>
+            <div key={v_andruavUnit.getPartyID() + "_ctl_sdr"} className={this.props.className}>
+                <div key={v_andruavUnit.getPartyID() + 'sdr_1'} className='row css_margin_zero padding_zero '>
+                    <div key={v_andruavUnit.getPartyID() + 'sdr_11'} className="col-6 col-md-6 ">
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_111'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.getPartyID() + 'sdr_dr_name'} className="col-5"><small><b>SDR Driver</b></small></label>
+                            <select multiple="" className="col-5" id={v_andruavUnit.getPartyID() + 'sdr_dr_name'} defaultValue={this.getDriverNameByIndex(v_andruavUnit, this.state.m_driver_index)} onChange={(e) => this.fn_onDriver(e)}>
                                 {driver_names}
                             </select>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_112'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_112'} className='row css_margin_zero padding_zero '>
                             <label className="col-5"><small><b>Freq Center</b></small></label>
                             <input type="text" className="col-5" placeholder="Center Frequency" aria-label="Center Frequency"  value={this.state.m_center_frequency} onChange={(e)=> this.fn_onFreqCenter(e)}/>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_212'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_212'} className='row css_margin_zero padding_zero '>
                             
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_114'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5"><small><b>Gain</b></small></label>
-                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_gain'} className="col-5" placeholder="Gain" aria-label="Gain"  value={this.state.m_gain} onChange={(e)=> this.fn_onGain(e)}/>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_114'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.getPartyID() + 'sdr_dm_gain'} className="col-5"><small><b>Gain</b></small></label>
+                            <input type="text" id={v_andruavUnit.getPartyID() + 'sdr_dm_gain'} className="col-5" placeholder="Gain" aria-label="Gain"  value={this.state.m_gain} onChange={(e)=> this.fn_onGain(e)}/>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_115'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_interval'} className="col-5"><small><b>Interval (ms)</b></small></label>
-                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_interval'} className="col-5" placeholder="Interval" aria-label="Interval"  value={this.state.m_interval} onChange={(e)=> this.fn_onInterval(e)}/>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_115'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.getPartyID() + 'sdr_dm_interval'} className="col-5"><small><b>Interval (ms)</b></small></label>
+                            <input type="text" id={v_andruavUnit.getPartyID() + 'sdr_dm_interval'} className="col-5" placeholder="Interval" aria-label="Interval"  value={this.state.m_interval} onChange={(e)=> this.fn_onInterval(e)}/>
                         </div>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'sdr_21'} className="col-6 col-md-6 ">
+                    <div key={v_andruavUnit.getPartyID() + 'sdr_21'} className="col-6 col-md-6 ">
                         
-                        <div key={v_andruavUnit.partyID + 'sdr_213'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_213'} className='row css_margin_zero padding_zero '>
                             <label className="col-5"><small><b>Sample Rate</b></small></label>
                             <input type="text" className="col-5" placeholder="Sample Rate" aria-label="Sample Rate"  value={this.state.m_sample_rate} onChange={(e)=> this.fn_onSampleRate(e)}/>
                         
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_215'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5"><small><b>Bars</b></small></label>
-                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_bar'} className="col-5" placeholder="Bars" aria-label="Bars"  value={this.state.m_display_bars} onChange={(e)=> this.fn_onDisplayBars(e)}/>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_215'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.getPartyID() + 'sdr_dm_bar'} className="col-5"><small><b>Bars</b></small></label>
+                            <input type="text" id={v_andruavUnit.getPartyID() + 'sdr_dm_bar'} className="col-5" placeholder="Bars" aria-label="Bars"  value={this.state.m_display_bars} onChange={(e)=> this.fn_onDisplayBars(e)}/>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'sdr_216'} className='row css_margin_zero padding_zero '>
-                            <label htmlFor={v_andruavUnit.partyID + 'sdr_dm_trigger_level'} className="col-5"><small><b>Trigger</b></small></label>
-                            <input type="text" id={v_andruavUnit.partyID + 'sdr_dm_trigger_level'} className="col-5" placeholder="Trigger" aria-label="Trigger"  value={this.state.m_trigger_level} onChange={(e)=> this.fn_onTriggerLevel(e)}/>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_216'} className='row css_margin_zero padding_zero '>
+                            <label htmlFor={v_andruavUnit.getPartyID() + 'sdr_dm_trigger_level'} className="col-5"><small><b>Trigger</b></small></label>
+                            <input type="text" id={v_andruavUnit.getPartyID() + 'sdr_dm_trigger_level'} className="col-5" placeholder="Trigger" aria-label="Trigger"  value={this.state.m_trigger_level} onChange={(e)=> this.fn_onTriggerLevel(e)}/>
                         </div>
                     </div>
                 </div>
-                <div key={v_andruavUnit.partyID + 'sdr_3'} className='row css_margin_zero padding_zero '>
-                        <div key={v_andruavUnit.partyID + 'sdr_31'} className="col-12">
-                            <p key={v_andruavUnit.partyID + 'sdr_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                <div key={v_andruavUnit.getPartyID() + 'sdr_3'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'sdr_31'} className="col-12">
+                            <p key={v_andruavUnit.getPartyID() + 'sdr_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                         </div>
                 </div>
                     {cmd_btns}
-                <div key={v_andruavUnit.partyID + 'sdr_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                <div key={v_andruavUnit.getPartyID() + 'sdr_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                     <ClassSDRSpectrumVisualizer p_unit={this.props.p_unit}/>
                 </div> 
-                <div key={v_andruavUnit.partyID + 'sdr_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                <div key={v_andruavUnit.getPartyID() + 'sdr_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
                     
                     
                 </div>

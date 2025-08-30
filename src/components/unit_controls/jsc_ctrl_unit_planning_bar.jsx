@@ -141,7 +141,7 @@ export class ClssCtrlUnitPlanningBar extends React.Component {
         let online_text ;
         let v_battery_display_fcb  	= this.hlp_getFCBBatteryCSSClass(v_andruavUnit); 
         let v_battery_display 		= this.hlp_getBatteryCSSClass(v_andruavUnit);
-        const id = v_andruavUnit.partyID + "_c_u_p_b";
+        const id = v_andruavUnit.getPartyID() + "_c_u_p_b";
         
         const module_version = v_andruavUnit.module_version();
                 

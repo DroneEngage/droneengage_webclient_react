@@ -282,55 +282,55 @@ export class ClssCtrlPx4FlightControl extends React.Component {
     }
 
     fn_doHold(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD);
     }
 
     fn_doManual(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_MANUAL);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_MANUAL);
     }
 
     fn_doStabilize(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_STABILIZE);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_STABILIZE);
     }
 
     fn_doAcro(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_ACRO);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_ACRO);
     }
 
     fn_doAltCtl(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_ALT_HOLD);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_ALT_HOLD);
     }
 
     fn_doRAttitude(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_RATTITUDE);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_RATTITUDE);
     }
 
     fn_doTakeoff(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_TAKEOFF);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_AUTO_TAKEOFF);
     }
 
     fn_doLand(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_LAND);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_AUTO_LAND);
     }
 
     fn_doMission(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_MISSION);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_AUTO_MISSION);
     }
 
     fn_doRTL(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_RTL);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_AUTO_RTL);
     }
 
     fn_doPosCtl(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_POSCTL);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_POSCTL);
     }
 
     fn_doPosOrbit(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_ORBIT);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_POSCTL_ORBIT);
     }
 
     fn_doVtolTakeOff(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.partyID, js_andruavUnit.CONST_FLIGHT_PX4_VTOL_TAKEOFF);
+        js_globals.v_andruavFacade.API_do_FlightMode(this.props.v_andruavUnit.getPartyID(), js_andruavUnit.CONST_FLIGHT_PX4_VTOL_TAKEOFF);
     }
 
     componentDidMount() {
@@ -368,7 +368,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     <button id='btn_auto_vtol_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_vtol_takeoff_class}  title='VTOL-Takeoff' onClick={ () => this.fn_doVtolTakeOff(this.props.v_andruavUnit)}>&nbsp;V-TkOff&nbsp;</button>
                     <button id='btn_pos_ctl' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_ctl_class}  title='Position Control' onClick={ () => this.fn_doPosCtl(this.props.v_andruavUnit)}>&nbsp;Pos-Ctl&nbsp;</button>
                     <button id='btn_pos_orbit' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_orbit_class}  title='APosition Orbit' onClick={ () => this.fn_doPosOrbit(this.props.v_andruavUnit)}>&nbsp;Orbit&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => gui_doYAW(this.props.v_andruavUnit.partyID)}>&nbsp;YAW&nbsp;</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => gui_doYAW(this.props.v_andruavUnit.getPartyID())}>&nbsp;YAW&nbsp;</button>
                     </div></div>);
                 break;
         }

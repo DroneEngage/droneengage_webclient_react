@@ -642,7 +642,7 @@ function fn_handleKeyBoard() {
 					switch (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].p)
 					{
 						case js_andruavMessages.CONST_EXTERNAL_CAMERA_TYPE_RTCWEBCAM:
-							fn_WEBRTC_login(v_andruavVideo.m_unit.partyID,v_trackId);
+							fn_WEBRTC_login(v_andruavVideo.m_unit.getPartyID(),v_trackId);
 						break;
 
 						case js_andruavMessages.CONST_EXTERNAL_CAMERA_TYPE_FFMPEGWEBCAM:
@@ -670,7 +670,7 @@ function fn_handleKeyBoard() {
 			{
 				if (v_andruavVideo.m_unit.m_Video.m_videoTracks[i].id === v_trackId)
 				{
-					js_globals.v_andruavFacade.API_CONST_RemoteCommand_recordVideo (v_andruavVideo.m_unit.partyID, v_trackId, p_Start);
+					js_globals.v_andruavFacade.API_CONST_RemoteCommand_recordVideo (v_andruavVideo.m_unit.getPartyID(), v_trackId, p_Start);
 				}
 			}
 		}
@@ -1423,8 +1423,8 @@ function fn_handleKeyBoard() {
 			for (let i = 0; i < size; ++i) {
 				let fence = js_globals.v_andruavClient.m_andruavGeoFences[keys[i]];
 
-				if ((fence.Units !== null && fence.Units !== undefined) && (fence.Units.hasOwnProperty(p_andruavUnit.partyID))) {
-					let geoFenceHitInfo = fence.Units[p_andruavUnit.partyID].geoFenceHitInfo;
+				if ((fence.Units !== null && fence.Units !== undefined) && (fence.Units.hasOwnProperty(p_andruavUnit.getPartyID()))) {
+					let geoFenceHitInfo = fence.Units[p_andruavUnit.getPartyID()].geoFenceHitInfo;
 					if (geoFenceHitInfo !== null && geoFenceHitInfo !== undefined) {
 
 						if (geoFenceHitInfo.hasValue === true) {
@@ -2350,9 +2350,9 @@ function fn_handleKeyBoard() {
 				
 				if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined)
 				{
-					if (js_globals.v_vehicle_gui[p_andruavUnit.partyID]!== null && js_globals.v_vehicle_gui[p_andruavUnit.partyID] !== undefined)
+					if (js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()]!== null && js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== undefined)
 					{
-						p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.partyID];
+						p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()];
 					}
 				}
 				
@@ -2382,7 +2382,7 @@ function fn_handleKeyBoard() {
 					const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 					// Add new Vehicle
 					p_andruavUnit.m_gui.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(),null, false,false, v_htmlTitle,[64,64]) ;
-					js_globals.v_vehicle_gui[p_andruavUnit.partyID]  = p_andruavUnit.m_gui;
+					js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()]  = p_andruavUnit.m_gui;
 					
 					js_leafletmap.fn_addListenerOnClickMarker (p_andruavUnit.m_gui.m_marker,
 						function (p_lat, p_lng) {
@@ -2975,7 +2975,7 @@ function fn_handleKeyBoard() {
 			}
 		
 			if (p_andruavUnit) {
-				oldgeoFenceInfo.Units[p_andruavUnit.partyID] = {
+				oldgeoFenceInfo.Units[p_andruavUnit.getPartyID()] = {
 					geoFenceHitInfo: {
 						hasValue: false,
 						fenceName: geoFenceInfo.m_geoFenceName,
@@ -2996,8 +2996,8 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavFacade.API_requestGeoFences(p_andruavUnit, geoFenceHitInfo.fenceName);
 				return;
 			}
-			if (fence.Units[p_andruavUnit.partyID] === undefined) fence.Units[p_andruavUnit.partyID] = {};
-			fence.Units[p_andruavUnit.partyID].geoFenceHitInfo = geoFenceHitInfo;
+			if (fence.Units[p_andruavUnit.getPartyID()] === undefined) fence.Units[p_andruavUnit.getPartyID()] = {};
+			fence.Units[p_andruavUnit.getPartyID()].geoFenceHitInfo = geoFenceHitInfo;
 			if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) return;   // will be updated later when GPS message is recieved from that drone.
 			var typeMsg = "info"; var msg = "OK";
 			if (geoFenceHitInfo.m_inZone && geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be Out fence " + geoFenceHitInfo.fenceName; }

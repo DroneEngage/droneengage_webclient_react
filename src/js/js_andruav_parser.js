@@ -76,7 +76,7 @@ class CAndruavClientParser {
                     js_andruav_facade.AndruavClientFacade.API_do_GetHomeLocation(unit);
                 }
                 if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
-                    js_andruav_facade.AndruavClientFacade.API_requestID(unit.partyID);
+                    js_andruav_facade.AndruavClientFacade.API_requestID(unit.getPartyID());
                 }
             }
 
@@ -257,9 +257,9 @@ class CAndruavClientParser {
             p_unit = new js_andruavUnit.CAndruavUnitObject();
             p_unit.m_IsMe = false;
             p_unit.m_defined = false;
-            p_unit.partyID = msg.senderName;
+            p_unit.setPartyID(msg.senderName);
             p_unit.m_index = js_globals.m_andruavUnitList.count;
-            js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
+            js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
             if (msg.messageType !== js_andruavMessages.CONST_TYPE_AndruavMessage_ID) {
                 if (p_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
                     js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
@@ -747,7 +747,7 @@ class CAndruavClientParser {
                         Me.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
                         return;
                     } else {
-                        if (fence.Units[p_unit.partyID] === null || fence.Units[p_unit.partyID] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
+                        if (fence.Units[p_unit.getPartyID()] === null || fence.Units[p_unit.getPartyID()] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
                             let geoFenceInfo = {};
                             geoFenceInfo.hasValue = false;
                             geoFenceInfo.fenceName = fence.m_geoFenceName;
@@ -755,8 +755,8 @@ class CAndruavClientParser {
                             geoFenceInfo.distance = Number.NaN;
                             geoFenceInfo.m_shouldKeepOutside = fence.m_shouldKeepOutside;
 
-                            fence.Units[p_unit.partyID] = {};
-                            fence.Units[p_unit.partyID].geoFenceInfo = geoFenceInfo;
+                            fence.Units[p_unit.getPartyID()] = {};
+                            fence.Units[p_unit.getPartyID()].geoFenceInfo = geoFenceInfo;
                         }
                         // else every thig already is there
                     }
@@ -767,8 +767,8 @@ class CAndruavClientParser {
 						* 			
 						* */
                     if ((fence !== null && fence !== undefined)) {
-                        if (fence.Units[p_unit.partyID] !== null && fence.Units[p_unit.partyID] !== undefined) {
-                            delete fence.Units[p_unit.partyID];
+                        if (fence.Units[p_unit.getPartyID()] !== null && fence.Units[p_unit.getPartyID()] !== undefined) {
+                            delete fence.Units[p_unit.getPartyID()];
                         }
                     }
                 }
@@ -931,15 +931,15 @@ class CAndruavClientParser {
                 let wayPoint = [];
 
                 if (v_isChunck !== WAYPOINT_NO_CHUNK) {
-                    if (js_globals.v_waypointsCache.hasOwnProperty(p_unit.partyID) === false) {
+                    if (js_globals.v_waypointsCache.hasOwnProperty(p_unit.getPartyID()) === false) {
                         // ! due to disconnection or repeated request this array could be filled of an incomplete previous request.
                         // ! this value will be reset each time load wp is called.
-                        js_globals.v_waypointsCache[p_unit.partyID] = [];
+                        js_globals.v_waypointsCache[p_unit.getPartyID()] = [];
                     }
 
-                    wayPoint = js_globals.v_waypointsCache[p_unit.partyID];
+                    wayPoint = js_globals.v_waypointsCache[p_unit.getPartyID()];
                 } else { // if this is a full message of the same unit then delete any possible old partial messages -cleaning up-.
-                    delete js_globals.v_waypointsCache[p_unit.partyID];
+                    delete js_globals.v_waypointsCache[p_unit.getPartyID()];
                 }
 
                 for (let i = 0; i < numberOfRecords; ++i) {
@@ -1031,7 +1031,7 @@ class CAndruavClientParser {
                     js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit: p_unit, wps: wayPoint });
                 } else if (v_isChunck === WAYPOINT_LAST_CHUNK) { // end of chunks
                     js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit: p_unit, wps: wayPoint });
-                    delete js_globals.v_waypointsCache[p_unit.partyID];
+                    delete js_globals.v_waypointsCache[p_unit.getPartyID()];
                 }
             }
                 break;
@@ -1099,8 +1099,8 @@ class CAndruavClientParser {
 
         if (isNewUnit) {
             p_unit.m_defined = true;
-            p_unit.partyID = p_jmsg.senderName;
-            js_globals.m_andruavUnitList.Add(p_unit.partyID, p_unit);
+            p_unit.setPartyID(p_jmsg.senderName);
+            js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
             this.#prv_onNewUnitAdded(p_unit);
             js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
         } else {
@@ -1199,7 +1199,7 @@ class CAndruavClientParser {
         }
 
         if (!isNewUnit) {
-            js_globals.m_andruavUnitList.putUnit(p_unit.partyID, p_unit);
+            js_globals.m_andruavUnitList.putUnit(p_unit.getPartyID(), p_unit);
             js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
         }
 
@@ -1210,7 +1210,7 @@ class CAndruavClientParser {
 
         if (p_unit.m_modules.has_sdr && !p_unit.m_SDR.m_initialized) {
             if (p_unit.m_delayedTimeout) clearTimeout(p_unit.m_delayedTimeout);
-            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestSDR(p_unit.partyID), 1000);
+            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestSDR(p_unit.getPartyID()), 1000);
         }
 
         const eventMap = {

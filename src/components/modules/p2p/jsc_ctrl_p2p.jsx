@@ -61,7 +61,7 @@ export class ClssCtrlP2P extends React.Component {
     
     fn_unitUpdated (p_me,p_andruavUnit)
     {
-        if (p_me.props.p_unit.partyID !== p_andruavUnit.partyID) return ;
+        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
@@ -166,21 +166,21 @@ export class ClssCtrlP2P extends React.Component {
         if (js_siteConfig.CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true)
         if (js_andruavAuth.fn_do_canControl())
         {
-            cmd_btns.push(<div key={v_andruavUnit.partyID + 'p2p_2'}  className='row css_margin_zero padding_zero  border-secondary'>
+            cmd_btns.push(<div key={v_andruavUnit.getPartyID() + 'p2p_2'}  className='row css_margin_zero padding_zero  border-secondary'>
                 
-                <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-12 mt-1">
-                <div key={v_andruavUnit.partyID + 'p2p_22'} className = 'row al_l css_margin_zero d-flex '>
-                    <div key={v_andruavUnit.partyID + 'p2p_221'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'p2p_2211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
+                <div key={v_andruavUnit.getPartyID() + 'p2p_21'} className="col-12 mt-1">
+                <div key={v_andruavUnit.getPartyID() + 'p2p_22'} className = 'row al_l css_margin_zero d-flex '>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_221'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'p2p_222'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'p2p_2212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_222'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'p2p_223'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'p2p_2213'} className={css_txt_channel_p2p_offline + ' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_P2P(v_andruavUnit, false, v_andruavUnit.m_P2P.m_p2p_disabled)}>{txt_channel_p2p_offline}</p>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_223'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2213'} className={css_txt_channel_p2p_offline + ' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_P2P(v_andruavUnit, false, v_andruavUnit.m_P2P.m_p2p_disabled)}>{txt_channel_p2p_offline}</p>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'p2p_224'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.partyID + 'p2p_2214'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_224'} className= 'col-4 col-sm-3 user-select-none '>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2214'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
                     </div>
                 </div>
                 </div>
@@ -190,45 +190,45 @@ export class ClssCtrlP2P extends React.Component {
         const v_date = (new Date(v_andruavUnit.m_Messages.m_lastActiveTime));
         
         return (
-            <div key={v_andruavUnit.partyID + "_ctl_p2p"} className={this.props.className}>
-                <div key={v_andruavUnit.partyID + 'p2p_1'} className='row css_margin_zero padding_zero '>
-                    <div key={v_andruavUnit.partyID + 'p2p_11'} className="col-6 ">
-                        <div key={v_andruavUnit.partyID + 'p2p_111'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>P2P Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p>
+            <div key={v_andruavUnit.getPartyID() + "_ctl_p2p"} className={this.props.className}>
+                <div key={v_andruavUnit.getPartyID() + 'p2p_1'} className='row css_margin_zero padding_zero '>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_11'} className="col-6 ">
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_111'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_1111'} className="textunit_nowidth user-select-all m-0"><span><small><b>P2P Type <span className={css_connection_type} ><b>{txt_connection_type}</b></span></b></small></span></p>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'p2p_112'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_1121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Channel <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_channel}</b></span></b></small></span></p>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_112'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_1121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Channel <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_channel}</b></span></b></small></span></p>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'p2p_113'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Mac  <span className='text-warning' ><b>{txt_parent_mac}</b></span><span className="text-success">{txt_parent_name}</span></b></small></span></p>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_113'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_1131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Mac  <span className='text-warning' ><b>{txt_parent_mac}</b></span><span className="text-success">{txt_parent_name}</span></b></small></span></p>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'p2p_114'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_1141'} className="textunit_nowidth user-select-all m-0"><span><small><b>L-Parent Mac  <span className='text-warning' ><b>{txt_logical_parent_mac}</b></span><span className="text-success">{txt_logical_parent_name}</span></b></small></span></p>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_114'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_1141'} className="textunit_nowidth user-select-all m-0"><span><small><b>L-Parent Mac  <span className='text-warning' ><b>{txt_logical_parent_mac}</b></span><span className="text-success">{txt_logical_parent_name}</span></b></small></span></p>
                         </div>
                     </div>
-                    <div key={v_andruavUnit.partyID + 'p2p_21'} className="col-6 ">
-                        <div key={v_andruavUnit.partyID + 'p2p_211'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_2111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className={css_txt_address} ><b>{v_andruavUnit.m_P2P.m_address_1 + txt_address }</b></span> </b></small></span></p>
+                    <div key={v_andruavUnit.getPartyID() + 'p2p_21'} className="col-6 ">
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_211'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_2111'} className="textunit_nowidth user-select-all m-0"><span><small><b>Address <span className={css_txt_address} ><b>{v_andruavUnit.m_P2P.m_address_1 + txt_address }</b></span> </b></small></span></p>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'p2p_212'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_2121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Group <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_password}</b></span> </b></small></span></p>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_212'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_2121'} className="textunit_nowidth user-select-all m-0"><span><small><b>Group <span className='text-warning' ><b>{v_andruavUnit.m_P2P.m_wifi_password}</b></span> </b></small></span></p>
                         </div>
-                        <div key={v_andruavUnit.partyID + 'p2p_213'} className='row css_margin_zero padding_zero '>
-                            <p key={v_andruavUnit.partyID + 'p2p_2131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Status  <span className={css_parent_connected} ><b>{txt_parent_connected}</b></span></b></small></span></p>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_213'} className='row css_margin_zero padding_zero '>
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_2131'} className="textunit_nowidth user-select-all m-0"><span><small><b>Parent Status  <span className={css_parent_connected} ><b>{txt_parent_connected}</b></span></b></small></span></p>
                         </div>
                     </div>
                 </div>
-                <div key={v_andruavUnit.partyID + 'p2p_3'} className='row css_margin_zero padding_zero '>
-                        <div key={v_andruavUnit.partyID + 'p2p_31'} className="col-12">
-                            <p key={v_andruavUnit.partyID + 'p2p_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
+                <div key={v_andruavUnit.getPartyID() + 'p2p_3'} className='row css_margin_zero padding_zero '>
+                        <div key={v_andruavUnit.getPartyID() + 'p2p_31'} className="col-12">
+                            <p key={v_andruavUnit.getPartyID() + 'p2p_311'} className="textunit user-select-all m-0"><span><small><b>Last Active <span className='text-warning' ><small><b>{v_date.toUTCString()}</b></small></span> </b></small></span></p>
                         </div>
                 </div>
                     {cmd_btns}
-                <div key={v_andruavUnit.partyID + 'p2p_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
-                    <CLASS_CTRL_P2P_IN_RANGE_NODEs key={v_andruavUnit.partyID + 'p2p_41'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_NODEs>
+                <div key={v_andruavUnit.getPartyID() + 'p2p_4'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                    <CLASS_CTRL_P2P_IN_RANGE_NODEs key={v_andruavUnit.getPartyID() + 'p2p_41'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_NODEs>
                 </div> 
-                <div key={v_andruavUnit.partyID + 'p2p_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
-                    <CLASS_CTRL_P2P_IN_RANGE_BSSIDs key={v_andruavUnit.partyID + 'p2p_51'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_BSSIDs>
+                <div key={v_andruavUnit.getPartyID() + 'p2p_5'}  className='row css_margin_zero padding_zero border-top border-secondary'>
+                    <CLASS_CTRL_P2P_IN_RANGE_BSSIDs key={v_andruavUnit.getPartyID() + 'p2p_51'} p_unit={v_andruavUnit} ></CLASS_CTRL_P2P_IN_RANGE_BSSIDs>
                 </div>    
             </div>
         );

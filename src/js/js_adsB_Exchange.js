@@ -179,12 +179,12 @@ import $ from 'jquery';
             if (js_globals.v_EnableADSB === false) return ;
 
             const now = Date.now();
-            if (this.__callsTimeTable.hasOwnProperty (p_andruavUnit.partyID) === false)
+            if (this.__callsTimeTable.hasOwnProperty (p_andruavUnit.getPartyID()) === false)
             {
-                this.__callsTimeTable[p_andruavUnit.partyID] = now;
+                this.__callsTimeTable[p_andruavUnit.getPartyID()] = now;
             }
 
-            if ((now - this.__callsTimeTable[p_andruavUnit.partyID] ) > this.ADSB_DroneRefreshRate)
+            if ((now - this.__callsTimeTable[p_andruavUnit.getPartyID()] ) > this.ADSB_DroneRefreshRate)
             {
                 this.fn_getADSBData (p_andruavUnit.m_Nav_Info.p_Location.lat,p_andruavUnit.m_Nav_Info.p_Location.lng,p_andruavUnit.m_Nav_Info.p_Location.alt_relative,10);
             }

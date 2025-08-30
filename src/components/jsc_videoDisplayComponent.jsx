@@ -41,11 +41,11 @@ export class ClssCVideoControl extends React.Component {
     fn_videoStarted(p_me, p_obj) {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
-        let vid = p_obj.andruavUnit.partyID + p_obj.talk.targetVideoTrack;
+        let vid = p_obj.andruavUnit.getPartyID() + p_obj.talk.targetVideoTrack;
         if (p_me.state.m_videoScreens.hasOwnProperty(vid) === false) {
             p_me.state.m_videoScreens[vid] = {};
             const c_screen = p_me.state.m_videoScreens[vid];
-            c_screen.v_unit = p_obj.andruavUnit.partyID;
+            c_screen.v_unit = p_obj.andruavUnit.getPartyID();
             c_screen.v_track = p_obj.talk.targetVideoTrack;
             c_screen.v_index = js_helpers.fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks, "id", p_obj.talk.targetVideoTrack);
             p_me.state.lastadded = vid;
@@ -60,7 +60,7 @@ export class ClssCVideoControl extends React.Component {
         // bug: if the tab is already selected then click will not be effective.
         // you need to deactivate the tab in case it is active
         // eq(0) is another bug as using [0] will return a DOM object and you need a JQuery object.
-        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.partyID + p_me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
+        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.getPartyID() + p_me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
 
     }
 
@@ -68,8 +68,8 @@ export class ClssCVideoControl extends React.Component {
     fn_videoStopped(p_me, obj) {
 
         obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-        if (p_me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.partyID) === false) {
-            p_me.state.m_videoScreens[obj.andruavUnit.partyID] = undefined;
+        if (p_me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.getPartyID()) === false) {
+            p_me.state.m_videoScreens[obj.andruavUnit.getPartyID()] = undefined;
         }
 
         if (p_me.m_flag_mounted === false)return ;
@@ -112,7 +112,7 @@ export class ClssCVideoControl extends React.Component {
                 }
 
                 out_h.push(<li key={'h' + v_key} className="nav-item">
-                    <a className={"nav-link user-select-none  " + _first} data-bs-toggle="tab" href={'#cam_' + andruavUnit.partyID + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
+                    <a className={"nav-link user-select-none  " + _first} data-bs-toggle="tab" href={'#cam_' + andruavUnit.getPartyID() + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
                 </li>);
                 out_b.push(<ClssCVideoScreen key={v_key} first={_first} obj={v_obj} />);
             }

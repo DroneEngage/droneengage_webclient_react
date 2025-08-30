@@ -166,7 +166,7 @@ export default class ClssServoControl extends React.Component {
     }
 
     fn_updateData(p_me, p_andruavUnit) {
-        p_me.setState({ 'partyID': p_andruavUnit.partyID });
+        p_me.setState({ 'partyID': p_andruavUnit.getPartyID() });
     }
 
     componentWillUnmount() {
@@ -236,7 +236,7 @@ export default class ClssServoControl extends React.Component {
         let c_partyID = "";
         let v_unitName = "undefined";
         if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
-            c_partyID = p_andruavUnit.partyID;
+            c_partyID = p_andruavUnit.getPartyID();
             v_unitName = p_andruavUnit.m_unitName;
             const servo_values = p_andruavUnit.m_Servo.m_values;
             servos.push(
@@ -296,7 +296,7 @@ export default class ClssServoControl extends React.Component {
                                     <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" ref={this.opaqueBtnRef}>opaque</button>
                                 </div>
                                 <div className="col-3">
-                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.partyID)}>Goto</button>
+                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.getPartyID())}>Goto</button>
                                 </div>
                                 <div className="col-3">
                                     <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestServoChannel(p_andruavUnit)} >Refresh</button>

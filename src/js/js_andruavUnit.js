@@ -1034,6 +1034,9 @@ class C_Messages {
 }
 
 export class CAndruavUnitObject {
+
+   #m_partyID;
+
   constructor() {
     this.m_index = 0;
     this.m_defined = false;
@@ -1043,7 +1046,7 @@ export class CAndruavUnitObject {
     this.Description = "";
     this.m_inZone = null; // name of A ZONE  that the unit is IN.
     this.m_unitName = "unknown";
-    this.partyID = null;
+    this.#m_partyID = null;
     this.m_groupName = null;
     this.m_isFlying = false;
     this.m_FlyingLastStartTime = 0; // flight duration of latest or current flight.
@@ -1059,6 +1062,16 @@ export class CAndruavUnitObject {
     this.m_version = "null";
     this.m_delayedTimeout = null; // used for delayed actions.
     this.init();
+  }
+
+  setPartyID (p_partyID)
+  {
+    this.#m_partyID = p_partyID
+  }
+
+  getPartyID()
+  {
+    return this.#m_partyID;
   }
 
   fn_getFullName() {
@@ -1256,7 +1269,7 @@ class CAndruavUnitList {
 
   attachGamePadToUnit(p_andruavUnit)
   {
-      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.partyID !== p_andruavUnit.partyID)) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.partyID !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
         this.API_disengageRX(this.m_currentEngagedUnitRX);
       }
 
@@ -1280,7 +1293,7 @@ class CAndruavUnitList {
     if (!this.m_currentEngagedUnitRX) return ;
 
     
-    if (p_andruavUnit.partyID === this.m_currentEngagedUnitRX.partyID) {
+    if (p_andruavUnit.getPartyID() === this.m_currentEngagedUnitRX.partyID) {
       this.m_currentEngagedUnitRX = undefined;
     }
     
