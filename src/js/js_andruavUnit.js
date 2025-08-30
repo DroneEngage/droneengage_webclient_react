@@ -1146,7 +1146,7 @@ export class CAndruavUnitObject {
   }
 
   fullName() {
-    return this.fn_getFullName(this.m_groupName, this.partyID);
+    return this.fn_getFullName(this.m_groupName, this.#m_partyID);
   }
 
   module_version () {
@@ -1269,7 +1269,7 @@ class CAndruavUnitList {
 
   attachGamePadToUnit(p_andruavUnit)
   {
-      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.partyID !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
         this.API_disengageRX(this.m_currentEngagedUnitRX);
       }
 
@@ -1293,7 +1293,7 @@ class CAndruavUnitList {
     if (!this.m_currentEngagedUnitRX) return ;
 
     
-    if (p_andruavUnit.getPartyID() === this.m_currentEngagedUnitRX.partyID) {
+    if (p_andruavUnit.getPartyID() === this.m_currentEngagedUnitRX.getPartyID()) {
       this.m_currentEngagedUnitRX = undefined;
     }
     

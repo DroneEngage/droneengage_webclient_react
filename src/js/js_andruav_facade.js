@@ -283,7 +283,7 @@ class CAndruavClientFacade {
         };
 
         js_common.fn_console_log(p_msg);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(c_currentEngagedUnitRX.partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(c_currentEngagedUnitRX.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
     };
 
 
@@ -401,11 +401,11 @@ class CAndruavClientFacade {
     }
 
     //TODO: change p_partyID to p_andruavUnit
-    API_do_FlightMode(p_partyID, flightMode) {
+    API_do_FlightMode(p_andruavUnit, flightMode) {
         let v_msg = {
             F: flightMode
         };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_partyID, js_andruavMessages.CONST_TYPE_AndruavMessage_FlightControl, v_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_FlightControl, v_msg);
     }
 
 
@@ -508,7 +508,7 @@ class CAndruavClientFacade {
 
 
     API_requestGeoFences(p_andruavUnit, p_fenceName) {
-        if (!p_andruavUnit?.partyID) return;
+        if (!p_andruavUnit?.getPartyID()) return;
 
         let v_msg = {
             C: js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence
@@ -524,7 +524,7 @@ class CAndruavClientFacade {
 
     API_requestGeoFencesAttachStatus(p_andruavUnit, p_fenceName) {
 
-        const c_party = p_andruavUnit?.partyID;
+        const c_party = p_andruavUnit?.getPartyID();
         if (!c_party) return;
 
 
@@ -940,7 +940,7 @@ class CAndruavClientFacade {
     API_engageRX(p_andruavUnit) {
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
         if ((c_currentEngagedUnitRX) &&
-            (c_currentEngagedUnitRX.partyID !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+            (c_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
             this.API_disengageRX(c_currentEngagedUnitRX);
         }
 

@@ -16,24 +16,19 @@ class CGamePadButtonFunctions {
         this.buttonActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
                 'ARM': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
-                    debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
                 },
                 'RTL': {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
-                    debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
                 },
                 'Land': {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
-                    debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
                 },
                 'Auto': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
-                    debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
                 },
                 'Brake': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit.partyID, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
-                    debounceTime: js_andruavMessages.CONST_GAMEPAD_REPEATED
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
                 },
                 'Guided': {
                     onRelease: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
@@ -135,7 +130,7 @@ class CGamePadButtonFunctions {
             if (!buttonConfig) return;
 
             if (button.m_longPress && buttonConfig.longPress) {
-                if (now - (p_me.m_lastgamePadCommandTime[buttonFunction] || 0) > buttonConfig.debounceTime) {
+                if (now - (p_me.m_lastgamePadCommandTime[buttonFunction] || 0) > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                     buttonConfig.longPress(c_currentEngagedUnitRX);
                     p_me.m_lastgamePadCommandTime[buttonFunction] = now;
                 }

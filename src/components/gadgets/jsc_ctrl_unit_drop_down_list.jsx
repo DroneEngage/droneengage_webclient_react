@@ -145,7 +145,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
         sortedPartyIDs.map(function (object)
         {
             
-            const partyID = object.partyID;
+            const partyID = object.getPartyID();
             const v_andruavUnit = object;
             
             // dont display if unit is not defined yet.
