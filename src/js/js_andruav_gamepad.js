@@ -342,4 +342,4 @@ class CAndruavGamePad {
     }
 }
 
-export const js_localGamePad = CAndruavGamePad.getInstance();
+export const js_andruav_gamepad = CAndruavGamePad.getInstance();

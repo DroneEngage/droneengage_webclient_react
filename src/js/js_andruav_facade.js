@@ -20,7 +20,7 @@ import { EVENTS as js_event } from './js_eventList.js'
 import * as js_helpers from './js_helpers.js';
 import * as js_siteConfig from './js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
-import { js_localGamePad } from './js_localGamePad.js'
+import { js_andruav_gamepad } from './js_andruav_gamepad.js'
 import * as js_andruavUnit from './js_andruavUnit.js';
 import * as js_andruavMessages from './js_andruavMessages.js';
 
@@ -1173,7 +1173,7 @@ class CAndruavClientFacade {
             return;
 
 
-        const c_controller = js_localGamePad.fn_getGamePad(js_globals.active_gamepad_index);
+        const c_controller = js_andruav_gamepad.fn_getGamePad(js_globals.active_gamepad_index);
         if (c_controller === null || c_controller === undefined)
             return;
 

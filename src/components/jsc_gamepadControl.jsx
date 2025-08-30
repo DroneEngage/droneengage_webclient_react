@@ -8,7 +8,7 @@ import {js_localStorage} from '../js/js_localStorage'
 import {js_eventEmitter} from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
 
-import {js_localGamePad} from '../js/js_localGamePad.js'
+import {js_andruav_gamepad} from '../js/js_andruav_gamepad.js'
 import {js_speak} from '../js/js_speak'
 
 import {fn_gotoUnit_byPartyID} from '../js/js_main'
@@ -51,7 +51,7 @@ class ClssGamePadAxesControl extends React.Component {
 
     render()
     {
-        const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
+        const c_padStatus = js_andruav_gamepad.fn_getGamePad(this.props.p_index);
         if ((c_padStatus== null))
         {
             return (
@@ -61,7 +61,7 @@ class ClssGamePadAxesControl extends React.Component {
                 
             );
         }
-        const c_mode = js_localGamePad.m_gamepad_mode_index;
+        const c_mode = js_andruav_gamepad.m_gamepad_mode_index;
         const v_axis = [js_globals.STICK_MODE_MAPPING[c_mode].RUD,
                         js_globals.STICK_MODE_MAPPING[c_mode].THR,
                         js_globals.STICK_MODE_MAPPING[c_mode].ALE,
@@ -117,8 +117,8 @@ class ClssGamePadButtonControl extends React.Component {
 
     render()
     {
-        const button_routing = js_localGamePad.m_button_routing;
-        const c_padStatus = js_localGamePad.fn_getGamePad(this.props.p_index);
+        const button_routing = js_andruav_gamepad.m_button_routing;
+        const c_padStatus = js_andruav_gamepad.fn_getGamePad(this.props.p_index);
         if (c_padStatus== null)
         {
             return (<div className='gp_buttons'></div>);
@@ -323,7 +323,7 @@ export default class ClssGamePadControl extends React.Component {
     {
         const c_config_index = js_localStorage.fn_getGamePadConfigIndex();
     
-        this.fn_renderMainOutput (js_localGamePad.fn_isGamePadDefined() === true);
+        this.fn_renderMainOutput (js_andruav_gamepad.fn_isGamePadDefined() === true);
         
         js_common.fn_console_log (this.m_output);
         const v_title = (this.state.m_andruavUnit !== null && this.state.m_andruavUnit !== undefined )?this.state.m_andruavUnit.m_unitName:'NA';
@@ -332,7 +332,7 @@ export default class ClssGamePadControl extends React.Component {
         
         for (let i=0; i<4;++i)
         { // 4 gamepads can be connected to computer.
-            const gamepad = js_localGamePad.v_controllers[i];
+            const gamepad = js_andruav_gamepad.v_controllers[i];
             if (gamepad !== null && gamepad !== undefined)
             {
                 function add (Me,p_index)
@@ -345,7 +345,7 @@ export default class ClssGamePadControl extends React.Component {
             }
         }
         let gamepad_title = "Select an active Game Pad"; 
-        const v_controller = js_localGamePad.v_controllers[js_globals.active_gamepad_index];
+        const v_controller = js_andruav_gamepad.v_controllers[js_globals.active_gamepad_index];
         if (v_controller !== null && v_controller !== undefined)
         {
             gamepad_title = v_controller.id.toString();
