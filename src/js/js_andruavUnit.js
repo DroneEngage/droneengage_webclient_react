@@ -1279,7 +1279,7 @@ class CAndruavUnitList {
 
     if (!this.m_currentEngagedUnitRX) return ;
 
-    p_andruavUnit.partyID  = this.ANYTHING;
+    
     if (p_andruavUnit.partyID === this.m_currentEngagedUnitRX.partyID) {
       this.m_currentEngagedUnitRX = undefined;
     }
