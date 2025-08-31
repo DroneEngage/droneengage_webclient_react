@@ -100,7 +100,7 @@ class GLOBALS {
 		this.v_gamePadMode 				= 2;
 
 		// GamePad Functions Assignment
-		this.v_gamepad_function_array 			= ["undefined", "THR", "ALE", "RUD", "ELE"];
+		this.v_gamepad_function_array 			= ["undefined", "THR", "ALE", "RUD", "ELE", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_button_function_array 	= ["undefined", "ARM", "RTL", "Land", "Auto", "Brake","Guided", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
 		this.active_gamepad_index           	= 0;

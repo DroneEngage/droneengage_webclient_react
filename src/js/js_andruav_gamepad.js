@@ -71,8 +71,18 @@ class CAndruavGamePad {
          *                  where [2] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          *                  where [3] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          */
-        this.m_channel_routing = [-1, -1, -1, -1]; // RUD,THR,ROLL,PITCH
+        this.m_channel_routing = []; // RUD,THR,ROLL,PITCH
         this.m_channel_axis_reverse = new Array(10).fill(1);
+        
+        /**
+         * m_button_routing index represents buttons on the virtual GamePad on screen.
+         * each cell value represents the source button of the Button index of 
+         * the source physical GamePad.
+         */
+        this.m_button_routing = new Array(10).fill(0);
+        
+        this.m_other_channel_routing = [];
+
         this.m_gamepad_mode_index = 0;
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
         this.fn_extractGamePadConfigMapping();
@@ -127,7 +137,7 @@ class CAndruavGamePad {
          * and the value of each cell represents the Axis index of the source 
          * of the gamepad.
          */
-        this.m_channel_routing = [-1, -1, -1, -1];
+        this.m_channel_routing = [];
 
         /**
          * m_button_routing index represents buttons on the virtual GamePad on screen.
@@ -157,12 +167,27 @@ class CAndruavGamePad {
             { key: 'ELE', index: functions_per_mode.ELE }
         ];
 
+        // Create a Set of keys from mappings for efficient lookup
+        const mappingKeys = new Set(mappings.map(({ key }) => key));
+
         mappings.forEach(({ key, index }) => {
             const mapping = functionMappings[key];
             if (mapping?.type === "axis") {
                 this.m_channel_routing[index] = mapping.index;
             }
         });
+        
+        this.m_other_channel_routing = [];
+
+        // Populate m_other_channel_routing with unused axis mappings
+        for (const item in functionMappings) {
+            if (functionMappings[item]?.type === "axis" && !mappingKeys.has(item)) {
+                this.m_other_channel_routing.push({
+                    key: item,
+                    index: functionMappings[item].index
+                });
+            }
+        }
 
         return true;
     }
@@ -287,6 +312,8 @@ class CAndruavGamePad {
              * ELE - 3
         */
         const channel_routing = this.m_channel_routing;
+        if (channel_routing.length === 0 ) return ;
+        
         const functions_per_mode = js_globals.STICK_MODE_MAPPING[this.m_gamepad_mode_index];
 
         if (!p_gamepad.axes || channel_routing.some(val => val === undefined)) {
@@ -307,6 +334,18 @@ class CAndruavGamePad {
                 c_padStatus.p_unified_virtual_axis[axis] = val;
                 v_axesChanged = true;
             }
+        });
+
+        this.m_other_channel_routing.forEach((item) => {
+            // {key, index}
+            const index = item.index;
+            const val = Math.max(-1, Math.min(1, p_gamepad.axes[index] || 0))
+                .toFixed(2) * this.m_channel_axis_reverse[index];
+                if (item.val !== val)
+                {
+                    v_axesChanged = true;
+                    item.val = val;
+                }
         });
 
         if (v_axesChanged) {
