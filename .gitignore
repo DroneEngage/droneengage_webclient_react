@@ -9,7 +9,7 @@ package-lock.json
 /coverage
 /build
 # production
-
+checks.json
 .vscode
 
 /ssl
