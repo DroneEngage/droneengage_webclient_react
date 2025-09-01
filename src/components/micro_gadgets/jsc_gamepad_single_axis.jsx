@@ -11,8 +11,8 @@ export class ClssSingleAxisProgressControl extends React.Component {
         // SVG dimensions and styling
         const width = isHorizontal ? 128 : 20;
         const height = isHorizontal ? 20 : 128;
-        const viewBox = isHorizontal ? '-6 -1 12 2' : '-1 -6 2 12';
-        
+        const viewBox = isHorizontal ? '-6.8 -0.5 2.2 12' : '-0.5 -6.8 2.2 12';
+
         // Calculate number of bars and their positions
         const numBars = 20;
         const barSpacing = 12 / (numBars - 1); // Full range from -6 to 6

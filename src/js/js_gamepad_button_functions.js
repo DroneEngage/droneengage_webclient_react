@@ -10,10 +10,9 @@ class CGamePadButtonFunctions {
     constructor() {
         this.m_lastgamePadCommandTime = {};
 
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated, this, this.fn_sendButtons);
-        const functions = js_globals.v_gamepad_button_function_array;
-
-        this.buttonActions = {
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated, this, this.#fn_sendButtons);
+        
+        this.m_buttonActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
                 'ARM': {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
@@ -84,24 +83,22 @@ class CGamePadButtonFunctions {
         return CGamePadButtonFunctions.instance;
     }
 
-    fn_init() { }
-
     fn_destroy() {
         try {
-            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated, this.fn_sendButtons);
+            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated, this.#fn_sendButtons);
         } catch (error) {
             js_common.fn_console_log(`Error during unsubscription: ${error.message}`);
         }
     }
 
-    fn_sendButtons(p_me, p_packet) {
+    #fn_sendButtons(p_me, p_packet) {
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
 
         if (!c_currentEngagedUnitRX) return;
 
-        // Default to VEHICLE_UNKNOWN if vehicleType is null, undefined, or not defined in buttonActions
+        // Default to VEHICLE_UNKNOWN if vehicleType is null, undefined, or not defined in m_buttonActions
         const vehicleType = c_currentEngagedUnitRX.m_VehicleType;
-        const effectiveVehicleType = (vehicleType && p_me.buttonActions[vehicleType])
+        const effectiveVehicleType = (vehicleType && p_me.m_buttonActions[vehicleType])
             ? vehicleType
             : js_andruavUnit.VEHICLE_UNKNOWN;
 
@@ -120,11 +117,11 @@ class CGamePadButtonFunctions {
             if (!buttonFunction || buttonFunction === null) return;
 
             // Try the effective vehicle type first
-            let buttonConfig = p_me.buttonActions[effectiveVehicleType]?.[buttonFunction];
+            let buttonConfig = p_me.m_buttonActions[effectiveVehicleType]?.[buttonFunction];
 
             // Fall back to VEHICLE_UNKNOWN if buttonFunction not found for effectiveVehicleType
             if (!buttonConfig && effectiveVehicleType !== js_andruavUnit.VEHICLE_UNKNOWN) {
-                buttonConfig = p_me.buttonActions[js_andruavUnit.VEHICLE_UNKNOWN]?.[buttonFunction];
+                buttonConfig = p_me.m_buttonActions[js_andruavUnit.VEHICLE_UNKNOWN]?.[buttonFunction];
             }
 
             if (!buttonConfig) return;

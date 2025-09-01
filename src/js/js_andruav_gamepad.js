@@ -20,6 +20,7 @@ import { js_localStorage } from './js_localStorage'
 import { js_eventEmitter } from './js_eventEmitter'
 import * as js_common from './js_common.js'
 import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js'
+import { js_gamepadAxisFunctions } from './js_gamepad_axis_functions.js'
 
 
 const GAME_GENERIC = 0;
@@ -33,20 +34,18 @@ class fn_Obj_padStatus {
     constructor() {
         this.p_ctrl_type = GAME_GENERIC;
 
-        js_gamepadButtonFunctions.fn_init();
-
         /**
          * IMPORTANT
          * THIS IS TRUE VALUES OF VIRTUAL GAMEPAD REGARDLESS OF MODE [RUD, THR, ALE, ELE]
          */
         this.p_unified_virtual_axis = [-1, 0, 0, 0]; // Rudder, Throttle, Aileron, Elevator
-        this.m_gamepad_mode_index = 0;
+        this.p_gamepad_mode_index = 0;
         /**
-        * m_button_routing index represents buttons on the virtual GamePad on screen.
+        * p_button_routing index represents buttons on the virtual GamePad on screen.
         * each cell value represents the source button of the Button index of 
         * the source physical GamePad.
         */
-        this.m_button_routing = new Array(10).fill(0); // Preallocate and initialize
+        this.p_button_routing = new Array(10).fill(0); // Preallocate and initialize
         this.p_buttons = new Array(js_globals.v_total_gampad_buttons).fill().map(() => ({
             m_pressed: false,
             m_timestamp: 0,
@@ -54,16 +53,21 @@ class fn_Obj_padStatus {
         }));
         this.p_connected = false;
         this.p_vibration = false;
+        this.p_channel_routing = [];
+        this.p_channel_axis_reverse = new Array(10).fill(1);
+        this.p_other_channel_routing = [];
+        this.p_axesChanged = false;
+        this.p_axesOtherChanged = false;
     }
 }
 
 class CAndruavGamePad {
+
     constructor() {
         this.c_haveEvents = 'GamepadEvent' in window;
         this.v_lastUpdateSent = Date.now();
         this.v_controllers = {};
         this.v_animationFrameId = null; // Add a property to store the animation frame ID
-
         /**
          * m_channel_routing represents input source index - 
          *                  where [0] contains the index of the input axis that streams data to STICK LEFT - HORIZONTAL
@@ -71,21 +75,8 @@ class CAndruavGamePad {
          *                  where [2] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          *                  where [3] contains the index of the input axis that streams data to STICK RIGHT - HORIZONTAL
          */
-        this.m_channel_routing = []; // RUD,THR,ROLL,PITCH
-        this.m_channel_axis_reverse = new Array(10).fill(1);
-        
-        /**
-         * m_button_routing index represents buttons on the virtual GamePad on screen.
-         * each cell value represents the source button of the Button index of 
-         * the source physical GamePad.
-         */
-        this.m_button_routing = new Array(10).fill(0);
-        
-        this.m_other_channel_routing = [];
 
-        this.m_gamepad_mode_index = 0;
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
-        this.fn_extractGamePadConfigMapping();
 
         js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Config_Index_Changed, this, this.fn_gamePadConfigChanged);
 
@@ -124,7 +115,7 @@ class CAndruavGamePad {
      * Reads GamePad configurations from app storage and parses them.
      * @returns 
      */
-    fn_extractGamePadConfigMapping() {
+    fn_updatePadConfig(padStatus) {
         if (!js_globals?.STICK_MODE_MAPPING) {
             console.error("js_globals.STICK_MODE_MAPPING is not defined");
             return false;
@@ -132,19 +123,19 @@ class CAndruavGamePad {
 
         /**
          * Based on TX mode 1,2,3,4
-         * the cells into m_channel_routing changes its function.
+         * the cells into p_channel_routing changes its function.
          * for example in mode-2 mapping is [RUD, THR, ALE, ELE, AXI1, AXI2]
          * and the value of each cell represents the Axis index of the source 
          * of the gamepad.
          */
-        this.m_channel_routing = [];
+        padStatus.p_channel_routing = [];
 
         /**
-         * m_button_routing index represents buttons on the virtual GamePad on screen.
+         * p_button_routing index represents buttons on the virtual GamePad on screen.
          * each cell value represents the source button of the Button index of 
          * the source physical GamePad.
          */
-        this.m_button_routing = new Array(10).fill(0);
+        padStatus.p_button_routing = new Array(10).fill(0);
         const config = js_localStorage.fn_getGamePadConfig(this.m_gamepad_config_index);
 
         if (!config) return false;
@@ -153,12 +144,12 @@ class CAndruavGamePad {
         if (!json_config?.functionMappings) return false;
 
         const { functionMappings, mode, axisReversed, buttonsFunction } = json_config;
-        this.m_gamepad_mode_index = mode - 1;
-        const functions_per_mode = js_globals.STICK_MODE_MAPPING[this.m_gamepad_mode_index];
+        padStatus.p_gamepad_mode_index = mode - 1;
+        const functions_per_mode = js_globals.STICK_MODE_MAPPING[padStatus.p_gamepad_mode_index];
 
-        this.m_channel_axis_reverse = axisReversed?.length ? axisReversed : (new Array(10).fill(1));
-        this.m_button_routing = buttonsFunction || this.m_button_routing;
-        this.m_button_routing = this.m_button_routing.map(item => item === 'undefined' ? 0 : item);
+        padStatus.p_channel_axis_reverse = axisReversed?.length ? axisReversed : (new Array(10).fill(1));
+        padStatus.p_button_routing = buttonsFunction || padStatus.p_button_routing;
+        padStatus.p_button_routing = padStatus.p_button_routing.map(item => item === 'undefined' ? 0 : item);
 
         const mappings = [
             { key: 'RUD', index: functions_per_mode.RUD },
@@ -173,16 +164,16 @@ class CAndruavGamePad {
         mappings.forEach(({ key, index }) => {
             const mapping = functionMappings[key];
             if (mapping?.type === "axis") {
-                this.m_channel_routing[index] = mapping.index;
+                padStatus.p_channel_routing[index] = mapping.index;
             }
         });
-        
-        this.m_other_channel_routing = [];
 
-        // Populate m_other_channel_routing with unused axis mappings
+        padStatus.p_other_channel_routing = [];
+
+        // Populate p_other_channel_routing with unused axis mappings
         for (const item in functionMappings) {
             if (functionMappings[item]?.type === "axis" && !mappingKeys.has(item)) {
-                this.m_other_channel_routing.push({
+                padStatus.p_other_channel_routing.push({
                     key: item,
                     index: functionMappings[item].index
                 });
@@ -194,7 +185,10 @@ class CAndruavGamePad {
 
     fn_gamePadConfigChanged(p_me) {
         p_me.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
-        p_me.fn_extractGamePadConfigMapping();
+        for (const index in p_me.v_controllers) {
+            const padStatus = p_me.v_controllers[index];
+            p_me.fn_updatePadConfig(padStatus);
+        }
         console.log("js_event.EE_GAMEPAD_CONTROL_UPDATE:", js_event.EE_GAMEPAD_CONTROL_UPDATE);
         js_eventEmitter.fn_dispatch(js_event.EE_GAMEPAD_CONTROL_UPDATE);
     }
@@ -250,24 +244,13 @@ class CAndruavGamePad {
 
     fn_addGamePad(me, p_gamepad) {
         const v_padStatus = new fn_Obj_padStatus();
-        let vendorNumber, productNumber;
-
-        if (js_helpers.fn_isFireFox()) {
-            const match = /^([^-]+)-([^-]+)/.exec(p_gamepad.id);
-            if (match) {
-                [vendorNumber, productNumber] = match.slice(1);
-            }
-        } else if (js_helpers.fn_isChrome()) {
-            const vendorMatch = /Vendor:\s+(\w+)/i.exec(p_gamepad.id);
-            const productMatch = /Product:\s+(\w+)/i.exec(p_gamepad.id);
-            vendorNumber = vendorMatch?.[1];
-            productNumber = productMatch?.[1];
-        }
-
         v_padStatus.id = p_gamepad.id;
         me.v_controllers[p_gamepad.index] = v_padStatus;
         v_padStatus.p_connected = true;
         v_padStatus.p_vibration = !!p_gamepad.vibrationActuator;
+
+        // Initialize config for the new pad
+        me.fn_updatePadConfig(v_padStatus);
 
         if (!me.v_animationFrameId) {
             me.v_animationFrameId = window.requestAnimationFrame(() => me.fn_updateStatus());
@@ -299,11 +282,23 @@ class CAndruavGamePad {
         }
     }
 
+    fn_AxesChanged() {
+        const padStatus = this.v_controllers[js_globals.active_gamepad_index];
+        return padStatus ? padStatus.p_axesChanged : false;
+    }
+
+    fn_AxesOthersChanged() {
+        const padStatus = this.v_controllers[js_globals.active_gamepad_index];
+        return padStatus ? padStatus.p_axesOtherChanged : false;
+    }
+
     fn_universalPad(p_gamepad) {
         const c_padStatus = this.v_controllers[p_gamepad.index];
         c_padStatus.p_connected = true;
 
-        let v_axesChanged = false;
+        c_padStatus.p_axesChanged = false;
+        c_padStatus.p_axesOtherChanged = false;
+
         const c_now = Date.now();
         /**
              * RDR - 0 
@@ -311,10 +306,10 @@ class CAndruavGamePad {
              * ALE - 2
              * ELE - 3
         */
-        const channel_routing = this.m_channel_routing;
-        if (channel_routing.length === 0 ) return ;
-        
-        const functions_per_mode = js_globals.STICK_MODE_MAPPING[this.m_gamepad_mode_index];
+        const channel_routing = c_padStatus.p_channel_routing;
+        if (channel_routing.length === 0) return;
+
+        const functions_per_mode = js_globals.STICK_MODE_MAPPING[c_padStatus.p_gamepad_mode_index];
 
         if (!p_gamepad.axes || channel_routing.some(val => val === undefined)) {
             return;
@@ -329,37 +324,44 @@ class CAndruavGamePad {
 
         mappings.forEach(({ axis, routing }) => {
             const val = Math.max(-1, Math.min(1, p_gamepad.axes[channel_routing[routing]] || 0))
-                .toFixed(2) * this.m_channel_axis_reverse[channel_routing[routing]];
+                .toFixed(2) * c_padStatus.p_channel_axis_reverse[channel_routing[routing]];
             if (c_padStatus.p_unified_virtual_axis[axis] !== val) {
                 c_padStatus.p_unified_virtual_axis[axis] = val;
-                v_axesChanged = true;
+                c_padStatus.p_axesChanged = true;
             }
         });
 
-        this.m_other_channel_routing.forEach((item) => {
+        c_padStatus.p_other_channel_routing.forEach((item) => {
             // {key, index}
             const index = item.index;
             const val = Math.max(-1, Math.min(1, p_gamepad.axes[index] || 0))
-                .toFixed(2) * this.m_channel_axis_reverse[index];
-                if (item.val !== val)
-                {
-                    v_axesChanged = true;
-                    item.val = val;
-                }
+                .toFixed(2) * c_padStatus.p_channel_axis_reverse[index];
+            if (item.val !== val) {
+                c_padStatus.p_axesOtherChanged = true;
+                item.val = val;
+            }
         });
 
-        if (v_axesChanged) {
+        if (c_padStatus.p_axesChanged || c_padStatus.p_axesOtherChanged) {
             js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Axes_Updated);
             this.v_lastUpdateSent = c_now;
         }
 
+
+        if (c_padStatus.p_axesOtherChanged) {
+            //js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Other_Axes_Updated);
+            js_gamepadAxisFunctions.fn_executeAxis();
+            this.v_lastUpdateSent = c_now;
+        }
+
+
         const len = p_gamepad.buttons.length;
         let button_indicies = [];
         for (let i = 0; i < len; ++i) {
-            if (this.m_button_routing[i] === 0) continue; // skip unmapped button.
+            if (c_padStatus.p_button_routing[i] === 0) continue; // skip unmapped button.
             const c_pressed = p_gamepad.buttons[i].pressed;
             const button = c_padStatus.p_buttons[i];
-            button.m_assigned_function = this.m_button_routing[i];
+            button.m_assigned_function = c_padStatus.p_button_routing[i];
             if (button.m_pressed !== c_pressed) {
                 button.m_pressed = c_pressed;
                 button.m_timestamp = c_now;
@@ -381,4 +383,5 @@ class CAndruavGamePad {
     }
 }
 
+Object.seal(CAndruavGamePad.prototype);
 export const js_andruav_gamepad = CAndruavGamePad.getInstance();

@@ -73,7 +73,8 @@ const EVENT_LIST = Object.freeze({
 
 		"EE_GamePad_Connected", 
 		"EE_GamePad_Disconnected", 
-		"EE_GamePad_Axes_Updated", 
+		"EE_GamePad_Axes_Updated",
+		"EE_GamePad_Other_Axes_Updated", 
 		"EE_GamePad_Button_Updated", 
 		"EE_GamePad_Config_Index_Changed", 
 		"EE_GamePad_Control_Update", 

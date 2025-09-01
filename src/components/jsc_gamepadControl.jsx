@@ -53,7 +53,7 @@ class ClssGamePadAxesControl extends React.Component {
     render()
     {
         const c_padStatus = js_andruav_gamepad.fn_getGamePad(this.props.p_index);
-        if ((c_padStatus== null))
+        if (!c_padStatus)
         {
             return (
             <div className='gp_axes'>
@@ -63,8 +63,8 @@ class ClssGamePadAxesControl extends React.Component {
             );
         }
 
-        const other_channel_routing = js_andruav_gamepad.m_other_channel_routing;
-        const c_mode = js_andruav_gamepad.m_gamepad_mode_index;
+        const other_channel_routing = c_padStatus.p_other_channel_routing;
+        const c_mode = c_padStatus.p_gamepad_mode_index;
         const v_axis = [js_globals.STICK_MODE_MAPPING[c_mode].RUD,
                         js_globals.STICK_MODE_MAPPING[c_mode].THR,
                         js_globals.STICK_MODE_MAPPING[c_mode].ALE,
@@ -77,17 +77,15 @@ class ClssGamePadAxesControl extends React.Component {
         other_channel_routing.forEach(({key, index, val}) => {
             axis_ctrl.push(
                 <ClssSingleAxisProgressControl 
-                    id={key} key={key + me.key} label={"axis1"} value={val} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/>
+                    id={key} key={key + me.key} label={key} value={val} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/>
             )
         });
         
         return (
             <div className='gp_axes'>
-                {/* <ClssSingleAxisProgressControl id='axes0' label={"axis1"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#FF4444"} min={-1.0} max={1.0}/> */}
                 <ClssGamePadAxisControl id='axes1' key={'axes1' + this.key} x={c_unified_virtual_axis[v_axis[0]]} y={c_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
                 <ClssGamePadAxisControl id='axes2' key={'axes2' + this.key} x={c_unified_virtual_axis[v_axis[2]]} y={c_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
                 {axis_ctrl}
-                {/* <ClssSingleAxisProgressControl id='axes3' label={"axis2"} value={c_unified_virtual_axis[v_axis[0]]} p_axis='vertical' color={"#00bc8cff"} min={-1.0} max={1.0}/> */}
                 
             </div>
                 
@@ -131,8 +129,9 @@ class ClssGamePadButtonControl extends React.Component {
 
     render()
     {
-        const button_routing = js_andruav_gamepad.m_button_routing;
         const c_padStatus = js_andruav_gamepad.fn_getGamePad(this.props.p_index);
+        const button_routing = c_padStatus.p_button_routing;
+        
         if (c_padStatus== null)
         {
             return (<div className='gp_buttons'></div>);

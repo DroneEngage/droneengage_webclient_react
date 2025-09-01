@@ -58,7 +58,7 @@ class CAndruavClientFacade {
 
         this.fn_init();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated, this, this.fn_sendAxes);
+        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated, this, this.#fn_sendAxes);
     }
 
     static getInstance() {
@@ -73,7 +73,7 @@ class CAndruavClientFacade {
         const Me = this;
         if (this.fn_timerID_sendRXChannels === null || this.fn_timerID_sendRXChannels === undefined) {
             this.fn_timerID_sendRXChannels = setInterval(function () {
-                Me._fn_sendRXChannels(Me)
+                Me.#fn_sendRXChannels(Me)
             }, js_andruavMessages.CONST_sendRXChannels_Interval);
         }
 
@@ -89,7 +89,7 @@ class CAndruavClientFacade {
 
         // Safely unsubscribe from events
         try {
-            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated, this.fn_sendAxes);
+            this.eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated, this.#fn_sendAxes);
         } catch (error) {
             this.common.fn_console_log(`Error during unsubscription: ${error.message}`);
         }
@@ -100,14 +100,17 @@ class CAndruavClientFacade {
     }
 
     // EVENT HANDLER AREA
-    _fn_sendRXChannels(p_me) {
+    #fn_sendRXChannels(p_me) {
         if (p_me.v_sendAxes === false) {
             p_me.v_sendAxes_skip++;
             if (p_me.v_sendAxes_skip % 4 !== 0) return;
         }
 
         p_me.v_sendAxes = false;
-        if (this.v_axes !== null) this.API_sendRXChannels(this.v_axes);
+        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        if (!c_currentEngagedUnitRX) return ;
+        
+        if (this.v_axes !== null) this.#API_sendRXChannels(c_currentEngagedUnitRX, this.v_axes);
     }
 
     /**
@@ -271,9 +274,7 @@ class CAndruavClientFacade {
     };
 
 
-    API_sendRXChannels(p_unified_virtual_axis) {
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
-        if (!c_currentEngagedUnitRX) return ;
+    #API_sendRXChannels(p_andruavUnit, p_unified_virtual_axis) {
         // IMPORTANT: Convert [-1,1] to [0,1000] IMPORTANT: -1 means channel release so min is 0
         let p_msg = {
             'R': parseInt(parseFloat(p_unified_virtual_axis[0]) * 500 + 500),  // Rudder
@@ -283,7 +284,7 @@ class CAndruavClientFacade {
         };
 
         js_common.fn_console_log(p_msg);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(c_currentEngagedUnitRX.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteControl2, p_msg);
     };
 
 
@@ -1167,7 +1168,7 @@ class CAndruavClientFacade {
 
 
     // receives event from gamepad and store it for sending.
-    fn_sendAxes(p_me) { // game pad should be attached to a unit.
+    #fn_sendAxes(p_me) { // game pad should be attached to a unit.
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
         if (!c_currentEngagedUnitRX)
             return;
