@@ -18,7 +18,7 @@ export class CCommandAPI
 
     }
 
-    static API_requestID(p_partyID) {
+    static API_requestID() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
@@ -30,7 +30,7 @@ export class CCommandAPI
         return msg;
     };
 
-    static API_requestP2P(p_andruavUnit) {
+    static API_requestP2P() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
@@ -42,7 +42,7 @@ export class CCommandAPI
         return msg;
     };
 
-    static API_requestSDR(p_andruavUnit) {
+    static API_requestSDR() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
@@ -56,7 +56,7 @@ export class CCommandAPI
     };
 
 
-    static API_scanSDRDrivers(p_andruavUnit) {
+    static API_scanSDRDrivers() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_REMOTE_EXECUTE,
@@ -70,7 +70,7 @@ export class CCommandAPI
     };
 
 
-    static API_scanSDRFreq(p_andruavUnit, p_on_off) {
+    static API_scanSDRFreq(p_on_off) {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
@@ -221,7 +221,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_scanP2P(p_andruavUnit) {
+    static API_scanP2P() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION,
@@ -234,7 +234,7 @@ export class CCommandAPI
     };
 
 
-    static API_resetP2P(p_andruavUnit) {
+    static API_resetP2P() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_ACTION,
@@ -483,7 +483,7 @@ export class CCommandAPI
     }
 
 
-    static API_requestDeleteWayPoints(p_andruavUnit) {
+    static API_requestDeleteWayPoints() {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
@@ -495,7 +495,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_requestDeleteFenceByName(p_andruavUnit, p_fenceName) {
+    static API_requestDeleteFenceByName(p_fenceName) {
         const msg = 
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
@@ -524,7 +524,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_StopTracking(p_andruavUnit)
+    static API_StopTracking()
     {
         const msg = 
         {
@@ -537,7 +537,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius)
+    static API_SendTrackPoint(p_center_x, p_center_y, p_radius)
     {
         const msg = 
         {
@@ -553,7 +553,7 @@ export class CCommandAPI
         return msg;
     }
 
-    static API_PauseTracking(p_andruavUnit)
+    static API_PauseTracking()
     {
         const msg = 
         {
@@ -567,7 +567,7 @@ export class CCommandAPI
     }
 
 
-    static API_EnableTracking(p_andruavUnit)
+    static API_EnableTracking()
     {
         const msg = 
         {
@@ -596,7 +596,7 @@ export class CCommandAPI
     }
 
     
-    static API_DisableTrackingAI(p_andruavUnit)
+    static API_DisableTrackingAI()
     {
         const msg = 
         {
@@ -636,7 +636,7 @@ export class CCommandAPI
         return msg;
     }
     
-    static API_disengageRX(p_andruavUnit)
+    static API_disengageRX()
     {
         const msg = 
         {

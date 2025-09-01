@@ -115,7 +115,7 @@ class CAndruavClientFacade {
     * @param {*} p_partyID is partyID not a unit object.
     */
     API_requestID(p_partyID) {
-        const cmd = CCommandAPI.API_requestID(p_partyID);
+        const cmd = CCommandAPI.API_requestID();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
     }
 
@@ -178,7 +178,7 @@ class CAndruavClientFacade {
     API_scanSDRFreq(p_andruavUnit, p_on_off) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
-        const cmd = CCommandAPI.API_scanSDRFreq(p_andruavUnit, p_on_off);
+        const cmd = CCommandAPI.API_scanSDRFreq(p_on_off);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
@@ -214,7 +214,7 @@ class CAndruavClientFacade {
     API_scanP2P(p_andruavUnit) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
-        const cmd = CCommandAPI.API_scanP2P(p_andruavUnit);
+        const cmd = CCommandAPI.API_scanP2P();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
@@ -222,7 +222,7 @@ class CAndruavClientFacade {
     API_resetP2P(p_andruavUnit) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 
-        const cmd = CCommandAPI.API_resetP2P(p_andruavUnit);
+        const cmd = CCommandAPI.API_resetP2P();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
@@ -601,7 +601,7 @@ class CAndruavClientFacade {
 
         const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
-        const cmd = CCommandAPI.API_requestDeleteWayPoints(p_andruavUnit);
+        const cmd = CCommandAPI.API_requestDeleteWayPoints();
         js_andruav_ws.AndruavClientWS.API_sendCMD(c_party, cmd.mt, cmd.ms);
     };
 
@@ -610,7 +610,7 @@ class CAndruavClientFacade {
 
         const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
-        const cmd = CCommandAPI.API_requestDeleteFenceByName(c_party, p_fenceName);
+        const cmd = CCommandAPI.API_requestDeleteFenceByName(p_fenceName);
 
         js_andruav_ws.AndruavClientWS.API_sendCMD(c_party, cmd.mt, cmd.ms);
 
@@ -954,7 +954,7 @@ class CAndruavClientFacade {
     API_disengageRX(p_andruavUnit) {
         
         js_globals.m_andruavUnitList.disengageUnitRX(p_andruavUnit);
-        const cmd = CCommandAPI.API_disengageRX(p_andruavUnit);
+        const cmd = CCommandAPI.API_disengageRX();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
         
         js_eventEmitter.fn_dispatch(js_event.EE_releaseGamePad, p_andruavUnit);
@@ -1026,7 +1026,7 @@ class CAndruavClientFacade {
     API_SendTrackPoint(p_andruavUnit, p_center_x, p_center_y, p_radius) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_SendTrackPoint(p_andruavUnit);
+        const cmd = CCommandAPI.API_SendTrackPoint();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
@@ -1034,7 +1034,7 @@ class CAndruavClientFacade {
     API_StopTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_StopTracking(p_andruavUnit);
+        const cmd = CCommandAPI.API_StopTracking();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
@@ -1042,7 +1042,7 @@ class CAndruavClientFacade {
     API_PauseTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_PauseTracking(p_andruavUnit);
+        const cmd = CCommandAPI.API_PauseTracking();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     };
@@ -1050,7 +1050,7 @@ class CAndruavClientFacade {
     API_EnableTracking(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_EnableTracking(p_andruavUnit);
+        const cmd = CCommandAPI.API_EnableTracking();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
@@ -1066,7 +1066,7 @@ class CAndruavClientFacade {
     API_DisableTrackingAI(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_DisableTrackingAI(p_andruavUnit);
+        const cmd = CCommandAPI.API_DisableTrackingAI();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     };
 
