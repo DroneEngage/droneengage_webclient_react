@@ -18,55 +18,55 @@ class CGamePadButtonFunctions {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
                 },
                 'RTL': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
                 },
                 'Land': {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
                 },
                 'Auto': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO),
                 },
                 'Brake': {
                     longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
                 },
                 'Guided': {
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
+                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
                 },
                 'TGT': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30)
                 },
                 'SRV9': {
                     onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
                     onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
                 },
                 'SRV10': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "10", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "10", 0)
                 },
                 'SRV11': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "11", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "11", 0)
                 },
                 'SRV12': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "12", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "12", 0)
                 },
                 'SRV13': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "13", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "13", 0)
                 },
                 'SRV14': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "14", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "14", 0)
                 },
                 'SRV15': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "15", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "15", 0)
                 },
                 'SRV16': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 9999),
-                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", 0)
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "16", 9999),
+                    onRelease: (unit) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "16", 0)
                 }
             },
             [js_andruavUnit.VEHICLE_TRI]: {},
