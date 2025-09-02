@@ -293,12 +293,6 @@ class CAndruavGamePad {
         c_padStatus.p_axesOtherChanged = false;
 
         const c_now = Date.now();
-        /**
-             * RDR - 0 
-             * THR - 1
-             * ALE - 2
-             * ELE - 3
-        */
         const channel_routing = c_padStatus.p_channel_routing;
         if (channel_routing.length === 0) return;
 
@@ -353,16 +347,7 @@ class CAndruavGamePad {
             const buttonType = c_padStatus.p_button_type[i] || 'on/off';
             button.m_assigned_function = c_padStatus.p_button_routing[i];
 
-            if (buttonType === 'on/off') {
-                // on/off: Acts as a switch, maintains state until pressed again
-                if (c_pressed && !button.m_lastPressed) {
-                    button.m_pressed = !button.m_pressed; // Toggle state
-                    button.m_timestamp = c_now;
-                    button.m_longPress = false; // No long press for on/off
-                    button_indicies.push(i);
-                    js_common.fn_console_log(`Button ${i} switched to ${button.m_pressed ? 'on' : 'off'}`);
-                }
-            } else if (buttonType === 'toggle') {
+            if (buttonType === js_globals.v_gamepad_button_types[0]) {
                 // toggle: Toggles state on each press
                 if (c_pressed && !button.m_lastPressed) {
                     button.m_pressed = !button.m_pressed; // Toggle state
@@ -371,7 +356,7 @@ class CAndruavGamePad {
                     button_indicies.push(i);
                     js_common.fn_console_log(`Button ${i} toggled to ${button.m_pressed ? 'on' : 'off'}`);
                 }
-            } else if (buttonType === 'press') {
+            } else if (buttonType === js_globals.v_gamepad_button_types[1]) {
                 // press: On when pressed, off when released
                 if (button.m_pressed !== c_pressed) {
                     button.m_pressed = c_pressed;
@@ -379,6 +364,17 @@ class CAndruavGamePad {
                     button.m_longPress = false; // No long press for press
                     button_indicies.push(i);
                     js_common.fn_console_log(`Button ${i} ${c_pressed ? 'pressed' : 'released'}`);
+                }
+            } else if (buttonType === js_globals.v_gamepad_button_types[2]) {
+                // long on/off: Toggles state only after a long press
+                if (c_pressed && !button.m_lastPressed) {
+                    button.m_timestamp = c_now; // Start timing the press
+                    button.m_longPress = false;
+                } else if (c_pressed && !button.m_longPress && (c_now - button.m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS) {
+                    button.m_pressed = !button.m_pressed; // Toggle state on long press
+                    button.m_longPress = true;
+                    button_indicies.push(i);
+                    js_common.fn_console_log(`Button ${i} long press toggled to ${button.m_pressed ? 'on' : 'off'}`);
                 }
             }
 
@@ -393,6 +389,5 @@ class CAndruavGamePad {
         }
     }
 }
-
 Object.seal(CAndruavGamePad.prototype);
 export const js_andruav_gamepad = CAndruavGamePad.getInstance();

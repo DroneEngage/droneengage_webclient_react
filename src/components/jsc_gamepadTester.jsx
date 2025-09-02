@@ -380,7 +380,7 @@ export default class ClssGamepadTester extends React.Component {
 
     return (
       <div className="container">
-        <h2 className="pt-5">Gamepad Tester</h2>
+        <h2 className="pt-5">Gamepad Configurator</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
             <label>Settings Template: </label>

@@ -16,22 +16,22 @@ class CGamePadButtonFunctions {
         this.m_buttonActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
                 'ARM': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
                 },
                 'RTL': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
                 },
                 'Land': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_Land(unit),
                 },
                 'Auto': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO),
                 },
                 'Brake': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE),
                 },
                 'Guided': {
-                    longPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
                 },
                 'TGT': {
                     onPress: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30),
@@ -127,18 +127,16 @@ class CGamePadButtonFunctions {
 
             if (!buttonConfig) return;
 
-            if (button.m_longPress && buttonConfig.longPress) {
-                if (now - (p_me.m_lastgamePadCommandTime[buttonFunction] || 0) > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
-                    buttonConfig.longPress(c_currentEngagedUnitRX);
-                    js_andruav_gamepad.fn_makeVibration(1000);
-                    p_me.m_lastgamePadCommandTime[buttonFunction] = now;
-                }
-            } else if (!button.m_longPress && buttonConfig.onPress && button.m_pressed) {
+            if (button.m_pressed  === true)
+            {
                 buttonConfig.onPress(c_currentEngagedUnitRX);
-            } else if (!button.m_longPress && buttonConfig.onRelease && !button.m_pressed) {
+            }
+            else
+            {
                 buttonConfig.onRelease(c_currentEngagedUnitRX);
             }
-
+            
+            
             js_common.fn_console_log("fn_sendButtons", buttonFunction);
         });
     }
