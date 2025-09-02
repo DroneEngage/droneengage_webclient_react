@@ -5,6 +5,7 @@ import * as js_common from './js_common.js'
 import { js_globals } from './js_globals.js';
 import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from './js_eventEmitter.js'
+import {js_andruav_gamepad} from './js_andruav_gamepad.js'
 
 class CGamePadButtonFunctions {
     constructor() {
@@ -129,6 +130,7 @@ class CGamePadButtonFunctions {
             if (button.m_longPress && buttonConfig.longPress) {
                 if (now - (p_me.m_lastgamePadCommandTime[buttonFunction] || 0) > js_andruavMessages.CONST_GAMEPAD_REPEATED) {
                     buttonConfig.longPress(c_currentEngagedUnitRX);
+                    js_andruav_gamepad.fn_makeVibration(1000);
                     p_me.m_lastgamePadCommandTime[buttonFunction] = now;
                 }
             } else if (!button.m_longPress && buttonConfig.onPress && button.m_pressed) {

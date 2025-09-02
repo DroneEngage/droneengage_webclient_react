@@ -12,15 +12,15 @@
  *************************************************************************************/
 
 
-import * as js_andruavMessages from './js_andruavMessages'
-import * as js_helpers from '../js/js_helpers'
-import { js_globals } from './js_globals'
-import { EVENTS as js_event } from './js_eventList.js'
-import { js_localStorage } from './js_localStorage'
-import { js_eventEmitter } from './js_eventEmitter'
-import * as js_common from './js_common.js'
-import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js'
-import { js_gamepadAxisFunctions } from './js_gamepad_axis_functions.js'
+import * as js_andruavMessages from './js_andruavMessages';
+import * as js_helpers from '../js/js_helpers';
+import { js_globals } from './js_globals';
+import { EVENTS as js_event } from './js_eventList.js';
+import { js_localStorage } from './js_localStorage';
+import { js_eventEmitter } from './js_eventEmitter';
+import * as js_common from './js_common.js';
+import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js';
+import { js_gamepadAxisFunctions } from './js_gamepad_axis_functions.js';
 
 
 const GAME_GENERIC = 0;
@@ -58,6 +58,7 @@ class fn_Obj_padStatus {
         this.p_other_channel_routing = [];
         this.p_axesChanged = false;
         this.p_axesOtherChanged = false;
+        this.p_button_type = new Array(js_globals.v_total_gampad_buttons).fill('on/off'); // Initialize button types
     }
 }
 
@@ -88,12 +89,10 @@ class CAndruavGamePad {
         }
 
         window.addEventListener('storage', (event) => {
-            // Check if the event is related to the specific field you care about
             if (event.key.includes('gamepad_config')) {
                 js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Config_Index_Changed);
             }
         });
-
     }
 
     componentWillUnmount() {
@@ -143,13 +142,14 @@ class CAndruavGamePad {
         const json_config = JSON.parse(config);
         if (!json_config?.functionMappings) return false;
 
-        const { functionMappings, mode, axisReversed, buttonsFunction } = json_config;
+        const { functionMappings, mode, axisReversed, buttonsFunction, buttonTypes } = json_config;
         padStatus.p_gamepad_mode_index = mode - 1;
         const functions_per_mode = js_globals.STICK_MODE_MAPPING[padStatus.p_gamepad_mode_index];
 
         padStatus.p_channel_axis_reverse = axisReversed?.length ? axisReversed : (new Array(10).fill(1));
         padStatus.p_button_routing = buttonsFunction || padStatus.p_button_routing;
         padStatus.p_button_routing = padStatus.p_button_routing.map(item => item === 'undefined' ? 0 : item);
+        padStatus.p_button_type = buttonTypes || padStatus.p_button_type;
 
         const mappings = [
             { key: 'RUD', index: functions_per_mode.RUD },
@@ -158,7 +158,6 @@ class CAndruavGamePad {
             { key: 'ELE', index: functions_per_mode.ELE }
         ];
 
-        // Create a Set of keys from mappings for efficient lookup
         const mappingKeys = new Set(mappings.map(({ key }) => key));
 
         mappings.forEach(({ key, index }) => {
@@ -170,7 +169,6 @@ class CAndruavGamePad {
 
         padStatus.p_other_channel_routing = [];
 
-        // Populate p_other_channel_routing with unused axis mappings
         for (const item in functionMappings) {
             if (functionMappings[item]?.type === "axis" && !mappingKeys.has(item)) {
                 padStatus.p_other_channel_routing.push({
@@ -203,24 +201,21 @@ class CAndruavGamePad {
 
     fn_makeVibration(p_duration) {
         if (isNaN(p_duration)) return;
-        p_duration = Math.min(Math.max(p_duration, 0), 2000); // Clamp duration between 0 and 2000ms
+        p_duration = Math.min(Math.max(p_duration, 0), 2000);
 
         const pads = navigator.getGamepads();
-        const gamepad = pads[0]; // Get the first connected gamepad
+        const gamepad = pads[0];
 
-        if (!gamepad) return; // Exit if no gamepad is connected
+        if (!gamepad) return;
 
-        // Try the modern vibrationActuator API (Chrome, Edge, etc.)
         if (gamepad.vibrationActuator) {
             gamepad.vibrationActuator.playEffect("dual-rumble", {
                 startDelay: 0,
                 duration: p_duration,
                 weakMagnitude: 0.5,
                 strongMagnitude: 0.5
-            }).catch(() => { }); // Handle potential errors silently
-        }
-        // Fallback to the older vibrate API (some older browsers)
-        else if (gamepad.vibrate) {
+            }).catch(() => { });
+        } else if (gamepad.vibrate) {
             gamepad.vibrate(p_duration);
         }
     }
@@ -249,7 +244,6 @@ class CAndruavGamePad {
         v_padStatus.p_connected = true;
         v_padStatus.p_vibration = !!p_gamepad.vibrationActuator;
 
-        // Initialize config for the new pad
         me.fn_updatePadConfig(v_padStatus);
 
         if (!me.v_animationFrameId) {
@@ -261,10 +255,9 @@ class CAndruavGamePad {
         if (p_gamepad && me.v_controllers[p_gamepad.index]) {
             delete me.v_controllers[p_gamepad.index];
         }
-        // Cancel the animation frame loop if no gamepads are connected
         if (Object.keys(me.v_controllers).length === 0 && me.v_animationFrameId) {
-            window.cancelAnimationFrame(me.v_animationFrameId);
-            me.v_animationFrameId = null;
+            window.cancelAnimationFrame(this.v_animationFrameId);
+            this.v_animationFrameId = null;
         }
     }
 
@@ -332,7 +325,6 @@ class CAndruavGamePad {
         });
 
         c_padStatus.p_other_channel_routing.forEach((item) => {
-            // {key, index}
             const index = item.index;
             const val = Math.max(-1, Math.min(1, p_gamepad.axes[index] || 0))
                 .toFixed(2) * c_padStatus.p_channel_axis_reverse[index];
@@ -347,13 +339,10 @@ class CAndruavGamePad {
             this.v_lastUpdateSent = c_now;
         }
 
-
         if (c_padStatus.p_axesOtherChanged) {
-            //js_eventEmitter.fn_dispatch(js_event.EE_GamePad_Other_Axes_Updated);
             js_gamepadAxisFunctions.fn_executeAxis();
             this.v_lastUpdateSent = c_now;
         }
-
 
         const len = p_gamepad.buttons.length;
         let button_indicies = [];
@@ -361,17 +350,39 @@ class CAndruavGamePad {
             if (c_padStatus.p_button_routing[i] === 0) continue; // skip unmapped button.
             const c_pressed = p_gamepad.buttons[i].pressed;
             const button = c_padStatus.p_buttons[i];
+            const buttonType = c_padStatus.p_button_type[i] || 'on/off';
             button.m_assigned_function = c_padStatus.p_button_routing[i];
-            if (button.m_pressed !== c_pressed) {
-                button.m_pressed = c_pressed;
-                button.m_timestamp = c_now;
-                button.m_longPress = false;
-                button_indicies.push(i);
-            } else if (c_pressed && !button.m_longPress && (c_now - button.m_timestamp) > js_andruavMessages.CONST_GAMEPAD_LONG_PRESS) {
-                button.m_longPress = true;
-                button_indicies.push(i);
-                js_common.fn_console_log(`button ${i} long press`);
+
+            if (buttonType === 'on/off') {
+                // on/off: Acts as a switch, maintains state until pressed again
+                if (c_pressed && !button.m_lastPressed) {
+                    button.m_pressed = !button.m_pressed; // Toggle state
+                    button.m_timestamp = c_now;
+                    button.m_longPress = false; // No long press for on/off
+                    button_indicies.push(i);
+                    js_common.fn_console_log(`Button ${i} switched to ${button.m_pressed ? 'on' : 'off'}`);
+                }
+            } else if (buttonType === 'toggle') {
+                // toggle: Toggles state on each press
+                if (c_pressed && !button.m_lastPressed) {
+                    button.m_pressed = !button.m_pressed; // Toggle state
+                    button.m_timestamp = c_now;
+                    button.m_longPress = false;
+                    button_indicies.push(i);
+                    js_common.fn_console_log(`Button ${i} toggled to ${button.m_pressed ? 'on' : 'off'}`);
+                }
+            } else if (buttonType === 'press') {
+                // press: On when pressed, off when released
+                if (button.m_pressed !== c_pressed) {
+                    button.m_pressed = c_pressed;
+                    button.m_timestamp = c_now;
+                    button.m_longPress = false; // No long press for press
+                    button_indicies.push(i);
+                    js_common.fn_console_log(`Button ${i} ${c_pressed ? 'pressed' : 'released'}`);
+                }
             }
+
+            button.m_lastPressed = c_pressed; // Store current press state for next iteration
         }
 
         if (button_indicies.length > 0) {

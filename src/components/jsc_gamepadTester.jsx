@@ -1,7 +1,7 @@
 import React from 'react';
 import * as js_helpers from '../js/js_helpers';
 import { js_globals } from '../js/js_globals';
-import * as js_siteConfig from '../js/js_siteConfig.js'
+import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_localStorage } from '../js/js_localStorage';
 import { js_speak } from '../js/js_speak';
@@ -21,11 +21,11 @@ export default class ClssGamepadTester extends React.Component {
       selectedConfig: '1',
       m_update: 1,
       configPreferences: {
-        "1": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
-        "2": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
-        "3": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
-        "4": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
-        "5": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], mode: 1 },
+        "1": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], buttonTypes: [], mode: 1 },
+        "2": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], buttonTypes: [], mode: 1 },
+        "3": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], buttonTypes: [], mode: 1 },
+        "4": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], buttonTypes: [], mode: 1 },
+        "5": { functionMappings: {}, axisReversed: [1,1,1,1,1,1,1,1], buttonsFunction: [], buttonTypes: [], mode: 1 },
       },
     };
 
@@ -51,9 +51,11 @@ export default class ClssGamepadTester extends React.Component {
       const savedConfig = js_localStorage.fn_getGamePadConfig(config);
       if (savedConfig) {
         updatedConfigs[config] = JSON.parse(savedConfig);
-        // Ensure buttonsFunction exists in loaded config
         if (!updatedConfigs[config].buttonsFunction) {
           updatedConfigs[config].buttonsFunction = [];
+        }
+        if (!updatedConfigs[config].buttonTypes) {
+          updatedConfigs[config].buttonTypes = [];
         }
       }
     });
@@ -128,7 +130,7 @@ export default class ClssGamepadTester extends React.Component {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.json';
-    fileInput.style.display = 'none';
+    fileInput.className = 'd-none';
 
     fileInput.addEventListener('change', this.fn_importData);
     document.body.appendChild(fileInput);
@@ -150,9 +152,11 @@ export default class ClssGamepadTester extends React.Component {
       const firstGamepad = connectedGamepads[0];
       const newAxisFunctions = new Array(firstGamepad.axes.length).fill('undefined');
       const newButtonFunctions = new Array(firstGamepad.buttons.length).fill('undefined');
+      const newButtonTypes = new Array(firstGamepad.buttons.length).fill(js_globals.v_gamepad_button_types[0]);
       const { selectedConfig, configPreferences } = this.state;
       const currentConfig = configPreferences[selectedConfig].functionMappings;
       const axisReversed = configPreferences[selectedConfig].axisReversed || [];
+      const buttonTypes = configPreferences[selectedConfig].buttonTypes || [];
 
       Object.entries(currentConfig).forEach(([functionName, mapping]) => {
         const isAxisFunction = js_globals.v_gamepad_function_array.includes(functionName);
@@ -165,6 +169,7 @@ export default class ClssGamepadTester extends React.Component {
       });
 
       configPreferences[selectedConfig].buttonsFunction = newButtonFunctions;
+      configPreferences[selectedConfig].buttonTypes = buttonTypes.length ? buttonTypes : newButtonTypes;
 
       const transformedAxes = firstGamepad.axes.map((value, i) => 
         (value * (axisReversed[i] !== undefined ? axisReversed[i] : 1)).toFixed(4)
@@ -214,7 +219,7 @@ export default class ClssGamepadTester extends React.Component {
     this.setState(prevState => ({
       configPreferences: {
         ...prevState.configPreferences,
-        [selectedConfig]: { functionMappings: {}, axisReversed: [], buttonsFunction: [], mode: 1 },
+        [selectedConfig]: { functionMappings: {}, axisReversed: [], buttonsFunction: [], buttonTypes: [], mode: 1 },
       },
       axisFunctions: prevState.axisFunctions.map(() => 'undefined'),
     }), () => {
@@ -320,8 +325,26 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
+  fn_assignButtonType = (buttonIndex, buttonType) => {
+    if (!js_globals.v_gamepad_button_types.includes(buttonType)) return;
+
+    this.setState(prevState => {
+      const newConfigPreferences = { ...prevState.configPreferences };
+      const currentConfig = { ...newConfigPreferences[prevState.selectedConfig] };
+      const newButtonTypes = [...(currentConfig.buttonTypes || [])];
+      newButtonTypes[buttonIndex] = buttonType;
+      currentConfig.buttonTypes = newButtonTypes;
+      newConfigPreferences[prevState.selectedConfig] = currentConfig;
+
+      return { configPreferences: newConfigPreferences };
+    }, () => {
+      this.onDataChanged();
+      console.log(`Assigning button type ${buttonType} to button ${buttonIndex} in ${this.state.selectedConfig}`);
+    });
+  };
+
   handleModeChange = (p_mode) => {
-    if (this.m_flag_mounted === false)return;
+    if (this.m_flag_mounted === false) return;
     if (isNaN(p_mode)) return;
 
     this.setState(prevState => {
@@ -353,17 +376,18 @@ export default class ClssGamepadTester extends React.Component {
     const currentTime = new Date().getTime();
     const currentMode = configPreferences[selectedConfig].mode || 1;
     const buttonFunctions = configPreferences[selectedConfig].buttonsFunction || [];
+    const buttonTypes = configPreferences[selectedConfig].buttonTypes || [];
 
     return (
       <div className="container">
-        <h2 className='pt-5'>Gamepad Tester</h2>
+        <h2 className="pt-5">Gamepad Tester</h2>
         <div className="row mb-3">
           <div className="col-3" role="group" aria-label="Button group with nested dropdown">
             <label>Settings Template: </label>
             <select
               value={selectedConfig}
               onChange={this.handleConfigChange}
-              className="ms-3 form-control-sm"
+              className="ms-3 form-control-sm "
             >
               {js_globals.v_gamepad_configuration.map((config, idx) => (
                 <option key={idx} value={config}>
@@ -429,26 +453,24 @@ export default class ClssGamepadTester extends React.Component {
             <div key={index} className="gamepad-section">
               <h3>{index + 1}: {gamepad.id} (Vendor: {gamepad.id.split(' ').pop().split(':')[0]} Product: {gamepad.id.split(' ').pop().split(':')[1]})</h3>
               <p>Connected: Yes | Mapping: {gamepad.mapping} | Timestamp: {gamepad.timestamp.toFixed(0)}</p>
-              <div className="axes-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+              <div className="d-flex flex-wrap gap-2">
                 {axes.map((value, i) => {
                   const lastUpdate = this.state[`axisLastUpdate_${i}`] || 0;
                   const opacity = lastUpdate ? Math.max(0, 1 - (currentTime - lastUpdate) / fadeDuration) : 0;
-                  const colorStyle = {
-                    color: opacity > 0 ? `rgba(255, 0, 0, ${opacity})` : 'inherit',
-                    transition: 'color 0.5s ease-out',
-                  };
                   const isReversed = (configPreferences[selectedConfig].axisReversed?.[i] || 1) === -1;
 
                   return (
-                    <div key={i} className="axis-row d-flex align-items-center mb-3">
-                      <span className={`me-2 font-monospace`} style={{ color: colorStyle.color, transition: colorStyle.transition }}>
+                    <div key={i} className="d-flex align-items-center mb-3">
+                      <span 
+                        className={`me-2 font-monospace ${opacity > 0 ? 'text-danger' : ''}`} 
+                        style={{ transition: 'color 0.5s ease-out', opacity: opacity > 0 ? opacity : 1 }}
+                      >
                         Axis {i}: {this.formatNumberWithSign(value, 8, 3)}
                       </span>
                       <select
                         value={axisFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
-                        className={`form-control ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success' : 'bg-warning text-dark'}`}
-                        style={{ marginRight: '10px', width: '150px' }}
+                        className={`form-control h-75 ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success text-white' : 'bg-warning text-dark'} w-75`}
                       >
                         {js_globals.v_gamepad_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
@@ -456,40 +478,57 @@ export default class ClssGamepadTester extends React.Component {
                           </option>
                         ))}
                       </select>
-                      <label style={{ marginRight: '10px', fontFamily: 'Courier New, monospace' }}>
+                      <div className="form-check ms-2 small">
                         <input
                           type="checkbox"
+                          className="form-check-input"
                           checked={isReversed}
                           onChange={() => this.toggleAxisReverse(i)}
+                          id={`reverseAxis${i}`}
                         />
-                        Reverse
-                      </label>
+                        <label className="form-check-label font-monospace" htmlFor={`reverseAxis${i}`}>
+                          Reverse
+                        </label>
+                      </div>
                     </div>
                   );
                 })}
               </div>
               <hr />
-              <div className="buttons-container d-flex flex-wrap gap-3">
+              <div className="d-flex flex-wrap gap-3">
                 {buttons.map((value, i) => {
                   const lastUpdate = this.state[`buttonLastUpdate_${i}`] || 0;
                   const opacity = lastUpdate ? Math.max(0, 1 - (currentTime - lastUpdate) / fadeDuration) : 0;
-                  const colorStyle = {
-                    color: opacity > 0 ? `rgba(0, 255, 0, ${opacity})` : 'inherit',
-                    transition: 'color 0.5s ease-out',
-                  };
 
                   return (
-                    <div key={i} className="button-row" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ ...colorStyle, marginRight: '10px' }}>Button {i} : {value}</span>
+                    <div key={i} className="d-flex align-items-center mb-3">
+                      <span 
+                        className={`me-2 font-monospace ${opacity > 0 ? 'text-success' : ''}`} 
+                        style={{ transition: 'color 0.5s ease-out', opacity: opacity > 0 ? opacity : 1 }}
+                      >
+                        Button {i}: {value}
+                      </span>
                       <select
+                        id={`1value`}
                         value={buttonFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}
-                        className={`form-control ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success text-dark'}`}
-                        style={{ marginRight: '10px' }}
+                        className={`form-control h-75 ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success text-white'} w-50`}
                       >
                         {js_globals.v_gamepad_button_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
                             {func}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        id={`2value`}
+                        value={buttonTypes[i] || js_globals.v_gamepad_button_types[0]}
+                        onChange={(e) => this.fn_assignButtonType(i, e.target.value)}
+                        className="form-control h-75 ms-2 bg-primary text-white w-25"
+                      >
+                        {js_globals.v_gamepad_button_types.map((type, idx) => (
+                          <option key={idx} value={type}>
+                            {type}
                           </option>
                         ))}
                       </select>
@@ -502,11 +541,12 @@ export default class ClssGamepadTester extends React.Component {
         ) : (
           <p>No gamepads detected</p>
         )}
-        <div className="image-container" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <div className="d-flex justify-content-center mt-3">
           <img
             src={`/images/mode${currentMode}.png`}
             alt={`Mode ${currentMode}`}
-            className='rounded-5 img-fluid max-height-300'
+            className="rounded-3 img-fluid"
+            style={{ maxHeight: '300px' }}
           />
         </div>
       </div>

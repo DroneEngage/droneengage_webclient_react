@@ -103,6 +103,7 @@ class GLOBALS {
 		this.v_gamepad_function_array 			= ["undefined", "THR", "ALE", "RUD", "ELE", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_button_function_array 	= ["undefined", "ARM", "RTL", "Land", "Auto", "Brake","Guided", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_configuration 			= ["1", "2", "3", "4", "5"];
+		this.v_gamepad_button_types				= ['on/off', 'toggle', 'press'];
 		this.active_gamepad_index           	= 0;
 		this.v_total_gampad_buttons				= 12;
 		
