@@ -231,23 +231,23 @@ export class ClssLoginControl extends React.Component {
 			);
 			break;
 			case CONST_NOT_CONNECTION_ONLINE:
-				title = 'Logout';
-				css = 'bg-danger';
-				ctrls2.push(
-				  <div key={"div_logout" + this.key} className=" "> {/* Key added here */}
-					<div className="form-group al_l">
-					  <label key={'txtEmail2' + this.key} htmlFor="txtEmail" id="email" className="text-muted">
-						Email
-					  </label>
-					  <p>{js_localStorage.fn_getEmail()}</p>
-					</div>
-					<div className="form-group al_l">
-					  <p className="text-muted">GCS ID</p>
-					  <p>{js_localStorage.fn_getUnitID()}</p>
-					</div>
-				  </div>
-				);
-				break;
+			title = 'Logout';
+			css = 'bg-danger';
+			ctrls2.push(
+				<div key={"div_logout" + this.key} className=" ">
+				<div className="form-group al_l">
+					<span key={'txtEmail2' + this.key} className="text-muted">
+					Email
+					</span>
+					<p>{js_localStorage.fn_getEmail()}</p>
+				</div>
+				<div className="form-group al_l">
+					<p className="text-muted">GCS ID</p>
+					<p>{js_localStorage.fn_getUnitID()}</p>
+				</div>
+				</div>
+			);
+			break;
 			  case CONST_NOT_CONNECTION_IN_PROGRESS:
 				title = 'Connecting..';
 				css = 'bg-warning';
