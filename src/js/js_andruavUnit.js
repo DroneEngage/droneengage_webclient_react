@@ -1099,6 +1099,7 @@ export class CAndruavUnitObject {
   }
 
   init() {
+    this.m_isDE = false;
     this.m_time_sync = 0; // time sent by unit so that you can use it to measrue other time fields sent by the same module.
     this.m_Permissions = "X0X0X0X0X0X0";
     this.m_IsShutdown = false; // Drone Unit reports a shutdown
