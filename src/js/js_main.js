@@ -3081,7 +3081,7 @@ function fn_handleKeyBoard() {
 				js_globals.v_andruavWS.m_server_port = js_andruavAuth.m_server_port;
 				js_globals.v_andruavWS.m_server_port_ss = js_andruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
 				js_globals.v_andruavWS.server_AuthKey = js_andruavAuth.server_AuthKey;
-				js_globals.v_andruavWS._permissions_ = js_andruavAuth.fn_getPermission();
+				js_globals.v_andruavWS.m_permissions = js_andruavAuth.fn_getPermission();
 				js_eventEmitter.fn_subscribe(js_event.EE_WS_OPEN,this,EVT_onOpen);
 				js_eventEmitter.fn_subscribe(js_event.EE_WS_CLOSE,this,EVT_onClose);
 				js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus2,this,fn_onSocketStatus);

@@ -68,7 +68,7 @@ class CAndruavClientWS {
         this.m_server_port = null;
         this.m_server_port_ss = null;
         this.server_AuthKey = null;
-        this._permissions_ = null;
+        this.m_permissions = null;
         this.server_accessCode = null;
 
         this.socketStatus = js_andruavMessages.CONST_SOCKET_STATUS_FREASH;
