@@ -139,7 +139,7 @@ class CAndruavClientFacade {
             TP: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_telemetry_protocol,
             UD: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_unitName,
             DS: js_andruav_ws.AndruavClientWS.m_andruavUnit.Description,
-            p: this._permissions_
+            p: js_andruav_ws.AndruavClientWS.m_permissions
         };
 
         // embedding messages - new technique.
