@@ -97,14 +97,14 @@ export class ClssCtrlAUDIO extends React.Component {
 
                             <div className="row ">
                                 <div key={v_andruavUnit.getPartyID() + 'audio_212'} className='col-8 col-sm-6 user-select-none '>
-                                    <label htmlFor="pitch_range" className="col-sm-4 col-form-label al_r flex" >Pitch</label>
+                                    <label htmlFor={v_andruavUnit.getPartyID() + 'prng'} className="col-sm-4 col-form-label al_r flex" >Pitch</label>
                                     <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id={v_andruavUnit.getPartyID() + 'prng'} ref={this.m_pitchRef} disabled={v_pitch_disabled === 'true'} />
                                 </div>
                             </div>
 
                             <div className="row ">
                                 <div key={v_andruavUnit.getPartyID() + 'audio_213'} className='col-12 col-sm-12 user-select-none '>
-                                    <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r flex" >Volume</label>
+                                    <label htmlFor={v_andruavUnit.getPartyID() + 'vrng'} className="col-sm-4 col-form-label al_r flex" >Volume</label>
                                     <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id={v_andruavUnit.getPartyID() + 'vrng'} ref={this.m_volumeRef} disabled={v_vol_disabled === 'true'} />
                                 </div>
                             </div>
