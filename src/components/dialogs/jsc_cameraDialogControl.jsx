@@ -50,7 +50,7 @@ class ClssCameraDevice extends React.Component {
 
 
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
-            this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
+            camera_index,
             1,
             0, 
             0);
