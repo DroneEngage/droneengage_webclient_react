@@ -226,7 +226,6 @@ class CAndruavClientWS {
         if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LogoutCommServer) {
             if (msg.msgPayload.s.indexOf('OK:del') !== -1) {
                 Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_FREASH);
-                //Me.EVT_onDeleted();
                 js_eventEmitter.fn_dispatch(js_event.EE_onDeleted);
 
             } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
