@@ -397,6 +397,8 @@ class C_NavInfo {
     };
     // flight path as points (lng,lat,alt)
     this.m_FlightPath = [];
+
+    Object.seal(this);
   }
 }
 
@@ -459,6 +461,8 @@ class C_Swarm {
     this.m_formation_as_follower =
       js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
     this.m_following = null;
+
+     Object.seal(this);
   }
 }
 
@@ -493,6 +497,8 @@ class C_P2P {
     this.m_p2p_connected = false;
     // there is a p2p module but p2p communication is paused.
     this.m_p2p_disabled = true;
+
+    Object.seal(this);
   }
 
   fn_isMyMac(mac) {
@@ -521,6 +527,8 @@ class C_SDR {
     this.m_spectrum_data = [];
     this.m_detectedSignal = [];
     this.m_detectedSignal_new = false;
+
+    Object.seal(this);
   }
 
   getLastSpectrum() {
@@ -704,6 +712,8 @@ class C_EKF {
     this.m_terrain_alt_variance = 0;
     this.m_airspeed_variance = 0;
     this.m_flags = 0;
+
+    Object.seal(this);
   }
 }
 
@@ -717,6 +727,8 @@ class C_Vibration {
     this.m_clipping_0 = 0;
     this.m_clipping_1 = 0;
     this.m_clipping_2 = 0;
+
+    Object.seal(this);
   }
 }
 
@@ -1116,8 +1128,6 @@ export class CAndruavUnitObject {
     this.m_GPS_Info3 = new C_GPS(this);
     this.m_Nav_Info = new C_NavInfo(this);
     this.m_Terrain_Info = new C_Terrain(this);
-    Object.seal(this.m_NetworkStatus);
-    Object.seal(this.m_Nav_Info);
     this.m_gui = new C_GUIHelper(this);
     this.m_Geo_Tags = new C_GeoTags(this);
     this.m_Telemetry = new C_Telemetry(this);
@@ -1132,8 +1142,6 @@ export class CAndruavUnitObject {
     this.m_Swarm = new C_Swarm(this);
     this.m_P2P = new C_P2P(this);
     this.m_SDR = new C_SDR(this);
-    Object.seal(this.m_Swarm);
-    Object.seal(this.m_P2P);
     this.m_SignalStatus = new C_SignalStatus(this);
 
     this.m_FCBParameters = new C_FCBParameters(this);
@@ -1170,6 +1178,18 @@ export class CAndruavUnitObject {
         }
 
         return module_version;
+  }
+
+
+  fn_disconnect()
+  {
+    if (!this.m_IsMe)
+    { 
+      return;
+    }
+
+    // todo : apply any shutdown updates
+    
   }
 }
 
