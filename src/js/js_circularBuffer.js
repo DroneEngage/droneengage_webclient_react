@@ -6,8 +6,7 @@
 *********************************************************************************** */
 
 
-export class ClssCustomCircularBuffer 
-{
+export class ClssCustomCircularBuffer {
 
     constructor(p_length) {
         if (!Number.isInteger(p_length) || p_length <= 0) {
@@ -23,14 +22,14 @@ export class ClssCustomCircularBuffer
         if (this.fn_bufferFull() && !p_forgetOld) {
             throw new Error("Buffer Overflow");
         }
-    
+
         if (this.fn_bufferFull() && fn_onDeleteCallBack) {
             fn_onDeleteCallBack(this.m_buffer[this.m_head]);
         }
-    
+
         this.m_buffer[this.m_head] = p_toAdd;
         this.m_head = (this.m_head + 1) % this.m_buffer.length;
-    
+
         if (this.m_unitCount < this.m_buffer.length) {
             this.m_unitCount++;
         }
@@ -43,7 +42,7 @@ export class ClssCustomCircularBuffer
             }
             return null;
         }
-    
+
         const item = this.m_buffer[this.m_tail];
         this.m_tail = (this.m_tail + 1) % this.m_buffer.length;
         this.m_unitCount--;
@@ -57,14 +56,12 @@ export class ClssCustomCircularBuffer
         this.m_unitCount = 0;
     }
 
-    toString() 
-    {
+    toString() {
         return `ClssCustomCircularBuffer(size=${this.m_buffer.length}, head=${this.m_head}, tail=${this.m_tail}, count=${this.m_unitCount})`;
     }
 
 
-    fn_bufferFull() 
-    {
+    fn_bufferFull() {
         return this.m_unitCount >= this.m_buffer.length;
     }
 }

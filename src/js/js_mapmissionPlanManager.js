@@ -11,7 +11,7 @@ class ClssAndruavMissionPlanManager {
         // Store the currently active mission plan
         this.m_activePlan = null;
         // Counter to track the number of missions created
-        this.m_missionCounter = 1; 
+        this.m_missionCounter = 1;
     }
 
     /**
@@ -33,13 +33,13 @@ class ClssAndruavMissionPlanManager {
     fn_createNewMission() {
         // Determine the initial color for the mission path from globals
         const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter % js_globals.v_colorDrawPathes.length];
-        
+
         // Create a new mission plan instance
         let v_missionPlan = new ClssAndruavMissionPlan(this.m_missionCounter, c_initColor);
-        
+
         // Store the new mission plan in the manager
         this.m_missionPlans[this.m_missionCounter] = v_missionPlan;
-        
+
         // Increment the mission counter for the next creation
         this.m_missionCounter += 1;
 
@@ -73,7 +73,7 @@ class ClssAndruavMissionPlanManager {
     }
 
 
-    fn_activateMissionItem(p_mission_item_id, direction){
+    fn_activateMissionItem(p_mission_item_id, direction) {
         let v_missionPlan = js_mapmission_planmanager.fn_getCurrentMission();
         if (v_missionPlan === null) return;
         return v_missionPlan.fn_activateMissionItem(p_mission_item_id, direction);
@@ -86,22 +86,22 @@ class ClssAndruavMissionPlanManager {
      */
     fn_activateNextMission(v_id2) {
         const c_mission_keys = Object.keys(this.m_missionPlans);
-        
+
         // Check if there are any mission plans
         if (!c_mission_keys.length) {
             return null; // Exit if there are none
         }
 
         const currentIndex = c_mission_keys.indexOf(v_id2);
-    
+
         if (currentIndex === -1) {
             return null; // v_id2 not found
         }
-    
+
         const nextIndex = (currentIndex + 1) % c_mission_keys.length;
         const nextMissionId = c_mission_keys[nextIndex];
         const nextMission = this.m_missionPlans[nextMissionId];
-    
+
         this.fn_setCurrentMission(nextMission.m_id);
         return nextMission;
 
@@ -116,7 +116,7 @@ class ClssAndruavMissionPlanManager {
         if (!this.m_missionPlans.hasOwnProperty(v_id1)) {
             return; // Exit if it does not exist
         }
-        
+
         // If there is an active mission plan, unhighlight it
         if (this.m_activePlan) {
             this.m_activePlan.fn_highlight(false);

@@ -1,18 +1,18 @@
 import * as js_common from './js_common.js';
-import {js_localStorage} from './js_localStorage';
+import { js_localStorage } from './js_localStorage';
 
 /***************************************************
 
-	Mohammad Said Hefny
-	mohammad.hefny@gmail.com
-	30 Jul 2016
+    Mohammad Said Hefny
+    mohammad.hefny@gmail.com
+    30 Jul 2016
 
 *****************************************************/
 
 class CSpeakEngine {
     constructor() {
-        
-		if (!window.speechSynthesis) {
+
+        if (!window.speechSynthesis) {
             console.error('Web Speech API is not supported in this browser.');
             return;
         }
@@ -92,7 +92,7 @@ class CSpeakEngine {
         // Clear the queue
         this._v_to_speak = [];
     }
-    
+
     fn_speakFirst(text) {
         if (!this._v_enable_speak || !text?.trim()) return;
 

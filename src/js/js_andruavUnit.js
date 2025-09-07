@@ -129,31 +129,28 @@ class C_TRACKER_AI {
   }
 
 
-  fn_addObjectClass(objectList)
-  {
+  fn_addObjectClass(objectList) {
     this.m_object_list = objectList;
   }
 
-  fn_updateTrackerStatus(status)
-  {
+  fn_updateTrackerStatus(status) {
     this.m_valid_unit_feedback = true;
-    
-    switch(status)
-    {
+
+    switch (status) {
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
-          this.m_detected = false;
-          this.m_active = true;
+        this.m_detected = false;
+        this.m_active = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
-          this.m_detected = true;
-          this.m_active = true;
+        this.m_detected = true;
+        this.m_active = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
-          this.m_active = true;
+        this.m_active = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
-          this.m_active = false;
-          this.m_detected = false;
+        this.m_active = false;
+        this.m_detected = false;
         break;
     }
   }
@@ -173,35 +170,32 @@ class C_Tracker {
   }
 
 
-  fn_enableGUITracker(enabled)
-  {
+  fn_enableGUITracker(enabled) {
     this.m_enable_gui_tracker = enabled;
   }
 
-  fn_updateTrackerStatus(status)
-  {
+  fn_updateTrackerStatus(status) {
     this.m_valid_unit_feedback = true;
-    
-    switch(status)
-    {
+
+    switch (status) {
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
-          this.m_detected = false;
-          this.m_active = true;
-          this.m_enable_gui_tracker = true;
+        this.m_detected = false;
+        this.m_active = true;
+        this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
-          this.m_detected = true;
-          this.m_active = true;
-          this.m_enable_gui_tracker = true;
+        this.m_detected = true;
+        this.m_active = true;
+        this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
-          this.m_active = true;
-          this.m_enable_gui_tracker = true;
+        this.m_active = true;
+        this.m_enable_gui_tracker = true;
         break;
       case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
-          this.m_active = false;
-          this.m_detected = false;
-          this.m_enable_gui_tracker = false;
+        this.m_active = false;
+        this.m_detected = false;
+        this.m_enable_gui_tracker = false;
         break;
     }
   }
@@ -213,8 +207,7 @@ class C_Obstacles {
     this.m_obstacles = [];
   }
 
-  fn_addObstacle ()
-  {
+  fn_addObstacle() {
 
   }
 
@@ -462,7 +455,7 @@ class C_Swarm {
       js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
     this.m_following = null;
 
-     Object.seal(this);
+    Object.seal(this);
   }
 }
 
@@ -539,17 +532,16 @@ class C_SDR {
     }
   }
 
-  addDetectedSignal(frequency, signal_value, longitude, latitude, altitude, relative_altitude, signal_direction)
-  {
-    let reading = 
+  addDetectedSignal(frequency, signal_value, longitude, latitude, altitude, relative_altitude, signal_direction) {
+    let reading =
     {
       frequency: frequency,
       signal_value: signal_value,
-      longitude:longitude,
-      latitude:latitude,
-      altitude:altitude,
-      relative_altitude:relative_altitude,
-      signal_direction:signal_direction
+      longitude: longitude,
+      latitude: latitude,
+      altitude: altitude,
+      relative_altitude: relative_altitude,
+      signal_direction: signal_direction
     }
 
     Object.seal(reading);
@@ -559,7 +551,7 @@ class C_SDR {
     // Ensure the array length is within the maximum limit
     if (this.m_detectedSignal.length > js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH) {
       this.m_detectedSignal = this.m_detectedSignal.slice(-js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH);
-  }
+    }
 
   }
 
@@ -572,8 +564,7 @@ class C_SDR {
     }
   }
 
-  addSpectrumData(p_info, p_data)
-  {   
+  addSpectrumData(p_info, p_data) {
     let spectrumData = {
       frequency_min: p_info.fcm,
       frequency_step: p_info.fcst,
@@ -582,12 +573,12 @@ class C_SDR {
     }
 
     Object.seal(spectrumData);
-    
+
     this.m_spectrum_data.push(spectrumData); // Add the new data to the array
 
     // Ensure the array length is within the maximum limit
     if (this.m_spectrum_data.length > js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH) {
-        this.m_spectrum_data = this.m_spectrum_data.slice(-js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH);
+      this.m_spectrum_data = this.m_spectrum_data.slice(-js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH);
     }
   }
 }
@@ -743,24 +734,23 @@ class C_DistanceSensor {
     this.m_current_distance = 0;
   }
 
-  update (p_mavlink_distance_sensor) {
+  update(p_mavlink_distance_sensor) {
     this.m_orientation = p_mavlink_distance_sensor.orientation; //MAV_SENSOR_ORIENTATION_ENUM_END
     this.m_isValid = true;
-    this.m_min_distance = p_mavlink_distance_sensor.min_distance ;  // cm
-    this.m_max_distance = p_mavlink_distance_sensor.max_distance ;  // cm
-    this.m_current_distance = p_mavlink_distance_sensor.current_distance ;  // cm
+    this.m_min_distance = p_mavlink_distance_sensor.min_distance;  // cm
+    this.m_max_distance = p_mavlink_distance_sensor.max_distance;  // cm
+    this.m_current_distance = p_mavlink_distance_sensor.current_distance;  // cm
 
     const now = new Date();
-    this.m_last_access = now ;
+    this.m_last_access = now;
 
-    this.m_parent.m_last_access = now ;
+    this.m_parent.m_last_access = now;
   }
 
 }
 
 class C_LidarInfo {
-  constructor (p_parent)
-  {
+  constructor(p_parent) {
     this.m_parent = p_parent;
     this.m_distance_sensors = [];
     this.m_last_access = new Date();
@@ -770,23 +760,20 @@ class C_LidarInfo {
     }
   }
 
-  update (mavlink_distance_sensor)
-  {
+  update(mavlink_distance_sensor) {
     const orientation = mavlink_distance_sensor.orientation;
-    
-    if (orientation >=40) return ;  
-                    
+
+    if (orientation >= 40) return;
+
     this.m_distance_sensors[orientation].update(mavlink_distance_sensor);
     this.m_any_valid = true;
   }
 
-  get(p_orientation)
-  {
-    return  this.m_distance_sensors[p_orientation];
+  get(p_orientation) {
+    return this.m_distance_sensors[p_orientation];
   }
 
-  anyValidDataExists ()
-  {
+  anyValidDataExists() {
     const now = new Date();
     return ((this.m_any_valid === true) && (now - this.m_last_access) < 5000);
   }
@@ -844,47 +831,47 @@ class C_GPIO {
     * *    PM_OFF		          7   // to input / release line
     *
     */
-      gpio_array.forEach(gpio => {
-        // Ensure required properties exist
-        if (gpio.b === undefined) {
-          console.warn("GPIO object missing required properties:", gpio);
-          return;
-        }
-  
-        const gpio_obj = {
-          pin_module_key: gpio.i==null?0:gpio.i, 
-          pin_number: gpio.b,
-          pin_mode: gpio.m,
-          gpio_type: gpio.t,
-          pin_value: gpio.v,
-          pin_name: gpio.n,
-          pwm_width: gpio.d==null?0:gpio.d, 
-        };
-  
-        this.m_gpios[gpio.i + '-' + gpio.b] = gpio_obj;
-      });
+    gpio_array.forEach(gpio => {
+      // Ensure required properties exist
+      if (gpio.b === undefined) {
+        console.warn("GPIO object missing required properties:", gpio);
+        return;
+      }
+
+      const gpio_obj = {
+        pin_module_key: gpio.i == null ? 0 : gpio.i,
+        pin_number: gpio.b,
+        pin_mode: gpio.m,
+        gpio_type: gpio.t,
+        pin_value: gpio.v,
+        pin_name: gpio.n,
+        pwm_width: gpio.d == null ? 0 : gpio.d,
+      };
+
+      this.m_gpios[gpio.i + '-' + gpio.b] = gpio_obj;
+    });
+  }
+
+  /**
+   * 
+   * @param {*} name gpio name
+   * @returns {Array} - An array of GPIO objects with the specified name.
+   */
+  getGPIOByName(name) {
+    if (typeof name !== 'string') {
+      console.error("Invalid input: name must be a string.");
+      return []; // Return an empty array for invalid input
     }
 
-    /**
-     * 
-     * @param {*} name gpio name
-     * @returns {Array} - An array of GPIO objects with the specified name.
-     */
-    getGPIOByName(name) {
-      if (typeof name !== 'string') {
-        console.error("Invalid input: name must be a string.");
-        return []; // Return an empty array for invalid input
+    const foundGpios = [];
+    for (const key in this.m_gpios) {
+      if (this.m_gpios.hasOwnProperty(key) && this.m_gpios[key].pin_name === name) {
+        foundGpios.push(this.m_gpios[key]);
       }
-    
-      const foundGpios = [];
-      for (const key in this.m_gpios) {
-        if (this.m_gpios.hasOwnProperty(key) && this.m_gpios[key].pin_name === name) {
-          foundGpios.push(this.m_gpios[key]);
-        }
-      }
-    
-      return foundGpios; // Return an array of all GPIO objects with the given name
     }
+
+    return foundGpios; // Return an array of all GPIO objects with the given name
+  }
 }
 
 class C_Modules {
@@ -919,12 +906,12 @@ class C_Modules {
 
     // check uavos_camera_plugin
     /*
-		{"v", module_item->version},
-		{"i", module_item->module_key},
-		{"c", module_item->module_class},
-		{"t", module_item->time_stamp},
-		{"d", module_item->is_dead},
-		*/
+    {"v", module_item->version},
+    {"i", module_item->module_key},
+    {"c", module_item->module_class},
+    {"t", module_item->time_stamp},
+    {"d", module_item->is_dead},
+    */
     jsonModules.forEach(module => {
       switch (module.c.toLowerCase()) {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
@@ -943,20 +930,20 @@ class C_Modules {
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_P2P:
-					this.has_p2p = true;	
+          this.has_p2p = true;
           this.has_p2p_alive = module.d === false;
-				  break;
-          
+          break;
+
         case js_andruavMessages.TYPE_MODULE_CLASS_SDR:
-          this.has_sdr = true;	
+          this.has_sdr = true;
           this.has_sdr_alive = module.d === false;
           break;
-            
+
         case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
           this.has_camera = true;
           this.has_camera_alive = module.d === false;
           break;
-        
+
         case js_andruavMessages.TYPE_MODULE_CLASS_TRACKING:
           this.has_tracking = true;
           this.has_tracking_alive = module.d === false;
@@ -966,7 +953,7 @@ class C_Modules {
           this.has_ai_recognition = true;
           this.has_ai_recognition_alive = module.d === false;
           break;
-      
+
         default:
           console.warn(`Unknown module class: ${module.c}`);
           break;
@@ -1028,7 +1015,7 @@ class C_Messages {
    */
   fn_sendMessageAllowed(message_id) {
     const data = this.m_messages_repeat[message_id];
-    if (data === null  || data === undefined) return true;
+    if (data === null || data === undefined) return true;
 
     const can_send = new Date() - data.from_time > data.interval_ms;
     return can_send;
@@ -1047,7 +1034,7 @@ class C_Messages {
 
 export class CAndruavUnitObject {
 
-   #m_partyID;
+  #m_partyID;
 
   constructor() {
     this.m_index = 0;
@@ -1076,13 +1063,11 @@ export class CAndruavUnitObject {
     this.init();
   }
 
-  setPartyID (p_partyID)
-  {
+  setPartyID(p_partyID) {
     this.#m_partyID = p_partyID
   }
 
-  getPartyID()
-  {
+  getPartyID() {
     return this.#m_partyID;
   }
 
@@ -1091,8 +1076,8 @@ export class CAndruavUnitObject {
   }
 
   fn_canCamera() {
-    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive===false)) return false;
-    
+    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
+
     if (this.m_Permissions[10] === "C") {
       return true;
     }
@@ -1101,8 +1086,8 @@ export class CAndruavUnitObject {
   }
 
   fn_canVideo() {
-    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive===false)) return false;
-    
+    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
+
     if (this.m_Permissions[8] === "V") {
       return true;
     }
@@ -1151,45 +1136,40 @@ export class CAndruavUnitObject {
     this.m_lidar_info = new C_LidarInfo(this);
     this.m_Throttle = 0; //MAVLINK_MSG_ID_VFR_HUD.throttle uint16_t % Current throttle setting (0 to 100).
 
-    
+
   }
 
   fullName() {
     return this.fn_getFullName(this.m_groupName, this.#m_partyID);
   }
 
-  module_version () {
-    let module_version = (this.Description+'\n');
-                
-        if (this.m_isDE !== true)
-        {
-            module_version += "Andruav";
-        }
-        else
-        {
-            module_version += "DE version: " + this.m_version;
-            const len = this.m_modules.length;
-            for (let i=0; i< len; ++i)
-            {
-                const module = this.m_modules[i];
-                module_version += '\n';
-                module_version += module.i + ' ver:' + module.v;
-            }
-        }
+  module_version() {
+    let module_version = (this.Description + '\n');
 
-        return module_version;
+    if (this.m_isDE !== true) {
+      module_version += "Andruav";
+    }
+    else {
+      module_version += "DE version: " + this.m_version;
+      const len = this.m_modules.length;
+      for (let i = 0; i < len; ++i) {
+        const module = this.m_modules[i];
+        module_version += '\n';
+        module_version += module.i + ' ver:' + module.v;
+      }
+    }
+
+    return module_version;
   }
 
 
-  fn_disconnect()
-  {
-    if (!this.m_IsMe)
-    { 
+  fn_disconnect() {
+    if (!this.m_IsMe) {
       return;
     }
 
     // todo : apply any shutdown updates
-    
+
   }
 }
 
@@ -1203,11 +1183,11 @@ class CAndruavUnitList {
   }
 
   static getInstance() {
-        if (!CAndruavUnitList.instance) {
-            CAndruavUnitList.instance = new CAndruavUnitList();
-        }
-        return CAndruavUnitList.instance;
+    if (!CAndruavUnitList.instance) {
+      CAndruavUnitList.instance = new CAndruavUnitList();
     }
+    return CAndruavUnitList.instance;
+  }
 
   fn_resetList() {
     this.List.clear();
@@ -1223,23 +1203,23 @@ class CAndruavUnitList {
      */
   fn_getUnitsSorted() {
     return Array.from(this.List.values()).sort((a, b) => {
-        const nameA = a.m_unitName || "";
-        const nameB = b.m_unitName || "";
-        return nameA.localeCompare(nameB);
+      const nameA = a.m_unitName || "";
+      const nameB = b.m_unitName || "";
+      return nameA.localeCompare(nameB);
     });
-  } 
+  }
 
 
-    /**
-     * Returns units sorted by system ID.
-     * @returns {Array} An array of units sorted by system ID.
-     */
-    fn_getUnitsSortedBy_APID() {
-      return Array.from(this.List.values()).sort((a, b) => {
-          const idA = a.m_FCBParameters.m_systemID || 0;
-          const idB = b.m_FCBParameters.m_systemID || 0;
-          return  idA - idB;
-      });
+  /**
+   * Returns units sorted by system ID.
+   * @returns {Array} An array of units sorted by system ID.
+   */
+  fn_getUnitsSortedBy_APID() {
+    return Array.from(this.List.values()).sort((a, b) => {
+      const idA = a.m_FCBParameters.m_systemID || 0;
+      const idB = b.m_FCBParameters.m_systemID || 0;
+      return idA - idB;
+    });
   }
 
   /**
@@ -1288,47 +1268,43 @@ class CAndruavUnitList {
     this.List.set(unitFullName, andruavUnit);
   }
 
-  attachGamePadToUnit(p_andruavUnit)
-  {
-      if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
-        this.API_disengageRX(this.m_currentEngagedUnitRX);
-      }
+  attachGamePadToUnit(p_andruavUnit) {
+    if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
+      this.API_disengageRX(this.m_currentEngagedUnitRX);
+    }
 
-      this.API_engageGamePad(p_andruavUnit);
+    this.API_engageGamePad(p_andruavUnit);
   }
 
-  getEngagedUnitRX()
-  {
+  getEngagedUnitRX() {
     return this.m_currentEngagedUnitRX;
   }
 
-  disengageUnitRX(p_andruavUnit)
-  {
-    if (!p_andruavUnit)  {
+  disengageUnitRX(p_andruavUnit) {
+    if (!p_andruavUnit) {
       this.m_currentEngagedUnitRX = undefined;
-      return ;
+      return;
     }
-   
+
     p_andruavUnit.m_Telemetry.m_rxEngaged = false;
 
-    if (!this.m_currentEngagedUnitRX) return ;
+    if (!this.m_currentEngagedUnitRX) return;
 
-    
+
     if (p_andruavUnit.getPartyID() === this.m_currentEngagedUnitRX.getPartyID()) {
       this.m_currentEngagedUnitRX = undefined;
     }
-    
+
   }
 
-  engageUnitRX(p_andruavUnit)
-  {
-    if (!p_andruavUnit) return ;
+  engageUnitRX(p_andruavUnit) {
+    if (!p_andruavUnit) return;
 
     p_andruavUnit.m_Telemetry.m_rxEngaged = true;
     this.m_currentEngagedUnitRX = p_andruavUnit;
   }
 
-  
+
 }
 
 Object.seal(CAndruavUnitList.prototype);

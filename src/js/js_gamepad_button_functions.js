@@ -5,18 +5,18 @@ import * as js_common from './js_common.js'
 import { js_globals } from './js_globals.js';
 import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from './js_eventEmitter.js'
-import {js_andruav_gamepad} from './js_andruav_gamepad.js'
+import { js_andruav_gamepad } from './js_andruav_gamepad.js'
 
 class CGamePadButtonFunctions {
     constructor() {
         this.m_lastgamePadCommandTime = {};
 
         js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated, this, this.#fn_sendButtons);
-        
+
         this.m_buttonActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
                 'ARM': {
-                    onPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit,true, false),
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_Arm(unit, true, false),
                 },
                 'RTL': {
                     onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_RTL),
@@ -72,7 +72,7 @@ class CGamePadButtonFunctions {
             },
             [js_andruavUnit.VEHICLE_TRI]: {},
             [js_andruavUnit.VEHICLE_QUAD]: {
-                
+
             }
         };
     }
@@ -127,16 +127,14 @@ class CGamePadButtonFunctions {
 
             if (!buttonConfig) return;
 
-            if (button.m_pressed  === true)
-            {
+            if (button.m_pressed === true) {
                 buttonConfig.onPress(c_currentEngagedUnitRX);
             }
-            else
-            {
+            else {
                 buttonConfig.onRelease(c_currentEngagedUnitRX);
             }
-            
-            
+
+
             js_common.fn_console_log("fn_sendButtons", buttonFunction);
         });
     }
