@@ -1,11 +1,11 @@
 import { js_globals } from "./js_globals.js";
-import {EVENTS as js_event} from './js_eventList.js'
-import {js_eventEmitter} from './js_eventEmitter';
+import { EVENTS as js_event } from './js_eventList.js'
+import { js_eventEmitter } from './js_eventEmitter';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
 
 const SEC_1 = 1000;
-    
+
 /**
  * Represents a single WebRTC conversation (peer connection).
  */
@@ -27,15 +27,15 @@ class CTalk {
     this.frameRateMonitorInterval = null; // Holds the setInterval ID
 
     // Callback functions, initialized to no-op functions
-    this.onError = () => {};
-    this.onConnect = () => {};
-    this.onDisplayVideo = () => {};
-    this.onAddStream = () => {}; // Currently unused in provided methods
-    this.onRemoveStream = () => {};
-    this.onClosing = () => {};
-    this.onDisconnected = () => {};
-    
-    
+    this.onError = () => { };
+    this.onConnect = () => { };
+    this.onDisplayVideo = () => { };
+    this.onAddStream = () => { }; // Currently unused in provided methods
+    this.onRemoveStream = () => { };
+    this.onClosing = () => { };
+    this.onDisconnected = () => { };
+
+
 
     // Initialize RTCPeerConnection
     this.pc = new this.PeerConnection(cAndruavStream.rtcConfig);
@@ -122,12 +122,10 @@ class CTalk {
         // For received video, look for 'inbound-rtp' statistics
         if (report.type === 'inbound-rtp' && report.kind === 'video') {
           // 'framesPerSecond' is commonly available in modern browsers
-          if (report.bytesReceived !== undefined)
-          {
+          if (report.bytesReceived !== undefined) {
             this.m_bytesReceived = report.bytesReceived;
           }
-          if (report.trackIdentifier !== undefined)
-          {
+          if (report.trackIdentifier !== undefined) {
             trackIdentifier = report.trackIdentifier;
           }
           if (report.framesPerSecond !== undefined) {
@@ -140,15 +138,15 @@ class CTalk {
         }
         // If sending video, you might look for 'outbound-rtp'
       });
-      
-      
+
+
 
       this.m_actualFrameRate = currentFrameRate;
       js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
       v_andruavUnit.m_Video.m_total_transfer_bytes += this.m_bytesReceived;
-			js_eventEmitter.fn_dispatch (js_event.EE_onWebRTC_Video_Statistics,{'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx':this.m_bytesReceived , 'track_id': trackIdentifier}); 
-        
+      js_eventEmitter.fn_dispatch(js_event.EE_onWebRTC_Video_Statistics, { 'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx': this.m_bytesReceived, 'track_id': trackIdentifier });
+
 
     } catch (e) {
       this.parentStream.debugError(`Error getting stats for ${this.targetVideoTrack}: ${e.message}`);
@@ -318,7 +316,7 @@ class AndruavStream {
       talk.onDisconnected = dialConfig.onDisconnected ?? talk.onDisconnected;
       talk.onOrphanDisconnect = dialConfig.onOrphanDisconnect ?? talk.onOrphanDisconnect;
       talk.onRemoveStream = dialConfig.onRemovestream ?? talk.onRemoveStream;
-      
+
 
       talk.pc.onremovestream = talk.onRemoveStream;
       talk.pc.ontrack = (mediaStreamEvent) => {

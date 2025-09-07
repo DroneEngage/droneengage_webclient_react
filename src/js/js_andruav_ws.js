@@ -159,7 +159,7 @@ class CAndruavClientWS {
         }
 
         const h = js_helpers.fn_str2ByteArray(this.fn_generateJSONMessage(this.partyID, targetName, v_msgRouting, msgType));
-        
+
         const msgx_bin = js_helpers.fn_concatBuffers(h, data, true);
         this.sendex(msgx_bin, true);
     };
