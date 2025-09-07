@@ -108,8 +108,8 @@ class CAndruavClientFacade {
 
         p_me.v_sendAxes = false;
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
-        if (!c_currentEngagedUnitRX) return ;
-        
+        if (!c_currentEngagedUnitRX) return;
+
         if (this.v_axes !== null) this.#API_sendRXChannels(c_currentEngagedUnitRX, this.v_axes);
     }
 
@@ -953,17 +953,17 @@ class CAndruavClientFacade {
     * @param {*} p_andruavUnit 
     */
     API_disengageRX(p_andruavUnit) {
-        
+
         js_globals.m_andruavUnitList.disengageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_disengageRX();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
-        
+
         js_eventEmitter.fn_dispatch(js_event.EE_releaseGamePad, p_andruavUnit);
     };
 
 
     API_engageGamePad(p_andruavUnit) {
-        
+
         js_globals.m_andruavUnitList.engageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_engageGamePad();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);

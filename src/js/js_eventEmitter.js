@@ -22,14 +22,14 @@ class CEventEmitter {
      */
     fn_dispatch(p_event, p_data) {
         const subscribers = this.m_v_events.get(p_event); // Get the Map of listeners for this event
-        
+
         if (!subscribers) { // Check if the Map exists (i.e., any subscribers for this event)
             return; // No listeners for this event
         }
 
         // subscribers is a Map: (listener -> callback)
         // Iterating over map entries [listener, callback]
-        for (const [listner, callback] of subscribers.entries()) { 
+        for (const [listner, callback] of subscribers.entries()) {
             try {
                 callback(listner, p_data); // Pass listener and data to the callback
             } catch (e) {

@@ -94,7 +94,7 @@ class CLocalStorage {
     }
 
     fn_resetUnitID() {
-        this.fn_setUnitID (js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
+        this.fn_setUnitID(js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
     fn_getUnitID() {
         return this._getSessionValue(js_globals.LS_UNIT_ID, js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
@@ -149,7 +149,7 @@ class CLocalStorage {
     fn_exportGamePadConfigs() {
         const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
         const configs = {};
-        
+
         // Iterate through localStorage to find all game pad configs
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -158,7 +158,7 @@ class CLocalStorage {
                 configs[configIndex] = localStorage.getItem(key);
             }
         }
-        
+
         // Create JSON string and trigger download
         const jsonString = JSON.stringify(configs, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
@@ -199,7 +199,7 @@ class CLocalStorage {
         return parseInt(this._getValue('_vDefaultSHD', js_globals.CONST_DEFAULT_ALTITUDE.toString()));
     }
 
-     fn_setDefaultSwarmVerticalDistance(value) {
+    fn_setDefaultSwarmVerticalDistance(value) {
         this._setValue('_vDefaultSVD', value.toString());
     }
 

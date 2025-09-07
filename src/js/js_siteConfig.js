@@ -28,7 +28,7 @@ export let CONST_HOME_URL = "https://cloud.ardupilot.org/";
 export let CONST_MANUAL_URL = "https://cloud.ardupilot.org/";
 export let CONST_FAQ_URL = "https://cloud.ardupilot.org/de-faq.html";
 export let CONST_CONTACT_URL = "https://droneengage.com";
-export let CONST_ANDRUAV_URL ="https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download";
+export let CONST_ANDRUAV_URL = "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download";
 export let CONST_ANDRUAV_URL_ENABLE = true;
 
 // CHOOSE YOUR MAP SOURCE
@@ -86,20 +86,20 @@ function loadConfigSync() {
             jsonString = jsonString.replace(/(^|\s)\/\/.*/g, '');
 
             const data = JSON.parse(jsonString);
-            
+
             // Update the exported constants
             if (data.CONST_TEST_MODE !== undefined) CONST_TEST_MODE = data.CONST_TEST_MODE;
             if (data.CONST_PROD_MODE_IP !== undefined) CONST_PROD_MODE_IP = data.CONST_PROD_MODE_IP;
             if (data.CONST_PROD_MODE_PORT !== undefined) CONST_PROD_MODE_PORT = data.CONST_PROD_MODE_PORT;
-            
+
             if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
             if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
-            
+
             if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
             if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
             if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
             if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
-            
+
             if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
             if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
 

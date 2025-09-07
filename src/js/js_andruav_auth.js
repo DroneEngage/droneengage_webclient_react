@@ -4,11 +4,11 @@
 *   2 Aug 2016
 *
 *********************************************************************************** */
-import $ from 'jquery'; 
+import $ from 'jquery';
 import * as  js_siteConfig from './js_siteConfig.js'
-import {EVENTS as js_event} from './js_eventList.js'
+import { EVENTS as js_event } from './js_eventList.js'
 import * as js_andruavMessages from './js_andruavMessages'
-import {js_eventEmitter} from './js_eventEmitter'
+import { js_eventEmitter } from './js_eventEmitter'
 
 
 
@@ -23,7 +23,7 @@ const DEFAULT_PERMISSIONS = 0xffffffff; // Default permission value
 
 class CAndruavAuth {
     constructor() {
-        
+
         this.m_username = '';
         this.m_accesscode = '';
         this.m_retry_login = true;
@@ -33,17 +33,15 @@ class CAndruavAuth {
         window._localserverPort = 9211;
 
         this._m_ver = '5.0.0';
-        if (js_siteConfig.CONST_TEST_MODE === true)
-        {
-            this.m_auth_ip = js_siteConfig.CONST_TEST_MODE_IP; 
+        if (js_siteConfig.CONST_TEST_MODE === true) {
+            this.m_auth_ip = js_siteConfig.CONST_TEST_MODE_IP;
             this._m_auth_port = js_siteConfig.CONST_TEST_MODE_PORT;
-            this._m_auth_ports = js_siteConfig.CONST_TEST_MODE_PORT; 
+            this._m_auth_ports = js_siteConfig.CONST_TEST_MODE_PORT;
         }
-        else
-        {
+        else {
             this.m_auth_ip = js_siteConfig.CONST_PROD_MODE_IP;
             this._m_auth_port = js_siteConfig.CONST_PROD_MODE_PORT;
-            this._m_auth_ports = js_siteConfig.CONST_PROD_MODE_PORT; 
+            this._m_auth_ports = js_siteConfig.CONST_PROD_MODE_PORT;
         }
         this._m_perm = 0;
         this._m_permissions_ = '';
@@ -59,16 +57,14 @@ class CAndruavAuth {
             CAndruavAuth.instance = new CAndruavAuth();
         }
         return CAndruavAuth.instance;
-    
+
     }
 
-    fn_getSessionID()
-    {
+    fn_getSessionID() {
         return this._m_session_ID;
     }
 
-    fn_logined()
-    {
+    fn_logined() {
         return this._m_logined;
     }
 
@@ -87,30 +83,29 @@ class CAndruavAuth {
     fn_do_canControlWP() {
         return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL);
     }
-    
-    
+
+
     fn_do_canControlModes() {
         return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL);
     }
-    
+
     fn_do_canVideo() {
         return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_VIDEO) === js_andruavMessages.CONST_ALLOW_GCS_VIDEO);
     }
 
 
     fn_retryLogin(p_enable) {
-        if (this.m_retry_handle !== null)
-        {
-            clearTimeout (this.m_retry_handle);
+        if (this.m_retry_handle !== null) {
+            clearTimeout(this.m_retry_handle);
             this.m_retry_handle = null;
         }
         this.m_retry_login = p_enable;
     }
 
-	async fn_do_loginAccount(p_userName, p_accessCode) {
-        
+    async fn_do_loginAccount(p_userName, p_accessCode) {
+
         js_eventEmitter.fn_dispatch(js_event.EE_Auth_Login_In_Progress, null);
-                
+
         if (!p_userName || !p_userName.length || !p_accessCode) {
             this._m_logined = false;
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, { e: -1, em: "Invalid username or password" }); // Dispatch an error event
@@ -180,8 +175,7 @@ class CAndruavAuth {
             console.error("Login error:", error);
         }
 
-        if (js_andruavAuth.m_retry_login === true)
-        {
+        if (js_andruavAuth.m_retry_login === true) {
             this.m_retry_handle = setTimeout(
                 this.fn_do_loginAccount.bind(this, p_userName, p_accessCode),
                 4000);
@@ -221,12 +215,12 @@ class CAndruavAuth {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: response?.e || -4, em: errorMessage }); // Dispatch error event with details
             }
         } catch (error) {
-            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message}); // Dispatch error event with error message
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, { e: this.C_ERR_SUCCESS_DISPLAY_MESSAGE, em: AUTH_ERROR_BAD_CONNECTION, error: error.message }); // Dispatch error event with error message
             console.error("Generate Access Code error:", error);
         }
     }
 
-	async fn_regenerateAccessCode(p_accountName, p_permission) {
+    async fn_regenerateAccessCode(p_accountName, p_permission) {
         if (!p_accountName || !p_accountName.length || typeof p_permission !== 'string') {
             return;
         }
@@ -265,9 +259,9 @@ class CAndruavAuth {
 
     fn_do_logoutAccount() {
         this._m_logined = false;
-            
+
     }
 }
 
-  
-export var js_andruavAuth =  CAndruavAuth.getInstance();
+
+export var js_andruavAuth = CAndruavAuth.getInstance();

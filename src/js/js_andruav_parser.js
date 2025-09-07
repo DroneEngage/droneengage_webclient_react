@@ -91,7 +91,7 @@ class CAndruavClientParser {
 
 
     fn_init() {
-        
+
         this.m_lastparamatersUpdateTime = 0;
 
         this.m_andruavGeoFences = {}; // list of fences each fence ha s list of attached units.
@@ -451,7 +451,7 @@ class CAndruavClientParser {
 
                 js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
                 break;
-                
+
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_BSSID: {
                 p_jmsg = msg.msgPayload;
@@ -1242,7 +1242,7 @@ class CAndruavClientParser {
         const messages = this.mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
         for (const c_mavlinkMessage of messages) {
             if (c_mavlinkMessage.id === -1) {
-               js_common.fn_console_log("BAD MAVLINK");
+                js_common.fn_console_log("BAD MAVLINK");
                 continue;
             }
             p_unit.m_Messages.fn_addMavlinkMsg(c_mavlinkMessage);

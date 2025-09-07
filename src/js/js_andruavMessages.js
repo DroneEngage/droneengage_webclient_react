@@ -49,9 +49,9 @@ export const CONST_TYPE_AndruavMessage_DistinationLocation = 1037;
 export const CONST_TYPE_AndruavMessage_ChangeSpeed = 1040;
 export const CONST_TYPE_AndruavMessage_Ctrl_Camera = 1041;
 // CODEBLOCK_START
-export const CONST_TYPE_AndruavMessage_TrackingTarget_ACTION  = 1042;
+export const CONST_TYPE_AndruavMessage_TrackingTarget_ACTION = 1042;
 export const CONST_TYPE_AndruavMessage_TrackingTargetLocation = 1043;
-export const CONST_TYPE_AndruavMessage_Target_STATUS    = 1044;
+export const CONST_TYPE_AndruavMessage_Target_STATUS = 1044;
 // CODEBLOCK_END
 export const CONST_TYPE_AndruavMessage_GimbalCtrl = 1045;
 export const CONST_TYPE_AndruavMessage_UploadWayPoints = 1046;
@@ -109,9 +109,9 @@ export const CONST_TYPE_AndruavMessage_P2P_INFO = 6517;
 export const CONST_TYPE_AndruavMessage_Mission_Item_Sequence = 6518;
 
 
-export const CONST_TYPE_AndruavMessage_GPIO_ACTION           = 6519;
-export const CONST_TYPE_AndruavMessage_GPIO_STATUS           = 6520;
-export const CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE   = 6521;
+export const CONST_TYPE_AndruavMessage_GPIO_ACTION = 6519;
+export const CONST_TYPE_AndruavMessage_GPIO_STATUS = 6520;
+export const CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE = 6521;
 
 
 /**
@@ -120,9 +120,9 @@ export const CONST_TYPE_AndruavMessage_GPIO_REMOTE_EXECUTE   = 6521;
  * [u]: url/ip
  * [p]: port
  */
-export const CONST_TYPE_AndruavMessage_LocalServer_ACTION              = 6522;
-export const CONST_TYPE_AndruavMessage_LocalServer_STATUS              = 6523;
-export const CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE      = 6524;
+export const CONST_TYPE_AndruavMessage_LocalServer_ACTION = 6522;
+export const CONST_TYPE_AndruavMessage_LocalServer_STATUS = 6523;
+export const CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE = 6524;
 
 // System Messages
 export const CONST_TYPE_AndruavSystem_LoadTasks = 9001;
@@ -163,32 +163,32 @@ export const CONST_TASHKEEL_SERB_COUNT = 2;
 
 
 // Tracking Target Action TYPE_AndruavMessage_TrackingTarget_ACTION
-export const CONST_TrackingTarget_ACTION_TRACKING_POINT     = 0; 
-export const CONST_TrackingTarget_ACTION_TRACKING_REGION    = 1;  
-export const CONST_TrackingTarget_ACTION_TRACKING_STOP      = 2; 
-export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE     = 3; 
-export const CONST_TrackingTarget_ACTION_TRACKING_ENABLE    = 4; 
+export const CONST_TrackingTarget_ACTION_TRACKING_POINT = 0;
+export const CONST_TrackingTarget_ACTION_TRACKING_REGION = 1;
+export const CONST_TrackingTarget_ACTION_TRACKING_STOP = 2;
+export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE = 3;
+export const CONST_TrackingTarget_ACTION_TRACKING_ENABLE = 4;
 
 // Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
-export const CONST_TrackingTarget_STATUS_TRACKING_LOST      = 0; 
-export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED  = 1; 
-export const CONST_TrackingTarget_STATUS_TRACKING_ENABLED   = 2; 
-export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED   = 3; 
+export const CONST_TrackingTarget_STATUS_TRACKING_LOST = 0;
+export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED = 1;
+export const CONST_TrackingTarget_STATUS_TRACKING_ENABLED = 2;
+export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED = 3;
 
 
 // TYPE_AndruavMessage_AI_Recognition_ACTION
-export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT       = 0;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH      = 1;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE     = 2;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE      = 3;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST  = 4;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT = 0;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH = 1;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE = 2;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE = 3;
+export const CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST = 4;
 
 // Tracking Target Action TYPE_AndruavMessage_AI_Recognition_STATUS
-export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST        = 0;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED    = 1;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED     = 2;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_DISABLED    = 3;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST  = 4;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST = 0;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED = 1;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED = 2;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_DISABLED = 3;
+export const CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST = 4;
 
 // AndruavMessage_RemoteExecute Commands
 export const CONST_RemoteCommand_MAKETILT = 100;
@@ -216,35 +216,35 @@ export const CONST_RemoteCommand_MISSION_COUNT = 507;
 export const CONST_RemoteCommand_MISSION_CURRENT = 508;
 
 // P2P Actions
-export const CONST_P2P_ACTION_RESTART_TO_MAC      = 0;
-export const CONST_P2P_ACTION_CONNECT_TO_MAC      = 1;
-export const CONST_P2P_ACTION_CANDICATE_MAC       = 2;
-export const CONST_P2P_ACTION_SCAN_NETWORK        = 3;
-export const CONST_P2P_ACTION_ACCESS_TO_MAC       = 4;
+export const CONST_P2P_ACTION_RESTART_TO_MAC = 0;
+export const CONST_P2P_ACTION_CONNECT_TO_MAC = 1;
+export const CONST_P2P_ACTION_CANDICATE_MAC = 2;
+export const CONST_P2P_ACTION_SCAN_NETWORK = 3;
+export const CONST_P2P_ACTION_ACCESS_TO_MAC = 4;
 
 // SDR Actions
-export const CONST_SDR_ACTION_CONNECT             = 0;
-export const CONST_SDR_ACTION_DISCONNECT          = 1;
-export const CONST_SDR_ACTION_LIST_SDR_DEVICES    = 2;
-export const CONST_SDR_ACTION_SET_CONFIG          = 3;
-export const CONST_SDR_ACTION_READ_DATA           = 4;
-export const CONST_SDR_ACTION_PAUSE_DATA          = 5;
-export const CONST_SDR_ACTION_SDR_INFO            = 6;
-export const CONST_SDR_ACTION_TRIGGER             = 7;
+export const CONST_SDR_ACTION_CONNECT = 0;
+export const CONST_SDR_ACTION_DISCONNECT = 1;
+export const CONST_SDR_ACTION_LIST_SDR_DEVICES = 2;
+export const CONST_SDR_ACTION_SET_CONFIG = 3;
+export const CONST_SDR_ACTION_READ_DATA = 4;
+export const CONST_SDR_ACTION_PAUSE_DATA = 5;
+export const CONST_SDR_ACTION_SDR_INFO = 6;
+export const CONST_SDR_ACTION_TRIGGER = 7;
 
 // SDR STATUS
-export const CONST_SDR_STATUS_NOT_CONNECTED       = 0;
-export const CONST_SDR_STATUS_CONNECTED           = 1;
-export const CONST_SDR_STATUS_STREAMING_ONCE      = 2;
+export const CONST_SDR_STATUS_NOT_CONNECTED = 0;
+export const CONST_SDR_STATUS_CONNECTED = 1;
+export const CONST_SDR_STATUS_STREAMING_ONCE = 2;
 export const CONST_SDR_STATUS_STREAMING_INTERVALS = 3;
-export const CONST_SDR_STATUS_ERROR               = 999;
+export const CONST_SDR_STATUS_ERROR = 999;
 
 
 // GPIO Messages for CONST_TYPE_AndruavMessage_GPIO_ACTION
-export const CONST_GPIO_ACTION_PORT_CONFIG        = 0;
-export const CONST_GPIO_ACTION_INFO               = 1;
-export const CONST_GPIO_ACTION_PORT_WRITE         = 2;
-export const CONST_GPIO_ACTION_PORT_READ          = 3;
+export const CONST_GPIO_ACTION_PORT_CONFIG = 0;
+export const CONST_GPIO_ACTION_INFO = 1;
+export const CONST_GPIO_ACTION_PORT_WRITE = 2;
+export const CONST_GPIO_ACTION_PORT_READ = 3;
 
 
 // FenceType
@@ -410,7 +410,7 @@ export const message_names = {
   1075: "Mission Upload - 1075",
   1076: "P2P AI_Action - 1076",
   1077: "AI-Status - 1077",
-  
+
 
   6001: "ServoChannel - 6001",
   6501: "ServoOutput - 6501",

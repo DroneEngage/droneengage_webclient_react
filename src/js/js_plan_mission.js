@@ -4,7 +4,7 @@
 *****************************************************/
 import * as js_helpers from "./js_helpers.js";
 import { js_globals } from "./js_globals.js";
-import {EVENTS as js_event} from './js_eventList.js'
+import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from "./js_eventEmitter.js";
 import { js_leafletmap } from "./js_leafletmap.js";
 
@@ -89,7 +89,7 @@ export class ClssAndruavMissionPlan {
     const order = { R: r, G: g, B: b };
     const newColor = `#${permutation.toUpperCase().split('').map(p => order[p].toString(16).padStart(2, '0')).join('')}`;
     return newColor;
-}
+  }
 
   /**
    * Draws path between markers
@@ -112,7 +112,7 @@ export class ClssAndruavMissionPlan {
       if (v_enforceRedraw === true) {
         this.fn_disconnectMissionItem(marker);
       }
-      js_leafletmap.fn_changeBootStrapIconColor(marker, this.getRelatedColor(this.m_pathColor,'bgr'));
+      js_leafletmap.fn_changeBootStrapIconColor(marker, this.getRelatedColor(this.m_pathColor, 'bgr'));
       if (marker.m_next == null) {
         const arrowCoordinates = {
           from_pos: marker.getLatLng(),
@@ -140,12 +140,12 @@ export class ClssAndruavMissionPlan {
         );
       }
     }
-    
-    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len-1], this.getRelatedColor(this.m_pathColor,'bgr'));
 
-    js_leafletmap.fn_changeBootStrapIconColor (this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
-        
-      
+    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len - 1], this.getRelatedColor(this.m_pathColor, 'bgr'));
+
+    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
+
+
   }
 
   fn_activateMissionItem(active_mission_item_id, direction) {
@@ -159,8 +159,8 @@ export class ClssAndruavMissionPlan {
     }
 
     let nextMissionOrder;
-    
-    
+
+
     if (direction === 'next') {
       nextMissionOrder = (active_mission_item_id % missionCount);
     } else if (direction === 'prev') {
@@ -179,8 +179,8 @@ export class ClssAndruavMissionPlan {
   }
 
   /*
-		measure distance between all markers.
-	*/
+    measure distance between all markers.
+  */
   fn_getMissionDistance() {
     if (!this.m_all_mission_items_shaps || this.m_all_mission_items_shaps.length === 0) {
       return 0;
@@ -237,7 +237,7 @@ export class ClssAndruavMissionPlan {
   /**
    *	removes a single marker.
    */
-   fn_deleteMe(marker_id) {
+  fn_deleteMe(marker_id) {
     const indexToDelete = this.m_all_mission_items_shaps.findIndex(marker => marker.id === marker_id);
     if (indexToDelete === -1) return; // Marker not found
 
@@ -349,37 +349,33 @@ export class ClssAndruavMissionPlan {
     return module ? (module.c.length > 0 ? module.c : null) : null;
   }
 
-  fn_importAsDE_V1 (p_andruavUnit, p_plan_text)
-  {
-      if (p_plan_text['fileType'] !== 'de_plan') return ;
+  fn_importAsDE_V1(p_andruavUnit, p_plan_text) {
+    if (p_plan_text['fileType'] !== 'de_plan') return;
 
-      const me_mission = p_plan_text['de_mission'];
-      const mav_waypoints = me_mission['mav_waypoints'];
-      const modules = me_mission['modules'];
+    const me_mission = p_plan_text['de_mission'];
+    const mav_waypoints = me_mission['mav_waypoints'];
+    const modules = me_mission['modules'];
 
-      let temp_missionItem = {};
+    let temp_missionItem = {};
 
-      const len = mav_waypoints.length;
-      for (let i = 0; i < len; ++i) {
-        const maypoint = mav_waypoints[i];
-        
-        const cmd = maypoint['c'];
-        const mavlink = maypoint['mv'];
-              
-        switch (cmd)
-        {
+    const len = mav_waypoints.length;
+    for (let i = 0; i < len; ++i) {
+      const maypoint = mav_waypoints[i];
 
-          case mavlink20.MAV_CMD_DO_SET_SERVO:
+      const cmd = maypoint['c'];
+      const mavlink = maypoint['mv'];
+
+      switch (cmd) {
+
+        case mavlink20.MAV_CMD_DO_SET_SERVO:
           {
-            if (mavlink[0] === 16)
-              { // FIRE EVENT
-                temp_missionItem.eventFireRequired = true;
-                temp_missionItem.eventFire = mavlink[1];
-              }
-            if (mavlink[0] === 15)
-            { // WAIT FOR EVENT
-                temp_missionItem.eventWaitRequired = true;
-                temp_missionItem.eventWait = mavlink[1];
+            if (mavlink[0] === 16) { // FIRE EVENT
+              temp_missionItem.eventFireRequired = true;
+              temp_missionItem.eventFire = mavlink[1];
+            }
+            if (mavlink[0] === 15) { // WAIT FOR EVENT
+              temp_missionItem.eventWaitRequired = true;
+              temp_missionItem.eventWait = mavlink[1];
             }
           }
           break;
@@ -536,7 +532,7 @@ export class ClssAndruavMissionPlan {
             0,
             0,
           ]);
-          
+
           // then insert MAV_CMD_NAV_DELAY
           /*
               MAV_CMD_NAV_DELAY	mavlink20.MAV_CMD_NAV_DELAY Delay the next navigation command a number of seconds or until a specified time
@@ -575,7 +571,7 @@ export class ClssAndruavMissionPlan {
             ]);
             break;
 
-        case mavlink20.MAV_CMD_NAV_TAKEOFF:
+          case mavlink20.MAV_CMD_NAV_TAKEOFF:
             fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_TAKEOFF, [
               0.0,
               0.0,
@@ -596,17 +592,17 @@ export class ClssAndruavMissionPlan {
             ]);
 
             /*step.id = missionCounter;
-						step.cmd = 22;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0.0;
-						step.param2 = 0.0;
-						step.param3 = 0.0;
-						step.param4 = 0.0;
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
-					*/
-          break;
+            step.cmd = 22;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0.0;
+            step.param2 = 0.0;
+            step.param3 = 0.0;
+            step.param4 = 0.0;
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
+          */
+            break;
 
           case mavlink20.MAV_CMD_NAV_LAND:
             fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_LAND, [
@@ -620,17 +616,17 @@ export class ClssAndruavMissionPlan {
             ]);
 
             /*step.id = missionCounter;
-						step.cmd = 21;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0.0;
-						step.param2 = 0.0;
-						step.param3 = 0.0;
-						step.param4 = 0.0;
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
-					*/
-          break;
+            step.cmd = 21;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0.0;
+            step.param2 = 0.0;
+            step.param3 = 0.0;
+            step.param4 = 0.0;
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
+          */
+            break;
 
           case mavlink20.MAV_CMD_NAV_GUIDED_ENABLE:
             fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
@@ -674,33 +670,33 @@ export class ClssAndruavMissionPlan {
             ]);
 
             /*step.id = missionCounter;
-						step.cmd = 16;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
-						step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
-						step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
-						step.param4 = 0.0; 
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
+            step.cmd = 16;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+            step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+            step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+            step.param4 = 0.0; 
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
 
-						nextstep.id = missionCounter;
-						nextstep.cmd = 20; << MAV_CMD_NAV_RETURN_TO_LAUNCH
-						nextstep.param1 = 0.0;
-						nextstep.param2 = 0.0;
-						nextstep.param3 = 0.0;
-						nextstep.param4 = 0.0;
-						nextstep.param5 = 0.0;
-						nextstep.param6 = 0.0;
-						nextstep.param7 = 0.0; 							
-					*/
-          break;
-      }
+            nextstep.id = missionCounter;
+            nextstep.cmd = 20; << MAV_CMD_NAV_RETURN_TO_LAUNCH
+            nextstep.param1 = 0.0;
+            nextstep.param2 = 0.0;
+            nextstep.param3 = 0.0;
+            nextstep.param4 = 0.0;
+            nextstep.param5 = 0.0;
+            nextstep.param6 = 0.0;
+            nextstep.param7 = 0.0; 							
+          */
+            break;
+        }
 
-      mission_item_latest = mission_drift;
-      if (skip === true) continue;
-      
-      if (marker.m_missionItem.m_speedRequired === true) {
+        mission_item_latest = mission_drift;
+        if (skip === true) continue;
+
+        if (marker.m_missionItem.m_speedRequired === true) {
           // add speed command
           /*
               MAV_CMD_DO_CHANGE_SPEED	Change speed and/or throttle set points.
@@ -727,7 +723,7 @@ export class ClssAndruavMissionPlan {
           ++mission_drift;
         }
 
-      if (marker.m_missionItem.m_yawRequired === true) {
+        if (marker.m_missionItem.m_yawRequired === true) {
           // add speed command
           /*
               MAV_CMD_CONDITION_YAW	Reach a certain target angle.
@@ -755,16 +751,16 @@ export class ClssAndruavMissionPlan {
 
         if (eventFireRequired === true) {
           // fire event will use servo (16) as default or other suitable servo channel.
-        /*
-						MAV_CMD_DO_SET_SERVO	Set a servo to a desired PWM value.
-						Mission Param #1	Servo instance number.
-						Mission Param #2	Pulse Width Modulation.
-						Mission Param #3	Empty
-						Mission Param #4	Empty
-						Mission Param #5	Empty
-						Mission Param #6	Empty
-						Mission Param #7	Empty
-					*/
+          /*
+              MAV_CMD_DO_SET_SERVO	Set a servo to a desired PWM value.
+              Mission Param #1	Servo instance number.
+              Mission Param #2	Pulse Width Modulation.
+              Mission Param #3	Empty
+              Mission Param #4	Empty
+              Mission Param #5	Empty
+              Mission Param #6	Empty
+              Mission Param #7	Empty
+            */
 
           fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
             16,
@@ -842,15 +838,15 @@ export class ClssAndruavMissionPlan {
 
         // wait event will use servo (15) as default or other suitable servo channel.
         /*
-					MAV_CMD_DO_SET_SERVO	mavlink20.MAV_CMD_DO_SET_SERVO Set a servo to a desired PWM value.
-					Mission Param #1	Servo instance number.
-					Mission Param #2	Pulse Width Modulation.
-					Mission Param #3	Empty
-					Mission Param #4	Empty
-					Mission Param #5	Empty
-					Mission Param #6	Empty
-					Mission Param #7	Empty
-				*/
+          MAV_CMD_DO_SET_SERVO	mavlink20.MAV_CMD_DO_SET_SERVO Set a servo to a desired PWM value.
+          Mission Param #1	Servo instance number.
+          Mission Param #2	Pulse Width Modulation.
+          Mission Param #3	Empty
+          Mission Param #4	Empty
+          Mission Param #5	Empty
+          Mission Param #6	Empty
+          Mission Param #7	Empty
+        */
 
         fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
           15,
@@ -864,15 +860,15 @@ export class ClssAndruavMissionPlan {
 
         // then insert MAV_CMD_NAV_DELAY
         /*
-					MAV_CMD_NAV_DELAY	mavlink20.MAV_CMD_NAV_DELAY Delay the next navigation command a number of seconds or until a specified time
-					1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
-					2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
-					3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-					4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
-					5	Empty		
-					6	Empty		
-					7	Empty
-				*/
+          MAV_CMD_NAV_DELAY	mavlink20.MAV_CMD_NAV_DELAY Delay the next navigation command a number of seconds or until a specified time
+          1: Delay	Delay (-1 to enable time-of-day fields)	min: -1 increment:1	s
+          2: Hour	hour (24h format, UTC, -1 to ignore)	min: -1 max:23 increment:1	
+          3: Minute	minute (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+          4: Second	second (24h format, UTC, -1 to ignore)	min: -1 max:59 increment:1	
+          5	Empty		
+          6	Empty		
+          7	Empty
+        */
 
         fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_DELAY, [
           0,
@@ -897,16 +893,16 @@ export class ClssAndruavMissionPlan {
             marker.m_missionItem.alt,
           ]);
           /*step.id = missionCounter;
-						step.cmd = 16;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
-						step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
-						step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
-						step.param4 = 0.0; 
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
-					*/
+            step.cmd = 16;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+            step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+            step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+            step.param4 = 0.0; 
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
+          */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
           fn_addMissionItem(marker, 22, [
@@ -929,16 +925,16 @@ export class ClssAndruavMissionPlan {
           ]);
 
           /*step.id = missionCounter;
-						step.cmd = 22;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0.0;
-						step.param2 = 0.0;
-						step.param3 = 0.0;
-						step.param4 = 0.0;
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
-					*/
+            step.cmd = 22;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0.0;
+            step.param2 = 0.0;
+            step.param3 = 0.0;
+            step.param4 = 0.0;
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
+          */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
           fn_addMissionItem(marker, 21, [
@@ -952,16 +948,16 @@ export class ClssAndruavMissionPlan {
           ]);
 
           /*step.id = missionCounter;
-						step.cmd = 21;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0.0;
-						step.param2 = 0.0;
-						step.param3 = 0.0;
-						step.param4 = 0.0;
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
-					*/
+            step.cmd = 21;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0.0;
+            step.param2 = 0.0;
+            step.param3 = 0.0;
+            step.param4 = 0.0;
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
+          */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
           fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP, [
@@ -976,26 +972,26 @@ export class ClssAndruavMissionPlan {
           fn_addMissionItem(marker, 20, [0, 0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 
           /*step.id = missionCounter;
-						step.cmd = 16;
-						step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
-						step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
-						step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
-						step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
-						step.param4 = 0.0; 
-						step.param5 = marker.getLatLng().lat;
-						step.param6 = marker.getLatLng().lng;
-						step.param7 = marker.m_missionItem.alt;
+            step.cmd = 16;
+            step.frameType =e.g. mavlink20.MAV_FRAME_GLOBAL_RELATIVE_ALT;
+            step.param1 = 0; // Hold time in decimal seconds. (ignored by fixed wing, time to stay at waypoint for rotary wing)
+            step.param2 = 5; // Acceptance radius in meters (if the sphere with this radius is hit, the waypoint counts as reached)
+            step.param3 = 0; // 0 to pass through the WP, if > 0 radius in meters to pass by WP. Positive value for clockwise orbit, negative value for counter-clockwise orbit. Allows trajectory control.
+            step.param4 = 0.0; 
+            step.param5 = marker.getLatLng().lat;
+            step.param6 = marker.getLatLng().lng;
+            step.param7 = marker.m_missionItem.alt;
 
-						nextstep.id = missionCounter;
-						nextstep.cmd = 20;
-						nextstep.param1 = 0.0;
-						nextstep.param2 = 0.0;
-						nextstep.param3 = 0.0;
-						nextstep.param4 = 0.0;
-						nextstep.param5 = 0.0;
-						nextstep.param6 = 0.0;
-						nextstep.param7 = 0.0; 							
-					*/
+            nextstep.id = missionCounter;
+            nextstep.cmd = 20;
+            nextstep.param1 = 0.0;
+            nextstep.param2 = 0.0;
+            nextstep.param3 = 0.0;
+            nextstep.param4 = 0.0;
+            nextstep.param5 = 0.0;
+            nextstep.param6 = 0.0;
+            nextstep.param7 = 0.0; 							
+          */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
           break;
@@ -1010,15 +1006,15 @@ export class ClssAndruavMissionPlan {
       if (marker.m_missionItem.m_speedRequired === true) {
         // add speed command
         /*
-					MAV_CMD_DO_CHANGE_SPEED	Change speed and/or throttle set points.
-					Mission Param #1	Speed type (0=Airspeed, 1=Ground Speed)
-					Mission Param #2	Speed (m/s, -1 indicates no change)
-					Mission Param #3	Throttle ( Percent, -1 indicates no change)
-					Mission Param #4	absolute or relative [0,1]
-					Mission Param #5	Empty
-					Mission Param #6	Empty
-					Mission Param #7	Empty
-				*/
+          MAV_CMD_DO_CHANGE_SPEED	Change speed and/or throttle set points.
+          Mission Param #1	Speed type (0=Airspeed, 1=Ground Speed)
+          Mission Param #2	Speed (m/s, -1 indicates no change)
+          Mission Param #3	Throttle ( Percent, -1 indicates no change)
+          Mission Param #4	absolute or relative [0,1]
+          Mission Param #5	Empty
+          Mission Param #6	Empty
+          Mission Param #7	Empty
+        */
 
         fn_addMissionItem(marker, 178, [
           1,
@@ -1035,15 +1031,15 @@ export class ClssAndruavMissionPlan {
       if (marker.m_missionItem.m_yawRequired === true) {
         // add speed command
         /*
-					MAV_CMD_CONDITION_YAW	Reach a certain target angle.
-					Mission Param #1	target angle: [0-360], 0 is north
-					Mission Param #2	speed during yaw change:[deg per second]
-					Mission Param #3	direction: negative: counter clockwise, positive: clockwise [-1,1]
-					Mission Param #4	relative offset or absolute angle: [ 1,0]
-					Mission Param #5	Empty
-					Mission Param #6	Empty
-					Mission Param #7	Empty
-				*/
+          MAV_CMD_CONDITION_YAW	Reach a certain target angle.
+          Mission Param #1	target angle: [0-360], 0 is north
+          Mission Param #2	speed during yaw change:[deg per second]
+          Mission Param #3	direction: negative: counter clockwise, positive: clockwise [-1,1]
+          Mission Param #4	relative offset or absolute angle: [ 1,0]
+          Mission Param #5	Empty
+          Mission Param #6	Empty
+          Mission Param #7	Empty
+        */
 
         fn_addMissionItem(marker, 115, [
           marker.m_missionItem.yaw, // param1
@@ -1059,15 +1055,15 @@ export class ClssAndruavMissionPlan {
       if (marker.m_missionItem.eventFireRequired === true) {
         // fire event will use servo (16) as default or other suitable servo channel.
         /*
-					MAV_CMD_DO_SET_SERVO	Set a servo to a desired PWM value.
-					Mission Param #1	Servo instance number.
-					Mission Param #2	Pulse Width Modulation.
-					Mission Param #3	Empty
-					Mission Param #4	Empty
-					Mission Param #5	Empty
-					Mission Param #6	Empty
-					Mission Param #7	Empty
-				*/
+          MAV_CMD_DO_SET_SERVO	Set a servo to a desired PWM value.
+          Mission Param #1	Servo instance number.
+          Mission Param #2	Pulse Width Modulation.
+          Mission Param #3	Empty
+          Mission Param #4	Empty
+          Mission Param #5	Empty
+          Mission Param #6	Empty
+          Mission Param #7	Empty
+        */
 
         fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_SET_SERVO, [
           16,
