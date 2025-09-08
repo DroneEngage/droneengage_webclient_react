@@ -1,0 +1,12 @@
+{
+  "online": "в сети",
+  "offline": "не в сети",
+  "armed": "Вооружён",
+  "noSignalInfo": "нет информации о сигнале",
+  "takePhoto": "Сделать фото",
+  "startLiveStream": "Начать прямую трансляцию",
+  "startRecordingOnDrone": "Начать запись на дроне",
+  "andruavBatteryTooltip": "Батарея Andruav: {{level}}% {{charging}} {{temp}}",
+  "fcbBatteryTooltip": "Батарея FCB: {{remaining}}% {{voltage}}В {{current}}А {{consumed}} мАч {{temp}}°C",
+  "networkSignal": "{{networkType}} [{{networkName}}] {{level}} дБм"
+}

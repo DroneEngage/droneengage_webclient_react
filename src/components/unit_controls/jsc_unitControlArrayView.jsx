@@ -1,5 +1,6 @@
 import $ from 'jquery'; 
 import React    from 'react';
+import { withTranslation } from 'react-i18next';
 
 
 import * as js_helpers from '../../js/js_helpers.js'
@@ -806,7 +807,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
     }
 }
 
-export default class ClssAndruavUnitListArray extends React.Component {
+class ClssAndruavUnitListArray extends React.Component {
   
     constructor()
 	{
@@ -928,6 +929,8 @@ export default class ClssAndruavUnitListArray extends React.Component {
     }
 
     render() {
+        const { t } = this.props; // Access t function
+        
         let unit = [];
         
         let units_details = [];
@@ -935,7 +938,7 @@ export default class ClssAndruavUnitListArray extends React.Component {
         if (this.state.andruavUnitPartyIDs.length === 0) 
         {
 
-            unit.push (<div key={'ClssAndruavUnitListArray_unit_length_empty' + this.key} className='bg-success'>NO ONLINE UNITS</div>);
+            unit.push (<div key={'ClssAndruavUnitListArray_unit_length_empty' + this.key} className='bg-success text-uppercase'>{t('msg.no_online_units')}</div>);
         }
         else 
             {
@@ -997,3 +1000,6 @@ export default class ClssAndruavUnitListArray extends React.Component {
         );
     }
 };
+
+
+export default withTranslation()(ClssAndruavUnitListArray);

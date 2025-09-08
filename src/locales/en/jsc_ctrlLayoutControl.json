@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "label": "SETTINGS",
+    "title": "Show/Hide Settings Section"
+  },
+  "map": {
+    "label": "MAP",
+    "title": "Show Map (ctrl+m)"
+  },
+  "camera": {
+    "label": "CAMERA",
+    "title": "Show Video (ctrl+r)"
+  },
+  "layout": {
+    "label": "FORM-{{mode}}",
+    "title": "Change Screen Layout (use keys from 1 to 6)"
+  },
+  "layoutSmall": {
+    "label": "display-{{mode}}",
+    "title": "Change Screen Layout"
+  }
+}
