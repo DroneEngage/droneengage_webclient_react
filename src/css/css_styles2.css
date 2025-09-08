@@ -653,6 +653,8 @@ input#txt_defaultAltitude
 	 display: -webkit-inline-box !important;
  }
 
+ 
+
 .ctrlbtn
 {
 	width: 90px !important;
@@ -1119,4 +1121,17 @@ div#displays
   #css_video_ctrl_panel img {
 	max-width: 100%;
 	height: auto;
+  }
+
+
+  #css_language_switcher {
+	width: 90px !Important;
+	height: 30px !important;
+  }
+
+
+  #main_btn_group button {
+	height: 30px !important;
+	font-size: 12px !important;
+	font-weight: bold !important;
   }

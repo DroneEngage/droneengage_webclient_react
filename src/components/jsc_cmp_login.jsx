@@ -2,8 +2,8 @@ import $ from 'jquery';
 
 import React from 'react';
 
-import {EVENTS as js_event} from '../js/js_eventList.js'
-import {js_eventEmitter} from '../js/js_eventEmitter'
+import { EVENTS as js_event } from '../js/js_eventList.js'
+import { js_eventEmitter } from '../js/js_eventEmitter'
 
 import { js_andruavAuth } from '../js/js_andruav_auth'
 import { js_localStorage } from '../js/js_localStorage'
@@ -27,15 +27,14 @@ export default class ClssLoginControl extends React.Component {
 
         js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_EE_permissionReceived);
         js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_EE_permissionBadLogin);
-		js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
+        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
     }
 
-	componentWillUnmount ()
-    {
-		js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
+    componentWillUnmount() {
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_BAD_Operation, this);
-		js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
-	}
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
+    }
 
     fn_EE_permissionReceived(me, params) {
         // Update the state with the received access code
@@ -59,7 +58,7 @@ export default class ClssLoginControl extends React.Component {
 
             document.getElementById('user_captcha_input').value = "";
 
-            
+
         }
 
         else {
@@ -80,7 +79,7 @@ export default class ClssLoginControl extends React.Component {
 
     fn_clickRegenerate(e) {
         this.fn_validateCaptcha(() => {
-           
+
             // Check which radio button is selected
             let v_permission = 0x0;
             if (this.m_chk_fullctrl.current.checked) {
@@ -97,7 +96,7 @@ export default class ClssLoginControl extends React.Component {
 
 
 
-    
+
     componentDidMount() {
 
         if (this.state.initialized === true) {
@@ -127,7 +126,7 @@ export default class ClssLoginControl extends React.Component {
                     <div className="form-group al_l">
                         <label htmlFor="txtEmail" id="email">Email</label>
                         <input type="email" id="txtEmail" ref={this.m_emailRef} name="txtEmail" className="form-control" defaultValue={js_localStorage.fn_getEmail()} />
-                         {/* Display the access code as a styled label */}
+                        {/* Display the access code as a styled label */}
                         {this.state.accessCode ? (
                             <label
                                 className="d-block m-1 text-warning text-bg-secondary h3"

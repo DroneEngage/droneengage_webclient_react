@@ -32,7 +32,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
-import { ClssMainUnitPopup } from '../components/popups/jsc_main_unit_popup.jsx'
+import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
 
 var oldAppend = $.fn.append;
 
@@ -2644,94 +2644,94 @@ function fn_showAdSBInfo(event, _adsb) {
 }
 
 
-function fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit) {
-	let sys_id = "";
-	if (p_andruavUnit.m_FCBParameters.m_systemID !== 0) {
-		sys_id = 'sysid:' + p_andruavUnit.m_FCBParameters.m_systemID + ' ';
-	}
-	let armedBadge = "";
-	if (p_andruavUnit.m_isArmed) armedBadge = '<span class="text-danger">&nbsp;<strong>ARMED</strong>&nbsp;</span>';
-	else armedBadge = '<span class="text-success">&nbsp;disarmed&nbsp;</span>';
-	if (p_andruavUnit.m_isFlying) armedBadge += '<span class="text-danger">&nbsp;flying&nbsp;</span>';
-	else armedBadge += '<span class="text-success">&nbsp;on-ground&nbsp;</span>';
+// function fn_showAndruavUnitInfo(p_lat, p_lng, p_andruavUnit) {
+// 	let sys_id = "";
+// 	if (p_andruavUnit.m_FCBParameters.m_systemID !== 0) {
+// 		sys_id = 'sysid:' + p_andruavUnit.m_FCBParameters.m_systemID + ' ';
+// 	}
+// 	let armedBadge = "";
+// 	if (p_andruavUnit.m_isArmed) armedBadge = '<span class="text-danger">&nbsp;<strong>ARMED</strong>&nbsp;</span>';
+// 	else armedBadge = '<span class="text-success">&nbsp;disarmed&nbsp;</span>';
+// 	if (p_andruavUnit.m_isFlying) armedBadge += '<span class="text-danger">&nbsp;flying&nbsp;</span>';
+// 	else armedBadge += '<span class="text-success">&nbsp;on-ground&nbsp;</span>';
 
-	let markerContent = "<p class='img-rounded bg-primary text-white'><strong class='css_padding_5'>" + p_andruavUnit.m_unitName + "</strong> <span>" + sys_id + "</span></p>\
-			  	<style class='img-rounded help-block'>" + p_andruavUnit.Description + "</style>";
+// 	let markerContent = "<p class='img-rounded bg-primary text-white'><strong class='css_padding_5'>" + p_andruavUnit.m_unitName + "</strong> <span>" + sys_id + "</span></p>\
+// 			  	<style class='img-rounded help-block'>" + p_andruavUnit.Description + "</style>";
 
-	if (p_andruavUnit.m_IsGCS === false) {
-		markerContent += "<span>" + armedBadge + " <span class='text-success'><strong>" + hlp_getFlightMode(p_andruavUnit) + "</strong></span> </span>";
-	}
-	else {
-		markerContent += "<p> <span class='text-success'>Ground Control Station</span> </p>";
-	}
+// 	if (p_andruavUnit.m_IsGCS === false) {
+// 		markerContent += "<span>" + armedBadge + " <span class='text-success'><strong>" + hlp_getFlightMode(p_andruavUnit) + "</strong></span> </span>";
+// 	}
+// 	else {
+// 		markerContent += "<p> <span class='text-success'>Ground Control Station</span> </p>";
+// 	}
 
-	let vAlt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
-	let vAlt_abs = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
-	if (vAlt === null || vAlt === undefined) {
-		vAlt = '?';
-	}
-	else {
-		vAlt = vAlt.toFixed(0);
-	}
-	if (vAlt_abs === null || vAlt_abs === undefined) {
-		vAlt_abs = '';
-	}
-	else {
-		vAlt_abs = ' <span class="text-primary">abs:</span>' + vAlt_abs.toFixed(0);
-	}
-	vAlt = vAlt + vAlt_abs;
+// 	let vAlt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
+// 	let vAlt_abs = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
+// 	if (vAlt === null || vAlt === undefined) {
+// 		vAlt = '?';
+// 	}
+// 	else {
+// 		vAlt = vAlt.toFixed(0);
+// 	}
+// 	if (vAlt_abs === null || vAlt_abs === undefined) {
+// 		vAlt_abs = '';
+// 	}
+// 	else {
+// 		vAlt_abs = ' <span class="text-primary">abs:</span>' + vAlt_abs.toFixed(0);
+// 	}
+// 	vAlt = vAlt + vAlt_abs;
 
-	let vSpeed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-	if (vSpeed === null || vSpeed === undefined) {
-		vSpeed = '?';
-	}
-	else {
-		vSpeed = vSpeed.toFixed(1);
-	}
-	let vAirSpeed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
-	if (vAirSpeed === null || vAirSpeed === undefined) {
-		vAirSpeed = '?';
-	}
-	else {
-		vAirSpeed = vAirSpeed.toFixed(1);
-	}
-	js_leafletmap.fn_getElevationForLocation(p_lat, p_lng
-		, function (p_elevation, p_lat, p_lng) {
-			if (p_elevation !== null && p_elevation !== undefined) {
+// 	let vSpeed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+// 	if (vSpeed === null || vSpeed === undefined) {
+// 		vSpeed = '?';
+// 	}
+// 	else {
+// 		vSpeed = vSpeed.toFixed(1);
+// 	}
+// 	let vAirSpeed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
+// 	if (vAirSpeed === null || vAirSpeed === undefined) {
+// 		vAirSpeed = '?';
+// 	}
+// 	else {
+// 		vAirSpeed = vAirSpeed.toFixed(1);
+// 	}
+// 	js_leafletmap.fn_getElevationForLocation(p_lat, p_lng
+// 		, function (p_elevation, p_lat, p_lng) {
+// 			if (p_elevation !== null && p_elevation !== undefined) {
 
-				if (js_localStorage.fn_getMetricSystem() === false) {
-					p_elevation = js_helpers.CONST_METER_TO_FEET * p_elevation;
-				}
+// 				if (js_localStorage.fn_getMetricSystem() === false) {
+// 					p_elevation = js_helpers.CONST_METER_TO_FEET * p_elevation;
+// 				}
 
-				if (isNaN(p_elevation) === false) {
-					p_elevation = p_elevation.toFixed(1);
-				}
-				markerContent += `<br><span class="text-primary">lat:<span class="text-success">${(p_lat).toFixed(6)}</span><span class="text-primary">,lng:</span><span class="text-success">${(p_lng).toFixed(6)}</span></br>
-							<span class="text-primary">alt:</span><span class="text-success">${vAlt}</span><span class="text-primary"> m</span>
-							<br><span class="text-primary">GS:</span><span class="text-success">${vSpeed} </span><span class="text-primary"> m/s</span>
-							<span class="text-primary"> AS:</span><span class="text-success">${vAirSpeed} </span><span class="text-primary"> m/s</span>`;
+// 				if (isNaN(p_elevation) === false) {
+// 					p_elevation = p_elevation.toFixed(1);
+// 				}
+// 				markerContent += `<br><span class="text-primary">lat:<span class="text-success">${(p_lat).toFixed(6)}</span><span class="text-primary">,lng:</span><span class="text-success">${(p_lng).toFixed(6)}</span></br>
+// 							<span class="text-primary">alt:</span><span class="text-success">${vAlt}</span><span class="text-primary"> m</span>
+// 							<br><span class="text-primary">GS:</span><span class="text-success">${vSpeed} </span><span class="text-primary"> m/s</span>
+// 							<span class="text-primary"> AS:</span><span class="text-success">${vAirSpeed} </span><span class="text-primary"> m/s</span>`;
 
-				if (p_andruavUnit.m_Swarm.m_isLeader === true) {
+// 				if (p_andruavUnit.m_Swarm.m_isLeader === true) {
 
-					markerContent += '<br><span class="text-danger "><strong>Leader</strong></span>'
-				}
-				if (p_andruavUnit.m_Swarm.m_following !== null && p_andruavUnit.m_Swarm.m_following !== undefined) {
-					let v_andruavUnitLeader = js_globals.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
-					if (v_andruavUnitLeader != null) {
-						markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">' + v_andruavUnitLeader.m_unitName + '</span>'
-					}
-				}
+// 					markerContent += '<br><span class="text-danger "><strong>Leader</strong></span>'
+// 				}
+// 				if (p_andruavUnit.m_Swarm.m_following !== null && p_andruavUnit.m_Swarm.m_following !== undefined) {
+// 					let v_andruavUnitLeader = js_globals.m_andruavUnitList.fn_getUnit(p_andruavUnit.m_Swarm.m_following);
+// 					if (v_andruavUnitLeader != null) {
+// 						markerContent += '<br><span class="text-warning ">Following:</span><span class="text-success ">' + v_andruavUnitLeader.m_unitName + '</span>'
+// 					}
+// 				}
 
-				if (js_globals.CONST_MAP_GOOLE === true) {
-					markerContent += '<br> sea-lvl alt:' + p_elevation + ' m.</p>';
-				}
-			}
+// 				if (js_globals.CONST_MAP_GOOLE === true) {
+// 					markerContent += '<br> sea-lvl alt:' + p_elevation + ' m.</p>';
+// 				}
+// 			}
 
-			infowindow2 = js_leafletmap.fn_showInfoWindow(infowindow2, markerContent, p_lat, p_lng);
+// 			infowindow2 = js_leafletmap.fn_showInfoWindow(infowindow2, markerContent, p_lat, p_lng);
 
-		});
+// 		});
 
-}
+// }
 
 function showAndruavHomePointInfo(p_lat, p_lng, p_andruavUnit) {
 	let _style = "", _icon = "";

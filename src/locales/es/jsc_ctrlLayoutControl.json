@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "label": "CONFIGURACIÓN",
+    "title": "Mostrar/Ocultar Sección de Configuración"
+  },
+  "map": {
+    "label": "MAPA",
+    "title": "Mostrar Mapa (ctrl+m)"
+  },
+  "camera": {
+    "label": "CÁMARA",
+    "title": "Mostrar Video (ctrl+r)"
+  },
+  "layout": {
+    "label": "FORMATO-{{mode}}",
+    "title": "Cambiar Diseño de Pantalla (usar teclas del 1 al 6)"
+  },
+  "layoutSmall": {
+    "label": "pantalla-{{mode}}",
+    "title": "Cambiar Diseño de Pantalla"
+  }
+}
