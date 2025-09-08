@@ -30,6 +30,7 @@ export let CONST_FAQ_URL = "https://cloud.ardupilot.org/de-faq.html";
 export let CONST_CONTACT_URL = "https://droneengage.com";
 export let CONST_ANDRUAV_URL = "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download";
 export let CONST_ANDRUAV_URL_ENABLE = true;
+export let CONST_ACCOUNT_URL_ENABLE = true;
 
 // CHOOSE YOUR MAP SOURCE
 export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ";
@@ -59,7 +60,7 @@ export let CONST_FEATURE = {
     DISABLE_VOICE: false,
     DISABLE_TRACKING: false,
     DISABLE_TRACKING_AI: false,
-    DISABLE_EXPERIMENTAL: false,
+    DISABLE_EXPERIMENTAL: true,
 };
 
 /**
@@ -95,7 +96,10 @@ function loadConfigSync() {
             if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
             if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
+
             if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
+            if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
+            
             if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
             if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
             if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;

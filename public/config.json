@@ -5,7 +5,7 @@
     "CONST_TEST_MODE_IP": "127.0.0.1",
     "CONST_TEST_MODE_PORT": "19408",
     "CONST_ANDRUAV_URL_ENABLE": true,
-
+    "CONST_ACCOUNT_URL_ENABLE": true,
 /**
  * This is for disable experimental features.
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
