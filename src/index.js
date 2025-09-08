@@ -4,6 +4,10 @@ import React  from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
+import { I18nextProvider } from 'react-i18next';
+import i18n from './js/i18n';
+
 import Layout from "./pages/Layout";
 import Home from "./pages/home";
 import Planning from "./pages/planning";
@@ -38,4 +42,8 @@ export default function App2() {
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App2 />);
+root.render(
+  <I18nextProvider i18n={i18n}>
+    <App2 />  
+  </I18nextProvider>
+);

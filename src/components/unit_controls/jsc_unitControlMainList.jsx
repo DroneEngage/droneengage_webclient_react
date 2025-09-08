@@ -1,6 +1,7 @@
 import $ from 'jquery'; 
 
 import React    from 'react';
+import { withTranslation } from 'react-i18next';
 
 
 import * as js_common from '../../js/js_common.js'
@@ -35,7 +36,7 @@ import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
  * tab_modules: true to display any other module such as SDR,P2P,Audio ...etc.
  * 
  */
-export default class ClssAndruavUnitList extends React.Component {
+class ClssAndruavUnitList extends React.Component {
   
     constructor()
 	{
@@ -191,6 +192,8 @@ export default class ClssAndruavUnitList extends React.Component {
     }
     
     render() {
+        const { t } = this.props; // Access t function
+        
         let unit = [];
         
         let units_header = [];
@@ -200,7 +203,7 @@ export default class ClssAndruavUnitList extends React.Component {
         if (this.state.andruavUnitPartyIDs.length === 0) 
         {
 
-            unit.push (<div key={'no_online_units'} className='text-center' >NO ONLINE UNITS</div>);
+            unit.push (<div key={'no_online_units'} className='text-center text-uppercase' >{t('msg.no_online_units')}</div>);
         }
         else 
         {
@@ -277,3 +280,6 @@ export default class ClssAndruavUnitList extends React.Component {
             );
     }
 };
+
+
+export default withTranslation()(ClssAndruavUnitList);

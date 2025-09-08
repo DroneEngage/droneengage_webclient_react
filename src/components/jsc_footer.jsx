@@ -1,9 +1,11 @@
 import packageJson from  '../../package.json'
 
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+
 import * as  js_siteConfig from '../js/js_siteConfig.js';
 
-export default class ClssFooterControl extends React.Component {
+class ClssFooterControl extends React.Component {
 	constructor()
 	{
         super ();
@@ -25,4 +27,4 @@ export default class ClssFooterControl extends React.Component {
     }
 }
 
-
+export default withTranslation()(ClssFooterControl);
