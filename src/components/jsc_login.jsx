@@ -133,15 +133,15 @@ class ClssLoginControl extends React.Component {
 
     let ctrls = [];
     let ctrls2 = [];
-	const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
+    const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
     switch (this.state.is_connected) {
       case CONST_NOT_CONNECTION_OFFLINE:
-        title = t('title.login'); 
+        title = t('title.login');
         ctrls.push(
           <div key={'div_login' + this.key} className="">
-			<div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">
-                {t('label.email')} 
+                {t('label.email')}
               </label>
               <input
                 type="email"
@@ -156,12 +156,12 @@ class ClssLoginControl extends React.Component {
             </div>
             <div className={`form-group ${dir}`}>
               <label htmlFor="txtAccessCode" id="account" className="text-white" title={t('tooltip.accessCode')}>
-                {t('label.password')} 
+                {t('label.password')}
               </label>
               <input
                 type="password"
                 id="txtAccessCode"
-                title={t('tooltip.accessCode')} 
+                title={t('tooltip.accessCode')}
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
                 className="form-control"
@@ -170,7 +170,7 @@ class ClssLoginControl extends React.Component {
                 }
               />
             </div>
-            <div className="form-group al_l hidden">
+            <div className={`form-group ${dir} hidden`}>
               <label htmlFor="txtGroupName" id="group" className="text-white">
                 {t('label.groupName')}
               </label>
@@ -209,13 +209,13 @@ class ClssLoginControl extends React.Component {
         css = 'bg-danger';
         ctrls2.push(
           <div key={'div_logout' + this.key} className=" ">
-            <div className="form-group al_l">
+            <div className={`form-group ${dir}`}>
               <span key={'txtEmail2' + this.key} className="text-muted">
                 {t('label.email')} {/* "Email" */}
               </span>
               <p>{js_localStorage.fn_getEmail()}</p>
             </div>
-            <div className="form-group al_l">
+            <div className={`form-group ${dir}`}>
               <p className="text-muted">{t('label.gcsId')}</p> {/* "GCS ID" */}
               <p>{js_localStorage.fn_getUnitID()}</p>
             </div>
@@ -245,12 +245,12 @@ class ClssLoginControl extends React.Component {
             </div>
             <div className={`form-group ${dir}`}>
               <label htmlFor="txtAccessCode" id="account" className="text-white" title={t('tooltip.accessCode')}>
-                {t('label.password')} 
+                {t('label.password')}
               </label>
               <input
                 type="password"
                 id="txtAccessCode"
-                title={t('tooltip.accessCode')} 
+                title={t('tooltip.accessCode')}
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
                 className="form-control"
@@ -260,7 +260,7 @@ class ClssLoginControl extends React.Component {
                 disabled
               />
             </div>
-            <div className="form-group al_l hidden">
+            <div className={`form-group ${dir} hidden`}>
               <label htmlFor="txtGroupName" id="group" className="text-white">
                 {t('label.groupName')} {/* "Group Name" */}
               </label>
