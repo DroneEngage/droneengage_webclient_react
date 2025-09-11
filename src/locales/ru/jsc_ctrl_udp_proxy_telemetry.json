@@ -1,0 +1,12 @@
+{
+  "smartTelemetry": "Умная телеметрия",
+  "udpRefresh": "Обновить UDP",
+  "pauseTitle": "Приостановить телеметрию",
+  "activateTitle": "Активировать телеметрию",
+  "refreshTitle": "Нажмите, чтобы получить информацию UDP",
+  "decreaseTitle": "Уменьшить сообщения/сек",
+  "increaseTitle": "Увеличить сообщения/сек",
+  "levelLabel": "Уровень: {{level}}",
+  "ip": "IP",
+  "port": "порт"
+}

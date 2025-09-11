@@ -1,0 +1,9 @@
+{
+  "leader": "Líder",
+  "unfollow": "dejar de seguir",
+  "none": "ninguno",
+  "notLeader": "no líder",
+  "buttonGroupLabel": "Grupo de botones con desplegable anidado",
+  "leaderTitle": "{{leader}} / siguiendo: {{follower}}",
+  "followingTitle": "Líder al que estoy siguiendo"
+}

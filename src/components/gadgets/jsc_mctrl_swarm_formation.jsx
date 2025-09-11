@@ -1,4 +1,5 @@
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import * as js_andruavMessages from '../../js/js_andruavMessages'
@@ -11,7 +12,7 @@ import { js_localStorage } from '../../js/js_localStorage'
  * @param {boolean} p_hidden - Indicates if the component should be hidden [for example when drone is not a leader in webclient]
  * @param {function} OnFormationChanged - Callback function when formation changes
  */
-export class ClssCtrlSWARMFormation extends React.Component {
+class ClssCtrlSWARMFormation extends React.Component {
 
     constructor(props) {
         super(props);
@@ -49,6 +50,7 @@ export class ClssCtrlSWARMFormation extends React.Component {
     }
 
     render() {
+        const { t } = this.props;
         if ((this.props.p_hidden===true) || (js_siteConfig.CONST_FEATURE.DISABLE_SWARM === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true)) {
             return (
                 <div></div>
@@ -72,3 +74,5 @@ export class ClssCtrlSWARMFormation extends React.Component {
         );
     }
 }
+
+export default withTranslation('swarmCtrl')(ClssCtrlSWARMFormation);

@@ -1,0 +1,62 @@
+{
+    "hud": {
+        "label": "HUD",
+        "unknown": "HUD - неизвестно",
+        "title": "Тангаж"
+    },
+    "bearing": {
+        "label": "пеленг/цель"
+    },
+    "waypoint": {
+        "title": "Расстояние до следующей путевой точки"
+    },
+    "telemetry": {
+        "mode": "режим - {{mode}}",
+        "connectTitle": "Нажмите, чтобы подключиться к FCB, если не активно",
+        "flightModeTitle": "Режим полёта",
+        "mode": "режим - {{mode}}",
+        "noFCB": "Нет подключения к FCB",
+        "connectTitle": "Нажмите, чтобы подключиться к FCB, если не активно",
+        "flightModeTitle": "Режим полёта"
+    },
+    "gps": {
+        "noFix": "Нет фиксации",
+        "3dFix": "3D фиксация",
+        "dgps": "DGPS",
+        "rtkFloat": "RTK-Fl",
+        "rtkFixed": "RTK-Fx",
+        "static": "статический",
+        "ppp": "ppp",
+        "noGps": "Нет GPS",
+        "status": "Статус GPS",
+        "auto": "GPS Авто",
+        "mobile": "GPS с мобильного",
+        "fcb": "GPS с FCB",
+        "satCount": "[{{count}} спутников]"
+    },
+    "flight": {
+        "totalFlying": "Общее время полёта: {{time}}",
+        "diving": "Погружение",
+        "flying": "В полёте",
+        "onGround": "На земле"
+    },
+    "distance": {
+        "title": "Расстояние устройства от меня (местоположение браузера)",
+        "noUnitGPS": "Нет GPS устройства",
+        "noGCSGPS": "Нет GPS GCS",
+        "label": "DFM"
+    },
+    "fence": {
+        "title": "Статус нарушения ограждения",
+        "unknown": "неизвестно",
+        "bad": "плохо",
+        "good": "хорошо",
+        "noViolation": "без нарушений"
+    },
+    "waypoint": {
+        "na": "н/д",
+        "m": " м",
+        "ft": " футов",
+        "to": " >> {{num}}/{{count}}"
+    }
+}

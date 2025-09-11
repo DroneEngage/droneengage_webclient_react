@@ -39,5 +39,9 @@
   "label.gcsId": "ID de GCS",
   "tooltip.accessCode": "Código de acceso",
   "connectedSpeech": "Conectado",
-  "msg.no_online_units": "No hay unidades en línea"
+  "msg.no_online_units": "No hay unidades en línea",
+  "distance.km": " km",
+  "distance.m": " m",
+  "distance.mi": " mi",
+  "distance.ft": " ft"
 }

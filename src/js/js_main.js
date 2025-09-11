@@ -33,6 +33,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
+import i18n from './i18n.js';
 
 var oldAppend = $.fn.append;
 
@@ -1605,7 +1606,7 @@ export function hlp_getFlightMode(p_andruavUnit) {
 				break;
 		}
 	}
-	return text;
+	return i18n.t(`general:fightMode.${text.toLowerCase()}`, { defaultValue: text });
 }
 
 
