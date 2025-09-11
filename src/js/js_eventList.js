@@ -108,7 +108,9 @@ const EVENT_LIST = Object.freeze({
 			"EE_onTrackingAIStatusChanged",
 			"EE_onTrackingAIObjectListUpdate",
 
-			"EE_onWebRTC_Video_Statistics"
+			"EE_onWebRTC_Video_Statistics",
+
+			"EE_Language_Changed"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;
