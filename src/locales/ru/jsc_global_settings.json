@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "m": "м",
+    "ft": "футов"
+  },
+  "speech": {
+    "enabled": "включено"
+  },
+  "settingsTitle": "Настройки",
+  "defaultsTab": "По умолчанию",
+  "missionTab": "Миссия",
+  "preferencesTab": "Предпочтения",
+  "altitudeLabel": "Шаг высоты",
+  "altitudeTitle": "Высота по умолчанию для команды набора высоты",
+  "radiusLabel": "Радиус",
+  "radiusTitle": "Радиус по умолчанию для круга",
+  "swarmHorizontalLabel": "Гориз. смещение",
+  "swarmHorizontalTitle": "Междронное расстояние (РОЙ)",
+  "swarmVerticalLabel": "Верт. смещение",
+  "swarmVerticalTitle": "Перепад высоты (РОЙ)",
+  "missionFileLabel": "Глобальный файл миссии",
+  "eventDroneEngageLabel": "Событие DroneEngage №",
+  "enableSpeechLabel": "Включить голос",
+  "volumeLabel": "Громкость",
+  "testVolume": "тест громкости",
+  "tabsDisplayLabel": "Устройства во вкладках",
+  "sortUnitsLabel": "Сортировать устройства (mav_id)",
+  "sortUnitsTitle": "сортировать по имени устройства или ID mavlink",
+  "gcsDisplayLabel": "Показать подключенные GCS",
+  "gcsShowMeLabel": "Показать меня",
+  "gcsShowMeTitle": "показать меня в списке GCS",
+  "advancedOptionsLabel": "Расширенные настройки"
+}

@@ -39,5 +39,9 @@
   "label.gcsId": "ID GCS",
   "tooltip.accessCode": "Код доступа",
   "connectedSpeech": "Подключено",
-  "msg.no_online_units": "Нет подключённых единиц"
+  "msg.no_online_units": "Нет подключённых единиц",
+  "distance.km": " км",
+  "distance.m": " м",
+  "distance.mi": " миль",
+  "distance.ft": " футов"
 }

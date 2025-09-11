@@ -1,0 +1,56 @@
+{
+    "hud": {
+        "label": "HUD",
+        "unknown": "HUD - غير معروف",
+        "title": "الانحدار"
+    },
+    "bearing": {
+        "label": "الاتجاه/الهدف"
+    },
+    "gps": {
+        "noFix": "لا توجد إشارة",
+        "3dFix": "إشارة ثلاثية الأبعاد",
+        "dgps": "DGPS",
+        "rtkFloat": "RTK-عائم",
+        "rtkFixed": "RTK-ثابت",
+        "static": "ثابت",
+        "ppp": "ppp",
+        "noGps": "لا يوجد GPS",
+        "status": "حالة GPS",
+        "auto": "GPS تلقائي",
+        "mobile": "GPS من الهاتف",
+        "fcb": "GPS من FCB",
+        "satCount": "[{{count}} أقمار]"
+    },
+    "flight": {
+        "totalFlying": "إجمالي زمن الطيران: {{time}}",
+        "diving": "الغوص",
+        "flying": "طائر",
+        "onGround": "على الأرض"
+    },
+    "telemetry": {
+        "mode": "{{mode}} - الوضع",
+        "connectTitle": "انقر للاتصال بـ FCB إذا لم يكن نشطًا",
+        "flightModeTitle": "وضع الطيران"
+    },
+    "distance": {
+        "title": "مسافة الوحدة مني (موقع المتصفح)",
+        "noUnitGPS": "لا يوجد GPS للوحدة",
+        "noGCSGPS": "لا يوجد GPS لـ GCS",
+        "label": "المسافة إليّ"
+    },
+    "fence": {
+        "title": "حالة انتهاك السياج",
+        "unknown": "غير معروف",
+        "bad": "سيء",
+        "good": "جيد",
+        "noViolation": "لا توجد انتهاكات"
+    },
+    "waypoint": {
+        "title": "المسافة إلى النقطة التالية",
+        "na": "غير متوفر",
+        "m": " م",
+        "ft": " قدم",
+        "to": " >> {{num}}/{{count}}"
+    }
+}

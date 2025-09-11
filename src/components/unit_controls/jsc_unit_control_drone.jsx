@@ -27,7 +27,7 @@ import { ClssCtrlExperimental } from '../modules/experimental/jsc_ctrl_experimen
 import { ClssCtrlArdupilotFlightController } from '../flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
 import { ClssCtrlPx4FlightControl } from '../flight_controllers/jsc_ctrl_px4_flightControl.jsx'
 import { ClssCtrlAUDIO } from '../gadgets/jsc_ctrl_audio.jsx'
-import { ClssCtrlDroneIMU } from './jsc_unit_control_imu.jsx'
+import ClssCtrlDroneIMU from './jsc_unit_control_imu.jsx'
 import { ClssAndruavUnitBase } from './jsc_unit_control_base.jsx'
 import ClssCtrlUnitMainBar from './jsc_ctrl_unit_main_bar.jsx'
 import ClssCtrlUnitPlanningBar from './jsc_ctrl_unit_planning_bar.jsx'

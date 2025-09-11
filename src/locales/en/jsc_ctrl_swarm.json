@@ -1,0 +1,9 @@
+{
+    "leader": "Leader",
+    "unfollow": "unfollow",
+    "none": "none",
+    "notLeader": "not leader",
+    "buttonGroupLabel": "Button group with nested dropdown",
+    "leaderTitle": "{{leader}} / following: {{follower}}",
+    "followingTitle": "Leader I am following"
+}

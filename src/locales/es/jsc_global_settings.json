@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "m": "m",
+    "ft": "ft"
+  },
+  "speech": {
+    "enabled": "activado"
+  },
+  "settingsTitle": "Configuraciones",
+  "defaultsTab": "Valores predeterminados",
+  "missionTab": "Misión",
+  "preferencesTab": "Preferencias",
+  "altitudeLabel": "Paso de altitud",
+  "altitudeTitle": "Altitud predeterminada para el comando de ascenso",
+  "radiusLabel": "Radio",
+  "radiusTitle": "Radio predeterminado para el círculo",
+  "swarmHorizontalLabel": "Desplazamiento H",
+  "swarmHorizontalTitle": "Distancia entre drones (ENJAMBRE)",
+  "swarmVerticalLabel": "Desplazamiento V",
+  "swarmVerticalTitle": "Delta de altitud (ENJAMBRE)",
+  "missionFileLabel": "Archivo de misión global",
+  "eventDroneEngageLabel": "Evento DroneEngage No.",
+  "enableSpeechLabel": "Habilitar voz",
+  "volumeLabel": "Volumen",
+  "testVolume": "probar volumen",
+  "tabsDisplayLabel": "Unidades en pestañas",
+  "sortUnitsLabel": "Ordenar unidades (mav_id)",
+  "sortUnitsTitle": "ordenar por nombre de unidad o ID de mavlink",
+  "gcsDisplayLabel": "Mostrar GCS conectados",
+  "gcsShowMeLabel": "Mostrame",
+  "gcsShowMeTitle": "mostrarme en la lista de GCS",
+  "advancedOptionsLabel": "Opciones avanzadas"
+}

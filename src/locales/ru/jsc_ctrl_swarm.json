@@ -1,0 +1,9 @@
+{
+  "leader": "Лидер",
+  "unfollow": "отписаться",
+  "none": "нет",
+  "notLeader": "не лидер",
+  "buttonGroupLabel": "Группа кнопок с вложенным выпадающим меню",
+  "leaderTitle": "{{leader}} / следующий: {{follower}}",
+  "followingTitle": "Лидер, за которым я следую"
+}
