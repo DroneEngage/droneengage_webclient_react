@@ -1,5 +1,5 @@
 {
-    "CONST_TEST_MODE": true,
+    "CONST_TEST_MODE": false,
     "CONST_PROD_MODE_IP": "airgap.droneengage.com",
     "CONST_PROD_MODE_PORT": "19408",
     "CONST_TEST_MODE_IP": "127.0.0.1",
