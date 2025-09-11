@@ -38,5 +38,9 @@
   "label.gcsId": "رقم المحطة",
   "tooltip.accessCode": "كود الدخول",
   "connectedSpeech": "متصل",
-  "msg.no_online_units": "لا توجد وحدات متصلة"
+  "msg.no_online_units": "لا توجد وحدات متصلة",
+  "distance.km": " كم",
+  "distance.m": " م",
+  "distance.mi": " ميل",
+  "distance.ft": " قدم"
 }

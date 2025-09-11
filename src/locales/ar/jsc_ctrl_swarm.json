@@ -1,0 +1,9 @@
+{
+  "leader": "القائد",
+  "unfollow": "إلغاء المتابعة",
+  "none": "لا شيء",
+  "notLeader": "ليس قائدًا",
+  "buttonGroupLabel": "مجموعة أزرار مع قائمة منسدلة مدمجة",
+  "leaderTitle": "{{leader}} / متابعة: {{follower}}",
+  "followingTitle": "القائد الذي أتبعه"
+}

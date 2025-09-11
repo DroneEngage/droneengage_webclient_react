@@ -1,0 +1,60 @@
+{
+    "telemetry": {
+        "flightModeTitle": "Flight Mode",
+        "noFCB": "No FCB Connected",
+        "mode": "mode - {{mode}}",
+        "connectTitle": "Click to connect to FCB if not active",
+        "mode": "mode - {{mode}}",
+        "connectTitle": "Click to connect to FCB if not active",
+        "flightModeTitle": "Flight Mode"
+    },
+    "distance": {
+        "title": "Unit's distance from Me (Browser Location)",
+        "noUnitGPS": "No Unit GPS",
+        "noGCSGPS": "No GCS GPS",
+        "label": "DFM"
+    },
+    "fence": {
+        "title": "Fence Violation Status",
+        "unknown": "unknown",
+        "bad": "bad",
+        "good": "good",
+        "noViolation": "no violation"
+    },
+    "hud": {
+        "label": "HUD",
+        "unknown": "HUD - unknown",
+        "title": "Pitch"
+    },
+    "bearing": {
+        "label": "bearing/target"
+    },
+    "gps": {
+        "noFix": "No Fix",
+        "3dFix": "3D Fix",
+        "dgps": "DGPS",
+        "rtkFloat": "RTK-Fl",
+        "rtkFixed": "RTK-Fx",
+        "static": "static",
+        "ppp": "ppp",
+        "noGps": "No GPS",
+        "status": "GPS Status",
+        "auto": "GPS Auto",
+        "mobile": "GPS From Mobile",
+        "fcb": "GPS From FCB",
+        "satCount": "[{{count}} sats]"
+    },
+    "flight": {
+        "totalFlying": "Total Flying: {{time}}",
+        "diving": "Diving",
+        "flying": "Flying",
+        "onGround": "On Ground"
+    },
+    "waypoint": {
+        "title": "Distance to next waypoint",
+        "na": "na",
+        "m": " m",
+        "ft": " ft",
+        "to": " >> {{num}}/{{count}}"
+    }
+}

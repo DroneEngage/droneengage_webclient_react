@@ -1,0 +1,33 @@
+{
+    "unit": {
+        "m": "m",
+        "ft": "ft"
+    },
+    "speech": {
+        "enabled": "enabled"
+    },
+    "settingsTitle": "Settings",
+    "defaultsTab": "Defaults",
+    "missionTab": "Mission",
+    "preferencesTab": "Preferences",
+    "altitudeLabel": "Alt Step",
+    "altitudeTitle": "Default altitude for climb command",
+    "radiusLabel": "Radius",
+    "radiusTitle": "Default radius for circle",
+    "swarmHorizontalLabel": "H-Offset",
+    "swarmHorizontalTitle": "Inter-Drone Distance (SWARM)",
+    "swarmVerticalLabel": "V-Offset",
+    "swarmVerticalTitle": "Altitude Delta (SWARM)",
+    "missionFileLabel": "Global Mission File",
+    "eventDroneEngageLabel": "Event DroneEngage No.",
+    "enableSpeechLabel": "Enable Speech",
+    "volumeLabel": "Volume",
+    "testVolume": "test volume",
+    "tabsDisplayLabel": "Units in Tabs",
+    "sortUnitsLabel": "Sort Units (mav_id)",
+    "sortUnitsTitle": "sort by unit name of mavlink id",
+    "gcsDisplayLabel": "Show Connected GCS",
+    "gcsShowMeLabel": "Show Me",
+    "gcsShowMeTitle": "show me in GCS list",
+    "advancedOptionsLabel": "Advanced Options"
+}

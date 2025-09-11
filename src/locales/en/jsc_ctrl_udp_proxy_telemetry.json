@@ -1,0 +1,12 @@
+{
+  "smartTelemetry": "Smart Telemetry",
+  "udpRefresh": "UDP Refresh",
+  "pauseTitle": "Pause Telemetry",
+  "activateTitle": "Activate Telemetry",
+  "refreshTitle": "Click to get UDP Info",
+  "decreaseTitle": "Decrease message/sec",
+  "increaseTitle": "Increase message/sec",
+  "levelLabel": "LVL: {{level}}",
+  "ip": "ip",
+  "port": "port"
+}

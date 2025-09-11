@@ -1,0 +1,12 @@
+{
+  "smartTelemetry": "التيليمتري الذكي",
+  "udpRefresh": "تحديث UDP",
+  "pauseTitle": "إيقاف التيليمتري مؤقتًا",
+  "activateTitle": "تفعيل التيليمتري",
+  "refreshTitle": "انقر للحصول على معلومات UDP",
+  "decreaseTitle": "تقليل الرسائل/ثانية",
+  "increaseTitle": "زيادة الرسائل/ثانية",
+  "levelLabel": "المستوى: {{level}}",
+  "ip": "عنوان",
+  "port": "منفذ"
+}

@@ -1,0 +1,33 @@
+{
+  "unit": {
+    "m": "م",
+    "ft": "قدم"
+  },
+  "speech": {
+    "enabled": "مُفعّل"
+  },
+  "settingsTitle": "الإعدادات",
+  "defaultsTab": "الافتراضيات",
+  "missionTab": "المهمة",
+  "preferencesTab": "التفضيلات",
+  "altitudeLabel": "خطوة الارتفاع",
+  "altitudeTitle": "الارتفاع الافتراضي لأمر الصعود",
+  "radiusLabel": "النصف قطر",
+  "radiusTitle": "النصف قطر الافتراضي للدائرة",
+  "swarmHorizontalLabel": "الإزاحة الأفقية",
+  "swarmHorizontalTitle": "المسافة بين الطائرات (التشكيل)",
+  "swarmVerticalLabel": "الإزاحة العمودية",
+  "swarmVerticalTitle": "فرق الارتفاع (التشكيل)",
+  "missionFileLabel": "ملف المهمة العام",
+  "eventDroneEngageLabel": "حدث مشاركة الطائرة رقم",
+  "enableSpeechLabel": "تفعيل الصوت",
+  "volumeLabel": "مستوى الصوت",
+  "testVolume": "اختبار مستوى الصوت",
+  "tabsDisplayLabel": "الوحدات في علامات التبويب",
+  "sortUnitsLabel": "فرز الوحدات (mav_id)",
+  "sortUnitsTitle": "فرز حسب اسم الوحدة أو معرف mavlink",
+  "gcsDisplayLabel": "إظهار GCS المتصلة",
+  "gcsShowMeLabel": "أظهرني",
+  "gcsShowMeTitle": "إظهاري في قائمة GCS",
+  "advancedOptionsLabel": "الخيارات المتقدمة"
+}
