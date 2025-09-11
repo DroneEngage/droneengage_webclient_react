@@ -1,12 +1,12 @@
 {
   "online": "متصل",
   "offline": "غير متصل",
-  "armed": "Armed",
+  "armed": "مفعل",
   "noSignalInfo": "لا إشارة",
   "takePhoto": "صورة",
   "startLiveStream": "بث فيديو حى",
   "startRecordingOnDrone": "تسجيل فيديو على الوحدة",
   "andruavBatteryTooltip": "{{temp}} {{charging}} {{level}}% : بطارية أندرويف",
-  "fcbBatteryTooltip": "FCB batt: {{remaining}}% {{voltage}}V {{current}}A {{consumed}} mAh {{temp}}°C",
+  "fcbBatteryTooltip": "{{remaining}}% {{voltage}}V {{current}}A {{consumed}} mAh {{temp}}°C بطارية بوردة التحكم",
   "networkSignal": "ديسيبل {{level}}  [{{networkName}}] {{networkType}}"
 }
