@@ -32,6 +32,8 @@ class ClssCtrlSWARM extends React.Component {
         this.m_flag_mounted = false;
         this.key = Math.random().toString();
         js_eventEmitter.fn_subscribe(js_event.EE_onAndruavUnitSwarmUpdated, this, this.fn_onSwarmUpdate);
+        js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
+
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -63,10 +65,17 @@ class ClssCtrlSWARM extends React.Component {
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_onAndruavUnitSwarmUpdated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Language_Changed, this);
+
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
+    }
+
+    fn_updateLanguage(p_me) {
+        if (p_me.m_flag_mounted === false) return;
+        p_me.setState({ m_update: p_me.state.m_update + 1 });
     }
 
     fn_onSwarmUpdate(p_me) {
