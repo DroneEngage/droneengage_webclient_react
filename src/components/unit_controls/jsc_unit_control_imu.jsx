@@ -302,7 +302,7 @@ class ClssCtrlDroneIMU extends React.Component {
             >
                 <div key={'gs_ctrl' + v_andruavUnit.getPartyID()} className="row al_l css_margin_zero d-flex">
                     <div key={'alt_ctrl1' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 user-select-none p-1">
-                        <ClssCtrlDrone_Speed_Ctrl p_unit={v_andruavUnit} />
+                        <ClssCtrlDrone_Speed_Ctrl p_unit={v_andruavUnit} className='' />
                     </div>
                     <div key="gps" className="col-6 col-md-3 user-select-none p-1">
                         <p
