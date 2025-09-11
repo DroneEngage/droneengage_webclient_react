@@ -262,7 +262,7 @@ class ClssPreferences extends React.Component {
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() { }
 
   fn_changeVolume(e) {
     js_localStorage.fn_setVolume(e.currentTarget.value);
@@ -324,6 +324,7 @@ class ClssPreferences extends React.Component {
 
   render() {
     const { t } = this.props;
+    const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
     let v_speech_disabled = 'false';
     if (js_localStorage.fn_getSpeechEnabled() === false) {
       v_speech_disabled = 'true';
@@ -332,7 +333,7 @@ class ClssPreferences extends React.Component {
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="row mb-12 align-items-center">
-          <label htmlFor="check_enable_speech" className="col-sm-4 col-form-label al_l">
+          <label htmlFor="check_enable_speech" className={`col-sm-4 col-form-label ${dir}`}>
             {t('globalSettings:enableSpeechLabel')}
           </label>
           <input
@@ -356,7 +357,7 @@ class ClssPreferences extends React.Component {
           />
         </div>
         <div className="row mb-12 align-items-center">
-          <label htmlFor="check_tabs_display" className="col-sm-4 col-form-label al_l">
+          <label htmlFor="check_tabs_display" className={`col-sm-4 col-form-label ${dir}`}>
             {t('globalSettings:tabsDisplayLabel')}
           </label>
           <input
@@ -382,7 +383,7 @@ class ClssPreferences extends React.Component {
           />
         </div>
         <div className="row mb-12 align-items-center">
-          <label htmlFor="check_gcs_display" className="col-sm-4 col-form-label al_l">
+          <label htmlFor="check_gcs_display" className={`col-sm-4 col-form-label ${dir}`}>
             {t('globalSettings:gcsDisplayLabel')}
           </label>
           <input
@@ -408,7 +409,7 @@ class ClssPreferences extends React.Component {
           />
         </div>
         <div className="row mb-12 align-items-center">
-          <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_l">
+          <label htmlFor="check_advanced" className={`col-sm-4 col-form-label ${dir}`}>
             {t('globalSettings:advancedOptionsLabel')}
           </label>
           <input
@@ -433,6 +434,8 @@ class ClssGlobalSettings extends React.Component {
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, this.fn_onAuthStatus);
+    js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
+
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -457,6 +460,11 @@ class ClssGlobalSettings extends React.Component {
     return false;
   }
 
+  fn_updateLanguage(p_me) {
+    if (p_me.m_flag_mounted === false) return;
+    p_me.setState({ m_update: p_me.state.m_update + 1 });
+  }
+
   fn_handleFileChange(e) {
     setSelectedMissionFilePathToWrite(this.mission_file_ref.current.files);
   }
@@ -473,6 +481,7 @@ class ClssGlobalSettings extends React.Component {
   componentWillUnmount() {
     this.state.m_update = 0;
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Logined, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_Language_Changed, this);
   }
 
   fn_fireDeEvent(value) {
@@ -567,4 +576,4 @@ class ClssGlobalSettings extends React.Component {
   }
 }
 
-export default withTranslation(['','globalSettings'])(ClssGlobalSettings);
+export default withTranslation(['', 'globalSettings'])(ClssGlobalSettings);
