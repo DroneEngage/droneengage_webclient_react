@@ -15,9 +15,12 @@
  *************************************************************************************/
 /*jshint esversion: 6 */
 
-import { js_globals } from "./js_globals.js";
+import * as js_siteConfig from './js_siteConfig.js';
 import * as js_andruavMessages from "./js_andruavMessages";
 import * as js_circularBuffer from "./js_circularBuffer";
+import { js_globals } from "./js_globals.js";
+import { EVENTS as js_event } from './js_eventList.js'
+import { js_eventEmitter } from './js_eventEmitter.js'
 import { mavlink20 } from "./js_mavlink_v2.js";
 
 // Vehicle Types
@@ -894,7 +897,40 @@ class C_Modules {
     this.has_ai_recognition = false;
     this.has_ai_recognition_alive = false;
     this.m_list = [];
+    this.m_old_version = false;
   }
+
+  compareVersions(v1, p_version_info) {
+    if (!v1 || !p_version_info) return 0;
+
+    const normalize = (version) => {
+      // Split the version string by dots and convert each part to an integer.
+      // Filter out empty strings that might result from extra dots.
+      return version.split('.').filter(Boolean).map(part => parseInt(part, 10));
+    };
+    const v2 = p_version_info.version;
+    const a1 = normalize(v1);
+    const a2 = normalize(v2);
+
+    const len = Math.max(a1.length, a2.length);
+
+    for (let i = 0; i < len; i++) {
+      const p1 = a1[i] || 0;
+      const p2 = a2[i] || 0;
+
+      if (p1 > p2) {
+        return 1; // v1 is larger
+      }
+      if (p1 < p2) {
+        return -1; // v2 is larger
+      }
+    }
+
+    return 0; // Versions are the same
+  };
+
+
+  
 
   addModules(jsonModules) {
 
@@ -903,6 +939,8 @@ class C_Modules {
       console.error("Invalid input: jsonModules must be an array.");
       return;
     }
+
+    let old_module = false;
 
     // check uavos_camera_plugin
     /*
@@ -917,41 +955,57 @@ class C_Modules {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
           this.has_fcb = true;
           this.has_fcb_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.fcb);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_GPIO:
           this.has_gpio = true;
           this.has_gpio_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.gpio);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
           this.has_sound = true;
           this.has_sound_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.snd);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_P2P:
           this.has_p2p = true;
           this.has_p2p_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.p2p);
+          old_module = old_module || (module.z ==1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SDR:
           this.has_sdr = true;
           this.has_sdr_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.sdr);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
           this.has_camera = true;
           this.has_camera_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.camera);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_TRACKING:
           this.has_tracking = true;
           this.has_tracking_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.trk);
+          old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_AI_RECOGNITION:
           this.has_ai_recognition = true;
           this.has_ai_recognition_alive = module.d === false;
+          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.aiq);
+          old_module = old_module || (module.z == -1);
           break;
 
         default:
@@ -961,6 +1015,10 @@ class C_Modules {
     });
 
     this.m_list = jsonModules;
+
+    if (old_module !== this.m_old_version) 
+      this.m_old_version = old_module;
+      js_eventEmitter.fn_dispatch(js_event.EE_OldModule);
   }
 }
 /**
@@ -1171,6 +1229,9 @@ export class CAndruavUnitObject {
     // todo : apply any shutdown updates
 
   }
+
+
+
 }
 
 class CAndruavUnitList {

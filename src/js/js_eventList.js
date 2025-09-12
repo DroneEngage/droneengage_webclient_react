@@ -29,6 +29,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_onPreferenceChanged",
 			"EE_unitAdded",
 			"EE_unitUpdated",
+			"EE_OldModule",
 			"EE_unitHighlighted",
 			"EE_unitOnlineChanged",
 			"EE_unitPowUpdated",
