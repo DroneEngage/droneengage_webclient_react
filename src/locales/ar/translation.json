@@ -42,5 +42,19 @@
   "distance.km": " كم",
   "distance.m": " م",
   "distance.mi": " ميل",
-  "distance.ft": " قدم"
+  "distance.ft": " قدم",
+  "version_colon": "الإصدار:",
+  "status_colon": "الحالة:",
+  "offline": "غير متصل",
+  "connected": "متصل",
+  "andruav": "أندرواف",
+  "no_modules_connected": "(لا توجد وحدات متصلة)",
+  "module_needs_upgrade": "الوحدة بحاجة إلى التحديث.",
+  "version_ok": "الإصدار جيد",
+  "change_udp_proxy_port": "تغيير منفذ بروكسي UDP",
+  "reset_counters": "إعادة تعيين العدادات",
+  "received_colon": "تم الاستلام:",
+  "video_data_colon": "بيانات الفيديو:",
+  "received_msgs_colon": "الرسائل المستلمة:",
+  "last_active_colon": "آخر نشاط:"
 }
