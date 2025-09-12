@@ -43,5 +43,19 @@
   "distance.km": " км",
   "distance.m": " м",
   "distance.mi": " миль",
-  "distance.ft": " футов"
+  "distance.ft": " футов",
+  "version_colon": "Версия:",
+  "status_colon": "Статус:",
+  "offline": "ОФФЛАЙН",
+  "connected": "Подключено",
+  "andruav": "Andruav",
+  "no_modules_connected": "(нет подключенных модулей)",
+  "module_needs_upgrade": "Модуль необходимо обновить.",
+  "version_ok": "версия в порядке",
+  "change_udp_proxy_port": "Изменить порт прокси UDP",
+  "reset_counters": "Сбросить счетчики",
+  "received_colon": "Получено:",
+  "video_data_colon": "Видеоданные:",
+  "received_msgs_colon": "Полученные сообщения:",
+  "last_active_colon": "Последняя активность:"
 }

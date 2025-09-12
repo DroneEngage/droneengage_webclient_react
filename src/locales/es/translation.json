@@ -43,5 +43,19 @@
   "distance.km": " km",
   "distance.m": " m",
   "distance.mi": " mi",
-  "distance.ft": " ft"
+  "distance.ft": " ft",
+  "version_colon": "Versión:",
+  "status_colon": "Estado:",
+  "offline": "DESCONECTADO",
+  "connected": "Conectado",
+  "andruav": "Andruav",
+  "no_modules_connected": "(ningún módulo conectado)",
+  "module_needs_upgrade": "El módulo necesita ser actualizado.",
+  "version_ok": "versión OK",
+  "change_udp_proxy_port": "Cambiar Puerto Proxy UDP",
+  "reset_counters": "Restablecer Contadores",
+  "received_colon": "Recibido:",
+  "video_data_colon": "Datos de Video:",
+  "received_msgs_colon": "Mensajes Recibidos:",
+  "last_active_colon": "Última Actividad:"
 }
