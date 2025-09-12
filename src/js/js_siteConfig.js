@@ -45,8 +45,15 @@ export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/sate
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
 export let CONST_DONT_BROADCAST_GCS_LOCATION = false;
 
+
+
+export let CONST_MODULE_VERSIONS = {
+        
+    };
+
+
 /**
- * This is for disable experimental features.
+ * This is for disable features.
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
  */
 export let CONST_FEATURE = {
@@ -63,6 +70,8 @@ export let CONST_FEATURE = {
     DISABLE_EXPERIMENTAL: true,
 };
 
+
+
 /**
  * WEBRTC Video Streaming Settings
  */
@@ -71,6 +80,11 @@ export let CONST_ICE_SERVERS = [
     { urls: "stun:stun1.l.google.com:19302" },
 ];
 
+
+
+/**
+ * This function load overrides values from config.json in public folder.
+ */
 function loadConfigSync() {
     try {
         const xhr = new XMLHttpRequest();
@@ -107,6 +121,7 @@ function loadConfigSync() {
             if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
             if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
 
+            if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS};
         } else {
             console.error('Error loading config:', xhr.status);
         }

@@ -53,13 +53,18 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             tab_log: this.props.tab_log,
             tab_details: this.props.tab_details,
             tab_module: this.props.tab_module,
-            tab_collapsed: this.props.tab_collapsed
+            tab_collapsed: this.props.tab_collapsed,
+
+            m_update: 0
         };
 
         this.m_flag_mounted = false;
 
         this.props.p_unit.m_gui.speed_link = false;
         this.key = Math.random().toString();
+
+        js_eventEmitter.fn_subscribe (js_event.EE_OldModule,this,this.fn_update);
+        
     }
 
     componentDidMount() {
@@ -68,7 +73,10 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     }
 
 
-
+    fn_update(p_me)
+    {
+        p_me.setState({'m_update': p_me.state.m_update +1});
+    }
 
     fn_requestGamePad(me, p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
@@ -232,7 +240,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if (this.state.tab_details === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li3'} className="nav-item">
-                <a className="nav-link  user-select-none bi bi-pci-card" data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
+                <a className={`nav-link  user-select-none bi bi-pci-card ${v_andruavUnit.m_modules.m_old_version===true?'text-warning':'text-white'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
             </li>);
         }
 
@@ -359,19 +367,6 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         return { container_tabs, container_controls };
     }
 
-    componentDidUpdate() {
-        // var cam = $(".dropdown-menu li a");
-        // if (cam !== null && cam !== undefined) 
-        // {
-        //     cam.on('click', function(){
-        //         var selText = $(this).attr('data-value');
-        //         $(this).parents('.btn-group').siblings('.menu').html(selText)
-        //     });
-        // }
-
-    }
-
-
     childcomponentWillMount() {
         js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad, this, this.fn_requestGamePad);
     }
@@ -383,6 +378,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        js_eventEmitter.fn_unsubscribe (js_event.EE_OldModule, this);
     }
 
 
