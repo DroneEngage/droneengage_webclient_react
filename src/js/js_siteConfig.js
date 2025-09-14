@@ -70,7 +70,19 @@ export let CONST_FEATURE = {
     DISABLE_EXPERIMENTAL: true,
 };
 
-
+/**
+ * Notice yoy cannot define new languages here.
+ * Only languages with locale files can be used.
+ */
+export let CONST_LANGUAGE = {
+  ENABLED_LANGUAGES: [
+    { code: 'en', label: 'English', className: '' },
+    { code: 'ar', label: 'عربى', className: 'rtl' },
+    { code: 'es', label: 'Español', className: '' },
+    { code: 'ru', label: 'Русский', className: '' }
+  ],
+  DEFAULT_LANGUAGE: 'en'
+};
 
 /**
  * WEBRTC Video Streaming Settings
@@ -122,6 +134,8 @@ function loadConfigSync() {
             if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
 
             if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS};
+
+            if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE};
         } else {
             console.error('Error loading config:', xhr.status);
         }
