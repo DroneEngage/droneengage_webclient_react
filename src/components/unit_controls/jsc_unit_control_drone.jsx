@@ -240,7 +240,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if (this.state.tab_details === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li3'} className="nav-item">
-                <a className={`nav-link  user-select-none bi bi-pci-card ${(v_andruavUnit.m_modules.m_old_version===true)||(v_andruavUnit.m_module_version_comparison<0)?'text-warning':'text-white'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
+                <a className={`nav-link  user-select-none bi bi-pci-card ${(!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version===true)||(v_andruavUnit.m_module_version_comparison<0))?'text-warning':'text-white'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
             </li>);
         }
 
