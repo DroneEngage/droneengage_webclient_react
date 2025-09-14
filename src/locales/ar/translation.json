@@ -44,6 +44,7 @@
   "distance.mi": " ميل",
   "distance.ft": " قدم",
   "version_colon": "الإصدار:",
+  "latest_version_colon": "التحديث:",
   "status_colon": "الحالة:",
   "offline": "غير متصل",
   "connected": "متصل",
@@ -56,5 +57,6 @@
   "received_colon": "تم الاستلام:",
   "video_data_colon": "بيانات الفيديو:",
   "received_msgs_colon": "الرسائل المستلمة:",
-  "last_active_colon": "آخر نشاط:"
+  "last_active_colon": "آخر نشاط:",
+  "download":"تحميل"
 }

@@ -896,19 +896,23 @@ class C_Modules {
     this.has_tracking_alive = false;
     this.has_ai_recognition = false;
     this.has_ai_recognition_alive = false;
-    this.m_list = [];
+
     this.m_old_version = false;
+
+    this.m_list = [];
+
+
+    Object.seal(this);
   }
 
-  compareVersions(v1, p_version_info) {
-    if (!v1 || !p_version_info) return 0;
+  compareVersions(v1, v2) {
+    if (!v1 || !v2) return 0;
 
     const normalize = (version) => {
       // Split the version string by dots and convert each part to an integer.
       // Filter out empty strings that might result from extra dots.
       return version.split('.').filter(Boolean).map(part => parseInt(part, 10));
     };
-    const v2 = p_version_info.version;
     const a1 = normalize(v1);
     const a2 = normalize(v2);
 
@@ -928,9 +932,6 @@ class C_Modules {
 
     return 0; // Versions are the same
   };
-
-
-  
 
   addModules(jsonModules) {
 
@@ -955,56 +956,64 @@ class C_Modules {
         case js_andruavMessages.TYPE_MODULE_CLASS_FCB:
           this.has_fcb = true;
           this.has_fcb_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.fcb);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.fcb ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.fcb.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.fcb;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_GPIO:
           this.has_gpio = true;
           this.has_gpio_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.gpio);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.gpio ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.gpio.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.gpio;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SOUND:
           this.has_sound = true;
           this.has_sound_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.snd);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.snd ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.snd.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.snd;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_P2P:
           this.has_p2p = true;
           this.has_p2p_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.p2p);
-          old_module = old_module || (module.z ==1);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.p2p ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.p2p.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.p2p;
+          old_module = old_module || (module.z == 1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_SDR:
           this.has_sdr = true;
           this.has_sdr_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.sdr);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.sdr ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.sdr.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.sdr;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_CAMERA:
           this.has_camera = true;
           this.has_camera_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.camera);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.camera ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.camera.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.camera;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_TRACKING:
           this.has_tracking = true;
           this.has_tracking_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.trk);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.trk ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.trk.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.trk;
           old_module = old_module || (module.z == -1);
           break;
 
         case js_andruavMessages.TYPE_MODULE_CLASS_AI_RECOGNITION:
           this.has_ai_recognition = true;
           this.has_ai_recognition_alive = module.d === false;
-          module.z = this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.aiq);
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.aiq ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.aiq.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.aiq;
           old_module = old_module || (module.z == -1);
           break;
 
@@ -1015,10 +1024,10 @@ class C_Modules {
     });
 
     this.m_list = jsonModules;
-
-    if (old_module !== this.m_old_version) 
+    
+    if (old_module !== this.m_old_version)
       this.m_old_version = old_module;
-      js_eventEmitter.fn_dispatch(js_event.EE_OldModule);
+    js_eventEmitter.fn_dispatch(js_event.EE_OldModule);
   }
 }
 /**
@@ -1093,9 +1102,11 @@ class C_Messages {
 export class CAndruavUnitObject {
 
   #m_partyID;
+  #m_version;
 
   constructor() {
     this.m_index = 0;
+
     this.m_defined = false;
     this.m_IsMe = false;
     this.m_IsGCS = true;
@@ -1116,9 +1127,21 @@ export class CAndruavUnitObject {
     this.m_VehicleType = VEHICLE_UNKNOWN;
     this.m_telemetry_protocol = js_andruavMessages.CONST_No_Telemetry;
     this.m_enum_userStatus = 0;
-    this.m_version = "null";
+    this.#m_version = "null";
     this.m_delayedTimeout = null; // used for delayed actions.
+    this.m_module_version_comparison = 0;
+    this.m_module_version_info = null;
+
     this.init();
+
+
+    this.m_fencestatus = null;
+    this.m_VehicleType_TXT = '';
+    this.m_wayPoint = {};
+
+    // UNCOMMENT LATER ... make sure that there is no add-on properties.
+    Object.seal(this);
+
   }
 
   setPartyID(p_partyID) {
@@ -1127,6 +1150,31 @@ export class CAndruavUnitObject {
 
   getPartyID() {
     return this.#m_partyID;
+  }
+
+
+  fn_setVersion(p_version) {
+    this.#m_version = p_version;
+    let module_version_comparison = 0;
+
+    if (this.m_isDE === true) {
+      module_version_comparison = js_siteConfig.CONST_MODULE_VERSIONS.de ? this.m_modules.compareVersions(this.#m_version, js_siteConfig.CONST_MODULE_VERSIONS.de.version) : 0;
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.de;
+    }
+    else {
+      module_version_comparison = js_siteConfig.CONST_MODULE_VERSIONS.andruav ? this.m_modules.compareVersions(this.#m_version, js_siteConfig.CONST_MODULE_VERSIONS.andruav.version) : 0;
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.andruav;
+    }
+
+    if (this.m_module_version_comparison != module_version_comparison) {
+      this.m_module_version_comparison = module_version_comparison;
+      js_eventEmitter.fn_dispatch(js_event.EE_OldModule);
+    }
+
+  }
+
+  fn_getVersion() {
+    return this.#m_version;
   }
 
   fn_getFullName() {
@@ -1201,20 +1249,16 @@ export class CAndruavUnitObject {
     return this.fn_getFullName(this.m_groupName, this.#m_partyID);
   }
 
+
+  //TODO: remove this function
   module_version() {
     let module_version = (this.Description + '\n');
 
     if (this.m_isDE !== true) {
-      module_version += "Andruav";
+      module_version += "Andruav: " + this.#m_version
     }
     else {
-      module_version += "DE version: " + this.m_version;
-      const len = this.m_modules.length;
-      for (let i = 0; i < len; ++i) {
-        const module = this.m_modules[i];
-        module_version += '\n';
-        module_version += module.i + ' ver:' + module.v;
-      }
+      module_version += "DE version: " + this.#m_version;
     }
 
     return module_version;

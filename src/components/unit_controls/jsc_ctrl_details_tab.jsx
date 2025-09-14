@@ -25,16 +25,41 @@ class ModuleDetails extends React.Component {
                                 </div>
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
-                                        <small className="text-muted me-2">{t('version_colon')}</small>
+                                        <small className="text-muted me-2 text-capitalize">{t('version_colon')}</small>
                                         <span className={`fw-bold ${module.z === -1 ? 'text-danger' : 'text-success'}`}>{module.v}</span>
                                     </div>
                                 </div>
                                 <div className="col-6">
-                                    <div className="d-flex align-items-center justify-content-end">
-                                        <small className="text-muted me-2">{t('status_colon')}</small>
+                                    <div className="d-flex align-items-center">
+                                        <small className="text-muted me-2 text-capitalize">{t('status_colon')}</small>
                                         <span className={`fw-bold ${module.d ? 'text-danger' : 'text-success'}`}>
                                             {module.d ? t('offline') : t('connected')}
                                         </span>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="d-flex align-items-center">
+                                        <small className="text-muted me-2 text-capitalize">{t('latest_version_colon')}</small>
+                                        <span className={`fw-bold ${module.z === -1 ? 'text-danger bold' : 'text-success'}`}>
+                                            {module.version_info ? module.version_info.version : 'unknown-version'}
+                                        </span>
+                                        {module.z === -1 && module.version_info && module.version_info.url ? (
+                                            <span className="fw-bold text-primary bold">
+                                                &nbsp;-&nbsp;
+                                                <a
+                                                    href={module.version_info.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary"
+                                                >
+                                                    {module.version_info.url}
+                                                </a>
+                                            </span>
+                                        ) : (
+                                            <span className="fw-bold text-secondary">
+                                                &nbsp;-&nbsp;{module.version_info ? module.version_info.url || 'unknown' : 'unknown'}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -91,9 +116,9 @@ class ClssCtrlUnitDetails extends React.Component {
     }
 
     // Toggle module expansion
-    fn_toggleModuleExpansion(module) {
+    fn_toggleModuleExpansion(i) {
         this.setState(prevState => ({
-            expandedModule: prevState.expandedModule === module ? null : module
+            expandedModule: prevState.expandedModule === i ? null : i
         }));
     }
 
@@ -102,43 +127,70 @@ class ClssCtrlUnitDetails extends React.Component {
         const v_andruavUnit = this.props.p_unit;
         let module_version = [];
 
-        if (v_andruavUnit.m_isDE === false) {
-            module_version.push(<span key={this.key + 'set_andruav'}>Andruav</span>);
+        //module_version.push(<span key={this.key + 'set_andruav'}>Andruav</span>);
+        const mainModule = {
+            i: (v_andruavUnit.m_isDE === false) ? 'Andruav' : 'Drone Engage',  // e.g., "Andruav Core" – add 'main_module' to your i18n keys
+            v: v_andruavUnit.fn_getVersion(),
+            d: false,  // Assume m_isConnected exists; fallback: Date.now() - new Date(v_andruavUnit.m_Messages.m_lastActiveTime) > 30000
+            z: v_andruavUnit.m_module_version_comparison,  // Version OK; set to -1 if upgrade check fails
+            version_info: v_andruavUnit.m_module_version_info
+        };
+        const isExpanded = this.state.expandedModule === mainModule.i;
+        const main_module = (<div className='row'>
+            <div key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
+                <span>
+                    &nbsp;-&nbsp;
+                    {mainModule.d === true ? (
+                        <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
+                    ) : (
+                        <span
+                            className={mainModule.z === -1 ? 'text-warning' : 'text-success'}
+                            title={mainModule.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
+                        >
+                            {mainModule.i}&nbsp;{mainModule.v}
+                            {mainModule.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                        </span>
+                    )}
+                    {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
+                </span>
+
+            </div>
+            <ModuleDetails key={this.key + 'mod_' + mainModule.i} module={mainModule} isExpanded={isExpanded} t={t} s />
+        </div>);
+        module_version.push(main_module);
+
+        if (v_andruavUnit.m_modules.m_list.length === 0) {
+            module_version.push(<span key={this.key + 'set_nm'} className='text-warning'>&nbsp;{t('no_modules_connected')} </span>);
         } else {
-            module_version.push(<span key={this.key + 'set_dev'} className=''>DE&nbsp;{t('version_colon')}&nbsp;{v_andruavUnit.m_version}</span>);
+            const modules = v_andruavUnit.m_modules.m_list.map((module) => {
+                const isExpanded = this.state.expandedModule === module.i;
+                return (
+                    <div className='row'>
+                        <div key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
+                            <span>
+                                &nbsp;-&nbsp;
+                                {module.d === true ? (
+                                    <span className='text-danger'>{module.i}&nbsp;{module.v}</span>
+                                ) : (
+                                    <span
+                                        className={module.z === -1 ? 'text-warning' : 'text-success'}
+                                        title={module.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
+                                    >
+                                        {module.i}&nbsp;{module.v}
+                                        {module.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                                    </span>
+                                )}
+                                {module.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
+                            </span>
 
-            if (v_andruavUnit.m_modules.m_list.length === 0) {
-                module_version.push(<span key={this.key + 'set_nm'} className='text-warning'>&nbsp;{t('no_modules_connected')} </span>);
-            } else {
-                const modules = v_andruavUnit.m_modules.m_list.map((module) => {
-                    const isExpanded = this.state.expandedModule === module;
-                    return (
-                        <div className='row'>
-                            <div key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module)} style={{ width: '100%' }}>
-                                <span>
-                                    &nbsp;-&nbsp;
-                                    {module.d === true ? (
-                                        <span className='text-danger'>{module.i}&nbsp;{module.v}</span>
-                                    ) : (
-                                        <span
-                                            className={module.z === -1 ? 'text-warning' : 'text-success'}
-                                            title={module.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
-                                        >
-                                            {module.i}&nbsp;{module.v}
-                                            {module.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
-                                        </span>
-                                    )}
-                                    {module.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
-                                </span>
-
-                            </div>
-                            <ModuleDetails key={this.key + 'mod_' + module.i} module={module} isExpanded={isExpanded} t={t} />
                         </div>
-                    );
-                });
-                module_version.push(...modules);
-            }
+                        <ModuleDetails key={this.key + 'mod_' + module.i} module={module} isExpanded={isExpanded} t={t} />
+                    </div>
+                );
+            });
+            module_version.push(...modules);
         }
+
 
         let cmd_btns = [];
         if (js_siteConfig.CONST_FEATURE.DISABLE_UDPPROXY_UPDATE !== true) {
