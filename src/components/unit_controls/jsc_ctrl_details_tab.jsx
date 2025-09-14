@@ -129,7 +129,7 @@ class ClssCtrlUnitDetails extends React.Component {
 
         //module_version.push(<span key={this.key + 'set_andruav'}>Andruav</span>);
         const mainModule = {
-            i: (v_andruavUnit.m_isDE === false) ? 'Andruav' : 'Drone Engage',  // e.g., "Andruav Core" – add 'main_module' to your i18n keys
+            i: (v_andruavUnit.fn_getIsDE() === false) ? 'Andruav' : 'Drone Engage',  // e.g., "Andruav Core" – add 'main_module' to your i18n keys
             v: v_andruavUnit.fn_getVersion(),
             d: false,  // Assume m_isConnected exists; fallback: Date.now() - new Date(v_andruavUnit.m_Messages.m_lastActiveTime) > 30000
             z: v_andruavUnit.m_module_version_comparison,  // Version OK; set to -1 if upgrade check fails

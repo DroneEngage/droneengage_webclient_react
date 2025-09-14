@@ -1103,6 +1103,7 @@ export class CAndruavUnitObject {
 
   #m_partyID;
   #m_version;
+  #m_isDE;
 
   constructor() {
     this.m_index = 0;
@@ -1110,7 +1111,7 @@ export class CAndruavUnitObject {
     this.m_defined = false;
     this.m_IsMe = false;
     this.m_IsGCS = true;
-    this.m_isDE = false; // is Drone Engage
+    this.#m_isDE = false; // is Drone Engage
     this.Description = "";
     this.m_inZone = null; // name of A ZONE  that the unit is IN.
     this.m_unitName = "unknown";
@@ -1127,9 +1128,9 @@ export class CAndruavUnitObject {
     this.m_VehicleType = VEHICLE_UNKNOWN;
     this.m_telemetry_protocol = js_andruavMessages.CONST_No_Telemetry;
     this.m_enum_userStatus = 0;
-    this.#m_version = "null";
+    this.#m_version = "unknown";
     this.m_delayedTimeout = null; // used for delayed actions.
-    this.m_module_version_comparison = 0;
+    this.m_module_version_comparison = -1;
     this.m_module_version_info = null;
 
     this.init();
@@ -1152,18 +1153,32 @@ export class CAndruavUnitObject {
     return this.#m_partyID;
   }
 
+  fn_setIsDE (p_isDE)
+  {
+    this.#m_isDE = p_isDE;
+    if (this.#m_isDE === true) {
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.de?? null;
+    }
+    else
+    {
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.andruav?? null;
+    }
+  }
+
+  fn_getIsDE ()
+  {
+    return this.#m_isDE;
+  }
 
   fn_setVersion(p_version) {
     this.#m_version = p_version;
     let module_version_comparison = 0;
 
-    if (this.m_isDE === true) {
+    if (this.#m_isDE === true) {
       module_version_comparison = js_siteConfig.CONST_MODULE_VERSIONS.de ? this.m_modules.compareVersions(this.#m_version, js_siteConfig.CONST_MODULE_VERSIONS.de.version) : 0;
-      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.de;
     }
     else {
       module_version_comparison = js_siteConfig.CONST_MODULE_VERSIONS.andruav ? this.m_modules.compareVersions(this.#m_version, js_siteConfig.CONST_MODULE_VERSIONS.andruav.version) : 0;
-      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.andruav;
     }
 
     if (this.m_module_version_comparison != module_version_comparison) {
@@ -1182,7 +1197,7 @@ export class CAndruavUnitObject {
   }
 
   fn_canCamera() {
-    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
+    if ((this.#m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
 
     if (this.m_Permissions[10] === "C") {
       return true;
@@ -1192,7 +1207,7 @@ export class CAndruavUnitObject {
   }
 
   fn_canVideo() {
-    if ((this.m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
+    if ((this.#m_isDE === true) && (this.m_modules.has_camera_alive === false)) return false;
 
     if (this.m_Permissions[8] === "V") {
       return true;
@@ -1202,7 +1217,7 @@ export class CAndruavUnitObject {
   }
 
   init() {
-    this.m_isDE = false;
+    this.#m_isDE = false;
     this.m_time_sync = 0; // time sent by unit so that you can use it to measrue other time fields sent by the same module.
     this.m_Permissions = "X0X0X0X0X0X0";
     this.m_IsShutdown = false; // Drone Unit reports a shutdown
@@ -1254,7 +1269,7 @@ export class CAndruavUnitObject {
   module_version() {
     let module_version = (this.Description + '\n');
 
-    if (this.m_isDE !== true) {
+    if (this.#m_isDE !== true) {
       module_version += "Andruav: " + this.#m_version
     }
     else {
