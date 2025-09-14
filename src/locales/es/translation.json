@@ -45,6 +45,7 @@
   "distance.mi": " mi",
   "distance.ft": " ft",
   "version_colon": "Versión:",
+  "latest_version_colon": "Versión más reciente:",
   "status_colon": "Estado:",
   "offline": "DESCONECTADO",
   "connected": "Conectado",
@@ -57,5 +58,6 @@
   "received_colon": "Recibido:",
   "video_data_colon": "Datos de Video:",
   "received_msgs_colon": "Mensajes Recibidos:",
-  "last_active_colon": "Última Actividad:"
+  "last_active_colon": "Última Actividad:",
+   "download":"descargar"
 }

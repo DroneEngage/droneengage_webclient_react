@@ -45,6 +45,7 @@
   "distance.mi": " миль",
   "distance.ft": " футов",
   "version_colon": "Версия:",
+  "latest_version_colon": "новейшая версия",
   "status_colon": "Статус:",
   "offline": "ОФФЛАЙН",
   "connected": "Подключено",
@@ -57,5 +58,6 @@
   "received_colon": "Получено:",
   "video_data_colon": "Видеоданные:",
   "received_msgs_colon": "Полученные сообщения:",
-  "last_active_colon": "Последняя активность:"
+  "last_active_colon": "Последняя активность:",
+   "download":"скачать"
 }
