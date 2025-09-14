@@ -15,24 +15,24 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-import { js_globals } from './js_globals.js';
-import { EVENTS as js_event } from './js_eventList.js'
-import * as js_helpers from './js_helpers.js';
-import * as js_siteConfig from './js_siteConfig.js';
+import { js_globals } from '../js_globals.js';
+import { EVENTS as js_event } from '../js_eventList.js'
+import * as js_helpers from '../js_helpers.js';
+import * as js_siteConfig from '../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
-import { js_andruav_gamepad } from './js_andruav_gamepad.js'
-import * as js_andruavUnit from './js_andruavUnit.js';
-import * as js_andruavMessages from './js_andruavMessages.js';
+import { js_andruav_gamepad } from '../js_andruav_gamepad.js'
+import * as js_andruavUnit from '../js_andruavUnit.js';
+import * as js_andruavMessages from '../js_andruavMessages.js';
 
-import * as js_common from './js_common.js'
-import { js_eventEmitter } from './js_eventEmitter.js'
-import { CCommandAPI } from './js_commands_api.js'
+import * as js_common from '../js_common.js'
+import { js_eventEmitter } from '../js_eventEmitter.js'
+import { CCommandAPI } from '../js_commands_api.js'
 
 import * as js_andruav_ws from './js_andruav_ws.js';
 import * as js_andruav_parser from './js_andruav_parser.js'
 
 
-import { mavlink20 } from './js_mavlink_v2.js'
+import { mavlink20 } from '../js_mavlink_v2.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;

@@ -15,18 +15,18 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-import { js_globals } from './js_globals.js';
-import { EVENTS as js_event } from './js_eventList.js'
-import * as js_helpers from './js_helpers.js';
-import * as js_andruavUnit from './js_andruavUnit.js';
-import * as js_andruavMessages from './js_andruavMessages.js';
+import { js_globals } from '../js_globals.js';
+import { EVENTS as js_event } from '../js_eventList.js'
+import * as js_helpers from '../js_helpers.js';
+import * as js_andruavUnit from '../js_andruavUnit.js';
+import * as js_andruavMessages from '../js_andruavMessages.js';
 
-import * as js_common from './js_common.js'
-import { js_eventEmitter } from './js_eventEmitter'
+import * as js_common from '../js_common.js'
+import { js_eventEmitter } from '../js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
 
 
-import { mavlink20, MAVLink20Processor } from './js_mavlink_v2.js'
+import { mavlink20, MAVLink20Processor } from '../js_mavlink_v2.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
@@ -1120,13 +1120,28 @@ class CAndruavClientParser {
         }
 
         if (p_jmsg.dv) {
+            // .dv meanse DRONEENGAGE-VERSION
             p_unit.m_isDE = true;
-            if (p_unit.m_version !== p_jmsg.dv) {
-                p_unit.m_version = p_jmsg.dv;
+            if (p_unit.fn_getVersion() !== p_jmsg.dv) {
+                p_unit.fn_setVersion(p_jmsg.dv);
                 setTimeout(() => {
                     js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
                         unit: p_unit,
-                        err: { notification_Type: 5, Description: `DE SW ver: ${p_unit.m_version}` }
+                        err: { notification_Type: 5, Description: `DE SW ver: ${p_jmsg.dv}` }
+                    });
+                }, 1000);
+            }
+        }else
+        if (p_jmsg.av)
+        {
+            // .av means ANDRUAV-VERSION
+            p_unit.m_isDE = false;
+            if (p_unit.fn_getVersion() !== p_jmsg.av) {
+                p_unit.fn_setVersion(p_jmsg.av);
+                setTimeout(() => {
+                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
+                        unit: p_unit,
+                        err: { notification_Type: 5, Description: `Andruav version: ${p_jmsg.av}` }
                     });
                 }, 1000);
             }
