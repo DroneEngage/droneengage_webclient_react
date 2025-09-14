@@ -1118,10 +1118,10 @@ class CAndruavClientParser {
             p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
             triggers.onHomePointChanged = true;
         }
-
+        p_jmsg.av = null;
         if (p_jmsg.dv) {
             // .dv meanse DRONEENGAGE-VERSION
-            p_unit.m_isDE = true;
+            p_unit.fn_setIsDE(true);
             if (p_unit.fn_getVersion() !== p_jmsg.dv) {
                 p_unit.fn_setVersion(p_jmsg.dv);
                 setTimeout(() => {
@@ -1131,19 +1131,21 @@ class CAndruavClientParser {
                     });
                 }, 1000);
             }
-        }else
-        if (p_jmsg.av)
-        {
-            // .av means ANDRUAV-VERSION
-            p_unit.m_isDE = false;
-            if (p_unit.fn_getVersion() !== p_jmsg.av) {
-                p_unit.fn_setVersion(p_jmsg.av);
-                setTimeout(() => {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
-                        unit: p_unit,
-                        err: { notification_Type: 5, Description: `Andruav version: ${p_jmsg.av}` }
-                    });
-                }, 1000);
+        } else {
+
+            p_unit.fn_setIsDE(false);  // backward compatibility
+
+            if (p_jmsg.av) {
+                // .av means ANDRUAV-VERSION
+                if (p_unit.fn_getVersion() !== p_jmsg.av) {
+                    p_unit.fn_setVersion(p_jmsg.av);
+                    setTimeout(() => {
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
+                            unit: p_unit,
+                            err: { notification_Type: 5, Description: `Andruav version: ${p_jmsg.av}` }
+                        });
+                    }, 1000);
+                }
             }
         }
 
@@ -1167,7 +1169,7 @@ class CAndruavClientParser {
         }
 
         let is_armed = false;
-        let is_ready_to_arm = p_unit.m_isDE ? true : false;
+        let is_ready_to_arm = p_unit.fn_getIsDE() ? true : false;
         if (typeof p_jmsg.AR === 'boolean') {
             is_armed = p_jmsg.AR;
             is_ready_to_arm = p_jmsg.AR;

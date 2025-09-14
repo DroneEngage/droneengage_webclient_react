@@ -143,7 +143,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         }
 
 
-        if (p_andruavUnit.m_isDE === true) {
+        if (p_andruavUnit.fn_getIsDE() === true) {
             res.btn_sendParameters_class = " btn-primary  bi bi-toggles ";
             if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null)
                 && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false)) {
@@ -270,7 +270,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false)
             && (this.state.tab_module === true)
             && (v_andruavUnit.m_modules.has_sound === true))
-            || (v_andruavUnit.m_isDE === false))// de already has audio
+            || (v_andruavUnit.fn_getIsDE() === false))// de already has audio
         {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
                 <a className="nav-link user-select-none bi bi-megaphone-fill" data-bs-toggle="tab" href={"#audio" + v_andruavUnit.getPartyID()} title='Audio'></a>
@@ -340,13 +340,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.m_isDE === false))) {
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.fn_getIsDE() === false))) {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAUDIO p_unit={v_andruavUnit} />
             </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false) && (this.state.tab_module === true) && (v_andruavUnit.m_isDE === true)) {
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false) && (this.state.tab_module === true) && (v_andruavUnit.fn_getIsDE() === true)) {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"exp" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlExperimental p_unit={v_andruavUnit} />
             </div>);

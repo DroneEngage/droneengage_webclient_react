@@ -270,7 +270,7 @@ class ClssCtrlUnitMainBar extends React.Component {
       v_andruavUnit.m_IsShutdown === false &&
       v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true
     ) {
-      if (v_andruavUnit.m_isDE !== true) {
+      if (v_andruavUnit.fn_getIsDE() !== true) {
         rows.push(
           <div key={id + '__5'} className="col-1 padding_zero align-baseline">
             <img
@@ -318,7 +318,7 @@ class ClssCtrlUnitMainBar extends React.Component {
         </div>
       );
     } else {
-      if (v_andruavUnit.m_isDE !== true) {
+      if (v_andruavUnit.fn_getIsDE() !== true) {
         rows.push(
           <div key={id + '__5'} className="col-1 padding_zero align-baseline">
             <img

@@ -41,7 +41,7 @@ class ClssCameraDevice extends React.Component {
     {
         if (this.props.prop_session == null) return ;
         let camera_index;
-        if (this.props.prop_session.m_unit.m_isDE === true) {
+        if (this.props.prop_session.m_unit.fn_getIsDE() === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {
@@ -60,7 +60,7 @@ class ClssCameraDevice extends React.Component {
     {
         if (this.props.prop_session == null) return ;
         let camera_index;
-        if (this.props.prop_session.m_unit.m_isDE === true) {
+        if (this.props.prop_session.m_unit.fn_getIsDE() === true) {
             camera_index = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id;
         }
         else {

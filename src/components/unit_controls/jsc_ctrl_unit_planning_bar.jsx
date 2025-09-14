@@ -204,7 +204,7 @@ class ClssCtrlUnitPlanningBar extends React.Component {
             sys_id = ':' + v_andruavUnit.m_FCBParameters.m_systemID + ' ';
         }
         if ((v_andruavUnit.m_IsDisconnectedFromGCS === false) && (v_andruavUnit.m_IsShutdown === false) && (v_andruavUnit.m_Power._FCB.p_Battery.p_hasPowerInfo === true)) {
-            if (v_andruavUnit.m_isDE !== true) {
+            if (v_andruavUnit.fn_getIsDE() !== true) {
                 rows.push(<div key={id + "__5"} className='col-1  padding_zero'><img className={v_battery_display.css} src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level + '% ' + v_battery_display.charging + v_battery_display.temp} /></div>);
             }
             // add FCB battery
@@ -213,7 +213,7 @@ class ClssCtrlUnitPlanningBar extends React.Component {
             rows.push(<div key={id + "fc3"} className="col-4 padding_zero text-end" onClick={(e) => fn_gotoUnit_byPartyID(v_andruavUnit)} ><p id='id' className={'cursor_hand text-right ' + online_class2} title={module_version} onClick={(e) => fn_changeUnitInfo(v_andruavUnit)} ><strong>{v_andruavUnit.m_unitName} </strong> {sys_id}<span className={' ' + online_class}>{online_text}</span></p></div>);
         }
         else {
-            if (v_andruavUnit.m_isDE !== true) {
+            if (v_andruavUnit.fn_getIsDE() !== true) {
                 rows.push(<div key={id + "__5"} className='col-1  padding_zero'><img className={v_battery_display.css} src={v_battery_display.m_battery_src} title={'Andruav batt: ' + v_battery_display.level + '% ' + v_battery_display.charging + v_battery_display.temp} /></div>);
             }
             // add FCB battery
