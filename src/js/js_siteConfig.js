@@ -68,6 +68,7 @@ export let CONST_FEATURE = {
     DISABLE_TRACKING: false,
     DISABLE_TRACKING_AI: false,
     DISABLE_EXPERIMENTAL: true,
+    DISABLE_VERSION_NOTIFICATION: true
 };
 
 /**

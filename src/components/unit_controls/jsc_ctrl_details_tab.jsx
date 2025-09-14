@@ -11,6 +11,9 @@ import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_messageControl.jsx';
 
 class ModuleDetails extends React.Component {
     render() {
+        if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION === true)
+            return (<></>)
+
         const { module, t } = this.props;
         if (!this.props.isExpanded) return null;
 
@@ -162,33 +165,35 @@ class ClssCtrlUnitDetails extends React.Component {
         if (v_andruavUnit.m_modules.m_list.length === 0) {
             module_version.push(<span key={this.key + 'set_nm'} className='text-warning'>&nbsp;{t('no_modules_connected')} </span>);
         } else {
-            const modules = v_andruavUnit.m_modules.m_list.map((module) => {
-                const isExpanded = this.state.expandedModule === module.i;
-                return (
-                    <div className='row'>
-                        <div key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
-                            <span>
-                                &nbsp;-&nbsp;
-                                {module.d === true ? (
-                                    <span className='text-danger'>{module.i}&nbsp;{module.v}</span>
-                                ) : (
-                                    <span
-                                        className={module.z === -1 ? 'text-warning' : 'text-success'}
-                                        title={module.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
-                                    >
-                                        {module.i}&nbsp;{module.v}
-                                        {module.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
-                                    </span>
-                                )}
-                                {module.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
-                            </span>
+            if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION !== true) {
+                const modules = v_andruavUnit.m_modules.m_list.map((module) => {
+                    const isExpanded = this.state.expandedModule === module.i;
+                    return (
+                        <div className='row'>
+                            <div key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
+                                <span>
+                                    &nbsp;-&nbsp;
+                                    {module.d === true ? (
+                                        <span className='text-danger'>{module.i}&nbsp;{module.v}</span>
+                                    ) : (
+                                        <span
+                                            className={module.z === -1 ? 'text-warning' : 'text-success'}
+                                            title={module.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
+                                        >
+                                            {module.i}&nbsp;{module.v}
+                                            {module.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                                        </span>
+                                    )}
+                                    {module.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
+                                </span>
 
+                            </div>
+                            <ModuleDetails key={this.key + 'mod_' + module.i} module={module} isExpanded={isExpanded} t={t} />
                         </div>
-                        <ModuleDetails key={this.key + 'mod_' + module.i} module={module} isExpanded={isExpanded} t={t} />
-                    </div>
-                );
-            });
-            module_version.push(...modules);
+                    );
+                });
+                module_version.push(...modules);
+            }
         }
 
 
