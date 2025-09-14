@@ -48,15 +48,15 @@ export class ClssCtrlAUDIO extends React.Component {
         let css_txt_channel_ws_offline = ' text-white bg-danger ';
         const v_andruavUnit = this.props.p_unit;
         let v_vol_disabled;
-        if (v_andruavUnit.m_isDE === false)
-            v_vol_disabled = 'true';
         let v_pitch_disabled;
-        if (v_andruavUnit.m_isDE === false)
-            v_pitch_disabled = 'true';
-
         let v_language_disabled;
-        if (v_andruavUnit.m_isDE === false)
+
+        if (v_andruavUnit.fn_getIsDE() === false)
+        {
+            v_vol_disabled = 'true';
+            v_pitch_disabled = 'true';
             v_language_disabled = 'true';
+        }
 
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_audio"} className="">

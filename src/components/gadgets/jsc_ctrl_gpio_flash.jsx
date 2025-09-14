@@ -74,7 +74,7 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
 
     render() {
 
-        if (this.props.p_unit.m_isDE === false) {
+        if (this.props.p_unit.fn_getIsDE() === false) {
             return ("");
         }
 
