@@ -6,6 +6,32 @@
     "CONST_TEST_MODE_PORT": "19408",
     "CONST_ANDRUAV_URL_ENABLE": true,
     "CONST_ACCOUNT_URL_ENABLE": true,
+
+
+    "CONST_MODULE_VERSIONS" :{
+        "de":{
+            "version": "3.10.0",
+            "url": "https://cloud.ardupilot.org/downloads/",
+            "help": "http://www.google.com"
+        },
+        "fcb":{
+            "version": "4.7.1",
+            "url": "https://cloud.ardupilot.org/downloads/",
+            "help": "http://www.google.com"
+         },
+         "andruav":{
+            "version": "7.2.3",
+            "url": "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download",
+            "help": "https://cloud.ardupilot.org/andruav-what-is.html"
+         },
+         "camera":{
+            "version": "3.3.2",
+            "url": "https://cloud.ardupilot.org/downloads/",
+            "help": "http://www.google.com"
+         }
+    },
+
+
 /**
  * This is for disable experimental features.
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
@@ -19,7 +45,8 @@
         "DISABLE_SDR": false,
         "DISABLE_GPIO": false,
         "DISABLE_VOICE": false,
-        "DISABLE_EXPERIMENTAL": true
+        "DISABLE_EXPERIMENTAL": true,
+        "DISABLE_VERSION_NOTIFICATION": false
     },
 
 // CHOOSE YOUR MAP SOURCE
