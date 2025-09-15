@@ -58,8 +58,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             m_update: 0
         };
 
-        this.m_flag_mounted = false;
-
+        
         this.props.p_unit.m_gui.speed_link = false;
         this.key = Math.random().toString();
 
