@@ -132,11 +132,11 @@ class CAndruavClientFacade {
             VT: js_andruavUnit.CONST_VEHICLE_GCS, // VehicleType
             GS: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_IsGCS, // IsCGS
             VR: 0, // VideoRecording [OPTIONAL in later Andruav versions]
-            FI: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_useFCBIMU, // useFCBIMU
-            AR: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isArmed, // m_isArmed
-            FL: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isFlying, // m_isFlying
+            //FI: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_useFCBIMU, // useFCBIMU
+            //AR: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isArmed, // m_isArmed
+            //FL: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isFlying, // m_isFlying
             SD: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_IsShutdown,
-            TP: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_telemetry_protocol,
+            //TP: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_telemetry_protocol,
             UD: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_unitName,
             DS: js_andruav_ws.AndruavClientWS.m_andruavUnit.Description,
             p: js_andruav_ws.AndruavClientWS.m_permissions
