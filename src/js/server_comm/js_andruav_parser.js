@@ -163,23 +163,6 @@ class CAndruavClientParser {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     #prv_parseFenceInfo(p_andruavUnit, p_jmsg) {
         let fencetype;
         let m_shouldKeepOutside = false;
@@ -242,9 +225,6 @@ class CAndruavClientParser {
         js_andruav_facade.AndruavClientFacade.API_requestUdpProxyStatus(target);
         js_andruav_facade.AndruavClientFacade.API_requestWayPoints(target);
         //js_andruav_facade.AndruavClientFacade.API_requestIMU (target,true);  // NOT USED
-
-
-
     };
 
 
@@ -1118,7 +1098,7 @@ class CAndruavClientParser {
             p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
             triggers.onHomePointChanged = true;
         }
-        
+
         if (p_jmsg.dv) {
             // .dv meanse DRONEENGAGE-VERSION
             p_unit.fn_setIsDE(true);
