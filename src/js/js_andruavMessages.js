@@ -1,3 +1,65 @@
+/**
+ * Constants for Andruav/Ardupilot-Cloud client-side authentication and communication.
+ * Aligns with backend's global.c_CONSTANTS for API interactions.
+ * Extracted from provided server and client code.
+ */
+
+/**
+ * API endpoint paths.
+ */
+export const CONST_LOGOUT_COMMAND = 'logout'; // Added for logout endpoint
+
+/**
+ * Request parameter keys.
+ */
+export const CONST_APP_GROUP_PARAMETER = 'gr'; // from fn_newLoginCard, js_router_web.js
+export const CONST_APP_NAME_PARAMETER = 'app'; // from fn_newLoginCard, js_router_web.js
+export const CONST_APP_VER_PARAMETER = 'ver'; // from fn_newLoginCard, js_router_web.js
+export const CONST_EXTRA_PARAMETER = 'ex'; // from fn_newLoginCard, js_router_web.js
+export const CONST_PERMISSION = 'per'; // from fn_generateLoginReplyToParty
+export const CONST_PERMISSION2 = 'prm'; // from fn_generateLoginReplyToParty
+export const CONST_COMM_SERVER = 'cs'; // from fn_handleLoginResponses
+export const CONST_CS_SERVER_PUBLIC_HOST = 'g'; // from fn_handleLoginResponses
+export const CONST_CS_SERVER_PORT = 'h'; // from fn_handleLoginResponses
+export const CONST_CS_LOGIN_TEMP_KEY = 'f'; // from fn_handleLoginResponses
+export const CONST_CS_REQUEST_ID = 'r'; // from fn_handleLoginResponses, fn_requestCommunicationLogin
+export const CONST_CS_ACCOUNT_ID = 'a'; // from fn_requestCommunicationLogin
+export const CONST_CS_GROUP_ID = 'gr'; // from fn_requestCommunicationLogin
+export const CONST_CS_SENDER_ID = 's'; // from fn_removePartyCommunicationSession
+export const CONST_INSTANCE_LIMIT = 'il'; // from fn_requestCommunicationLogin
+
+/**
+ * Command values for account operations.
+ */
+export const CONST_CMD_GET_ACCOUNT_NAME = 'gan'; // from fn_accountOperation
+export const CONST_CMD_VERIFY_HARDWARE_BY_ID = 'vhw'; // from fn_hardwareOperationFromAgent
+
+/**
+ * Error codes.
+ */
+export const CONST_ERROR_NON = 0; // from fn_createLoginCard, fn_accountOperation
+export const CONST_ERROR_ACCOUNT_NOT_FOUND = 1; // Implied from fn_createLoginCard
+export const CONST_ERROR_NO_PERMISSION = 2; // from fn_newLoginCard
+export const CONST_ERROR_OLD_APP_VERSION = 3; // from fn_checkAppVersion
+export const CONST_ERROR_SERVER_NOT_AVAILABLE = 4; // from fn_handleLoginResponses
+export const CONST_ERROR_SESSION_NOT_FOUND = 5; // from fn_hardwareOperationFromAgent
+export const CONST_ERROR_HARDWARE_NOT_FOUND = 6; // from fn_do_verifyHardwareByAccountSID
+export const CONST_ERROR_DATA_UNKNOWN_ERROR = 7; // from fn_sendSubscriptionEmail
+
+
+
+/**
+ * Command values for communication server messages.
+ */
+export const CONST_CS_CMD_INFO = 'i'; // from fn_handleServerInfo
+export const CONST_CS_CMD_LOGIN_REQUEST = 'lr'; // from fn_handleLoginResponses
+export const CONST_CS_CMD_LOGOUT_REQUEST = 'lo'; // from fn_removePartyCommunicationSession
+
+/**
+ * Other constants.
+ */
+export const CONST_COMMAND = 'c'; // from fn_checkAppVersion, js_router_web.js
+// 
 // Params of AUTH
 
 export const CONST_WEB_FUNCTION = "/w";
