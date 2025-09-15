@@ -1118,7 +1118,7 @@ class CAndruavClientParser {
             p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
             triggers.onHomePointChanged = true;
         }
-        p_jmsg.av = null;
+        
         if (p_jmsg.dv) {
             // .dv meanse DRONEENGAGE-VERSION
             p_unit.fn_setIsDE(true);
