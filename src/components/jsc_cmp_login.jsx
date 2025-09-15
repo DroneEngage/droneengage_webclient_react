@@ -57,7 +57,7 @@ export default class ClssLoginControl extends React.Component {
             alert('Captcha Matched');
 
             document.getElementById('user_captcha_input').value = "";
-
+            if (callback !== null) callback();
 
         }
 
@@ -66,7 +66,6 @@ export default class ClssLoginControl extends React.Component {
             document.getElementById('user_captcha_input').value = "";
         }
 
-        if (callback !== null) callback();
     }
 
     fn_clickConnect(e) {
