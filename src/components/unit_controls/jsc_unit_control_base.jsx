@@ -17,6 +17,8 @@ export class ClssAndruavUnitBase extends React.Component {
             'm_IsGCS': this.props.p_unit.m_IsGCS,
         };
 
+        this.m_flag_mounted = false;
+
         this.lastUpdateTime = null;
 
         js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, this, this.fn_unitUpdated);
@@ -46,7 +48,7 @@ export class ClssAndruavUnitBase extends React.Component {
             me.lastUpdateTime = now;
         }
 
-        if (me.state.m_update === 0) return;
+        if (!me.m_flag_mounted ) return;
 
         me.setState({ 'm_update': me.state.m_update + 1 });
     }
