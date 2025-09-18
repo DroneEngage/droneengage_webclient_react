@@ -1149,7 +1149,7 @@ class CAndruavClientParser {
         }
 
         let is_armed = false;
-        let is_ready_to_arm = p_unit.fn_getIsDE() ? true : false;
+        let is_ready_to_arm = false;
         if (typeof p_jmsg.AR === 'boolean') {
             is_armed = p_jmsg.AR;
             is_ready_to_arm = p_jmsg.AR;
