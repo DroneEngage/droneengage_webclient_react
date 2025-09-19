@@ -148,8 +148,8 @@ class CAndruavAuth {
      * @returns {boolean} True if valid, false otherwise.
      */
     #validatePermission(permission) {
-        return typeof permission === 'string' && 
-           /^0x[0-9a-fA-F]{8}$/.test(permission);
+        return typeof permission === 'string' &&
+            /^0x[0-9a-fA-F]{8}$/.test(permission);
     }
 
     /**
@@ -190,9 +190,27 @@ class CAndruavAuth {
             [js_andruavMessages.CONST_APP_GROUP_PARAMETER]: '1',
             [js_andruavMessages.CONST_APP_NAME_PARAMETER]: 'andruav',
             [js_andruavMessages.CONST_APP_VER_PARAMETER]: this._m_ver,
-            [js_andruavMessages.CONST_EXTRA_PARAMETER]: 'Andruav',
+            [js_andruavMessages.CONST_EXTRA_PARAMETER]: 'DRONE ENGAGE Web Client',
             [js_andruavMessages.CONST_ACTOR_TYPE]: AUTH_GCS_TYPE,
         };
+
+        const probeResult = await this.fn_probeServer(url);
+        if (!probeResult.success) {
+            this._m_logined = false;
+            const isSslError = probeResult.isSslError;
+            const errorCode = isSslError ? ERROR_CODES.SSL_ERROR : ERROR_CODES.NETWORK_ERROR;
+            const errorMessage = isSslError
+                ? 'SSL Error: Server certificate may be invalid. Please verify the server\'s HTTPS setup.'
+                : 'Network error: Unable to reach the server.';
+
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
+                e: errorCode,
+                em: errorMessage,
+                error: 'Probe failed',
+                ssl: isSslError,
+            });
+            return false;
+        }
 
         try {
             const response = await fetch(url, {
@@ -249,6 +267,18 @@ class CAndruavAuth {
         return false;
     }
 
+    async fn_probeServer(baseUrl) {
+        try {
+            // Simple HEAD request to check if server is reachable (no body, quick)
+            await fetch(baseUrl, { method: 'HEAD', mode: 'no-cors' });  // 'no-cors' to avoid full CORS checks
+            return { success: true };
+        } catch (error) {
+            if (error instanceof TypeError && error.message === 'Failed to fetch' && baseUrl.startsWith('https://')) {
+                return { success: false, isSslError: true };
+            }
+            return { success: false, isSslError: false };
+        }
+    }
     /**
      * Generates a new access code for an account.
      * @param {string} p_accountName - The account email.
@@ -256,6 +286,7 @@ class CAndruavAuth {
      * @returns {Promise<void>}
      */
     async fn_generateAccessCode(p_accountName, p_permission) {
+        
         if (!this.#validateEmail(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
                 e: ERROR_CODES.INVALID_INPUT,
@@ -270,7 +301,7 @@ class CAndruavAuth {
             });
             return;
         }
-        
+
         const url = this.#getBaseUrl(js_andruavMessages.CONST_ACCOUNT_MANAGMENT);
         const keyValues = {
             [js_andruavMessages.CONST_SUB_COMMAND]: js_andruavMessages.CONST_CMD_CREATE_ACCESSCODE,
