@@ -65,7 +65,7 @@ export class ClssMainContextMenu extends React.Component {
                             <div key={'cmc1' + p_andruavUnit.getPartyID()}  className='row'>";
                                 <div className='col-sm-12'><p className='bg-primary text-white  si-07x'>" + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT + "</p></div>";
                                 <div className='col-6'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
-                                <div className='col-6'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
+                                <div className='col-6'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
                             </div>);
                     }
                 }
@@ -85,7 +85,7 @@ export class ClssMainContextMenu extends React.Component {
                                 <div key={'cmc2' + p_andruavUnit.getPartyID()} className='row '>                           
                                 {/* <div className='col-4 '><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doCircle2(p_andruavUnit.getPartyID(), p_lat, p_lng, fn_convertToMeter(js_globals.CONST_DEFAULT_ALTITUDE), fn_convertToMeter(js_globals.CONST_DEFAULT_RADIUS), 10)}>Circle</p></div> */}
                                 <div className='col-6 p-0p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
-                                <div className='col-6 p-0p-0'><p className='al_r cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs)}>Set Home</p></div>
+                                <div className='col-6 p-0p-0'><p className='al_r cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
                             </div>);
 
                     }
