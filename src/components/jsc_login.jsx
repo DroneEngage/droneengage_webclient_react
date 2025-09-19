@@ -12,6 +12,7 @@ import { QueryString, fn_connect, fn_logout, getTabStatus } from '../js/js_main'
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;
 const CONST_NOT_CONNECTION_ONLINE = 2;
+const CONST_NOT_CONNECTION_OFFLINE_FAILED = 3;
 
 class ClssLoginControl extends React.Component {
   constructor() {
@@ -30,7 +31,10 @@ class ClssLoginControl extends React.Component {
 
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
+    js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
+
   }
+
 
   fn_onSocketStatus(me, params) {
     const { t } = me.props; // Access t function
@@ -54,8 +58,15 @@ class ClssLoginControl extends React.Component {
     me.setState({ m_update: me.state.m_update + 1 });
   }
 
+  fn_onAuthBad(me) {
+    if (me.m_flag_mounted === false) return;
+    me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
+    me.setState({ m_update: me.state.m_update + 1 });
+  }
+
+
   clickConnect(e) {
-    if (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE) {
+    if ((this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE) && (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE_FAILED)) {
       // online or connecting
       fn_logout();
       this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE });
@@ -78,6 +89,7 @@ class ClssLoginControl extends React.Component {
   componentWillUnmount() {
     js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
   }
 
   componentDidMount() {
@@ -135,8 +147,11 @@ class ClssLoginControl extends React.Component {
     let ctrls2 = [];
     const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
     switch (this.state.is_connected) {
+      
+      case CONST_NOT_CONNECTION_OFFLINE_FAILED:
       case CONST_NOT_CONNECTION_OFFLINE:
         title = t('title.login');
+        css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'bg-warning':'bg-success';
         ctrls.push(
           <div key={'div_login' + this.key} className="">
             <div className={`form-group ${dir}`}>
