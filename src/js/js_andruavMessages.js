@@ -62,8 +62,10 @@ export const CONST_COMMAND = 'c'; // from fn_checkAppVersion, js_router_web.js
 // 
 // Params of AUTH
 
+export const CONST_HEALTH_FUNCTION = "/h";
 export const CONST_WEB_FUNCTION = "/w";
 export const CONST_WEB_LOGIN_COMMAND = "/wl/";
+export const CONST_WEB_LOGOUT_COMMAND = "/wo/";
 export const CONST_ACCOUNT_MANAGMENT = "/am/";
 export const CONST_CMD_CREATE_ACCESSCODE = "c";
 export const CONST_CMD_REGENERATE_ACCESSCODE = "r";

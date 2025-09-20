@@ -164,6 +164,16 @@ class CAndruavAuth {
         return `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_WEB_FUNCTION}${path}`;
     }
 
+
+    #getHealthURL()
+    {
+        const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+        if (protocol === 'http' && window.location.hostname !== 'localhost') {
+            console.warn('Using HTTP in production—switch to HTTPS for security');
+        }
+        return `${protocol}://${this.m_auth_ip}:${this._m_auth_port}${js_andruavMessages.CONST_HEALTH_FUNCTION}`;
+    }
+
     /**
      * Logs in a user with the provided credentials.
      * @param {string} p_userName - The username (email).
@@ -194,7 +204,7 @@ class CAndruavAuth {
             [js_andruavMessages.CONST_ACTOR_TYPE]: AUTH_GCS_TYPE,
         };
 
-        const probeResult = await this.fn_probeServer(url);
+        const probeResult = await this.fn_probeServer(this.#getHealthURL());
         if (!probeResult.success) {
             this._m_logined = false;
             const isSslError = probeResult.isSslError;
@@ -269,16 +279,21 @@ class CAndruavAuth {
 
     async fn_probeServer(baseUrl) {
         try {
-            // Simple HEAD request to check if server is reachable (no body, quick)
-            await fetch(baseUrl, { method: 'HEAD', mode: 'no-cors' });  // 'no-cors' to avoid full CORS checks
-            return { success: true };
+            console.log('Probing URL:', `${baseUrl}/health`);
+            const response = await fetch(`${baseUrl}/health`, {
+                method: 'GET', // Use GET for simplicity; HEAD is also viable
+                headers: { 'Content-Type': 'application/json' },
+                mode: 'cors', // Use cors mode to access response status
+                signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
+            });
+            return { success: response.ok, isSslError: false };
         } catch (error) {
-            if (error instanceof TypeError && error.message === 'Failed to fetch' && baseUrl.startsWith('https://')) {
-                return { success: false, isSslError: true };
-            }
-            return { success: false, isSslError: false };
+            console.error('Probe error:', error);
+            const isSslError = error.message?.includes('ERR_CERT') || error.message?.includes('SSL');
+            return { success: false, isSslError };
         }
     }
+
     /**
      * Generates a new access code for an account.
      * @param {string} p_accountName - The account email.
@@ -286,7 +301,7 @@ class CAndruavAuth {
      * @returns {Promise<void>}
      */
     async fn_generateAccessCode(p_accountName, p_permission) {
-        
+
         if (!this.#validateEmail(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
                 e: ERROR_CODES.INVALID_INPUT,
@@ -426,7 +441,7 @@ class CAndruavAuth {
             return;
         }
 
-        const url = this.#getBaseUrl(js_andruavMessages.CONST_LOGOUT_COMMAND || '/logout'); // Assume endpoint exists
+        const url = this.#getBaseUrl(js_andruavMessages.CONST_WEB_LOGOUT_COMMAND || '/logout'); // Assume endpoint exists
         const keyValues = {
             [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
         };
