@@ -1,6 +1,6 @@
 {
     "CONST_TEST_MODE": false,
-    "CONST_PROD_MODE_IP": "airgap.droneengage.com",
+    "CONST_PROD_MODE_IP": "airgap.local",
     "CONST_PROD_MODE_PORT": "19408",
     "CONST_TEST_MODE_IP": "127.0.0.1",
     "CONST_TEST_MODE_PORT": "19408",
@@ -60,7 +60,7 @@
  * WEBRTC Video Streaming Settings
  */
     "CONST_ICE_SERVERS": [
-        { "urls": "turn:cloud.ardupilot.org", "credential": "1234", "username": "andruav_ap" },
+        { "urls": "turn:airgap.local", "credential": "1234", "username": "andruav_ap" },
         { "urls": "stun:stun1.l.google.com:19302" }
     ]
 }
