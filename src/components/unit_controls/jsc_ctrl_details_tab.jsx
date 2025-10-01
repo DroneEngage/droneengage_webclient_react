@@ -154,7 +154,7 @@ class ClssCtrlUnitDetails extends React.Component {
                             {mainModule.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
                         </span>
                     )}
-                    {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
+                    {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}
                 </span>
 
             </div>
@@ -184,7 +184,7 @@ class ClssCtrlUnitDetails extends React.Component {
                                             {module.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
                                         </span>
                                     )}
-                                    {module.d === true && <span className='blink_alert animate_iteration_5s'>{t('offline')}</span>}
+                                    {module.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}
                                 </span>
 
                             </div>
