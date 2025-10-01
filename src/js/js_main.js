@@ -1931,8 +1931,11 @@ export function fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst, p_files) {
 
 
 var EVT_onDeleted = function () {
-	js_globals.v_andruavClient.fn_disconnect();
+	js_globals.v_andruavWS.fn_disconnect();
 	js_globals.v_andruavClient = null;
+	js_globals.v_andruavFacade = null;
+	js_globals.v_andruavWS = null;
+
 };
 
 
