@@ -1,8 +1,14 @@
 
 div.css_mainbody
 {
-	margin-right: 0px !important;
-	margin-top: 100px !important;
+  position: fixed;
+  top: 90px; /* Header height */
+  bottom: 50px; /* Footer height */
+  left: 0;
+  right: 0;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 img.camera_switch
@@ -480,10 +486,7 @@ img.battery_charging:before
 	content:url('/public/images/battery_bg_32x32.png');
 }
 
-div#mainbody 
-{
-	padding-top: 0px !important;
-}
+
 
 div#imu_yaw_knob
 {
@@ -1072,11 +1075,10 @@ table.css_table_log
 	display:inline-block;
 }
 
-/* div#row_2
-{
-    max-width: 30% !important;
-	min-width: 30% !important;
-} */
+#row_2 {
+  overflow-y: auto;
+  max-height: calc(100vh - 110px); /* Adjust based on header (60px) and footer (50px) heights */
+}
 
 div#displays
 {
@@ -1135,3 +1137,23 @@ div#displays
 	font-size: 12px !important;
 	font-weight: bold !important;
   }
+
+
+  #rowheader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 60px !important; /* Adjust based on actual header height */
+}
+
+
+  #footer_div {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 0px; /* Adjust based on actual footer height */
+}

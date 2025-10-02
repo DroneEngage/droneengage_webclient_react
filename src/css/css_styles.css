@@ -1,4 +1,25 @@
 
+:root {
+  /* Bootstrap 5.3 default color overrides to reset from darkly theme */
+    --bs-gray-900: #222;
+    --bs-primary: #375a7f;
+    --bs-secondary: #444;
+    --bs-success: #00bc8c;
+    --bs-info: #3498db;
+    --bs-warning: #f39c12;
+    --bs-danger: #e74c3c;
+    --bs-light: #adb5bd;
+    --bs-dark: #303030;
+    --bs-primary-rgb: 55, 90, 127;
+    --bs-secondary-rgb: 68, 68, 68;
+    --bs-success-rgb: 0, 188, 140;
+    --bs-info-rgb: 52, 152, 219;
+    --bs-warning-rgb: 243, 156, 18;
+    --bs-danger-rgb: 231, 76, 60;
+    --bs-light-rgb: 173, 181, 189;
+    --bs-dark-rgb: 48, 48, 48;
+}
+
 
 
 * {
@@ -6,7 +27,7 @@
 	box-sizing: border-box;
 }
 
-html {
+/* html {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -22,6 +43,14 @@ body {
     width: 100%;
 	float: left;
 
+} */
+
+html, body {
+  overflow-x: hidden;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
 }
 
 
