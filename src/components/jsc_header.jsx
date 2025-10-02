@@ -47,11 +47,11 @@ class ClssHeaderControl extends React.Component {
             );
         }
         return (
-            <div key='ClssHeaderControl' className='row  css_padding_zero bg-dark fixed-top ps-3'>
+            <div id='rowheader' key='ClssHeaderControl' className='row  css_padding_zero bg-dark fixed-top ps-3'>
                 <div className='col-7  css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
-                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-0">
                         <a className="navbar-brand fs-3" href=".">
-                            <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top" alt="" />
+                            <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top pt-2" alt="" />
                             {js_siteConfig.CONST_TITLE}
                         </a>
                         <div className="collapse navbar-collapse" id="navbarNav">
