@@ -10,6 +10,18 @@ import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_messageControl.jsx';
 
 
 class ModuleDetails extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            m_update: 0
+        };
+
+
+        this.key = Math.random().toString();
+
+    }
+
     render() {
         if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION === true)
             return (<></>)
@@ -18,13 +30,13 @@ class ModuleDetails extends React.Component {
         if (!this.props.isExpanded) return null;
 
         return (
-            <div className="row css_margin_zero padding_zero mt-1 w-100">
+            <div id={`MD${this.key}`} key={`MD${this.key}`} className="row css_margin_zero padding_zero mt-1 w-100 cursor_default">
                 <div className="col-12">
                     <div className="card border-secondary mb-0 bg-secondary">
                         <div className="card-body p-2">
                             <div className="row align-items-center mb-0">
                                 <div className="col-12 mb-1">
-                                    <p className="card-title mb-1"><strong>{module.i}</strong></p>
+                                    <p className="card-title mb-1 cursor_hand"><strong>{module.i}</strong></p>
                                 </div>
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
@@ -140,7 +152,7 @@ class ClssCtrlUnitDetails extends React.Component {
         };
         const isExpanded = this.state.expandedModule === mainModule.i;
         const main_module = (<div className='row'>
-            <div key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
+            <div id={this.key + mainModule.i} key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
                 <span>
                     &nbsp;-&nbsp;
                     {mainModule.d === true ? (
@@ -170,7 +182,7 @@ class ClssCtrlUnitDetails extends React.Component {
                     const isExpanded = this.state.expandedModule === module.i;
                     return (
                         <div className='row'>
-                            <div key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
+                            <div id={this.key + module.i} key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
                                 <span>
                                     &nbsp;-&nbsp;
                                     {module.d === true ? (
