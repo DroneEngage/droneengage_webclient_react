@@ -13,12 +13,12 @@ module.exports = {
           mangle: {
             keep_fnames: false, // Mangle function names
             keep_classnames: false, // Mangle class names
-            toplevel: true // Mangle top-level variables
+            toplevel: true, // Mangle top-level variables
 
-            // properties: {
-            //   regex: /^m_/,
-            //   reserved: ['m_index'], // Exclude specific properties if needed
-            // },
+            properties: {
+              regex: /^(fn_|p_|v_)/,
+              reserved: ['m_index'], // Exclude specific properties if needed
+            },
 
           },
           compress: {

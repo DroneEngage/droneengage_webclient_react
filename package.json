@@ -52,7 +52,7 @@
   },
   "scripts": {
     "start": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=$WEB_SSL_KEY SSL_KEY_FILE=$WEB_SSL_KEY react-scripts start",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && HTTPS=true SSL_CRT_FILE=$WEB_SSL_CRT SSL_KEY_FILE=$WEB_SSL_KEY react-scripts build --mode production --config-overrides ./webpack.config.js",
+    "build": "react-scripts build --mode production --config-overrides ./webpack.config.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src"
