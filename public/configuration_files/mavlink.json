@@ -1,0 +1,38 @@
+[
+    {
+        "name": "connect to fcb",
+        "template": {
+            "fcb_connection_uri_1": {
+                "fieldName": "fcb_connection_uri",
+                "type": "object",
+                "fields": {
+                    "protocol": { "type": "combo", "defaultvalue": "tcp", "list_values": ["tcp", "udp"] },
+                    "ip": { "type": "text", "defaultvalue": "127.0.0.1" },
+                    "port": { "type": "number", "defaultvalue": 8080 }
+                },
+                "optional": true,
+                "desc": "TCP/UDP connection settings - ONLY ONE fcb_connection_uri"
+            },
+            "fcb_connection_uri_2": {
+                "fieldName": "fcb_connection_uri",
+                "type": "object",
+                "fields": {
+                    "type": { "type": "combo", "defaultvalue": "serial", "list_values": ["serial"] },
+                    "port": { "type": "text", "defaultvalue": "/dev/ttyUSB1" },
+                    "baudrate": { "type": "number", "defaultvalue": "115200" },
+                    "dynamic": { "type": "checkbox", "defaultvalue": false }
+                },
+                "optional": true,
+                "desc": "serial port settings - ONLY ONE fcb_connection_uri"
+            }
+        }
+    },
+    {
+                "name": "change rates",
+                "template": {
+                    "module_id": { "type": "text", "defaultvalue": "FCB_CTRL"},
+                    "s2s_udp_target_ip": { "type": "text", "defaultvalue": "127.0.0.1"
+            }
+        }
+    }
+]
