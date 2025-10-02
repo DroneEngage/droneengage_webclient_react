@@ -5,10 +5,19 @@
  *  Function: The ClssConfigGenerator is a React class component designed to dynamically generate 
  *  a form based on a JSON configuration input (provided via the configs prop) 
  *  and produce a JSON output based on user interactions.
- * 
  */
 import React from 'react';
-import {handleSave, handleCopy, updateEnable, updateValue, getNested, buildOutput, buildInitialEnabled, buildInitialValues} from '../js/helpers/js_form_utils.js'
+import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import {
+  buildInitialValues,
+  buildInitialEnabled,
+  buildOutput,
+  getNested,
+  updateValue,
+  updateEnable,
+  handleCopy,
+  handleSave,
+} from '../js/helpers/js_form_utils.js';
 
 /**
  * ClssConfigGenerator is a React class component that dynamically generates a form
@@ -31,9 +40,10 @@ export class ClssConfigGenerator extends React.Component {
       fileName: 'config.json', // Default filename for saving
     };
 
+    this.m_flag_mounted = false;
+
     // Set initial template and initialize state
     this.currentTemplate = props.configs.find(c => c.name === this.state.selected)?.template || {};
-    // Initialize values, enabled, and output in a single state update
     this.state = {
       ...this.state,
       values: buildInitialValues(this.currentTemplate),
@@ -45,6 +55,64 @@ export class ClssConfigGenerator extends React.Component {
     this.handleCopy = this.handleCopy.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.initBootstrap = this.initBootstrap.bind(this);
+  }
+
+  /**
+   * Determines whether the component should re-render based on changes in props or state.
+   * Prevents re-renders when only the output state changes, as it doesn't affect the UI.
+   * @param {Object} nextProps - The next props
+   * @param {Object} nextState - The next state
+   * @returns {boolean} Whether the component should update
+   */
+  shouldComponentUpdate(nextProps, nextState) {
+    if (!this.m_flag_mounted) return false;
+
+    // Compare props.configs
+    if (JSON.stringify(this.props.configs) !== JSON.stringify(nextProps.configs)) {
+      return true;
+    }
+    // Compare UI-affecting state
+    if (
+      this.state.selected !== nextState.selected ||
+      JSON.stringify(this.state.values) !== JSON.stringify(nextState.values) ||
+      JSON.stringify(this.state.enabled) !== JSON.stringify(nextState.enabled) ||
+      this.state.fileName !== nextState.fileName
+    ) {
+      return true;
+    }
+    // Skip re-render if only output changes
+    return false;
+  }
+
+  /**
+   * Initializes Bootstrap tooltips and dropdowns for elements with data-bs-toggle.
+   */
+  initBootstrap() {
+    // Initialize tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    
+  }
+
+  /**
+   * Lifecycle method to initialize tooltips and dropdowns after component mounts.
+   */
+  componentDidMount() {
+    this.m_flag_mounted = true;
+    this.initBootstrap();
+  }
+
+  /**
+   * Lifecycle method to re-initialize tooltips and dropdowns after component updates.
+   * @param {Object} prevProps - Previous props
+   * @param {Object} prevState - Previous state
+   */
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.selected !== prevState.selected || JSON.stringify(this.state.enabled) !== JSON.stringify(prevState.enabled)) {
+      this.initBootstrap();
+    }
   }
 
   /**
@@ -55,7 +123,7 @@ export class ClssConfigGenerator extends React.Component {
     const values = buildInitialValues(this.currentTemplate);
     const enabled = buildInitialEnabled(this.currentTemplate);
     const output = JSON.stringify(buildOutput(this.currentTemplate, values, enabled), null, 4);
-    this.setState({ values, enabled, output });
+    this.setState({ values, enabled, output }, () => this.initBootstrap());
   }
 
   /**
@@ -65,7 +133,7 @@ export class ClssConfigGenerator extends React.Component {
    */
   updateOutput(values, enabled) {
     const output = JSON.stringify(buildOutput(this.currentTemplate, values, enabled), null, 4);
-    this.setState({ output });
+    this.setState({ output }, () => this.initBootstrap());
   }
 
   /**
@@ -103,9 +171,10 @@ export class ClssConfigGenerator extends React.Component {
               onChange={(e) => this.setState(
                 (prev) => {
                   const newEnabled = updateEnable(prev.enabled, fullPath, e.target.checked);
-                  return { enabled: newEnabled };
+                  const newOutput = JSON.stringify(buildOutput(this.currentTemplate, prev.values, newEnabled), null, 4);
+                  return { enabled: newEnabled, output: newOutput };
                 },
-                () => this.updateOutput(this.state.values, this.state.enabled)
+                () => this.initBootstrap()
               )}
             />
           </div>
@@ -113,8 +182,16 @@ export class ClssConfigGenerator extends React.Component {
       }
       return (
         <div key={fullPath} className="mb-3">
-          <label htmlFor={fullPath} className="form-label" title={fieldConfig.desc}>
+          <label htmlFor={fullPath} className="form-label">
             {fieldName}
+            {fieldConfig.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={fieldConfig.desc}
+              ></i>
+            )}
           </label>
           {optionalPart}
           {this.renderInput(fieldName, fieldConfig, path, isEnabled)}
@@ -134,20 +211,22 @@ export class ClssConfigGenerator extends React.Component {
   renderInput(fieldName, fieldConfig, path, enabled) {
     const fullPath = path ? `${path}.${fieldName}` : fieldName;
     const disabled = !enabled ? 'disabled' : '';
+    const css = disabled === 'disabled' && fieldConfig.css ? fieldConfig.css : '';
     switch (fieldConfig.type) {
       case 'text':
         return (
           <input
             type="text"
             id={fullPath}
-            className={`form-control ${disabled}`}
+            className={`form-control ${disabled} ${css}`}
             value={getNested(this.state.values, fullPath) ?? ''}
             onChange={(e) => this.setState(
               (prev) => {
                 const newValues = updateValue(prev.values, fullPath, e.target.value);
-                return { values: newValues };
+                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                return { values: newValues, output: newOutput };
               },
-              () => this.updateOutput(this.state.values, this.state.enabled)
+              () => this.initBootstrap()
             )}
             disabled={!enabled}
           />
@@ -162,9 +241,10 @@ export class ClssConfigGenerator extends React.Component {
             onChange={(e) => this.setState(
               (prev) => {
                 const newValues = updateValue(prev.values, fullPath, Number(e.target.value));
-                return { values: newValues };
+                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                return { values: newValues, output: newOutput };
               },
-              () => this.updateOutput(this.state.values, this.state.enabled)
+              () => this.initBootstrap()
             )}
             disabled={!enabled}
           />
@@ -180,9 +260,10 @@ export class ClssConfigGenerator extends React.Component {
               onChange={(e) => this.setState(
                 (prev) => {
                   const newValues = updateValue(prev.values, fullPath, e.target.checked);
-                  return { values: newValues };
+                  const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                  return { values: newValues, output: newOutput };
                 },
-                () => this.updateOutput(this.state.values, this.state.enabled)
+                () => this.initBootstrap()
               )}
               disabled={!enabled}
             />
@@ -197,9 +278,10 @@ export class ClssConfigGenerator extends React.Component {
             onChange={(e) => this.setState(
               (prev) => {
                 const newValues = updateValue(prev.values, fullPath, e.target.value);
-                return { values: newValues };
+                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                return { values: newValues, output: newOutput };
               },
-              () => this.updateOutput(this.state.values, this.state.enabled)
+              () => this.initBootstrap()
             )}
             disabled={!enabled}
           >
@@ -223,9 +305,10 @@ export class ClssConfigGenerator extends React.Component {
                 onChange={(e) => this.setState(
                   (prev) => {
                     const newValues = updateValue(prev.values, `${fullPath}.${index}`, Number(e.target.value));
-                    return { values: newValues };
+                    const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                    return { values: newValues, output: newOutput };
                   },
-                  () => this.updateOutput(this.state.values, this.state.enabled)
+                  () => this.initBootstrap()
                 )}
                 disabled={!enabled}
               />
@@ -244,9 +327,10 @@ export class ClssConfigGenerator extends React.Component {
             onChange={(e) => this.setState(
               (prev) => {
                 const newValues = updateValue(prev.values, fullPath, e.target.value);
-                return { values: newValues };
+                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+                return { values: newValues, output: newOutput };
               },
-              () => this.updateOutput(this.state.values, this.state.enabled)
+              () => this.initBootstrap()
             )}
             disabled={!enabled}
           />
@@ -273,6 +357,7 @@ export class ClssConfigGenerator extends React.Component {
    * @returns {JSX.Element} The rendered component
    */
   render() {
+    console.log('Render called', this.state);
     return (
       <div className="container-fluid bg-dark text-light p-4">
         <h5 className="mb-3">Select Configuration:</h5>
@@ -290,12 +375,12 @@ export class ClssConfigGenerator extends React.Component {
           ))}
         </select>
 
-        <div id="form-container" className="mb-4">
+        <div id="form-container" className="mb-4 small">
           {this.renderFields(this.currentTemplate)}
         </div>
 
-        <h5 className="mb-3">Generated JSON:</h5>
-        <div className="position-relative mb-4">
+        <h6 className="mb-3">Generated JSON:</h6>
+        <div className="position-relative mb-4 small">
           <textarea
             id="output"
             className="form-control bg-dark text-light"
@@ -312,7 +397,7 @@ export class ClssConfigGenerator extends React.Component {
           </button>
         </div>
 
-        <div className="input-group mb-3">
+        <div className="input-group mb-3 small">
           <input
             type="text"
             id="filename"
@@ -333,4 +418,3 @@ export class ClssConfigGenerator extends React.Component {
     );
   }
 }
-
