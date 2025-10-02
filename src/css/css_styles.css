@@ -896,6 +896,11 @@ tr.IsShutdown_false td.camera.m_IsGCS_false
 	cursor: pointer;
 }
 
+.cursor_default
+{
+	cursor: default
+}
+
 .line-height-0
 {
 	line-height: 0px !important;
