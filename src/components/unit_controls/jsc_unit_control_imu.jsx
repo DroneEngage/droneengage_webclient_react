@@ -8,7 +8,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_andruavMessages from '../../js/js_andruavMessages.js';
 import ClssCtrlUDPPoxyTelemetry from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx';
 import { ClssCtrlHUD } from '../gadgets/jsc_ctrl_hudControl.jsx';
-import { ClssCtrlDirections } from '../gadgets/jsc_ctrl_directionsControl.jsx';
+import { ClssCtrlDirections } from '../gadgets/jsc_ctrl_directions_control.jsx';
 import ClssCtrlSWARM from '../gadgets/jsc_ctrl_swarm.jsx';
 import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx';
 import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx';
