@@ -7,84 +7,7 @@ import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import { js_andruavAuth } from '../../js/js_andruav_auth.js';
 import { fn_changeUDPPort } from '../../js/js_main.js';
 import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_messageControl.jsx';
-
-
-class ModuleDetails extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            m_update: 0
-        };
-
-
-        this.key = Math.random().toString();
-
-    }
-
-    render() {
-        if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION === true)
-            return (<></>)
-
-        const { module, t } = this.props;
-        if (!this.props.isExpanded) return null;
-
-        return (
-            <div id={`MD${this.key}`} key={`MD${this.key}`} className="row css_margin_zero padding_zero mt-1 w-100 cursor_default">
-                <div className="col-12">
-                    <div className="card border-secondary mb-0 bg-secondary">
-                        <div className="card-body p-2">
-                            <div className="row align-items-center mb-0">
-                                <div className="col-12 mb-1">
-                                    <p className="card-title mb-1 cursor_hand"><strong>{module.i}</strong></p>
-                                </div>
-                                <div className="col-6">
-                                    <div className="d-flex align-items-center">
-                                        <small className="text-muted me-2 text-capitalize">{t('version_colon')}</small>
-                                        <span className={`fw-bold ${module.z === -1 ? 'text-danger' : 'text-success'}`}>{module.v}</span>
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="d-flex align-items-center">
-                                        <small className="text-muted me-2 text-capitalize">{t('status_colon')}</small>
-                                        <span className={`fw-bold ${module.d ? 'text-danger' : 'text-success'}`}>
-                                            {module.d ? t('offline') : t('connected')}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <div className="d-flex align-items-center">
-                                        <small className="text-muted me-2 text-capitalize">{t('latest_version_colon')}</small>
-                                        <span className={`fw-bold ${module.z === -1 ? 'text-danger bold' : 'text-success'}`}>
-                                            {module.version_info ? module.version_info.version : 'unknown-version'}
-                                        </span>
-                                        {module.z === -1 && module.version_info && module.version_info.url ? (
-                                            <span className="fw-bold text-primary bold">
-                                                &nbsp;-&nbsp;
-                                                <a
-                                                    href={module.version_info.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-primary"
-                                                >
-                                                    {module.version_info.url}
-                                                </a>
-                                            </span>
-                                        ) : (
-                                            <span className="fw-bold text-secondary">
-                                                &nbsp;-&nbsp;{module.version_info ? module.version_info.url || 'unknown' : 'unknown'}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
+import { ClssModuleDetails } from '../gadgets/jsc_ctrl_unit_module_details.jsx';
 
 class ClssCtrlUnitDetails extends React.Component {
     constructor(props) {
@@ -151,7 +74,7 @@ class ClssCtrlUnitDetails extends React.Component {
             version_info: v_andruavUnit.m_module_version_info
         };
         const isExpanded = this.state.expandedModule === mainModule.i;
-        const main_module = (<div className='row'>
+        const main_module = (<div key={this.key + 'main_module'} className='row'>
             <div id={this.key + mainModule.i} key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
                 <span>
                     &nbsp;-&nbsp;
@@ -170,7 +93,7 @@ class ClssCtrlUnitDetails extends React.Component {
                 </span>
 
             </div>
-            <ModuleDetails key={this.key + 'mod_' + mainModule.i} module={mainModule} isExpanded={isExpanded} t={t} s />
+            <ClssModuleDetails key={this.key + 'mod_' + mainModule.i} module={mainModule} p_unit={this.props.p_unit} isExpanded={isExpanded} t={t} s />
         </div>);
         module_version.push(main_module);
 
@@ -178,10 +101,10 @@ class ClssCtrlUnitDetails extends React.Component {
             module_version.push(<span key={this.key + 'set_nm'} className='text-warning'>&nbsp;{t('no_modules_connected')} </span>);
         } else {
             if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION !== true) {
-                const modules = v_andruavUnit.m_modules.m_list.map((module) => {
+                const modules = v_andruavUnit.m_modules.m_list.map((module, index) => {
                     const isExpanded = this.state.expandedModule === module.i;
                     return (
-                        <div className='row'>
+                        <div key={this.key + 'module_' + index} className='row'>
                             <div id={this.key + module.i} key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
                                 <span>
                                     &nbsp;-&nbsp;
@@ -200,7 +123,7 @@ class ClssCtrlUnitDetails extends React.Component {
                                 </span>
 
                             </div>
-                            <ModuleDetails key={this.key + 'mod_' + module.i} module={module} isExpanded={isExpanded} t={t} />
+                            <ClssModuleDetails key={this.key + 'mod_' + module.i} module={module} p_unit={this.props.p_unit} isExpanded={isExpanded} t={t} />
                         </div>
                     );
                 });
@@ -313,6 +236,4 @@ class ClssCtrlUnitDetails extends React.Component {
 }
 
 const ClssCtrlUnitDetailsTranslated = withTranslation()(ClssCtrlUnitDetails);
-const ModuleDetailsTranslated = withTranslation()(ModuleDetails);
-
-export { ClssCtrlUnitDetailsTranslated as ClssCtrlUnitDetails, ModuleDetailsTranslated as ModuleDetails };
+export { ClssCtrlUnitDetailsTranslated as ClssCtrlUnitDetails};
