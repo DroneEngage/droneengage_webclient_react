@@ -55,6 +55,7 @@ export class ClssConfigGenerator extends React.Component {
     this.handleCopy = this.handleCopy.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.fn_handleSubmit = this.fn_handleSubmit.bind(this);
     this.initBootstrap = this.initBootstrap.bind(this);
   }
 
@@ -166,7 +167,7 @@ export class ClssConfigGenerator extends React.Component {
             <input
               type="checkbox"
               id={`${fullPath}_optional`}
-              className="form-check-input"
+              className="form-check-input "
               checked={this.state.enabled[fullPath] || false}
               onChange={(e) => this.setState(
                 (prev) => {
@@ -218,7 +219,7 @@ export class ClssConfigGenerator extends React.Component {
           <input
             type="text"
             id={fullPath}
-            className={`form-control ${disabled} ${css}`}
+            className={`form-control input-sm ${disabled} ${css}`}
             value={getNested(this.state.values, fullPath) ?? ''}
             onChange={(e) => this.setState(
               (prev) => {
@@ -236,7 +237,7 @@ export class ClssConfigGenerator extends React.Component {
           <input
             type="number"
             id={fullPath}
-            className={`form-control ${disabled}`}
+            className={`form-control input-sm ${disabled}`}
             value={getNested(this.state.values, fullPath) ?? ''}
             onChange={(e) => this.setState(
               (prev) => {
@@ -255,7 +256,7 @@ export class ClssConfigGenerator extends React.Component {
             <input
               type="checkbox"
               id={fullPath}
-              className={`form-check-input ${disabled}`}
+              className={`form-check-input  ${disabled}`}
               checked={getNested(this.state.values, fullPath) ?? false}
               onChange={(e) => this.setState(
                 (prev) => {
@@ -273,7 +274,7 @@ export class ClssConfigGenerator extends React.Component {
         return (
           <select
             id={fullPath}
-            className={`form-select ${disabled}`}
+            className={`form-select input-sm pt-0 ps-2 ${disabled}`}
             value={getNested(this.state.values, fullPath) ?? ''}
             onChange={(e) => this.setState(
               (prev) => {
@@ -300,7 +301,7 @@ export class ClssConfigGenerator extends React.Component {
               <input
                 key={index}
                 type="number"
-                className={`form-control ${disabled}`}
+                className={`form-control input-sm ${disabled}`}
                 value={val}
                 onChange={(e) => this.setState(
                   (prev) => {
@@ -322,7 +323,7 @@ export class ClssConfigGenerator extends React.Component {
           <input
             type="text"
             id={fullPath}
-            className={`form-control ${disabled}`}
+            className={`form-control input-sm ${disabled}`}
             value={getNested(this.state.values, fullPath) ?? ''}
             onChange={(e) => this.setState(
               (prev) => {
@@ -345,6 +346,15 @@ export class ClssConfigGenerator extends React.Component {
     handleCopy(this.state.output);
   }
 
+
+  fn_handleSubmit()
+  {
+    if (!this.props.onSubmit) return ;
+    
+    this.props.onSubmit(this.state.output);
+    
+  }
+
   /**
    * Saves the generated JSON as a downloadable file.
    */
@@ -357,7 +367,6 @@ export class ClssConfigGenerator extends React.Component {
    * @returns {JSX.Element} The rendered component
    */
   render() {
-    console.log('Render called', this.state);
     return (
       <div className="container-fluid bg-dark text-light p-4">
         <h5 className="mb-3">Select Configuration:</h5>
@@ -395,13 +404,20 @@ export class ClssConfigGenerator extends React.Component {
           >
             Copy
           </button>
+          <button
+            id="copyButton"
+            className="btn btn-warning btn-sm"
+            onClick={this.fn_handleSubmit}
+          >
+            Apply
+          </button>
         </div>
 
         <div className="input-group mb-3 small">
           <input
             type="text"
             id="filename"
-            className="form-control"
+            className="form-control input-sm"
             value={this.state.fileName}
             onChange={(e) => this.setState({ fileName: e.target.value })}
             placeholder="config.json"
