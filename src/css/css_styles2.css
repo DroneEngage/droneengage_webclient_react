@@ -662,7 +662,7 @@ input#txt_defaultAltitude
 {
 	width: 90px !important;
 	height: 30px !important;
-	font-size: 12px !important;
+	font-size: 11px !important;
 	font-weight: bold !important;
 }
 
@@ -670,7 +670,7 @@ input#txt_defaultAltitude
 .ctrlbtn_lng
 {
 	width: 80px !important;
-	font-size: 12px !important;
+	font-size: 11px !important;
 	font-weight: bold !important;
 }
 
@@ -678,7 +678,7 @@ input#txt_defaultAltitude
 {
 	width: 70px !important;
 	height: 30px !important;
-	font-size: 12px !important;
+	font-size: 11px !important;
 	font-weight: bold !important;
 }
 .flgtctrlbtn_icon
@@ -703,7 +703,7 @@ input#txt_defaultAltitude
 .flgtctrlbtn_lng
 {
 	width: 70px !important;
-	font-size: 12px !important;
+	font-size: 11px !important;
 	font-weight: bold !important;
 }
 
@@ -1134,7 +1134,7 @@ div#displays
 
   #main_btn_group button {
 	height: 30px !important;
-	font-size: 12px !important;
+	font-size: 11px !important;
 	font-weight: bold !important;
   }
 
