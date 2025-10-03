@@ -663,5 +663,39 @@ export class CCommandAPI {
     }
 
 
+    static API_updateConfigRestart(p_module_key) {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart,
+            }
+        };
+
+        if (p_module_key) {
+            msg.ms.b = p_module_key
+        }
+
+        return msg;
+    }
+
+
+    static API_updateConfigJSON(p_module_key, p_json_config) {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_TYPE_CONFIG_ACTION_APPLY_CONFIG,
+                c: p_json_config
+            }
+        };
+
+        if (p_module_key) {
+            msg.ms.b = p_module_key
+        }
+
+        return msg;
+    }
+
 }
 
