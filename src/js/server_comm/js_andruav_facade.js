@@ -1167,6 +1167,23 @@ class CAndruavClientFacade {
     };
 
 
+    API_updateConfigRestart(p_andruavUnit, p_module_key) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_updateConfigRestart(p_module_key);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+    }
+
+
+    API_updateConfigJSON(p_andruavUnit, p_module_key, p_json_config) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_updateConfigJSON(p_module_key, p_json_config);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+    }
+
     // receives event from gamepad and store it for sending.
     #fn_sendAxes(p_me) { // game pad should be attached to a unit.
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
