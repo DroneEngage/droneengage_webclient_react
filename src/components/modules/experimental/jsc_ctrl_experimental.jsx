@@ -10,7 +10,6 @@ import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import { js_globals } from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
-import { ClssConfigGenerator } from '../../jsc_config_generator.jsx'
 import {loadConfigurationFiles} from '../../../js/js_configuration_files.js'
 
 
@@ -52,6 +51,13 @@ export class ClssCtrlExperimental extends React.Component {
         if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
         if (p_me.m_flag_mounted === false) return;
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+    }
+
+    fn_applyMavlinkConfiguration (p_contents)
+    {
+        const v_andruavUnit = this.props.p_unit;
+        console.log(p_contents);
+        js_globals.v_andruavFacade.API_updateConfigRestart(v_andruavUnit);
     }
 
     render() {
@@ -123,9 +129,6 @@ export class ClssCtrlExperimental extends React.Component {
                 </div>
                 {cmd_btns}
                 <div key={v_andruavUnit.getPartyID() + 'exp_4'} className='row css_margin_zero padding_zero border-top border-secondary'>
-                </div>
-                <div key={v_andruavUnit.getPartyID() + 'exp_41'}>
-                    <ClssConfigGenerator configs={this.jsonData}/>
                 </div>
                 <div key={v_andruavUnit.getPartyID() + 'exp_5'} className='row css_margin_zero padding_zero border-top border-secondary'>
                 </div>

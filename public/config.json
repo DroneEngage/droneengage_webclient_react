@@ -23,15 +23,15 @@
             "help": "https://cloud.ardupilot.org/andruav-what-is.html"
         },
         "camera": {
-            "version": "3.4.0",
+            "version": "3.5.0",
             "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
             "help": "https://cloud.ardupilot.org/de-what-is.html"
         }
     },
     /**
- * This is for disable experimental features.
- * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
- */
+    * This is for disable experimental features.
+    * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
+    */
     "CONST_FEATURE": {
         "DISABLE_UNIT_NAMING": false,
         "DISABLE_UDPPROXY_UPDATE": false,

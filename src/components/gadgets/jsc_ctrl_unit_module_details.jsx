@@ -3,9 +3,11 @@ import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
+import { EVENTS as js_event } from '../../js/js_eventList.js'
+import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 
 
-class ClssModuleDetails extends React.Component {
+export default class ClssModuleDetails extends React.Component {
 
     constructor(props) {
         super(props);
@@ -13,13 +15,23 @@ class ClssModuleDetails extends React.Component {
             m_update: 0
         };
 
+        this.popupRef = React.createRef();
         this.key = Math.random().toString();
-
+        
+        this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
+        this.fn_configModule = this.fn_configModule.bind(this);
     }
 
     fn_shutdownModule(p_module_key) {
         console.log(p_module_key);
         js_globals.v_andruavFacade.API_updateConfigRestart(this.props.p_unit, p_module_key);
+    }
+
+    fn_configModule(module) {
+        console.log(module);
+        const c_me = this;
+        js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, {'p_unit':c_me.props.p_unit, 'module':module});
+
     }
 
     render() {
@@ -41,7 +53,7 @@ class ClssModuleDetails extends React.Component {
                                     </p>
                                     <div className='d-flex'>
                                         <button key={this.key + 'btn1'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
-                                        <button key={this.key + 'btn2'} className='btn al_c bg-success cursor_hand text-white textunit_nowidth'>config</button>
+                                        <button key={this.key + 'btn2'} className='btn al_c bg-success cursor_hand text-white textunit_nowidth' onClick={(e) => this.fn_configModule(module)}>config</button>
                                     </div>
                                 </div>
                                 <div className="col-6">
