@@ -17,7 +17,7 @@ export default class ClssModuleDetails extends React.Component {
 
         this.popupRef = React.createRef();
         this.key = Math.random().toString();
-        
+
         this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
         this.fn_configModule = this.fn_configModule.bind(this);
     }
@@ -28,9 +28,8 @@ export default class ClssModuleDetails extends React.Component {
     }
 
     fn_configModule(module) {
-        console.log(module);
         const c_me = this;
-        js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, {'p_unit':c_me.props.p_unit, 'module':module});
+        js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, { 'p_unit': c_me.props.p_unit, 'module': module });
 
     }
 
@@ -51,9 +50,20 @@ export default class ClssModuleDetails extends React.Component {
                                     <p className="card-title mb-1 cursor_hand me-2">
                                         <strong>{module.i}</strong>
                                     </p>
-                                    <div className='d-flex'>
-                                        <button key={this.key + 'btn1'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
-                                        <button key={this.key + 'btn2'} className='btn al_c bg-success cursor_hand text-white textunit_nowidth' onClick={(e) => this.fn_configModule(module)}>config</button>
+                                    <div id={`MD_CB${this.key}`} className='d-flex'>
+                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
+                                        {
+                                            // Config Button
+                                        (module.c && module.c !== 'comm') && (
+                                            <button
+                                                id={this.key + 'config'}
+                                                key={this.key + 'config'}
+                                                className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
+                                                onClick={(e) => this.fn_configModule(module)}
+                                            >
+                                                config
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="col-6">

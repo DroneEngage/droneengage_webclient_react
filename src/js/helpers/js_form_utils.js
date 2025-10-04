@@ -3,11 +3,14 @@
 export function buildInitialValues(template) {
   const res = {};
   for (const fieldName in template) {
-    const fieldConfig = template[fieldName];
+    let fieldConfig = template[fieldName];
+    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+      fieldConfig = { type: 'object', fields: fieldConfig };
+    }
     if (fieldConfig.type === 'object') {
       res[fieldName] = buildInitialValues(fieldConfig.fields);
     } else if (fieldConfig.type === 'array') {
-      res[fieldName] = [...fieldConfig.defaultvalue];
+      res[fieldName] = fieldConfig.defaultvalue ? [...fieldConfig.defaultvalue] : [];
     } else {
       res[fieldName] = fieldConfig.defaultvalue;
     }
@@ -19,13 +22,22 @@ export function buildInitialValues(template) {
 // Sets optional fields to false and recursively processes nested objects
 export function buildInitialEnabled(template, path = '', res = {}) {
   for (const fieldName in template) {
-    const fieldConfig = template[fieldName];
+    let fieldConfig = template[fieldName];
+    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+      fieldConfig = { type: 'object', fields: fieldConfig };
+    }
     const fullPath = path ? `${path}.${fieldName}` : fieldName;
     if (fieldConfig.optional) {
       res[fullPath] = false;
     }
     if (fieldConfig.type === 'object') {
       buildInitialEnabled(fieldConfig.fields, fullPath, res);
+    }
+    if (fieldConfig.type === 'array') {
+      const defaultArray = fieldConfig.defaultvalue || [];
+      for (let i = 0; i < defaultArray.length; i++) {
+        buildInitialEnabled(fieldConfig.array_template, `${fullPath}.${i}`, res);
+      }
     }
   }
   return res;
@@ -36,20 +48,37 @@ export function buildInitialEnabled(template, path = '', res = {}) {
 export function buildOutput(template, values, enabled, path = '') {
   const res = {};
   for (const fieldName in template) {
-    const fieldConfig = template[fieldName];
+    let fieldConfig = template[fieldName];
+    if (fieldConfig == null) continue;
+    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+      fieldConfig = { type: 'object', fields: fieldConfig };
+    }
     const fullPath = path ? `${path}.${fieldName}` : fieldName;
-    if (fieldConfig.optional && !enabled[fullPath]) continue;
+    if (fieldConfig.optional && !(enabled[fullPath] ?? true)) continue;
     const v_fieldName = fieldConfig.fieldName || fieldName;
     if (fieldConfig.type === 'object') {
-      res[v_fieldName] = buildOutput(fieldConfig.fields, values[fieldName], enabled, fullPath);
+      const subValues = values?.[fieldName] || {};
+      const subOutput = buildOutput(fieldConfig.fields, subValues, enabled, fullPath);
+      if (Object.keys(subOutput).length > 0) {
+        res[v_fieldName] = subOutput;
+      }
     } else if (fieldConfig.type === 'array') {
-      res[v_fieldName] = [...values[fieldName]];
+      const arrayValues = values?.[fieldName] || [];
+      const filteredArray = arrayValues.map((item, index) => {
+        const itemPath = `${fullPath}.${index}`;
+        const itemEnabled = enabled[itemPath] ?? true;
+        if (!itemEnabled && fieldConfig.optional) return null;
+        return buildOutput(fieldConfig.array_template, item, enabled, itemPath);
+      }).filter(item => item !== null);
+      if (filteredArray.length > 0) {
+        res[v_fieldName] = filteredArray;
+      }
     } else if (fieldConfig.type === 'checkbox') {
-      res[v_fieldName] = values[fieldName];
+      res[v_fieldName] = values?.[fieldName];
     } else if (fieldConfig.type === 'number') {
-      res[v_fieldName] = Number(values[fieldName]);
+      res[v_fieldName] = Number(values?.[fieldName]);
     } else {
-      res[v_fieldName] = values[fieldName];
+      res[v_fieldName] = values?.[fieldName];
     }
   }
   return res;
@@ -77,7 +106,7 @@ export function updateValue(values, pathStr, newVal) {
   for (let i = 0; i < pathArr.length - 1; i++) {
     let key = pathArr[i];
     key = isNaN(key) ? key : parseInt(key);
-    if (current[key] == null) current[key] = {};
+    if (current[key] == null) current[key] = isNaN(pathArr[i + 1]) ? {} : [];
     current = current[key];
   }
   let lastKey = pathArr[pathArr.length - 1];
@@ -90,6 +119,23 @@ export function updateValue(values, pathStr, newVal) {
 // Returns a new object with the updated enabled state
 export function updateEnable(enabled, pathStr, checked) {
   return { ...enabled, [pathStr]: checked };
+}
+
+// Sets a nested value in an object using a dot-separated path
+// Returns the modified object (mutates the original)
+export function setNested(obj, pathStr, value) {
+  const pathArr = pathStr.split('.');
+  let current = obj;
+  for (let i = 0; i < pathArr.length - 1; i++) {
+    let key = pathArr[i];
+    key = isNaN(key) ? key : parseInt(key);
+    if (current[key] == null) current[key] = isNaN(pathArr[i + 1]) ? {} : [];
+    current = current[key];
+  }
+  let lastKey = pathArr[pathArr.length - 1];
+  lastKey = isNaN(lastKey) ? lastKey : parseInt(lastKey);
+  current[lastKey] = value;
+  return obj;
 }
 
 // Copies text to the clipboard and displays a confirmation alert
