@@ -21,6 +21,7 @@ import {
   updateEnable,
   handleCopy,
   handleSave,
+  setNested,
 } from '../js/helpers/js_form_utils.js';
 
 /**
@@ -49,6 +50,7 @@ export default class ClssConfigGenerator extends React.Component {
     this.m_flag_mounted = false;
     this.popupRef = React.createRef();
     this.currentTemplate = {};
+    this.key = Math.random().toString();
 
     // Bind methods
     this.handleCopy = this.handleCopy.bind(this);
@@ -57,6 +59,8 @@ export default class ClssConfigGenerator extends React.Component {
     this.fn_handleSubmit = this.fn_handleSubmit.bind(this);
     this.fn_close = this.fn_close.bind(this);
     this.initBootstrap = this.initBootstrap.bind(this);
+    this.handleAddArrayItem = this.handleAddArrayItem.bind(this);
+    this.handleRemoveArrayItem = this.handleRemoveArrayItem.bind(this);
 
     // Subscribe to event
     js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
@@ -142,75 +146,243 @@ export default class ClssConfigGenerator extends React.Component {
     }, () => this.initBootstrap());
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (!this.m_flag_mounted) return false;
+  handleAddArrayItem(fullPath, arrayTemplate) {
+    this.setState(prev => {
+      const newValues = JSON.parse(JSON.stringify(prev.values));
+      const array = getNested(newValues, fullPath) || [];
+      array.push(buildInitialValues(arrayTemplate));
+      setNested(newValues, fullPath, array);
 
-    if (
-      this.state.visible !== nextState.visible ||
-      this.state.p_unit !== nextState.p_unit ||
-      this.state.module !== nextState.module ||
-      JSON.stringify(this.state.jsonData) !== JSON.stringify(nextState.jsonData) ||
-      this.state.selectedConfig !== nextState.selectedConfig ||
-      JSON.stringify(this.state.values) !== JSON.stringify(nextState.values) ||
-      JSON.stringify(this.state.enabled) !== JSON.stringify(nextState.enabled) ||
-      this.state.fileName !== nextState.fileName
-    ) {
-      return true;
-    }
-    // Skip re-render if only output changes
-    return false;
+      const newEnabled = { ...prev.enabled };
+      const newIndex = array.length - 1;
+      buildInitialEnabled(arrayTemplate, `${fullPath}.${newIndex}`, newEnabled);
+
+      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, newEnabled), null, 4);
+      return { values: newValues, enabled: newEnabled, output: newOutput };
+    }, () => this.initBootstrap());
   }
 
-  /**
-   * Initializes Bootstrap tooltips and dropdowns.
-   */
+  handleRemoveArrayItem(fullPath, index) {
+    this.setState(prev => {
+      const newValues = JSON.parse(JSON.stringify(prev.values));
+      const array = getNested(newValues, fullPath) || [];
+      array.splice(index, 1);
+      setNested(newValues, fullPath, array);
+
+      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+      return { values: newValues, output: newOutput };
+    }, () => this.initBootstrap());
+  }
+
+  handleEnableChange(fullPath, checked) {
+    this.setState(prev => ({
+      enabled: updateEnable(prev.enabled, fullPath, checked),
+      output: JSON.stringify(buildOutput(this.currentTemplate, prev.values, updateEnable(prev.enabled, fullPath, checked)), null, 4),
+    }));
+  }
+
+  renderFields(template, parentPath = '') {
+    const fields = [];
+    for (const fieldName in template) {
+      let fieldConfig = template[fieldName];
+      if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+        fieldConfig = { type: 'object', fields: fieldConfig };
+      }
+      const fullPath = parentPath ? `${parentPath}.${fieldName}` : fieldName;
+      const effectiveConfig = fieldConfig;
+      const isEnabled = effectiveConfig.optional ? (this.state.enabled[fullPath] ?? false) : true;
+      const cssClass = effectiveConfig.css || '';
+
+      if (effectiveConfig.type === 'object') {
+        fields.push(
+          <div key={fullPath} className="mb-2">
+            <h6>{fieldName}
+              {effectiveConfig.desc && (
+                <i
+                  className="bi bi-info-circle ms-1 text-info"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title={effectiveConfig.desc}
+                ></i>
+              )}
+            </h6>
+            {effectiveConfig.optional && (
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={isEnabled}
+                  onChange={(e) => {
+                    this.setState({
+                      enabled: updateEnable(this.state.enabled, fullPath, e.target.checked),
+                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, {
+                        ...this.state.enabled,
+                        [fullPath]: e.target.checked
+                      }), null, 4)
+                    });
+                  }}
+                />
+                <label className="form-check-label">Enable {fieldName}
+                  {effectiveConfig.desc && (
+                    <i
+                      className="bi bi-info-circle ms-1 text-info"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title={effectiveConfig.desc}
+                    ></i>
+                  )}
+                </label>
+              </div>
+            )}
+            {isEnabled && (
+              <div className="ms-3">{this.renderFields(effectiveConfig.fields, fullPath)}</div>
+            )}
+          </div>
+        );
+      } else if (effectiveConfig.type === 'array') {
+        const arrayValues = getNested(this.state.values, fullPath) || [];
+        fields.push(
+          <div key={fullPath} className="mb-2">
+            <h6>{fieldName}
+              {effectiveConfig.desc && (
+                <i
+                  className="bi bi-info-circle ms-1 text-info"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title={effectiveConfig.desc}
+                ></i>
+              )}
+            </h6>
+            {arrayValues.map((item, index) => (
+              <div key={`${fullPath}.${index}`} className="border p-1 mb-1 position-relative">
+                <button
+                  type="button"
+                  className="btn-close btn-close-white position-relative float-end"
+                  onClick={() => this.handleRemoveArrayItem(fullPath, index)}
+                >
+                  
+                </button>
+                {this.renderFields(effectiveConfig.array_template, `${fullPath}.${index}`)}
+              </div>
+            ))}
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => this.handleAddArrayItem(fullPath, effectiveConfig.array_template)}
+            >
+              Add {fieldName}
+            </button>
+          </div>
+        );
+      } else {
+        fields.push(
+          <div key={fullPath} className="mb-2">
+            {effectiveConfig.optional && (
+              <div className="form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={isEnabled}
+                  onChange={(e) => {
+                    this.setState({
+                      enabled: updateEnable(this.state.enabled, fullPath, e.target.checked),
+                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, {
+                        ...this.state.enabled,
+                        [fullPath]: e.target.checked
+                      }), null, 4)
+                    });
+                  }}
+                />
+                <label className="form-check-label">Enable {fieldName}
+                  {effectiveConfig.desc && (
+                    <i
+                      className="bi bi-info-circle ms-1 text-info"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title={effectiveConfig.desc}
+                    ></i>
+                  )}
+                </label>
+              </div>
+            )}
+            {isEnabled && (
+              <div className="mb-2">
+                <span className="mb-2">{fieldName}
+                  {effectiveConfig.desc && (
+                    <i
+                      className="bi bi-info-circle ms-1 text-info"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title={effectiveConfig.desc}
+                    ></i>
+                  )}
+                </span>
+                {effectiveConfig.type === 'combo' ? (
+                  <select
+                    className={`form-select ${cssClass}`}
+                    value={getNested(this.state.values, fullPath) || effectiveConfig.defaultvalue}
+                    onChange={(e) => {
+                  this.setState(prevState => ({
+                    values: updateValue(prevState.values, fullPath, e.target.value)
+                  }), () => {
+                    this.setState({
+                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    }, () => this.initBootstrap());
+                  });
+                }}
+                  >
+                    {effectiveConfig.list_values.map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                ) : effectiveConfig.type === 'checkbox' ? (
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={getNested(this.state.values, fullPath) || effectiveConfig.defaultvalue}
+                    onChange={(e) => {
+                  this.setState(prevState => ({
+                    values: updateValue(prevState.values, fullPath, e.target.checked)
+                  }), () => {
+                    this.setState({
+                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    }, () => this.initBootstrap());
+                  });
+                }}
+                  />
+
+                ) : (
+                  <input
+                    type={effectiveConfig.type === 'number' ? 'number' : 'text'}
+                    className={`form-control ${cssClass}`}
+                    value={getNested(this.state.values, fullPath) || effectiveConfig.defaultvalue}
+                    onChange={(e) => {
+                  const value = fieldConfig.type === 'number' ? Number(e.target.value) : e.target.value;
+                  this.setState(prevState => ({
+                    values: updateValue(prevState.values, fullPath, value)
+                  }), () => {
+                    this.setState({
+                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    }, () => this.initBootstrap());
+                  });
+                }}
+                  />
+                )}
+
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+    return fields;
+  }
+
   initBootstrap() {
+    // Initialize Bootstrap components if needed
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     tooltipTriggerList.forEach(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-  }
 
-  /**
-   * Lifecycle method to initialize Bootstrap after mount.
-   */
-  componentDidMount() {
-    this.m_flag_mounted = true;
-    this.initBootstrap();
-  }
-
-  /**
-   * Lifecycle method to re-initialize Bootstrap after updates.
-   * @param {Object} prevProps - Previous props
-   * @param {Object} prevState - Previous state
-   */
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      JSON.stringify(this.state.enabled) !== JSON.stringify(prevState.enabled) ||
-      this.state.visible !== prevState.visible ||
-      this.state.selectedConfig !== prevState.selectedConfig
-    ) {
-      this.initBootstrap();
-    }
-  }
-
-  /**
-   * Closes the config generator dialog.
-   */
-  fn_close() {
-    this.setState({ visible: false, jsonData: null, selectedConfig: '', values: {}, enabled: {}, output: '' });
-  }
-
-  /**
-   * Handles form submission by sending config to the API and closing.
-   */
-  fn_handleSubmit() {
-    if (this.state.p_unit && this.state.module) {
-      js_globals.v_andruavFacade.API_updateConfig(
-        this.state.p_unit,
-        this.state.module.k,
-        this.state.output
-      );
-    }
-    this.fn_close();
   }
 
   handleCopy() {
@@ -221,149 +393,15 @@ export default class ClssConfigGenerator extends React.Component {
     handleSave(this.state.output, this.state.fileName);
   }
 
-  renderFields(fields, path = '') {
-    if (!fields) return null;
-
-    return Object.entries(fields).map(([key, fieldConfig]) => {
-      const fullPath = path ? `${path}.${key}` : key;
-      const enabled = getNested(this.state.enabled, fullPath) ?? true;
-      const disabled = enabled ? '' : 'disabled';
-
-      const input = this.renderInput(fieldConfig, fullPath, enabled, disabled);
-
-      return (
-        <div key={fullPath} className="form-group mb-2 small">
-          {fieldConfig.optional && (
-            <div className="form-check mb-1">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                checked={enabled}
-                onChange={(e) => this.setState(
-                  (prev) => {
-                    const newEnabled = updateEnable(prev.enabled, fullPath, e.target.checked);
-                    const newOutput = JSON.stringify(buildOutput(this.currentTemplate, prev.values, newEnabled), null, 4);
-                    return { enabled: newEnabled, output: newOutput };
-                  },
-                  () => this.initBootstrap()
-                )}
-              />
-              <label className="form-check-label">{key}</label>
-            </div>
-          )}
-          {!fieldConfig.optional && <label>{key}</label>}
-          {fieldConfig.desc && (
-            <small className="text-muted d-block mb-1">{fieldConfig.desc}</small>
-          )}
-          {input}
-        </div>
-      );
-    });
+  fn_handleSubmit() {
+    // Implement apply logic, e.g., send to server
+    js_globals.v_andruavFacade.API_updateConfigJSON(this.state.p_unit, this.state.module, JSON.parse(this.state.output));
+    console.log('Submitted:', this.state.output);
+    this.fn_close();
   }
 
-  renderInput(fieldConfig, fullPath, enabled, disabled) {
-    switch (fieldConfig.type) {
-      case 'text':
-      case 'number':
-        return (
-          <input
-            type={fieldConfig.type}
-            className={`form-control input-sm ${disabled} ${fieldConfig.css || ''}`}
-            value={getNested(this.state.values, fullPath) ?? fieldConfig.defaultvalue ?? ''}
-            onChange={(e) => this.setState(
-              (prev) => {
-                const newValues = updateValue(prev.values, fullPath, fieldConfig.type === 'number' ? Number(e.target.value) : e.target.value);
-                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
-                return { values: newValues, output: newOutput };
-              },
-              () => this.initBootstrap()
-            )}
-            disabled={!enabled}
-          />
-        );
-      case 'checkbox':
-        return (
-          <input
-            type="checkbox"
-            className={`form-check-input ${disabled}`}
-            checked={getNested(this.state.values, fullPath) ?? fieldConfig.defaultvalue ?? false}
-            onChange={(e) => this.setState(
-              (prev) => {
-                const newValues = updateValue(prev.values, fullPath, e.target.checked);
-                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
-                return { values: newValues, output: newOutput };
-              },
-              () => this.initBootstrap()
-            )}
-            disabled={!enabled}
-          />
-        );
-      case 'combo':
-        return (
-          <select
-            className={`form-select input-sm ${disabled}`}
-            value={getNested(this.state.values, fullPath) ?? fieldConfig.defaultvalue ?? ''}
-            onChange={(e) => this.setState(
-              (prev) => {
-                const newValues = updateValue(prev.values, fullPath, e.target.value);
-                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
-                return { values: newValues, output: newOutput };
-              },
-              () => this.initBootstrap()
-            )}
-            disabled={!enabled}
-          >
-            {fieldConfig.list_values?.map((val) => (
-              <option key={val} value={val}>
-                {val}
-              </option>
-            )) || null}
-          </select>
-        );
-      case 'array':
-        const arr = getNested(this.state.values, fullPath) ?? fieldConfig.defaultvalue ?? [];
-        return (
-          <div className="array-input">
-            {arr.map((val, index) => (
-              <input
-                key={index}
-                type="number"
-                className={`form-control input-sm ${disabled}`}
-                value={val}
-                onChange={(e) => this.setState(
-                  (prev) => {
-                    const newValues = updateValue(prev.values, `${fullPath}.${index}`, Number(e.target.value));
-                    const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
-                    return { values: newValues, output: newOutput };
-                  },
-                  () => this.initBootstrap()
-                )}
-                disabled={!enabled}
-              />
-            ))}
-          </div>
-        );
-      case 'object':
-        return <div className="object-input">{this.renderFields(fieldConfig.fields, fullPath)}</div>;
-      default:
-        return (
-          <input
-            type="text"
-            id={fullPath}
-            className={`form-control input-sm ${disabled}`}
-            value={getNested(this.state.values, fullPath) ?? fieldConfig.defaultvalue ?? ''}
-            onChange={(e) => this.setState(
-              (prev) => {
-                const newValues = updateValue(prev.values, fullPath, e.target.value);
-                const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
-                return { values: newValues, output: newOutput };
-              },
-              () => this.initBootstrap()
-            )}
-            disabled={!enabled}
-          />
-        );
-    }
+  fn_close() {
+    this.setState({ visible: false });
   }
 
   render() {
@@ -373,54 +411,55 @@ export default class ClssConfigGenerator extends React.Component {
 
     return (
       <Draggable nodeRef={this.popupRef}>
-        <div 
-          ref={this.popupRef} 
-          className="container-fluid bg-dark text-light position-fixed" 
-          style={{ 
-            zIndex: 1000, 
-            width: '500px', 
-            maxHeight: '80vh', 
-            top: '50%', 
-            left: '50%', 
+        <div
+          id="modal_ctrl_config_generator"
+          key={this.key + "m0"}
+          ref={this.popupRef}
+          className="modal bg-dark text-light position-fixed"
+          style={{
+            zIndex: 1000,
+            width: '500px',
+            maxHeight: '80vh',
+            top: '50%',
+            left: '50%',
             transform: 'translate(-50%, -50%)',
             display: 'flex',
             flexDirection: 'column'
           }}
         >
           {/* Fixed Header */}
-          <div className="p-3 border-bottom" style={{ flexShrink: 0 }}>
-            <div className="d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">{title}</h5>
-              <button className="btn-close btn-close-white" onClick={this.fn_close}></button>
-            </div>
-            {Array.isArray(this.state.jsonData) && this.state.jsonData.length > 1 && (
-              <div className="mt-3">
-                <h6 className="mb-2">Select Configuration:</h6>
-                <select
-                  id="configSelect"
-                  className="form-select mb-2 small"
-                  value={this.state.selectedConfig}
-                  onChange={this.handleSelectChange}
-                >
-                  <option value="">Select a configuration</option>
-                  {this.state.jsonData.map((config) => (
-                    <option key={config.name} value={config.name}>
-                      {config.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <div className="modal-header p-3 border-bottom" style={{ flexShrink: 0 }}>
+            <h5 className="modal-title mb-0">{title}</h5>
+            <button type="button" className="btn-close btn-close-white" onClick={this.fn_close}></button>
           </div>
 
+          {Array.isArray(this.state.jsonData) && this.state.jsonData.length > 1 && (
+            <div className="p-3 border-bottom">
+              <h6 className="mb-2">Select Configuration:</h6>
+              <select
+                id="configSelect"
+                className="form-select mb-2"
+                value={this.state.selectedConfig}
+                onChange={this.handleSelectChange}
+              >
+                <option value="">Select a configuration</option>
+                {this.state.jsonData.map((config) => (
+                  <option key={config.name} value={config.name}>
+                    {config.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Scrollable Content with increased height */}
-          <div 
-            id="form-container" 
-            className="p-3 small" 
-            style={{ 
-              flex: '1 1 60%', // Increased height allocation
+          <div
+            id="form-container"
+            className="modal-body p-3 small"
+            style={{
+              flex: '1 1 60%',
               overflowY: 'auto',
-              maxHeight: 'calc(80vh - 150px)' // Adjusted to give more space to middle
+              maxHeight: 'calc(80vh - 150px)'
             }}
           >
             {this.renderFields(this.currentTemplate)}
@@ -428,40 +467,48 @@ export default class ClssConfigGenerator extends React.Component {
 
           {/* Fixed Bottom Section with reduced spacing */}
           <div className="p-2 border-top" style={{ flexShrink: 0 }}>
-            <h6 className="mb-2">Generated JSON:</h6>
-            <div className="position-relative mb-2 small">
+            <div className="mb-2">
+              <h6 className="mb-2">Generated JSON:</h6>
+            </div>
+            <div className="mb-2">
               <textarea
                 id="output"
-                className="form-control bg-dark text-light"
+                className="form-control bg-dark text-light w-100"
                 value={this.state.output}
                 readOnly
-                rows={4} // Reduced height
+                rows={4}
               />
-              <button
-                className="btn btn-warning btn-sm position-absolute top-0 end-0 m-1"
-                onClick={this.handleCopy}
-              >
-                Copy
-              </button>
-              <button
-                className="btn btn-warning btn-sm position-absolute top-0 end-0 m-1 me-5"
-                onClick={this.fn_handleSubmit}
-              >
-                Apply
-              </button>
+              <div className="d-flex justify-content-end mt-1">
+                <button
+                  type="button"
+                  className="btn btn-warning btn-sm m-1 textunit_nowidth"
+                  onClick={this.handleCopy}
+                >
+                  Copy
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-warning btn-sm m-1 textunit_nowidth"
+                  onClick={this.fn_handleSubmit}
+                >
+                  Apply
+                </button>
+              </div>
             </div>
-
-            <div className="input-group mb-0 small">
+          </div>
+          <div className='modal-footer '>
+            <div className="input-group mb-0">
               <input
                 type="text"
                 id="filename"
-                className="form-control input-sm"
+                className="form-control p-1"
                 value={this.state.fileName}
                 onChange={(e) => this.setState({ fileName: e.target.value })}
                 placeholder="config.json"
               />
               <button
-                className="btn btn-primary"
+                type="button"
+                className="btn btn-primary textunit_nowidth"
                 onClick={this.handleSave}
               >
                 Save Config
@@ -471,5 +518,5 @@ export default class ClssConfigGenerator extends React.Component {
         </div>
       </Draggable>
     );
-}
+  }
 }
