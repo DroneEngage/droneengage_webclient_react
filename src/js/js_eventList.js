@@ -59,6 +59,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_onShapeDeleted",
 			"EE_mapMissionUpdate",
 			"EE_displayServoForm",
+			"EE_displayConfigGenerator",
 			"EE_servoOutputUpdate",
 			"EE_DetectedTarget",
 			"EE_SearchableTarget",
