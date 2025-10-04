@@ -21,10 +21,12 @@ import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
 import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx';
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx';
+import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_details.jsx';
 import ClssGamePadControl from '../components/jsc_gamepadControl.jsx';
 import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx';
 import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
+import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
 import { ClssCVideoControl } from '../components/jsc_videoDisplayComponent.jsx';
 import { fn_on_ready } from '../js/js_main';
 
@@ -104,11 +106,13 @@ const Home = () => {
             </div>
           </div>
 
+          <ClssModuleDetails/>
           <ClssLidarInfoDialog />
           <ClssYawDialog />
           <ClssCameraDialog />
           <ClssServoControl />
           <ClssUnitParametersList />
+          <ClssConfigGenerator />
           <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
           <ClssStreamDialog />
         </div>

@@ -32,11 +32,11 @@
     },
 
 
-/**
- * This is for disable experimental features.
- * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
- */
-    "CONST_FEATURE" :{
+    /**
+    * This is for disable experimental features.
+    * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
+    */
+    "CONST_FEATURE": {
         "DISABLE_UNIT_NAMING": false,
         "DISABLE_UDPPROXY_UPDATE": false,
         "DISABLE_SWARM": false,
