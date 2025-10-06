@@ -50,7 +50,7 @@ export default class ClssModuleDetails extends React.Component {
                                     <p className="card-title mb-1 cursor_hand me-2">
                                         <strong>{module.i}</strong>
                                     </p>
-                                    <div id={`MD_CB${this.key}`} className='d-flex'>
+                                    { this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
                                         <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
                                         {
                                             // Config Button
@@ -64,7 +64,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 config
                                             </button>
                                         )}
-                                    </div>
+                                    </div>}
                                 </div>
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
