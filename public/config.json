@@ -28,8 +28,6 @@
             "help": "https://cloud.ardupilot.org/de-what-is.html"
         }
     },
-
-
     /**
     * This is for disable experimental features.
     * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
@@ -46,15 +44,13 @@
         "DISABLE_EXPERIMENTAL": true,
         "DISABLE_VERSION_NOTIFICATION": false
     },
-
-// CHOOSE YOUR MAP SOURCE
-"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
-//export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-//export let CONST_MAP_LEAFLET_URL = "https://airgap.droneengage.com:88/{x}_{y}_{z}.jpeg" //LOCAL MAP
-//export let CONST_MAP_LEAFLET_URL = "http://127.0.0.1:9991/{x}_{y}_{z}.jpeg" //LOCAL MAP
-
-
-
+    // CHOOSE YOUR MAP SOURCE
+    "CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
+    //export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+    //export let CONST_MAP_LEAFLET_URL = "https://airgap.local:88/{x}_{y}_{z}.jpeg" //LOCAL MAP
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/data/imagery/{z}/{x}/{y}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=X",
     "CONST_LANGUAGE": {
         "ENABLED_LANGUAGES": [
             {
@@ -75,17 +71,18 @@
         ],
         "DEFAULT_LANGUAGE": "en"
     },
-    
-    // CHOOSE YOUR MAP SOURCE
-    //"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
-    "CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=X",
-    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/data/imagery/{z}/{x}/{y}.jpg?api_key=X",
-    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=X",
+
     /**
- * WEBRTC Video Streaming Settings
- */
+    * WEBRTC Video Streaming Settings
+    */
     "CONST_ICE_SERVERS": [
-        { "urls": "turn:airgap.local", "credential": "1234", "username": "andruav_ap" },
-        { "urls": "stun:stun1.l.google.com:19302" }
+        {
+            "urls": "turn:airgap.local",
+            "credential": "1234",
+            "username": "andruav_ap"
+        },
+        {
+            "urls": "stun:stun1.l.google.com:19302"
+        }
     ]
 }
