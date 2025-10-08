@@ -257,6 +257,29 @@ class CAndruavClientParser {
 
         switch (msg.messageType) {
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS: {
+               console.log("CONST_TYPE_AndruavMessage_Target_STATUS");
+               p_jmsg = msg.msgPayload;
+               
+               if (p_jmsg.R === true) { // this is a reply to request.
+                        // if (this.v_callbackListeners.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList) === true) {
+                        //     this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList](v_session);
+                        //     delete this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList];
+                        // }
+
+                        const c_module  = p_unit.m_modules.getModuleByKey(p_jmsg.k)
+                        if (!c_module) 
+                        {
+                            // PUBLISH ERROR
+                            return ;
+                        }
+                        c_module.template = p_jmsg.b;
+             
+                        this.fn_callbackOnMessageID_Answer(msg.messageType, {p_unit:p_unit , p_module:c_module});
+                }
+            }
+                break;
+
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Target_STATUS: {
                 console.log("CONST_TYPE_AndruavMessage_Target_STATUS");
                 p_jmsg = msg.msgPayload;
