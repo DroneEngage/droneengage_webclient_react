@@ -1176,12 +1176,22 @@ class CAndruavClientFacade {
     }
 
 
-    API_updateConfigJSON(p_andruavUnit, p_module_key, p_json_config) {
+    API_updateConfigJSON(p_andruavUnit, p_module, p_json_config) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_updateConfigJSON(p_module_key, p_json_config);
+        const cmd = CCommandAPI.API_updateConfigJSON(p_module, p_json_config);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
+    }
+
+    API_fetchConfigJSON(p_andruavUnit, p_module, p_callback) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        if (p_callback !== null && p_callback !== undefined) {
+            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS);
+        }
+        const cmd = CCommandAPI.API_fetchConfigJSON(p_module);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
     // receives event from gamepad and store it for sending.

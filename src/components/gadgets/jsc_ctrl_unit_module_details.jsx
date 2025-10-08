@@ -27,10 +27,12 @@ export default class ClssModuleDetails extends React.Component {
         js_globals.v_andruavFacade.API_updateConfigRestart(this.props.p_unit, p_module_key);
     }
 
-    fn_configModule(module) {
-        const c_me = this;
-        js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, { 'p_unit': c_me.props.p_unit, 'module': module });
+    fn_configModule(p_module) {
 
+        function fn_callback(p_params) {
+            js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, { 'p_unit': p_params.p_unit, 'module': p_params.p_module });
+        }
+        js_globals.v_andruavFacade.API_fetchConfigJSON(this.props.p_unit, p_module, fn_callback);
     }
 
     render() {
@@ -50,26 +52,26 @@ export default class ClssModuleDetails extends React.Component {
                                     <p className="card-title mb-1 cursor_hand me-2">
                                         <strong>{module.i}</strong>
                                     </p>
-                                    { this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
+                                    {this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
                                         <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
                                         {
                                             // Config Button
-                                        (module.c && module.c !== 'comm') && (
-                                            <button
-                                                id={this.key + 'config'}
-                                                key={this.key + 'config'}
-                                                className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
-                                                onClick={(e) => this.fn_configModule(module)}
-                                            >
-                                                config
-                                            </button>
-                                        )}
+                                            (module.c && module.c !== 'comm') && (
+                                                <button
+                                                    id={this.key + 'config'}
+                                                    key={this.key + 'config'}
+                                                    className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
+                                                    onClick={(e) => this.fn_configModule(module)}
+                                                >
+                                                    config
+                                                </button>
+                                            )}
                                     </div>}
                                 </div>
                                 <div className="col-6">
                                     <div className="d-flex align-items-center">
                                         <small className="text-muted me-2 text-capitalize">{t('version_colon')}</small>
-                                        <span className={`fw-bold ${module.z === -1 ? 'text-danger' : 'text-success'}`}>{module.v}</span>
+                                        <span className={`fw-bold ${module.z === -1 ? 'text-danger bold' : module.z === 1?'text-white':'text-success'}`}>{module.v}</span>
                                     </div>
                                 </div>
                                 <div className="col-6">
