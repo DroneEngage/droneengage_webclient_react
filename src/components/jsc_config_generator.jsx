@@ -181,180 +181,300 @@ export default class ClssConfigGenerator extends React.Component {
     }));
   }
 
+  // Renders fields for a given template, sorting by 'order' property
   renderFields(template, path = '') {
-  const fields = [];
-  // Sort field names based on the 'order' property
-  const fieldNames = Object.keys(template).sort((a, b) => {
-    const orderA = template[a]?.order || 999;
-    const orderB = template[b]?.order || 999;
-    return orderA - orderB;
-  });
+    const fields = [];
+    // Sort field names based on the 'order' property
+    const fieldNames = Object.keys(template).sort((a, b) => {
+      const orderA = template[a]?.order || 999;
+      const orderB = template[b]?.order || 999;
+      return orderA - orderB;
+    });
 
-  for (const fieldName of fieldNames) {
-    let fieldConfig = template[fieldName];
-    if (fieldConfig == null) continue;
-    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
-      fieldConfig = { type: 'object', fields: fieldConfig };
+    for (const fieldName of fieldNames) {
+      let fieldConfig = template[fieldName];
+      if (fieldConfig == null) continue;
+      if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+        fieldConfig = { type: 'object', fields: fieldConfig };
+      }
+      const fullPath = path ? `${path}.${fieldName}` : fieldName;
+      const effectiveConfig = {
+        ...fieldConfig,
+        cssClass: fieldConfig.css || fieldConfig.cssClass || '', // Map 'css' to 'cssClass'
+        options: fieldConfig.type === 'combo' && fieldConfig.list_values
+          ? fieldConfig.list_values.map(value => ({ value, label: value }))
+          : fieldConfig.options || []
+      };
+
+      if (effectiveConfig.type === 'object') {
+        fields.push(this.renderObjectField(effectiveConfig, fieldName, fullPath));
+      } else if (effectiveConfig.type === 'array') {
+        fields.push(this.renderArrayField(effectiveConfig, fieldName, fullPath));
+      } else {
+        fields.push(this.renderScalarField(effectiveConfig, fieldName, fullPath));
+      }
     }
-    const fullPath = path ? `${path}.${fieldName}` : fieldName;
-    const effectiveConfig = {
-      ...fieldConfig,
-      cssClass: fieldConfig.css || fieldConfig.cssClass || '', // Map 'css' to 'cssClass'
-      options: fieldConfig.type === 'combo' && fieldConfig.list_values
-        ? fieldConfig.list_values.map(value => ({ value, label: value }))
-        : fieldConfig.options || []
-    };
-    const v_fieldName = effectiveConfig.fieldName || fieldName;
-    const cssClass = effectiveConfig.cssClass;
-    const disabled = effectiveConfig.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
-    const isChecked = this.state.enabled[fullPath] ?? true;
+    return fields;
+  }
 
-    if (effectiveConfig.type === 'object') {
-      fields.push(
-        <div key={fullPath} className="mb-2">
-          <h6>{v_fieldName}
-            {effectiveConfig.desc && (
-              <i
-                className="bi bi-info-circle ms-1 text-info"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title={effectiveConfig.desc}
-              ></i>
-            )}
-          </h6>
-          <div className="ms-3">
-            {this.renderFields(effectiveConfig.fields, fullPath)}
-          </div>
-        </div>
-      );
-    } else if (effectiveConfig.type === 'array') {
-      const arrayValues = getNested(this.state.values, fullPath) || [];
-      fields.push(
-        <div key={fullPath} className="mb-2">
-          <h6>{v_fieldName}
-            {effectiveConfig.desc && (
-              <i
-                className="bi bi-info-circle ms-1 text-info"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title={effectiveConfig.desc}
-              ></i>
-            )}
-          </h6>
-          {arrayValues.map((item, index) => (
-            <div key={`${fullPath}.${index}`} className="border p-2 mb-2">
-              {this.renderFields(effectiveConfig.array_template, `${fullPath}.${index}`)}
-              <button
-                type="button"
-                className="btn btn-sm btn-danger"
-                onClick={() => this.handleRemoveArrayItem(fullPath, index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            className="btn btn-sm btn-success"
-            onClick={() => this.handleAddArrayItem(fullPath, effectiveConfig.array_template)}
-          >
-            Add Item
-          </button>
-        </div>
-      );
-    } else {
-      fields.push(
-        <div key={fullPath} className="mb-2">
-          {effectiveConfig.optional && (
-            <div className="form-check form-check-inline">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={`${fullPath}_enable`}
-                checked={isChecked}
-                onChange={(e) => {
-                  this.setState(prevState => ({
-                    enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
-                  }), () => {
-                    this.setState({
-                      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
-                    }, () => this.initBootstrap());
-                  });
-                }}
-              />
-              <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-                {v_fieldName}
-              </label>
-            </div>
+  // Renders an object field with nested fields
+  renderObjectField(config, fieldName, fullPath) {
+    const v_fieldName = config.fieldName || fieldName;
+    return (
+      <div key={fullPath} className="mb-2">
+        <h6>{v_fieldName}
+          {config.desc && (
+            <i
+              className="bi bi-info-circle ms-1 text-info"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title={config.desc}
+            ></i>
           )}
-          {!effectiveConfig.optional && (
-            <h6>{v_fieldName}
-              {effectiveConfig.desc && (
-                <i
-                  className="bi bi-info-circle ms-1 text-info"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title={effectiveConfig.desc}
-                ></i>
-              )}
-            </h6>
+        </h6>
+        <div className="ms-3">
+          {this.renderFields(config.fields, fullPath)}
+        </div>
+      </div>
+    );
+  }
+
+  // Renders an array field with nested items and add/remove buttons
+  renderArrayField(config, fieldName, fullPath) {
+    const v_fieldName = config.fieldName || fieldName;
+    const arrayValues = getNested(this.state.values, fullPath) || [];
+    return (
+      <div key={fullPath} className="mb-2">
+        <h6>{v_fieldName}
+          {config.desc && (
+            <i
+              className="bi bi-info-circle ms-1 text-info"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title={config.desc}
+            ></i>
           )}
-          {effectiveConfig.type === 'checkbox' ? (
-            <input
-              type="checkbox"
-              className={`form-check-input ${cssClass} ${disabled}`}
-              checked={getNested(this.state.values, fullPath) || false}
-              onChange={(e) => {
-                this.setState(prevState => ({
-                  values: updateValue(prevState.values, fullPath, e.target.checked)
-                }), () => {
-                  this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
-                  }, () => this.initBootstrap());
-                });
-              }}
-            />
-          ) : effectiveConfig.type === 'combo' ? (
-            <select
-              className={`form-select ${cssClass} ${disabled}`}
-              value={getNested(this.state.values, fullPath) || effectiveConfig.defaultvalue}
-              onChange={(e) => {
-                this.setState(prevState => ({
-                  values: updateValue(prevState.values, fullPath, e.target.value)
-                }), () => {
-                  this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
-                  }, () => this.initBootstrap());
-                });
-              }}
+        </h6>
+        {arrayValues.map((item, index) => (
+          <div key={`${fullPath}.${index}`} className="border p-2 mb-2">
+            {this.renderFields(config.array_template, `${fullPath}.${index}`)}
+            <button
+              type="button"
+              className="btn btn-sm btn-danger"
+              onClick={() => this.handleRemoveArrayItem(fullPath, index)}
             >
-              {effectiveConfig.options.map((option, idx) => (
-                <option key={idx} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          ) : (
-            <input
-              type={effectiveConfig.type === 'number' ? 'number' : 'text'}
-              className={`form-control ${cssClass} ${disabled}`}
-              value={getNested(this.state.values, fullPath) || effectiveConfig.defaultvalue}
-              onChange={(e) => {
-                const value = effectiveConfig.type === 'number' ? Number(e.target.value) : e.target.value;
-                this.setState(prevState => ({
-                  values: updateValue(prevState.values, fullPath, value)
-                }), () => {
-                  this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
-                  }, () => this.initBootstrap());
-                });
-              }}
-            />
-          )}
-        </div>
-      );
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="btn btn-sm btn-success"
+          onClick={() => this.handleAddArrayItem(fullPath, config.array_template)}
+        >
+          Add Item
+        </button>
+      </div>
+    );
+  }
+
+  // Renders scalar fields by delegating to specific field type renderers
+  renderScalarField(config, fieldName, fullPath) {
+    if (config.type === 'checkbox') {
+      return this.renderCheckboxField(config, fieldName, fullPath);
+    } else if (config.type === 'combo') {
+      return this.renderComboField(config, fieldName, fullPath);
+    } else {
+      return this.renderInputField(config, fieldName, fullPath);
     }
   }
-  return fields;
-}
+
+  // Renders a checkbox field
+  renderCheckboxField(config, fieldName, fullPath) {
+    const v_fieldName = config.fieldName || fieldName;
+    const cssClass = config.cssClass;
+    const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
+    const isChecked = this.state.enabled[fullPath] ?? true;
+
+    return (
+      <div key={fullPath} className="mb-2">
+        {config.optional && (
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={`${fullPath}_enable`}
+              checked={isChecked}
+              onChange={(e) => {
+                this.setState(prevState => ({
+                  enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
+                }), () => {
+                  this.setState({
+                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                  }, () => this.initBootstrap());
+                });
+              }}
+            />
+            <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
+              {v_fieldName}
+            </label>
+          </div>
+        )}
+        {!config.optional && (
+          <h6>{v_fieldName}
+            {config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
+          </h6>
+        )}
+        <input
+          type="checkbox"
+          className={`form-check-input ${cssClass} ${disabled}`}
+          checked={getNested(this.state.values, fullPath) || false}
+          onChange={(e) => {
+            this.setState(prevState => ({
+              values: updateValue(prevState.values, fullPath, e.target.checked)
+            }), () => {
+              this.setState({
+                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+              }, () => this.initBootstrap());
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Renders a combo (select) field
+  renderComboField(config, fieldName, fullPath) {
+    const v_fieldName = config.fieldName || fieldName;
+    const cssClass = config.cssClass;
+    const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
+    const isChecked = this.state.enabled[fullPath] ?? true;
+
+    return (
+      <div key={fullPath} className="mb-2">
+        {config.optional && (
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={`${fullPath}_enable`}
+              checked={isChecked}
+              onChange={(e) => {
+                this.setState(prevState => ({
+                  enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
+                }), () => {
+                  this.setState({
+                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                  }, () => this.initBootstrap());
+                });
+              }}
+            />
+            <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
+              {v_fieldName}
+            </label>
+          </div>
+        )}
+        {!config.optional && (
+          <h6>{v_fieldName}
+            {config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
+          </h6>
+        )}
+        <select
+          className={`form-select ${cssClass} ${disabled}`}
+          value={getNested(this.state.values, fullPath) || config.defaultvalue}
+          onChange={(e) => {
+            this.setState(prevState => ({
+              values: updateValue(prevState.values, fullPath, e.target.value)
+            }), () => {
+              this.setState({
+                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+              }, () => this.initBootstrap());
+            });
+          }}
+        >
+          {config.options.map((option, idx) => (
+            <option key={idx} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  // Renders a number or text input field
+  renderInputField(config, fieldName, fullPath) {
+    const v_fieldName = config.fieldName || fieldName;
+    const cssClass = config.cssClass;
+    const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
+    const isChecked = this.state.enabled[fullPath] ?? true;
+
+    return (
+      <div key={fullPath} className="mb-2">
+        {config.optional && (
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id={`${fullPath}_enable`}
+              checked={isChecked}
+              onChange={(e) => {
+                this.setState(prevState => ({
+                  enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
+                }), () => {
+                  this.setState({
+                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                  }, () => this.initBootstrap());
+                });
+              }}
+            />
+            <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
+              {v_fieldName}
+            </label>
+          </div>
+        )}
+        {!config.optional && (
+          <h6>{v_fieldName}
+            {config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
+          </h6>
+        )}
+        <input
+          type={config.type === 'number' ? 'number' : 'text'}
+          className={`form-control ${cssClass} ${disabled}`}
+          value={getNested(this.state.values, fullPath) || config.defaultvalue}
+          onChange={(e) => {
+            const value = config.type === 'number' ? Number(e.target.value) : e.target.value;
+            this.setState(prevState => ({
+              values: updateValue(prevState.values, fullPath, value)
+            }), () => {
+              this.setState({
+                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+              }, () => this.initBootstrap());
+            });
+          }}
+        />
+      </div>
+    );
+  }
 
   initBootstrap() {
     // Initialize Bootstrap components if needed
