@@ -933,6 +933,28 @@ class C_Modules {
     return 0; // Versions are the same
   };
 
+  /**
+   * Searches the internal list of modules (m_list) and returns the module object 
+   * that matches the given module key.
+   * * The module key is expected to be stored under the property 'i' of the module object.
+   * * @param {string} p_module_key The unique key of the module to find (property 'i').
+   * @returns {Object | null} The module object if found, otherwise null.
+   */
+  getModuleByKey(p_module_key) {
+    // Ensure we have a valid key to search for and the list is an array
+    if (!p_module_key || !Array.isArray(this.m_list)) {
+      return null;
+    }
+
+    // Use Array.prototype.find() for an efficient search
+    const foundModule = this.m_list.find(module => {
+      return module && module.k === p_module_key;
+    });
+
+    // Return the found module or null if not found
+    return foundModule || null;
+  }
+
   addModules(jsonModules) {
 
     // Ensure jsonModules is an array
@@ -1024,7 +1046,7 @@ class C_Modules {
     });
 
     this.m_list = jsonModules;
-    
+
     if (old_module !== this.m_old_version)
       this.m_old_version = old_module;
     js_eventEmitter.fn_dispatch(js_event.EE_OldModule);
@@ -1153,20 +1175,17 @@ export class CAndruavUnitObject {
     return this.#m_partyID;
   }
 
-  fn_setIsDE (p_isDE)
-  {
+  fn_setIsDE(p_isDE) {
     this.#m_isDE = p_isDE;
     if (this.#m_isDE === true) {
-      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.de?? null;
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.de ?? null;
     }
-    else
-    {
-      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.andruav?? null;
+    else {
+      this.m_module_version_info = js_siteConfig.CONST_MODULE_VERSIONS.andruav ?? null;
     }
   }
 
-  fn_getIsDE ()
-  {
+  fn_getIsDE() {
     return this.#m_isDE;
   }
 

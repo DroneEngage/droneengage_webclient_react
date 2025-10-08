@@ -190,7 +190,7 @@ export const CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE = 6524;
 
 export const CONST_TYPE_AndruavMessage_CONFIG_ACTION = 6525;
 export const CONST_TYPE_AndruavMessage_CONFIG_STATUS = 6526;
-export const CONST_TYPE_AndruavMessage_CONFIG_REMOTE_EXECUTE = 6527;
+
 
 // System Messages
 export const CONST_TYPE_AndruavSystem_LoadTasks = 9001;
@@ -318,6 +318,12 @@ export const CONST_GPIO_ACTION_PORT_READ = 3;
 // Module Config 
 export const CONST_TYPE_CONFIG_ACTION_Restart = 0;
 export const CONST_TYPE_CONFIG_ACTION_APPLY_CONFIG = 1;
+export const CONST_TYPE_CONFIG_REQUEST_FETCH_CONFIG_TEMPLATE = 2;
+export const CONST_TYPE_CONFIG_REQUEST_FETCH_CONFIG = 3;
+
+export const CONST_TYPE_CONFIG_STATUS_FETCH_CONFIG_TEMPLATE = 0;
+export const CONST_TYPE_CONFIG_STATUS_FETCH_CONFIG = 1;
+
 
 // FenceType
 export const CONST_TYPE_LinearFence = 1;
