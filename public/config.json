@@ -67,12 +67,14 @@
     
     // CHOOSE YOUR MAP SOURCE
     //"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
-    "CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://airgap.local:88/sat_{x}_{y}_{z}.png",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=XXXXXXX",
     //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/data/imagery/{z}/{x}/{y}.jpg?api_key=X",
     //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=X",
+    
     /**
- * WEBRTC Video Streaming Settings
- */
+    * WEBRTC Video Streaming Settings
+    */
     "CONST_ICE_SERVERS": [
         {
             "urls": "turn:cloud.ardupilot.org",
