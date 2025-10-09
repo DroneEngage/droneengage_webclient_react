@@ -1,0 +1,95 @@
+{
+    "CONST_TEST_MODE": false,
+    "CONST_PROD_MODE_IP": "airgap.local",
+    "CONST_PROD_MODE_PORT": "19408",
+    "CONST_TEST_MODE_IP": "127.0.0.1",
+    "CONST_TEST_MODE_PORT": "19408",
+    "CONST_ANDRUAV_URL_ENABLE": true,
+    "CONST_ACCOUNT_URL_ENABLE": true,
+    "CONST_MODULE_VERSIONS": {
+        "de": {
+            "version": "3.7.0",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-what-is.html"
+        },
+        "fcb": {
+            "version": "4.10.0",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-what-is.html"
+        },
+        "andruav": {
+            "version": "7.2.0",
+            "url": "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download",
+            "help": "https://cloud.ardupilot.org/andruav-what-is.html"
+        },
+        "camera": {
+            "version": "3.8.3",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-what-is.html"
+        }
+    },
+    /**
+    * This is for disable experimental features.
+    * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
+    */
+    "CONST_FEATURE": {
+        "DISABLE_UNIT_NAMING": false,
+        "DISABLE_UDPPROXY_UPDATE": false,
+        "DISABLE_SWARM": false,
+        "DISABLE_SWARM_DESTINATION_PONTS": false,
+        "DISABLE_P2P": false,
+        "DISABLE_SDR": false,
+        "DISABLE_GPIO": false,
+        "DISABLE_VOICE": false,
+        "DISABLE_EXPERIMENTAL": true,
+        "DISABLE_VERSION_NOTIFICATION": false
+    },
+    // CHOOSE YOUR MAP SOURCE
+    "CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
+    //export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+    //export let CONST_MAP_LEAFLET_URL = "https://airgap.local:88/{x}_{y}_{z}.jpeg" //LOCAL MAP
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/data/imagery/{z}/{x}/{y}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=X",
+    "CONST_LANGUAGE": {
+        "ENABLED_LANGUAGES": [
+            {
+                "code": "en",
+                "label": "English",
+                "className": ""
+            },
+            {
+                "code": "es",
+                "label": "Español",
+                "className": ""
+            },
+            {
+                "code": "ru",
+                "label": "Русский",
+                "className": ""
+            }
+        ],
+        "DEFAULT_LANGUAGE": "en"
+    },
+    
+    // CHOOSE YOUR MAP SOURCE
+    //"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
+    //"CONST_MAP_LEAFLET_URL": "https://airgap.local:88/sat_{x}_{y}_{z}.png",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg?api_key=XXXXXXX",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/data/imagery/{z}/{x}/{y}.jpg?api_key=X",
+    //"CONST_MAP_LEAFLET_URL": "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=X",
+    
+    /**
+    * WEBRTC Video Streaming Settings
+    */
+    "CONST_ICE_SERVERS": [
+        {
+            "urls": "turn:airgap.local",
+            "credential": "1234",
+            "username": "andruav_ap"
+        },
+        {
+            "urls": "stun:stun1.l.google.com:19302"
+        }
+    ]
+}
