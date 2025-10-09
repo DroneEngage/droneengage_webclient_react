@@ -61,7 +61,8 @@ export default class ClssConfigGenerator extends React.Component {
     this.initBootstrap = this.initBootstrap.bind(this);
     this.handleAddArrayItem = this.handleAddArrayItem.bind(this);
     this.handleRemoveArrayItem = this.handleRemoveArrayItem.bind(this);
-
+    this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
+        
     // Subscribe to event
     js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
   }
@@ -495,8 +496,14 @@ export default class ClssConfigGenerator extends React.Component {
     // Implement apply logic, e.g., send to server
     js_globals.v_andruavFacade.API_updateConfigJSON(this.state.p_unit, this.state.module, JSON.parse(this.state.output));
     console.log('Submitted:', this.state.output);
-    this.fn_close();
+    alert("data submitted. you need to restart the module.");
   }
+
+  fn_shutdownModule() {
+    js_globals.v_andruavFacade.API_updateConfigRestart(this.state.p_unit, this.state.module.k);
+    alert("Sending Restart Signal.");
+  }
+  
 
   fn_close() {
     this.setState({ visible: false });
@@ -586,10 +593,17 @@ export default class ClssConfigGenerator extends React.Component {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-warning btn-sm m-1 textunit_nowidth"
+                  className="btn btn-danger btn-sm m-1 textunit_nowidth"
                   onClick={this.fn_handleSubmit}
                 >
                   Apply
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm m-1 textunit_nowidth"
+                  onClick={(e) => this.fn_shutdownModule()}
+                >
+                  Restart
                 </button>
               </div>
             </div>
@@ -611,6 +625,7 @@ export default class ClssConfigGenerator extends React.Component {
               >
                 Save Config
               </button>
+              
             </div>
           </div>
         </div>
