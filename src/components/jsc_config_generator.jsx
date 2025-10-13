@@ -62,7 +62,7 @@ export default class ClssConfigGenerator extends React.Component {
     this.handleAddArrayItem = this.handleAddArrayItem.bind(this);
     this.handleRemoveArrayItem = this.handleRemoveArrayItem.bind(this);
     this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
-        
+
     // Subscribe to event
     js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
   }
@@ -91,44 +91,60 @@ export default class ClssConfigGenerator extends React.Component {
 
   /**
    * Loads the configuration JSON file based on module class.
-   * @param {string} module_class - The class from module.c
+   * @param {object} module - The class from module.c
    */
   async loadConfig(module) {
-    // let file = 'default.json';
+    let file = 'default.json';
 
-    // switch (module_class) {
-    //   case 'fcb':
-    //     file = 'fcb.json';
-    //     break;
+    switch (module.c) {
+      case 'fcb':
+        file = 'fcb.json';
+        break;
 
-    //   case 'camera':
-    //     file = 'camera.json';
-    //     break;
+      case 'camera':
+        file = 'camera.json';
+        break;
 
-    //   case 'gpio':
-    //     file = 'gpio.json';
-    //     break;
-    // }
-    // Add more conditions for other module classes as needed
+      case 'gpio':
+        file = 'gpio.json';
+        break;
+      // Add more conditions for other module classes as needed
+    }
+
+    let configData = module.template; // Use module.template as the initial fallback
 
     try {
-      //const res = await fetch(`/configuration_files/${file}`); // Adjust path as needed
-      const jsonData = module.template;
-      this.setState({ jsonData }, () => {
-        // Select the first configuration by default
-        const firstConfig = Array.isArray(jsonData) && jsonData.length > 0 ? jsonData[0] : { template: {} };
-        this.setState({
-          selectedConfig: firstConfig.name || '',
-          values: buildInitialValues(firstConfig.template || {}),
-          enabled: buildInitialEnabled(firstConfig.template || {}),
-          output: JSON.stringify(buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled), null, 4),
-        });
-        this.currentTemplate = firstConfig.template || {};
-      });
+      const res = await fetch(`/configuration_files/${file}`); // Adjust path as needed
+
+      // Check if the response is successful (status code 200-299)
+      if (res.ok) {
+        configData = await res.json(); // If successful, use the fetched data
+      } else {
+        // If fetch succeeds but status is not 'ok' (e.g., 404),
+        // we log it and continue to use the initial fallback (module.template).
+        console.warn(`Configuration file not found or failed for ${file}. Status: ${res.status}`);
+      }
+
     } catch (e) {
-      console.error('Failed to load config:', e);
-      this.setState({ jsonData: [], selectedConfig: '', values: {}, enabled: {}, output: '' });
+      // If fetch fails (e.g., network error, JSON parsing error),
+      // we log the error and continue to use the initial fallback (module.template).
+      console.error(`Failed to fetch or parse config file ${file}:`, e);
+      // configData remains module.template from the initialization above
     }
+
+    // Use configData (which is either the fetched data or module.template)
+    this.setState({ jsonData: configData }, () => {
+      // Ensure configData is an array for safety when accessing the first element
+      const firstConfig = Array.isArray(configData) && configData.length > 0 ? configData[0] : { template: {} };
+
+      this.setState({
+        selectedConfig: firstConfig.name || '',
+        values: buildInitialValues(firstConfig.template || {}),
+        enabled: buildInitialEnabled(firstConfig.template || {}),
+        output: JSON.stringify(buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled), null, 4),
+      });
+      this.currentTemplate = firstConfig.template || {};
+    });
   }
 
   /**
