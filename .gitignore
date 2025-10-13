@@ -13,7 +13,7 @@ checks.json
 .vscode
 
 /ssl
-
+/local
 # misc
 .DS_Store
 .env
