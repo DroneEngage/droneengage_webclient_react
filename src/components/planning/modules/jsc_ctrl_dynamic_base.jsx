@@ -7,9 +7,11 @@ import {
     updateValue,
     updateEnable,
     setNested,
-} from '../../../js/helpers/js_form_utils.js'; // Use without modification
-import { js_globals } from '../../../js/js_globals.js'; // For unit list in dropdown
-import ClssCtrlSWARMFormation from '../../gadgets/jsc_mctrl_swarm_formation.jsx'; // For formation type
+    deepMerge,
+    inferEnabled,
+} from '../../../js/helpers/js_form_utils.js';
+import { js_globals } from '../../../js/js_globals.js';
+import ClssCtrlSWARMFormation from '../../gadgets/jsc_mctrl_swarm_formation.jsx';
 
 class ClssModulePlanningBase extends React.Component {
   constructor(props) {
@@ -20,7 +22,7 @@ class ClssModulePlanningBase extends React.Component {
       enabled: {},
       loaded: false,
     };
-    this.moduleName = ''; // To be set by child classes
+    this.moduleName = '';
     this.key = Math.random().toString();
   }
 
@@ -31,13 +33,10 @@ class ClssModulePlanningBase extends React.Component {
         const template = data.template;
         const defaultValues = buildInitialValues(template);
         const initialValues = this.props.p_shape.m_missionItem.modules[this.moduleName]?.cmds || {};
-        const values = {};
-        for (const key in template) {
-          const config = template[key];
-          const storedKey = config.fieldName || key;
-          values[storedKey] = initialValues.hasOwnProperty(storedKey) ? initialValues[storedKey] : defaultValues[key];
-        }
-        const enabled = buildInitialEnabled(template);
+        // Deep merge initialValues with defaultValues
+        const values = deepMerge(defaultValues, initialValues, template);
+        let enabled = buildInitialEnabled(template);
+        enabled = inferEnabled(template, initialValues, '', enabled);
         this.setState({ template, values, enabled, loaded: true });
       })
       .catch(error => console.error(`Error loading ${this.moduleName} template:`, error));
@@ -45,28 +44,20 @@ class ClssModulePlanningBase extends React.Component {
 
   fn_editShape() {
     if (!this.state.loaded) return;
-    const output = buildOutput(this.state.template, this.state.values, this.state.enabled);
-    const mappedOutput = {};
-    for (const key in this.state.template) {
-      const config = this.state.template[key];
-      const storedKey = config.fieldName || key;
-      if (output.hasOwnProperty(storedKey)) {
-        mappedOutput[storedKey] = output[storedKey];
-      }
-    }
-    if (Object.keys(mappedOutput).length === 0) {
-      this.props.p_shape.m_missionItem.modules[this.moduleName] = { cmds: {} };
-    } else {
-      this.props.p_shape.m_missionItem.modules[this.moduleName] = { cmds: mappedOutput };
-    }
+    const { objectOutput } = buildOutput(this.state.template, this.state.values, this.state.enabled);
+    this.props.p_shape.m_missionItem.modules[this.moduleName] = { cmds: objectOutput };
   }
 
   handleChange = (path, value) => {
-    this.setState({ values: updateValue(this.state.values, path, value) });
+    this.setState(prevState => ({
+      values: updateValue(prevState.values, path, value)
+    }));
   };
 
   handleEnable = (path, checked) => {
-    this.setState({ enabled: updateEnable(this.state.enabled, path, checked) });
+    this.setState(prevState => ({
+      enabled: updateEnable(prevState.enabled, path, checked)
+    }));
   };
 
   renderFields(fields, path = '') {
@@ -93,8 +84,9 @@ class ClssModulePlanningBase extends React.Component {
   }
 
   renderField(config, path) {
-    const value = getNested(this.state.values, path) ?? config.defaultvalue;
-    const label = config.fieldName ? path.split('.').pop() : config.desc || path.split('.').pop();
+    const v_fieldName = config.fieldName || path.split('.').pop();
+    const value = getNested(this.state.values, path) ?? config.defaultvalue ?? '';
+    const label = config.desc || v_fieldName;
     if (config.optional) {
       return (
         <div key={path} className="form-check mb-2 pt-2">
@@ -158,8 +150,8 @@ class ClssModulePlanningBase extends React.Component {
         return (
           <select
             className="form-control"
-            value={value ?? config.defaultvalue}
-            onChange={(e) => this.handleChange(path, Number(e.target.value))}
+            value={value ?? config.defaultvalue ?? ''}
+            onChange={(e) => this.handleChange(path, e.target.value)}
           >
             {options.map(opt => (
               <option key={opt.value} value={opt.value} className={opt.className || ''}>
