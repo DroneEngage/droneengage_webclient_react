@@ -15,7 +15,7 @@ import {ClssGPIO_Planning} from '../modules/jsc_ctrl_gpio_planning.jsx'
 /**
  * This is a complete Single Mission Plan.
  */
-export class ClssSingle_Mission_Card extends React.Component {
+export class ClssSingle_Mission_Item_Card extends React.Component {
 
     constructor()
     {
