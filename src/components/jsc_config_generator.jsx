@@ -43,7 +43,7 @@ export default class ClssConfigGenerator extends React.Component {
       selectedConfig: '', // Name of the selected configuration
       values: {},
       enabled: {},
-      output: '',
+      output: {objectOutput:{}, fieldNameOutput:{}},
       fileName: 'config.json',
     };
 
@@ -141,7 +141,7 @@ export default class ClssConfigGenerator extends React.Component {
         selectedConfig: firstConfig.name || '',
         values: buildInitialValues(firstConfig.template || {}),
         enabled: buildInitialEnabled(firstConfig.template || {}),
-        output: JSON.stringify(buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled), null, 4),
+        output: buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled),
       });
       this.currentTemplate = firstConfig.template || {};
     });
@@ -159,7 +159,7 @@ export default class ClssConfigGenerator extends React.Component {
       selectedConfig,
       values: buildInitialValues(this.currentTemplate),
       enabled: buildInitialEnabled(this.currentTemplate),
-      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4),
+      output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
     }, () => this.initBootstrap());
   }
 
@@ -174,7 +174,7 @@ export default class ClssConfigGenerator extends React.Component {
       const newIndex = array.length - 1;
       buildInitialEnabled(arrayTemplate, `${fullPath}.${newIndex}`, newEnabled);
 
-      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, newEnabled), null, 4);
+      const newOutput = buildOutput(this.currentTemplate, newValues, newEnabled);
       return { values: newValues, enabled: newEnabled, output: newOutput };
     }, () => this.initBootstrap());
   }
@@ -186,7 +186,7 @@ export default class ClssConfigGenerator extends React.Component {
       array.splice(index, 1);
       setNested(newValues, fullPath, array);
 
-      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+      const newOutput = buildOutput(this.currentTemplate, newValues, prev.enabled)
       return { values: newValues, output: newOutput };
     }, () => this.initBootstrap());
   }
@@ -194,7 +194,7 @@ export default class ClssConfigGenerator extends React.Component {
   handleEnableChange(fullPath, checked) {
     this.setState(prev => ({
       enabled: updateEnable(prev.enabled, fullPath, checked),
-      output: JSON.stringify(buildOutput(this.currentTemplate, prev.values, updateEnable(prev.enabled, fullPath, checked)), null, 4),
+      output: buildOutput(this.currentTemplate, prev.values, updateEnable(prev.enabled, fullPath, checked)),
     }));
   }
 
@@ -327,7 +327,7 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
                   }, () => this.initBootstrap());
                 });
               }}
@@ -358,7 +358,7 @@ export default class ClssConfigGenerator extends React.Component {
               values: updateValue(prevState.values, fullPath, e.target.checked)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled),
               }, () => this.initBootstrap());
             });
           }}
@@ -388,7 +388,7 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled),
                   }, () => this.initBootstrap());
                 });
               }}
@@ -418,7 +418,7 @@ export default class ClssConfigGenerator extends React.Component {
               values: updateValue(prevState.values, fullPath, e.target.value)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
           }}
@@ -484,7 +484,7 @@ export default class ClssConfigGenerator extends React.Component {
               values: updateValue(prevState.values, fullPath, value)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
           }}
@@ -595,7 +595,7 @@ export default class ClssConfigGenerator extends React.Component {
               <textarea
                 id="output"
                 className="form-control bg-dark text-light w-100"
-                value={this.state.output}
+                value={JSON.stringify(this.state.output.fieldNameOutput, null, 4)}
                 readOnly
                 rows={4}
               />
