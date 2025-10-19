@@ -1,0 +1,33 @@
+{
+    "name": "sdr",
+    "template": {
+            "Enable SDR": {
+            "type": "checkbox",
+            "defaultvalue": null,
+            "fieldName": "sdr_cmd",
+            "desc": "Enable SDR communication",
+            "optional": true
+            },
+            "Fire Event": {
+                "type": "text",
+                "defaultvalue": null,
+                "fieldName": "sdr_fire_event",
+                "desc": "Event to be fired.",
+                "optional": true
+            },
+            "Start Frequency": {
+                "type": "number",
+                "defaultvalue": null,
+                "fieldName": "sdr_freq_start",
+                "desc": "Freq Start Range in Hz",
+                "optional": true
+            },
+            "End Frequency": {
+                "type": "number",
+                "defaultvalue": null,
+                "fieldName": "sdr_freq_end",
+                "desc": "Freq End Range in Hz",
+                "optional": true
+            }
+    }
+}

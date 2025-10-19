@@ -1,5 +1,5 @@
 {
-  "name": "P2P",
+  "name": "p2p",
   "template": {
     "Enable P2P": {
       "type": "checkbox",
@@ -23,7 +23,7 @@
       "optional": true
     },
     "Follow": {
-      "type": "unit_dropdown",
+      "type": "ctrl_unit_dropdown",
       "defaultvalue": -1,
       "fieldName": "swr_cmd",
       "desc": "Select unit to follow",
@@ -40,11 +40,11 @@
       "optional": true
     },
     "Leader Formation": {
-      "type": "formation",
+      "type": "ctrl_formation",
       "defaultvalue": 1,
       "fieldName": "swr_leader_formation",
       "desc": "Select leader formation",
-      "optional": true
+      "optional": false
     }
   }
 }
