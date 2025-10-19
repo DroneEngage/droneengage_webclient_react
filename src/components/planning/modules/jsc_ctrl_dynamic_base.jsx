@@ -70,7 +70,7 @@ class ClssModulePlanningBase extends React.Component {
             {config.layout === 'row' ? (
               Object.entries(config.fields).map(([subKey, subConfig]) => (
                 <div key={`${fullPath}.${subKey}`} className="col-6 pt-2">
-                  {this.renderField(subConfig, `${fullPath}.${subKey}`)}
+                  {this.renderField(subConfig, `${fullPath}.${subKey}`, key)}
                 </div>
               ))
             ) : (
@@ -79,14 +79,14 @@ class ClssModulePlanningBase extends React.Component {
           </div>
         );
       }
-      return this.renderField(config, fullPath);
+      return this.renderField(config, fullPath, key);
     });
   }
 
-  renderField(config, path) {
+  renderField(config, path, key) {
     const v_fieldName = config.fieldName || path.split('.').pop();
     const value = getNested(this.state.values, path) ?? config.defaultvalue ?? '';
-    const label = config.desc || v_fieldName;
+    const label = key || config.desc ;
     if (config.optional) {
       return (
         <div key={path} className="form-check mb-2 pt-2">
@@ -96,7 +96,14 @@ class ClssModulePlanningBase extends React.Component {
             checked={this.state.enabled[path] ?? false}
             onChange={(e) => this.handleEnable(path, e.target.checked)}
           />
-          <label className="form-check-label">{label}</label>
+          <label className="form-check-label">{label}{config.desc && (
+            <i
+              className="bi bi-info-circle ms-1 text-info"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title={config.desc}
+            ></i>
+          )}</label>
           {this.state.enabled[path] && this.renderInput(config, path, value)}
         </div>
       );
@@ -141,7 +148,7 @@ class ClssModulePlanningBase extends React.Component {
             onChange={(e) => this.handleChange(path, e.target.value)}
           />
         );
-      case 'unit_dropdown':
+      case 'ctrl_unit_dropdown':
         const units = js_globals.m_andruavUnitList.fn_getUnitValues() || [];
         const options = [
           ...config.fixed_list.map(([val, label, className]) => ({ value: val, label, className })),
@@ -160,7 +167,7 @@ class ClssModulePlanningBase extends React.Component {
             ))}
           </select>
         );
-      case 'formation':
+      case 'ctrl_formation':
         return (
           <ClssCtrlSWARMFormation
             p_editable={true}
