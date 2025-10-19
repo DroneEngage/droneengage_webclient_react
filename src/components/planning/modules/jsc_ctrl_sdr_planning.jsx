@@ -44,23 +44,7 @@ export class ClssSDR_Planning extends React.Component {
                     };
                 }
         }
-        else
-        {
-            // // copy saved data
-            // const p2p = this.props.p_shape.m_missionItem.modules.p2p;
-
-            // this.state.m_cmd_packet.m_enable_telemetry = p2p.tel;
-            // this.state.m_cmd_packet.m_enable_p2p = p2p.p2p;
-            // this.state.m_cmd_packet.m_enable_servercomm = p2p.srv;
-            // this.state.m_cmd_packet.m_follow_partyID = p2p.swr;
-            // this.state.m_cmd_packet.m_swarm_leader = p2p.swr_leader;
-
-            // this.telemetry_Ref.current.checked = p2p.tel;
-            // this.p2p_Ref.current.checked = p2p.p2p;
-            // this.servercomm_Ref.current.checked = p2p.srv;
-            // this.swarm_Ref.current.m_partyID = p2p.swr;
-            // this.swrm_leader_Ref.current.checked = p2p.swr_leader;
-        }
+        
 
         this.setState({m_update: this.state.m_update +1});
 
