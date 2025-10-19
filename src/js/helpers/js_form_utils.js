@@ -46,7 +46,8 @@ export function buildInitialEnabled(template, path = '', res = {}) {
 // Constructs the JSON output by processing the template, values, and enabled states
 // Handles different field types and skips disabled optional fields
 export function buildOutput(template, values, enabled, path = '') {
-  const res = {};
+  const objectOutput = {};
+  const fieldNameOutput = {};
   for (const fieldName in template) {
     let fieldConfig = template[fieldName];
     if (fieldConfig == null) continue;
@@ -55,34 +56,52 @@ export function buildOutput(template, values, enabled, path = '') {
     }
     const fullPath = path ? `${path}.${fieldName}` : fieldName;
     if (fieldConfig.optional && !(enabled[fullPath] ?? true)) continue;
-    const v_fieldName = fieldConfig.fieldName || fieldName;
+    const v_fieldName = fieldName;
+    const mappedKey = fieldConfig.fieldName || fieldName;
     if (fieldConfig.type === 'object') {
-      const subValues = values?.[fieldName] || {};
-      const subOutput = buildOutput(fieldConfig.fields, subValues, enabled, fullPath);
-      if (Object.keys(subOutput).length > 0) {
-        res[v_fieldName] = subOutput;
+      const subValues = values?.[v_fieldName] || {};
+      const { objectOutput: subObjectOutput, fieldNameOutput: subFieldNameOutput } = buildOutput(fieldConfig.fields, subValues, enabled, fullPath);
+      if (Object.keys(subObjectOutput).length > 0) {
+        objectOutput[v_fieldName] = subObjectOutput;
+        fieldNameOutput[mappedKey] = subFieldNameOutput;
       }
     } else if (fieldConfig.type === 'array') {
-      const arrayValues = values?.[fieldName] || [];
-      const filteredArray = arrayValues.map((item, index) => {
+      const arrayValues = values?.[v_fieldName] || [];
+      const filteredObjectArray = [];
+      const filteredFieldNameArray = [];
+      for (let index = 0; index < arrayValues.length; index++) {
+        const item = arrayValues[index];
         const itemPath = `${fullPath}.${index}`;
         const itemEnabled = enabled[itemPath] ?? true;
-        if (!itemEnabled && fieldConfig.optional) return null;
-        return buildOutput(fieldConfig.array_template, item, enabled, itemPath);
-      }).filter(item => item !== null);
-      if (filteredArray.length > 0) {
-        res[v_fieldName] = filteredArray;
+        if (!itemEnabled && fieldConfig.optional) continue;
+        const { objectOutput: itemObjectOutput, fieldNameOutput: itemFieldNameOutput } = buildOutput(fieldConfig.array_template, item, enabled, itemPath);
+        filteredObjectArray.push(itemObjectOutput);
+        filteredFieldNameArray.push(itemFieldNameOutput);
+      }
+      if (filteredObjectArray.length > 0) {
+        objectOutput[v_fieldName] = filteredObjectArray;
+        fieldNameOutput[mappedKey] = filteredFieldNameArray;
       }
     } else if (fieldConfig.type === 'checkbox') {
-      res[v_fieldName] = values?.[fieldName];
+      if (values?.[v_fieldName] !== undefined) {
+        objectOutput[v_fieldName] = values[v_fieldName];
+        fieldNameOutput[mappedKey] = values[v_fieldName];
+      }
     } else if (fieldConfig.type === 'number') {
-      res[v_fieldName] = Number(values?.[fieldName]);
+      if (values?.[v_fieldName] !== undefined) {
+        objectOutput[v_fieldName] = Number(values[v_fieldName]);
+        fieldNameOutput[mappedKey] = Number(values[v_fieldName]);
+      }
     } else {
-      res[v_fieldName] = values?.[fieldName];
+      if (values?.[v_fieldName] !== undefined) {
+        objectOutput[v_fieldName] = values[v_fieldName];
+        fieldNameOutput[mappedKey] = values[v_fieldName];
+      }
     }
   }
-  return res;
+  return { objectOutput, fieldNameOutput };
 }
+
 
 // Retrieves a value from a nested object using a dot-separated path
 // Returns undefined if the path is invalid
