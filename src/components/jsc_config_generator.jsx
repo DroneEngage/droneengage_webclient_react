@@ -114,7 +114,7 @@ export default class ClssConfigGenerator extends React.Component {
     let configData = module.template; // Use module.template as the initial fallback
 
     try {
-      const res = await fetch(`/configuration_files/${file}`); // Adjust path as needed
+      const res = await fetch(`/template/settings/${file}`); // Adjust path as needed
 
       // Check if the response is successful (status code 200-299)
       if (res.ok) {
