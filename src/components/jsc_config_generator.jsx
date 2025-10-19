@@ -43,7 +43,7 @@ export default class ClssConfigGenerator extends React.Component {
       selectedConfig: '', // Name of the selected configuration
       values: {},
       enabled: {},
-      output: {objectOutput:{}, fieldNameOutput:{}},
+      output: { objectOutput: {}, fieldNameOutput: {} },
       fileName: 'config.json',
     };
 
@@ -452,7 +452,7 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
                   }, () => this.initBootstrap());
                 });
               }}
@@ -477,9 +477,9 @@ export default class ClssConfigGenerator extends React.Component {
         <input
           type={config.type === 'number' ? 'number' : 'text'}
           className={`form-control ${cssClass} ${disabled}`}
-          value={getNested(this.state.values, fullPath) || config.defaultvalue}
+          value={getNested(this.state.values, fullPath) ?? config.defaultvalue ?? ''}
           onChange={(e) => {
-            const value = config.type === 'number' ? Number(e.target.value) : e.target.value;
+            const value = e.target.value; // Allow raw input, including empty string
             this.setState(prevState => ({
               values: updateValue(prevState.values, fullPath, value)
             }), () => {
@@ -487,6 +487,25 @@ export default class ClssConfigGenerator extends React.Component {
                 output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
+          }}
+          onBlur={(e) => {
+            if (config.type === 'number') {
+              let value = e.target.value;
+              if (value === '' || isNaN(value)) {
+                value = config.defaultvalue ?? config.min ?? 0;
+              } else {
+                value = Number(value);
+                if (config.min !== undefined && value < config.min) value = config.min;
+                if (config.max !== undefined && value > config.max) value = config.max;
+              }
+              this.setState(prevState => ({
+                values: updateValue(prevState.values, fullPath, value)
+              }), () => {
+                this.setState({
+                  output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
+                }, () => this.initBootstrap());
+              });
+            }
           }}
         />
       </div>
@@ -519,7 +538,7 @@ export default class ClssConfigGenerator extends React.Component {
     js_globals.v_andruavFacade.API_updateConfigRestart(this.state.p_unit, this.state.module.k);
     alert("Sending Restart Signal.");
   }
-  
+
 
   fn_close() {
     this.setState({ visible: false });
@@ -641,7 +660,7 @@ export default class ClssConfigGenerator extends React.Component {
               >
                 Save Config
               </button>
-              
+
             </div>
           </div>
         </div>
