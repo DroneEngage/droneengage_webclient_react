@@ -43,6 +43,64 @@ export function buildInitialEnabled(template, path = '', res = {}) {
   return res;
 }
 
+// Infers enabled states for optional fields based on initialValues
+// Sets enabled to true if a value exists in initialValues
+export function inferEnabled(template, initialValues, path = '', enabled = {}) {
+  for (const fieldName in template) {
+    let fieldConfig = template[fieldName];
+    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+      fieldConfig = { type: 'object', fields: fieldConfig };
+    }
+    const fullPath = path ? `${path}.${fieldName}` : fieldName;
+    if (fieldConfig.optional) {
+      const value = getNested(initialValues, fullPath);
+      if (value !== undefined) {
+        enabled[fullPath] = true;
+      }
+      // else leave as false from buildInitialEnabled
+    }
+    if (fieldConfig.type === 'object') {
+      const subInitial = getNested(initialValues, fullPath) || {};
+      inferEnabled(fieldConfig.fields, subInitial, fullPath, enabled);
+    } else if (fieldConfig.type === 'array') {
+      const arrayInitial = getNested(initialValues, fullPath) || [];
+      for (let i = 0; i < arrayInitial.length; i++) {
+        const subPath = `${fullPath}.${i}`;
+        inferEnabled(fieldConfig.array_template, arrayInitial[i], subPath, enabled);
+      }
+    }
+  }
+  return enabled;
+}
+
+// Deep merges defaultValues with initialValues based on template
+export function deepMerge(defaultValues, initialValues, template) {
+  const result = JSON.parse(JSON.stringify(defaultValues)); // Deep copy to avoid mutating defaultValues
+  for (const key in template) {
+    if (!template.hasOwnProperty(key)) continue;
+    let fieldConfig = template[key];
+    if (typeof fieldConfig === 'object' && fieldConfig.type === undefined) {
+      fieldConfig = { type: 'object', fields: fieldConfig };
+    }
+    if (fieldConfig.type === 'object' && initialValues[key]) {
+      result[key] = deepMerge(defaultValues[key] || {}, initialValues[key], fieldConfig.fields);
+    } else if (fieldConfig.type === 'array' && Array.isArray(initialValues[key])) {
+      result[key] = initialValues[key].map((item, index) =>
+        fieldConfig.array_template
+          ? deepMerge(
+              defaultValues[key][index] || buildInitialValues(fieldConfig.array_template),
+              item,
+              fieldConfig.array_template
+            )
+          : item
+      );
+    } else if (initialValues[key] !== undefined) {
+      result[key] = initialValues[key];
+    }
+  }
+  return result;
+}
+
 // Constructs the JSON output by processing the template, values, and enabled states
 // Handles different field types and skips disabled optional fields
 export function buildOutput(template, values, enabled, path = '') {
