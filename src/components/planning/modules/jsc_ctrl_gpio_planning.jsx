@@ -25,7 +25,7 @@ export class ClssGPIO_Planning extends React.Component {
             {
                 this.m_flag_mounted = true;
                 
-                if (this.props.p_shape.m_missionItem.modules.sdr === undefined) {
+                if (this.props.p_shape.m_missionItem.modules.gpio === undefined) {
                     // load compiled data [compiled_cmds] -loaded missions-.
                     if (this.props.p_shape.m_missionItem.modules.compiled_cmds !== null && this.props.p_shape.m_missionItem.modules.compiled_cmds !== undefined)
                         {
@@ -34,7 +34,7 @@ export class ClssGPIO_Planning extends React.Component {
                         else
                         {
                             // init data
-                            this.props.p_shape.m_missionItem.modules.sdr =
+                            this.props.p_shape.m_missionItem.modules.gpio =
                             {
                                 // tel: this.state.m_cmd_packet.m_enable_telemetry,
                                 // p2p: this.state.m_cmd_packet.m_enable_p2p,
@@ -85,7 +85,7 @@ export class ClssGPIO_Planning extends React.Component {
             fn_editShape()
             {
                 if (this.m_enabled_ctrl !== true) {
-                    this.props.p_shape.m_missionItem.modules.sdr =
+                    this.props.p_shape.m_missionItem.modules.gpio =
                     {
                         cmds: {}
                     };
