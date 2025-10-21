@@ -24,6 +24,8 @@ class ClssModulePlanningBase extends React.Component {
     };
     this.moduleName = '';
     this.key = Math.random().toString();
+
+    this.m_output = { 'objectOutput':{}, 'fieldNameOutput':{} };
   }
 
   componentDidMount() {
@@ -44,8 +46,7 @@ class ClssModulePlanningBase extends React.Component {
 
   fn_editShape() {
     if (!this.state.loaded) return;
-    const { objectOutput } = buildOutput(this.state.template, this.state.values, this.state.enabled);
-    this.props.p_shape.m_missionItem.modules[this.moduleName] = { cmds: objectOutput };
+    this.m_output = buildOutput(this.state.template, this.state.values, this.state.enabled);
   }
 
   handleChange = (path, value) => {
@@ -87,30 +88,63 @@ class ClssModulePlanningBase extends React.Component {
     const v_fieldName = config.fieldName || path.split('.').pop();
     const value = getNested(this.state.values, path) ?? config.defaultvalue ?? '';
     const label = key || config.desc ;
+    const infoIcon = config.desc ? (
+      <i
+        className="bi bi-info-circle ms-1 text-info"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title={config.desc}
+      ></i>
+    ) : null;
+
     if (config.optional) {
-      return (
-        <div key={path} className="form-check mb-2 pt-2">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            checked={this.state.enabled[path] ?? false}
-            onChange={(e) => this.handleEnable(path, e.target.checked)}
-          />
-          <label className="form-check-label">{label}{config.desc && (
-            <i
-              className="bi bi-info-circle ms-1 text-info"
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title={config.desc}
-            ></i>
-          )}</label>
-          {this.state.enabled[path] && this.renderInput(config, path, value)}
-        </div>
-      );
+      if (config.type === 'checkbox') {
+        const options = [
+          { value: null, label: 'no action', className: 'text-white' },
+          { value: true, label: 'enable', className: 'text-success' },
+          { value: false, label: 'disable', className: 'text-danger' },
+        ];
+        return (
+          <div key={path} className="mb-2 pt-2">
+            <label>{label}{infoIcon}</label>
+            <select
+              className="form-control"
+              value={value === true ? 'true' : (value === false ? 'false' : '')}
+              onChange={(e) => {
+                let val = e.target.value;
+                if (val === 'true') val = true;
+                else if (val === 'false') val = false;
+                else val = null;
+                this.handleChange(path, val);
+                this.handleEnable(path, val !== null);
+              }}
+            >
+              {options.map(opt => (
+                <option key={opt.value ?? 'null'} value={opt.value === true ? 'true' : (opt.value === false ? 'false' : '')} className={opt.className || ''}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      } else {
+        return (
+          <div key={path} className="form-check mb-2 pt-2">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              checked={this.state.enabled[path] ?? false}
+              onChange={(e) => this.handleEnable(path, e.target.checked)}
+            />
+            <label className="form-check-label">{label}{infoIcon}</label>
+            {this.state.enabled[path] && this.renderInput(config, path, value)}
+          </div>
+        );
+      }
     }
     return (
       <div key={path} className="mb-2 pt-2">
-        <label>{label}</label>
+        <label>{label}{infoIcon}</label>
         {this.renderInput(config, path, value)}
       </div>
     );
