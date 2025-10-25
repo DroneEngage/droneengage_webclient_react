@@ -477,9 +477,9 @@ div.monitorview
 
 div.cameraview
 {
-	display:block;
-	overflow:auto;
-	
+    display:block;
+    overflow:hidden;
+    
 }
 
 div#andruavUnits {
