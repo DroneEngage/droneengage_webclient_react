@@ -1167,10 +1167,10 @@ class CAndruavClientFacade {
     };
 
 
-    API_updateConfigRestart(p_andruavUnit, p_module_key) {
+    API_doModuleConfigAction(p_andruavUnit, p_module_key, p_action) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_updateConfigRestart(p_module_key);
+        const cmd = CCommandAPI.API_doModuleConfigAction(p_module_key, p_action);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     }
