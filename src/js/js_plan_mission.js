@@ -782,9 +782,10 @@ export class ClssAndruavMissionPlan {
       const cmds = [];
       for (let key in marker.m_missionItem.modules) {
         const m = marker.m_missionItem.modules[key];
-        if (m.cmds !== null && m.cmds !== undefined) {
-          for (let key2 in m.cmds) {
-            const single_cmd = m.cmds[key2];
+        if (m.cmd_msgs !== null && m.cmd_msgs !== undefined) {
+          const cmd_msg = m.cmd_msgs;
+          for (let key2 in cmd_msg) {
+            const single_cmd = cmd_msg[key2];
             if (single_cmd === null || single_cmd === undefined) continue;
             cmds.push(single_cmd);
           }

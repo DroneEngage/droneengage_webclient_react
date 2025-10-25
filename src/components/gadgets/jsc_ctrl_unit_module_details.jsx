@@ -5,7 +5,11 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import * as js_andruavMessages from '../../js/js_andruavMessages.js'
 
+import {
+    fn_do_modal_confirmation
+    } from '../../js/js_main.js'
 
 export default class ClssModuleDetails extends React.Component {
 
@@ -20,11 +24,23 @@ export default class ClssModuleDetails extends React.Component {
 
         this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
         this.fn_configModule = this.fn_configModule.bind(this);
+        this.fn_shutDownBoard = this.fn_shutdownBoard.bind(this);
     }
 
     fn_shutdownModule(p_module_key) {
         console.log(p_module_key);
-        js_globals.v_andruavFacade.API_updateConfigRestart(this.props.p_unit, p_module_key);
+        js_globals.v_andruavFacade.API_doModuleConfigAction(this.props.p_unit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+    }
+
+    fn_shutdownBoard(p_module_key) {
+
+        const v_andruavUnit = this.props.p_unit;
+                
+        fn_do_modal_confirmation("Completely ShutDown Board - NO Restart" + v_andruavUnit.m_unitName,
+                    "Are you sure you want to completly stop the BOARD?", function (p_approved) {
+                        if (p_approved === false) return;
+                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN);
+                    }, "YES", "bg-danger text-white");
     }
 
     fn_configModule(p_module) {
@@ -65,7 +81,20 @@ export default class ClssModuleDetails extends React.Component {
                                                 >
                                                     config
                                                 </button>
-                                            )}
+                                            )
+                                        }
+                                        {
+                                            (!module.c ) && (
+                                                <button
+                                                    id={this.key + 'shutdown'}
+                                                    key={this.key + 'shutdown'}
+                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth'
+                                                    onClick={(e) => this.fn_shutDownBoard(module)}
+                                                >
+                                                    shutdown
+                                                </button>
+                                            )
+                                        }
                                     </div>}
                                 </div>
                                 <div className="col-6">

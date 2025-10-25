@@ -6,4 +6,10 @@ export class ClssGPIO_Planning extends ClssModulePlanningBase {
     super(props);
     this.moduleName = 'gpio';
   }
+
+  fn_editShape() {
+    // Call parent fn_editShape if needed
+    super.fn_editShape();
+  }
+  
 }

@@ -9,6 +9,7 @@ import React from 'react';
 import Draggable from "react-draggable";
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as js_andruavMessages from '../js/js_andruavMessages.js'
 import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/js_eventList.js'
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
@@ -535,7 +536,7 @@ export default class ClssConfigGenerator extends React.Component {
   }
 
   fn_shutdownModule() {
-    js_globals.v_andruavFacade.API_updateConfigRestart(this.state.p_unit, this.state.module.k);
+    js_globals.v_andruavFacade.API_doModuleConfigAction(this.state.p_unit, this.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
     alert("Sending Restart Signal.");
   }
 

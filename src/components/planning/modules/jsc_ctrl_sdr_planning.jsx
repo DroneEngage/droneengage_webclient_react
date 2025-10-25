@@ -6,4 +6,10 @@ export class ClssSDR_Planning extends ClssModulePlanningBase {
     super(props);
     this.moduleName = 'sdr';
   }
+
+  fn_editShape() {
+    // Call parent fn_editShape if needed
+    super.fn_editShape();
+    }
+
 }
