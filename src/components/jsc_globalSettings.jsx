@@ -351,7 +351,7 @@ class ClssPreferences extends React.Component {
             className="form-range col-sm-4 width_fit ps-5"
             id="volume_range"
             ref={this.m_volumeRangeRef}
-            disabled={v_speech_disabled}
+            disabled={v_speech_disabled === 'true' }
             onChange={(e) => this.fn_changeVolume(e)}
             onMouseUp={(e) => this.fn_handleMouseUp(e)}
           />
