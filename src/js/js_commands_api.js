@@ -663,12 +663,12 @@ export class CCommandAPI {
     }
 
 
-    static API_updateConfigRestart(p_module_key) {
+    static API_doModuleConfigAction(p_module_key, p_action) {
         const msg =
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart,
+                a: p_action,
             }
         };
 

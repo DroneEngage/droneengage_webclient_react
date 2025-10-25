@@ -34,7 +34,7 @@ class ClssModulePlanningBase extends React.Component {
       .then(data => {
         const template = data.template;
         const defaultValues = buildInitialValues(template);
-        const initialValues = this.props.p_shape.m_missionItem.modules[this.moduleName]?.cmds || {};
+        const initialValues = this.props.p_shape.m_missionItem.modules[this.moduleName]?.cmds.objectOutput || {};
         // Deep merge initialValues with defaultValues
         const values = deepMerge(defaultValues, initialValues, template);
         let enabled = buildInitialEnabled(template);

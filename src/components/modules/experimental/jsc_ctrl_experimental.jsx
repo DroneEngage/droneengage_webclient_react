@@ -57,7 +57,7 @@ export class ClssCtrlExperimental extends React.Component {
     {
         const v_andruavUnit = this.props.p_unit;
         console.log(p_contents);
-        js_globals.v_andruavFacade.API_updateConfigRestart(v_andruavUnit);
+        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN);
     }
 
     render() {
