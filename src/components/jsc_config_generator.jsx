@@ -25,6 +25,7 @@ import {
   setNested,
 } from '../js/helpers/js_form_utils.js';
 
+import { fn_do_modal_confirmation } from '../js/js_main.js';
 /**
  * ClssConfigGenerator generates a form based on a JSON configuration loaded from a file.
  * It is triggered by the EE_displayConfigGenerator event with {p_unit, module}.
@@ -108,6 +109,9 @@ export default class ClssConfigGenerator extends React.Component {
 
       case 'gpio':
         file = 'gpio.json';
+        break;
+      case 'trk':
+        file = 'tracking.json';
         break;
       // Add more conditions for other module classes as needed
     }
@@ -237,7 +241,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders an object field with nested fields
   renderObjectField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     return (
       <div key={fullPath} className="mb-2">
         <h6>{v_fieldName}
@@ -259,7 +263,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders an array field with nested items and add/remove buttons
   renderArrayField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const arrayValues = getNested(this.state.values, fullPath) || [];
     return (
       <div key={fullPath} className="mb-2">
@@ -309,7 +313,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders a checkbox field
   renderCheckboxField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -334,7 +338,14 @@ export default class ClssConfigGenerator extends React.Component {
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -370,7 +381,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders a combo (select) field
   renderComboField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -395,7 +406,14 @@ export default class ClssConfigGenerator extends React.Component {
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -434,7 +452,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders a number or text input field
   renderInputField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -459,7 +477,14 @@ export default class ClssConfigGenerator extends React.Component {
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -530,14 +555,34 @@ export default class ClssConfigGenerator extends React.Component {
 
   fn_handleSubmit() {
     // Implement apply logic, e.g., send to server
-    js_globals.v_andruavFacade.API_updateConfigJSON(this.state.p_unit, this.state.module, JSON.parse(this.state.output));
-    console.log('Submitted:', this.state.output);
-    alert("data submitted. you need to restart the module.");
+    let me  = this;
+    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
+      "Are you sure you want to apply settings", function (p_approved) {
+        if (p_approved === false) return;
+
+        js_globals.v_andruavFacade.API_updateConfigJSON(me.state.p_unit, me.state.module, me.state.output.fieldNameOutput);
+
+        console.log('Submitted:', me.state.output);
+        alert("data submitted. you need to restart the module.");
+
+      }, "YES", "bg-danger text-white");
+
+    
   }
 
   fn_shutdownModule() {
-    js_globals.v_andruavFacade.API_doModuleConfigAction(this.state.p_unit, this.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
     alert("Sending Restart Signal.");
+
+    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
+      "Are you sure you want to apply settings", function (p_approved) {
+        if (p_approved === false) return;
+
+        js_globals.v_andruavFacade.API_doModuleConfigAction(this.state.p_unit, this.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+    
+        console.log('Submitted:', this.state.output);
+        alert("data submitted. you need to restart the module.");
+        
+      }, "YES", "bg-danger text-white");
   }
 
 
