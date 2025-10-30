@@ -555,7 +555,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   fn_handleSubmit() {
     // Implement apply logic, e.g., send to server
-    let me  = this;
+    const me  = this;
     fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
       "Are you sure you want to apply settings", function (p_approved) {
         if (p_approved === false) return;
@@ -573,13 +573,14 @@ export default class ClssConfigGenerator extends React.Component {
   fn_shutdownModule() {
     alert("Sending Restart Signal.");
 
+    const me  = this;
     fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
       "Are you sure you want to apply settings", function (p_approved) {
         if (p_approved === false) return;
 
-        js_globals.v_andruavFacade.API_doModuleConfigAction(this.state.p_unit, this.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+        js_globals.v_andruavFacade.API_doModuleConfigAction(me.state.p_unit, me.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
     
-        console.log('Submitted:', this.state.output);
+        console.log('Submitted:', me.state.output);
         alert("data submitted. you need to restart the module.");
         
       }, "YES", "bg-danger text-white");
