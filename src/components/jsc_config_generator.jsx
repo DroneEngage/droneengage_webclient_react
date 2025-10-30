@@ -361,20 +361,23 @@ export default class ClssConfigGenerator extends React.Component {
             )}
           </h6>
         )}
-        <input
-          type="checkbox"
-          className={`form-check-input ${cssClass} ${disabled}`}
-          checked={getNested(this.state.values, fullPath) || false}
+        <select
+          className={`form-select ${cssClass} ${disabled}`}
+          value={(getNested(this.state.values, fullPath) ?? false) ? 'true' : 'false'}
           onChange={(e) => {
+            const newVal = e.target.value === 'true';
             this.setState(prevState => ({
-              values: updateValue(prevState.values, fullPath, e.target.checked)
+              values: updateValue(prevState.values, fullPath, newVal)
             }), () => {
               this.setState({
-                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled),
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
           }}
-        />
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
       </div>
     );
   }
