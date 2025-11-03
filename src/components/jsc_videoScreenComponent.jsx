@@ -38,6 +38,8 @@ export default class ClssCVideoScreen extends React.Component {
         this.isDrawing = false;
         this.startX = 0;
         this.startY = 0;
+        this.startClientX = 0;
+        this.startClientY = 0;
         // Use an object to hold current drawing rectangle's visual properties
         this.currentDrawingRect = {
             left: 0,
@@ -227,6 +229,19 @@ export default class ClssCVideoScreen extends React.Component {
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
+    // Convert a client (screen) coordinate to normalized coordinates within the rendered video area (0..1)
+    // Returns null if the client point is outside the video content rect
+    fn_normalizeClientPointToVideo(clientX, clientY) {
+        const videoEl = this.videoRef && this.videoRef.current;
+        if (!videoEl) return null;
+        const vr = videoEl.getBoundingClientRect();
+        if (vr.width <= 0 || vr.height <= 0) return null;
+        const x = (clientX - vr.left) / vr.width;
+        const y = (clientY - vr.top) / vr.height;
+        if (x < 0 || x > 1 || y < 0 || y > 1) return null;
+        const nx = this.m_mirrored ? (1 - x) : x;
+        return { x: Math.max(0, Math.min(1, nx)), y: Math.max(0, Math.min(1, y)) };
+    }
 
     fn_lnkVideo() {
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
@@ -417,6 +432,8 @@ export default class ClssCVideoScreen extends React.Component {
         const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
         this.startX = e.clientX - containerRect.left; // Store in instance variable
         this.startY = e.clientY - containerRect.top; // Store in instance variable
+        this.startClientX = e.clientX;
+        this.startClientY = e.clientY;
         this.isDrawing = true; // Store in instance variable
 
         // Initialize currentDrawingRect
@@ -453,24 +470,33 @@ export default class ClssCVideoScreen extends React.Component {
         };
         
 
-        // Now, you can process the finalized rectangle and send it
-        const v_x1 = (newLeft / containerRect.width).toFixed(3);
-        const v_y1 = (newTop / containerRect.height).toFixed(3);
-        const normalizedWidth = (newWidth / containerRect.width).toFixed(3);
-        const normalizedHeight = (newHeight / containerRect.height).toFixed(3);
+        // Compute normalized rect within the video content area using client coordinates
+        const p1 = this.fn_normalizeClientPointToVideo(this.startClientX, this.startClientY);
+        const p2 = this.fn_normalizeClientPointToVideo(e.clientX, e.clientY);
 
-        if ((normalizedWidth < 0.01) || (normalizedHeight < 0.01)) return ;
+        if (p1 == null || p2 == null) {
+            // Drag did not occur fully within video content; ignore
+            return;
+        }
+
+        const x1 = Math.min(p1.x, p2.x);
+        const y1 = Math.min(p1.y, p2.y);
+        const w = Math.abs(p2.x - p1.x);
+        const h = Math.abs(p2.y - p1.y);
+
+        if ((w < 0.01) || (h < 0.01)) return ;
         
         const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null) {
             return;
         }
 
-        js_globals.v_andruavFacade.API_SendTrackCRegion(c_andruavUnit,
-            parseFloat(v_x1),
-            parseFloat(v_y1),
-            parseFloat(normalizedWidth),
-            parseFloat(normalizedHeight)
+        js_globals.v_andruavFacade.API_SendTrackCRegion(
+            c_andruavUnit,
+            parseFloat(x1.toFixed(3)),
+            parseFloat(y1.toFixed(3)),
+            parseFloat(w.toFixed(3)),
+            parseFloat(h.toFixed(3))
         );
         
     }
@@ -488,10 +514,14 @@ export default class ClssCVideoScreen extends React.Component {
         }
 
         // send new points
-        const c_dim = e.currentTarget.getBoundingClientRect();
-        const v_x1 = ((e.nativeEvent.x - c_dim.left) / c_dim.width).toFixed(3);
-        const v_y1 = ((e.nativeEvent.y - c_dim.top) / c_dim.height).toFixed(3);;
-        js_globals.v_andruavFacade.API_SendTrackPoint(c_andruavUnit, parseFloat(v_x1), parseFloat(v_y1), parseFloat("0.05"));
+        const p = this.fn_normalizeClientPointToVideo(e.clientX, e.clientY);
+        if (p == null) return;
+        js_globals.v_andruavFacade.API_SendTrackPoint(
+            c_andruavUnit,
+            parseFloat(p.x.toFixed(3)),
+            parseFloat(p.y.toFixed(3)),
+            parseFloat("0.05")
+        );
     }
 
     render() {
