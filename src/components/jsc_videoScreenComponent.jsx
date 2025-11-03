@@ -230,17 +230,42 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     // Convert a client (screen) coordinate to normalized coordinates within the rendered video area (0..1)
-    // Returns null if the client point is outside the video content rect
+    // Returns null if the client point is outside the video content rect.
+    // Applies inverse of local display transforms (rotation, mirroring) to map back to source video coordinates.
     fn_normalizeClientPointToVideo(clientX, clientY) {
         const videoEl = this.videoRef && this.videoRef.current;
         if (!videoEl) return null;
         const vr = videoEl.getBoundingClientRect();
         if (vr.width <= 0 || vr.height <= 0) return null;
-        const x = (clientX - vr.left) / vr.width;
-        const y = (clientY - vr.top) / vr.height;
-        if (x < 0 || x > 1 || y < 0 || y > 1) return null;
-        const nx = this.m_mirrored ? (1 - x) : x;
-        return { x: Math.max(0, Math.min(1, nx)), y: Math.max(0, Math.min(1, y)) };
+        // Coordinates relative to rendered video box (display space)
+        const xd = (clientX - vr.left) / vr.width;
+        const yd = (clientY - vr.top) / vr.height;
+        if (xd < 0 || xd > 1 || yd < 0 || yd > 1) return null;
+
+        // Inverse rotation: map displayed (xd, yd) back to source (xr, yr)
+        let xr = xd;
+        let yr = yd;
+        const rotIdx = this.m_rotation % 4;
+        if (rotIdx === 1) {           // 90deg
+            xr = yd;
+            yr = 1 - xd;
+        } else if (rotIdx === 2) {    // 180deg
+            xr = 1 - xd;
+            yr = 1 - yd;
+        } else if (rotIdx === 3) {    // 270deg
+            xr = 1 - yd;
+            yr = xd;
+        }
+
+        // Inverse mirror (scaleX)
+        if (this.m_mirrored === true) {
+            xr = 1 - xr;
+        }
+
+        // Clamp
+        xr = Math.max(0, Math.min(1, xr));
+        yr = Math.max(0, Math.min(1, yr));
+        return { x: xr, y: yr };
     }
 
     fn_lnkVideo() {
