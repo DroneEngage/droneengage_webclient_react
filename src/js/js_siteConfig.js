@@ -18,7 +18,7 @@ export let CONST_PROD_MODE_IP = 'airgap.droneengage.com';
 export let CONST_PROD_MODE_PORT = '19408';
 export let CONST_TEST_MODE_IP = '127.0.0.1';
 export let CONST_TEST_MODE_PORT = '19408';
-export let CONST_TEST_MODE_ENABLE_LOG = false;
+export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
 /**
