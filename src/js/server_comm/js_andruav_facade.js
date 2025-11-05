@@ -55,6 +55,8 @@ class CAndruavClientFacade {
         this.v_axes = null;
         this.v_sendAxes = false;
         this.v_sendAxes_skip = 0;
+        this.lastSentAxes = null;
+        this.lastSentTime = 0;
 
         this.fn_init();
 
@@ -101,16 +103,49 @@ class CAndruavClientFacade {
 
     // EVENT HANDLER AREA
     #fn_sendRXChannels(p_me) {
-        if (p_me.v_sendAxes === false) {
-            p_me.v_sendAxes_skip++;
-            if (p_me.v_sendAxes_skip % 4 !== 0) return;
+        const unit = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        if (!unit) return;
+        const axes = p_me.v_axes;
+        if (axes === null || axes === undefined) return;
+
+        const now = Date.now();
+        const epsilon = js_globals.GP_EPSILON_CHANGE;
+        const heartbeat = js_globals.GP_HEARTBEAT_MS;
+
+        let shouldSend = false;
+        let reason = 'initial';
+        if (p_me.lastSentAxes === null) {
+            shouldSend = true;
+            reason = 'initial';
+        } else {
+            const d0 = Math.abs(parseFloat(axes[0]) - parseFloat(p_me.lastSentAxes[0]));
+            const d1 = Math.abs(parseFloat(axes[1]) - parseFloat(p_me.lastSentAxes[1]));
+            const d2 = Math.abs(parseFloat(axes[2]) - parseFloat(p_me.lastSentAxes[2]));
+            const d3 = Math.abs(parseFloat(axes[3]) - parseFloat(p_me.lastSentAxes[3]));
+            const maxDelta = Math.max(d0, d1, d2, d3);
+            if (maxDelta >= epsilon) {
+                shouldSend = true;
+                reason = 'delta';
+            } else if ((now - p_me.lastSentTime) >= heartbeat) {
+                shouldSend = true;
+                reason = 'heartbeat';
+            }
         }
 
-        p_me.v_sendAxes = false;
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
-        if (!c_currentEngagedUnitRX) return;
-
-        if (this.v_axes !== null) this.#API_sendRXChannels(c_currentEngagedUnitRX, this.v_axes);
+        if (shouldSend) {
+            try {
+                const d0 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[0]) - parseFloat(p_me.lastSentAxes[0])) : null);
+                const d1 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[1]) - parseFloat(p_me.lastSentAxes[1])) : null);
+                const d2 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[2]) - parseFloat(p_me.lastSentAxes[2])) : null);
+                const d3 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[3]) - parseFloat(p_me.lastSentAxes[3])) : null);
+                const maxDeltaLog = (d0===null)?null:Math.max(d0,d1,d2,d3);
+                js_common.fn_console_log({ tag: 'RC_SEND', when: now, reason: reason, maxDelta: maxDeltaLog, axes: [axes[0],axes[1],axes[2],axes[3]] });
+            } catch(e) {}
+            p_me.#API_sendRXChannels(unit, axes);
+            p_me.lastSentAxes = [axes[0], axes[1], axes[2], axes[3]];
+            p_me.lastSentTime = now;
+            p_me.v_sendAxes = false;
+        }
     }
 
     /**
@@ -1205,11 +1240,35 @@ class CAndruavClientFacade {
         if (c_controller === null || c_controller === undefined)
             return;
 
-        // read gamepad values
         p_me.v_axes = c_controller.p_unified_virtual_axis;
-        p_me.v_sendAxes = true;
 
-        js_common.fn_console_log("fn_sendAxes");
+        const now = Date.now();
+        const sudden = js_globals.GP_SUDDEN_CHANGE;
+        const minGap = js_globals.GP_MIN_GAP_FAST_MS;
+
+        let isSudden = false;
+        if (p_me.lastSentAxes !== null) {
+            const d0 = Math.abs(parseFloat(p_me.v_axes[0]) - parseFloat(p_me.lastSentAxes[0]));
+            const d1 = Math.abs(parseFloat(p_me.v_axes[1]) - parseFloat(p_me.lastSentAxes[1]));
+            const d2 = Math.abs(parseFloat(p_me.v_axes[2]) - parseFloat(p_me.lastSentAxes[2]));
+            const d3 = Math.abs(parseFloat(p_me.v_axes[3]) - parseFloat(p_me.lastSentAxes[3]));
+            const maxDelta = Math.max(d0, d1, d2, d3);
+            isSudden = (maxDelta >= sudden);
+        } else {
+            isSudden = true;
+        }
+
+        if (isSudden && (now - p_me.lastSentTime) >= minGap) {
+            try {
+                js_common.fn_console_log({ tag: 'RC_SEND_IMMEDIATE', when: now, reason: 'sudden', axes: [p_me.v_axes[0],p_me.v_axes[1],p_me.v_axes[2],p_me.v_axes[3]] });
+            } catch(e) {}
+            p_me.#API_sendRXChannels(c_currentEngagedUnitRX, p_me.v_axes);
+            p_me.lastSentAxes = [p_me.v_axes[0], p_me.v_axes[1], p_me.v_axes[2], p_me.v_axes[3]];
+            p_me.lastSentTime = now;
+            p_me.v_sendAxes = false;
+        } else {
+            p_me.v_sendAxes = true;
+        }
     }
 }
 

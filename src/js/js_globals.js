@@ -140,7 +140,12 @@ class GLOBALS {
 		this.BUTTON_FUNTION_ARM = 1;
 		this.BUTTON_FUNTION_RTL = 2;
 		this.BUTTON_FUNTION_LAND = 3;
+		this.GP_EPSILON_CHANGE = 0.02;
+		this.GP_SUDDEN_CHANGE = 0.20;
+		this.GP_MIN_GAP_FAST_MS = 80;
+		this.GP_HEARTBEAT_MS = 2500;
 
+		
 		// Mission File Extension
 		this.v_mission_file_extension = '.de';
 

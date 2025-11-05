@@ -131,14 +131,17 @@ class CGamePadButtonFunctions {
             if (!buttonConfig) return;
 
             if (button.m_pressed === true) {
-                buttonConfig.onPress(c_currentEngagedUnitRX);
+                js_common.fn_console_log({ tag: 'BTN_ACTION', when: now, idx: buttonIndex, func: buttonFunction, action: 'press' });
+                if (typeof buttonConfig.onPress === 'function') {
+                    buttonConfig.onPress(c_currentEngagedUnitRX);
+                }
             }
             else {
-                buttonConfig.onRelease(c_currentEngagedUnitRX);
+                js_common.fn_console_log({ tag: 'BTN_ACTION', when: now, idx: buttonIndex, func: buttonFunction, action: 'release' });
+                if (typeof buttonConfig.onRelease === 'function') {
+                    buttonConfig.onRelease(c_currentEngagedUnitRX);
+                }
             }
-
-
-            js_common.fn_console_log("fn_sendButtons", buttonFunction);
         });
     }
 
