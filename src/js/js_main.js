@@ -33,6 +33,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
+import {js_websocket_bridge} from './CPC/js_websocket_bridge.js'
 import i18n from './i18n.js';
 
 var oldAppend = $.fn.append;
@@ -3213,4 +3214,6 @@ export function fn_on_ready() {
 
 	js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, fn_connectWebSocket);
 
+	//js_channel.fn_init();
+	js_websocket_bridge.fn_init();
 };  // end of onReady

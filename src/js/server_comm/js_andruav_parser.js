@@ -24,6 +24,7 @@ import * as js_andruavMessages from '../js_andruavMessages.js';
 import * as js_common from '../js_common.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
+import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js';
 
 
 import { mavlink20, MAVLink20Processor } from '../js_mavlink_v2.js'
@@ -1259,6 +1260,8 @@ class CAndruavClientParser {
     * @param p_mavlinkPacket: should be a mavlink message.
     */
     #prv_parseUnitMavlinkMessage(p_unit, p_mavlinkPacket) {
+        js_websocket_bridge.sendMessage(p_mavlinkPacket);
+            
         const messages = this.mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
         for (const c_mavlinkMessage of messages) {
             if (c_mavlinkMessage.id === -1) {
