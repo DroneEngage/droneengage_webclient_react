@@ -711,5 +711,30 @@ export class CCommandAPI {
         return msg;
     }
 
+    static API_doChangeAltitude(p_altitude) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude,
+            'ms': {
+                a: parseInt(p_altitude)
+            }
+        };
+
+        return msg;
+    }
+
+    static API_doYaw(p_targetAngle, p_turnRate, p_isClockwise, p_isRelative) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW,
+            'ms': {
+                A: parseFloat(p_targetAngle),
+                R: parseFloat(p_turnRate),
+                C: p_isClockwise,
+                L: p_isRelative
+            }
+        };
+
+        return msg;
+    }
+
 }
 
