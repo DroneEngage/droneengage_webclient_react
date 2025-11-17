@@ -355,23 +355,19 @@ class CAndruavClientFacade {
 
     API_do_ChangeAltitude(p_andruavUnit, param_altitude) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        let msg = {
-            a: parseInt(param_altitude)
-        };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude, msg);
+        
+        const cmd = CCommandAPI.API_doChangeAltitude(param_altitude);
+        
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
-    API_do_YAW(p_andruavUnit, var_targetAngle, var_turnRate, var_isClockwise, var_isRelative) {
+    API_do_YAW(p_andruavUnit, v_targetAngle, v_turnRate, v_isClockwise, v_isRelative) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        let msg = {
-            A: parseFloat(var_targetAngle),
-            R: parseFloat(var_turnRate),
-            C: var_isClockwise,
-            L: var_isRelative
-
-        };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW, msg);
+        
+        const cmd = CCommandAPI.API_doYaw(v_targetAngle, v_turnRate, v_isClockwise, v_isRelative);
+        
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
