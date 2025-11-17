@@ -32,6 +32,8 @@ export let CONST_ANDRUAV_URL = "https://cloud.ardupilot.org/andruav-how-to-compi
 export let CONST_ANDRUAV_URL_ENABLE = true;
 export let CONST_ACCOUNT_URL_ENABLE = true;
 
+export let CONST_WEBSOCKET_BRIDGE_PORT = 8812;
+
 // CHOOSE YOUR MAP SOURCE
 export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ";
 //export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
