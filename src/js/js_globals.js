@@ -14,6 +14,9 @@ class GLOBALS {
 		this.m_markGuided = null;
 
 		this.v_waypointsCache = {};
+
+		this.m_current_tab_status = 'unknown';
+		
 		this.planes_icon = ['/images/planetracker_r_0d_.png',
 			'/images/planetracker_y_0d_.png',
 			'/images/planetracker_g_0d_.png',
