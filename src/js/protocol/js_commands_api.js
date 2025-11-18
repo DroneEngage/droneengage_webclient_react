@@ -9,7 +9,8 @@
 
 
 import * as js_andruavMessages from './js_andruavMessages.js';
-import * as js_common from './js_common.js'
+import * as js_common from '../js_common.js'
+import { mavlink20 } from '../js_mavlink_v2.js'
 
 export class CCommandAPI {
 
@@ -730,6 +731,20 @@ export class CCommandAPI {
                 R: parseFloat(p_turnRate),
                 C: p_isClockwise,
                 L: p_isRelative
+            }
+        };
+
+        return msg;
+    }
+
+    static API_requestMavlinkHeartBeat()
+    {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms': {
+                C:js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink,
+                Act: mavlink20.MAVLINK_MSG_ID_HEARTBEAT
             }
         };
 

@@ -13,7 +13,7 @@ import {
     fn_clearWayPoints, fn_putWayPoints
 } from '../../js/js_main.js'
 
-import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 
 
 import { ClssCtrlUnitLog } from './jsc_ctrl_log_tab.jsx' // add extension to allow encryptor to see it as same as file name.

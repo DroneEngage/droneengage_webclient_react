@@ -7,7 +7,7 @@ import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_mission_plan from '../../../js/js_plan_mission.js'
 import * as js_fence_plan from '../../../js/js_mission_fence.js'
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 
 import {js_leafletmap} from '../../../js/js_leafletmap.js'
 import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../../js/js_main.js'

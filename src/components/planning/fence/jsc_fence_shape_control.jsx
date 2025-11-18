@@ -5,7 +5,7 @@ import React    from 'react';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 
 
 const DEFAULT_DISTANCE = 10;

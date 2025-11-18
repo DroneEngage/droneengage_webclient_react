@@ -3,7 +3,7 @@ import { EVENTS as js_event } from '../js_eventList.js'
 import * as js_helpers from '../js_helpers.js';
 import * as js_siteConfig from '../js_siteConfig.js';
 import * as js_andruavUnit from '../js_andruavUnit.js';
-import * as js_andruavMessages from '../js_andruavMessages.js';
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 
 import * as js_common from '../js_common.js'
 import { js_localStorage } from '../js_localStorage.js'

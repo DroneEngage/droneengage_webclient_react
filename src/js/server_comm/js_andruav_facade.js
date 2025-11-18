@@ -22,11 +22,11 @@ import * as js_siteConfig from '../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import { js_andruav_gamepad } from '../js_andruav_gamepad.js'
 import * as js_andruavUnit from '../js_andruavUnit.js';
-import * as js_andruavMessages from '../js_andruavMessages.js';
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 
 import * as js_common from '../js_common.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
-import { CCommandAPI } from '../js_commands_api.js'
+import { CCommandAPI } from '../protocol/js_commands_api.js'
 
 import * as js_andruav_ws from './js_andruav_ws.js';
 import * as js_andruav_parser from './js_andruav_parser.js'
@@ -1222,6 +1222,15 @@ class CAndruavClientFacade {
             js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS);
         }
         const cmd = CCommandAPI.API_fetchConfigJSON(p_module);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+
+    API_requestMavlinkHeartBeat(p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_requestMavlinkMsgID(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 

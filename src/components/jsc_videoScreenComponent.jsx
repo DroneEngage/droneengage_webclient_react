@@ -9,7 +9,7 @@ import { js_eventEmitter } from '../js/js_eventEmitter'
 import * as js_common from '../js/js_common.js'
 import {EVENTS as js_event} from '../js/js_eventList.js'
 import * as js_andruavUnit from '../js/js_andruavUnit'
-import * as js_andruavMessages from '../js/js_andruavMessages'
+import * as js_andruavMessages from '../js/protocol/js_andruavMessages'
 
 import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../js/js_main'
 import ClssCtrlGPIO_Flash from './gadgets/jsc_ctrl_gpio_flash.jsx'

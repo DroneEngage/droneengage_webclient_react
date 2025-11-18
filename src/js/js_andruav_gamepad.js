@@ -12,7 +12,7 @@
  *************************************************************************************/
 
 
-import * as js_andruavMessages from './js_andruavMessages';
+import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import * as js_helpers from '../js/js_helpers';
 import { js_globals } from './js_globals';
 import { EVENTS as js_event } from './js_eventList.js';

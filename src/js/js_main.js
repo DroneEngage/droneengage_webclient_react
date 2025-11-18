@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RecordRTC from 'recordrtc';
 
 
-import * as js_andruavMessages from './js_andruavMessages'
+import * as js_andruavMessages from './protocol/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';

@@ -5,7 +5,7 @@ import { js_globals } from '../../js/js_globals.js';
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import { hlp_getFlightMode, fn_switchGPS, fn_openFenceManager, fn_isBadFencing } from '../../js/js_main.js';
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
-import * as js_andruavMessages from '../../js/js_andruavMessages.js';
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages';
 import ClssCtrlUDPPoxyTelemetry from '../gadgets/jsc_ctrl_udp_proxy_telemetry.jsx';
 import { ClssCtrlHUD } from '../gadgets/jsc_ctrl_hudControl.jsx';
 import { ClssCtrlDirections } from '../gadgets/jsc_ctrl_directions_control.jsx';
