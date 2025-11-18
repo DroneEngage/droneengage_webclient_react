@@ -1,6 +1,6 @@
 import * as js_siteConfig from './js_siteConfig.js';
 import { EVENTS as js_event } from './js_eventList.js';
-import * as js_andruavMessages from './js_andruavMessages';
+import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import { js_eventEmitter } from './js_eventEmitter';
 
 // Constants

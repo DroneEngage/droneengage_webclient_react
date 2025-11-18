@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import * as js_andruavMessages from '../js/js_andruavMessages';
+import * as js_andruavMessages from '../js/protocol/js_andruavMessages.js';
 import * as js_common from '../js/js_common.js';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_globals } from '../js/js_globals.js';

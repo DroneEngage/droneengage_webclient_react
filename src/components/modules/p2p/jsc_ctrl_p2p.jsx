@@ -9,7 +9,7 @@ import React    from 'react';
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
 import {js_andruavAuth} from '../../../js/js_andruav_auth.js'
 

@@ -16,7 +16,7 @@
 /*jshint esversion: 6 */
 
 import * as js_siteConfig from './js_siteConfig.js';
-import * as js_andruavMessages from "./js_andruavMessages";
+import * as js_andruavMessages from "./protocol/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
 import { js_globals } from "./js_globals.js";
 import { EVENTS as js_event } from './js_eventList.js'

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import * as js_common from './js_common.js'
-import * as js_andruavMessages from './js_andruavMessages'
+import * as js_andruavMessages from './protocol/js_andruavMessages'
 import { EVENTS as js_event } from './js_eventList.js'
 import * as js_siteConfig from './js_siteConfig'
 import { js_eventEmitter } from './js_eventEmitter'
