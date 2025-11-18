@@ -2,7 +2,7 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
 import {js_speak} from '../../js/js_speak'
 import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, gui_doYAW} from '../../js/js_main'

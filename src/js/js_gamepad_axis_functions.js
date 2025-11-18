@@ -1,6 +1,6 @@
 import * as js_andruavUnit from './js_andruavUnit'
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
-import * as js_andruavMessages from './js_andruavMessages';
+import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import * as js_common from './js_common.js'
 
 import { js_globals } from './js_globals.js';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 import * as js_common from '../../../js/js_common.js'
 
 
