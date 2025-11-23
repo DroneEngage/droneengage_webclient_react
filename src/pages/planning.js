@@ -49,23 +49,6 @@ const Planning = () => {
 								</div>
 							</div>
 						</div>
-
-						<div id="modal_AlertConfirmation" className="modal fade" role="dialog">
-							<div className="modal-dialog">
-								<div className="modal-content">
-									<div className="modal-header">
-										<h4 id="title" className="modal-title bg-success p-1 text-white"><strong>Attention:</strong> Delete Operation.</h4>
-										<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-									</div>
-									<div className="modal-body  text-white">
-										<p>Mota2aked wala la2</p>
-									</div>
-									<div className="modal-footer">
-										<button type="button" className="btn btn-muted" data-bs-dismiss="modal">Cancel</button>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
 
 				</div>
