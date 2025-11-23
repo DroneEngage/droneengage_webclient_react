@@ -281,7 +281,7 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 			'aria-modal': 'true',
 			'aria-labelledby': 'title',
 			'tabindex': '-1'
-		}).focus(); // Focus the modal
+		}).trigger('focus'); // Focus the modal
 
 		js_common.showModal('#modal_saveConfirmation', true);
 	} else {
@@ -1110,7 +1110,8 @@ export function fn_doSetHome(p_partyID, p_latitude, p_longitude, p_altitude) {
 
 	let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 	if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
-		fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT, "Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
+		fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT,
+			"Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
 			if (p_approved === false) return;
 			js_speak.fn_speak('home sent');
 			js_globals.v_andruavFacade.API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude);
@@ -3214,6 +3215,4 @@ export function fn_on_ready() {
 
 	js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, fn_connectWebSocket);
 
-	//js_channel.fn_init();
-	js_websocket_bridge.fn_init();
 };  // end of onReady
