@@ -737,14 +737,14 @@ export class CCommandAPI {
         return msg;
     }
 
-    static API_requestMavlinkHeartBeat()
+    static API_requestMavlinkMsg(p_msgID)
     {
         const msg =
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
             'ms': {
                 C:js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink,
-                Act: mavlink20.MAVLINK_MSG_ID_HEARTBEAT
+                Act: p_msgID
             }
         };
 

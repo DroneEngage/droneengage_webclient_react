@@ -11,6 +11,8 @@ import { js_localStorage } from '../js/js_localStorage';
 import { js_andruavAuth } from '../js/js_andruav_auth';
 import { ClssFireEvent } from './micro_gadgets/jsc_mctrl_fire_event.jsx';
 import { setSelectedMissionFilePathToWrite } from '../js/js_main.js';
+import {js_websocket_bridge} from '../js/CPC/js_websocket_bridge.js'
+
 
 class ClssDefault extends React.Component {
   constructor() {
@@ -248,6 +250,7 @@ class ClssPreferences extends React.Component {
     this.m_tabsDisplayeRef = React.createRef();
     this.m_unitSortRef = React.createRef();
     this.m_advancedRef = React.createRef();
+    this.m_ws2wsRef = React.createRef();
     this.m_gcsDisplayRef = React.createRef();
     this.m_gcsShowMeRef = React.createRef();
   }
@@ -260,6 +263,7 @@ class ClssPreferences extends React.Component {
     this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
+    this.m_ws2wsRef.current.checked = false;
   }
 
   componentWillUnmount() { }
@@ -292,6 +296,19 @@ class ClssPreferences extends React.Component {
     const enabled = e.currentTarget.checked;
     js_localStorage.fn_setAdvancedOptionsEnabled(enabled);
     js_eventEmitter.fn_dispatch(js_event.EE_onAdvancedMode);
+  }
+
+  fn_enableWS2WS(e)
+  {
+    const enabled = e.currentTarget.checked;
+    if (enabled === true)
+    {
+      js_websocket_bridge.fn_init();
+    }
+    else
+    {
+      js_websocket_bridge.fn_uninit();
+    }
   }
 
   fn_enableTabsDisplay(e) {
@@ -418,6 +435,16 @@ class ClssPreferences extends React.Component {
             id="check_advanced"
             ref={this.m_advancedRef}
             onClick={(e) => this.fn_enableAdvanced(e)}
+          />
+          <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_r">
+            Mavlink3D
+          </label>
+          <input
+            className="form-check-input col-sm-8"
+            type="checkbox"
+            id="enable_ws2ws_socket"
+            ref={this.m_ws2wsRef}
+            onClick={(e) => this.fn_enableWS2WS(e)}
           />
         </div>
       </fieldset>
