@@ -1228,10 +1228,16 @@ class CAndruavClientFacade {
 
     API_requestMavlinkHeartBeat(p_andruavUnit)
     {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        let v_partyID= '';
 
-        const cmd = CCommandAPI.API_requestMavlinkMsgID(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
+        {
+            v_partyID = p_andruavUnit.getPartyID();
+        }
+
+        const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
+        console.log("API_requestMavlinkHeartBeat");
     }
 
     // receives event from gamepad and store it for sending.

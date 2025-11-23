@@ -1,5 +1,7 @@
 import * as js_siteConfig from '../js_siteConfig.js';
 
+import * as js_andruav_facade from '../server_comm/js_andruav_facade.js';
+
 /**
  * CWebSocketBridge is a WebSocket client implementation that connects to a target port
  * and provides methods for sending and receiving messages.
@@ -15,6 +17,8 @@ class CWebSocketBridge {
         this.m_socket = null;
         this.m_isConnected = false;
         this.m_reconnectTimer = null;
+        this.m_heartbeatTimer = null;
+        this.m_heartbeatIntervalMs = 10000; // 1 per 10 sec MAVLink heartbeat
     }
 
     /**
@@ -43,6 +47,7 @@ class CWebSocketBridge {
         // Set up event handlers
         this.m_socket.onopen = () => {
             this.m_isConnected = true;
+            this.#fn_startHeartbeat();
         };
 
         this.m_socket.onmessage = (event) => {
@@ -50,11 +55,25 @@ class CWebSocketBridge {
         };
 
         this.m_socket.onerror = () => {
-            // WebSocket error will be followed by close in most cases
+            // Ensure we clean up and trigger reconnect on error as well
+            this.m_isConnected = false;
+            this.#fn_stopHeartbeat();
+
+            try {
+                if (this.m_socket &&
+                    this.m_socket.readyState !== WebSocket.CLOSING &&
+                    this.m_socket.readyState !== WebSocket.CLOSED)
+                {
+                    this.m_socket.close();
+                }
+            } catch (e) {
+                // ignore close errors
+            }
         };
 
         this.m_socket.onclose = () => {
             this.m_isConnected = false;
+            this.#fn_stopHeartbeat();
             this.m_socket = null;
 
             // Reconnect after a short delay
@@ -66,6 +85,14 @@ class CWebSocketBridge {
                 }, 3000);
             }
         };
+    }
+
+    fn_uninit()
+    {
+        this.m_isConnected = false;
+        this.#fn_stopHeartbeat();
+        this.m_reconnectTimer = null;
+        this.m_socket = null;
     }
 
     /**
@@ -99,14 +126,10 @@ class CWebSocketBridge {
             payload = (typeof p_message === 'string') ? p_message : JSON.stringify(p_message);
         }
 
-        // Send the message if the socket is connected, otherwise try to reconnect
+        // Send the message if the socket is connected
         if (this.m_socket && this.m_socket.readyState === WebSocket.OPEN)
         {
             this.m_socket.send(payload);
-        }
-        else
-        {
-            this.fn_init();
         }
     }
 
@@ -118,6 +141,41 @@ class CWebSocketBridge {
     {
         // Log the received message
         console.log('WebSocket bridge received message:', data);
+    }
+
+    #fn_startHeartbeat()
+    {
+        if (this.m_heartbeatTimer !== null)
+        {
+            return;
+        }
+
+        this.m_heartbeatTimer = window.setInterval(() => {
+            if (!this.m_isConnected || !this.m_socket || this.m_socket.readyState !== WebSocket.OPEN)
+            {
+                return;
+            }
+
+            try
+            {
+                js_andruav_facade.AndruavClientFacade.API_requestMavlinkHeartBeat();
+            }
+            catch (e)
+            {
+                // Swallow errors to avoid breaking the heartbeat loop
+            }
+        }, this.m_heartbeatIntervalMs);
+    }
+
+    #fn_stopHeartbeat()
+    {
+        if (this.m_heartbeatTimer === null)
+        {
+            return;
+        }
+
+        window.clearInterval(this.m_heartbeatTimer);
+        this.m_heartbeatTimer = null;
     }
 }
 
