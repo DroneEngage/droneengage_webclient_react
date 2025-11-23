@@ -1237,7 +1237,6 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
         js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
-        console.log("API_requestMavlinkHeartBeat");
     }
 
     // receives event from gamepad and store it for sending.
