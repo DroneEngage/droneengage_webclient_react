@@ -173,6 +173,14 @@ h1.font-thin
 	direction: ltr;
 }
 
+.modal {
+  z-index: 2000 !important;
+}
+
+.modal-backdrop {
+  z-index: 1900 !important;
+}
+
 .modal-header .close
 {
 	/*Extend FEATURE*/
