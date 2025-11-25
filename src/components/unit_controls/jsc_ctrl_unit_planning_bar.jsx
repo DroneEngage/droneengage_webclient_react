@@ -195,7 +195,7 @@ class ClssCtrlUnitPlanningBar extends React.Component {
                 }
             }
         }
-        js_common.fn_console_log("online_comment:" + online_comment);
+        //js_common.fn_console_log("online_comment:" + online_comment);
 
         let rows = [];
         let sys_id = "";
