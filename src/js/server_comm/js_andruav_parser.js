@@ -739,7 +739,7 @@ class CAndruavClientParser {
                 const geoFenceAttachStatus = {};
                 geoFenceAttachStatus.fenceName = p_jmsg.n;
                 geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                const fence = Me.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
+                const fence = this.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
 
                 if (geoFenceAttachStatus.isAttachedToFence === true) { /*
 						* If Action Attach:
@@ -748,7 +748,7 @@ class CAndruavClientParser {
 							// 2- Add this Drone to the fence
 						*/
                     if (fence === null || fence === undefined) {
-                        Me.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
+                        js_andruav_facade.AndruavClientFacade.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
                         return;
                     } else {
                         if (fence.Units[p_unit.getPartyID()] === null || fence.Units[p_unit.getPartyID()] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
