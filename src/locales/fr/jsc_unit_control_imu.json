@@ -1,0 +1,60 @@
+{
+    "telemetry": {
+        "flightModeTitle": "Mode de Vol",
+        "noFCB": "Pas de FC Connecté",
+        "mode": "mode - {{mode}}",
+        "connectTitle": "Cliquer pour connecter le FC si pas actif",
+        "mode": "mode - {{mode}}",
+        "connectTitle": "Cliquer pour connecter le FC si pas actif",
+        "flightModeTitle": "Mode de Vol"
+    },
+    "distance": {
+        "title": "Distance de l'unité par rapport à moi (Location du Navigateur)",
+        "noUnitGPS": "Pas de GPS pour l'unité",
+        "noGCSGPS": "Pas de GPS pour GCS",
+        "label": "DFM"
+    },
+    "fence": {
+        "title": "Status VIolation Geofence",
+        "unknown": "Inconnu",
+        "bad": "Mauvais",
+        "good": "Bien",
+        "noViolation": "Pas de violation"
+    },
+    "hud": {
+        "label": "HUD",
+        "unknown": "HUD - unknown",
+        "title": "Pitch"
+    },
+    "bearing": {
+        "label": "cap/cible"
+    },
+    "gps": {
+        "noFix": "Pas de Fix",
+        "3dFix": "3D Fix",
+        "dgps": "DGPS",
+        "rtkFloat": "RTK-Fl",
+        "rtkFixed": "RTK-Fx",
+        "static": "static",
+        "ppp": "ppp",
+        "noGps": "Pas de GPS",
+        "status": "Status GPS",
+        "auto": "GPS Auto",
+        "mobile": "GPS depuis Mobile",
+        "fcb": "GPS depuis FC",
+        "satCount": "[{{count}} sats]"
+    },
+    "flight": {
+        "totalFlying": "Temps total de vol: {{time}}",
+        "diving": "Plongé",
+        "flying": "En vol",
+        "onGround": "Au sol"
+    },
+    "waypoint": {
+        "title": "Distance du prochain waypoint",
+        "na": "na",
+        "m": " m",
+        "ft": " ft",
+        "to": " >> {{num}}/{{count}}"
+    }
+}

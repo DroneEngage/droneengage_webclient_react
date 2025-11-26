@@ -1,0 +1,9 @@
+{
+    "leader": "Leader",
+    "unfollow": "Ne plus suivre",
+    "none": "rien",
+    "notLeader": "Pas Leader",
+    "buttonGroupLabel": "Groupe de boutons avec menu déroulant",
+    "leaderTitle": "{{leader}} / Suiveur: {{follower}}",
+    "followingTitle": "Leader, je suis"
+}
