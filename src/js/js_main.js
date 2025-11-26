@@ -1364,8 +1364,10 @@ export function toggleRecrodingVideo(p_andruavUnit) {
 export function fn_isBadFencing(p_andruavUnit) {
 	// !TODO CREATE A CONTROL.
 
-	let keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
-	let size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
+	if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return 0b00;
+
+	const keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
+	const size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
 
 	/* 
 		bit 0: out of green zone

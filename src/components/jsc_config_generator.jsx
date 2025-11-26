@@ -69,6 +69,11 @@ export default class ClssConfigGenerator extends React.Component {
     js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
   }
 
+  componentDidMount () {
+        this.m_flag_mounted = true;
+  }
+
+    
   componentWillUnmount() {
     js_eventEmitter.fn_unsubscribe(js_event.EE_displayConfigGenerator, this);
   }

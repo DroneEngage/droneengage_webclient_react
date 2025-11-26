@@ -53,6 +53,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
 
     componentDidMount() {
+        this.m_flag_mounted = true;
         this.setState({ m_update: 1 });
     }
 
