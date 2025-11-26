@@ -28,8 +28,19 @@ export default class ClssModuleDetails extends React.Component {
     }
 
     fn_shutdownModule(p_module_key) {
-        console.log(p_module_key);
-        js_globals.v_andruavFacade.API_doModuleConfigAction(this.props.p_unit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+        const c_module_key = p_module_key;
+        const me  = this;
+            fn_do_modal_confirmation("WARNING! - Config Change " + this.props.p_unit.m_unitName,
+              "Are you sure you want to apply settings", function (p_approved) {
+                if (p_approved === false) return;
+        
+                js_globals.v_andruavFacade.API_doModuleConfigAction(me.props.p_unit, c_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+
+            
+                console.log('Submitted:', me.state.output);
+                alert("data submitted. you need to restart the module.");
+                
+              }, "YES", "bg-danger text-white");
     }
 
     fn_shutdownBoard(p_module_key) {
