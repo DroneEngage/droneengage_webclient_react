@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "label": "PARAMETRES",
+    "title": "Voir/Cacher les paramètres"
+  },
+  "map": {
+    "label": "MAP",
+    "title": "Voir Map (ctrl+m)"
+  },
+  "camera": {
+    "label": "CAMERA",
+    "title": "Voir Video (ctrl+r)"
+  },
+  "layout": {
+    "label": "FORMULAIRE-{{mode}}",
+    "title": "Modifier la disposition de l'écran (utilisez les touches de 1 à 6)"
+  },
+  "layoutSmall": {
+    "label": "affichage-{{mode}}",
+    "title": "Modifier la disposition de l'écran"
+  }
+}

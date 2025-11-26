@@ -1,0 +1,11 @@
+{
+  "online": "En Ligne",
+  "offline": "Hors-Ligne",
+  "noSignalInfo": "Pas d'infos signal",
+  "takePhoto": "Prendre une Photo",
+  "startLiveStream": "Démarrer Stream en direct",
+  "startRecordingOnDrone": "Démarrer l'enregistrement sur le Drone",
+  "andruavBatteryTooltip": "Andruav batt: {{level}}% {{charging}} {{temp}}",
+  "fcbBatteryTooltip": "FCB batt: {{remaining}}% {{voltage}}V {{current}}A {{consumed}} mAh {{temp}}°C",
+  "networkSignal": "{{networkType}} [{{networkName}}] {{level}} dBm"
+}

@@ -1,0 +1,33 @@
+{
+    "unit": {
+        "m": "m",
+        "ft": "ft"
+    },
+    "speech": {
+        "enabled": "enabled"
+    },
+    "settingsTitle": "paramètres",
+    "defaultsTab": "Defaults",
+    "missionTab": "Mission",
+    "preferencesTab": "Préferences",
+    "altitudeLabel": "Alt Step",
+    "altitudeTitle": "Altitude par défaut pour la commande de montée",
+    "radiusLabel": "Radius",
+    "radiusTitle": "Radius par default pour Circle",
+    "swarmHorizontalLabel": "H-Offset",
+    "swarmHorizontalTitle": "Distance Inter-Drone (SWARM)",
+    "swarmVerticalLabel": "V-Offset",
+    "swarmVerticalTitle": "Altitude Delta (SWARM)",
+    "missionFileLabel": "Fichier Global de Mission",
+    "eventDroneEngageLabel": "Evènement DroneEngage No.",
+    "enableSpeechLabel": "Activer la voix",
+    "volumeLabel": "Volume",
+    "testVolume": "test volume",
+    "tabsDisplayLabel": "Nb Unité dans la tab",
+    "sortUnitsLabel": "Trier les unités (mav_id)",
+    "sortUnitsTitle": "trier le nom des unités de mavlink id",
+    "gcsDisplayLabel": "Voir les GCS connectés",
+    "gcsShowMeLabel": "Me montrer",
+    "gcsShowMeTitle": "Me montrer dans la liste GCS",
+    "advancedOptionsLabel": "Options avancés"
+}
