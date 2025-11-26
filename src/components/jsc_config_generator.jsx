@@ -574,8 +574,6 @@ export default class ClssConfigGenerator extends React.Component {
   }
 
   fn_shutdownModule() {
-    alert("Sending Restart Signal.");
-
     const me  = this;
     fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
       "Are you sure you want to apply settings", function (p_approved) {
