@@ -77,7 +77,7 @@ class ClssCtrlUnitDetails extends React.Component {
         const main_module = (<div key={this.key + 'main_module'} className='row'>
             <div id={this.key + mainModule.i} key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
                 <span>
-                    &nbsp;-&nbsp;
+                    {isExpanded ? '\u00a0-\u00a0' : '\u00a0+\u00a0'}
                     {mainModule.d === true ? (
                         <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
                     ) : (
@@ -107,7 +107,7 @@ class ClssCtrlUnitDetails extends React.Component {
                         <div key={this.key + 'module_' + index} className='row'>
                             <div id={this.key + module.i} key={this.key + module.i} onClick={() => this.fn_toggleModuleExpansion(module.i)} style={{ width: '100%' }}>
                                 <span>
-                                    &nbsp;-&nbsp;
+                                    {isExpanded ? '\u00a0-\u00a0' : '\u00a0+\u00a0'}
                                     {module.d === true ? (
                                         <span className='text-danger'>{module.i}&nbsp;{module.v}</span>
                                     ) : (
