@@ -23,6 +23,7 @@ class ClssLoginControl extends React.Component {
       m_update: 0,
     };
 
+    this.m_flag_mounted = false;
     this.key = Math.random().toString();
     this.txtEmailRef = React.createRef();
     this.txtAccessCodeRef = React.createRef();
@@ -94,6 +95,9 @@ class ClssLoginControl extends React.Component {
   }
 
   componentDidMount() {
+    
+    this.m_flag_mounted = true;
+  
     this.setState({ m_update: 1 });
 
     const tabStatus = getTabStatus();

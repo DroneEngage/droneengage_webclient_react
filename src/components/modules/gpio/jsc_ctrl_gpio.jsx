@@ -28,6 +28,7 @@ export class ClssCtrlGPIO extends React.Component {
     }
 
     componentDidMount() {
+        this.m_flag_mounted = true;
         this.setState({ m_update: 1 });
         js_globals.v_andruavFacade.API_requestGPIOStatus(this.props.p_unit); // retrieve the GPIO status.
     }
