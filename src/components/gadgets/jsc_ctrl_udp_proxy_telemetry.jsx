@@ -17,6 +17,7 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
     this.m_flag_mounted = false;
 
     js_eventEmitter.fn_subscribe(js_event.EE_onProxyInfoUpdated, this, this.fn_onProxyInfoUpdated);
+    js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -25,11 +26,17 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
   }
 
   componentWillUnmount() {
+    js_eventEmitter.fn_unsubscribe(js_event.EE_Language_Changed, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onProxyInfoUpdated, this);
   }
 
   componentDidMount() {
     this.m_flag_mounted = true;
+  }
+
+  fn_updateLanguage(p_me) {
+    if (p_me.m_flag_mounted === false) return;
+    p_me.setState({ m_update: p_me.state.m_update + 1 });
   }
 
   fn_onProxyInfoUpdated(p_me, p_andruavUnit) {
