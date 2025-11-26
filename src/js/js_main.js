@@ -1053,7 +1053,7 @@ function gui_camCtrl(p_partyID) {
 
 }
 
-export function gui_doYAW(p_partyID) {
+export function gui_doYAW(p_partyID, p_onApply) {
 
 
 	let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
@@ -1070,7 +1070,13 @@ export function gui_doYAW(p_partyID) {
 		const target_angle_deg = $('#yaw_knob').val();
 		const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
 		let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
-		fn_doYAW(p_andruavUnit, $('#yaw_knob').val(), 0, !direction, false);
+		const target_angle = $('#yaw_knob').val();
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, target_angle, 0, !direction, false);
+		}
+		else {
+			fn_doYAW(p_andruavUnit, target_angle, 0, !direction, false);
+		}
 	});
 
 	ctrl_yaw = $('#modal_ctrl_yaw').find('#btnResetYaw');
@@ -1078,7 +1084,12 @@ export function gui_doYAW(p_partyID) {
 	ctrl_yaw.on('click', function () {
 		$('#yaw_knob').val(0);
 		$('#yaw_knob').trigger('change');
-		fn_doYAW(p_andruavUnit, -1, 0, true, false);
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, -1, 0, true, false);
+		}
+		else {
+			fn_doYAW(p_andruavUnit, -1, 0, true, false);
+		}
 	});
 
 
@@ -1189,7 +1200,7 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 	js_common.showModal('#modal_changeUnitInfo', true);
 }
 
-export function fn_changeAltitude(p_andruavUnit) {
+export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
@@ -1219,12 +1230,18 @@ export function fn_changeAltitude(p_andruavUnit) {
 			// the GUI in feet and FCB in meters
 			v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 		}
-		// save target speed as indication.
+		let v_alt_cmd;
 		if (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE) {
-			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, -v_alt);
+			v_alt_cmd = -v_alt;
 		}
 		else {
-			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, v_alt);
+			v_alt_cmd = v_alt;
+		}
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, parseFloat(v_alt_cmd));
+		}
+		else {
+			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, v_alt_cmd);
 		}
 	});
 
@@ -1234,7 +1251,7 @@ export function fn_changeAltitude(p_andruavUnit) {
 /**
  Open Change Speed Modal 
 **/
-export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
+export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 	let v_speed_val = p_initSpeed;
@@ -1276,9 +1293,15 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
 			// the GUI in miles and the FCB is meters
 			v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
 		}
+		const v_speed_cmd = parseFloat(v_speed);
 		// save target speed as indication.
-		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
-		js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(v_speed));
+		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed_cmd;
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, v_speed_cmd);
+		}
+		else {
+			js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, v_speed_cmd);
+		}
 	});
 
 	js_common.showModal('#changespeed_modal', true);
