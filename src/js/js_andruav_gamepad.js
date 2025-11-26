@@ -310,8 +310,24 @@ class CAndruavGamePad {
         ];
 
         mappings.forEach(({ axis, routing }) => {
-            const val = Math.max(-1, Math.min(1, p_gamepad.axes[channel_routing[routing]] || 0))
-                .toFixed(2) * c_padStatus.p_channel_axis_reverse[channel_routing[routing]];
+            const sourceAxisIndex = channel_routing[routing];
+            if (sourceAxisIndex == null) {
+                console.log('GamePad axis mapping skipped: undefined sourceAxisIndex for routing', routing);
+                return;
+            }
+            if (sourceAxisIndex < 0 ||
+                sourceAxisIndex >= p_gamepad.axes.length ||
+                sourceAxisIndex >= c_padStatus.p_channel_axis_reverse.length) {
+                console.log('GamePad axis mapping skipped: out-of-range sourceAxisIndex', sourceAxisIndex,
+                    'axes.length=', p_gamepad.axes.length,
+                    'reverse.length=', c_padStatus.p_channel_axis_reverse.length,
+                    'routing=', routing);
+                return;
+            }
+
+            const raw = p_gamepad.axes[sourceAxisIndex] ?? 0;
+            const val = Math.max(-1, Math.min(1, raw))
+                .toFixed(2) * c_padStatus.p_channel_axis_reverse[sourceAxisIndex];
             if (c_padStatus.p_unified_virtual_axis[axis] !== val) {
                 c_padStatus.p_unified_virtual_axis[axis] = val;
                 c_padStatus.p_axesChanged = true;
@@ -320,7 +336,22 @@ class CAndruavGamePad {
 
         c_padStatus.p_other_channel_routing.forEach((item) => {
             const index = item.index;
-            const val = Math.max(-1, Math.min(1, p_gamepad.axes[index] || 0))
+            if (index == null) {
+                console.log('GamePad other axis mapping skipped: undefined index for item', item);
+                return;
+            }
+            if (index < 0 ||
+                index >= p_gamepad.axes.length ||
+                index >= c_padStatus.p_channel_axis_reverse.length) {
+                console.log('GamePad other axis mapping skipped: out-of-range index', index,
+                    'axes.length=', p_gamepad.axes.length,
+                    'reverse.length=', c_padStatus.p_channel_axis_reverse.length,
+                    'item.key=', item.key);
+                return;
+            }
+
+            const raw = p_gamepad.axes[index] ?? 0;
+            const val = Math.max(-1, Math.min(1, raw))
                 .toFixed(2) * c_padStatus.p_channel_axis_reverse[index];
             if (item.val !== val) {
                 c_padStatus.p_axesOtherChanged = true;
@@ -340,7 +371,14 @@ class CAndruavGamePad {
 
         const len = p_gamepad.buttons.length;
         let button_indicies = [];
-        for (let i = 0; i < len; ++i) {
+        const maxButtons = Math.min(
+            len,
+            c_padStatus.p_buttons.length,
+            c_padStatus.p_button_routing.length,
+            c_padStatus.p_button_type.length
+        );
+
+        for (let i = 0; i < maxButtons; ++i) {
             if (c_padStatus.p_button_routing[i] === 0) continue; // skip unmapped button.
             const c_pressed = p_gamepad.buttons[i].pressed;
             const button = c_padStatus.p_buttons[i];
