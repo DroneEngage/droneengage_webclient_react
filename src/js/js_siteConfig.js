@@ -79,6 +79,7 @@ export let CONST_LANGUAGE = {
   ENABLED_LANGUAGES: [
     { code: 'en', label: 'English', className: '' },
     { code: 'ar', label: 'عربى', className: 'rtl' },
+    { code: 'fr', label: 'Français', className: '' },
     { code: 'es', label: 'Español', className: '' },
     { code: 'ru', label: 'Русский', className: '' }
   ],
