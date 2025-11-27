@@ -1065,27 +1065,29 @@ export function gui_doYAW(p_partyID, p_onApply) {
 	js_eventEmitter.fn_dispatch(js_event.EE_displayYawDlgForm, p_andruavUnit);
 
 	let ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
-	ctrl_yaw.unbind("click");
+	ctrl_yaw.off("click");
 	ctrl_yaw.on('click', function () {
-		const target_angle_deg = $('#yaw_knob').val();
-		const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-		let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
 		const target_angle = $('#yaw_knob').val();
 		if (typeof p_onApply === 'function') {
-			p_onApply(p_andruavUnit, target_angle, 0, !direction, false);
+			// In callback mode, pass only the target angle; direction will be computed per-unit by the caller
+			p_onApply(p_andruavUnit, target_angle);
 		}
 		else {
+			const target_angle_deg = target_angle;
+			const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+			let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
 			fn_doYAW(p_andruavUnit, target_angle, 0, !direction, false);
 		}
 	});
 
 	ctrl_yaw = $('#modal_ctrl_yaw').find('#btnResetYaw');
-	ctrl_yaw.unbind("click");
+	ctrl_yaw.off("click");
 	ctrl_yaw.on('click', function () {
 		$('#yaw_knob').val(0);
 		$('#yaw_knob').trigger('change');
 		if (typeof p_onApply === 'function') {
-			p_onApply(p_andruavUnit, -1, 0, true, false);
+			// -1 indicates reset-to-heading; caller will handle direction per-unit
+			p_onApply(p_andruavUnit, -1);
 		}
 		else {
 			fn_doYAW(p_andruavUnit, -1, 0, true, false);

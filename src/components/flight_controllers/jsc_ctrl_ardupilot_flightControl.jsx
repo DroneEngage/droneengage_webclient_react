@@ -4,8 +4,9 @@ import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
+import * as js_helpers from '../../js/js_helpers'
 import {js_speak} from '../../js/js_speak'
-import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, gui_doYAW} from '../../js/js_main'
+import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, gui_doYAW} from '../../js/js_main'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -455,6 +456,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     actionCallback(unit);
                 }
             });
+            // For safety: uncheck the "apply to all" checkbox after each multi-unit action
+            this.setState({ m_applyOnAllSameType: false });
         }
         else {
             actionCallback(v_andruavUnit);
@@ -685,9 +688,19 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     fn_doYawWrapper(v_andruavUnit) {
         if (this.state.m_applyOnAllSameType === true) {
             const me = this;
-            gui_doYAW(v_andruavUnit.getPartyID(), function (p_baseUnit, p_targetAngle, p_turnRate, p_isClockwise, p_isRelative) {
+            gui_doYAW(v_andruavUnit.getPartyID(), function (p_baseUnit, p_targetAngle) {
                 me.fn_applyAction(v_andruavUnit, function (unit) {
-                    gui_doYAW(unit, p_targetAngle, p_turnRate, p_isClockwise, p_isRelative);
+                    if (p_targetAngle === -1) {
+                        // Reset yaw: keep original behavior
+                        fn_doYAW(unit, -1, 0, true, false);
+                    }
+                    else {
+                        // Compute direction per-unit based on its own current heading
+                        const target_angle_deg = parseFloat(p_targetAngle);
+                        const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((unit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+                        let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
+                        fn_doYAW(unit, p_targetAngle, 0, !direction, false);
+                    }
                 });
             });
         }
@@ -771,7 +784,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => gui_doYAW(this.props.v_andruavUnit.getPartyID())}>&nbsp;YAW&nbsp;</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
                     <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
                     </div></div>);
