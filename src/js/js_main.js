@@ -1188,7 +1188,7 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 	$('#modal_changeUnitInfo').find('#title').html('Change Unit Name of ' + p_andruavUnit.m_unitName);
 	$('#modal_changeUnitInfo').find('#txtUnitName').val(p_andruavUnit.m_unitName);
 	$('#modal_changeUnitInfo').find('#txtDescription').val(p_andruavUnit.Description);
-	$('#modal_changeUnitInfo').find('#btnOK').unbind("click");
+	$('#modal_changeUnitInfo').find('#btnOK').off("click");
 	$('#modal_changeUnitInfo').find('#btnOK').on('click', function () {
 		let v_unitName = $('#modal_changeUnitInfo').find('#txtUnitName').val();
 		if (v_unitName === '' || v_unitName === undefined) return;
@@ -1224,7 +1224,7 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 	$('#changespeed_modal').find('#title').html('Change Altitude of ' + p_andruavUnit.m_unitName);
 	$('#changespeed_modal').find('#txtSpeed').val(v_altitude_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html(v_altitude_unit);
-	$('#changespeed_modal').find('#btnOK').unbind('click');
+	$('#changespeed_modal').find('#btnOK').off('click');
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
 		let v_alt = $('#changespeed_modal').find('#txtSpeed').val();
 		if (v_alt === '' || v_alt === undefined || isNaN(v_alt)) return;
@@ -1285,7 +1285,7 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	}
 
 	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').unbind("click");
+	$('#changespeed_modal').find('#btnOK').off("click");
 	$('#changespeed_modal').find('#txtSpeed').val(v_speed_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html(v_speed_unit);
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
@@ -1318,7 +1318,7 @@ export function fn_changeUDPPort(p_andruavUnit, init_pot) {
 	}
 
 	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').unbind("click");
+	$('#changespeed_modal').find('#btnOK').off("click");
 	$('#changespeed_modal').find('#txtSpeed').val(v_port_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html("");
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
