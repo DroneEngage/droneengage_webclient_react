@@ -9,7 +9,8 @@
 
 
 import * as js_andruavMessages from './js_andruavMessages.js';
-import * as js_common from './js_common.js'
+import * as js_common from '../js_common.js'
+import { mavlink20 } from '../js_mavlink_v2.js'
 
 export class CCommandAPI {
 
@@ -663,12 +664,12 @@ export class CCommandAPI {
     }
 
 
-    static API_updateConfigRestart(p_module_key) {
+    static API_doModuleConfigAction(p_module_key, p_action) {
         const msg =
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart,
+                a: p_action,
             }
         };
 
@@ -705,6 +706,45 @@ export class CCommandAPI {
             'ms': {
                 a: js_andruavMessages.CONST_TYPE_CONFIG_REQUEST_FETCH_CONFIG_TEMPLATE,
                 b: p_module.k
+            }
+        };
+
+        return msg;
+    }
+
+    static API_doChangeAltitude(p_altitude) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude,
+            'ms': {
+                a: parseInt(p_altitude)
+            }
+        };
+
+        return msg;
+    }
+
+    static API_doYaw(p_targetAngle, p_turnRate, p_isClockwise, p_isRelative) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW,
+            'ms': {
+                A: parseFloat(p_targetAngle),
+                R: parseFloat(p_turnRate),
+                C: p_isClockwise,
+                L: p_isRelative
+            }
+        };
+
+        return msg;
+    }
+
+    static API_requestMavlinkMsg(p_msgID)
+    {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms': {
+                C:js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink,
+                Act: p_msgID
             }
         };
 

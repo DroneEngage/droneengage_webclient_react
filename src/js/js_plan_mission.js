@@ -8,7 +8,7 @@ import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from "./js_eventEmitter.js";
 import { js_leafletmap } from "./js_leafletmap.js";
 
-import * as js_andruavMessages from "./js_andruavMessages.js";
+import * as js_andruavMessages from "./protocol/js_andruavMessages.js";
 import { js_andruavAuth } from "./js_andruav_auth.js";
 import { ClssAndruavFencePlan } from "./js_plan_fence.js";
 import { mavlink20 } from "./js_mavlink_v2.js";
@@ -506,7 +506,7 @@ export class ClssAndruavMissionPlan {
       const eventFire = marker.m_missionItem.eventFire;
       const eventWait = marker.m_missionItem.eventWait;
 
-      if (marker.m_missionItem.m_missionType !== js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString()) {
+      if (marker.m_missionItem.m_missionType !== js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE) {
         mission_drift += 1; // mission starts from 1 because 0 is home.
         if (eventWaitRequired === true) {
           // WAITING EVENT SHOULD BE THE FIRST THING
@@ -782,9 +782,10 @@ export class ClssAndruavMissionPlan {
       const cmds = [];
       for (let key in marker.m_missionItem.modules) {
         const m = marker.m_missionItem.modules[key];
-        if (m.cmds !== null && m.cmds !== undefined) {
-          for (let key2 in m.cmds) {
-            const single_cmd = m.cmds[key2];
+        if (m.cmd_msgs !== null && m.cmd_msgs !== undefined) {
+          const cmd_msg = m.cmd_msgs;
+          for (let key2 in cmd_msg) {
+            const single_cmd = cmd_msg[key2];
             if (single_cmd === null || single_cmd === undefined) continue;
             cmds.push(single_cmd);
           }
@@ -793,7 +794,7 @@ export class ClssAndruavMissionPlan {
 
       if (cmds === null || cmds === undefined) continue;
 
-      if (marker.m_missionItem.m_missionType === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString()) {
+      if (marker.m_missionItem.m_missionType === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE) {
         fn_addModuleItem(cmds, null,
           eventFireRequired === true ? eventFire : null,
           eventWaitRequired === true ? eventWait : null
@@ -905,7 +906,7 @@ export class ClssAndruavMissionPlan {
           */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
-          fn_addMissionItem(marker, 22, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_TAKEOFF, [
             0.0,
             0.0,
             0.0,
@@ -937,7 +938,7 @@ export class ClssAndruavMissionPlan {
           */
           break;
         case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
-          fn_addMissionItem(marker, 21, [
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_LAND, [
             0.0,
             0.0,
             0.0,
@@ -969,7 +970,7 @@ export class ClssAndruavMissionPlan {
             marker.getLatLng().lng,
             marker.m_missionItem.alt,
           ]);
-          fn_addMissionItem(marker, 20, [0, 0, 0.0, 0.0, 0.0, 0.0, 0.0]);
+          fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_RETURN_TO_LAUNCH, [0, 0, 0.0, 0.0, 0.0, 0.0, 0.0]);
 
           /*step.id = missionCounter;
             step.cmd = 16;
@@ -1016,7 +1017,7 @@ export class ClssAndruavMissionPlan {
           Mission Param #7	Empty
         */
 
-        fn_addMissionItem(marker, 178, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_DO_CHANGE_SPEED, [
           1,
           marker.m_missionItem.speed,
           1,
@@ -1041,7 +1042,7 @@ export class ClssAndruavMissionPlan {
           Mission Param #7	Empty
         */
 
-        fn_addMissionItem(marker, 115, [
+        fn_addMissionItem(marker, mavlink20.MAV_CMD_CONDITION_YAW, [
           marker.m_missionItem.yaw, // param1
           0, // defalt speed [AUTO_YAW_SLEW_RATE]
           0, // direction is not effectve in absolute degree

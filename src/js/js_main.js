@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RecordRTC from 'recordrtc';
 
 
-import * as js_andruavMessages from './js_andruavMessages'
+import * as js_andruavMessages from './protocol/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';
@@ -33,6 +33,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
+import {js_websocket_bridge} from './CPC/js_websocket_bridge.js'
 import i18n from './i18n.js';
 
 var oldAppend = $.fn.append;
@@ -280,7 +281,7 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 			'aria-modal': 'true',
 			'aria-labelledby': 'title',
 			'tabindex': '-1'
-		}).focus(); // Focus the modal
+		}).trigger('focus'); // Focus the modal
 
 		js_common.showModal('#modal_saveConfirmation', true);
 	} else {
@@ -1052,7 +1053,7 @@ function gui_camCtrl(p_partyID) {
 
 }
 
-export function gui_doYAW(p_partyID) {
+export function gui_doYAW(p_partyID, p_onApply) {
 
 
 	let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
@@ -1064,20 +1065,33 @@ export function gui_doYAW(p_partyID) {
 	js_eventEmitter.fn_dispatch(js_event.EE_displayYawDlgForm, p_andruavUnit);
 
 	let ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
-	ctrl_yaw.unbind("click");
+	ctrl_yaw.off("click");
 	ctrl_yaw.on('click', function () {
-		const target_angle_deg = $('#yaw_knob').val();
-		const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-		let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
-		fn_doYAW(p_andruavUnit, $('#yaw_knob').val(), 0, !direction, false);
+		const target_angle = $('#yaw_knob').val();
+		if (typeof p_onApply === 'function') {
+			// In callback mode, pass only the target angle; direction will be computed per-unit by the caller
+			p_onApply(p_andruavUnit, target_angle);
+		}
+		else {
+			const target_angle_deg = target_angle;
+			const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+			let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
+			fn_doYAW(p_andruavUnit, target_angle, 0, !direction, false);
+		}
 	});
 
 	ctrl_yaw = $('#modal_ctrl_yaw').find('#btnResetYaw');
-	ctrl_yaw.unbind("click");
+	ctrl_yaw.off("click");
 	ctrl_yaw.on('click', function () {
 		$('#yaw_knob').val(0);
 		$('#yaw_knob').trigger('change');
-		fn_doYAW(p_andruavUnit, -1, 0, true, false);
+		if (typeof p_onApply === 'function') {
+			// -1 indicates reset-to-heading; caller will handle direction per-unit
+			p_onApply(p_andruavUnit, -1);
+		}
+		else {
+			fn_doYAW(p_andruavUnit, -1, 0, true, false);
+		}
 	});
 
 
@@ -1109,7 +1123,8 @@ export function fn_doSetHome(p_partyID, p_latitude, p_longitude, p_altitude) {
 
 	let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 	if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
-		fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT, "Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
+		fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT,
+			"Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
 			if (p_approved === false) return;
 			js_speak.fn_speak('home sent');
 			js_globals.v_andruavFacade.API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude);
@@ -1173,7 +1188,7 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 	$('#modal_changeUnitInfo').find('#title').html('Change Unit Name of ' + p_andruavUnit.m_unitName);
 	$('#modal_changeUnitInfo').find('#txtUnitName').val(p_andruavUnit.m_unitName);
 	$('#modal_changeUnitInfo').find('#txtDescription').val(p_andruavUnit.Description);
-	$('#modal_changeUnitInfo').find('#btnOK').unbind("click");
+	$('#modal_changeUnitInfo').find('#btnOK').off("click");
 	$('#modal_changeUnitInfo').find('#btnOK').on('click', function () {
 		let v_unitName = $('#modal_changeUnitInfo').find('#txtUnitName').val();
 		if (v_unitName === '' || v_unitName === undefined) return;
@@ -1187,7 +1202,7 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 	js_common.showModal('#modal_changeUnitInfo', true);
 }
 
-export function fn_changeAltitude(p_andruavUnit) {
+export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
@@ -1209,7 +1224,7 @@ export function fn_changeAltitude(p_andruavUnit) {
 	$('#changespeed_modal').find('#title').html('Change Altitude of ' + p_andruavUnit.m_unitName);
 	$('#changespeed_modal').find('#txtSpeed').val(v_altitude_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html(v_altitude_unit);
-	$('#changespeed_modal').find('#btnOK').unbind('click');
+	$('#changespeed_modal').find('#btnOK').off('click');
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
 		let v_alt = $('#changespeed_modal').find('#txtSpeed').val();
 		if (v_alt === '' || v_alt === undefined || isNaN(v_alt)) return;
@@ -1217,12 +1232,18 @@ export function fn_changeAltitude(p_andruavUnit) {
 			// the GUI in feet and FCB in meters
 			v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 		}
-		// save target speed as indication.
+		let v_alt_cmd;
 		if (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE) {
-			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, -v_alt);
+			v_alt_cmd = -v_alt;
 		}
 		else {
-			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, v_alt);
+			v_alt_cmd = v_alt;
+		}
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, parseFloat(v_alt_cmd));
+		}
+		else {
+			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, v_alt_cmd);
 		}
 	});
 
@@ -1232,7 +1253,7 @@ export function fn_changeAltitude(p_andruavUnit) {
 /**
  Open Change Speed Modal 
 **/
-export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
+export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 	let v_speed_val = p_initSpeed;
@@ -1264,7 +1285,7 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
 	}
 
 	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').unbind("click");
+	$('#changespeed_modal').find('#btnOK').off("click");
 	$('#changespeed_modal').find('#txtSpeed').val(v_speed_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html(v_speed_unit);
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
@@ -1274,9 +1295,15 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed) {
 			// the GUI in miles and the FCB is meters
 			v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
 		}
+		const v_speed_cmd = parseFloat(v_speed);
 		// save target speed as indication.
-		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed;
-		js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(v_speed));
+		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed_cmd;
+		if (typeof p_onApply === 'function') {
+			p_onApply(p_andruavUnit, v_speed_cmd);
+		}
+		else {
+			js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, v_speed_cmd);
+		}
 	});
 
 	js_common.showModal('#changespeed_modal', true);
@@ -1291,7 +1318,7 @@ export function fn_changeUDPPort(p_andruavUnit, init_pot) {
 	}
 
 	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').unbind("click");
+	$('#changespeed_modal').find('#btnOK').off("click");
 	$('#changespeed_modal').find('#txtSpeed').val(v_port_val);
 	$('#changespeed_modal').find('#txtSpeedUnit').html("");
 	$('#changespeed_modal').find('#btnOK').on('click', function () {
@@ -1362,8 +1389,10 @@ export function toggleRecrodingVideo(p_andruavUnit) {
 export function fn_isBadFencing(p_andruavUnit) {
 	// !TODO CREATE A CONTROL.
 
-	let keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
-	let size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
+	if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return 0b00;
+
+	const keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
+	const size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
 
 	/* 
 		bit 0: out of green zone

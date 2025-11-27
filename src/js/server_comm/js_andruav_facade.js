@@ -22,11 +22,11 @@ import * as js_siteConfig from '../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import { js_andruav_gamepad } from '../js_andruav_gamepad.js'
 import * as js_andruavUnit from '../js_andruavUnit.js';
-import * as js_andruavMessages from '../js_andruavMessages.js';
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 
 import * as js_common from '../js_common.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
-import { CCommandAPI } from '../js_commands_api.js'
+import { CCommandAPI } from '../protocol/js_commands_api.js'
 
 import * as js_andruav_ws from './js_andruav_ws.js';
 import * as js_andruav_parser from './js_andruav_parser.js'
@@ -55,6 +55,8 @@ class CAndruavClientFacade {
         this.v_axes = null;
         this.v_sendAxes = false;
         this.v_sendAxes_skip = 0;
+        this.lastSentAxes = null;
+        this.lastSentTime = 0;
 
         this.fn_init();
 
@@ -101,16 +103,49 @@ class CAndruavClientFacade {
 
     // EVENT HANDLER AREA
     #fn_sendRXChannels(p_me) {
-        if (p_me.v_sendAxes === false) {
-            p_me.v_sendAxes_skip++;
-            if (p_me.v_sendAxes_skip % 4 !== 0) return;
+        const unit = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        if (!unit) return;
+        const axes = p_me.v_axes;
+        if (axes === null || axes === undefined) return;
+
+        const now = Date.now();
+        const epsilon = js_globals.GP_EPSILON_CHANGE;
+        const heartbeat = js_globals.GP_HEARTBEAT_MS;
+
+        let shouldSend = false;
+        let reason = 'initial';
+        if (p_me.lastSentAxes === null) {
+            shouldSend = true;
+            reason = 'initial';
+        } else {
+            const d0 = Math.abs(parseFloat(axes[0]) - parseFloat(p_me.lastSentAxes[0]));
+            const d1 = Math.abs(parseFloat(axes[1]) - parseFloat(p_me.lastSentAxes[1]));
+            const d2 = Math.abs(parseFloat(axes[2]) - parseFloat(p_me.lastSentAxes[2]));
+            const d3 = Math.abs(parseFloat(axes[3]) - parseFloat(p_me.lastSentAxes[3]));
+            const maxDelta = Math.max(d0, d1, d2, d3);
+            if (maxDelta >= epsilon) {
+                shouldSend = true;
+                reason = 'delta';
+            } else if ((now - p_me.lastSentTime) >= heartbeat) {
+                shouldSend = true;
+                reason = 'heartbeat';
+            }
         }
 
-        p_me.v_sendAxes = false;
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
-        if (!c_currentEngagedUnitRX) return;
-
-        if (this.v_axes !== null) this.#API_sendRXChannels(c_currentEngagedUnitRX, this.v_axes);
+        if (shouldSend) {
+            try {
+                const d0 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[0]) - parseFloat(p_me.lastSentAxes[0])) : null);
+                const d1 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[1]) - parseFloat(p_me.lastSentAxes[1])) : null);
+                const d2 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[2]) - parseFloat(p_me.lastSentAxes[2])) : null);
+                const d3 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[3]) - parseFloat(p_me.lastSentAxes[3])) : null);
+                const maxDeltaLog = (d0===null)?null:Math.max(d0,d1,d2,d3);
+                js_common.fn_console_log({ tag: 'RC_SEND', when: now, reason: reason, maxDelta: maxDeltaLog, axes: [axes[0],axes[1],axes[2],axes[3]] });
+            } catch(e) {}
+            p_me.#API_sendRXChannels(unit, axes);
+            p_me.lastSentAxes = [axes[0], axes[1], axes[2], axes[3]];
+            p_me.lastSentTime = now;
+            p_me.v_sendAxes = false;
+        }
     }
 
     /**
@@ -320,23 +355,19 @@ class CAndruavClientFacade {
 
     API_do_ChangeAltitude(p_andruavUnit, param_altitude) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        let msg = {
-            a: parseInt(param_altitude)
-        };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_ChangeAltitude, msg);
+        
+        const cmd = CCommandAPI.API_doChangeAltitude(param_altitude);
+        
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
-    API_do_YAW(p_andruavUnit, var_targetAngle, var_turnRate, var_isClockwise, var_isRelative) {
+    API_do_YAW(p_andruavUnit, v_targetAngle, v_turnRate, v_isClockwise, v_isRelative) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        let msg = {
-            A: parseFloat(var_targetAngle),
-            R: parseFloat(var_turnRate),
-            C: var_isClockwise,
-            L: var_isRelative
-
-        };
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_DoYAW, msg);
+        
+        const cmd = CCommandAPI.API_doYaw(v_targetAngle, v_turnRate, v_isClockwise, v_isRelative);
+        
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
@@ -1167,10 +1198,10 @@ class CAndruavClientFacade {
     };
 
 
-    API_updateConfigRestart(p_andruavUnit, p_module_key) {
+    API_doModuleConfigAction(p_andruavUnit, p_module_key, p_action) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_updateConfigRestart(p_module_key);
+        const cmd = CCommandAPI.API_doModuleConfigAction(p_module_key, p_action);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
     }
@@ -1194,6 +1225,20 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
+
+    API_requestMavlinkHeartBeat(p_andruavUnit)
+    {
+        let v_partyID= '';
+
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
+        {
+            v_partyID = p_andruavUnit.getPartyID();
+        }
+
+        const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
+    }
+
     // receives event from gamepad and store it for sending.
     #fn_sendAxes(p_me) { // game pad should be attached to a unit.
         const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
@@ -1205,11 +1250,35 @@ class CAndruavClientFacade {
         if (c_controller === null || c_controller === undefined)
             return;
 
-        // read gamepad values
         p_me.v_axes = c_controller.p_unified_virtual_axis;
-        p_me.v_sendAxes = true;
 
-        js_common.fn_console_log("fn_sendAxes");
+        const now = Date.now();
+        const sudden = js_globals.GP_SUDDEN_CHANGE;
+        const minGap = js_globals.GP_MIN_GAP_FAST_MS;
+
+        let isSudden = false;
+        if (p_me.lastSentAxes !== null) {
+            const d0 = Math.abs(parseFloat(p_me.v_axes[0]) - parseFloat(p_me.lastSentAxes[0]));
+            const d1 = Math.abs(parseFloat(p_me.v_axes[1]) - parseFloat(p_me.lastSentAxes[1]));
+            const d2 = Math.abs(parseFloat(p_me.v_axes[2]) - parseFloat(p_me.lastSentAxes[2]));
+            const d3 = Math.abs(parseFloat(p_me.v_axes[3]) - parseFloat(p_me.lastSentAxes[3]));
+            const maxDelta = Math.max(d0, d1, d2, d3);
+            isSudden = (maxDelta >= sudden);
+        } else {
+            isSudden = true;
+        }
+
+        if (isSudden && (now - p_me.lastSentTime) >= minGap) {
+            try {
+                js_common.fn_console_log({ tag: 'RC_SEND_IMMEDIATE', when: now, reason: 'sudden', axes: [p_me.v_axes[0],p_me.v_axes[1],p_me.v_axes[2],p_me.v_axes[3]] });
+            } catch(e) {}
+            p_me.#API_sendRXChannels(c_currentEngagedUnitRX, p_me.v_axes);
+            p_me.lastSentAxes = [p_me.v_axes[0], p_me.v_axes[1], p_me.v_axes[2], p_me.v_axes[3]];
+            p_me.lastSentTime = now;
+            p_me.v_sendAxes = false;
+        } else {
+            p_me.v_sendAxes = true;
+        }
     }
 }
 

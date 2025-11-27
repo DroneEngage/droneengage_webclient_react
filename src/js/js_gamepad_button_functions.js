@@ -1,5 +1,5 @@
 import * as js_andruavUnit from './js_andruavUnit'
-import * as js_andruavMessages from './js_andruavMessages';
+import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import * as js_common from './js_common.js'
 
 import { js_globals } from './js_globals.js';
@@ -32,6 +32,9 @@ class CGamePadButtonFunctions {
                 },
                 'Guided': {
                     onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED),
+                },
+                'Loiter': {
+                    onPress: (unit) => js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER),
                 },
                 'TGT': {
                     onPress: (unit) => js_globals.v_andruavFacade.API_SendTrackPoint(unit, 0.5, 0.5, 30),
@@ -128,14 +131,17 @@ class CGamePadButtonFunctions {
             if (!buttonConfig) return;
 
             if (button.m_pressed === true) {
-                buttonConfig.onPress(c_currentEngagedUnitRX);
+                js_common.fn_console_log({ tag: 'BTN_ACTION', when: now, idx: buttonIndex, func: buttonFunction, action: 'press' });
+                if (typeof buttonConfig.onPress === 'function') {
+                    buttonConfig.onPress(c_currentEngagedUnitRX);
+                }
             }
             else {
-                buttonConfig.onRelease(c_currentEngagedUnitRX);
+                js_common.fn_console_log({ tag: 'BTN_ACTION', when: now, idx: buttonIndex, func: buttonFunction, action: 'release' });
+                if (typeof buttonConfig.onRelease === 'function') {
+                    buttonConfig.onRelease(c_currentEngagedUnitRX);
+                }
             }
-
-
-            js_common.fn_console_log("fn_sendButtons", buttonFunction);
         });
     }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import { js_localStorage } from '../../js/js_localStorage'
 
 /**

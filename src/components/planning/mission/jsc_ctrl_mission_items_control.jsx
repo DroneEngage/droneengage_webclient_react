@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js';
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages';
 import * as js_common from '../../../js/js_common.js';
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
@@ -30,6 +30,7 @@ export default class ClssMission_Container extends React.Component {
     }
 
     componentDidMount() {
+        this.m_flag_mounted = true;
         this.setState({ m_update: 1 });
     }
 
@@ -62,7 +63,6 @@ export default class ClssMission_Container extends React.Component {
         if (me.m_flag_mounted === false)return;
         me.setState({ m_update: me.state.m_update + 1 });
     }
-
 
     fn_onShapeCreated(me, p_shape) {
         js_common.fn_console_log("fn_onShapeCreated: " + p_shape);

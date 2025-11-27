@@ -9,6 +9,7 @@ import React from 'react';
 import Draggable from "react-draggable";
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as js_andruavMessages from '../js/protocol/js_andruavMessages'
 import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/js_eventList.js'
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
@@ -24,6 +25,7 @@ import {
   setNested,
 } from '../js/helpers/js_form_utils.js';
 
+import { fn_do_modal_confirmation } from '../js/js_main.js';
 /**
  * ClssConfigGenerator generates a form based on a JSON configuration loaded from a file.
  * It is triggered by the EE_displayConfigGenerator event with {p_unit, module}.
@@ -43,7 +45,7 @@ export default class ClssConfigGenerator extends React.Component {
       selectedConfig: '', // Name of the selected configuration
       values: {},
       enabled: {},
-      output: '',
+      output: { objectOutput: {}, fieldNameOutput: {} },
       fileName: 'config.json',
     };
 
@@ -67,6 +69,11 @@ export default class ClssConfigGenerator extends React.Component {
     js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
   }
 
+  componentDidMount () {
+        this.m_flag_mounted = true;
+  }
+
+    
   componentWillUnmount() {
     js_eventEmitter.fn_unsubscribe(js_event.EE_displayConfigGenerator, this);
   }
@@ -108,13 +115,16 @@ export default class ClssConfigGenerator extends React.Component {
       case 'gpio':
         file = 'gpio.json';
         break;
+      case 'trk':
+        file = 'tracking.json';
+        break;
       // Add more conditions for other module classes as needed
     }
 
     let configData = module.template; // Use module.template as the initial fallback
 
     try {
-      const res = await fetch(`/configuration_files/${file}`); // Adjust path as needed
+      const res = await fetch(`/template/settings/${file}`); // Adjust path as needed
 
       // Check if the response is successful (status code 200-299)
       if (res.ok) {
@@ -141,7 +151,7 @@ export default class ClssConfigGenerator extends React.Component {
         selectedConfig: firstConfig.name || '',
         values: buildInitialValues(firstConfig.template || {}),
         enabled: buildInitialEnabled(firstConfig.template || {}),
-        output: JSON.stringify(buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled), null, 4),
+        output: buildOutput(firstConfig.template || {}, this.state.values, this.state.enabled),
       });
       this.currentTemplate = firstConfig.template || {};
     });
@@ -159,7 +169,7 @@ export default class ClssConfigGenerator extends React.Component {
       selectedConfig,
       values: buildInitialValues(this.currentTemplate),
       enabled: buildInitialEnabled(this.currentTemplate),
-      output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4),
+      output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
     }, () => this.initBootstrap());
   }
 
@@ -174,7 +184,7 @@ export default class ClssConfigGenerator extends React.Component {
       const newIndex = array.length - 1;
       buildInitialEnabled(arrayTemplate, `${fullPath}.${newIndex}`, newEnabled);
 
-      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, newEnabled), null, 4);
+      const newOutput = buildOutput(this.currentTemplate, newValues, newEnabled);
       return { values: newValues, enabled: newEnabled, output: newOutput };
     }, () => this.initBootstrap());
   }
@@ -186,7 +196,7 @@ export default class ClssConfigGenerator extends React.Component {
       array.splice(index, 1);
       setNested(newValues, fullPath, array);
 
-      const newOutput = JSON.stringify(buildOutput(this.currentTemplate, newValues, prev.enabled), null, 4);
+      const newOutput = buildOutput(this.currentTemplate, newValues, prev.enabled)
       return { values: newValues, output: newOutput };
     }, () => this.initBootstrap());
   }
@@ -194,7 +204,7 @@ export default class ClssConfigGenerator extends React.Component {
   handleEnableChange(fullPath, checked) {
     this.setState(prev => ({
       enabled: updateEnable(prev.enabled, fullPath, checked),
-      output: JSON.stringify(buildOutput(this.currentTemplate, prev.values, updateEnable(prev.enabled, fullPath, checked)), null, 4),
+      output: buildOutput(this.currentTemplate, prev.values, updateEnable(prev.enabled, fullPath, checked)),
     }));
   }
 
@@ -236,7 +246,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders an object field with nested fields
   renderObjectField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     return (
       <div key={fullPath} className="mb-2">
         <h6>{v_fieldName}
@@ -258,7 +268,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders an array field with nested items and add/remove buttons
   renderArrayField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const arrayValues = getNested(this.state.values, fullPath) || [];
     return (
       <div key={fullPath} className="mb-2">
@@ -308,7 +318,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders a checkbox field
   renderCheckboxField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -327,13 +337,20 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
                   }, () => this.initBootstrap());
                 });
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -349,27 +366,30 @@ export default class ClssConfigGenerator extends React.Component {
             )}
           </h6>
         )}
-        <input
-          type="checkbox"
-          className={`form-check-input ${cssClass} ${disabled}`}
-          checked={getNested(this.state.values, fullPath) || false}
+        <select
+          className={`form-select ${cssClass} ${disabled}`}
+          value={(getNested(this.state.values, fullPath) ?? false) ? 'true' : 'false'}
           onChange={(e) => {
+            const newVal = e.target.value === 'true';
             this.setState(prevState => ({
-              values: updateValue(prevState.values, fullPath, e.target.checked)
+              values: updateValue(prevState.values, fullPath, newVal)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
           }}
-        />
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
       </div>
     );
   }
 
   // Renders a combo (select) field
   renderComboField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -388,13 +408,20 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled),
                   }, () => this.initBootstrap());
                 });
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -418,7 +445,7 @@ export default class ClssConfigGenerator extends React.Component {
               values: updateValue(prevState.values, fullPath, e.target.value)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
           }}
@@ -433,7 +460,7 @@ export default class ClssConfigGenerator extends React.Component {
 
   // Renders a number or text input field
   renderInputField(config, fieldName, fullPath) {
-    const v_fieldName = config.fieldName || fieldName;
+    const v_fieldName = fieldName || config.fieldName;
     const cssClass = config.cssClass;
     const disabled = config.optional && !(this.state.enabled[fullPath] ?? true) ? 'disabled' : '';
     const isChecked = this.state.enabled[fullPath] ?? true;
@@ -452,13 +479,20 @@ export default class ClssConfigGenerator extends React.Component {
                   enabled: updateEnable(prevState.enabled, fullPath, e.target.checked)
                 }), () => {
                   this.setState({
-                    output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                    output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
                   }, () => this.initBootstrap());
                 });
               }}
             />
             <label className="form-check-label" htmlFor={`${fullPath}_enable`}>
-              {v_fieldName}
+              {v_fieldName}{config.desc && (
+              <i
+                className="bi bi-info-circle ms-1 text-info"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title={config.desc}
+              ></i>
+            )}
             </label>
           </div>
         )}
@@ -477,16 +511,35 @@ export default class ClssConfigGenerator extends React.Component {
         <input
           type={config.type === 'number' ? 'number' : 'text'}
           className={`form-control ${cssClass} ${disabled}`}
-          value={getNested(this.state.values, fullPath) || config.defaultvalue}
+          value={getNested(this.state.values, fullPath) ?? config.defaultvalue ?? ''}
           onChange={(e) => {
-            const value = config.type === 'number' ? Number(e.target.value) : e.target.value;
+            const value = e.target.value; // Allow raw input, including empty string
             this.setState(prevState => ({
               values: updateValue(prevState.values, fullPath, value)
             }), () => {
               this.setState({
-                output: JSON.stringify(buildOutput(this.currentTemplate, this.state.values, this.state.enabled), null, 4)
+                output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
               }, () => this.initBootstrap());
             });
+          }}
+          onBlur={(e) => {
+            if (config.type === 'number') {
+              let value = e.target.value;
+              if (value === '' || isNaN(value)) {
+                value = config.defaultvalue ?? config.min ?? 0;
+              } else {
+                value = Number(value);
+                if (config.min !== undefined && value < config.min) value = config.min;
+                if (config.max !== undefined && value > config.max) value = config.max;
+              }
+              this.setState(prevState => ({
+                values: updateValue(prevState.values, fullPath, value)
+              }), () => {
+                this.setState({
+                  output: buildOutput(this.currentTemplate, this.state.values, this.state.enabled)
+                }, () => this.initBootstrap());
+              });
+            }
           }}
         />
       </div>
@@ -510,16 +563,35 @@ export default class ClssConfigGenerator extends React.Component {
 
   fn_handleSubmit() {
     // Implement apply logic, e.g., send to server
-    js_globals.v_andruavFacade.API_updateConfigJSON(this.state.p_unit, this.state.module, JSON.parse(this.state.output));
-    console.log('Submitted:', this.state.output);
-    alert("data submitted. you need to restart the module.");
+    const me  = this;
+    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
+      "Are you sure you want to apply settings", function (p_approved) {
+        if (p_approved === false) return;
+
+        js_globals.v_andruavFacade.API_updateConfigJSON(me.state.p_unit, me.state.module, me.state.output.fieldNameOutput);
+
+        console.log('Submitted:', me.state.output);
+        alert("data submitted. you need to restart the module.");
+
+      }, "YES", "bg-danger text-white");
+
+    
   }
 
   fn_shutdownModule() {
-    js_globals.v_andruavFacade.API_updateConfigRestart(this.state.p_unit, this.state.module.k);
-    alert("Sending Restart Signal.");
+    const me  = this;
+    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
+      "Are you sure you want to apply settings", function (p_approved) {
+        if (p_approved === false) return;
+
+        js_globals.v_andruavFacade.API_doModuleConfigAction(me.state.p_unit, me.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+    
+        console.log('Submitted:', me.state.output);
+        alert("data submitted. you need to restart the module.");
+        
+      }, "YES", "bg-danger text-white");
   }
-  
+
 
   fn_close() {
     this.setState({ visible: false });
@@ -595,7 +667,7 @@ export default class ClssConfigGenerator extends React.Component {
               <textarea
                 id="output"
                 className="form-control bg-dark text-light w-100"
-                value={this.state.output}
+                value={JSON.stringify(this.state.output.fieldNameOutput, null, 4)}
                 readOnly
                 rows={4}
               />
@@ -641,7 +713,6 @@ export default class ClssConfigGenerator extends React.Component {
               >
                 Save Config
               </button>
-              
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import React from 'react';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import { js_globals } from '../../../js/js_globals.js';
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import {loadConfigurationFiles} from '../../../js/js_configuration_files.js'
 
@@ -57,7 +57,7 @@ export class ClssCtrlExperimental extends React.Component {
     {
         const v_andruavUnit = this.props.p_unit;
         console.log(p_contents);
-        js_globals.v_andruavFacade.API_updateConfigRestart(v_andruavUnit);
+        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN);
     }
 
     render() {

@@ -6,7 +6,7 @@
 *****************************************************/
 import { js_globals } from './js_globals.js';
 
-import * as js_andruavMessages from './js_andruavMessages.js'
+import * as js_andruavMessages from './protocol/js_andruavMessages.js'
 
 
 

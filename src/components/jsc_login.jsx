@@ -1,9 +1,10 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import * as js_andruavMessages from '../js/js_andruavMessages';
+import * as js_andruavMessages from '../js/protocol/js_andruavMessages.js';
 import * as js_common from '../js/js_common.js';
 import { EVENTS as js_event } from '../js/js_eventList.js';
+import { js_globals } from '../js/js_globals.js';
 import { js_localStorage } from '../js/js_localStorage';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
@@ -22,6 +23,7 @@ class ClssLoginControl extends React.Component {
       m_update: 0,
     };
 
+    this.m_flag_mounted = false;
     this.key = Math.random().toString();
     this.txtEmailRef = React.createRef();
     this.txtAccessCodeRef = React.createRef();
@@ -93,22 +95,29 @@ class ClssLoginControl extends React.Component {
   }
 
   componentDidMount() {
+    
+    this.m_flag_mounted = true;
+  
     this.setState({ m_update: 1 });
 
     const tabStatus = getTabStatus();
 
     switch (tabStatus) {
       case 'new':
+        js_globals.m_current_tab_status = 'new';
         console.log('This is a newly opened tab.');
         break;
       case 'refresh':
+        js_globals.m_current_tab_status = 'refresh';
         console.log('This tab was refreshed.');
         break;
       case 'duplicate':
+        js_globals.m_current_tab_status = 'duplicate';
         console.log('This tab is a duplicate.');
         js_localStorage.fn_resetUnitID();
         break;
       default:
+        js_globals.m_current_tab_status = 'unknown';
         console.log('Unknown tab status.');
     }
 

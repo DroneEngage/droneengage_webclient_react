@@ -1,6 +1,6 @@
 import * as js_andruavUnit from './js_andruavUnit'
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
-import * as js_andruavMessages from './js_andruavMessages';
+import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import * as js_common from './js_common.js'
 
 import { js_globals } from './js_globals.js';
@@ -11,6 +11,9 @@ class CGamePadAxisFunctions {
     constructor() {
 
         // js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Other_Axes_Updated, this, this.fn_executeAxis);
+
+        this.m_lastVals = {};
+        this.m_lastTimes = {};
 
         this.m_axisActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
@@ -82,9 +85,13 @@ class CGamePadAxisFunctions {
         // Determine effective vehicle type, default to VEHICLE_UNKNOWN if not found
         const effectiveVehicleType = this.m_axisActions[vehicleType] ? vehicleType : js_andruavUnit.VEHICLE_UNKNOWN;
 
-        const other_channel_routing = c_controller.p_other_channel_routing; // Array of objects with key property
+        const other_channel_routing = c_controller.p_other_channel_routing;
 
         // Iterate over channel routing and execute corresponding action
+        const now = Date.now();
+        const epsilon = js_globals.GP_EPSILON_CHANGE;
+        const minGap = js_globals.GP_MIN_GAP_FAST_MS;
+
         other_channel_routing.forEach((item) => {
             if (!item || !item.key) {
                 js_common.fn_console_log("Invalid item or key in other_channel_routing.");
@@ -105,9 +112,17 @@ class CGamePadAxisFunctions {
                 return;
             }
 
+            const lastVal = this.m_lastVals[item.key];
+            const lastTime = this.m_lastTimes[item.key] || 0;
+            const delta = (lastVal === undefined) ? Infinity : Math.abs(parseFloat(item.val) - parseFloat(lastVal));
+            const timeOk = (now - lastTime) >= minGap;
+
+            if (!(delta >= epsilon && timeOk)) return;
+
             try {
-                // Call the execute function for the corresponding key
                 actionConfig.execute(c_currentEngagedUnitRX, item.val);
+                this.m_lastVals[item.key] = item.val;
+                this.m_lastTimes[item.key] = now;
                 js_common.fn_console_log(`Executed action for key: ${item.key}`);
             } catch (error) {
                 js_common.fn_console_log(`Error executing action for key ${item.key}: ${error.message}`);

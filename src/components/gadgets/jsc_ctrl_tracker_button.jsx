@@ -3,7 +3,7 @@ import React from 'react';
 import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 
@@ -30,6 +30,7 @@ export default class ClssCtrlObjectTracker extends React.Component {
         
     
         componentDidMount() {
+            this.m_flag_mounted = true;
             this.setState({ m_update: 1 });
     
         }

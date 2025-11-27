@@ -18,7 +18,7 @@ export let CONST_PROD_MODE_IP = 'airgap.droneengage.com';
 export let CONST_PROD_MODE_PORT = '19408';
 export let CONST_TEST_MODE_IP = '127.0.0.1';
 export let CONST_TEST_MODE_PORT = '19408';
-export let CONST_TEST_MODE_ENABLE_LOG = false;
+export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
 /**
@@ -31,6 +31,8 @@ export let CONST_CONTACT_URL = "https://droneengage.com";
 export let CONST_ANDRUAV_URL = "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download";
 export let CONST_ANDRUAV_URL_ENABLE = true;
 export let CONST_ACCOUNT_URL_ENABLE = true;
+
+export let CONST_WEBSOCKET_BRIDGE_PORT = 8812;
 
 // CHOOSE YOUR MAP SOURCE
 export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ";
@@ -79,6 +81,7 @@ export let CONST_LANGUAGE = {
   ENABLED_LANGUAGES: [
     { code: 'en', label: 'English', className: '' },
     { code: 'ar', label: 'عربى', className: 'rtl' },
+    { code: 'fr', label: 'Français', className: '' },
     { code: 'es', label: 'Español', className: '' },
     { code: 'ru', label: 'Русский', className: '' }
   ],

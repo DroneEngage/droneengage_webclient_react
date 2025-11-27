@@ -13,7 +13,7 @@ checks.json
 .vscode
 
 /ssl
-local/
+/local
 # misc
 .DS_Store
 .env
@@ -21,9 +21,12 @@ local/
 .env.development.local
 .env.test.local
 .env.production.local
+.editorconfig
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 HEFNY_README.txt
 HEFNY_DEPLOY.txt
+
+local/

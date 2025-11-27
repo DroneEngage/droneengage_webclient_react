@@ -10,7 +10,7 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_leafletmap} from '../../js/js_leafletmap.js'
 import * as js_common from '../../js/js_common.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 
@@ -912,7 +912,7 @@ class ClssAndruavUnitListArray extends React.Component {
             if ($('#andruav_unit_list_array_float').attr('opacity') == null) {
                 $('#andruav_unit_list_array_float').attr('opacity', '1.0');
                 $('#andruav_unit_list_array_float').css('opacity', '1.0');
-                $('#andruav_unit_list_array_float').unbind('mouseout');
+                $('#andruav_unit_list_array_float').off('mouseout');
                 $('#andruav_unit_list_array_float #obaq').removeClass('bi-x-diamond');
                 $('#andruav_unit_list_array_float #obaq').addClass('bi-x-diamond-fill');
             }

@@ -2,10 +2,11 @@ import React    from 'react';
 import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
+import * as js_helpers from '../../js/js_helpers'
 import {js_speak} from '../../js/js_speak'
-import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, gui_doYAW} from '../../js/js_main'
+import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, gui_doYAW} from '../../js/js_main'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -15,7 +16,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		    this.state = {
                 m_VehicleType: p_andruavUnit.m_VehicleType,
                 m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
-                m_isArmed: p_andruavUnit.m_isArmed
+                m_isArmed: p_andruavUnit.m_isArmed,
+                m_applyOnAllSameType: false
 		};
     }
 
@@ -27,6 +29,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         const update =  (p_andruavUnit.m_VehicleType != v_andruavUnit.m_VehicleType
             || p_andruavUnit.m_is_ready_to_arm != v_andruavUnit.m_is_ready_to_arm
             || p_andruavUnit.m_isArmed != v_andruavUnit.m_isArmed
+            || p_andruavUnit.m_applyOnAllSameType != nextState.m_applyOnAllSameType
         );
 
         return update;
@@ -41,7 +44,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             return {
                 m_VehicleType: v_andruavUnit.m_VehicleType,
                 m_is_ready_to_arm: v_andruavUnit.m_is_ready_to_arm,
-                m_isArmed: v_andruavUnit.m_isArmed
+                m_isArmed: v_andruavUnit.m_isArmed,
+                m_applyOnAllSameType: prevState.m_applyOnAllSameType
             };
         }
         return null; // No state update needed
@@ -439,6 +443,27 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 	    return res;
 	}
 
+
+    fn_applyAction(v_andruavUnit, actionCallback) {
+        if (v_andruavUnit === null || v_andruavUnit === undefined || typeof actionCallback !== 'function') {
+            return;
+        }
+
+        if (this.state.m_applyOnAllSameType === true && js_globals.m_andruavUnitList && typeof js_globals.m_andruavUnitList.fn_getUnitValues === 'function') {
+            const units = js_globals.m_andruavUnitList.fn_getUnitValues() || [];
+            units.forEach((unit) => {
+                if (unit && unit.m_VehicleType === v_andruavUnit.m_VehicleType) {
+                    actionCallback(unit);
+                }
+            });
+            // For safety: uncheck the "apply to all" checkbox after each multi-unit action
+            this.setState({ m_applyOnAllSameType: false });
+        }
+        else {
+            actionCallback(v_andruavUnit);
+        }
+    }
+
     fn_ToggleArm(v_andruavUnit) {
         if (this.props.v_andruavUnit !== null && this.props.v_andruavUnit  !== undefined) {
             if (this.props.v_andruavUnit.m_isArmed) {
@@ -452,17 +477,22 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_doArm(v_andruavUnit) {
         if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
+            const me = this;
             fn_do_modal_confirmation("DANGEROUS: FORCE ADMING  " + v_andruavUnit.m_unitName + "   " + v_andruavUnit.m_VehicleType_TXT,
                 "OVERRIDE ARM .. Are You SURE?", function (p_approved) {
                     if (p_approved === false) 
                     {
-                        js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, true, false);
+                        me.fn_applyAction(v_andruavUnit, (unit) => {
+                            js_globals.v_andruavFacade.API_do_Arm(unit, true, false);
+                        });
                         return;
                     }
                     else
                     {
 					    js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
-                        js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, true, true);
+                        me.fn_applyAction(v_andruavUnit, (unit) => {
+                            js_globals.v_andruavFacade.API_do_Arm(unit, true, true);
+                        });
                         return ;
                     }
                 }, "FORCED-ARM", "bg-danger text-white", "ARM");
@@ -471,11 +501,14 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_doDisarm(v_andruavUnit) {
         if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
+            const me = this;
             fn_do_modal_confirmation("DANGEROUS: EMERGENCY DISARM  " + v_andruavUnit.m_unitName + "   " + v_andruavUnit.m_VehicleType_TXT,
                 "STOP all MOTORS and if vehicle in air will CRASH. Are You SURE?", function (p_approved) {
                     if (p_approved === false) return;
 					js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
-                    js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, false, true);
+                    me.fn_applyAction(v_andruavUnit, (unit) => {
+                            js_globals.v_andruavFacade.API_do_Arm(unit, false, true);
+                    });
                 }, "KILL-MOTORS", "bg-danger text-white");
 
 
@@ -483,93 +516,137 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     }
 
     fn_doTakeOffPlane(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
+        });
     }
 
     fn_doLand(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_Land(v_andruavUnit);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_Land(unit);
+        });
     }
 
     fn_doSurface(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
+        });
     }
 
     fn_doManual(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
+        });
     }
 
     fn_doAcro(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
+        });
     }
 
     fn_doStabilize(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
+        });
     }
 
     fn_doRTL(v_andruavUnit, smart) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+        });
     }
 
 
     fn_doCruise(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
+        });
     }
 
 
     fn_doCircle(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+        });
     }
 
     fn_doFBWA(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
+        });
     }
 
     fn_doFBWB(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
+        });
     }
 
 
     fn_doQStabilize(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
+        });
     }
     fn_doQLoiter(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
+        });
     }
     fn_doQHover(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
+        });
     }
     fn_doQLand(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
+        });
     }
     fn_doQRTL(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
+        });
     }
 
     
     
 
     fn_doGuided(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+        });
     }
 
     fn_doAuto(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
+        });
     }
 
     fn_doPosHold(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
+        });
     }
 
     fn_doLoiter(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
+        });
     }
 
     fn_doBrake(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
+        });
     }
 
     fn_doHold(v_andruavUnit) {
-        js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
+        });
     }
 
     fn_ServoControl(p_andruavUnit)
@@ -577,12 +654,68 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         js_eventEmitter.fn_dispatch (js_event.EE_displayServoForm, p_andruavUnit.getPartyID());
     }
 
-    
+    fn_changeAltitudeWrapper(v_andruavUnit) {
+        if (this.state.m_applyOnAllSameType === true) {
+            const me = this;
+            fn_changeAltitude(v_andruavUnit, function (p_baseUnit, p_altitudeCmd) {
+                me.fn_applyAction(v_andruavUnit, function (unit) {
+                    js_globals.v_andruavFacade.API_do_ChangeAltitude(unit, p_altitudeCmd);
+                });
+            });
+        }
+        else {
+            fn_changeAltitude(v_andruavUnit);
+        }
+    }
+
+    fn_changeSpeedWrapper(v_andruavUnit) {
+        const initSpeed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : v_andruavUnit.m_gui.speed_link;
+
+        if (this.state.m_applyOnAllSameType === true) {
+            const me = this;
+            fn_changeSpeed(v_andruavUnit, initSpeed, function (p_baseUnit, p_speedCmd) {
+                me.fn_applyAction(v_andruavUnit, function (unit) {
+                    unit.m_Nav_Info.p_UserDesired.m_NavSpeed = p_speedCmd;
+                    js_globals.v_andruavFacade.API_do_ChangeSpeed2(unit, p_speedCmd);
+                });
+            });
+        }
+        else {
+            fn_changeSpeed(v_andruavUnit, initSpeed);
+        }
+    }
+
+    fn_doYawWrapper(v_andruavUnit) {
+        if (this.state.m_applyOnAllSameType === true) {
+            const me = this;
+            gui_doYAW(v_andruavUnit.getPartyID(), function (p_baseUnit, p_targetAngle) {
+                me.fn_applyAction(v_andruavUnit, function (unit) {
+                    if (p_targetAngle === -1) {
+                        // Reset yaw: keep original behavior
+                        fn_doYAW(unit, -1, 0, true, false);
+                    }
+                    else {
+                        // Compute direction per-unit based on its own current heading
+                        const target_angle_deg = parseFloat(p_targetAngle);
+                        const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((unit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+                        let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
+                        fn_doYAW(unit, p_targetAngle, 0, !direction, false);
+                    }
+                });
+            });
+        }
+        else {
+            gui_doYAW(v_andruavUnit.getPartyID());
+        }
+    }
 
     render ()
     {
         const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
         let ctrl=[];
+        const hasSameTypeUnits = js_globals.m_andruavUnitList &&
+            typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
+            js_globals.m_andruavUnitList.fn_hasSameTypeUnits(this.props.v_andruavUnit);
         
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
@@ -591,7 +724,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 {
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group ddd flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
                     <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
                     <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
@@ -612,8 +745,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => gui_doYAW(this.props.v_andruavUnit.getPartyID())}>&nbsp;YAW&nbsp;</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
+                    <button id='btn_speed' type='button' className={'btn btn_sm  flgtctrlbtn ' + btn.btn_speed_class } onClick={ (e) => this.fn_changeSpeedWrapper(this.props.v_andruavUnit)}>&nbsp;GS&nbsp;</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
                     </div></div>);
             
@@ -633,7 +766,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 {
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => fn_changeAltitude(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
                     <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
                     <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
@@ -654,7 +787,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => gui_doYAW(this.props.v_andruavUnit.getPartyID())}>&nbsp;YAW&nbsp;</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
                     <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
                     </div></div>);
@@ -665,6 +798,20 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
         return (<div key={this.props.id+"rc"}   id={this.props.id+"rc"} >
             {ctrl}
+            {hasSameTypeUnits && (
+                <div className='form-check mt-1'>
+                    <input
+                        className='form-check-input'
+                        type='checkbox'
+                        id={this.props.id+"applySameType"}
+                        checked={this.state.m_applyOnAllSameType}
+                        onChange={(e) => this.setState({ m_applyOnAllSameType: e.target.checked })}
+                    />
+                    <label className='form-check-label text-white small' htmlFor={this.props.id+"applySameType"}>
+                        Apply to all units of same vehicle type
+                    </label>
+                </div>
+            )}
             </div>
         );
     }

@@ -4,7 +4,7 @@ import L from 'leaflet';
 
 import {js_leafletmap} from '../../../js/js_leafletmap.js'
 import {js_globals} from '../../../js/js_globals.js';
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 
 import {CFieldChecked} from '../../micro_gadgets/jsc_mctrl_field_check.jsx'
 
@@ -24,7 +24,7 @@ export class CWayPointAction extends React.Component {
 
     fn_editShape ()
     {
-        let waypointType = this.m_missionTypeRef.current.value; //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
+        let waypointType = parseInt(this.m_missionTypeRef.current.value, 10); //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
         
         let icon_img = 'bi bi-geo-alt-fill';
@@ -117,9 +117,9 @@ export class CWayPointAction extends React.Component {
       
     
     handleMissionTypeChange = (event) => {
-        const mission_type = event.target.value;
+        const mission_type = parseInt(event.target.value, 10);
         if (this.props.p_shape && this.props.p_shape.m_missionItem) { // Check if p_shape and m_missionItem are not null
-            if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE.toString())
+            if (mission_type === js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP_DE)
             {
                 // in DE_Mission Type Waypoints does not fire events.
                 this.props.p_shape.m_missionItem.eventFireRequired = false;

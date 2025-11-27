@@ -7,7 +7,7 @@ import Draggable from "react-draggable";
 import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import * as js_andruavMessages from '../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_common from '../../js/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';

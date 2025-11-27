@@ -19,11 +19,12 @@ import { js_globals } from '../js_globals.js';
 import { EVENTS as js_event } from '../js_eventList.js'
 import * as js_helpers from '../js_helpers.js';
 import * as js_andruavUnit from '../js_andruavUnit.js';
-import * as js_andruavMessages from '../js_andruavMessages.js';
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 
 import * as js_common from '../js_common.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
+import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js';
 
 
 import { mavlink20, MAVLink20Processor } from '../js_mavlink_v2.js'
@@ -738,7 +739,7 @@ class CAndruavClientParser {
                 const geoFenceAttachStatus = {};
                 geoFenceAttachStatus.fenceName = p_jmsg.n;
                 geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                const fence = Me.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
+                const fence = this.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
 
                 if (geoFenceAttachStatus.isAttachedToFence === true) { /*
 						* If Action Attach:
@@ -747,7 +748,7 @@ class CAndruavClientParser {
 							// 2- Add this Drone to the fence
 						*/
                     if (fence === null || fence === undefined) {
-                        Me.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
+                        js_andruav_facade.AndruavClientFacade.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
                         return;
                     } else {
                         if (fence.Units[p_unit.getPartyID()] === null || fence.Units[p_unit.getPartyID()] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
@@ -1172,7 +1173,7 @@ class CAndruavClientParser {
         }
 
         let is_armed = false;
-        let is_ready_to_arm = p_unit.fn_getIsDE() ? true : false;
+        let is_ready_to_arm = false;
         if (typeof p_jmsg.AR === 'boolean') {
             is_armed = p_jmsg.AR;
             is_ready_to_arm = p_jmsg.AR;
@@ -1259,6 +1260,8 @@ class CAndruavClientParser {
     * @param p_mavlinkPacket: should be a mavlink message.
     */
     #prv_parseUnitMavlinkMessage(p_unit, p_mavlinkPacket) {
+        js_websocket_bridge.sendMessage(p_mavlinkPacket);
+            
         const messages = this.mavlinkProcessor.parseBuffer(new Int8Array(p_mavlinkPacket));
         for (const c_mavlinkMessage of messages) {
             if (c_mavlinkMessage.id === -1) {

@@ -16,7 +16,7 @@
 /*jshint esversion: 6 */
 
 import * as js_siteConfig from './js_siteConfig.js';
-import * as js_andruavMessages from "./js_andruavMessages";
+import * as js_andruavMessages from "./protocol/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
 import { js_globals } from "./js_globals.js";
 import { EVENTS as js_event } from './js_eventList.js'
@@ -1396,6 +1396,29 @@ class CAndruavUnitList {
   fn_getUnitValues() {
     if (!js_globals.v_andruavClient) return undefined;
     return Array.from(this.List.values());
+  }
+
+  /**
+   * Returns true if there is at least one other unit with the same vehicle type
+   * as the provided unit.
+   * @param {CAndruavUnitObject} p_andruavUnit
+   * @returns {boolean}
+   */
+  fn_hasSameTypeUnits(p_andruavUnit) {
+    if (!p_andruavUnit) return false;
+
+    const units = this.fn_getUnitValues() || [];
+    let count = 0;
+    for (let i = 0; i < units.length; ++i) {
+      const unit = units[i];
+      if (unit && unit.m_VehicleType === p_andruavUnit.m_VehicleType) {
+        count++;
+        if (count > 1) {
+          return true; // found at least one *other* same-type unit
+        }
+      }
+    }
+    return false;
   }
 
   fn_getUnitCount() {

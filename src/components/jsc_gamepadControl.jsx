@@ -259,7 +259,7 @@ export default class ClssGamePadControl extends React.Component {
         if (p_me.m_flag_mounted === false)return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         p_me.state.m_andruavUnit = p_andruavUnit;
-        $('#modal_ctrl_gamepad').find('#btnGoto').unbind("click");
+        $('#modal_ctrl_gamepad').find('#btnGoto').off("click");
         $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
             fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.getPartyID()));
         });

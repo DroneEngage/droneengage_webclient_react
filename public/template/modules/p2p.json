@@ -1,0 +1,50 @@
+{
+  "name": "p2p",
+  "template": {
+    "Enable P2P": {
+      "type": "checkbox",
+      "defaultvalue": null,
+      "fieldName": "p2p_cmd",
+      "desc": "Enable P2P communication",
+      "optional": true
+    },
+    "Enable Telemetry": {
+      "type": "checkbox",
+      "defaultvalue": null,
+      "fieldName": "tel_cmd",
+      "desc": "Enable telemetry transmission",
+      "optional": true
+    },
+    "Enable Server Communication": {
+      "type": "checkbox",
+      "defaultvalue": null,
+      "fieldName": "srv_cmd",
+      "desc": "Enable server communication",
+      "optional": true
+    },
+    "Follow": {
+      "type": "ctrl_unit_dropdown",
+      "defaultvalue": -1,
+      "fieldName": "swr_cmd",
+      "desc": "Select unit to follow",
+      "fixed_list": [
+        [-1, "no action", "text-white"],
+        [0, "unfollow", "text-danger"]
+      ]
+    },
+    "Swarm Leader": {
+      "type": "checkbox",
+      "defaultvalue": null,
+      "fieldName": "swr_leader",
+      "desc": "Designate as swarm leader",
+      "optional": true
+    },
+    "Leader Formation": {
+      "type": "ctrl_formation",
+      "defaultvalue": 1,
+      "fieldName": "swr_leader_formation",
+      "desc": "Select leader formation",
+      "optional": true
+    }
+  }
+}

@@ -2,7 +2,7 @@ import React    from 'react';
 
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
-import * as js_andruavMessages from '../../js/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 
 
 export  class ClssRX_MESSAGE  extends React.Component {

@@ -14,6 +14,9 @@ class GLOBALS {
 		this.m_markGuided = null;
 
 		this.v_waypointsCache = {};
+
+		this.m_current_tab_status = 'unknown';
+		
 		this.planes_icon = ['/images/planetracker_r_0d_.png',
 			'/images/planetracker_y_0d_.png',
 			'/images/planetracker_g_0d_.png',
@@ -100,7 +103,7 @@ class GLOBALS {
 
 		// GamePad Functions Assignment
 		this.v_gamepad_function_array = ["undefined", "THR", "ALE", "RUD", "ELE", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
-		this.v_gamepad_button_function_array = ["undefined", "ARM", "RTL", "Land", "Auto", "Brake", "Guided", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
+		this.v_gamepad_button_function_array = ["undefined", "ARM", "RTL", "Land", "Auto", "Brake", "Loiter", "Guided", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
 		this.v_gamepad_configuration = ["1", "2", "3", "4", "5"];
 		this.v_gamepad_button_types = ['on/off', 'press', 'long latch'];
 		this.active_gamepad_index = 0;
@@ -140,7 +143,12 @@ class GLOBALS {
 		this.BUTTON_FUNTION_ARM = 1;
 		this.BUTTON_FUNTION_RTL = 2;
 		this.BUTTON_FUNTION_LAND = 3;
+		this.GP_EPSILON_CHANGE = 0.02;
+		this.GP_SUDDEN_CHANGE = 0.20;
+		this.GP_MIN_GAP_FAST_MS = 80;
+		this.GP_HEARTBEAT_MS = 2500;
 
+		
 		// Mission File Extension
 		this.v_mission_file_extension = '.de';
 

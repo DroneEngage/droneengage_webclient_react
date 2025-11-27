@@ -8,7 +8,7 @@ import React    from 'react';
 import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
-import * as js_andruavMessages from '../../../js/js_andruavMessages.js'
+import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
 
 import {ClssCtrlGPIO_Port} from './jsc_ctrl_gpio_port.jsx'
 
@@ -28,6 +28,7 @@ export class ClssCtrlGPIO extends React.Component {
     }
 
     componentDidMount() {
+        this.m_flag_mounted = true;
         this.setState({ m_update: 1 });
         js_globals.v_andruavFacade.API_requestGPIOStatus(this.props.p_unit); // retrieve the GPIO status.
     }

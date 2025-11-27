@@ -44,6 +44,28 @@
         "DISABLE_EXPERIMENTAL": true,
         "DISABLE_VERSION_NOTIFICATION": false
     },
+    "CONST_LANGUAGE": {
+        "ENABLED_LANGUAGES": [
+            {
+                "code": "ar",
+                "label": "عربى",
+                "className": "rtl"
+            },
+            {
+                "code": "en",
+                "label": "English",
+                "className": ""
+            },
+            { "code": "fr", "label": "Français", "className": "" },
+            { "code": "es", "label": "Español", "className": "" },
+            {
+                "code": "ru",
+                "label": "Русский",
+                "className": ""
+            }
+        ],
+        "DEFAULT_LANGUAGE": "en"
+    },
     // CHOOSE YOUR MAP SOURCE
     "CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",
     //export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
