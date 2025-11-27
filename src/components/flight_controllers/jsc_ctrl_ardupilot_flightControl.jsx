@@ -713,6 +713,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     {
         const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
         let ctrl=[];
+        const hasSameTypeUnits = js_globals.m_andruavUnitList &&
+            typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
+            js_globals.m_andruavUnitList.fn_hasSameTypeUnits(this.props.v_andruavUnit);
         
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
@@ -795,18 +798,20 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
         return (<div key={this.props.id+"rc"}   id={this.props.id+"rc"} >
             {ctrl}
-            <div className='form-check mt-1'>
-                <input
-                    className='form-check-input'
-                    type='checkbox'
-                    id={this.props.id+"applySameType"}
-                    checked={this.state.m_applyOnAllSameType}
-                    onChange={(e) => this.setState({ m_applyOnAllSameType: e.target.checked })}
-                />
-                <label className='form-check-label text-white small' htmlFor={this.props.id+"applySameType"}>
-                    Apply to all units of same vehicle type
-                </label>
-            </div>
+            {hasSameTypeUnits && (
+                <div className='form-check mt-1'>
+                    <input
+                        className='form-check-input'
+                        type='checkbox'
+                        id={this.props.id+"applySameType"}
+                        checked={this.state.m_applyOnAllSameType}
+                        onChange={(e) => this.setState({ m_applyOnAllSameType: e.target.checked })}
+                    />
+                    <label className='form-check-label text-white small' htmlFor={this.props.id+"applySameType"}>
+                        Apply to all units of same vehicle type
+                    </label>
+                </div>
+            )}
             </div>
         );
     }

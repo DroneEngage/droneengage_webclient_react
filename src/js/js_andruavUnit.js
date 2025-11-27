@@ -1398,6 +1398,29 @@ class CAndruavUnitList {
     return Array.from(this.List.values());
   }
 
+  /**
+   * Returns true if there is at least one other unit with the same vehicle type
+   * as the provided unit.
+   * @param {CAndruavUnitObject} p_andruavUnit
+   * @returns {boolean}
+   */
+  fn_hasSameTypeUnits(p_andruavUnit) {
+    if (!p_andruavUnit) return false;
+
+    const units = this.fn_getUnitValues() || [];
+    let count = 0;
+    for (let i = 0; i < units.length; ++i) {
+      const unit = units[i];
+      if (unit && unit.m_VehicleType === p_andruavUnit.m_VehicleType) {
+        count++;
+        if (count > 1) {
+          return true; // found at least one *other* same-type unit
+        }
+      }
+    }
+    return false;
+  }
+
   fn_getUnitCount() {
     if (!js_globals.v_andruavClient || !this.List) return 0;
     return this.List.size;
