@@ -28,8 +28,7 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
     $('#modal_saveConfirmation').children().find('div.modal-body p#conf').html(p_message);
     $('#modal_saveConfirmation').children().find('div.modal-body p#res').html("");
     $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').off('click');
-    $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').unbind('click');
-    $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').click(p_callback);
+    $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').on('click', p_callback);
     if (p_yesCaption != null) {
         $('#modal_saveConfirmation').children().find('button#geo_btn_confirm').html(p_yesCaption);
     }
