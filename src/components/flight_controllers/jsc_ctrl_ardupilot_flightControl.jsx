@@ -12,13 +12,17 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
 	{
 		super (props);
-            const p_andruavUnit = this.props.v_andruavUnit;
+		    const p_andruavUnit = this.props.v_andruavUnit;
+		    const hasSameTypeUnits = js_globals.m_andruavUnitList &&
+		        typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
+		        js_globals.m_andruavUnitList.fn_hasSameTypeUnits(p_andruavUnit);
 		    this.state = {
-                m_VehicleType: p_andruavUnit.m_VehicleType,
-                m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
-                m_isArmed: p_andruavUnit.m_isArmed,
-                m_applyOnAllSameType: false
-		};
+		        m_VehicleType: p_andruavUnit.m_VehicleType,
+		        m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
+		        m_isArmed: p_andruavUnit.m_isArmed,
+		        m_applyOnAllSameType: false,
+		        m_hasSameTypeUnits: hasSameTypeUnits
+			};
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -30,6 +34,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             || p_andruavUnit.m_is_ready_to_arm != v_andruavUnit.m_is_ready_to_arm
             || p_andruavUnit.m_isArmed != v_andruavUnit.m_isArmed
             || p_andruavUnit.m_applyOnAllSameType != nextState.m_applyOnAllSameType
+            || p_andruavUnit.m_hasSameTypeUnits != nextState.m_hasSameTypeUnits
         );
 
         return update;
@@ -37,15 +42,20 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         const { v_andruavUnit } = nextProps;
+        const hasSameTypeUnits = js_globals.m_andruavUnitList &&
+            typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
+            js_globals.m_andruavUnitList.fn_hasSameTypeUnits(v_andruavUnit);
 
         if (v_andruavUnit.m_VehicleType !== prevState.m_VehicleType ||
             v_andruavUnit.m_is_ready_to_arm !== prevState.m_is_ready_to_arm ||
-            v_andruavUnit.m_isArmed !== prevState.m_isArmed) {
+            v_andruavUnit.m_isArmed !== prevState.m_isArmed ||
+            hasSameTypeUnits !== prevState.m_hasSameTypeUnits) {
             return {
                 m_VehicleType: v_andruavUnit.m_VehicleType,
                 m_is_ready_to_arm: v_andruavUnit.m_is_ready_to_arm,
                 m_isArmed: v_andruavUnit.m_isArmed,
-                m_applyOnAllSameType: prevState.m_applyOnAllSameType
+                m_applyOnAllSameType: prevState.m_applyOnAllSameType,
+                m_hasSameTypeUnits: hasSameTypeUnits
             };
         }
         return null; // No state update needed
@@ -713,9 +723,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     {
         const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
         let ctrl=[];
-        const hasSameTypeUnits = js_globals.m_andruavUnitList &&
-            typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
-            js_globals.m_andruavUnitList.fn_hasSameTypeUnits(this.props.v_andruavUnit);
+        const hasSameTypeUnits = this.state.m_hasSameTypeUnits;
         
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
