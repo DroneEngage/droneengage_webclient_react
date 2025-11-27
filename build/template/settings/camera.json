@@ -1,0 +1,63 @@
+[
+    {
+        "name": "Scan Cameras",
+        "template": {
+            "camera scan": {
+                "fieldName": "camera",
+                "type": "object",
+                "fields": {
+                    "camera_start_index": {
+                        "type": "number",
+                        "defaultvalue": "0"
+                    },
+                    "camera_end_index": {
+                        "type": "number",
+                        "defaultvalue": "60"
+                    }
+                },
+                "optional": false,
+                "desc": "scan /dev/video(#Start) to /dev/video(#End) - recommended"
+            }
+        }
+    },
+    {
+        "name": "Camera List",
+        "template": {
+            "camera array": {
+                "fieldName": "camera",
+                "type": "object",
+                "fields": {
+                    "camera list": {
+                        "fieldName": "camera_list",
+                        "type": "array",
+                        "array_template": {
+                            "name": {
+                                "order":1,
+                                "type": "text",
+                                "defaultvalue": "CAM1",
+                                "desc": "name appears on webclient"
+                            },
+                            "device_num": {
+                                "order":2,
+                                "type": "number",
+                                "optional": true,
+                                "defaultvalue": "1",
+                                "desc": "/dev/videoX"
+                            },
+                            "device_name": {
+                                "order":3,
+                                "type": "text",
+                                "optional": true,
+                                "defaultvalue": "DE-CAM1",
+                                "desc": "Virtual video driver name or WebCam Name - advanced."
+                            }
+                        },
+                        "optional": false,
+                        "desc": "define specific camera devices and assign custom names - advanced"
+                    }
+                }
+            }
+        }
+    }
+
+]
