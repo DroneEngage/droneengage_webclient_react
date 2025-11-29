@@ -25,6 +25,7 @@ export default class ClssModuleDetails extends React.Component {
         this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
         this.fn_configModule = this.fn_configModule.bind(this);
         this.fn_shutDownBoard = this.fn_shutdownBoard.bind(this);
+        this.fn_rebootBoard = this.fn_rebootBoard.bind(this);
     }
 
     fn_shutdownModule(p_module_key) {
@@ -47,10 +48,21 @@ export default class ClssModuleDetails extends React.Component {
 
         const v_andruavUnit = this.props.p_unit;
                 
-        fn_do_modal_confirmation("Completely ShutDown Board - NO Restart" + v_andruavUnit.m_unitName,
-                    "Are you sure you want to completly stop the BOARD?", function (p_approved) {
+        fn_do_modal_confirmation("VERY DANGEROUS ACTION! - Completely ShutDown Board - NO Restart" + v_andruavUnit.m_unitName,
+                    "Are you sure you want to completly shutdown the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
-                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN);
+                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
+                    }, "YES", "bg-danger text-white");
+    }
+
+    fn_rebootBoard(p_module_key) {
+
+        const v_andruavUnit = this.props.p_unit;
+                
+        fn_do_modal_confirmation("VERY DANGEROUS ACTION! - Completely Reboot Board" + v_andruavUnit.m_unitName,
+                    "Are you sure you want to completly reboot the BOARD?", function (p_approved) {
+                        if (p_approved === false) return;
+                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_RESTART_HW);
                     }, "YES", "bg-danger text-white");
     }
 
@@ -89,6 +101,7 @@ export default class ClssModuleDetails extends React.Component {
                                                     key={this.key + 'config'}
                                                     className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_configModule(module)}
+                                                    title='Configure Module'
                                                 >
                                                     config
                                                 </button>
@@ -99,10 +112,24 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'shutdown'}
                                                     key={this.key + 'shutdown'}
-                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth'
-                                                    onClick={(e) => this.fn_shutDownBoard(module)}
+                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2'
+                                                    onClick={(e) => this.fn_shutDownBoard(module.k)}
+                                                    title='Shutdown Board Completly'
                                                 >
                                                     shutdown
+                                                </button>
+                                            )
+                                        }
+                                        {
+                                            (!module.c ) && (
+                                                <button
+                                                    id={this.key + 'reboot'}
+                                                    key={this.key + 'reboot'}
+                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth'
+                                                    onClick={(e) => this.fn_rebootBoard(module.k)}
+                                                    title='Reboot Board'
+                                                >
+                                                    reboot
                                                 </button>
                                             )
                                         }
