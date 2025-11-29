@@ -335,12 +335,6 @@ class CAndruavClientFacade {
     }
 
 
-    API_requestServoChannel(p_andruavUnit) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-        const cmd = CCommandAPI.API_requestServoChannel();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
-    }
 
     // Very Danger to expose [emergencyDisarm]
     API_do_Arm(p_andruavUnit, param_toArm, param_emergencyDisarm) {
@@ -1236,6 +1230,20 @@ class CAndruavClientFacade {
         }
 
         const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_HEARTBEAT);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
+    }
+
+
+    API_requestMavlinkServoChannel(p_andruavUnit)
+    {
+        let v_partyID= '';
+
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
+        {
+            v_partyID = p_andruavUnit.getPartyID();
+        }
+
+        const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW);
         js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
     }
 

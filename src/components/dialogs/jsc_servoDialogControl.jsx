@@ -131,8 +131,13 @@ class ClssServoUnit extends React.Component {
 
 
 export default class ClssServoControl extends React.Component {
-    constructor() {
-        super();
+    static defaultProps = {
+        startServo: 5,
+        endServo: 16
+    };
+
+    constructor(props) {
+        super(props);
         this.state = {
             is_connected: false,
             initialized: false,
@@ -161,7 +166,7 @@ export default class ClssServoControl extends React.Component {
 
             const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
             if (!p_andruavUnit) return ;
-            js_globals.v_andruavFacade.API_requestServoChannel(p_andruavUnit);
+            js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit); 
         }
     }
 
@@ -239,38 +244,38 @@ export default class ClssServoControl extends React.Component {
             c_partyID = p_andruavUnit.getPartyID();
             v_unitName = p_andruavUnit.m_unitName;
             const servo_values = p_andruavUnit.m_Servo.m_values;
+            
+            // Generate servo units dynamically based on startServo and endServo props
+            const { startServo, endServo } = this.props;
+            const servoUnits = [];
+            for (let i = startServo; i <= endServo; i++) {
+                const servoValue = servo_values[`m_servo${i}`];
+                servoUnits.push(
+                    <div className='col-3' key={this.key + `servo-${i}`}>
+                        <ClssServoUnit 
+                            prop_party={p_andruavUnit} 
+                            prop_channel={String(i)} 
+                            prop_value={servoValue} 
+                            prop_name={`AP-Srv ${i}`} 
+                        />
+                    </div>
+                );
+            }
+
+            // Group servo units into rows of 4
+            const rows = [];
+            for (let i = 0; i < servoUnits.length; i += 4) {
+                rows.push(
+                    <div className='row mt-1' key={this.key + `row-${i}`}>
+                        {servoUnits.slice(i, i + 4)}
+                    </div>
+                );
+            }
+
             servos.push(
-                        <div className='row margin_zero pt-2' key={this.key + 'srvs-keys'} >
-                            <div className='row mt-1'>
-                                <div className='col-3 margi'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='9' prop_value={servo_values.m_servo9} prop_name='AP-Srv 9' key={this.key + 'Key 1'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='10' prop_value={servo_values.m_servo10} prop_name='AP-Srv 10' key={this.key + 'Key 2'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='11' prop_value={servo_values.m_servo11} prop_name='AP-Srv 11' key={this.key + 'Key 3'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='12' prop_value={servo_values.m_servo12} prop_name='AP-Srv 12' key={this.key + 'Key 4'}/>
-                                </div>
-                            </div>
-                            <div className='row mt-1'>
-                                <div className='col-3 margi'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='13' prop_value={servo_values.m_servo13} prop_name='AP-Srv 13' key={this.key + 'Key 5'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='14' prop_value={servo_values.m_servo14} prop_name='AP-Srv 14' key={this.key + 'Key 6'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='15' prop_value={servo_values.m_servo15} prop_name='AP-Srv 15' key={this.key + 'Key 7'}/>
-                                </div>
-                                <div className='col-3'>
-                                    <ClssServoUnit prop_party={p_andruavUnit} prop_channel='16' prop_value={servo_values.m_servo16} prop_name='AP-Srv 16' key={this.key + 'Key 8'}/>
-                                </div>
-                            </div>
-                        </div>
-                        
+                <div className='row margin_zero pt-2' key={this.key + 'srvs-keys'}>
+                    {rows}
+                </div>
             );
         }
             
@@ -299,7 +304,7 @@ export default class ClssServoControl extends React.Component {
                                     <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.getPartyID())}>Goto</button>
                                 </div>
                                 <div className="col-3">
-                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestServoChannel(p_andruavUnit)} >Refresh</button>
+                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit)} >Refresh</button>
                                 </div>
                                 <div className="col-3">
                                     <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>

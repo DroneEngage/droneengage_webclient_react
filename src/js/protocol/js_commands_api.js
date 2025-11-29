@@ -651,18 +651,7 @@ export class CCommandAPI {
     }
 
 
-    static API_requestServoChannel() {
-        const msg =
-        {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
-            'ms': {
-                C: js_andruavMessages.CONST_TYPE_AndruavMessage_ServoChannel
-            }
-        };
-
-        return msg;
-    }
-
+    
 
     static API_doModuleConfigAction(p_module_key, p_action) {
         const msg =
