@@ -15,27 +15,50 @@ class ClssServoUnit extends React.Component {
 
         this.key = Math.random().toString();
         this.state = {
-            pendingButton: null // Can be 'min', 'med', 'max', or null
+            pendingButton: null, // Can be 'min', 'med', 'max', 'slider', or null
+            sliderValue: 1500 // Default slider value
         };
 
-        this.handleClick = this.handleClick.bind(this); // Bind the handler
+        this.handleClick = this.handleClick.bind(this);
+        this.handleSliderChange = this.handleSliderChange.bind(this);
+        this.handleSliderRelease = this.handleSliderRelease.bind(this);
     }
 
     // This lifecycle method is called after every render, perfect for reacting to prop changes
     componentDidUpdate(prevProps) {
         // If the prop_value has changed, it means we've received an update from the vehicle.
-        // Clear the pending state.
+        // Clear the pending state and sync slider value.
         if (this.props.prop_value !== prevProps.prop_value) {
+            const newState = {};
             if (this.state.pendingButton !== null) {
-                this.setState({ pendingButton: null });
+                newState.pendingButton = null;
+            }
+            // Sync slider with actual servo value (clamp to 1000-2000 range)
+            if (this.props.prop_value !== null && this.props.prop_value !== undefined) {
+                const clampedValue = Math.max(1000, Math.min(2000, this.props.prop_value));
+                newState.sliderValue = clampedValue;
+            }
+            if (Object.keys(newState).length > 0) {
+                this.setState(newState);
             }
         }
     }
 
     handleClick(buttonType, servoValue) {
-        if (!this.btn_disabled) { // Use the render's computed btn_disabled state
+        if (!this.btn_disabled) {
             this.setState({ pendingButton: buttonType });
             js_globals.v_andruavFacade.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
+        }
+    }
+
+    handleSliderChange(e) {
+        this.setState({ sliderValue: parseInt(e.target.value, 10) });
+    }
+
+    handleSliderRelease() {
+        if (!this.btn_disabled) {
+            this.setState({ pendingButton: 'slider' });
+            js_globals.v_andruavFacade.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, this.state.sliderValue);
         }
     }
 
@@ -72,56 +95,87 @@ class ClssServoUnit extends React.Component {
 
             // Apply pending (yellow) state if applicable
             if (this.state.pendingButton === 'min') {
-                btn_min_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+                btn_min_css = ' css_servo_selected bg-warning text-dark ';
             } else if (this.state.pendingButton === 'med') {
-                btn_med_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+                btn_med_css = ' css_servo_selected bg-warning text-dark ';
             } else if (this.state.pendingButton === 'max') {
-                btn_max_css = ' css_servo_selected bg-warning text-dark '; // Yellow for pending
+                btn_max_css = ' css_servo_selected bg-warning text-dark ';
             }
             
-            this.state.pendingButton= null; //resolves your rapid-click visual issue.
+            this.state.pendingButton = null;
         }
+
+        // Calculate slider position percentage for visual indicator
+        const currentValue = this.props.prop_value || 1500;
+        const sliderPercent = ((currentValue - 1000) / 1000) * 100;
 
         return (
             <div id='servoblk' key={this.key} className='row margin_zero bg-secondary border rounded-3' title={'value: ' + this.props.prop_value} >
                 <div className='row margin_zero small'>
-                    <div className='col-12  margin_zero pt-2'>
-                        <div className='margin_zero'>
-                            <p
-                                id={'min' + this.props.prop_channel}
-                                className={'label rounded-1 ' + btn_min_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={() => this.handleClick('min', 0)}
-                            >
-                                MIN
-                            </p>
+                    <div className='col-8'>
+                        <div className='col-12 margin_zero'>
+                            <div className='margin_zero  pt-2'>
+                                <p
+                                    id={'max' + this.props.prop_channel}
+                                    className={'label rounded-1 ' + btn_max_css + (btn_disabled ? ' disabled' : '')}
+                                    onClick={() => this.handleClick('max', 9999)}
+                                >
+                                    MAX
+                                </p>
+                            </div>
+                        </div>
+                        <div className='col-12 margin_zero'>
+                            <div className='margin_zero'>
+                                <p
+                                    id={'med' + this.props.prop_channel}
+                                    className={'label rounded-1 ' + btn_med_css + (btn_disabled ? ' disabled' : '')}
+                                    onClick={() => this.handleClick('med', 1500)}
+                                >
+                                    MED
+                                </p>
+                            </div>
+                        </div>
+                        <div className='col-12 margin_zero'>
+                            <div className='margin_zero'>
+                                <p
+                                    id={'min' + this.props.prop_channel}
+                                    className={'label rounded-1 ' + btn_min_css + (btn_disabled ? ' disabled' : '')}
+                                    onClick={() => this.handleClick('min', 0)}
+                                >
+                                    MIN
+                                </p>
+                            </div>
+                        </div>
+                        <div className='col-12 margin_zero'>
+                            <div className='margin_zero si-09x'>
+                                {this.props.prop_name}
+                            </div>
                         </div>
                     </div>
-                    <div className='col-12  margin_zero'>
-                        <div className='margin_zero'>
-                            <p
-                                id={'med' + this.props.prop_channel}
-                                className={'label rounded-1 ' + btn_med_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={() => this.handleClick('med', 1500)}
-                            >
-                                MED
-                            </p>
-                        </div>
-                    </div>
-                    <div className='col-12  margin_zero'>
-                        <div className='margin_zero'>
-                            <p
-                                id={'max' + this.props.prop_channel}
-                                className={'label rounded-1 ' + btn_max_css + (btn_disabled ? ' disabled' : '')}
-                                onClick={() => this.handleClick('max', 9999)}
-                            >
-                                MAX
-                            </p>
-                        </div>
-                    </div>
-                    <div className='col-12  margin_zero'>
-                        <div className='margin_zero si-09x'>
-                            {this.props.prop_name}
-                        </div>
+                    <div className='col-4 d-flex flex-column align-items-center justify-content-center py-2'>
+                        <span className='si-07x text-light'>2000</span>
+                        <input
+                            type='range'
+                            min='1000'
+                            max='2000'
+                            step='10'
+                            value={this.state.sliderValue}
+                            onChange={this.handleSliderChange}
+                            onMouseUp={this.handleSliderRelease}
+                            onTouchEnd={this.handleSliderRelease}
+                            disabled={btn_disabled}
+                            className='css_servo_slider'
+                            style={{
+                                writingMode: 'vertical-lr',
+                                direction: 'rtl',
+                                height: '80px',
+                                width: '20px',
+                                cursor: btn_disabled ? 'not-allowed' : 'pointer'
+                            }}
+                            title={`Set PWM: ${this.state.sliderValue}`}
+                        />
+                        <span className='si-07x text-light'>1000</span>
+                        <span className='si-07x text-warning mt-1'>{this.state.sliderValue}</span>
                     </div>
                 </div>
             </div>
@@ -251,7 +305,7 @@ export default class ClssServoControl extends React.Component {
             for (let i = startServo; i <= endServo; i++) {
                 const servoValue = servo_values[`m_servo${i}`];
                 servoUnits.push(
-                    <div className='col-3' key={this.key + `servo-${i}`}>
+                    <div className='col-3 si-07x ' key={this.key + `servo-${i}`}>
                         <ClssServoUnit 
                             prop_party={p_andruavUnit} 
                             prop_channel={String(i)} 
