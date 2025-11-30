@@ -124,6 +124,10 @@ Configure TURN/STUN servers for video streaming.
 - **jQuery** - DOM manipulation
 - **i18next** - Internationalization
 
+## WIKI Link
+
+    https://windsurf.com/codemaps/85985e7b-e7f7-4a84-b4be-29fde30afc12-bf8b4864a72d0584
+
 ## Author
 
 **Mohammad Said Hefny**  
