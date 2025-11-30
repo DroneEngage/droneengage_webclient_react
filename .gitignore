@@ -11,7 +11,7 @@ package-lock.json
 # production
 checks.json
 .vscode
-
+wiki/local_wiki
 /ssl
 /local
 # misc
