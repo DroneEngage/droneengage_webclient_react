@@ -160,7 +160,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if ((p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() !== js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS)
             && (p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() !== js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED)) {
-            res.btn_rx_class = " btn-primary bi bi-controller";
+            res.btn_rx_class = " btn-primary bi bi-dpad";
             res.btn_rx_text = "R/C Off";
             res.btn_rx_title = "Press to take control using Web - TX";
         }
@@ -169,26 +169,26 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             || (p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() === js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED)) {
 
             if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
-                res.btn_rx_class = " btn-danger bi bi-controller";
+                res.btn_rx_class = " btn-danger bi bi-dpad";
                 res.btn_rx_text = " R/C On";
                 res.btn_rx_title = " You control this drone using Web - TX";
 
             }
             else {
-                res.btn_rx_class = " btn-outline-warning bi bi-controller";
+                res.btn_rx_class = " btn-outline-warning bi bi-dpad";
                 res.btn_rx_text = " R/C Off";
                 res.btn_rx_title = "Drone is being controller by another GCS";
             }
         }
         else {
             if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
-                res.btn_rx_class = " btn-danger bi bi-controller";
+                res.btn_rx_class = " btn-danger bi bi-dpad";
                 res.btn_rx_text = " R/C On";
                 res.btn_rx_title = " You control this drone using Web - TX";
 
             }
             else {
-                res.btn_rx_class = " btn-outline-warning hidden bi bi-controller";
+                res.btn_rx_class = " btn-outline-warning hidden bi bi-dpad";
                 res.btn_rx_text = " R/C Off";
                 res.btn_rx_title = "Drone is being controller by another GCS";
             }
