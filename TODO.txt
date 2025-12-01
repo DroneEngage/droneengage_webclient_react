@@ -1,3 +1,0 @@
-1- colored LOG
-
-info, critical,notice, warning ....
