@@ -2,20 +2,19 @@ import $ from 'jquery';
 import React    from 'react';
 
 
-import {js_globals} from '../js/js_globals.js';
-import {EVENTS as js_event} from '../js/js_eventList.js'
-import {js_localStorage} from '../js/js_localStorage'
-import {js_eventEmitter} from '../js/js_eventEmitter'
-import * as js_common from '../js/js_common.js'
+import {js_globals} from '../../js/js_globals.js';
+import {EVENTS as js_event} from '../../js/js_eventList.js'
+import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import * as js_common from '../../js/js_common.js'
 
-import {js_andruav_gamepad} from '../js/js_andruav_gamepad.js'
-import {js_speak} from '../js/js_speak'
+import {js_andruav_gamepad} from '../../js/gamepad/js_andruav_gamepad.js'
 
-import {fn_gotoUnit_byPartyID} from '../js/js_main'
+import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
-import { ClssGamePadAxisControl } from './micro_gadgets/jsc_gamepad_axis.jsx';
-import { ClssGamePadButton } from './micro_gadgets/jsc_gamepad_button.jsx';
-import {ClssSingleAxisProgressControl} from './micro_gadgets/jsc_gamepad_single_axis.jsx';
+import { ClssGamePadAxisControl } from '../micro_gadgets/jsc_gamepad_axis.jsx';
+import { ClssGamePadButton } from '../micro_gadgets/jsc_gamepad_button.jsx';
+import {ClssSingleAxisProgressControl} from '../micro_gadgets/jsc_gamepad_single_axis.jsx';
 
 
 class ClssGamePadAxesControl extends React.Component {

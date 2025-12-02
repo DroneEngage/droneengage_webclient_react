@@ -22,7 +22,7 @@ import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogContro
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx';
 import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_details.jsx';
-import ClssGamePadControl from '../components/jsc_gamepadControl.jsx';
+import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx';
 import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
