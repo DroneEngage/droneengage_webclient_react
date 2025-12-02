@@ -12,13 +12,13 @@
  *************************************************************************************/
 
 
-import * as js_andruavMessages from './protocol/js_andruavMessages.js';
-import * as js_helpers from '../js/js_helpers';
-import { js_globals } from './js_globals';
-import { EVENTS as js_event } from './js_eventList.js';
-import { js_localStorage } from './js_localStorage';
-import { js_eventEmitter } from './js_eventEmitter';
-import * as js_common from './js_common.js';
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
+import * as js_helpers from '../js_helpers.js';
+import { js_globals } from '../js_globals.js';
+import { EVENTS as js_event } from '../js_eventList.js';
+import { js_localStorage } from '../js_localStorage.js';
+import { js_eventEmitter } from '../js_eventEmitter.js';
+import * as js_common from '../js_common.js';
 import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js';
 import { js_gamepadAxisFunctions } from './js_gamepad_axis_functions.js';
 

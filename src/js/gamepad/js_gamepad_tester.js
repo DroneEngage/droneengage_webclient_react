@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import * as js_siteConfig from './js_siteConfig'
+import * as js_siteConfig from '../js_siteConfig'
 
 export function fn_on_ready() {
 
