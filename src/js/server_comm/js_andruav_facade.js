@@ -20,7 +20,7 @@ import { EVENTS as js_event } from '../js_eventList.js'
 import * as js_helpers from '../js_helpers.js';
 import * as js_siteConfig from '../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
-import { js_andruav_gamepad } from '../js_andruav_gamepad.js'
+import { js_andruav_gamepad } from '../gamepad/js_andruav_gamepad.js'
 import * as js_andruavUnit from '../js_andruavUnit.js';
 import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 

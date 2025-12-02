@@ -9,9 +9,9 @@ import React , { useEffect } from 'react';
 
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
-import ClssGamepadTester from "../components/jsc_gamepadTester"
+import ClssGamepadTester from "../components/gamepad/jsc_gamepadTester"
 
-import {fn_on_ready} from '../js/js_gamepad_tester'
+import {fn_on_ready} from '../js/gamepad/js_gamepad_tester'
 
 const GamePadTesterPage = () => {
     useEffect(() => {

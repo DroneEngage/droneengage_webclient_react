@@ -1,11 +1,9 @@
 import React from 'react';
-import * as js_helpers from '../js/js_helpers';
-import { js_globals } from '../js/js_globals';
-import * as js_siteConfig from '../js/js_siteConfig.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
-import { js_localStorage } from '../js/js_localStorage';
-import { js_speak } from '../js/js_speak';
-import { fn_helpPage } from '../js/js_main.js';
+import { js_globals } from '../../js/js_globals.js';
+import * as js_siteConfig from '../../js/js_siteConfig.js';
+import { js_localStorage } from '../../js/js_localStorage.js';
+import { js_speak } from '../../js/js_speak.js';
+import { fn_helpPage } from '../../js/js_main.js';
 
 const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
 const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';

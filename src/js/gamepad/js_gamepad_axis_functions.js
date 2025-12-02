@@ -1,11 +1,11 @@
-import * as js_andruavUnit from './js_andruavUnit'
+import * as js_andruavUnit from '../js_andruavUnit'
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
-import * as js_andruavMessages from './protocol/js_andruavMessages.js';
-import * as js_common from './js_common.js'
+import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
+import * as js_common from '../js_common.js'
 
-import { js_globals } from './js_globals.js';
-import { EVENTS as js_event } from './js_eventList.js'
-import { js_eventEmitter } from './js_eventEmitter.js'
+import { js_globals } from '../js_globals.js';
+import { EVENTS as js_event } from '../js_eventList.js'
+import { js_eventEmitter } from '../js_eventEmitter.js'
 
 class CGamePadAxisFunctions {
     constructor() {
