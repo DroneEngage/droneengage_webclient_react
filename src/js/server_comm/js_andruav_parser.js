@@ -1091,6 +1091,7 @@ class CAndruavClientParser {
         p_unit.m_IsGCS = p_jmsg.GS;
         p_unit.m_unitName = p_jmsg.UD;
         p_unit.Description = p_jmsg.DS;
+        const oldVehicleType = p_unit.m_VehicleType;
         p_unit.m_VehicleType = p_jmsg.VT;
         p_unit.m_Video.VideoRecording = p_jmsg.VR;
         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
@@ -1108,7 +1109,7 @@ class CAndruavClientParser {
             this.#prv_onNewUnitAdded(p_unit);
             js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
         } else {
-            triggers.onVehicleChanged = p_unit.m_VehicleType !== p_jmsg.VT;
+            triggers.onVehicleChanged = oldVehicleType !== p_jmsg.VT;
             triggers.onFCB = p_unit.m_useFCBIMU !== p_jmsg.FI || p_unit.m_telemetry_protocol !== p_jmsg.TP;
         }
 
