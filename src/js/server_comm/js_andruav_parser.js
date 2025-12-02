@@ -1158,8 +1158,12 @@ class CAndruavClientParser {
             p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
         }
 
-        if (p_jmsg.C) {
+        if (p_jmsg.hasOwnProperty('C')) {
             p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
+        }
+        else
+        {
+            p_unit.m_Telemetry.fn_updateTelemetry(0);
         }
 
         if (p_jmsg.hasOwnProperty('SD')) {
