@@ -29,6 +29,7 @@ yarn-error.log*
 HEFNY_README.txt
 HEFNY_DEPLOY.txt
 
+wiki/local_wiki
 local/
 TODO.txt
 
