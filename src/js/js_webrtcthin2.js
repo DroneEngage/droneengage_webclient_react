@@ -25,6 +25,8 @@ class CTalk {
     // New properties for frame rate monitoring
     this.m_actualFrameRate = 0; // Stores the latest measured frame rate
     this.frameRateMonitorInterval = null; // Holds the setInterval ID
+    this.m_bytesReceived = 0; // Total bytes received from stats
+    this._lastBytesReceived = 0; // Previous bytes received for delta calculation
 
     // Callback functions, initialized to no-op functions
     this.onError = () => { };
@@ -144,7 +146,9 @@ class CTalk {
       this.m_actualFrameRate = currentFrameRate;
       js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
-      v_andruavUnit.m_Video.m_total_transfer_bytes += this.m_bytesReceived;
+      const deltaBytes = this.m_bytesReceived - this._lastBytesReceived;
+      v_andruavUnit.m_Video.m_total_transfer_bytes += deltaBytes;
+      this._lastBytesReceived = this.m_bytesReceived;
       js_eventEmitter.fn_dispatch(js_event.EE_onWebRTC_Video_Statistics, { 'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx': this.m_bytesReceived, 'track_id': trackIdentifier });
 
 
