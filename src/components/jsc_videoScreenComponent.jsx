@@ -76,7 +76,19 @@ export default class ClssCVideoScreen extends React.Component {
         js_eventEmitter.fn_subscribe(js_event.EE_DetectedTarget, this, this.fn_targetDetected);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraZoomChanged, this, this.fn_zoomChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStreamChanged);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStreamChanged);
         
+    }
+    
+    fn_videoStreamChanged(p_me, p_obj) {
+        // Re-render when video stream starts or stops for this track
+        if (p_me.props.obj.v_unit === p_obj.andruavUnit.getPartyID() && 
+            p_me.props.obj.v_track === p_obj.talk.targetVideoTrack) {
+            if (p_me.m_flag_mounted) {
+                p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+            }
+        }
     }
 
 
@@ -111,6 +123,8 @@ export default class ClssCVideoScreen extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraFlashChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraZoomChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped, this);
 
         // Remove fullscreen event listeners
         document.removeEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
@@ -585,9 +599,17 @@ export default class ClssCVideoScreen extends React.Component {
         const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
         const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const divID = "cam_" + andruavUnit.getPartyID() + this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
+        
+        // Check if this tab is currently active by looking at the DOM element
+        let activeClass = this.props.first;
+        const existingElement = document.getElementById(divID);
+        if (existingElement && existingElement.classList.contains('active')) {
+            activeClass = "active show";
+        }
+        
         if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
-                <div id={divID} className={"tab-pane fade in " + this.props.first}>
+                <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
                     <h4 key="h" className='bg-danger text-white rounded_6px'>{andruavUnit.m_unitName}</h4>
                     <div key="d" >NO VIDEO</div>
                 </div>
@@ -802,7 +824,7 @@ export default class ClssCVideoScreen extends React.Component {
         const isVideoFullScreen = this.fnl_isVideoFullScreen();
 
         return (
-            <div id={divID} className={"css_videoScreen tab-pane fade " + this.props.first}>
+            <div id={divID} className={"css_videoScreen tab-pane fade " + activeClass}>
                 <h4 key="h" className="bg-primary text-white rounded_6px">
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>
