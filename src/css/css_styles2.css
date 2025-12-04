@@ -195,6 +195,16 @@ img.css_fullscreen_active
 	content:url('/public/images/fullscreen_rb_32x32.png');
 }
 
+img.css_video_fullscreen
+{
+	content:url('/public/images/fullscreen_gb_32x32.png');
+}
+
+img.css_video_fullscreen_active
+{
+	content:url('/public/images/fullscreen_rb_32x32.png');
+}
+
 /* fire fox */
 img.css_video_ready:before
 {
@@ -856,6 +866,119 @@ input#txt_defaultAltitude
     background-attachment: scroll;
     overflow: hidden;
     box-sizing: border-box;
+}
+
+.css_videoContainer:fullscreen,
+.css_videoContainer:-webkit-full-screen,
+.css_videoContainer:-moz-full-screen,
+.css_videoContainer:-ms-fullscreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: black;
+    border-radius: 0;
+}
+
+.css_fullscreen_toolbar.show_toolbar {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 8px;
+}
+
+/* Video sizing modes - apply in both normal and fullscreen */
+.videoObject.video_fit_contain {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+}
+
+.videoObject.video_fit_width {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: fill;
+}
+
+.videoObject.video_fit_height {
+    width: auto !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: 100% !important;
+    object-fit: fill;
+}
+
+.videoObject.video_fit_stretch {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: fill;
+}
+
+/* Video sizing modes for fullscreen - use viewport units */
+.css_videoContainer:fullscreen .videoObject.video_fit_contain,
+.css_videoContainer:-webkit-full-screen .videoObject.video_fit_contain,
+.css_videoContainer:-moz-full-screen .videoObject.video_fit_contain,
+.css_videoContainer:-ms-fullscreen .videoObject.video_fit_contain {
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+}
+
+.css_videoContainer:fullscreen .videoObject.video_fit_width,
+.css_videoContainer:-webkit-full-screen .videoObject.video_fit_width,
+.css_videoContainer:-moz-full-screen .videoObject.video_fit_width,
+.css_videoContainer:-ms-fullscreen .videoObject.video_fit_width {
+    width: 100vw !important;
+}
+
+.css_videoContainer:fullscreen .videoObject.video_fit_height,
+.css_videoContainer:-webkit-full-screen .videoObject.video_fit_height,
+.css_videoContainer:-moz-full-screen .videoObject.video_fit_height,
+.css_videoContainer:-ms-fullscreen .videoObject.video_fit_height {
+    height: 100vh !important;
+}
+
+.css_videoContainer:fullscreen .videoObject.video_fit_stretch,
+.css_videoContainer:-webkit-full-screen .videoObject.video_fit_stretch,
+.css_videoContainer:-moz-full-screen .videoObject.video_fit_stretch,
+.css_videoContainer:-ms-fullscreen .videoObject.video_fit_stretch {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+img.css_video_fit_mode_contain {
+    content: url('/public/images/mode-alt_w.png');
+    width: 32px;
+    height: 32px;
+}
+
+img.css_video_fit_mode_width {
+    content: url('/public/images/mode-alt_g.png');
+    width: 32px;
+    height: 32px;
+}
+
+img.css_video_fit_mode_height {
+    content: url('/public/images/mode-alt_b.png');
+    width: 32px;
+    height: 32px;
+}
+
+img.css_video_fit_mode_stretch {
+    content: url('/public/images/mode-alt_r.png');
+    width: 32px;
+    height: 32px;
 }
 
 .canvasOverlay 

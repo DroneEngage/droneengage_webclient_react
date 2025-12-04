@@ -66,6 +66,12 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_local_rotations = ["rotate(0deg)", "rotate(90deg)", "rotate(180deg)", "rotate(270deg)"];
         this.m_timerID = null;
 
+        // Video fit modes: contain, width, height, stretch
+        this.m_videoFitModes = ["video_fit_contain", "video_fit_width", "video_fit_height", "video_fit_stretch"];
+        this.m_videoFitModeLabels = ["Fit (Contain)", "Fit Width (100%)", "Fit Height (100%)", "Stretch (Fill)"];
+        this.m_videoFitModeIcons = ["css_video_fit_mode_contain", "css_video_fit_mode_width", "css_video_fit_mode_height", "css_video_fit_mode_stretch"];
+        this.m_videoFitModeIndex = 0;
+
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
         js_eventEmitter.fn_subscribe(js_event.EE_DetectedTarget, this, this.fn_targetDetected);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
@@ -79,7 +85,17 @@ export default class ClssCVideoScreen extends React.Component {
         const me = this;
 
         this.m_flag_mounted = true;
-   
+
+        // Listen for fullscreen changes to update toolbar visibility
+        this.fnl_handleFullscreenChange = () => {
+            if (me.m_flag_mounted) {
+                me.setState({ 'm_update': me.state.m_update + 1 });
+            }
+        };
+        document.addEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', this.fnl_handleFullscreenChange);
     }
 
 
@@ -95,6 +111,12 @@ export default class ClssCVideoScreen extends React.Component {
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraFlashChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraZoomChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
+
+        // Remove fullscreen event listeners
+        document.removeEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', this.fnl_handleFullscreenChange);
     }
 
     
@@ -341,18 +363,23 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
 
-    fnl_isFullScreen() {
-
+    fnl_isVideoFullScreen() {
+        const c_ele = this.drawingContainerRef.current;
+        if (!c_ele) return false;
+        
         return (
-            window.innerHeight === window.screen.height ||
-            (window.screenTop === 0 && window.screenY === 0)
+            document.fullscreenElement === c_ele ||
+            document.webkitFullscreenElement === c_ele ||
+            document.mozFullScreenElement === c_ele ||
+            document.msFullscreenElement === c_ele
         );
     }
 
-    fnl_requestFullScreen(e) {
-        const c_ele = window.document.getElementById("div_video_control");
-        js_common.fn_console_log("fnl_requestFullScreen");
-        if (this.fnl_isFullScreen()) {
+    fnl_requestVideoFullScreen(e) {
+        const c_ele = this.drawingContainerRef.current;
+        if (!c_ele) return;
+        
+        if (this.fnl_isVideoFullScreen()) {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
@@ -380,8 +407,13 @@ export default class ClssCVideoScreen extends React.Component {
                 c_ele.msRequestFullscreen();
             }
         }
+    }
 
-
+    fnl_toggleVideoFitMode(e) {
+        this.m_videoFitModeIndex = (this.m_videoFitModeIndex + 1) % this.m_videoFitModes.length;
+        js_common.fn_console_log("Video fit mode: " + this.m_videoFitModeLabels[this.m_videoFitModeIndex]);
+        if (this.m_flag_mounted === false) return;
+        this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
     fnl_zoomInOut(e, p_zoomIn, p_obj) {
@@ -626,15 +658,15 @@ export default class ClssCVideoScreen extends React.Component {
             btn_videorecordClass = "cursor_hand  css_recvideo_active";
         }
 
-        let btn_fullscreen, btn_fullscreen_txt;
+        let btn_video_fullscreen, btn_video_fullscreen_txt;
 
-        if (this.fnl_isFullScreen()) {
-            btn_fullscreen = "cursor_hand css_fullscreen_active";
-            btn_fullscreen_txt = "Exit Full Screen";
+        if (this.fnl_isVideoFullScreen()) {
+            btn_video_fullscreen = "cursor_hand css_video_fullscreen_active";
+            btn_video_fullscreen_txt = "Exit Video Full Screen";
         }
         else {
-            btn_fullscreen = "cursor_hand css_fullscreen";
-            btn_fullscreen_txt = "Full Screen";
+            btn_video_fullscreen = "cursor_hand css_video_fullscreen";
+            btn_video_fullscreen_txt = "Video Full Screen";
         }
 
 
@@ -680,11 +712,20 @@ export default class ClssCVideoScreen extends React.Component {
                 </div>
                 <div key={key + "5"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <img
-                        id="btn_fullscreen"
-                        className={btn_fullscreen + " cursor_hand"}
-                        alt={btn_fullscreen_txt}
-                        title={btn_fullscreen_txt}
-                        onClick={(e) => this.fnl_requestFullScreen(e)}
+                        id="btn_video_fullscreen"
+                        className={btn_video_fullscreen}
+                        alt={btn_video_fullscreen_txt}
+                        title={btn_video_fullscreen_txt}
+                        onClick={(e) => this.fnl_requestVideoFullScreen(e)}
+                    />
+                </div>
+                <div key={key + "5c"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <img
+                        id="btn_video_fit_mode"
+                        className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
+                        alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                        title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                        onClick={(e) => this.fnl_toggleVideoFitMode(e)}
                     />
                 </div>
                 <div key={key + "6"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
@@ -758,12 +799,14 @@ export default class ClssCVideoScreen extends React.Component {
 
 
 
+        const isVideoFullScreen = this.fnl_isVideoFullScreen();
+
         return (
             <div id={divID} className={"css_videoScreen tab-pane fade " + this.props.first}>
                 <h4 key="h" className="bg-primary text-white rounded_6px">
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>
-                {v_btns}
+                {!isVideoFullScreen && v_btns}
                 <div key="d2" className="row">
                     <div id="gimbaldiv" className="col-4">
                         <div>
@@ -793,14 +836,19 @@ export default class ClssCVideoScreen extends React.Component {
                 <div
                     key={"tv" + talk.targetVideoTrack}
                     id={'css_tvideo-div' + talk.targetVideoTrack}
-                    className="css_videoContainer"
+                    className={"css_videoContainer" + (isVideoFullScreen ? " is_fullscreen" : "")}
                     ref={this.drawingContainerRef}
                     onMouseDown={(e) => this.fnl_div_mouseDown(e)}
                     onMouseUp={(e) => this.fnl_div_mouseUp(e)}
                 >
+                    {isVideoFullScreen && (
+                        <div className="css_fullscreen_toolbar show_toolbar">
+                            {v_btns}
+                        </div>
+                    )}
                     <video
                         autoPlay
-                        className="videoObject"
+                        className={"videoObject " + this.m_videoFitModes[this.m_videoFitModeIndex]}
                         id={"videoObject" + talk.targetVideoTrack}
                         style={video_style}
                         data-number={talk.number}
