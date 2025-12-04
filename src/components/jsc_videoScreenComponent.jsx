@@ -69,7 +69,7 @@ export default class ClssCVideoScreen extends React.Component {
         // Video fit modes: contain, width, height, stretch
         this.m_videoFitModes = ["video_fit_contain", "video_fit_width", "video_fit_height", "video_fit_stretch"];
         this.m_videoFitModeLabels = ["Fit (Contain)", "Fit Width (100%)", "Fit Height (100%)", "Stretch (Fill)"];
-        this.m_videoFitModeIcons = ["css_video_fit_mode_contain", "css_video_fit_mode_width", "css_video_fit_mode_height", "css_video_fit_mode_stretch"];
+        this.m_videoFitModeIcons = ["bi bi-arrows-expand css_large_icon text-primary", "bi bi-arrow-left-right css_large_icon text-success", "bi bi-arrow-down-up css_large_icon text-primary", "bi bi-arrows-fullscreen css_large_icon text-success"];
         this.m_videoFitModeIndex = 0;
 
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
@@ -741,15 +741,6 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_requestVideoFullScreen(e)}
                     />
                 </div>
-                <div key={key + "5c"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
-                    <img
-                        id="btn_video_fit_mode"
-                        className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
-                        alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        onClick={(e) => this.fnl_toggleVideoFitMode(e)}
-                    />
-                </div>
                 <div key={key + "6"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <img
                         id="btnSwitchCam"
@@ -812,6 +803,15 @@ export default class ClssCVideoScreen extends React.Component {
                 </div>
                 <div key={key + "14"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
+                </div>
+                <div key={key + "5c"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <i
+                        id="btn_video_fit_mode"
+                        className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
+                        alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                        title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                        onClick={(e) => this.fnl_toggleVideoFitMode(e)}
+                    ></i>
                 </div>
                 <div key={key + "15"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
