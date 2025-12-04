@@ -146,6 +146,8 @@ class CTalk {
       this.m_actualFrameRate = currentFrameRate;
       js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
+      if (!v_andruavUnit?.m_Video) return;
+      
       const deltaBytes = this.m_bytesReceived - this._lastBytesReceived;
       v_andruavUnit.m_Video.m_total_transfer_bytes += deltaBytes;
       this._lastBytesReceived = this.m_bytesReceived;
@@ -177,16 +179,6 @@ class AndruavStream {
     this.SessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription;
 
     this.rtcConfig = {
-      constraints: {
-        mandatory: {
-          OfferToReceiveAudio: false,
-          OfferToReceiveVideo: true,
-          codec: {
-            // mimeType: 'video/H264' // or 'video/VP8', 'video/VP9'
-          }
-        },
-        optional: [],
-      },
       sdpSemantics: "unified-plan",
       iceServers: js_siteConfig.CONST_ICE_SERVERS,
     };
@@ -322,7 +314,7 @@ class AndruavStream {
       talk.onRemoveStream = dialConfig.onRemovestream ?? talk.onRemoveStream;
 
 
-      talk.pc.onremovestream = talk.onRemoveStream;
+      talk.pc.onremovetrack = (event) => talk.onRemoveStream(event);
       talk.pc.ontrack = (mediaStreamEvent) => {
         talk.onConnect(talk);
         this.onAddTrack(talk, mediaStreamEvent);
