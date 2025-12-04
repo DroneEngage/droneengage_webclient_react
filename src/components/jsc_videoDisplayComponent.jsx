@@ -1,8 +1,4 @@
-import $ from 'jquery';
-
 import React from 'react';
-
-import FileSaver from 'file-saver';
 
 import { js_globals } from '../js/js_globals.js';
 import { js_eventEmitter } from '../js/js_eventEmitter'
@@ -10,7 +6,7 @@ import {EVENTS as js_event} from '../js/js_eventList.js'
 import * as js_helpers from '../js/js_helpers'
 import * as js_andruavUnit from '../js/js_andruavUnit'
 
-import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../js/js_main'
+import { fn_showVideoMainTab } from '../js/js_main'
 import ClssCVideoScreen from './jsc_videoScreenComponent.jsx'
 
 
@@ -20,6 +16,7 @@ export class ClssCVideoControl extends React.Component {
         this.state = {
             m_videoScreens: {},
             lastadded: null,
+            needsTabActivation: false,
             'm_update': 0
         };
 
@@ -37,6 +34,45 @@ export class ClssCVideoControl extends React.Component {
         this.m_flag_mounted = true;
     }
     
+    componentDidUpdate() {
+        // Activate the new tab after render if needed
+        if (this.state.needsTabActivation && this.state.lastadded) {
+            const v_obj = this.state.m_videoScreens[this.state.lastadded];
+            if (v_obj) {
+                const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
+                const tabPaneId = 'cam_' + andruavUnit.getPartyID() + v_obj.v_track;
+                const tabSelector = 'a[href="#' + tabPaneId + '"]';
+                
+                // Manually activate the tab by manipulating classes
+                // Deactivate all tabs and panes
+                const allTabs = document.querySelectorAll('#div_video_control .nav-link');
+                const allPanes = document.querySelectorAll('#div_video_control .tab-pane');
+                
+                allTabs.forEach(tab => {
+                    tab.classList.remove('active', 'show');
+                    tab.setAttribute('aria-selected', 'false');
+                });
+                
+                allPanes.forEach(pane => {
+                    pane.classList.remove('active', 'show', 'in');
+                    pane.classList.add('fade');
+                });
+                
+                // Activate the new tab
+                const tabElement = document.querySelector(tabSelector);
+                const paneElement = document.getElementById(tabPaneId);
+                
+                if (tabElement && paneElement) {
+                    tabElement.classList.add('active', 'show');
+                    tabElement.setAttribute('aria-selected', 'true');
+                    paneElement.classList.add('active', 'show', 'in');
+                }
+            }
+            // Reset the flag
+            this.setState({ needsTabActivation: false });
+        }
+    }
+    
     
     fn_videoStarted(p_me, p_obj) {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
@@ -49,18 +85,13 @@ export class ClssCVideoControl extends React.Component {
             c_screen.v_track = p_obj.talk.targetVideoTrack;
             c_screen.v_index = js_helpers.fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks, "id", p_obj.talk.targetVideoTrack);
             p_me.state.lastadded = vid;
+            p_me.state.needsTabActivation = true; // Flag to activate tab after render
         }
 
         fn_showVideoMainTab();
 
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
-
-        // SIMULATE a click to activate the link.
-        // bug: if the tab is already selected then click will not be effective.
-        // you need to deactivate the tab in case it is active
-        // eq(0) is another bug as using [0] will return a DOM object and you need a JQuery object.
-        $('#div_video_control ul li a[href="#cam_' + p_obj.andruavUnit.getPartyID() + p_me.state.m_videoScreens[vid].v_track + '"]').eq(0).parent().removeClass("active");
 
     }
 
