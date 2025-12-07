@@ -1029,7 +1029,7 @@ class CAndruavClientFacade {
         );
         let x = p_param_set.pack(p_param_set);
         let z = js_helpers.array_to_ArrayBuffer(x);
-        this.API_sendBinCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink, z);
+        js_andruav_ws.AndruavClientWS.API_sendBinCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink, z);
         p_mavlink_param.is_dirty = false;
     };
 
