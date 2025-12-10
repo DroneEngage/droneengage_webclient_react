@@ -174,6 +174,28 @@ export default class ClssModuleDetails extends React.Component {
                                         )}
                                     </div>
                                 </div>
+                                <div className="col-12">
+                                    <div className="d-flex align-items-center">
+                                        <small className="text-muted me-2 text-capitalize">{t('help_colon')}</small>
+                                        
+                                        {module.z === -1 && module.version_info && module.version_info.url ? (
+                                            <span className="fw-bold text-primary bold">
+                                                <a
+                                                    href={module.version_info.help}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-success"
+                                                >
+                                                    {module.version_info.help}
+                                                </a>
+                                            </span>
+                                        ) : (
+                                            <span className="fw-bold text-secondary">
+                                                &nbsp;-&nbsp;{module.help ? module.version_info.help || 'unknown' : 'unknown'}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -46,6 +46,7 @@
   "distance.ft": " футов",
   "version_colon": "Версия:",
   "latest_version_colon": "новейшая версия",
+  "help_colon":"Справка:",
   "status_colon": "Статус:",
   "offline": "ОФФЛАЙН",
   "connected": "Подключено",
