@@ -46,6 +46,7 @@
   "distance.ft": " ft",
   "version_colon": "Version:",
   "latest_version_colon": "Latest Version:",
+  "help_colon":"Help:",
   "status_colon": "Status:",
   "offline": "OFFLINE",
   "connected": "Connected",
