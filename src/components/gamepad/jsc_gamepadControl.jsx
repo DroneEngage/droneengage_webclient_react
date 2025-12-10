@@ -12,9 +12,9 @@ import {js_andruav_gamepad} from '../../js/gamepad/js_andruav_gamepad.js'
 
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
-import { ClssGamePadAxisControl } from '../micro_gadgets/jsc_gamepad_axis.jsx';
-import { ClssGamePadButton } from '../micro_gadgets/jsc_gamepad_button.jsx';
-import {ClssSingleAxisProgressControl} from '../micro_gadgets/jsc_gamepad_single_axis.jsx';
+import { ClssGamePadAxisControl } from './jsc_gamepad_axis.jsx';
+import { ClssGamePadButton } from './jsc_gamepad_button.jsx';
+import {ClssSingleAxisProgressControl} from './jsc_gamepad_single_axis.jsx';
 
 
 class ClssGamePadAxesControl extends React.Component {
