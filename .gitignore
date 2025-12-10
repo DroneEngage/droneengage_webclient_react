@@ -11,6 +11,7 @@ package-lock.json
 # production
 checks.json
 .vscode
+.windsurf
 wiki/local_wiki
 /ssl
 /local
