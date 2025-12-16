@@ -1516,7 +1516,7 @@ export function hlp_getFlightMode(p_andruavUnit) {
 				text = "Stabilize";
 				break;
 			case js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD:
-				text = "Hold";
+				text = "Alt-H";
 				break;
 			case js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL:
 				text = "Manual";
