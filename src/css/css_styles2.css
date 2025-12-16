@@ -1081,7 +1081,20 @@ div.modal_dialog_style
 	padding: 2px !important;
 	margin: 0 !important;
 	font-size: small !important;
+	width: 72px !important;
+}
 
+.css_hud_bullets li
+{
+	display: flex !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+}
+.css_hud_value
+{
+	display: inline-block !important;
+	width: 44px !important;
+	text-align: right !important;
 }
 .css_hud_div
 {
