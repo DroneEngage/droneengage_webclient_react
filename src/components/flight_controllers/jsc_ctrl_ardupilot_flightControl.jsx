@@ -162,6 +162,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_fbwa_class 	 	    = " disabled hidden ";
                     res.btn_yaw_class 	 	    = " btn-success  ";
                     res.btn_speed_class 	    = " btn-success  ";
+                    res.btn_acro_class          = " btn-danger ";
+                    res.btn_stabilize_class     = " btn-danger ";
+                    res.btn_alt_hold_class      = " btn-warning ";
                 break;
 
                 case js_andruavUnit.VEHICLE_SUBMARINE:
@@ -475,6 +478,27 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         }
     }
 
+
+    fn_doConfirmMode(v_andruavUnit, fn_callback)
+    {
+        if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
+            const me = this;
+            fn_do_modal_confirmation("DANGEROUS-YOU NEED TO CONTROL DRONE " + v_andruavUnit.m_unitName + "   " + v_andruavUnit.m_VehicleType_TXT,
+                "Are You SURE?", function (p_approved) {
+                    if (p_approved === false) 
+                    {
+                       return;
+                    }
+                    else
+                    {
+					    js_speak.fn_speak('DANGEROUS ACRO MODEL');
+                        fn_callback(v_andruavUnit);
+                        return ;
+                    }
+                }, "CONFIRM", "bg-danger text-white", "Cancel");
+        }
+    }
+
     fn_doArm(v_andruavUnit) {
         if (v_andruavUnit !== null && v_andruavUnit !== undefined) {
             const me = this;
@@ -550,7 +574,13 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
         });
     }
-
+    
+    fn_doAltHold(v_andruavUnit) {
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD);
+        });
+    }
+    
     fn_doRTL(v_andruavUnit, smart) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
             js_globals.v_andruavFacade.API_do_FlightMode(unit, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
@@ -717,6 +747,44 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
+            case js_andruavUnit.VEHICLE_QUAD:
+            case js_andruavUnit.VEHICLE_TRI:
+    {
+                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
+                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
+                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
+                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
+                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
+                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
+                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
+                    </div></div>);
+
+                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>&nbsp;Pos-H&nbsp;</button>
+                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>&nbsp;Loiter&nbsp;</button>
+                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>&nbsp;Manual&nbsp;</button>
+                    <button id='btn_acro' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_acro_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doAcro.bind(this))}>&nbsp;Acro&nbsp;</button>
+                    <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doStabilize.bind(this))}>&nbsp;Stablize&nbsp;</button>
+                    <button id='btn_altHold' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_alt_hold_class } onClick={ (e) => this.fn_doAltHold(this.props.v_andruavUnit)}>&nbsp;Alt-H&nbsp;</button>
+                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>&nbsp;RTL&nbsp;</button>
+                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>&nbsp;S-RTL&nbsp;</button>
+                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
+                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
+                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
+                    </div></div>);
+
+                
+                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
+                    </div></div>);
+                    }
+            break;
             case js_andruavUnit.VEHICLE_VTOL:
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
