@@ -169,6 +169,13 @@ h1.font-thin
 	display: none;
 }
 
+.btn-group > .hidden + .btn,
+.btn-group > .hidden + .btn-group,
+.btn-group > .hidden + .btn-check + .btn,
+.btn-group > .hidden + .btn-check + .btn-group {
+	margin-left: 0 !important;
+}
+
 .ltr {
 	direction: ltr;
 }
