@@ -1206,6 +1206,27 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
+	const v_modal = $('#changespeed_modal');
+	const v_txtSpeed = v_modal.find('#txtSpeed');
+	v_modal.off('shown.bs.modal.changespeed_modal');
+	v_modal.on('shown.bs.modal.changespeed_modal', function () {
+		v_txtSpeed.trigger('focus');
+	});
+	v_txtSpeed.off('keydown.changespeed_modal');
+	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
+		if (e.key === 'Enter' || e.keyCode === 13) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnOK').trigger('click');
+			return;
+		}
+		if (e.key === 'Escape' || e.keyCode === 27) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnCancel').trigger('click');
+		}
+	});
+
 
 	let v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt_relative != null ? (p_andruavUnit.m_Nav_Info.p_Location.alt_relative).toFixed(1) : 0;
 	if (v_altitude_val < js_globals.CONST_DEFAULT_ALTITUDE_min) {
@@ -1255,6 +1276,27 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 **/
 export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+	const v_modal = $('#changespeed_modal');
+	const v_txtSpeed = v_modal.find('#txtSpeed');
+	v_modal.off('shown.bs.modal.changespeed_modal');
+	v_modal.on('shown.bs.modal.changespeed_modal', function () {
+		v_txtSpeed.trigger('focus');
+	});
+	v_txtSpeed.off('keydown.changespeed_modal');
+	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
+		if (e.key === 'Enter' || e.keyCode === 13) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnOK').trigger('click');
+			return;
+		}
+		if (e.key === 'Escape' || e.keyCode === 27) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnCancel').trigger('click');
+		}
+	});
 
 	let v_speed_val = p_initSpeed;
 	if (v_speed_val === null || v_speed_val === undefined) {
@@ -1311,6 +1353,27 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 
 export function fn_changeUDPPort(p_andruavUnit, init_pot) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+	const v_modal = $('#changespeed_modal');
+	const v_txtSpeed = v_modal.find('#txtSpeed');
+	v_modal.off('shown.bs.modal.changespeed_modal');
+	v_modal.on('shown.bs.modal.changespeed_modal', function () {
+		v_txtSpeed.trigger('focus');
+	});
+	v_txtSpeed.off('keydown.changespeed_modal');
+	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
+		if (e.key === 'Enter' || e.keyCode === 13) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnOK').trigger('click');
+			return;
+		}
+		if (e.key === 'Escape' || e.keyCode === 27) {
+			e.preventDefault();
+			e.stopPropagation();
+			v_modal.find('#btnCancel').trigger('click');
+		}
+	});
 
 	let v_port_val = init_pot;
 	if (v_port_val === null || v_port_val === undefined) {
