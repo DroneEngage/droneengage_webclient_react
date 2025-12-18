@@ -25,6 +25,41 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 			};
     }
 
+    hlp_adjustFlightModeButtonClass (p_className, p_isActive)
+    {
+        if (p_className === null || p_className === undefined) return p_className;
+        if (typeof p_className !== 'string') return p_className;
+
+        if (p_className.includes('disabled') || p_className.includes('hidden')) return p_className;
+
+        const colors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'];
+        let res = p_className;
+
+        for (let i = 0; i < colors.length; ++i)
+        {
+            const color = colors[i];
+            const solid = `btn-${color}`;
+            const outline = `btn-outline-${color}`;
+
+            if (p_isActive === true)
+            {
+                if (res.includes(outline))
+                {
+                    res = res.replace(outline, solid);
+                }
+            }
+            else
+            {
+                if (res.includes(solid) && !res.includes(outline))
+                {
+                    res = res.replace(solid, outline);
+                }
+            }
+        }
+
+        return res;
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
         // Only re-render if the gpio_obj has changed
         const p_andruavUnit = this.state;
@@ -33,6 +68,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         const update =  (p_andruavUnit.m_VehicleType != v_andruavUnit.m_VehicleType
             || p_andruavUnit.m_is_ready_to_arm != v_andruavUnit.m_is_ready_to_arm
             || p_andruavUnit.m_isArmed != v_andruavUnit.m_isArmed
+            || (p_andruavUnit.m_flightMode != v_andruavUnit.m_flightMode)
             || p_andruavUnit.m_applyOnAllSameType != nextState.m_applyOnAllSameType
             || p_andruavUnit.m_hasSameTypeUnits != nextState.m_hasSameTypeUnits
         );
@@ -442,6 +478,38 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             } 				
 
 		}
+
+
+
+
+
+        // Activate buttons based on ACTIVE flight mode
+		const currentFlightMode = p_andruavUnit.m_flightMode;
+
+		res.btn_auto_class = this.hlp_adjustFlightModeButtonClass(res.btn_auto_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
+		res.btn_guided_class = this.hlp_adjustFlightModeButtonClass(res.btn_guided_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+		res.btn_circle_class = this.hlp_adjustFlightModeButtonClass(res.btn_circle_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+		res.btn_brake_class = this.hlp_adjustFlightModeButtonClass(res.btn_brake_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
+		res.btn_hold_class = this.hlp_adjustFlightModeButtonClass(res.btn_hold_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
+		res.btn_manual_class = this.hlp_adjustFlightModeButtonClass(res.btn_manual_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
+		res.btn_acro_class = this.hlp_adjustFlightModeButtonClass(res.btn_acro_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
+		res.btn_stabilize_class = this.hlp_adjustFlightModeButtonClass(res.btn_stabilize_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
+		res.btn_alt_hold_class = this.hlp_adjustFlightModeButtonClass(res.btn_alt_hold_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD);
+		res.btn_pos_hold_class = this.hlp_adjustFlightModeButtonClass(res.btn_pos_hold_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
+		res.btn_loiter_class = this.hlp_adjustFlightModeButtonClass(res.btn_loiter_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
+		res.btn_rtl_class = this.hlp_adjustFlightModeButtonClass(res.btn_rtl_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+		res.btn_srtl_class = this.hlp_adjustFlightModeButtonClass(res.btn_srtl_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL);
+		res.btn_cruise_class = this.hlp_adjustFlightModeButtonClass(res.btn_cruise_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
+		res.btn_fbwa_class = this.hlp_adjustFlightModeButtonClass(res.btn_fbwa_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
+		res.btn_takeoff_class = this.hlp_adjustFlightModeButtonClass(res.btn_takeoff_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
+		res.btn_land_class = this.hlp_adjustFlightModeButtonClass(res.btn_land_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_LAND);
+		res.btn_surface_class = this.hlp_adjustFlightModeButtonClass(res.btn_surface_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
+
+		res.btn_q_stabilize = this.hlp_adjustFlightModeButtonClass(res.btn_q_stabilize, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
+		res.btn_q_loiter = this.hlp_adjustFlightModeButtonClass(res.btn_q_loiter, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
+		res.btn_q_hover = this.hlp_adjustFlightModeButtonClass(res.btn_q_hover, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
+		res.btn_q_land = this.hlp_adjustFlightModeButtonClass(res.btn_q_land, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
+		res.btn_q_rtl = this.hlp_adjustFlightModeButtonClass(res.btn_q_rtl, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
 
 	    return res;
 	}
