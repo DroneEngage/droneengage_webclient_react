@@ -4,8 +4,6 @@
         "noFCB": "No FCB Connected",
         "mode": "mode - {{mode}}",
         "connectTitle": "Click to connect to FCB if not active",
-        "mode": "mode - {{mode}}",
-        "connectTitle": "Click to connect to FCB if not active",
         "flightModeTitle": "Flight Mode"
     },
     "distance": {
