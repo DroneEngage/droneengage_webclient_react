@@ -203,9 +203,9 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         }
         // for now this feature is disabled.
         //res.btn_rx_class   = "hidden disabled"; 
-        res.btn_save_wp_class = "btn-outline-danger  bi bi-journal-arrow-up";
+        res.btn_save_wp_class = "btn-danger  bi bi-journal-arrow-up";
         res.btn_clear_wp_class = "btn-danger bi bi-journal-x";
-        res.btn_load_wp_class = "btn-outline-primary  bi bi-journal-arrow-down";
+        res.btn_load_wp_class = "btn-primary  bi bi-journal-arrow-down";
 
 
 
