@@ -8,11 +8,12 @@ export default class ClssCtrlVideoFPS extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            actual_fps: 0,
+            m_actual_fps: 0,
             m_update: 0
         };
 
         this.key = Math.random().toString();
+        this.m_flag_mounted = false;
 
         js_eventEmitter.fn_subscribe(js_event.EE_onWebRTC_Video_Statistics, this, this.fn_videoStatistics);
     }
@@ -25,11 +26,13 @@ export default class ClssCtrlVideoFPS extends React.Component {
     }
 
     componentDidMount() {
+            this.m_flag_mounted = true;
             this.setState({ m_update: 1 });
     }
     
         
     componentWillUnmount() {
+        this.m_flag_mounted = false;
         js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
 
     }
@@ -37,11 +40,12 @@ export default class ClssCtrlVideoFPS extends React.Component {
     fn_videoStatistics(p_me, p_obj) {
         // {'unit':,'fps':, 'rx':bytesReceived}
 
-        p_me.state.m_actual_fps = p_obj.fps ?? p_obj.fps;
         if ((p_me.props.p_unit.getPartyID() !== p_obj.unit.getPartyID()) ||
         (p_me.props.track_id !== p_obj.track_id))
         return ;
         
+        p_me.state.m_actual_fps = p_obj.fps ?? p_obj.fps;
+
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
     }
