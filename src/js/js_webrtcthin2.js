@@ -133,7 +133,11 @@ class CTalk {
           if (report.framesPerSecond !== undefined) {
             currentFrameRate = report.framesPerSecond;
           } else if (report.framesDecoded !== undefined && this._lastFramesDecoded !== undefined && this._lastTimestamp !== undefined) {
-            currentFrameRate = 0;
+            const timeDiff = report.timestamp - this._lastTimestamp;
+            const frameDiff = report.framesDecoded - this._lastFramesDecoded;
+            if (timeDiff > 0) {
+              currentFrameRate = (frameDiff / timeDiff) * 1000;
+            }
           }
           this._lastFramesDecoded = report.framesDecoded;
           this._lastTimestamp = report.timestamp;
@@ -151,7 +155,7 @@ class CTalk {
       const deltaBytes = this.m_bytesReceived - this._lastBytesReceived;
       v_andruavUnit.m_Video.m_total_transfer_bytes += deltaBytes;
       this._lastBytesReceived = this.m_bytesReceived;
-      js_eventEmitter.fn_dispatch(js_event.EE_onWebRTC_Video_Statistics, { 'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx': this.m_bytesReceived, 'track_id': trackIdentifier });
+      js_eventEmitter.fn_dispatch(js_event.EE_onWebRTC_Video_Statistics, { 'unit': v_andruavUnit, 'fps': currentFrameRate, 'rx': this.m_bytesReceived, 'track_id': this.targetVideoTrack });
 
 
     } catch (e) {
