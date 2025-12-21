@@ -68,7 +68,7 @@ export default class ClssCtrlVideoFPS extends React.Component {
                 className={css_Track + " css_large_icon " + this.props.className}
                 title={css_Track_title}
                     >
-                    <span style={{ fontFamily: 'monospace', display: 'inline-block', width: '3ch', textAlign: 'right' }}>{this.state.m_actual_fps}</span>
+                    <span style={{ fontFamily: 'monospace', display: 'inline-block', width: '3ch', textAlign: 'right' }}>{Math.max(0, parseInt(this.state.m_actual_fps) || 0)}</span>
                     {this.state.m_update % 2 === 0 ? (
                         <span className="text-success">.</span>
                     ) : (
