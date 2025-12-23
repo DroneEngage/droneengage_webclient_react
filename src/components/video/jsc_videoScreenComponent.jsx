@@ -15,6 +15,9 @@ import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, f
 import ClssCtrlGPIO_Flash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'
+import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
+
+import ClssCVideoTrackerLayer from './jsc_videoTrackerLayer.jsx'
 
 export default class ClssCVideoScreen extends React.Component {
 
@@ -59,12 +62,10 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_transform_rotated = "";
         this.m_transform_mirrored = "";
         this.videoRef = React.createRef();
-        this.canvasRef = React.createRef();
         this.m_rotation = 0;
 
         this.m_rotations = [0, 90, 180, 270];
         this.m_local_rotations = ["rotate(0deg)", "rotate(90deg)", "rotate(180deg)", "rotate(270deg)"];
-        this.m_timerID = null;
 
         // Video fit modes: contain, width, height, stretch
         this.m_videoFitModes = ["video_fit_contain", "video_fit_width", "video_fit_height", "video_fit_stretch"];
@@ -73,7 +74,6 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_videoFitModeIndex = 0;
 
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
-        js_eventEmitter.fn_subscribe(js_event.EE_DetectedTarget, this, this.fn_targetDetected);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraZoomChanged, this, this.fn_zoomChanged);
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStreamChanged);
@@ -119,7 +119,6 @@ export default class ClssCVideoScreen extends React.Component {
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamRedraw, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_DetectedTarget, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraFlashChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_cameraZoomChanged, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
@@ -220,21 +219,6 @@ export default class ClssCVideoScreen extends React.Component {
 
 
 
-    fn_targetDetected(p_me, p_unit) {
-        //CODEBLOCK_START
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
-            // used to test behavior after removing code and as double check
-            return;
-        }
-
-        if (p_me.props.obj.v_unit !== p_unit.getPartyID()) {
-            return;
-        }
-
-        p_me.fnl_canvas(p_unit.m_DetectedTargets.m_targets);
-        //CODEBLOCK_END
-    }
-
     fn_flashChanged(p_me, p_obj) {
         if (p_me.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
             return;
@@ -310,41 +294,6 @@ export default class ClssCVideoScreen extends React.Component {
         const v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
         if (v_video === null || v_video === undefined) return;
         v_video.srcObject = c_talk.stream;
-    }
-
-    fnl_canvas(p_targets) {
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) return;
-
-        if (this.m_timerID) cancelAnimationFrame(this.m_timerID);
-
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
-        const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
-        const c_canvas = $('canvas#canvasoObject' + c_talk.targetVideoTrack)[0];
-        if (!c_canvas) return;
-
-        const c_ctx = c_canvas.getContext('2d');
-        c_ctx.font = "8px Arial";
-        c_ctx.textAlign = "center";
-        c_ctx.fillStyle = "yellow";
-
-        c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
-
-        const c_list = p_targets.m_list;
-        const c_len = c_list.length;
-        for (let i = 0; i < c_len; ++i) {
-            const p_target = c_list[i];
-            const c_x1 = p_target.x1 * c_canvas.width;
-            const c_y1 = p_target.y1 * c_canvas.height;
-            const c_x2 = p_target.x2 * c_canvas.width;
-            const c_y2 = p_target.y2 * c_canvas.height;
-            c_ctx.strokeStyle = 'rgb(200, 0, 0)';
-            c_ctx.strokeRect(c_x1, c_y1, c_x2, c_y2);
-            c_ctx.fillText(p_target.m_name, c_x1 + c_x2 / 2, c_y1 + c_y2 / 2);
-        }
-
-        this.m_timerID = requestAnimationFrame(() => {
-            c_ctx.clearRect(0, 0, c_canvas.width, c_canvas.height);
-        });
     }
 
     fnl_requestPictureInPicture(p_andruavUnit, videoTrackID) {
@@ -876,6 +825,17 @@ export default class ClssCVideoScreen extends React.Component {
                         data-number={talk.number}
                         ref={this.videoRef}
                     ></video>
+                    <ClssCVideoTrackerLayer
+                        id={"canvasoObject" + talk.targetVideoTrack} 
+                        p_videoRef={this.videoRef}
+                        p_obj={this.props.obj}
+                        zIndex={210}
+                    />
+                    <ClssCVideoHUDOverlay
+                        p_unit={andruavUnit}
+                        p_videoRef={this.videoRef}
+                        p_containerRef={this.drawingContainerRef}
+                    />
                 </div>
             </div>
         );
