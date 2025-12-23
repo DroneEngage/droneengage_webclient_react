@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { js_globals } from '../js/js_globals.js';
-import { js_eventEmitter } from '../js/js_eventEmitter'
-import {EVENTS as js_event} from '../js/js_eventList.js'
-import * as js_helpers from '../js/js_helpers'
-import * as js_andruavUnit from '../js/js_andruavUnit'
+import { js_globals } from '../../js/js_globals.js';
+import { js_eventEmitter } from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/js_eventList.js'
+import * as js_helpers from '../../js/js_helpers.js'
+import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
-import { fn_showVideoMainTab } from '../js/js_main'
+import { fn_showVideoMainTab } from '../../js/js_main.js'
 import ClssCVideoScreen from './jsc_videoScreenComponent.jsx'
 
 
