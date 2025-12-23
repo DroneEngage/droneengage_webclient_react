@@ -27,7 +27,7 @@ import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx';
 import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
-import { ClssCVideoControl } from '../components/jsc_videoDisplayComponent.jsx';
+import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
 import { fn_on_ready } from '../js/js_main';
 
 const Home = () => {
