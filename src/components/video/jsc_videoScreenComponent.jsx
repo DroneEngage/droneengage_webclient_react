@@ -18,6 +18,7 @@ import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'
 import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx'
 import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx'
 import ClssCtrlDrone_FlightMode_Ctrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx'
+import ClssCtrlDistanceToMeControl from '../gadgets/jsc_ctrl_distance_to_me_control.jsx'
 import ClssCtrlOpacityControl from '../gadgets/jsc_ctrl_opacity_control.jsx'
 import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
 
@@ -866,6 +867,15 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="80px"
+                        width="150px"
+                        height="30px"
+                        style={{zIndex: 220}}
+                    />
+                    <ClssCtrlDistanceToMeControl
+                        p_unit={andruavUnit}
+                        isHUD={true}
+                        x="10px"
+                        y="115px"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
