@@ -126,6 +126,8 @@ export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
                 <ClssCVideoCanvasLabel
                     x={this.props.x}
                     y={this.props.y}
+                    originX={this.props.originX}
+                    originY={this.props.originY}
                     width={this.props.width}
                     height={this.props.height}
                     style={this.props.style}
