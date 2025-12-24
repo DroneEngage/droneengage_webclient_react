@@ -12,6 +12,7 @@ import { ClssCtrlDirections } from '../gadgets/jsc_ctrl_directions_control.jsx';
 import ClssCtrlSWARM from '../gadgets/jsc_ctrl_swarm.jsx';
 import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx';
 import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx';
+import ClssCtrlDrone_FlightMode_Ctrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx';
 
 /**
  * This is the MAIN tab control
@@ -122,8 +123,6 @@ class ClssCtrlDroneIMU extends React.Component {
         let v_bearing_text;
         let v_bearing_knob = [];
         let v_bearingTarget_knob = [];
-        let v_flight_mode_text;
-        let v_flight_mode_class = " ";
         let v_distanceToMe_text;
         let v_distanceToMe_class;
         let v_flight_status_text;
@@ -151,25 +150,6 @@ class ClssCtrlDroneIMU extends React.Component {
         const c_delta = v_andruavUnit.m_FlyingLastStartTime === 0 ? 0.0 : v_andruavUnit.m_FlyingLastStartTime;
         v_totalFlyingTime = js_helpers.fn_getTimeDiffDetails_Shortest(c_delta + v_andruavUnit.m_FlyingTotalDuration);
 
-        switch (v_andruavUnit.m_telemetry_protocol) {
-            case js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry:
-                v_flight_mode_text = t('unit_control_imu:telemetry.noFCB');
-                v_flight_mode_class = "bg-warning";
-                v_fcb_mode_title = t('unit_control_imu:telemetry.connectTitle');
-                break;
-            case js_andruavMessages.CONST_TelemetryProtocol_CONST_Andruav_Telemetry:
-            case js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry:
-            case js_andruavMessages.CONST_TelemetryProtocol_CONST_MW_Telemetry:
-            case js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry:
-            case js_andruavMessages.CONST_TelemetryProtocol_DJI_Telemetry:
-            case js_andruavMessages.CONST_TelemetryProtocol_CONST_Unknown_Telemetry:
-                v_flight_mode_text = t('unit_control_imu:telemetry.mode', { mode: hlp_getFlightMode(v_andruavUnit) });
-                v_flight_mode_class = "bg-info text-white";
-                v_fcb_mode_title = t('unit_control_imu:telemetry.flightModeTitle');
-                break;
-        }
-
-        v_flight_mode_class += " cursor_hand";
 
         if (v_andruavUnit.m_Nav_Info.p_Location.lat === null || v_andruavUnit.m_Nav_Info.p_Location.lat === undefined) {
             v_distanceToMe_class = "bg-danger text-white cursor_hand";
@@ -360,14 +340,7 @@ class ClssCtrlDroneIMU extends React.Component {
                         </p>
                     </div>
                     <div key={'fcb_mode_ctrl4' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 css_margin_zero user-select-none p-1">
-                        <p
-                            id="fcb_mode"
-                            className={'rounded-3 textunit_att_btn text-center p-1 ' + v_flight_mode_class}
-                            title={v_fcb_mode_title}
-                            onClick={(e) => this.fn_connectToFCB(v_andruavUnit, true)}
-                        >
-                            {v_flight_mode_text}
-                        </p>
+                        <ClssCtrlDrone_FlightMode_Ctrl p_unit={v_andruavUnit} />
                     </div>
                 </div>
 
