@@ -16,6 +16,8 @@ import ClssCtrlGPIO_Flash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'
 import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx'
+import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx'
+import ClssCtrlOpacityControl from '../gadgets/jsc_ctrl_opacity_control.jsx'
 import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
 
 import ClssCVideoTrackerLayer from './jsc_videoTrackerLayer.jsx'
@@ -763,6 +765,9 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_toggleVideoFitMode(e)}
                     ></i>
                 </div>
+                <div key={key + "5d"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
+                </div>
                 <div key={key + "15"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
                 </div>
@@ -842,6 +847,15 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="10px"
+                        width="150px"
+                        height="30px"
+                        style={{zIndex: 220}}
+                    />
+                    <ClssCtrlDrone_Speed_Ctrl
+                        p_unit={andruavUnit}
+                        isHUD={true}
+                        x="10px"
+                        y="45px"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}

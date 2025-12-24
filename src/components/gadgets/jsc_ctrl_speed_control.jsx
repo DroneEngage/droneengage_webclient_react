@@ -4,6 +4,7 @@ import * as js_helpers from '../../js/js_helpers.js'
 import { js_globals } from '../../js/js_globals.js';
 import { js_speak } from '../../js/js_speak'
 import { fn_changeSpeed } from '../../js/js_main.js'
+import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 
 export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
@@ -63,29 +64,55 @@ export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
 
     render() {
         const v_andruavUnit = this.props.p_unit;
+        if (!v_andruavUnit) return null;
 
-        let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " m/s";
+        let v_unit_text = js_globals.v_useMetricSystem ? 'm/s' : 'mph';
+
+        let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " " + v_unit_text;
         if (js_globals.v_useMetricSystem === false) {
             // value stored in meters per seconds so convert it to miles per hour
-            v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " mph";
+            v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " " + v_unit_text;
         }
 
-        let v_speed_text = "";
+        let v_speed_val = 'NA';
 
-        if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed === null || v_andruavUnit.m_Nav_Info.p_Location.ground_speed === undefined) {
-            v_speed_text = 'NA';
-        } else {
-            v_speed_text = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
+        if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== null && v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== undefined) {
+            let speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
             v_andruavUnit.m_gui.speed_link = true;
             if (js_globals.v_useMetricSystem === true) {
-                v_speed_text = v_speed_text.toFixed(0) + ' m/s';
+                v_speed_val = speed.toFixed(0);
             }
             else {
-                v_speed_text = (v_speed_text * js_helpers.CONST_METER_TO_MILE).toFixed(0) + ' mph';
+                v_speed_val = (speed * js_helpers.CONST_METER_TO_MILE).toFixed(0);
             }
-
         }
 
+        // HUD MODE
+        if (this.props.isHUD === true) {
+             return (
+                <ClssCVideoCanvasLabel
+                    x={this.props.x}
+                    y={this.props.y}
+                    width={this.props.width}
+                    height={this.props.height}
+                    style={this.props.style}
+                    css_class={this.props.css_class}
+                    
+                    backgroundColor={this.props.backgroundColor || 'rgba(177, 175, 175, 0.89)'}
+                    opacity={this.props.opacity || 0.8}
+                    borderRadius={this.props.borderRadius || '6px'}
+                    padding={this.props.padding}
+                    pointerEvents={this.props.pointerEvents || 'none'}
+                    
+                    p_title={{ text: 'GS:', color: '#eee3e3ff' }}
+                    p_value={{ text: v_speed_val, color: '#05f826ff' }}
+                    p_unit={{ text: v_unit_text, color: '#00FF00' }}
+                />
+             );
+        }
+
+        // Standard Rendering
+        const v_speed_text = v_speed_val === 'NA' ? 'NA' : (v_speed_val + ' ' + v_unit_text);
 
         return (
             <p key={this.key + 'spd_ctrl'} className={this.props.className + ' rounded-3 text-warning cursor_hand textunit_w135'} title='Ground Speed'>
