@@ -204,8 +204,20 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         // If x or y are provided, switch to absolute positioning
         if (this.props.x !== undefined || this.props.y !== undefined) {
             style.position = 'absolute';
-            if (this.props.x !== undefined) style.left = this.props.x;
-            if (this.props.y !== undefined) style.top = this.props.y;
+
+            const originX = this.props.originX || 'left';
+            const originY = this.props.originY || 'top';
+
+            if (this.props.x !== undefined) {
+                if (originX === 'right') style.right = this.props.x;
+                else style.left = this.props.x;
+            }
+
+            if (this.props.y !== undefined) {
+                if (originY === 'bottom') style.bottom = this.props.y;
+                else style.top = this.props.y;
+            }
+
             // Ensure zIndex is high enough if not specified
             if (style.zIndex === undefined) style.zIndex = 10;
         }

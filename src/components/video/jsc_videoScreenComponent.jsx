@@ -849,6 +849,7 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="10px"
+                        originX="right"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
@@ -858,6 +859,7 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="45px"
+                        originX="right"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
@@ -867,6 +869,7 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="80px"
+                        originX="right"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
@@ -876,6 +879,7 @@ export default class ClssCVideoScreen extends React.Component {
                         isHUD={true}
                         x="10px"
                         y="115px"
+                        originX="right"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
