@@ -3,16 +3,17 @@
         "flightModeTitle": "Mode de Vol",
         "noFCB": "Pas de FC Connecté",
         "mode": "mode - {{mode}}",
-        "connectTitle": "Cliquer pour connecter le FC si pas actif",
-        "mode": "mode - {{mode}}",
-        "connectTitle": "Cliquer pour connecter le FC si pas actif",
-        "flightModeTitle": "Mode de Vol"
+        "connectTitle": "Cliquer pour connecter le FC si pas actif"
     },
     "distance": {
         "title": "Distance de l'unité par rapport à moi (Location du Navigateur)",
         "noUnitGPS": "Pas de GPS pour l'unité",
         "noGCSGPS": "Pas de GPS pour GCS",
-        "label": "DFM"
+        "label": "DFM",
+        "km": " km",
+        "m": " m",
+        "mi": " mi",
+        "ft": " ft"
     },
     "fence": {
         "title": "Status VIolation Geofence",
