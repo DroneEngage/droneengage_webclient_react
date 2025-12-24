@@ -48,7 +48,7 @@ export default class ClssCtrlOpacityControl extends React.Component {
     }
 
     render() {
-        let css_icon = "bi bi-eye-fill cursor_hand";
+        let css_icon = "bi bi-lightbulb-fill cursor_hand";
         let title = "Opacity Control";
 
         // Logic for icon colors and titles based on opacity
@@ -59,16 +59,16 @@ export default class ClssCtrlOpacityControl extends React.Component {
 
         // Use a small epsilon for float comparison just in case, though usually exact match works for assigned values
         if (this.state.m_opacity >= 0.95) { // ~1.0
-            css_icon = "bi bi-eye-fill text-warning cursor_hand";
+            css_icon = "bi bi-lightbulb-fill text-white cursor_hand";
             title = "HUD Visible (100%)";
         } else if (this.state.m_opacity >= 0.65) { // ~0.7
-            css_icon = "bi bi-eye-fill text-success cursor_hand";
+            css_icon = "bi bi-lightbulb-fill text-light cursor_hand";
             title = "HUD Visible (70%)";
         } else if (this.state.m_opacity >= 0.35) { // ~0.4
-            css_icon = "bi bi-eye-fill text-primary cursor_hand";
+            css_icon = "bi bi-lightbulb-fill text-secondary cursor_hand";
             title = "HUD Visible (40%)";
         } else { // ~0.0
-            css_icon = "bi bi-eye-slash text-secondary cursor_hand";
+            css_icon = "bi bi-lightbulb-off text-secondary cursor_hand";
             title = "HUD Hidden";
         }
 
