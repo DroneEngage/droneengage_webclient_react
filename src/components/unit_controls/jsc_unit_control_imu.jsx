@@ -13,6 +13,7 @@ import ClssCtrlSWARM from '../gadgets/jsc_ctrl_swarm.jsx';
 import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx';
 import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx';
 import ClssCtrlDrone_FlightMode_Ctrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx';
+import ClssCtrlDistanceToMeControl from '../gadgets/jsc_ctrl_distance_to_me_control.jsx';
 
 /**
  * This is the MAIN tab control
@@ -123,8 +124,6 @@ class ClssCtrlDroneIMU extends React.Component {
         let v_bearing_text;
         let v_bearing_knob = [];
         let v_bearingTarget_knob = [];
-        let v_distanceToMe_text;
-        let v_distanceToMe_class;
         let v_flight_status_text;
         let v_flight_status_class;
         let distanceToWP_class;
@@ -150,41 +149,6 @@ class ClssCtrlDroneIMU extends React.Component {
         const c_delta = v_andruavUnit.m_FlyingLastStartTime === 0 ? 0.0 : v_andruavUnit.m_FlyingLastStartTime;
         v_totalFlyingTime = js_helpers.fn_getTimeDiffDetails_Shortest(c_delta + v_andruavUnit.m_FlyingTotalDuration);
 
-
-        if (v_andruavUnit.m_Nav_Info.p_Location.lat === null || v_andruavUnit.m_Nav_Info.p_Location.lat === undefined) {
-            v_distanceToMe_class = "bg-danger text-white cursor_hand";
-            v_distanceToMe_text = t('unit_control_imu:distance.noUnitGPS');
-        } else if (js_globals.myposition === null || js_globals.myposition === undefined) {
-            v_distanceToMe_text = t('unit_control_imu:distance.noGCSGPS');
-            v_distanceToMe_class = "bg-danger text-white cursor_hand";
-        } else {
-            const v_lat2 = v_andruavUnit.m_Nav_Info.p_Location.lat;
-            const v_lng2 = v_andruavUnit.m_Nav_Info.p_Location.lng;
-            const distance = js_helpers.fn_calcDistance(js_globals.myposition.coords.latitude, js_globals.myposition.coords.longitude, v_lat2, v_lng2);
-            if (js_globals.v_useMetricSystem === true) {
-                const KM_1 = 1000;
-                if (distance >= KM_1) {
-                    v_distanceToMe_text = Number((distance / 1000).toFixed(1)).toLocaleString() + t('unit_control_imu:distance.km');
-                } else {
-                    v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + t('unit_control_imu:distance.m');
-                }
-            } else {
-                const MILE_1 = 5280;
-                if (distance * js_helpers.CONST_METER_TO_FEET >= MILE_1) {
-                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / MILE_1).toFixed(1)).toLocaleString() + t('unit_control_imu:distance.mi');
-                } else {
-                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + t('unit_control_imu:distance.ft');
-                }
-            }
-
-            if (distance > js_globals.CONST_DFM_FAR) {
-                v_distanceToMe_class = "bg-danger text-white cursor_hand";
-            } else if (distance > js_globals.CONST_DFM_SAFE) {
-                v_distanceToMe_class = "bg-info text-white";
-            } else {
-                v_distanceToMe_class = "bg-success text-white";
-            }
-        }
 
         if (v_andruavUnit.m_Nav_Info.p_Orientation.yaw == null) {
             v_yaw_text = t('unit_control_imu:hud.unknown');
@@ -297,13 +261,7 @@ class ClssCtrlDroneIMU extends React.Component {
                         </p>
                     </div>
                     <div key="DFM" className="col-6 col-md-3 user-select-none p-1">
-                        <p
-                            id="DFM"
-                            className={'rounded-3 text-center textunit_att_btn p-1 ' + v_distanceToMe_class}
-                            title={t('unit_control_imu:distance.title')}
-                        >
-                            {t('unit_control_imu:distance.label') + ': ' + v_distanceToMe_text}
-                        </p>
+                        <ClssCtrlDistanceToMeControl p_unit={v_andruavUnit} />
                     </div>
                     <div key="fence" className="col-6 col-md-3 user-select-none p-1">
                         <p
