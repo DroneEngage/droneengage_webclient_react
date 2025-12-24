@@ -868,8 +868,8 @@ export default class ClssCVideoScreen extends React.Component {
                         p_unit={andruavUnit}
                         isHUD={true}
                         x="10px"
-                        y="80px"
-                        originX="right"
+                        y="10px"
+                        originX="left"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}
@@ -878,8 +878,8 @@ export default class ClssCVideoScreen extends React.Component {
                         p_unit={andruavUnit}
                         isHUD={true}
                         x="10px"
-                        y="115px"
-                        originX="right"
+                        y="45px"
+                        originX="left"
                         width="150px"
                         height="30px"
                         style={{zIndex: 220}}

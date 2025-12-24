@@ -4,6 +4,14 @@ import { EVENTS as js_event } from '../../js/js_eventList.js'
 
 export default class ClssCVideoCanvasLabel extends React.Component {
 
+    static defaultProps = {
+        background_color: 'rgba(91, 91, 92, 0.29)',
+        title_color: '#eee3e3ff',
+        value_color: '#05f826ff',
+        unit_color: '#00FF00',
+        opacity: 0.8
+    };
+
     constructor(props) {
         super(props);
 
