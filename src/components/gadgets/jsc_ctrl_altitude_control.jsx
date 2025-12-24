@@ -17,7 +17,7 @@ export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
         super(props);
         this.state = {
             m_update: 0,
-            m_opacity: 0.8
+            m_opacity: ClssCVideoCanvasLabel.defaultProps.opacity
         };
     };
 
@@ -146,15 +146,15 @@ export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
                     style={this.props.style}
                     css_class={this.props.css_class}
                     
-                    backgroundColor={this.props.backgroundColor || 'rgba(177, 175, 175, 0.89)'}
+                    backgroundColor={this.props.backgroundColor || ClssCVideoCanvasLabel.defaultProps.background_color}
                     opacity={this.state.m_opacity}
                     borderRadius={this.props.borderRadius || '6px'}
                     padding={this.props.padding}
                     pointerEvents={this.props.pointerEvents || 'none'}
                     
-                    p_title={{ text: v_alt_title, color: '#eee3e3ff' }}
-                    p_value={{ text: displayValue, color: '#05f826ff' }}
-                    p_unit={{ text: v_unit_text, color: '#00FF00' }}
+                    p_title={{ text: v_alt_title, color: ClssCVideoCanvasLabel.defaultProps.title_color }}
+                    p_value={{ text: displayValue, color: ClssCVideoCanvasLabel.defaultProps.value_color }}
+                    p_unit={{ text: v_unit_text, color: ClssCVideoCanvasLabel.defaultProps.unit_color }}
                 />
              );
         }
