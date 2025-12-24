@@ -12,7 +12,8 @@ export default class ClssCVideoHUDOverlay extends React.Component {
         super(props);
 
         this.state = {
-            'm_update': 0
+            'm_update': 0,
+            'm_opacity': 0.8 // Default opacity
         };
 
         this.key = Math.random().toString();
@@ -30,14 +31,21 @@ export default class ClssCVideoHUDOverlay extends React.Component {
         this.fnl_handleResize = this.fnl_handleResize.bind(this);
 
         js_eventEmitter.fn_subscribe (js_event.EE_unitNavUpdated,this,this.fn_update);
+        js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
 
         this.m_resizeObserver = null;
         this.m_raf_id = null;
     }
 
+    fn_EE_changeOpacity(me, params) {
+        if (params && params.opacity !== undefined) {
+            me.setState({ 'm_opacity': params.opacity });
+        }
+    }
+
 
     shouldComponentUpdate(nextProps, nextState) {
-        const update = (this.state.m_update != nextState.m_update) ;
+        const update = (this.state.m_update != nextState.m_update) || (this.state.m_opacity !== nextState.m_opacity);
 
         return update;
     }
@@ -83,6 +91,7 @@ export default class ClssCVideoHUDOverlay extends React.Component {
 
     componentWillUnmount () {
         js_eventEmitter.fn_unsubscribe (js_event.EE_unitNavUpdated,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
 
         window.removeEventListener('resize', this.fnl_handleResize);
 
@@ -286,7 +295,8 @@ export default class ClssCVideoHUDOverlay extends React.Component {
                     backgroundColor: 'rgba(60, 60, 60, 0.35)',
                     borderRadius: '6px',
                     pointerEvents: 'none',
-                    zIndex: 200
+                    zIndex: 200,
+                    opacity: this.state.m_opacity
                 }}
             >
                 <canvas
