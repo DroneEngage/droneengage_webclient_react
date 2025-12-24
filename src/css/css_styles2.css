@@ -1359,6 +1359,7 @@ div#displays
 	height: 30px !important;
 	font-size: 11px !important;
 	font-weight: bold !important;
+    min-width: 100px !important;
   }
 
 
