@@ -8,6 +8,7 @@ import {js_localStorage} from '../../js/js_localStorage'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import { fn_changeAltitude, fn_convertToMeter } from '../../js/js_main.js'
+import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 
 export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
@@ -56,70 +57,76 @@ export class ClssCtrlDrone_Altitude_Ctrl extends React.Component {
     }
     
 
-
     render() {
         const v_andruavUnit = this.props.p_unit;
+        if (!v_andruavUnit) return null;
 
-        let v_altitude_text = "";
-		let v_alt_title, v_alt_remark;
+        let v_alt_title, v_alt_remark;
+        let v_unit_text = js_globals.v_useMetricSystem ? 'm' : 'ft';
 
-        if (v_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE)
-        {
-            v_alt_title ='depth:';
+        if (v_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE) {
+            v_alt_title = 'depth:';
             v_alt_remark = 'depth';
-        }
-        else
-        {
+        } else {
             v_alt_title = 'Alt:';
             v_alt_remark = 'Alt ';
-        }  
+        }
 
         v_alt_remark += 'display: relative/absolute ... step: ' + js_localStorage.fn_getDefaultAltitude();
+        v_alt_remark += js_globals.v_useMetricSystem ? " m" : " feet";
 
-        if (js_globals.v_useMetricSystem === true) {
-            v_alt_remark += " m";
-        }
-        else
-        {
-            v_alt_remark += " feet";
-        }
+        let v_alt_rel_val = v_andruavUnit.m_Nav_Info.p_Location.alt_relative;
+        let v_alt_abs_val = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
+        
+        let v_alt_rel_str = 'NA';
+        let v_alt_abs_str = 'NA';
 
-        let v_altitude = v_andruavUnit.m_Nav_Info.p_Location.alt_relative;
-		if (v_altitude==null) 
-        {
-            v_altitude = 'NA';
-        } 
-        else 
-        {
-            if (js_globals.v_useMetricSystem === true)
-            {
-                v_altitude = v_altitude.toFixed(0).toString() + "m";
-            }
-            else
-            {
-                v_altitude = (v_altitude * js_helpers.CONST_METER_TO_FEET).toFixed(0) + "ft";
-            }
+        if (v_alt_rel_val !== null && v_alt_rel_val !== undefined) {
+             if (js_globals.v_useMetricSystem) {
+                 v_alt_rel_str = v_alt_rel_val.toFixed(0);
+             } else {
+                 v_alt_rel_str = (v_alt_rel_val * js_helpers.CONST_METER_TO_FEET).toFixed(0);
+             }
         }
 
-        let v_altitude_abs = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
-		if (v_altitude_abs === null || v_altitude_abs === undefined) 
-        {
-            v_altitude_abs = 'NA';
-        } 
-        else 
-        {
-            if (js_globals.v_useMetricSystem === true)
-            {
-                v_altitude_abs = v_altitude_abs.toFixed(0).toString() + "m";
-            }
-            else
-            {
-                v_altitude_abs = (v_altitude_abs * js_helpers.CONST_METER_TO_FEET).toFixed(0) + "ft";
-            }
+        if (v_alt_abs_val !== null && v_alt_abs_val !== undefined) {
+             if (js_globals.v_useMetricSystem) {
+                 v_alt_abs_str = v_alt_abs_val.toFixed(0);
+             } else {
+                 v_alt_abs_str = (v_alt_abs_val * js_helpers.CONST_METER_TO_FEET).toFixed(0);
+             }
         }
 
-        v_altitude_text = v_altitude + '/' + v_altitude_abs;    
+        // HUD MODE
+        if (this.props.isHUD === true) {
+             const displayValue = `${v_alt_rel_str}/${v_alt_abs_str}`;
+             
+             return (
+                <ClssCVideoCanvasLabel
+                    x={this.props.x}
+                    y={this.props.y}
+                    width={this.props.width}
+                    height={this.props.height}
+                    style={this.props.style}
+                    css_class={this.props.css_class}
+                    
+                    backgroundColor={this.props.backgroundColor || 'rgba(177, 175, 175, 0.89)'}
+                    opacity={this.props.opacity || 0.8}
+                    borderRadius={this.props.borderRadius || '6px'}
+                    padding={this.props.padding}
+                    pointerEvents={this.props.pointerEvents || 'none'}
+                    
+                    p_title={{ text: v_alt_title, color: '#eee3e3ff' }}
+                    p_value={{ text: displayValue, color: '#05f826ff' }}
+                    p_unit={{ text: v_unit_text, color: '#00FF00' }}
+                />
+             );
+        }
 
+        // Standard Rendering
+        const legacy_rel = v_alt_rel_str === 'NA' ? 'NA' : (v_alt_rel_str + v_unit_text);
+        const legacy_abs = v_alt_abs_str === 'NA' ? 'NA' : (v_alt_abs_str + v_unit_text);
+        const v_altitude_text = legacy_rel + '/' + legacy_abs;    
 
         return (
                 <p id='alt' className={this.props.className + ' rounded-3 cursor_hand textunit_att_btn text-warning '} >

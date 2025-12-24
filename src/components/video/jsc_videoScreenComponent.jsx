@@ -15,6 +15,7 @@ import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, f
 import ClssCtrlGPIO_Flash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'
+import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx'
 import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
 
 import ClssCVideoTrackerLayer from './jsc_videoTrackerLayer.jsx'
@@ -835,6 +836,15 @@ export default class ClssCVideoScreen extends React.Component {
                         p_unit={andruavUnit}
                         p_videoRef={this.videoRef}
                         p_containerRef={this.drawingContainerRef}
+                    />
+                    <ClssCtrlDrone_Altitude_Ctrl
+                        p_unit={andruavUnit}
+                        isHUD={true}
+                        x="10px"
+                        y="10px"
+                        width="150px"
+                        height="30px"
+                        style={{zIndex: 220}}
                     />
                 </div>
             </div>
