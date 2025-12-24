@@ -3,14 +3,17 @@
         "flightModeTitle": "Flight Mode",
         "noFCB": "No FCB Connected",
         "mode": "mode - {{mode}}",
-        "connectTitle": "Click to connect to FCB if not active",
-        "flightModeTitle": "Flight Mode"
+        "connectTitle": "Click to connect to FCB if not active"
     },
     "distance": {
         "title": "Unit's distance from Me (Browser Location)",
         "noUnitGPS": "No Unit GPS",
         "noGCSGPS": "No GCS GPS",
-        "label": "DFM"
+        "label": "DFM",
+        "km": " km",
+        "m": " m",
+        "mi": " mi",
+        "ft": " ft"
     },
     "fence": {
         "title": "Fence Violation Status",

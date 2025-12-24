@@ -38,7 +38,11 @@
         "title": "Distancia de la unidad desde mí (ubicación del navegador)",
         "noUnitGPS": "Sin GPS de la unidad",
         "noGCSGPS": "Sin GPS de GCS",
-        "label": "DFM"
+        "label": "DFM",
+        "km": " km",
+        "m": " m",
+        "mi": " mi",
+        "ft": " ft"
     },
     "fence": {
         "title": "Estado de violación de la valla",

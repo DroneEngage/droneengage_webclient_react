@@ -164,16 +164,16 @@ class ClssCtrlDroneIMU extends React.Component {
             if (js_globals.v_useMetricSystem === true) {
                 const KM_1 = 1000;
                 if (distance >= KM_1) {
-                    v_distanceToMe_text = Number((distance / 1000).toFixed(1)).toLocaleString() + t('distance.km');
+                    v_distanceToMe_text = Number((distance / 1000).toFixed(1)).toLocaleString() + t('unit_control_imu:distance.km');
                 } else {
-                    v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + t('distance.m');
+                    v_distanceToMe_text = Number(distance.toFixed(0)).toLocaleString() + t('unit_control_imu:distance.m');
                 }
             } else {
                 const MILE_1 = 5280;
                 if (distance * js_helpers.CONST_METER_TO_FEET >= MILE_1) {
-                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / MILE_1).toFixed(1)).toLocaleString() + t('distance.mi');
+                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET / MILE_1).toFixed(1)).toLocaleString() + t('unit_control_imu:distance.mi');
                 } else {
-                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + t('distance.ft');
+                    v_distanceToMe_text = Number((distance * js_helpers.CONST_METER_TO_FEET).toFixed(0)).toLocaleString() + t('unit_control_imu:distance.ft');
                 }
             }
 
