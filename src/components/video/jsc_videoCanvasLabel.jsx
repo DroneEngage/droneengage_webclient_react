@@ -1,4 +1,6 @@
 import React from 'react';
+import { js_eventEmitter } from '../../js/js_eventEmitter'
+import { EVENTS as js_event } from '../../js/js_eventList.js'
 
 export default class ClssCVideoCanvasLabel extends React.Component {
 
@@ -8,10 +10,24 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         this.m_canvasRef = React.createRef();
         this.m_containerRef = React.createRef();
         
+        this.state = {
+            m_opacity: this.props.opacity !== undefined ? this.props.opacity : 0.8
+        };
+
         this.m_resizeObserver = null;
         this.m_raf_id = null;
 
         this.fnl_handleResize = this.fnl_handleResize.bind(this);
+        js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
+                
+    }
+
+    fn_EE_changeOpacity(me, params) {
+        if (params && params.opacity !== undefined) {
+            me.setState({ m_opacity: params.opacity }, () => {
+                me.fn_draw();
+            });
+        }
     }
 
     componentDidMount() {
@@ -37,6 +53,7 @@ export default class ClssCVideoCanvasLabel extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.fnl_handleResize);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
         
         if (this.m_resizeObserver) {
             this.m_resizeObserver.disconnect();
@@ -199,7 +216,10 @@ export default class ClssCVideoCanvasLabel extends React.Component {
 
         // Apply visual properties
         if (this.props.backgroundColor !== undefined) style.backgroundColor = this.props.backgroundColor;
-        if (this.props.opacity !== undefined) style.opacity = this.props.opacity;
+        
+        // Use state for opacity to support dynamic updates
+        style.opacity = this.state.m_opacity;
+
         if (this.props.borderRadius !== undefined) style.borderRadius = this.props.borderRadius;
         if (this.props.padding !== undefined) style.padding = this.props.padding;
         if (this.props.pointerEvents !== undefined) style.pointerEvents = this.props.pointerEvents;
