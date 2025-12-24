@@ -1,5 +1,6 @@
 import React from 'react';
-
+import { EVENTS as js_event } from '../../js/js_eventList.js';
+import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import * as js_helpers from '../../js/js_helpers.js'
 import { js_globals } from '../../js/js_globals.js';
 import { js_speak } from '../../js/js_speak'
@@ -13,11 +14,43 @@ export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
 
         this.state = {
             m_update: 0,
+            m_opacity: 0.8
         };
 
         this.key = Math.random().toString();
-
     };
+
+    componentDidMount() {
+        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated, this, this.fn_update);
+        js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
+    }
+
+    componentWillUnmount() {
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.m_update !== nextState.m_update) return true;
+        if (this.state.m_opacity !== nextState.m_opacity) return true;
+        
+        if (this.props.p_unit !== nextProps.p_unit) return true;
+        if (this.props.isHUD !== nextProps.isHUD) return true;
+        
+        return false;
+    }
+
+    fn_update(p_me, p_andruavUnit) {
+        if (p_me.props.p_unit && p_andruavUnit.getPartyID() === p_me.props.p_unit.getPartyID()) {
+            p_me.setState({ m_update: p_me.state.m_update + 1 });
+        }
+    }
+
+    fn_EE_changeOpacity(me, params) {
+        if (params && params.opacity !== undefined) {
+            me.setState({ 'm_opacity': params.opacity });
+        }
+    }
 
     fn_changeSpeed(e, p_andruavUnit, p_speed) {
         if (fn_changeSpeed === false) return; // no speed info
@@ -99,7 +132,7 @@ export class ClssCtrlDrone_Speed_Ctrl extends React.Component {
                     css_class={this.props.css_class}
                     
                     backgroundColor={this.props.backgroundColor || 'rgba(177, 175, 175, 0.89)'}
-                    opacity={this.props.opacity || 0.8}
+                    opacity={this.state.m_opacity}
                     borderRadius={this.props.borderRadius || '6px'}
                     padding={this.props.padding}
                     pointerEvents={this.props.pointerEvents || 'none'}
