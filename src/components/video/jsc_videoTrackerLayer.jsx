@@ -96,11 +96,16 @@ export default class ClssCVideoTrackerLayer extends React.Component {
         // Clear everything
         c_ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-        c_ctx.font = "8px Arial";
+        c_ctx.font = "bold 12px Arial";
         c_ctx.textAlign = "center";
-        c_ctx.fillStyle = "yellow";
-        c_ctx.strokeStyle = 'rgb(200, 0, 0)';
-        c_ctx.lineWidth = 2; // Make it visible
+        
+        // Style: Green dashed border with semi-transparent green background
+        c_ctx.strokeStyle = '#00FF00';
+        c_ctx.lineWidth = 2;
+        c_ctx.setLineDash([6, 3]); 
+
+        // Debug log to confirm new code is running
+        console.log("ClssCVideoTrackerLayer: drawing targets (Green)", p_targets);
 
         const c_list = p_targets.m_list;
         const c_len = c_list.length;
@@ -111,7 +116,15 @@ export default class ClssCVideoTrackerLayer extends React.Component {
             const c_x2 = p_target.x2 * cssWidth;
             const c_y2 = p_target.y2 * cssHeight;
             
+            // Draw background
+            c_ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+            c_ctx.fillRect(c_x1, c_y1, c_x2, c_y2);
+
+            // Draw border
             c_ctx.strokeRect(c_x1, c_y1, c_x2, c_y2);
+            
+            // Draw text
+            c_ctx.fillStyle = "yellow";
             c_ctx.fillText(p_target.m_name, c_x1 + c_x2 / 2, c_y1 + c_y2 / 2);
         }
 
@@ -188,7 +201,7 @@ export default class ClssCVideoTrackerLayer extends React.Component {
     }
 
     render() {
-        const { zIndex } = this.props;
+        const { zIndex, pointerEvents } = this.props;
         return (
             <canvas
                 id={this.props.id}
@@ -196,7 +209,7 @@ export default class ClssCVideoTrackerLayer extends React.Component {
                 className={this.props.className}
                 style={{
                     position: 'absolute',
-                    pointerEvents: 'none',
+                    pointerEvents: pointerEvents || 'none',
                     zIndex: zIndex || 'auto'
                 }}
             />
