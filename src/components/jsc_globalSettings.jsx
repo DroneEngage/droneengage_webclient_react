@@ -125,7 +125,7 @@ class ClssDefault extends React.Component {
                   id="txt_defaultAltitude"
                   type="number"
                   min={parseInt(js_globals.CONST_DEFAULT_ALTITUDE_min)}
-                  className="form-control input-xs input-sm"
+                  className="form-control input-xs input-sm ms-2"
                   onChange={(e) => this.onChange(e)}
                   value={this.state.CONST_DEFAULT_ALTITUDE}
                   ref={this.altitudeInputRef}
@@ -153,14 +153,14 @@ class ClssDefault extends React.Component {
                   id="txt_defaultCircle"
                   type="number"
                   min={parseInt(js_globals.CONST_DEFAULT_RADIUS_min)}
-                  className="form-control input-xs input-sm"
+                  className="form-control input-xs input-sm ms-2"
                   onChange={(e) => this.onChange(e)}
                   value={this.state.CONST_DEFAULT_RADIUS}
                   ref={this.radiusInputRef}
                 />
                 <button
                   id="btn_defaultCircle"
-                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1"
+                  className="btn btn-secondary btn-sm mb-1 pt-0 pb-1 ms-1"
                   type="button"
                   onClick={(e) => this.clickToggleUnit(e)}
                 >
