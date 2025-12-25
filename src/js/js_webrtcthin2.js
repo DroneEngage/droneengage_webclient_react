@@ -148,7 +148,7 @@ class CTalk {
 
 
       this.m_actualFrameRate = currentFrameRate;
-      js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
+      //js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
       const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
       if (!v_andruavUnit?.m_Video) return;
       
