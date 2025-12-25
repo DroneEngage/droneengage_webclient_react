@@ -19,6 +19,7 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         this.m_containerRef = React.createRef();
         
         this.state = {
+            m_update: 0,
             m_opacity: this.props.opacity !== undefined ? this.props.opacity : 0.8
         };
 
@@ -26,6 +27,8 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         this.m_raf_id = null;
 
         this.fnl_handleResize = this.fnl_handleResize.bind(this);
+        this.fnl_handleFullscreenChange = this.fnl_handleFullscreenChange.bind(this);
+        
         js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
                 
     }
@@ -42,6 +45,10 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         this.fn_syncCanvasSize();
         
         window.addEventListener('resize', this.fnl_handleResize);
+        document.addEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', this.fnl_handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', this.fnl_handleFullscreenChange);
 
         const c_container = this.m_containerRef.current;
         if (c_container && window.ResizeObserver) {
@@ -61,6 +68,11 @@ export default class ClssCVideoCanvasLabel extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.fnl_handleResize);
+        document.removeEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('mozfullscreenchange', this.fnl_handleFullscreenChange);
+        document.removeEventListener('MSFullscreenChange', this.fnl_handleFullscreenChange);
+
         js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
         
         if (this.m_resizeObserver) {
@@ -74,12 +86,19 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         }
     }
 
+    fnl_handleFullscreenChange() {
+        // Give the browser a moment to settle layout
+        setTimeout(() => {
+            this.fnl_handleResize();
+        }, 100);
+        this.fnl_handleResize();
+    }
+
     fnl_handleResize() {
         if (this.m_raf_id) cancelAnimationFrame(this.m_raf_id);
         this.m_raf_id = requestAnimationFrame(() => {
             this.m_raf_id = null;
-            this.fn_syncCanvasSize();
-            this.fn_draw();
+            this.setState({ m_update: this.state.m_update + 1 });
         });
     }
 

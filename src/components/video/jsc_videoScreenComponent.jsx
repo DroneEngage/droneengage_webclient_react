@@ -62,6 +62,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         this.key = Math.random().toString();
         this.drawingContainerRef = React.createRef(); // Ref to your main div
+        this.selectionBoxRef = React.createRef(); // Ref for selection visual feedback
 
         this.m_mirrored = false;
         this.m_transform_rotated = "";
@@ -451,7 +452,10 @@ export default class ClssCVideoScreen extends React.Component {
         if (c_andruavUnit == null) {
             return;
         }
-        if (!c_andruavUnit.m_tracker.m_enable_gui_tracker) return ;
+        if (!c_andruavUnit.m_tracker.m_enable_gui_tracker) {
+            js_common.fn_console_log("GUI Tracker disabled");
+            return;
+        }
         if (e.button !== 0) return;
 
         const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
@@ -468,14 +472,49 @@ export default class ClssCVideoScreen extends React.Component {
             width: 0,
             height: 0
         };
-        
+
+        // Initialize visual selection box
+        if (this.selectionBoxRef && this.selectionBoxRef.current) {
+            const s = this.selectionBoxRef.current.style;
+            s.left = this.startX + 'px';
+            s.top = this.startY + 'px';
+            s.width = '0px';
+            s.height = '0px';
+            s.display = 'block';
+        }
     }
 
+    fnl_div_mouseMove(e) {
+        if (!this.isDrawing) return;
+
+        const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
+        const currentX = e.clientX - containerRect.left;
+        const currentY = e.clientY - containerRect.top;
+
+        const width = Math.abs(currentX - this.startX);
+        const height = Math.abs(currentY - this.startY);
+        const left = Math.min(this.startX, currentX);
+        const top = Math.min(this.startY, currentY);
+
+        // Update visual selection box
+        if (this.selectionBoxRef && this.selectionBoxRef.current) {
+            const s = this.selectionBoxRef.current.style;
+            s.left = left + 'px';
+            s.top = top + 'px';
+            s.width = width + 'px';
+            s.height = height + 'px';
+        }
+    }
     
     fnl_div_mouseUp(e) {
         if (!this.isDrawing) return; // Use instance variable
 
         this.isDrawing = false; // Reset instance variable
+        
+        // Hide visual selection box
+        if (this.selectionBoxRef && this.selectionBoxRef.current) {
+            this.selectionBoxRef.current.style.display = 'none';
+        }
         
         const containerRect = this.drawingContainerRef.current.getBoundingClientRect();
         const currentX = e.clientX - containerRect.left;
@@ -814,79 +853,96 @@ export default class ClssCVideoScreen extends React.Component {
                 </div>
                 <div
                     key={"tv" + talk.targetVideoTrack}
-                    id={'css_tvideo-div' + talk.targetVideoTrack}
-                    className={"css_videoContainer" + (isVideoFullScreen ? " is_fullscreen" : "")}
-                    ref={this.drawingContainerRef}
-                    onMouseDown={(e) => this.fnl_div_mouseDown(e)}
-                    onMouseUp={(e) => this.fnl_div_mouseUp(e)}
-                >
-                    {isVideoFullScreen && (
-                        <div className="css_fullscreen_toolbar show_toolbar">
-                            {v_btns}
-                        </div>
-                    )}
-                    <video
-                        autoPlay
-                        className={"videoObject " + this.m_videoFitModes[this.m_videoFitModeIndex]}
-                        id={"videoObject" + talk.targetVideoTrack}
-                        style={video_style}
-                        data-number={talk.number}
-                        ref={this.videoRef}
-                    ></video>
-                    <ClssCVideoTrackerLayer
-                        id={"canvasoObject" + talk.targetVideoTrack} 
-                        p_videoRef={this.videoRef}
-                        p_obj={this.props.obj}
-                        zIndex={210}
-                    />
-                    <ClssCVideoHUDOverlay
-                        p_unit={andruavUnit}
-                        p_videoRef={this.videoRef}
-                        p_containerRef={this.drawingContainerRef}
-                    />
-                    <ClssCtrlDrone_Altitude_Ctrl
-                        p_unit={andruavUnit}
-                        isHUD={true}
-                        x="10px"
-                        y="10px"
-                        originX="right"
-                        width="150px"
-                        height="30px"
-                        style={{zIndex: 220}}
-                    />
-                    <ClssCtrlDrone_Speed_Ctrl
-                        p_unit={andruavUnit}
-                        isHUD={true}
-                        x="10px"
-                        y="45px"
-                        originX="right"
-                        width="150px"
-                        height="30px"
-                        style={{zIndex: 220}}
-                    />
-                    <ClssCtrlDrone_FlightMode_Ctrl
-                        p_unit={andruavUnit}
-                        isHUD={true}
-                        x="10px"
-                        y="10px"
-                        originX="left"
-                        width="150px"
-                        height="30px"
-                        style={{zIndex: 220}}
-                    />
-                    <ClssCtrlDistanceToMeControl
-                        p_unit={andruavUnit}
-                        isHUD={true}
-                        x="10px"
-                        y="45px"
-                        originX="left"
-                        width="150px"
-                        height="30px"
-                        style={{zIndex: 220}}
-                    />
+            id={'css_tvideo-div' + talk.targetVideoTrack}
+            className={"css_videoContainer" + (isVideoFullScreen ? " is_fullscreen" : "")}
+            ref={this.drawingContainerRef}
+            onMouseDown={(e) => this.fnl_div_mouseDown(e)}
+            onMouseUp={(e) => this.fnl_div_mouseUp(e)}
+            onMouseMove={(e) => this.fnl_div_mouseMove(e)}
+        >
+            {isVideoFullScreen && (
+                <div className="css_fullscreen_toolbar show_toolbar">
+                    {v_btns}
                 </div>
-            </div>
-        );
+            )}
+            <video
+                autoPlay
+                className={"videoObject " + this.m_videoFitModes[this.m_videoFitModeIndex]}
+                id={"videoObject" + talk.targetVideoTrack}
+                style={video_style}
+                data-number={talk.number}
+                ref={this.videoRef}
+            ></video>
+            <div 
+                ref={this.selectionBoxRef}
+                style={{
+                    position: 'absolute',
+                    border: '2px dashed #cee40bff',
+                    backgroundColor: 'rgba(219, 55, 14, 0.2)',
+                    zIndex: 1001,
+                    display: 'none',
+                    pointerEvents: 'none'
+                }}
+            />
+            <ClssCVideoTrackerLayer
+                id={"canvasoObject" + talk.targetVideoTrack} 
+                p_videoRef={this.videoRef}
+                p_obj={this.props.obj}
+                zIndex={210}
+                pointerEvents='none'
+            />
+            <ClssCVideoHUDOverlay
+                p_unit={andruavUnit}
+                p_videoRef={this.videoRef}
+                p_containerRef={this.drawingContainerRef}
+            />
+            <ClssCtrlDrone_Altitude_Ctrl
+                p_unit={andruavUnit}
+                isHUD={true}
+                x="10px"
+                y="420px"
+                originX="right"
+                originY="bottom"
+                width="150px"
+                height="30px"
+                style={{zIndex: 1000}}
+            />
+            <ClssCtrlDrone_Speed_Ctrl
+                p_unit={andruavUnit}
+                isHUD={true}
+                x="10px"
+                y="385px"
+                originX="right"
+                originY="bottom"
+                width="150px"
+                height="30px"
+                style={{zIndex: 1000}}
+            />
+            <ClssCtrlDrone_FlightMode_Ctrl
+                p_unit={andruavUnit}
+                isHUD={true}
+                x="10px"
+                y="350px"
+                originX="right"
+                originY="bottom"
+                width="150px"
+                height="30px"
+                style={{zIndex: 1000}}
+            />
+            <ClssCtrlDistanceToMeControl
+                p_unit={andruavUnit}
+                isHUD={true}
+                x="10px"
+                y="315px"
+                originX="right"
+                originY="bottom"
+                width="150px"
+                height="30px"
+                style={{zIndex: 1000}}
+            />
+        </div>
+    </div>
+);
     }
 }
 
