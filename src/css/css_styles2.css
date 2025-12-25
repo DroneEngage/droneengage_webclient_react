@@ -2,8 +2,8 @@
 div.css_mainbody
 {
   position: fixed;
-  top: 90px; /* Header height */
-  bottom: 50px; /* Footer height */
+  top: 60px; /* Header height */
+  bottom: 30px; /* Footer height */
   left: 0;
   right: 0;
   overflow-y: hidden;
@@ -775,10 +775,6 @@ div#alertdiv
 	border-width: 0px !important;
 }
 
-div#servoblk
-{
-	
-}
 
 div#gimbaldiv
 {
@@ -822,15 +818,7 @@ div#login_btn
 	margin-top: 5px;
 }
 
-div#login_div
-{
-    
-}
 
-div#andruavUnits
-{
-    
-}
 
 input#txt_defaultCircle
 {
@@ -1205,20 +1193,8 @@ div.msgerror {
 }
 
 
-.lbl_prop
-{
-	
-}
 
-.txt_prop
-{
 
-}
-
-.btn_prop
-{
-	
-}
 
 .small_icon
 {
@@ -1247,7 +1223,7 @@ table.css_table_log
 
 #row_2 {
   overflow-y: auto;
-  max-height: calc(100vh - 110px); /* Adjust based on header (60px) and footer (50px) heights */
+  height: 100%;
 }
 
 div#displays
@@ -1379,5 +1355,5 @@ div#displays
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 0px; /* Adjust based on actual footer height */
+  height: 30px; /* Adjust based on actual footer height */
 }

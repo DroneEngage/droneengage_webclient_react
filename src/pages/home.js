@@ -40,9 +40,7 @@ const Home = () => {
 
   return (
     <div>
-      <div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
-        <ClssHeaderControl />
-      </div>
+      <ClssHeaderControl />
 
       <div id="mainBody" className="row css_mainbody">
         <div id="row_1" className="col-8">
@@ -282,7 +280,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
+      <div id="footer_div" className="row mt-0 me-0 mw-0">
         <ClssFooterControl />
       </div>
     </div>
