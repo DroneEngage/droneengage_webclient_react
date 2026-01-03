@@ -14,6 +14,7 @@ import Planning from "./pages/planning";
 import Accounts from "./pages/accounts";
 import NoPage from "./pages/NoPage";
 import GamePadTesterPage from "./pages/gamepadTester";
+import DebugPage from "./pages/debug";
 
 
 
@@ -34,6 +35,7 @@ export default function App2() {
           <Route path="mapeditor"  element={<Planning />} />
           <Route path="accounts"  element={<Accounts />} />
           <Route path="gamepad"  element={<GamePadTesterPage />} />
+          <Route path="debug"  element={<DebugPage />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
