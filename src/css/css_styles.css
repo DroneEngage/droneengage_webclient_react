@@ -1090,6 +1090,14 @@ padding-left: 5px
 	border-right: 1px dotted var(--bs-light);
 }
 
+.css_border_right_faint {
+    border-right: 1px dotted rgba(153, 150, 146, 0.452) !important;
+}
+
+.css_padding_horizontal_5 {
+    padding: 0px 8px !important;
+}
+
 .blink_error {
 	animation: blink_error 0.5s ;
 	color: var(--bs-danger) ;
