@@ -55,6 +55,10 @@ class CLeafLetAndruavMap {
 
     fn_invalidateSize()
     {
+        if (this.m_Map == null) {
+            console.warn('Map not initialized');
+            return;
+        }
         this.m_Map.invalidateSize();
     }
 
@@ -69,7 +73,7 @@ class CLeafLetAndruavMap {
     */
     fn_initMap(p_mapelement) {
         let v_site_copyright;
-         v_site_copyright = '&copy; <a href="' + js_siteConfig.CONST_HOME_URL + '">' + js_siteConfig.CONST_TITLE + '</a>';
+         v_site_copyright = '&copy; <a href="' + (js_siteConfig.CONST_HOME_URL || '#') + '">' + (js_siteConfig.CONST_TITLE || 'Map') + '</a>';
 
 
         this.m_Map = L.map(p_mapelement, {
@@ -78,27 +82,28 @@ class CLeafLetAndruavMap {
             doubleClickZoom: false // Disable the default double-click zoom
         });
         
-        if (js_globals.CONST_MAP_GOOLE_PLUGIN === true)
-        {
-            let ggl = new L.Google('SATELLITE'); // Possible types: SATELLITE, ROADMAP, HYBRID, TERRAIN
-
-            this.m_Map.addLayer(ggl);
-            let zoomControl = new L.Control.Zoom({ position: 'topright' });
-            zoomControl.addTo(this.m_Map);
+        // Validate tile layer URL before using
+        const tileUrl = js_siteConfig.CONST_MAP_LEAFLET_URL;
+        if (!tileUrl) {
+            console.error('Map tile URL not configured in js_siteConfig.CONST_MAP_LEAFLET_URL');
+            return;
         }
-        else
-        {
-            L.tileLayer(js_siteConfig.CONST_MAP_LEAFLET_URL, {
+        
+        L.tileLayer(tileUrl, {
                 maxZoom: 22,
                 attribution: v_site_copyright,
                 id: 'mapbox.streets'
             }).addTo(this.m_Map);
-        }
-
         
 
         
         if (js_globals.CONST_MAP_EDITOR === true) {
+            // Check if Geoman plugin is available
+            if (this.m_Map.pm == null) {
+                console.error('Geoman plugin not loaded. Map editor features will not be available.');
+                return;
+            }
+            
             this.m_Map.pm.addControls({
                 position: 'topleft',
                 drawMarker: false,
@@ -169,19 +174,6 @@ class CLeafLetAndruavMap {
             });
         }
         
-         // Function to add a marker
-        // function fn_addMarker(loc, me) {
-        //     const marker = L.marker(loc).addTo(me.m_Map);
-        //     marker.pm.enable();
-        //     marker.bindPopup('New Marker').openPopup();
-        //     // Fire the pm:create event
-        //     marker.fire('pm:create', {
-        //         layer: marker,
-        //         shape: 'Marker'
-        //     });
-        // }
-
-        
         let update_timeout = null;
         this.m_Map.on('click', function (event) {
             if (js_globals.CONST_MAP_EDITOR !== true)
@@ -236,37 +228,70 @@ class CLeafLetAndruavMap {
 
 
     fn_PanTo_latlng(p_lat, p_lng) {
+        if (this.m_Map == null) {
+            console.warn('Map not initialized');
+            return;
+        }
         let v_latlng = new L.LatLng(p_lat, p_lng);
 
         this.m_Map.panTo(v_latlng);
     };
 
     fn_PanTo(p_marker) {
+        if (!p_marker || !p_marker._latlng) return;
+        if (this.m_Map == null) {
+            console.warn('Map not initialized');
+            return;
+        }
         this.m_Map.panTo(p_marker._latlng);
     };
 
     fn_enableDrawMarker(p_enable) {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.addControls({drawMarker: p_enable});
     }
 
     fn_enableDrawLine(p_enable) {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.addControls({"drawPolyline": p_enable});
     }
 
     fn_enableDrawCircle(p_enable) {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.addControls({"drawCircle": p_enable});
     }
 
     fn_enableDrawPolygon(p_enable) {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.addControls({"drawPolygon": p_enable});
     }
 
     fn_enableDrawRectangle(p_enable) {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.addControls({"drawRectangle": p_enable});
     }
 
     fn_removeControls()
     {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
         this.m_Map.pm.removeControls();
     }
 
@@ -401,10 +426,17 @@ class CLeafLetAndruavMap {
          * @param {*} p_yaw to set orientation.
          */
     fn_setPosition_bylatlng(p_marker, p_lat, p_lng, p_yaw) {
+        if (p_marker == null) {
+            console.warn('Marker is null');
+            return;
+        }
 
         p_marker.setLatLng(new L.LatLng(p_lat, p_lng));
-        // p_marker.setRotationOrigin ('center 10px');
-        p_marker.setRotationAngle(p_yaw * 180 / Math.PI); // (360 + p_yaw * 180 / Math.PI) % 360;
+        // Check if rotation methods are available (rotatedmarker plugin)
+        if (typeof p_marker.setRotationAngle === 'function') {
+            // p_marker.setRotationOrigin ('center 10px');
+            p_marker.setRotationAngle(p_yaw * 180 / Math.PI); // (360 + p_yaw * 180 / Math.PI) % 360;
+        }
 
     };
 
@@ -432,12 +464,17 @@ class CLeafLetAndruavMap {
             v_iconAnchor = anchor;
         }
         
-        let v_popupAnchor = [-p_iconsize[0]/2, -p_iconsize[0]/2];
-        let v_htmlIcon = "<image src='" + p_image + "'/>";
+        let v_popupAnchor = [-p_iconsize[0]/2, -p_iconsize[1]/2];
+        
+        // Escape HTML attributes to prevent XSS
+        const escapedImage = p_image.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const escapedTitle = (p_htmlTitle || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        
+        let v_htmlIcon = `<img src="${escapedImage}" alt="icon"/>`;
         if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
             
         } else {
-            v_htmlIcon = p_htmlTitle + "<image src='" + p_image + "'/>";
+            v_htmlIcon = `${escapedTitle}<img src="${escapedImage}" alt="icon"/>`;
         }
 
         v_image = L.divIcon({
@@ -479,13 +516,17 @@ class CLeafLetAndruavMap {
     };
 
     fn_setVehicleIcon(p_marker, p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize) {
-        if (p_marker == null) 
+        if (p_marker == null) {
+            console.warn('Marker is null');
             return;
+        }
         
         const v_image = this.fn_createIcon (p_image, p_title, anchor, p_draggable, p_isTop, p_htmlTitle, p_iconsize);
 
-
-        p_marker.setRotationOrigin('center center');
+        // Check if rotation methods are available (rotatedmarker plugin)
+        if (typeof p_marker.setRotationOrigin === 'function') {
+            p_marker.setRotationOrigin('center center');
+        }
         p_marker.setIcon(v_image);
 
     };
@@ -527,13 +568,18 @@ class CLeafLetAndruavMap {
          * Deletes shapes created by Geoman Plugin
          */
     fn_deleteAllEditShapes() {
+        if (this.m_Map == null || this.m_Map.pm == null) {
+            console.warn('Map or Geoman plugin not initialized');
+            return;
+        }
+        
         const v_editLayers = this.m_Map.pm.getGeomanDrawLayers();
         if ((v_editLayers === null || v_editLayers === undefined) || (v_editLayers.length === 0)) 
             return;
         
 
         v_editLayers.forEach(function (e) {
-            if (e.m_next!==null) e.m_next.remove(); // delete attached markers
+            if (e.m_next !== null && e.m_next !== undefined) e.m_next.remove(); // delete attached markers
             e.remove()
         })
 
@@ -558,14 +604,7 @@ class CLeafLetAndruavMap {
          */
     fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng) {
         
-        this.fn_hideInfoWindow(p_infoWindow);
-
-        p_infoWindow = L.popup().setLatLng(new L.LatLng(p_lat, p_lng)).setContent(p_content).openOn(this.m_Map);
-
-        return p_infoWindow;
-    }
-
-    fn_showInfoWindow2(p_infoWindow, p_content, p_lat, p_lng) {
+        if (this.m_Map == null) return null;
         
         this.fn_hideInfoWindow(p_infoWindow);
 
@@ -574,9 +613,10 @@ class CLeafLetAndruavMap {
         return p_infoWindow;
     }
 
-
     fn_bindPopup (p_infoWindow, p_content, p_lat, p_lng)
     {
+        if (!p_infoWindow) return null;
+
         p_infoWindow.bindPopup(p_content).openPopup();
 
         return p_infoWindow;
