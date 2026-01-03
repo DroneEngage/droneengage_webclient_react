@@ -10,4 +10,136 @@ img.leaflet-marker-icon
 .leaflet-div-icon {
 	background: unset !important;
 	border: unset !important;
-  }
+}
+
+/* SCOPED STYLES FOR MISSION ITEM CARD ONLY */
+/* .css_mission_item_card rules */
+
+/* 1. Navigation Row (<< Order >>) */
+.css_mission_item_card .row .col-2 {
+    padding: 0 2px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.css_mission_item_card .row .col-6 {
+    padding: 0 5px !important;
+}
+.css_mission_item_card input[id^="txt_orderNum"] {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* 2. Location Inputs (Lat, Lng, Alt) */
+.css_mission_item_card .geo_fence .form-group {
+    margin-bottom: 5px !important;
+}
+.css_mission_item_card .geo_fence label {
+    width: 100%;
+    margin-bottom: 2px;
+    font-size: 0.85rem;
+    color: #ddd;
+}
+.css_mission_item_card .geo_fence .input-group {
+    flex-wrap: nowrap;
+}
+
+/* 3. Action Fields (Wait, Fire, Speed, Yaw) - CFieldChecked */
+/* These use .input-group and .col-* classes internally */
+.css_mission_item_card .input-group {
+    margin-bottom: 8px !important;
+    align-items: center;
+}
+
+/* Target the label inside the input group */
+.css_mission_item_card .input-group > label {
+    text-align: right;
+    padding-right: 10px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Ensure col-4 width is respected in flex container */
+    flex: 0 0 33.333333%; 
+    max-width: 33.333333%;
+}
+
+/* Target the text input */
+.css_mission_item_card .input-group > input[type="text"],
+.css_mission_item_card .input-group > input[type="number"] {
+    /* Ensure col-7 width is respected */
+    flex: 0 0 58.333333%;
+    max-width: 58.333333%;
+    border-radius: 4px !important;
+}
+
+/* Target the checkbox */
+.css_mission_item_card .input-group > input[type="checkbox"] {
+    margin-left: 10px !important;
+    margin-top: 0 !important;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* 4. Dropdowns & Generic Form Controls (Mission Type, Tab Modules, etc) */
+.css_mission_item_card select.form-control,
+.css_mission_item_card input.form-control {
+    background-color: #343a40; /* Dark background */
+    color: #fff;
+    border: 1px solid #6c757d;
+}
+
+.css_mission_item_card select.form-control:focus,
+.css_mission_item_card input.form-control:focus {
+    background-color: #3b4248;
+    color: #fff;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 5. Tabs */
+.css_mission_item_card .nav-tabs {
+    border-bottom: 1px solid #444;
+    margin-bottom: 10px;
+}
+.css_mission_item_card .nav-link {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    color: #aaa;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+}
+.css_mission_item_card .nav-link:hover {
+    color: #fff;
+    border-color: #555 #555 #444;
+    background-color: rgba(255,255,255,0.05);
+}
+.css_mission_item_card .nav-link.active {
+    color: #fff;
+    background-color: #375a7f; /* Match primary theme or card header */
+    border-color: #375a7f #375a7f transparent;
+}
+
+/* 6. Tab Content Area */
+.css_mission_item_card .tab-content {
+    padding: 10px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 0 0 4px 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-top: none;
+}
+
+/* General Layout helpers within the card */
+.css_mission_item_card .form-control-label {
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+    display: block;
+}
+
+/* Apply button */
+.css_mission_item_card button#btn { /* ID selector used in existing code, slightly risky but specific */
+   width: 100%;
+}
