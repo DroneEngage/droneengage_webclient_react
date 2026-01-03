@@ -159,7 +159,7 @@ export class ClssSingle_Plan_Header extends React.Component {
             v_item.push(
 
 
-                <div id="geofence1" key={'mp1' + this.props.p_mission.m_id + this.key} className="btn-group  css_margin_top_small" >
+                <div id="geofence1" key={'mp1' + this.props.p_mission.m_id + this.key} className="d-flex flex-wrap css_margin_top_small" >
                     <ClssSingleMissionControlBar p_mission={this.props.p_mission} m_selected_unit={this.state.m_partyID} />
                 </div>
 
@@ -183,11 +183,11 @@ export class ClssSingle_Plan_Header extends React.Component {
         }
 
 
-        let v_class = (this.props.p_isCurrent === true) ? "w-100 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "w-100  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
+        let v_class = (this.props.p_isCurrent === true) ? "flex-grow-1 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "flex-grow-1  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
         return (
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
                 <div className="form-inline  margin_zero padding_zero">
-                    <div className="card-header text-center d-flex">
+                    <div className="card-header text-center d-flex align-items-center">
                         <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.props.p_isCollapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>
                         <input type='color' className="border hidden" id={'cp_' + this.props.p_mission.m_id} ref={this.cp_Ref}  onChange={(e) => this.fn_changeColor()} />
                         <p id={'pc_' + this.props.p_mission.m_id} ref={this.pc_Ref} onClick={(e) => this.fn_simClick(e)} className={this.state.css_pc} title="Change Plan color path"  >C</p>

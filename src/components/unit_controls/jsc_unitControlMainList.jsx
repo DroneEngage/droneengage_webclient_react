@@ -276,7 +276,7 @@ class ClssAndruavUnitList extends React.Component {
         
     return (
 
-                <div key='main' className='margin_zero row'>{unit}</div>
+                <div key='main' className='margin_zero width_100'>{unit}</div>
             );
     }
 };
