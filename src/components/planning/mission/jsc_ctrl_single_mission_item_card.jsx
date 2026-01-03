@@ -142,7 +142,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
                 </div>    
                 <div className="card-body">
         
-                    <div className='row justify-content-center'>
+                    <div className='row justify-content-center margin_zero'>
                         <div className='col-2'>
                             <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>{"<<"}</button>
                         </div>
