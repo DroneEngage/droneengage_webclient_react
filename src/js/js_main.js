@@ -294,6 +294,81 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 }
 
 
+export function fn_do_modal_apply_all(p_mission) {
+	if (p_mission === null || p_mission === undefined) return;
+	
+	let modal = $('#modal_applyAll');
+	if (!modal.length) {
+		console.error("Apply All modal element not found.");
+		return;
+	}
+
+	// Reset checkboxes and get current values from first mission item if available
+	const missionItems = p_mission.m_all_mission_items_shaps;
+	if (missionItems && missionItems.length > 0) {
+		const firstItem = missionItems[0];
+		if (firstItem.m_missionItem) {
+			$('#txt_apply_altitude').val(firstItem.m_missionItem.alt || 30);
+			$('#sel_apply_frametype').val(firstItem.m_missionItem.m_frameType || 3);
+			if (firstItem.m_missionItem.m_speedRequired) {
+				$('#txt_apply_speed').val(firstItem.m_missionItem.speed || 5);
+			}
+		}
+	}
+
+	modal.find('button#btnApplyAllConfirm').off('click').on('click', function () {
+		const overrideExisting = $('#chk_override_existing').is(':checked');
+		const applyAltitude = $('#chk_apply_altitude').is(':checked');
+		const applyFrameType = $('#chk_apply_frametype').is(':checked');
+		const applySpeed = $('#chk_apply_speed').is(':checked');
+
+		const altitudeValue = parseFloat($('#txt_apply_altitude').val());
+		const frameTypeValue = parseInt($('#sel_apply_frametype').val());
+		const speedValue = parseFloat($('#txt_apply_speed').val());
+
+		// Default altitude value (used to detect if user has modified it)
+		const defaultAltitude = 30;
+
+		// Apply to all mission items
+		if (missionItems && missionItems.length > 0) {
+			missionItems.forEach(marker => {
+				if (marker.m_missionItem) {
+					if (applyAltitude && !isNaN(altitudeValue)) {
+						// Only apply if override is checked OR if altitude is still at default
+						if (overrideExisting || marker.m_missionItem.alt === defaultAltitude) {
+							marker.m_missionItem.alt = altitudeValue;
+						}
+					}
+					if (applyFrameType) {
+						// Only apply if override is checked OR if frame type hasn't been set
+						if (overrideExisting || marker.m_missionItem.m_frameType === undefined) {
+							marker.m_missionItem.m_frameType = frameTypeValue;
+						}
+					}
+					if (applySpeed && !isNaN(speedValue)) {
+						// Only apply if override is checked OR if speed is not required (not set)
+						if (overrideExisting || !marker.m_missionItem.m_speedRequired) {
+							marker.m_missionItem.speed = speedValue;
+							marker.m_missionItem.m_speedRequired = true;
+						}
+					}
+				}
+			});
+			
+			// Update the mission path display
+			p_mission.fn_updatePath(true);
+		}
+
+		js_common.showModal('#modal_applyAll', false);
+	});
+
+	modal.find('button#btnApplyAllCancel').off('click').on('click', function () {
+		js_common.showModal('#modal_applyAll', false);
+	});
+
+	js_common.showModal('#modal_applyAll', true);
+}
+
 
 export function fn_takeLocalImage(p_andruavUnit, videoTrackID) {
 	const v_videoctrl = '#videoObject' + videoTrackID;

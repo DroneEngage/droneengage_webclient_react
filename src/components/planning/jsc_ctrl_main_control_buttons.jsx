@@ -87,7 +87,7 @@ export default class ClssMain_Control_Buttons extends React.Component {
     render() {
 
         return (
-            <div className="row">
+            <div className="col-12 padding_zero">
             <div id="main_btn_group" className={`${this.props.className} btn-group`} role="group">
                 <button
                     type="button"
@@ -107,12 +107,12 @@ export default class ClssMain_Control_Buttons extends React.Component {
                 </button>
             </div>
 
-            <div ref={this.missionControlRef} id="c_missioncontrol_section" className="row" style={{ display: this.state.activeTab === 'missions' ? 'block' : 'none' }}>
-                <div id="c_missioncontrol" className="col col-sm-12 container-fluid localcontainer">
-                   <div className="row">
+            <div ref={this.missionControlRef} id="c_missioncontrol_section" className="col-12" style={{ display: this.state.activeTab === 'missions' ? 'block' : 'none' }}>
+                <div id="c_missioncontrol" className="col col-sm-12 container-fluid localcontainer margin_zero css_margin_top_small">
+                   <div className="row margin_zero">
                     <div className="col col-sm-12">
                         <h5 className="text-center">Geo Fence</h5>
-                        <div className="row">
+                        <div className="row margin_zero">
                             <div className="col col-sm-12">
                                 <ClssFence_Shape_Control />
                             </div>
@@ -120,7 +120,7 @@ export default class ClssMain_Control_Buttons extends React.Component {
                     </div>
                     <div className="col col-sm-12">
                         <h5 className="text-center">Mission Plans</h5>
-                        <div className="row">
+                        <div className="row margin_zero">
                             <div className="col col-sm-12">
                                 <ClssMission_Container />
                             </div>
@@ -130,13 +130,13 @@ export default class ClssMain_Control_Buttons extends React.Component {
                 </div>
             </div>
 
-            <div ref={this.fenceControlRef} id="fenceControl_section" className="row" style={{ display: this.state.activeTab === 'geofences' ? 'block' : 'none' }}>
-                <div id="fenceControl" className="col col-sm-12 m-1 p-1">
+            <div ref={this.fenceControlRef} id="fenceControl_section" className="col-12" style={{ display: this.state.activeTab === 'geofences' ? 'block' : 'none' }}>
+                <div id="fenceControl" className="col col-sm-12 my-1 p-1">
                     <ClssFence_Shape_Control />
                 </div>
             </div>
 
-            <div ref={this.fenceGlobalRef} id="fence_global_section" className="row" style={{ display: this.state.activeTab === 'geofences' ? 'block' : 'none' }}>
+            <div ref={this.fenceGlobalRef} id="fence_global_section" className="col-12" style={{ display: this.state.activeTab === 'geofences' ? 'block' : 'none' }}>
                 {/* <div id="fence_global" className="col col-sm-12 container-fluid localcontainer">
                     <ClssFenceGlobalSettingsControl />
                 </div> */}

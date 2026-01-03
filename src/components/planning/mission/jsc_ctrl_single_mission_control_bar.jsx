@@ -11,7 +11,8 @@ import {
     fn_requestWayPoints,
     fn_clearWayPoints, 
     fn_do_modal_confirmation,
-    fn_readMissionFile
+    fn_readMissionFile,
+    fn_do_modal_apply_all
     } from '../../../js/js_main.js'
 
 
@@ -101,6 +102,11 @@ export class ClssSingleMissionControlBar extends React.Component {
         js_eventEmitter.fn_dispatch(js_event.EE_onMissionReset);
     }
 
+    fn_applyToAll() {
+        if (this.props.p_mission == null) return;
+        fn_do_modal_apply_all(this.props.p_mission);
+    }
+
     render ()
     {
         const c_key = this.key;
@@ -114,13 +120,14 @@ export class ClssSingleMissionControlBar extends React.Component {
         
             
         return (
-            <div id="geofence" key={'m_c_b' + c_key} className="btn-group  css_margin_top_small" >
+            <div id="geofence" key={'m_c_b' + c_key} className="d-flex flex-wrap gap-1 css_margin_top_small" >
                 <button  id='pre_geo_btn_generate' key={'mp1b1' + c_key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission() } >Export</button>
                 <button  id='geo_btn_georeset'  key={'mp1b2' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission() } >Reset</button>
                 <button  id='geo_btn_geoupload'  key={'mp1b3' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_putWayPoints(true)}  >Upload</button>
                 <button  id='geo_btn_georead'  key={'mp1b4' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Read Mission from Unit" type="button" onClick={ (e) => this.fn_requestWayPoints(true)} >Read</button>
                 <button  id='geo_btn_geoclear'  key={'mp1b5' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_clearWayPoints() } >Clear</button>
                 <button  id='geo_btn_geoload'  key={'mp1b6' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Delete Mission from Unit" type="button" onClick={ (e) => this.fn_loadWayPointsFromFile() } >Load</button>
+                <button  id='geo_btn_applyall'  key={'mp1b7' + c_key} className="btn btn-success btn-sm ctrlbtn" title ="Apply settings to all mission items" type="button" onClick={ (e) => this.fn_applyToAll() } >Apply All</button>
                 {v_saveAsTask}
             </div>
         );

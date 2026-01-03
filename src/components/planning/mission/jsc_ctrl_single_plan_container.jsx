@@ -131,7 +131,7 @@ export  class ClssSinglePlanContainer extends React.Component {
             //         fontWeight: "bold"
             //     });
             // }
-            item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer " + c_borderStyle}>
+            item.push(<div key={"mstp" + this.props.p_missionPlan.m_id} id="missionstep" className={"container-fluid localcontainer margin_zero " + c_borderStyle}>
                 <ClssSingle_Plan_Header p_mission={this.props.p_missionPlan} p_isCollapsed={this.state.m_collapsed}  p_ParentCtrl={this} p_isHidden={this.props.p_missionPlan.m_hidden} p_isCurrent={this.props.p_isCurrent} onSelectUnit={(partyID)=>this.fn_onSelectUnit(partyID)} onClick={(e)=>this.fn_onCollapse(e)}/>
                 <ClssSingle_Mission_Item_Card p_shape={this.state.s_shape} p_isCollapsed={this.state.m_collapsed} p_isCurrent={this.props.p_isCurrent} p_unit={andruavSelectedUnit} />
             </div>);

@@ -40,7 +40,7 @@ const Planning = () => {
 				<ClssHeaderControl />
 			</div>
 
-			<div id='mainBody' className='row css_mainbody' >
+			<div id='mainBody' className='css_mainbody' >
 				<div id="row_1" className="col-8">
 					<div id="row_1_1" className="row margin_zero">
 						<div id="displays" className="container-fluid localcontainer">
@@ -54,10 +54,10 @@ const Planning = () => {
 				</div>
 
 				<div id="row_2" className="col col-sm-6 col-md-4">
-					<div id='andruavUnitList' className='row'>
+					<div id='andruavUnitList' className='col-12 padding_zero'>
 						<ClssAndruavUnitList gcs_list={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false} />
 					</div>
-					<div className="row">
+					<div className="col-12 padding_zero">
 						<ClssMain_Control_Buttons />
 					</div>
 
@@ -83,6 +83,53 @@ const Planning = () => {
 							</button>
 							<button id="modal_btn_confirm" type="button" data-bs-dismiss="modal" className="btn btn-danger">
 								{t('home:modal.saveConfirmation.submit')}
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="modal_applyAll" className="modal fade" role="dialog">
+				<div className="modal-dialog">
+					<div className="modal-content">
+						<div className="modal-header">
+							<h4 id="applyall_title" className="modal-title bg-success p-1 rounded_10px text-white">
+								<strong>Apply Settings to All Mission Items</strong>
+							</h4>
+							<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div className="modal-body text-white">
+							<p className="text-warning">Select which settings to apply to all mission items:</p>
+							<div className="form-check mb-3 border-bottom pb-2">
+								<input className="form-check-input" type="checkbox" id="chk_override_existing" />
+								<label className="form-check-label text-danger" htmlFor="chk_override_existing"><strong>Override existing values</strong></label>
+							</div>
+							<div className="form-check">
+								<input className="form-check-input" type="checkbox" id="chk_apply_altitude" defaultChecked />
+								<label className="form-check-label" htmlFor="chk_apply_altitude">Altitude</label>
+								<input type="number" id="txt_apply_altitude" className="form-control form-control-sm mt-1" placeholder="Altitude (m)" defaultValue="30" />
+							</div>
+							<div className="form-check mt-2">
+								<input className="form-check-input" type="checkbox" id="chk_apply_frametype" />
+								<label className="form-check-label" htmlFor="chk_apply_frametype">Frame Type</label>
+								<select id="sel_apply_frametype" className="form-control form-control-sm mt-1">
+									<option value="0">Absolute (MSL)</option>
+									<option value="3">Relative to Home</option>
+									<option value="10">Terrain</option>
+								</select>
+							</div>
+							<div className="form-check mt-2">
+								<input className="form-check-input" type="checkbox" id="chk_apply_speed" />
+								<label className="form-check-label" htmlFor="chk_apply_speed">Speed</label>
+								<input type="number" id="txt_apply_speed" className="form-control form-control-sm mt-1" placeholder="Speed (m/s)" defaultValue="5" />
+							</div>
+						</div>
+						<div className="modal-footer">
+							<button id="btnApplyAllCancel" type="button" data-bs-dismiss="modal" className="btn btn-secondary">
+								Cancel
+							</button>
+							<button id="btnApplyAllConfirm" type="button" data-bs-dismiss="modal" className="btn btn-success">
+								Apply to All
 							</button>
 						</div>
 					</div>
