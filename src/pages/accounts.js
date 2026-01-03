@@ -36,46 +36,6 @@ const Accounts = () => {
             </div>
 
 			
-        <div id="modal_saveConfirmation" className="modal fade" role="dialog">
-            <div className="modal-dialog">
-
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <button type="button" className="margin_zero btn-close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 id="title" className="modal-title bg-success text-white"><strong>Attention:</strong> Delete Operation.</h4>
-                    </div>
-                    <div className="modal-body">
-                        <p id="conf">XAre you?</p>
-                        <div className='row'>
-                        <div className='col-sm-6'>
-                            <div className="capbox">
-                            <div id="CaptchaDiv"></div>
-                
-                            <div className="capbox-inner">
-                            Type the above number:<br/>
-                
-                            <input type="text" id="txtCaptcha"/>
-                            <input type="text" name="CaptchaInput" id="CaptchaInput" size="15"/><br/>
-                            <br/><br/>
-                            </div>
-                            </div>
-                        </div>
-                        <div className='col-sm-6'>
-                        <p id="res">XAre you?</p>
-                        </div>  
-                        </div>
-                        
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-muted" data-bs-dismiss="modal">Cancel</button>
-                            <button id="geo_btn_confirm" type="button" className="btn btn-danger" >Submit</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>  
-
-
         <div id='mainBody' className='row css_mainbody justify-content-center' > 
             
             <div className="container">
