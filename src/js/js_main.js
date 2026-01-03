@@ -203,6 +203,10 @@ function enableDragging() {
  */
 function fn_handleKeyBoard() {
 
+	if (js_globals.CONST_MAP_EDITOR === true) {
+		return;
+	}
+
 	$('body').on('keydown', function (p_event) {
 		const key = p_event.key;
 		p_event = p_event || window.event;
