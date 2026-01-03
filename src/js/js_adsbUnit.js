@@ -52,4 +52,4 @@ class CADSBObjectList {
 }
 
 
-export var js_adsbUnit = CADSBObjectList.getInstance();
+export const js_adsbUnit = CADSBObjectList.getInstance();

@@ -627,4 +627,4 @@ class CLeafLetAndruavMap {
 }
 
 
-export var js_leafletmap =  CLeafLetAndruavMap.getInstance();
+export const js_leafletmap =  CLeafLetAndruavMap.getInstance();
