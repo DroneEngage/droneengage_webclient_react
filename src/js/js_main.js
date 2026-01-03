@@ -53,15 +53,15 @@ var info_unit_context_popup = null;
 let selectedMissionFilesToRead = "";
 let selectedMissionFilesToWrite = "";
 
-export var setSelectedMissionFilePathToRead = function (p_file_name) {
+export const setSelectedMissionFilePathToRead = function (p_file_name) {
 	selectedMissionFilesToRead = p_file_name;
 }
 
-export var setSelectedMissionFilePathToWrite = function (p_file_name) {
+export const setSelectedMissionFilePathToWrite = function (p_file_name) {
 	selectedMissionFilesToWrite = p_file_name;
 }
 
-export var QueryString = function () {
+export const QueryString = function () {
 	let query_string = {};
 	let query = window.location.search.substring(1); // Get the query string (excluding the '?')
 	let vars = query.split("&"); // Split into individual key-value pairs

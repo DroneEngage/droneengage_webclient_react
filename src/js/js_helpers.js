@@ -28,7 +28,7 @@ export const CONST_NETWORK_TYPE_IDEN = 11;
 export const CONST_NETWORK_TYPE_LTE = 13;
 export const CONST_NETWORK_TYPE_EHRPD = 14;
 export const CONST_NETWORK_TYPE_HSPAP = 15;
-export var v_NETWORK_TYPE = ['Unknown', 'GPRS', 'EDGE', 'UTMS', 'CDMA', 'U+', 'U+', 'Unknown', 'U+', 'H', 'H', 'H+', 'H+', 'LTE', 'EHRPD', 'HSPAP'];
+export const v_NETWORK_TYPE = ['Unknown', 'GPRS', 'EDGE', 'UTMS', 'CDMA', 'U+', 'U+', 'Unknown', 'U+', 'H', 'H', 'H+', 'H+', 'LTE', 'EHRPD', 'HSPAP'];
 
 
 export const CONST_TELEPHONE_NOTFOUND = 0;

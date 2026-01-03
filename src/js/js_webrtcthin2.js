@@ -446,4 +446,4 @@ class AndruavStream {
   }
 }
 
-export var js_webrtcstream = AndruavStream.getInstance();
+export const js_webrtcstream = AndruavStream.getInstance();

@@ -9,7 +9,7 @@ It enables real-time video communication between drones and web clients using We
 
 ```javascript
 449:449:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_webrtcthin2.js
-export var js_webrtcstream = AndruavStream.getInstance();
+export const js_webrtcstream = AndruavStream.getInstance();
 ```
 
 - **Type**: `AndruavStream` (singleton instance)
