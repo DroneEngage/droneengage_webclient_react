@@ -136,13 +136,13 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
     
         const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         return (
-            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3">
+            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3 css_mission_item_card">
                 <div className="card-header text-center"> 
                     <h4><strong>{"Mission Item #" + this.props.p_shape.order}</strong></h4>
                 </div>    
                 <div className="card-body">
         
-                    <div className='row'>
+                    <div className='row justify-content-center'>
                         <div className='col-2'>
                             <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>{"<<"}</button>
                         </div>
