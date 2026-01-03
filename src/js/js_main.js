@@ -1728,7 +1728,11 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+				
+				// REACT POPUP LIMITATION: This creates static HTML content
+				// Interactive React elements (links, buttons, events) will not work
+				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
+				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 
 				// now add your div that contains ReactDOM to it.
 				info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
@@ -1762,7 +1766,11 @@ function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+				
+				// REACT POPUP LIMITATION: This creates static HTML content
+				// Interactive React elements (links, buttons, events) will not work
+				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
+				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 
 				// now add your div that contains ReactDOM to it.
 				info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
@@ -1801,8 +1809,22 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 			OnComplete={(e) => {
 				// Step 3: Extract the HTML
 				const htmlContent = tempContainer.innerHTML;
+				
+				// IMPORTANT: React popup limitation
+				// This approach creates a static HTML snapshot for Leaflet popups.
+				// - React event handlers and interactive elements will NOT work after tempContainer.remove()
+				// - Links, buttons, and other interactive elements become non-functional
+				// - This is intentional for display-only popups to avoid React/Leaflet integration complexity
+				// 
+				// FUTURE: If interactive popups are needed, consider:
+				// 1. Using Leaflet's popupopen/popupclose events to mount/unmount React components
+				// 2. Implementing a React portal system for Leaflet popups
+				// 3. Using a React-Leaflet integration library
+				//
+				// Current limitation documented: Static popup content only
 				tempContainer.remove();  // the HTML is not linked to REACT object anymore so links will not be working.
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow2(null, htmlContent, v_lat, v_lng);
+				
+				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 				if (v_ignore === true) {
 					info_unit_context_popup.m_ignoreMouseOut = true;
 				}

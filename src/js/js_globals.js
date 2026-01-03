@@ -196,7 +196,6 @@ class GLOBALS {
 
 
 
-		this.CONST_MAP_GOOLE_PLUGIN = false;
 		this.CONST_MAP_GOOLE = false;
 		this.CONST_MAP_EDITOR = false;
 
