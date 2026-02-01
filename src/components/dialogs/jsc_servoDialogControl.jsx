@@ -153,7 +153,7 @@ class ClssServoUnit extends React.Component {
                         </div>
                     </div>
                     <div className='col-4 d-flex flex-column align-items-center justify-content-center py-2'>
-                        <span className='si-07x text-light'>2000</span>
+                        <span className='si-07x txt-theme-aware'>2000</span>
                         <input
                             type='range'
                             min='1000'
@@ -174,7 +174,7 @@ class ClssServoUnit extends React.Component {
                             }}
                             title={`Set PWM: ${this.state.sliderValue}`}
                         />
-                        <span className='si-07x text-light'>1000</span>
+                        <span className='si-07x txt-theme-aware'>1000</span>
                         <span className='si-07x text-warning mt-1'>{this.state.sliderValue}</span>
                     </div>
                 </div>

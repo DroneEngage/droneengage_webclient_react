@@ -62,7 +62,7 @@ export default class ClssCtrlOpacityControl extends React.Component {
             css_icon = "bi bi-lightbulb-fill txt-theme-aware cursor_hand";
             title = "HUD Visible (100%)";
         } else if (this.state.m_opacity >= 0.65) { // ~0.7
-            css_icon = "bi bi-lightbulb-fill text-light cursor_hand";
+            css_icon = "bi bi-lightbulb-fill txt-theme-aware cursor_hand";
             title = "HUD Visible (70%)";
         } else if (this.state.m_opacity >= 0.35) { // ~0.4
             css_icon = "bi bi-lightbulb-fill text-secondary cursor_hand";

@@ -60,7 +60,7 @@ class ClssLanguageSwitcher extends React.Component {
         return (
             <select
                 id="css_language_switcher"
-                className={`bg-secondary txt-theme-aware rounded-1 ${this.props.className || ''}`}
+                className={`form-select bg-secondary txt-theme-aware rounded-1 ${this.props.className || ''}`}
                 onChange={(e) => this.changeLanguage(e.target.value)}
                 defaultValue={defaultLang}
             >

@@ -178,7 +178,7 @@ class ClssCtrlSWARM extends React.Component {
         let v_leader_title_leader = t('swarmCtrl:notLeader');
         let v_leader_title_follower = t('swarmCtrl:none');
         let v_leader_dropdown_class = "bg-secondry";
-        let v_swarm_class = 'text-light';
+        let v_swarm_class = 'txt-theme-aware';
         let v_class_follower = 'hidden';
         let v_class_formation_as_leader = 'hidden';
         let v_class_formation_as_follower = 'hidden';
