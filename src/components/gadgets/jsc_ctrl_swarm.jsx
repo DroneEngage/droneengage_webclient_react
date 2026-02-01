@@ -173,11 +173,11 @@ class ClssCtrlSWARM extends React.Component {
         const len = v_units.length;
         const c_items = [];
 
-        let v_leader_class = "btn-secondry";
-        let v_follower_class = "bg-secondry";
+        let v_leader_class = "btn-secondary";
+        let v_follower_class = "bg-secondary";
         let v_leader_title_leader = t('swarmCtrl:notLeader');
         let v_leader_title_follower = t('swarmCtrl:none');
-        let v_leader_dropdown_class = "bg-secondry";
+        let v_leader_dropdown_class = "bg-secondary";
         let v_swarm_class = 'txt-theme-aware';
         let v_class_follower = 'hidden';
         let v_class_formation_as_leader = 'hidden';
@@ -197,11 +197,11 @@ class ClssCtrlSWARM extends React.Component {
             v_class_formation_as_follower = '';
             v_class_follower = '';
         } else {
-            v_follower_class = "bg-secondry";
+            v_follower_class = "bg-secondary";
         }
 
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
-            v_leader_class = "btn-danger";
+            v_leader_class = "btn-danger bg-danger";
             v_leader_dropdown_class = "bg-danger txt-theme-aware";
             v_leader_title_leader = t('swarmCtrl:leader');
             v_class_formation_as_leader = '';
