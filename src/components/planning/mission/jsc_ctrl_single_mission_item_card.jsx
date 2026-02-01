@@ -91,7 +91,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         let ctrl = [];
 
         tabs.push(<li id={'h' + this.key} key={'h_main' + this.key} className="nav-item nav-units">
-                    <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_main" + this.key}>Action</a>
+                    <a className={"nav-link user-select-none txt-theme-aware "} data-bs-toggle="tab" href={"#tab_main" + this.key}>Action</a>
                     </li>);
         
         ctrl.push(<div key={'tab_main' + this.key} className="tab-pane fade" id={"tab_main"+this.key}>
@@ -102,7 +102,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_p2p' + this.key} className="nav-item nav-units">
-                    <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_p2p" + this.key}>P2P</a>
+                    <a className={"nav-link user-select-none txt-theme-aware "} data-bs-toggle="tab" href={"#tab_p2p" + this.key}>P2P</a>
                     </li>);
         
             ctrl.push(<div key={'tab_p2p' + this.key} className="tab-pane fade" id={"tab_p2p"+this.key}>
@@ -114,7 +114,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_sdr' + this.key} className="nav-item nav-units">
-                    <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_sdr" + this.key}>SDR</a>
+                    <a className={"nav-link user-select-none txt-theme-aware "} data-bs-toggle="tab" href={"#tab_sdr" + this.key}>SDR</a>
                     </li>);
         
             ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
@@ -125,7 +125,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO===false))
         {
             tabs.push(<li id={'h' + this.key} key={'h_gpio' + this.key} className="nav-item nav-units">
-                    <a className={"nav-link user-select-none "} data-bs-toggle="tab" href={"#tab_gpio" + this.key}>GPIO</a>
+                    <a className={"nav-link user-select-none txt-theme-aware "} data-bs-toggle="tab" href={"#tab_gpio" + this.key}>GPIO</a>
                     </li>);
 
             ctrl.push(<div key={'tab_gpio' + this.key} className="tab-pane fade" id={"tab_gpio"+this.key}>
@@ -136,7 +136,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
     
         const ordernum_id = 'txt_orderNum' + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
         return (
-            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card text-white bg-primary mb-3 css_mission_item_card">
+            <div key={"ms_o" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_hdr" className="card txt-theme-aware bg-primary mb-3 css_mission_item_card">
                 <div className="card-header text-center"> 
                     <h4><strong>{"Mission Item #" + this.props.p_shape.order}</strong></h4>
                 </div>    

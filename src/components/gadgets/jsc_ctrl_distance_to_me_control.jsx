@@ -58,12 +58,12 @@ class ClssCtrlDistanceToMeControl extends React.Component {
         let v_distance_unit = ""; // For HUD
 
         if (p_unit.m_Nav_Info.p_Location.lat === null || p_unit.m_Nav_Info.p_Location.lat === undefined) {
-            v_distanceToMe_class = "bg-danger text-white cursor_hand";
+            v_distanceToMe_class = "bg-danger txt-theme-aware cursor_hand";
             v_distanceToMe_text = t('unit_control_imu:distance.noUnitGPS');
             v_distance_val = "No GPS";
         } else if (js_globals.myposition === null || js_globals.myposition === undefined) {
             v_distanceToMe_text = t('unit_control_imu:distance.noGCSGPS');
-            v_distanceToMe_class = "bg-danger text-white cursor_hand";
+            v_distanceToMe_class = "bg-danger txt-theme-aware cursor_hand";
             v_distance_val = "No GCS";
         } else {
             const v_lat2 = p_unit.m_Nav_Info.p_Location.lat;
@@ -99,11 +99,11 @@ class ClssCtrlDistanceToMeControl extends React.Component {
             }
 
             if (distance > js_globals.CONST_DFM_FAR) {
-                v_distanceToMe_class = "bg-danger text-white cursor_hand";
+                v_distanceToMe_class = "bg-danger txt-theme-aware cursor_hand";
             } else if (distance > js_globals.CONST_DFM_SAFE) {
-                v_distanceToMe_class = "bg-info text-white";
+                v_distanceToMe_class = "bg-info txt-theme-aware";
             } else {
-                v_distanceToMe_class = "bg-success text-white";
+                v_distanceToMe_class = "bg-success txt-theme-aware";
             }
         }
 

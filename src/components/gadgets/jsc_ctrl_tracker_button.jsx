@@ -85,7 +85,7 @@ export default class ClssCtrlObjectTracker extends React.Component {
             {
                 if (this.props.p_unit.m_tracker.m_active)
                 {
-                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand text-warning text-white';
+                    css_Track = ' bi bi-chevron-bar-contract css_large_icon cursor_hand text-warning txt-theme-aware';
                     css_Track_title += ' enable tracking ';
                     this.state.m_tracker_gui_enabled = false;
                 }

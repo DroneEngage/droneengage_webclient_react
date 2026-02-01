@@ -128,7 +128,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
         
         const v_prop = this.props;
         let units_details = [];
-        let v_css_select = ' text-white ';
+        let v_css_select = ' txt-theme-aware ';
 
         if (this.props.p_fixed_list !== undefined)
         {
@@ -139,7 +139,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
         }
         else
         {
-            units_details.push(<option key={this.key + "00"} className="col-6 text-white" value="0">n/a</option>);
+            units_details.push(<option key={this.key + "00"} className="col-6 txt-theme-aware" value="0">n/a</option>);
         }
 
         sortedPartyIDs.map(function (object)
@@ -180,7 +180,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
         return (
                 <div className={`form-group${this.props.className ? " " + this.props.className : ""}`}>
-                    <label htmlFor={this.key + 'combo_list'} className="col-3 text-white al_r pe-2 "><small><b>{this.props.p_label}</b></small></label>
+                    <label htmlFor={this.key + 'combo_list'} className="col-3 txt-theme-aware al_r pe-2 "><small><b>{this.props.p_label}</b></small></label>
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
                         {units_details}
                     </select>

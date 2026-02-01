@@ -233,13 +233,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if (this.state.tab_log === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li2'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-list-columns" data-bs-toggle="tab" href={"#log" + v_andruavUnit.getPartyID()} title='Log'></a>
+                <a className="nav-link user-select-none bi bi-list-columns txt-theme-aware " data-bs-toggle="tab" href={"#log" + v_andruavUnit.getPartyID()} title='Log'></a>
             </li>);
         }
 
         if (this.state.tab_details === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li3'} className="nav-item">
-                <a className={`nav-link  user-select-none bi bi-pci-card ${(!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version===true)||(v_andruavUnit.m_module_version_comparison<0))?'text-warning':'text-white'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
+                <a className={`nav-link  user-select-none bi bi-pci-card ${(!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version===true)||(v_andruavUnit.m_module_version_comparison<0))?'text-warning':'txt-theme-aware'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
             </li>);
         }
 
@@ -249,13 +249,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (this.state.tab_module === true)
             && (v_andruavUnit.m_modules.has_p2p === true)) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li4'} className="nav-item">
-                <a className="nav-link user-select-none " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.getPartyID()}>P2P</a>
+                <a className="nav-link user-select-none txt-theme-aware  " data-bs-toggle="tab" href={"#p2p" + v_andruavUnit.getPartyID()}>P2P</a>
             </li>);
         }
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_SDR != null) && (js_siteConfig.CONST_FEATURE.DISABLE_SDR === false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_sdr === true)) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li5'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-activity" data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.getPartyID()} title='SDR'></a>
+                <a className="nav-link user-select-none bi bi-activity txt-theme-aware " data-bs-toggle="tab" href={"#sdr" + v_andruavUnit.getPartyID()} title='SDR'></a>
             </li>);
         }
 
@@ -272,7 +272,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             || (v_andruavUnit.fn_getIsDE() === false))// de already has audio
         {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-megaphone-fill" data-bs-toggle="tab" href={"#audio" + v_andruavUnit.getPartyID()} title='Audio'></a>
+                <a className="nav-link user-select-none bi bi-megaphone-fill txt-theme-aware " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.getPartyID()} title='Audio'></a>
             </li>);
         }
 
@@ -280,7 +280,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             && (js_siteConfig.CONST_FEATURE.DISABLE_EXPERIMENTAL === false)
             && (this.state.tab_module === true)) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'lie'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-bug" data-bs-toggle="tab" href={"#exp" + v_andruavUnit.getPartyID()} title='DEBUG'></a>
+                <a className="nav-link user-select-none bi bi-bug txt-theme-aware " data-bs-toggle="tab" href={"#exp" + v_andruavUnit.getPartyID()} title='DEBUG'></a>
             </li>);
         }
 

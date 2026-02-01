@@ -128,11 +128,11 @@ export class ClssCtrlBattery extends React.Component {
         if (this.state.is_compact === true)
         {
             return (
-                <div key={'bat_com_m' + this.key} className = {this.props.className + ' row  css_margin_zero fss-4 text-white cursor_hand'} onClick={(e) => this.fn_toggle()}>
+                <div key={'bat_com_m' + this.key} className = {this.props.className + ' row  css_margin_zero fss-4 txt-theme-aware cursor_hand'} onClick={(e) => this.fn_toggle()}>
                     <div key={'bat_com_m1' + this.key} className = {'col-3  css_margin_zero ' + v_battery_display_fcb.css}><span className="text-warning">{this.props.m_title}</span></div>
-                    <div key={'bat_com_m2' + this.key} className = {'col-3  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryVoltage/1000).toFixed(1).toString()} <span className="text-warning">v</span></div>
-                    <div key={'bat_com_m3' + this.key} className = {'col-3  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryCurrent/1000).toFixed(0).toString()} <span className="text-warning">A</span></div>
-                    <div key={'bat_com_m4' + this.key} className = {'col-3  css_margin_zero text-white' + v_battery_display_fcb.css}>{parseFloat(this.props.m_battery.FCB_BatteryRemaining).toFixed(0)} <span className="text-warning">%</span></div>
+                    <div key={'bat_com_m2' + this.key} className = {'col-3  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryVoltage/1000).toFixed(1).toString()} <span className="text-warning">v</span></div>
+                    <div key={'bat_com_m3' + this.key} className = {'col-3  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryCurrent/1000).toFixed(0).toString()} <span className="text-warning">A</span></div>
+                    <div key={'bat_com_m4' + this.key} className = {'col-3  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{parseFloat(this.props.m_battery.FCB_BatteryRemaining).toFixed(0)} <span className="text-warning">%</span></div>
                 </div>
             );
         }
@@ -141,11 +141,11 @@ export class ClssCtrlBattery extends React.Component {
             return (
             <div key={'bat_ncom_m' + this.key} className = {this.props.className + ' row  css_margin_zero fss-4 '} onClick={(e) => this.fn_toggle()}>
                     <div key={'bat_ncom_m5' + this.key} className = {'col-2  css_margin_zero ' + v_battery_display_fcb.css}><span className="text-warning">{this.props.m_title}</span></div>
-                    <div key={'bat_ncom_m6' + this.key} className = {'col-2  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryVoltage/1000).toFixed(1).toString()} <span className="text-warning">v</span></div>
-                    <div key={'bat_ncom_m7' + this.key} className = {'col-2  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryCurrent/1000).toFixed(0).toString()} <span className="text-warning">A</span></div>
-                    <div key={'bat_ncom_m8' + this.key} className = {'col-2  css_margin_zero text-white' + v_battery_display_fcb.css}>{parseFloat(this.props.m_battery.FCB_BatteryRemaining).toFixed(0)} <span className="text-warning">%</span></div>
-                    <div key={'bat_ncom_m9' + this.key} className = {'col-2  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_TotalCurrentConsumed/1000).toFixed(0).toString()} <span className="text-warning">AH</span></div>
-                    <div key={'bat_ncom_m10' + this.key} className = {'col-2  css_margin_zero text-white' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryTemprature/1000).toFixed(1).toString()} <span className="text-warning">C</span></div>
+                    <div key={'bat_ncom_m6' + this.key} className = {'col-2  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryVoltage/1000).toFixed(1).toString()} <span className="text-warning">v</span></div>
+                    <div key={'bat_ncom_m7' + this.key} className = {'col-2  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryCurrent/1000).toFixed(0).toString()} <span className="text-warning">A</span></div>
+                    <div key={'bat_ncom_m8' + this.key} className = {'col-2  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{parseFloat(this.props.m_battery.FCB_BatteryRemaining).toFixed(0)} <span className="text-warning">%</span></div>
+                    <div key={'bat_ncom_m9' + this.key} className = {'col-2  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_TotalCurrentConsumed/1000).toFixed(0).toString()} <span className="text-warning">AH</span></div>
+                    <div key={'bat_ncom_m10' + this.key} className = {'col-2  css_margin_zero txt-theme-aware' + v_battery_display_fcb.css}>{(this.props.m_battery.FCB_BatteryTemprature/1000).toFixed(1).toString()} <span className="text-warning">C</span></div>
             </div>
             );
         }

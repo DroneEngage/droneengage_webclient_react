@@ -60,7 +60,7 @@ export class ClssSingleMissionControlBar extends React.Component {
                 
                 js_globals.v_andruavFacade.API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
 
-            }, "YES", "bg-danger text-white");
+            }, "YES", "bg-danger txt-theme-aware");
         
     }
 

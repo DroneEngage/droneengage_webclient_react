@@ -131,7 +131,7 @@ export class ClssCtrlGPIO extends React.Component {
                 <div key={v_andruavUnit.getPartyID() + 'gpio_1'} className="col-12 mt-1">
                 <div key={v_andruavUnit.getPartyID() + 'gpio_2'} className = 'row al_l css_margin_zero d-flex '>
                     <div key={v_andruavUnit.getPartyID() + 'gpio_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'gpio_211'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh GPIO' onClick={() => this.fn_refreshGPIO(v_andruavUnit)}>Refresh</p>
+                    <p key={v_andruavUnit.getPartyID() + 'gpio_211'} className=' rounded-3 txt-theme-aware bg-primary cursor_hand textunit_nowidth al_c' title ='Refresh GPIO' onClick={() => this.fn_refreshGPIO(v_andruavUnit)}>Refresh</p>
                     </div>
                 </div>
                 </div>

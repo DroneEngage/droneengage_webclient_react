@@ -563,7 +563,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         fn_callback(v_andruavUnit);
                         return ;
                     }
-                }, "CONFIRM", "bg-danger text-white", "Cancel");
+                }, "CONFIRM", "bg-danger txt-theme-aware", "Cancel");
         }
     }
 
@@ -587,7 +587,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         });
                         return ;
                     }
-                }, "FORCED-ARM", "bg-danger text-white", "ARM");
+                }, "FORCED-ARM", "bg-danger txt-theme-aware", "ARM");
         }
     }
 
@@ -601,7 +601,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     me.fn_applyAction(v_andruavUnit, (unit) => {
                             js_globals.v_andruavFacade.API_do_Arm(unit, false, true);
                     });
-                }, "KILL-MOTORS", "bg-danger text-white");
+                }, "KILL-MOTORS", "bg-danger txt-theme-aware");
 
 
         }
@@ -941,7 +941,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         checked={this.state.m_applyOnAllSameType}
                         onChange={(e) => this.setState({ m_applyOnAllSameType: e.target.checked })}
                     />
-                    <label className='form-check-label text-white small' htmlFor={this.props.id+"applySameType"}>
+                    <label className='form-check-label txt-theme-aware small' htmlFor={this.props.id+"applySameType"}>
                         Apply to all units of same vehicle type
                     </label>
                 </div>

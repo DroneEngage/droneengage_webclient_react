@@ -118,7 +118,7 @@ class ClssDefault extends React.Component {
           <div className="form-inline">
             <div className="form-group">
               <div title={t('globalSettings:altitudeTitle')}>
-                <label htmlFor="txt_defaultAltitude" className="user-select-none text-white txt_label_width">
+                <label htmlFor="txt_defaultAltitude" className="user-select-none txt-theme-aware txt_label_width">
                   <small>{t('globalSettings:altitudeLabel')}</small>
                 </label>
                 <input
@@ -146,7 +146,7 @@ class ClssDefault extends React.Component {
           <div className="form-inline">
             <div className="form-group">
               <div title={t('globalSettings:radiusTitle')}>
-                <label htmlFor="txt_defaultCircle" className="user-select-none text-white txt_label_width">
+                <label htmlFor="txt_defaultCircle" className="user-select-none txt-theme-aware txt_label_width">
                   <small>{t('globalSettings:radiusLabel')}</small>
                 </label>
                 <input
@@ -180,7 +180,7 @@ class ClssDefault extends React.Component {
             <div className="form-inline">
               <div className="form-group">
                 <div title={t('globalSettings:swarmHorizontalTitle')}>
-                  <label htmlFor="txt_defaultSwarmDistance" className="user-select-none text-white txt_label_width">
+                  <label htmlFor="txt_defaultSwarmDistance" className="user-select-none txt-theme-aware txt_label_width">
                     <small>{t('globalSettings:swarmHorizontalLabel')}</small>
                   </label>
                   <input
@@ -208,7 +208,7 @@ class ClssDefault extends React.Component {
             <div className="form-inline">
               <div className="form-group">
                 <div title={t('globalSettings:swarmVerticalTitle')}>
-                  <label htmlFor="txt_defaultSwarmAltDelta" className="user-select-none text-white txt_label_width">
+                  <label htmlFor="txt_defaultSwarmAltDelta" className="user-select-none txt-theme-aware txt_label_width">
                     <small>{t('globalSettings:swarmVerticalLabel')}</small>
                   </label>
                   <input
@@ -530,7 +530,7 @@ class ClssGlobalSettings extends React.Component {
         <div key={this.key + 'v_uploadFile1'} className="col-12">
           <div key={this.key + 'v_uploadFile2'} className="form-inline">
             <div key={this.key + 'v_uploadFile3'} className="form-group">
-              <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2">
+              <label htmlFor="btn_filesWP" className="user-select-none txt-theme-aware mt-2">
                 <small>{t('globalSettings:missionFileLabel')}</small>
               </label>
               <input
@@ -554,7 +554,7 @@ class ClssGlobalSettings extends React.Component {
 
     return (
       <div key={this.key + 'g1'} className="row margin_zero" dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="card text-white border-light mb-3 padding_zero">
+        <div className="card txt-theme-aware border-light mb-3 padding_zero">
           <div className="card-header text-center user-select-none">
             <strong>{t('globalSettings:settingsTitle')}</strong>
           </div>

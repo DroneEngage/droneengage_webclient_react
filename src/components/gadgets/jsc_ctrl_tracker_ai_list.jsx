@@ -198,7 +198,7 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
         }
         else 
         {
-            css_Track = ' text-white ';
+            css_Track = ' txt-theme-aware ';
             css_Track_title += ' enable tracking ';
             this.state.m_tracker_ai_gui_enabled = false;
         }

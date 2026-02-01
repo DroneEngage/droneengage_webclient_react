@@ -143,7 +143,7 @@ export class ClssCVideoControl extends React.Component {
                 }
 
                 out_h.push(<li key={'h' + v_key} className="nav-item">
-                    <a className={"nav-link user-select-none  " + _first} data-bs-toggle="tab" href={'#cam_' + andruavUnit.getPartyID() + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
+                    <a className={"nav-link user-select-none  txt-theme-aware  " + _first} data-bs-toggle="tab" href={'#cam_' + andruavUnit.getPartyID() + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
                 </li>);
                 out_b.push(<ClssCVideoScreen key={v_key} first={_first} obj={v_obj} />);
             }

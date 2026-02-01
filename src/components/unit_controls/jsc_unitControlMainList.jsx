@@ -249,7 +249,7 @@ class ClssAndruavUnitList extends React.Component {
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
                                 <a 
-                                className={`nav-link user-select-none ${c_active === true ? '' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()}><span className={header_info.classes}> {header_info.text}</span> </a>
+                                className={`nav-link user-select-none txt-theme-aware  ${c_active === true ? '' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
 

@@ -603,7 +603,7 @@ export default class ClssCVideoScreen extends React.Component {
         if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
-                    <h4 key="h" className='bg-danger text-white rounded_6px'>{andruavUnit.m_unitName}</h4>
+                    <h4 key="h" className='bg-danger txt-theme-aware rounded_6px'>{andruavUnit.m_unitName}</h4>
                     <div key="d" >NO VIDEO</div>
                 </div>
             );
@@ -821,7 +821,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         return (
             <div id={divID} className={"css_videoScreen tab-pane fade " + activeClass}>
-                <h4 key="h" className="bg-primary text-white rounded_6px">
+                <h4 key="h" className="bg-primary txt-theme-aware rounded_6px">
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>
                 {!isVideoFullScreen && v_btns}

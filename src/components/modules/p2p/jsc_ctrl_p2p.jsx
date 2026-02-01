@@ -131,12 +131,12 @@ export class ClssCtrlP2P extends React.Component {
         let txt_logical_parent_name = '';
         let txt_channel_p2p_offline = 'P2PDC';
         let txt_channel_ws_offline = 'WSDC';
-        let css_txt_channel_p2p_offline = ' text-white bg-danger ';
-        let css_txt_channel_ws_offline = ' text-white bg-danger ';
+        let css_txt_channel_p2p_offline = ' txt-theme-aware bg-danger ';
+        let css_txt_channel_ws_offline = ' txt-theme-aware bg-danger ';
         if (v_andruavUnit.m_P2P.m_p2p_disabled === true)
         {
             txt_channel_p2p_offline = 'P2PC';
-            css_txt_channel_p2p_offline = ' text-white bg-primary ';
+            css_txt_channel_p2p_offline = ' txt-theme-aware bg-primary ';
         }
         if (v_andruavUnit.m_P2P.m_parent_address !== "" && v_andruavUnit.m_P2P.m_parent_address !== null && v_andruavUnit.m_P2P.m_parent_address !== undefined)
         {
@@ -171,10 +171,10 @@ export class ClssCtrlP2P extends React.Component {
                 <div key={v_andruavUnit.getPartyID() + 'p2p_21'} className="col-12 mt-1">
                 <div key={v_andruavUnit.getPartyID() + 'p2p_22'} className = 'row al_l css_margin_zero d-flex '>
                     <div key={v_andruavUnit.getPartyID() + 'p2p_221'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'p2p_2211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2211'} className=' rounded-3 txt-theme-aware bg-danger cursor_hand textunit_nowidth al_c' title ='Reset P2P HW' onClick={() => this.fn_resetP2P(v_andruavUnit)}>Reset P2P</p>
                     </div>
                     <div key={v_andruavUnit.getPartyID() + 'p2p_222'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'p2p_2212'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
+                    <p key={v_andruavUnit.getPartyID() + 'p2p_2212'} className=' rounded-3 txt-theme-aware bg-primary cursor_hand textunit_nowidth al_c' title ='Scan Nearby WIFI' onClick={() => this.fn_scanP2P(v_andruavUnit)}>Scan P2P</p>
                     </div>
                     <div key={v_andruavUnit.getPartyID() + 'p2p_223'} className= 'col-4 col-sm-3 user-select-none '>
                     <p key={v_andruavUnit.getPartyID() + 'p2p_2213'} className={css_txt_channel_p2p_offline + ' rounded-3 cursor_hand text unit_nowidth al_c'} title ='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_P2P(v_andruavUnit, false, v_andruavUnit.m_P2P.m_p2p_disabled)}>{txt_channel_p2p_offline}</p>

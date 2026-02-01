@@ -72,7 +72,7 @@ class CLASS_CTRL_P2P_IN_RANGE_BSSID_INFO  extends React.Component {
         }else
         if (rssi > -70)
         {
-            css_txt_rssi = 'text-white';
+            css_txt_rssi = 'txt-theme-aware';
             txt_rssi = 'Okay';
         }else
         if (rssi > -80)

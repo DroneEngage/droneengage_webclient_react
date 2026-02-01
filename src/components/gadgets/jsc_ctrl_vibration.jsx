@@ -66,17 +66,17 @@ export class ClssCtrlVibration extends React.Component {
         }else
         if (value >= 60)
         {
-            ret.css = 'bg-danger text-white';
+            ret.css = 'bg-danger txt-theme-aware';
         }else
         if (value >= 30)
         {
-            ret.css = 'bg-warning text-white';
+            ret.css = 'bg-warning txt-theme-aware';
         }if (value >= 5)
         {
-            ret.css = 'bg-info text-white';
+            ret.css = 'bg-info txt-theme-aware';
         }else
         {
-            ret.css = 'bg-success text-white';
+            ret.css = 'bg-success txt-theme-aware';
         }
 
         return ret;
@@ -94,22 +94,22 @@ export class ClssCtrlVibration extends React.Component {
         }else
         if (value === 0)
         {
-            ret.css = 'bg-success text-white ';
+            ret.css = 'bg-success txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x2;
         }else
         if (value >= 50)
         {
-            ret.css = 'bg-danger text-white ';
+            ret.css = 'bg-danger txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x10;
         }else
         if (value >= 5)
         {
-            ret.css = 'bg-warning text-white ';
+            ret.css = 'bg-warning txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x8;
         }else
         if (value >= 1)
         {
-            ret.css = 'bg-info text-white ';
+            ret.css = 'bg-info txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x4;
         }
 
@@ -142,7 +142,7 @@ export class ClssCtrlVibration extends React.Component {
         if (this.state.is_compact === true)
         {
             return (
-                <div className = {'css_margin_zero css_padding_zero  al_c text-white cursor_hand ' + this.getSingleCSS()} onClick={ (e) => this.fn_toggle()}>
+                <div className = {'css_margin_zero css_padding_zero  al_c txt-theme-aware cursor_hand ' + this.getSingleCSS()} onClick={ (e) => this.fn_toggle()}>
                     VIB
                 </div>
             );

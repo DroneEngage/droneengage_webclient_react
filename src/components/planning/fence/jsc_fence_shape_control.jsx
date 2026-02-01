@@ -135,7 +135,7 @@ class ClssShapeControl extends React.Component {
      fn_updateToolTip()
      {
         this.props.shape.unbindTooltip();
-        this.props.shape.bindTooltip(this.props.shape.m_geofenceInfo.m_geoFenceName, {sticky: true, permanent: true, className: "bg-transparent fence_tooltip border-0 fs-6 text-white", opacity: 0.5, ffset: [0, 0] });
+        this.props.shape.bindTooltip(this.props.shape.m_geofenceInfo.m_geoFenceName, {sticky: true, permanent: true, className: "bg-transparent fence_tooltip border-0 fs-6 txt-theme-aware", opacity: 0.5, ffset: [0, 0] });
      }
    
      fn_editShape ()
@@ -201,7 +201,7 @@ class ClssPolygonControl extends ClssShapeControl {
         
         return (
 
-            <div key={this.props.shape.id} id="geo" className="card text-white bg-primary mb-3">
+            <div key={this.props.shape.id} id="geo" className="card txt-theme-aware bg-primary mb-3">
                 <h4 className="card-header text-center">Polygon Fence</h4>
                 <div className="card-body">
                 <div className="form-group">
@@ -267,7 +267,7 @@ class ClssPolylineControl extends ClssShapeControl {
 
         return (
 
-            <div key={this.props.shape.id} id="geo" className="card text-white bg-primary mb-3">
+            <div key={this.props.shape.id} id="geo" className="card txt-theme-aware bg-primary mb-3">
                 <h4 className="card-header  text-center">Polyline Fence</h4>
                 <div className="card-body">
                 <div className="form-group">
@@ -331,7 +331,7 @@ class ClssCircleControl extends ClssShapeControl {
         
         return (
 
-            <div key={this.props.shape.id} id="geo" className="card text-white bg-primary mb-3">
+            <div key={this.props.shape.id} id="geo" className="card txt-theme-aware bg-primary mb-3">
 		        <h4 className="card-header  text-center">Circle Fence</h4>
                 <div className="card-body">
                 <div className="form-group">
@@ -383,7 +383,7 @@ class ClssRectangleControl extends ClssShapeControl {
         this.fn_init ();
 
         return (
-            <div key={this.props.shape.id} id="geo" className="card text-white bg-primary mb-3">
+            <div key={this.props.shape.id} id="geo" className="card txt-theme-aware bg-primary mb-3">
                 <h4 className="card-header  text-center">Rectangle Fence</h4>
                 <div className="card-body">
                 <div className="form-group">

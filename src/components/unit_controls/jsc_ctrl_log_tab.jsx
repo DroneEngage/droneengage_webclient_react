@@ -12,7 +12,7 @@ class ClssAndruavMessageItem extends React.Component {
     
     render () 
     {
-        let v_text_color = " text-white ";
+        let v_text_color = " txt-theme-aware ";
         switch (this.props.p_msg.m_msg.m_error.notification_Type)
         {
             case 0:

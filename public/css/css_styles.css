@@ -135,10 +135,6 @@ html, body {
   font-size: 1.0em !important;
 }
 
-body {
-  padding-top: 60px !important; /* Account for fixed header */
-}
-
 body.no-zoom {
     zoom: 1;
 }
@@ -918,65 +914,6 @@ padding-left: 5px
 
 .css_dotted_border {
 	border-style: dotted !important;
-}
-
-/* Theme-aware text color class */
-.txt-theme-aware {
-  color: var(--bs-body-color) !important;
-}
-
-.nav-link.txt-theme-aware {
-  color: var(--bs-body-color) !important;
-}
-
-.nav-link.txt-theme-aware:hover {
-  color: var(--bs-nav-link-hover-color, var(--bs-link-hover-color)) !important;
-}
-
-.nav-link.txt-theme-aware.active {
-  color: var(--bs-nav-tabs-link-active-color, var(--bs-body-color)) !important;
-}
-
-.css_mission_item_card .nav-link.txt-theme-aware {
-  color: var(--bs-body-color) !important;
-}
-
-.css_mission_item_card .nav-link.txt-theme-aware:hover {
-  color: var(--bs-nav-link-hover-color, var(--bs-link-hover-color)) !important;
-}
-
-/* Theme-aware background classes */
-.txt-theme-aware-bg {
-  background-color: var(--bs-body-bg) !important;
-  border: none !important;
-  border-top: none !important;
-}
-
-.txt-theme-aware-navbar {
-  background-color: var(--bs-body-bg) !important;
-  border: none !important;
-  border-top: none !important;
-}
-
-.txt-theme-aware-navbar .navbar-brand {
-  color: var(--bs-body-color) !important;
-}
-
-.txt-theme-aware-navbar .navbar-brand:hover {
-  color: var(--bs-navbar-hover-color, var(--bs-link-hover-color)) !important;
-}
-
-/* Remove borders from fixed header */
-#rowheader {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
-}
-
-#rowheader .navbar {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
 }
 
 /* Animation keyframes for status indicators */

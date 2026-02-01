@@ -53,7 +53,7 @@ export default class ClssCtrlVideoFPS extends React.Component {
 
     render() {
 
-        let css_Track = ' text-white ';                            
+        let css_Track = ' txt-theme-aware ';                            
         let css_Track_title = this.props.title?this.props.title :'video fps';
         
         if (isNaN(this.state.m_actual_fps))

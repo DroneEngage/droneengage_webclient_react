@@ -47,7 +47,7 @@ export class ClssFireEvent extends React.Component {
     else {
       return (
         <div className="form-group">
-          <label htmlFor="txt_ev" className="user-select-none  form-label text-white "><small>{this.props.label}</small></label>
+          <label htmlFor="txt_ev" className="user-select-none  form-label txt-theme-aware "><small>{this.props.label}</small></label>
           <div className="input-group mb-3">
             <input id="txt_ev" type="number" min={0} max={2000} step="1.0" className="form-control input-sm input-sm txt_margin " placeholder="0" aria-label="0" ref={this.edit_Ref} />
             <button id="btn_ev" type="button" className="btn btn-success input-sm line-height-0" onClick={(e) => this.fn_fireEvent()} >Fire</button>

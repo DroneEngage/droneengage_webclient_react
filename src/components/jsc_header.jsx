@@ -5,7 +5,7 @@ import * as  js_siteConfig from '../js/js_siteConfig'
 
 import ClssLoginControl from './jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
-
+import ThemeSwitcher from './ThemeSwitcher.jsx'
 
 import { withTranslation } from 'react-i18next';
 
@@ -77,6 +77,11 @@ class ClssHeaderControl extends React.Component {
                                 {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account" className="nav-item">
                                     <a className="nav-link" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a>
                                 </li>}
+                                <li key="Theme" className="nav-item">
+                                    <div className="nav-link p-0">
+                                        <ThemeSwitcher showLabel={false} className="d-inline-block" />
+                                    </div>
+                                </li>
                             </ul>
                         </div>
                     </nav>

@@ -67,16 +67,16 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         }else
         if (value >= 0.8)
         {
-            ret.css = 'bg-danger text-white ';
+            ret.css = 'bg-danger txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x8;
         }else
         if (value >= 0.5)
         {
-            ret.css = 'bg-warning text-white ';
+            ret.css = 'bg-warning txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x4;
         }else
         {
-            ret.css = 'bg-success text-white ';
+            ret.css = 'bg-success txt-theme-aware ';
             this.state.warning_level = this.state.warning_level | 0x2;
         }
 
@@ -108,7 +108,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         if (this.state.is_compact === true)
         {
             return (
-                <div className = {'css_margin_zero css_padding_zero  al_c text-white cursor_hand ' + this.getSingleCSS()} onClick={ (e) => this.fn_toggle()}>
+                <div className = {'css_margin_zero css_padding_zero  al_c txt-theme-aware cursor_hand ' + this.getSingleCSS()} onClick={ (e) => this.fn_toggle()}>
                     EFK
                 </div>
             );
