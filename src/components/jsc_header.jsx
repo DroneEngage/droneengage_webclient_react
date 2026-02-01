@@ -5,7 +5,7 @@ import * as  js_siteConfig from '../js/js_siteConfig'
 
 import ClssLoginControl from './jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
-import ThemeSwitcher from './ThemeSwitcher.jsx'
+import ThemeSwitcher from './jsc_theme_switcher.jsx'
 
 import { withTranslation } from 'react-i18next';
 
