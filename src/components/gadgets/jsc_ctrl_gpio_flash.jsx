@@ -95,7 +95,7 @@ export default class ClssCtrlGPIO_Flash extends React.Component {
             
         }
         else {
-            css_flashGPIO = " bi bi-sun text-light ";
+            css_flashGPIO = " bi bi-sun txt-theme-aware ";
             this.state.m_gpio_flashes_enabled = false;
         }
 

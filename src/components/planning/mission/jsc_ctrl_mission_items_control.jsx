@@ -152,7 +152,7 @@ export default class ClssMission_Container extends React.Component {
                             onClick={() => this.handleTabSwitch(c_id)} // Add this line
                         >
                             <i className="bi bi-geo-alt-fill location-icon" style={{ color: v_plan.m_pathColor }}></i>
-                            <span className={c_active ? 'animate_iteration_3s blink_warning' : 'text-light'}>
+                            <span className={c_active ? 'animate_iteration_3s blink_warning' : 'txt-theme-aware'}>
                                 {`P${v_plan.m_id}-(${(v_plan.fn_getMissionDistance() / 1000.0).toFixed(1)} km)`}
                             </span>
                         </a>

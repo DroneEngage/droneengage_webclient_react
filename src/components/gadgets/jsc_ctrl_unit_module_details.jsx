@@ -84,7 +84,7 @@ export default class ClssModuleDetails extends React.Component {
         return (
             <div id={`MD${this.key}`} key={`MD${this.key}`} className="row css_margin_zero padding_zero mt-1 w-100 cursor_default">
                 <div className="col-12">
-                    <div className="card border-secondary mb-0 bg-secondary">
+                    <div className="card border-secondary mb-0 bg-theme-aware">
                         <div className="card-body p-2">
                             <div className="row align-items-center mb-0">
                                 <div className="col-12 mb-1 d-flex align-items-center justify-content-between">

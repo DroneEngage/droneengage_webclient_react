@@ -20,7 +20,7 @@ class ClssFooterControl extends React.Component {
         return (
             <footer className="text-center bg-4">
   
-                <p className="user-select-none  txt-theme-aware">© Copyright  2014-{year}, <a href={js_siteConfig.CONST_HOME_URL} className="a_nounderline a_hoverinvers"data-bs-toggle="tooltip" title="DroneEngage">{js_siteConfig.CONST_TITLE}</a> <span className="small text-light text-decoration-underline">  build:{packageJson.build_number}</span></p> 
+                <p className="user-select-none  txt-theme-aware">© Copyright  2014-{year}, <a href={js_siteConfig.CONST_HOME_URL} className="a_nounderline a_hoverinvers"data-bs-toggle="tooltip" title="DroneEngage">{js_siteConfig.CONST_TITLE}</a> <span className="small txt-theme-aware text-decoration-underline">  build:{packageJson.build_number}</span></p> 
     
             </footer>
         );
