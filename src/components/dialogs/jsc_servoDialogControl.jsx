@@ -80,17 +80,17 @@ class ClssServoUnit extends React.Component {
         } else {
             // Determine active button based on prop_value
             if (this.props.prop_value <= 1200) {
-                btn_min_css = ' css_servo_selected bg-danger text-white ';
-                btn_med_css = ' css_servo_clickable bg-success text-white ';
-                btn_max_css = ' css_servo_clickable bg-success text-white ';
+                btn_min_css = ' css_servo_selected bg-danger txt-theme-aware ';
+                btn_med_css = ' css_servo_clickable bg-success txt-theme-aware ';
+                btn_max_css = ' css_servo_clickable bg-success txt-theme-aware ';
             } else if (this.props.prop_value >= 1800) {
-                btn_min_css = ' css_servo_clickable bg-success text-white ';
-                btn_med_css = ' css_servo_clickable bg-success text-white ';
-                btn_max_css = ' css_servo_selected bg-danger text-white ';
+                btn_min_css = ' css_servo_clickable bg-success txt-theme-aware ';
+                btn_med_css = ' css_servo_clickable bg-success txt-theme-aware ';
+                btn_max_css = ' css_servo_selected bg-danger txt-theme-aware ';
             } else {
-                btn_min_css = ' css_servo_clickable bg-success text-white ';
-                btn_med_css = ' css_servo_selected bg-danger text-white ';
-                btn_max_css = ' css_servo_clickable bg-success text-white ';
+                btn_min_css = ' css_servo_clickable bg-success txt-theme-aware ';
+                btn_med_css = ' css_servo_selected bg-danger txt-theme-aware ';
+                btn_max_css = ' css_servo_clickable bg-success txt-theme-aware ';
             }
 
             // Apply pending (yellow) state if applicable

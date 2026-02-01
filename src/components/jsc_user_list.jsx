@@ -109,11 +109,11 @@ class ClssUserEntry extends  React.Component {
             {
                 if ((this.props.prop_single_item.is_valid!=null) && (this.props.prop_single_item.is_valid === false))
                 {
-                    cls_color = " bg-danger text-white ";
+                    cls_color = " bg-danger txt-theme-aware ";
                 }
                 else
                 {
-                    cls_color = " bg-success text-white ";
+                    cls_color = " bg-success txt-theme-aware ";
                 }
             }
         }
@@ -283,7 +283,7 @@ class ClssUserList extends React.Component {
                         <div className="form-inline">
                             <div className="form-group">
                                 <div>
-                                    <label htmlFor="txt_searchParam" className="text-white">Search&nbsp;</label>
+                                    <label htmlFor="txt_searchParam" className="txt-theme-aware">Search&nbsp;</label>
                                     <input id="txt_searchParam" type="text" className="form-control input-sm" placeholder="" value={this.state.m_search} onChange={(e) => this.fn_onSearch(e)} />
                                 </div>
                             </div>
@@ -311,7 +311,7 @@ class ClssUserList extends React.Component {
                         <div className="">
                             <div className="bg-dark ">
                             <div className="card-header bg-primary ">
-                            <h3 id="modal_ctrl_parameters_lbl" className="text-white">Users List</h3>
+                            <h3 id="modal_ctrl_parameters_lbl" className="txt-theme-aware">Users List</h3>
                             </div>
                             <div id="card-body" className="" >
                                     {p_params}

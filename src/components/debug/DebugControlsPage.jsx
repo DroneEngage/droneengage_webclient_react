@@ -75,7 +75,7 @@ const DebugControlsPage = () => {
         <div className="container-fluid mt-4">
             <div className="row">
                 <div className="col-12">
-                    <h2 className="text-white mb-4">Micro Gadgets Debug Page</h2>
+                    <h2 className="txt-theme-aware mb-4">Micro Gadgets Debug Page</h2>
                     <p className="text-muted">Test page for all micro gadget components</p>
                 </div>
             </div>
@@ -83,7 +83,7 @@ const DebugControlsPage = () => {
             <div className="row">
                 {/* Field Check Component */}
                 <div className="col-md-6 mb-4">
-                    <div className="card bg-secondary text-white">
+                    <div className="card bg-secondary txt-theme-aware">
                         <div className="card-header">
                             <h5>CFieldChecked Component</h5>
                         </div>
@@ -106,7 +106,7 @@ const DebugControlsPage = () => {
 
                 {/* Tri State Component */}
                 <div className="col-md-6 mb-4">
-                    <div className="card bg-secondary text-white">
+                    <div className="card bg-secondary txt-theme-aware">
                         <div className="card-header">
                             <h5>CTriStateChecked Component</h5>
                         </div>
@@ -128,7 +128,7 @@ const DebugControlsPage = () => {
 
                 {/* Fire Event Component */}
                 <div className="col-md-6 mb-4">
-                    <div className="card bg-secondary text-white">
+                    <div className="card bg-secondary txt-theme-aware">
                         <div className="card-header">
                             <h5>ClssFireEvent Component</h5>
                         </div>
@@ -148,7 +148,7 @@ const DebugControlsPage = () => {
 
                 {/* Radar Screen Component */}
                 <div className="col-md-6 mb-4">
-                    <div className="card bg-secondary text-white">
+                    <div className="card bg-secondary txt-theme-aware">
                         <div className="card-header">
                             <h5>Class_Radar_Screen Component</h5>
                         </div>
@@ -189,7 +189,7 @@ const DebugControlsPage = () => {
             {/* Component Status */}
             <div className="row mt-4">
                 <div className="col-12">
-                    <div className="card bg-dark text-white">
+                    <div className="card bg-dark txt-theme-aware">
                         <div className="card-header">
                             <h5>Component Status</h5>
                         </div>

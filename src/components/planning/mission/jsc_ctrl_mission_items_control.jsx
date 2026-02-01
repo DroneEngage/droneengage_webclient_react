@@ -196,7 +196,7 @@ export default class ClssMission_Container extends React.Component {
                         <div className="col-12">
                             <div className="form-inline">
                                 <div className="form-group">
-                                    <label htmlFor="btn_filesWP" className="user-select-none text-white mt-2">
+                                    <label htmlFor="btn_filesWP" className="user-select-none txt-theme-aware mt-2">
                                         <small>Global Mission File</small>
                                     </label>
                                     <input

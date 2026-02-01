@@ -183,9 +183,9 @@ export class ClssCtrlHUD extends React.Component {
             <div key={this.key + 'hud'} id={this.props.id} className='css_hud_div'>
                 <div className='col-6  css_margin_zero d-flex '>
                     <ul className='css_hud_bullets'>
-                        <li><span className='text-white'>R:</span><span className='css_hud_value text-warning'>{this.c_roll}º</span></li>
-                        <li><span className='text-white'>P:</span><span className='css_hud_value text-warning'>{this.c_pitch}º</span></li>
-                        <li><span className='text-white'>Y:</span><span className='css_hud_value text-warning'>{this.c_yaw}º</span></li>
+                        <li><span className='txt-theme-aware'>R:</span><span className='css_hud_value text-warning'>{this.c_roll}º</span></li>
+                        <li><span className='txt-theme-aware'>P:</span><span className='css_hud_value text-warning'>{this.c_pitch}º</span></li>
+                        <li><span className='txt-theme-aware'>Y:</span><span className='css_hud_value text-warning'>{this.c_yaw}º</span></li>
                     </ul>
                     <canvas
                         key={this.key + 'chud'}

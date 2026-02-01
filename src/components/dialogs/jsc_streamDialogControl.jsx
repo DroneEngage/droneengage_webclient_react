@@ -110,7 +110,7 @@ class ClssStreamChannel extends React.Component {
             
             return (
                     <div className="row al_l css_margin_zero">
-                            <div className= "col-8   si-09x css_margin_zero text-white">
+                            <div className= "col-8   si-09x css_margin_zero txt-theme-aware">
                             <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>
                             <div className= "col-2   si-09x css_margin_zero css_padding_2">

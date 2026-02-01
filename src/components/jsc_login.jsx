@@ -164,7 +164,7 @@ class ClssLoginControl extends React.Component {
         ctrls.push(
           <div key={'div_login' + this.key} className="">
             <div className={`form-group ${dir}`}>
-              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">
+              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')}
               </label>
               <input
@@ -179,7 +179,7 @@ class ClssLoginControl extends React.Component {
               />
             </div>
             <div className={`form-group ${dir}`}>
-              <label htmlFor="txtAccessCode" id="account" className="text-white" title={t('tooltip.accessCode')}>
+              <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
               <input
@@ -195,7 +195,7 @@ class ClssLoginControl extends React.Component {
               />
             </div>
             <div className={`form-group ${dir} hidden`}>
-              <label htmlFor="txtGroupName" id="group" className="text-white">
+              <label htmlFor="txtGroupName" id="group" className="txt-theme-aware">
                 {t('label.groupName')}
               </label>
               <input
@@ -252,7 +252,7 @@ class ClssLoginControl extends React.Component {
         ctrls.push(
           <div key={'div_connecting' + this.key} className="">
             <div className={`form-group ${dir}`}>
-              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="text-white">
+              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')} {/* "Email" */}
               </label>
               <input
@@ -268,7 +268,7 @@ class ClssLoginControl extends React.Component {
               />
             </div>
             <div className={`form-group ${dir}`}>
-              <label htmlFor="txtAccessCode" id="account" className="text-white" title={t('tooltip.accessCode')}>
+              <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
               <input
@@ -285,7 +285,7 @@ class ClssLoginControl extends React.Component {
               />
             </div>
             <div className={`form-group ${dir} hidden`}>
-              <label htmlFor="txtGroupName" id="group" className="text-white">
+              <label htmlFor="txtGroupName" id="group" className="txt-theme-aware">
                 {t('label.groupName')} {/* "Group Name" */}
               </label>
               <input

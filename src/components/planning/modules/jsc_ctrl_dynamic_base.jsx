@@ -100,7 +100,7 @@ class ClssModulePlanningBase extends React.Component {
     if (config.optional) {
       if (config.type === 'checkbox') {
         const options = [
-          { value: null, label: 'no action', className: 'text-white' },
+          { value: null, label: 'no action', className: 'txt-theme-aware' },
           { value: true, label: 'enable', className: 'text-success' },
           { value: false, label: 'disable', className: 'text-danger' },
         ];

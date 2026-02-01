@@ -53,7 +53,7 @@ class ClssParameterItem extends React.Component {
     render() {
         let cls_color = " bg-white text-black-50";
         if (this.props.prop_param.is_dirty === true) {
-            cls_color = this.props.prop_param.is_valid === false ? " bg-danger text-white " : " bg-success text-white ";
+            cls_color = this.props.prop_param.is_valid === false ? " bg-danger txt-theme-aware " : " bg-success txt-theme-aware ";
         }
         return (
             <tr>
@@ -254,7 +254,7 @@ export default class ClssUnitParametersList extends React.Component {
                     <div className="col-12">
                         <div className="form-inline">
                             <div className="form-group">
-                                <label htmlFor="txt_searchParam" className="text-white">Search&nbsp;</label>
+                                <label htmlFor="txt_searchParam" className="txt-theme-aware">Search&nbsp;</label>
                                 <input
                                     id="txt_searchParam"
                                     type="text"

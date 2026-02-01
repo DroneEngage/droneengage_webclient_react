@@ -573,7 +573,7 @@ export default class ClssConfigGenerator extends React.Component {
         console.log('Submitted:', me.state.output);
         alert("data submitted. you need to restart the module.");
 
-      }, "YES", "bg-danger text-white");
+      }, "YES", "bg-danger txt-theme-aware");
 
     
   }
@@ -589,7 +589,7 @@ export default class ClssConfigGenerator extends React.Component {
         console.log('Submitted:', me.state.output);
         alert("data submitted. you need to restart the module.");
         
-      }, "YES", "bg-danger text-white");
+      }, "YES", "bg-danger txt-theme-aware");
   }
 
 
