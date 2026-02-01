@@ -561,13 +561,13 @@ class ClssGlobalSettings extends React.Component {
           <div className="card-body">
             <ul className="nav nav-tabs">
               <li className="nav-item">
-                <a className="nav-link user-select-none" data-bs-toggle="tab" href="#settings_home">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home">
                   {t('globalSettings:defaultsTab')}
                 </a>
               </li>
               <li className="nav-item">
                 <a
-                  className={'nav-link user-select-none ' + cls_ctrl_wp}
+                  className={'nav-link user-select-none txt-theme-aware ' + cls_ctrl_wp}
                   data-bs-toggle="tab"
                   href="#settings_profile"
                 >
@@ -575,7 +575,7 @@ class ClssGlobalSettings extends React.Component {
                 </a>
               </li>
               <li className="nav-item">
-                <a className="nav-link user-select-none" data-bs-toggle="tab" href="#settings_preference">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_preference">
                   {t('globalSettings:preferencesTab')}
                 </a>
               </li>
