@@ -186,6 +186,7 @@ class GLOBALS {
 		this.LS_METRIC_SYS = '_vv_useMetricSystem';
 		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
+		this.LS_SELECTED_THEME = '_vSelectedTheme';
 
 
 

@@ -268,6 +268,15 @@ class CLocalStorage {
     fn_getGCSDisplayEnabled() {
         return this._getValue('_vGCSDisplay', 'true') === 'true';
     }
+
+    // Selected Theme
+    fn_setSelectedTheme(value) {
+        this._setValue(js_globals.LS_SELECTED_THEME, value);
+    }
+
+    fn_getSelectedTheme() {
+        return this._getValue(js_globals.LS_SELECTED_THEME, 'default');
+    }
 }
 
 export const js_localStorage = CLocalStorage.getInstance();
