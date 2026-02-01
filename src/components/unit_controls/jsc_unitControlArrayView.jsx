@@ -645,9 +645,6 @@ class ClssAndruavUnitDroneRow extends React.Component{
             if (v_andruavUnit.m_isArmed === true) 
             {
                 v_id_class = " bg-danger txt-theme-aware ";
-                v_armed.text ='ARMED';
-                v_armed.css = 'bg-danger txt-theme-aware fw-bold';
-                
             }
             else
             {
@@ -666,6 +663,13 @@ class ClssAndruavUnitDroneRow extends React.Component{
             {
 
             }
+        }
+
+        // Update armed status regardless of connection state
+        if (v_andruavUnit.m_isArmed === true) 
+        {
+            v_armed.text ='ARMED';
+            v_armed.css = 'bg-danger txt-theme-aware fw-bold';
         }
         
         let ctrl_ekf = [];
