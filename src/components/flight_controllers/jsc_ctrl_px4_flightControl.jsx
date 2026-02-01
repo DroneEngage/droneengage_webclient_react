@@ -75,7 +75,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     res.btn_auto_hold_class             = " btn-primary ";
                     res.btn_auto_mission_class          = " btn-primary ";
                     res.btn_auto_rtl_class              = " btn-primary ";
-                    res.btn_auto_vtol_takeoff_class     = " btn-outline-light disabled hidden ";
+                    res.btn_auto_vtol_takeoff_class     = " btn-outline-theme-aware disabled hidden ";
                     res.btn_pos_ctl_class               = " btn-primary ";
                     res.btn_pos_orbit_class             = " btn-primary ";
                 break;
@@ -150,8 +150,8 @@ export class ClssCtrlPx4FlightControl extends React.Component {
             {
                 case js_andruavUnit.VEHICLE_SUBMARINE:
                     res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_yaw_class                   = " btn-outline-light ";
-		            res.btn_climb_class 	            = " btn-outline-light ";
+                    res.btn_yaw_class                   = " btn-outline-theme-aware ";
+		            res.btn_climb_class 	            = " btn-outline-theme-aware ";
                     res.btn_climb_text                  = "Dive";
                     res.btn_manual_ctl_class            = " disabled hidden ";
                     res.btn_acro_ctl_class              = " disabled hidden ";
@@ -172,7 +172,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                 case js_andruavUnit.VEHICLE_ROVER:
                     res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " disabled hidden  ";
-		            res.btn_manual_ctl_class            = " btn-outline-light ";
+		            res.btn_manual_ctl_class            = " btn-outline-theme-aware ";
                     res.btn_climb_class 	            = " disabled hidden ";
                     res.btn_acro_ctl_class              = " disabled hidden ";
                     res.btn_stabilize_class             = " disabled hidden ";
@@ -181,7 +181,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     res.btn_auto_takeoff_class          = " disabled hidden ";
                     res.btn_auto_land_class             = " disabled hidden ";
                     res.btn_auto_hold_class             = " disabled hidden ";
-                    res.btn_auto_mission_class          = " btn-outline-light ";
+                    res.btn_auto_mission_class          = " btn-outline-theme-aware ";
                     res.btn_auto_rtl_class              = " disabled hidden ";
                     res.btn_auto_vtol_takeoff_class     = " disabled hidden ";
                     res.btn_pos_ctl_class               = " disabled hidden ";
@@ -192,41 +192,41 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                 case js_andruavUnit.VEHICLE_TRI:
                 case js_andruavUnit.VEHICLE_QUAD:
                     res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_yaw_class                   = " btn-outline-light ";
-		            res.btn_climb_class 	            = " btn-outline-light ";
-                    res.btn_manual_ctl_class            = " btn-outline-light ";
-                    res.btn_acro_ctl_class              = " btn-outline-light ";
-                    res.btn_stabilize_class             = " btn-outline-light ";
-                    res.btn_alt_ctl_class               = " btn-outline-light ";
-                    res.btn_r_attd_class                = " btn-outline-light ";
-                    res.btn_auto_takeoff_class          = " btn-outline-light ";
-                    res.btn_auto_land_class             = " btn-outline-light ";
-                    res.btn_auto_hold_class             = " btn-outline-light ";
-                    res.btn_auto_mission_class          = " btn-outline-light ";
-                    res.btn_auto_rtl_class              = " btn-outline-light ";
+                    res.btn_yaw_class                   = " btn-outline-theme-aware ";
+		            res.btn_climb_class 	            = " btn-outline-theme-aware ";
+                    res.btn_manual_ctl_class            = " btn-outline-theme-aware ";
+                    res.btn_acro_ctl_class              = " btn-outline-theme-aware ";
+                    res.btn_stabilize_class             = " btn-outline-theme-aware ";
+                    res.btn_alt_ctl_class               = " btn-outline-theme-aware ";
+                    res.btn_r_attd_class                = " btn-outline-theme-aware ";
+                    res.btn_auto_takeoff_class          = " btn-outline-theme-aware ";
+                    res.btn_auto_land_class             = " btn-outline-theme-aware ";
+                    res.btn_auto_hold_class             = " btn-outline-theme-aware ";
+                    res.btn_auto_mission_class          = " btn-outline-theme-aware ";
+                    res.btn_auto_rtl_class              = " btn-outline-theme-aware ";
                     res.btn_auto_vtol_takeoff_class     = " disabled hidden ";
-                    res.btn_pos_ctl_class               = " btn-outline-light ";
-                    res.btn_pos_orbit_class             = " btn-outline-light ";
+                    res.btn_pos_ctl_class               = " btn-outline-theme-aware ";
+                    res.btn_pos_orbit_class             = " btn-outline-theme-aware ";
                     break;
 
                 case js_andruavUnit.VEHICLE_VTOL: 
                 case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class 		            = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
                     res.btn_yaw_class                   = " disabled hidden ";
-		            res.btn_climb_class 	            = " btn-outline-light ";
-                    res.btn_manual_ctl_class            = " btn-outline-light ";
+		            res.btn_climb_class 	            = " btn-outline-theme-aware ";
+                    res.btn_manual_ctl_class            = " btn-outline-theme-aware ";
                     res.btn_acro_ctl_class              = " disabled hidden ";
-                    res.btn_stabilize_class             = " btn-outline-light ";
-                    res.btn_alt_ctl_class               = " btn-outline-light ";
+                    res.btn_stabilize_class             = " btn-outline-theme-aware ";
+                    res.btn_alt_ctl_class               = " btn-outline-theme-aware ";
                     res.btn_r_attd_class                = " disabled hidden ";
-                    res.btn_auto_takeoff_class          = " btn-outline-light ";
-                    res.btn_auto_land_class             = " btn-outline-light ";
-                    res.btn_auto_hold_class             = " btn-outline-light ";
-                    res.btn_auto_mission_class          = " btn-outline-light ";
-                    res.btn_auto_rtl_class              = " btn-outline-light ";
-                    res.btn_auto_vtol_takeoff_class     = " btn-outline-light ";
-                    res.btn_pos_ctl_class               = " btn-outline-light ";
-                    res.btn_pos_orbit_class             = " btn-outline-light ";
+                    res.btn_auto_takeoff_class          = " btn-outline-theme-aware ";
+                    res.btn_auto_land_class             = " btn-outline-theme-aware ";
+                    res.btn_auto_hold_class             = " btn-outline-theme-aware ";
+                    res.btn_auto_mission_class          = " btn-outline-theme-aware ";
+                    res.btn_auto_rtl_class              = " btn-outline-theme-aware ";
+                    res.btn_auto_vtol_takeoff_class     = " btn-outline-theme-aware ";
+                    res.btn_pos_ctl_class               = " btn-outline-theme-aware ";
+                    res.btn_pos_orbit_class             = " btn-outline-theme-aware ";
                     break;
         
                 default: 

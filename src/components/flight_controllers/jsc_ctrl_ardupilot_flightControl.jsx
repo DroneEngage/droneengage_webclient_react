@@ -109,8 +109,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         res.btn_auto_class              = "";
         res.btn_guided_class            = "";
         res.btn_circle_class 	        = "";
-        res.btn_brake_class             = " btn-outline-light ";
-        res.btn_hold_class              = " btn-outline-light ";
+        res.btn_brake_class             = " btn-outline-theme-aware ";
+        res.btn_hold_class              = " btn-outline-theme-aware ";
         res.btn_brake_text              = "";
 		res.btn_manual_class            = "";
         res.btn_acro_class              = " disabled hidden ";
@@ -204,7 +204,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 break;
 
                 case js_andruavUnit.VEHICLE_SUBMARINE:
-                    res.btn_takeoff_class      = " btn-outline-light ";
+                    res.btn_takeoff_class      = " btn-outline-theme-aware ";
                     res.btn_arm_class 		    = " btn-danger ";
                     res.btn_climb_class 	    = " btn-warning ";
                     res.btn_climb_text          = "dive";
@@ -299,7 +299,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
                     res.btn_circle_class 	    = " btn-primary ";
-                    res.btn_manual_class	    = " btn-outline-light  ";
+                    res.btn_manual_class	    = " btn-outline-theme-aware  ";
                     res.btn_acro_class	        = " disabled hidden ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
@@ -320,19 +320,19 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		{
             // NOT ARMED
 
-			res.btn_arm_class 			= " btn-outline-light ";
+			res.btn_arm_class 			= " btn-outline-theme-aware ";
 			res.btn_climb_class 		= " disabled hidden ";
 			res.btn_land_class 			= " disabled hidden ";
             res.btn_auto_class 			= " disabled hidden ";
-			res.btn_guided_class 		= " btn-outline-light  ";
-            res.btn_circle_class 	    = " btn-outline-light ";
+			res.btn_guided_class 		= " btn-outline-theme-aware  ";
+            res.btn_circle_class 	    = " btn-outline-theme-aware ";
             res.btn_manual_class	    = " disabled hidden ";
             res.btn_acro_class	        = " disabled hidden ";
             res.btn_stabilize_class     = " disabled hidden ";
             res.btn_pos_hold_class      = " disabled disabled hidden  ";
             res.btn_loiter_class 		= " disabled hidden ";
-			res.btn_rtl_class 			= " btn-outline-light ";
-			res.btn_srtl_class 		    = " btn-outline-light ";
+			res.btn_rtl_class 			= " btn-outline-theme-aware ";
+			res.btn_srtl_class 		    = " btn-outline-theme-aware ";
             res.btn_cruise_class  	    = " disabled hidden ";
             res.btn_fbwa_class 	 	    = " bdisabled hidden ";
 		    res.btn_yaw_class 	 		= " disabled hidden ";
@@ -341,15 +341,15 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             switch (p_andruavUnit.m_VehicleType)
             {
                 case js_andruavUnit.VEHICLE_SUBMARINE:
-                    res.btn_takeoff_class      = " btn-outline-light ";
+                    res.btn_takeoff_class      = " btn-outline-theme-aware ";
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-theme-aware ";
                     res.btn_climb_text          = "dive";
 		            res.btn_land_class 		    = " disabled hidden ";
-                    res.btn_surface_class       = " btn-outline-light ";
-                    res.btn_auto_class 		    = " btn-outline-light ";
-                    res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_circle_class 	    = " btn-outline-light ";
+                    res.btn_surface_class       = " btn-outline-theme-aware ";
+                    res.btn_auto_class 		    = " btn-outline-theme-aware ";
+                    res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_circle_class 	    = " btn-outline-theme-aware ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
@@ -362,8 +362,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_rtl_class 		    = " disabled hidden ";
                     res.btn_srtl_class 		    = " disabled hidden ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_yaw_class 	 	    = " btn-outline-light ";
-                    res.btn_speed_class 	    = " btn-outline-light ";
+                    res.btn_yaw_class 	 	    = " btn-outline-theme-aware ";
+                    res.btn_speed_class 	    = " btn-outline-theme-aware ";
                     break;
                 case js_andruavUnit.VEHICLE_BOAT:
                 case js_andruavUnit.VEHICLE_ROVER:
@@ -371,100 +371,100 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_climb_class 	    = " disabled hidden ";
                     res.btn_land_class 		    = " disabled hidden ";
                     res.btn_surface_class       = " disabled hidden ";
-                    res.btn_auto_class 		    = " btn-outline-light ";
+                    res.btn_auto_class 		    = " btn-outline-theme-aware ";
                     res.btn_takeoff_class       = " disabled hidden ";
-                    res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_circle_class 	    = " btn-outline-light ";
-                    res.btn_manual_class	    = " btn-outline-light ";
-                    res.btn_acro_class	        = " btn-outline-light ";
+                    res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_circle_class 	    = " btn-outline-theme-aware ";
+                    res.btn_manual_class	    = " btn-outline-theme-aware ";
+                    res.btn_acro_class	        = " btn-outline-theme-aware ";
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
-                    res.btn_loiter_class	    = " btn-outline-light "; // used in boat only
-                    res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
-                    res.btn_srtl_class 		    = " btn-outline-light ";
+                    res.btn_loiter_class	    = " btn-outline-theme-aware "; // used in boat only
+                    res.btn_rtl_class 		    = " btn-outline-theme-aware rounded-1 ";
+                    res.btn_srtl_class 		    = " btn-outline-theme-aware ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " btn-primary disabled hidden ";
                     res.btn_fbwa_class 	 	    = " btn-primary disabled hidden ";
                     res.btn_yaw_class 	 	    = " disabled hidden ";
                     res.btn_brake_class 	    = " btn-primary disabled hidden ";
-                    res.btn_hold_class          = "  btn-outline-light ";
-                    res.btn_speed_class	 	    = "  btn-outline-light ";
+                    res.btn_hold_class          = "  btn-outline-theme-aware ";
+                    res.btn_speed_class	 	    = "  btn-outline-theme-aware ";
                         break;
 
                 case js_andruavUnit.VEHICLE_TRI:
                 case js_andruavUnit.VEHICLE_QUAD:
                     res.btn_takeoff_class       = " disabled hidden ";
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
-                    res.btn_land_class 		    = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-theme-aware ";
+                    res.btn_land_class 		    = " btn-outline-theme-aware ";
                     res.btn_surface_class       = " disabled hidden ";
-                    res.btn_auto_class 		    = " btn-outline-light ";
-                    res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_circle_class 	    = " btn-outline-light ";
+                    res.btn_auto_class 		    = " btn-outline-theme-aware ";
+                    res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_circle_class 	    = " btn-outline-theme-aware ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
-                    res.btn_alt_hold_class      = " btn-outline-light ";
-                    res.btn_pos_hold_class      = " btn-outline-light ";
-                    res.btn_loiter_class 	    = " btn-outline-light ";
-                    res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
-                    res.btn_srtl_class 		    = " btn-outline-light ";
+                    res.btn_alt_hold_class      = " btn-outline-theme-aware ";
+                    res.btn_pos_hold_class      = " btn-outline-theme-aware ";
+                    res.btn_loiter_class 	    = " btn-outline-theme-aware ";
+                    res.btn_rtl_class 		    = " btn-outline-theme-aware rounded-1 ";
+                    res.btn_srtl_class 		    = " btn-outline-theme-aware ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
                     res.btn_cruise_class  	    = " disabled hidden ";
                     res.btn_fbwa_class 	 	    = " disabled hidden ";
-                    res.btn_yaw_class 	 	    = " btn-outline-light ";
-                    res.btn_speed_class 	    = " btn-outline-light ";
+                    res.btn_yaw_class 	 	    = " btn-outline-theme-aware ";
+                    res.btn_speed_class 	    = " btn-outline-theme-aware ";
                     break;
 
                 case js_andruavUnit.VEHICLE_VTOL:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
-                    res.btn_takeoff_class       = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-theme-aware ";
+                    res.btn_takeoff_class       = " btn-outline-theme-aware ";
                     res.btn_land_class 		    = " disabled hidden ";
-                    res.btn_auto_class 		    = " btn-outline-light ";
-                    res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_manual_class	    = " btn-outline-light ";
-                    res.btn_stabilize_class     = " btn-outline-light ";
+                    res.btn_auto_class 		    = " btn-outline-theme-aware ";
+                    res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_manual_class	    = " btn-outline-theme-aware ";
+                    res.btn_stabilize_class     = " btn-outline-theme-aware ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
-                    res.btn_loiter_class 	    = " btn-outline-light ";
-                    res.btn_rtl_class 		    = " btn-outline-light rounded-1 ";
-                    res.btn_srtl_class 		    = " btn-outline-light ";
+                    res.btn_loiter_class 	    = " btn-outline-theme-aware ";
+                    res.btn_rtl_class 		    = " btn-outline-theme-aware rounded-1 ";
+                    res.btn_srtl_class 		    = " btn-outline-theme-aware ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_cruise_class  	    = " btn-outline-light ";
-                    res.btn_fbwa_class 	 	    = " btn-outline-light ";
+                    res.btn_cruise_class  	    = " btn-outline-theme-aware ";
+                    res.btn_fbwa_class 	 	    = " btn-outline-theme-aware ";
                     res.btn_yaw_class 	 	    = " disabled hidden   ";
-                    res.btn_speed_class 	    = " btn-outline-light ";
+                    res.btn_speed_class 	    = " btn-outline-theme-aware ";
 
-                    res.btn_q_stabilize         = " btn-outline-light ";
-                    res.btn_q_loiter            = " btn-outline-light ";
-                    res.btn_q_hover             = " btn-outline-light ";
-                    res.btn_q_land              = " btn-outline-light ";
-                    res.btn_q_rtl               = " btn-outline-light ";
+                    res.btn_q_stabilize         = " btn-outline-theme-aware ";
+                    res.btn_q_loiter            = " btn-outline-theme-aware ";
+                    res.btn_q_hover             = " btn-outline-theme-aware ";
+                    res.btn_q_land              = " btn-outline-theme-aware ";
+                    res.btn_q_rtl               = " btn-outline-theme-aware ";
                     break;
 
                 case js_andruavUnit.VEHICLE_PLANE:
                     res.btn_arm_class 		    = p_andruavUnit.m_is_ready_to_arm===true?" btn-primary ":" btn-light ";
-                    res.btn_climb_class 	    = " btn-outline-light ";
-                    res.btn_takeoff_class       = " btn-outline-light ";
+                    res.btn_climb_class 	    = " btn-outline-theme-aware ";
+                    res.btn_takeoff_class       = " btn-outline-theme-aware ";
                     res.btn_land_class 		    = " disabled hidden ";
-                    res.btn_auto_class 		    = " btn-outline-light ";
-                    res.btn_guided_class 	    = " btn-outline-light ";
-                    res.btn_manual_class	    = " btn-outline-light ";
-                    res.btn_stabilize_class     = " btn-outline-light ";
+                    res.btn_auto_class 		    = " btn-outline-theme-aware ";
+                    res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_manual_class	    = " btn-outline-theme-aware ";
+                    res.btn_stabilize_class     = " btn-outline-theme-aware ";
                     res.btn_brake_class 	    = " disabled hidden ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_alt_hold_class      = " disabled hidden ";
                     res.btn_pos_hold_class      = " disabled hidden ";
-                    res.btn_loiter_class 	    = " btn-outline-light ";
-                    res.btn_rtl_class 		    = " btn-outline-light ";
-                    res.btn_srtl_class 		    = " btn-outline-light ";
+                    res.btn_loiter_class 	    = " btn-outline-theme-aware ";
+                    res.btn_rtl_class 		    = " btn-outline-theme-aware ";
+                    res.btn_srtl_class 		    = " btn-outline-theme-aware ";
                     res.btn_takeCTRL_class      = ((c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_CENTER_CHANNELS) || (c_manualTXBlockedSubAction === js_andruavMessages.CONST_RC_SUB_ACTION_FREEZE_CHANNELS))?" btn-danger   ":" btn-primary   ";
-                    res.btn_cruise_class  	    = " btn-outline-light ";
-                    res.btn_fbwa_class 	 	    = " btn-outline-light ";
+                    res.btn_cruise_class  	    = " btn-outline-theme-aware ";
+                    res.btn_fbwa_class 	 	    = " btn-outline-theme-aware ";
                     res.btn_yaw_class 	 	    = " disabled hidden   ";
-                    res.btn_speed_class 	    = " btn-outline-light ";
+                    res.btn_speed_class 	    = " btn-outline-theme-aware ";
 
                     res.btn_q_stabilize         = " disabled hidden ";
                     res.btn_q_loiter            = " disabled hidden ";

@@ -1231,3 +1231,55 @@ select.txt-theme-aware option {
 	}
 }
 
+/* Theme-aware outline button class - only apply to visible buttons with exact class match */
+button.btn-outline-theme-aware:not(.hidden),
+.btn-outline-theme-aware.btn:not(.hidden) {
+  --bs-btn-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-border-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-hover-color: var(--bs-body-bg, #fff) !important;
+  --bs-btn-hover-bg: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-hover-border-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-focus-shadow-rgb: 173, 181, 189 !important;
+  --bs-btn-active-color: var(--bs-body-bg, #fff) !important;
+  --bs-btn-active-bg: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-active-border-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important;
+  --bs-btn-disabled-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-btn-disabled-bg: transparent !important;
+  --bs-btn-disabled-border-color: var(--bs-tertiary-color, #adb5bd) !important;
+  --bs-gradient: none !important;
+}
+
+/* Fallback for themes where tertiary color might be too light/transparent - only apply to visible buttons with exact class match */
+button.btn-outline-theme-aware:not(.hidden),
+.btn-outline-theme-aware.btn:not(.hidden) {
+  color: #adb5bd !important;
+  border-color: #adb5bd !important;
+  background-color: transparent !important;
+}
+
+button.btn-outline-theme-aware:not(.hidden):hover,
+.btn-outline-theme-aware.btn:not(.hidden):hover {
+  color: var(--bs-body-bg, #fff) !important;
+  background-color: #adb5bd !important;
+  border-color: #adb5bd !important;
+}
+
+button.btn-outline-theme-aware:not(.hidden):focus,
+button.btn-outline-theme-aware:not(.hidden):active,
+.btn-outline-theme-aware.btn:not(.hidden):focus,
+.btn-outline-theme-aware.btn:not(.hidden):active {
+  color: var(--bs-body-bg, #fff) !important;
+  background-color: #adb5bd !important;
+  border-color: #adb5bd !important;
+  box-shadow: 0 0 0 0.25rem rgba(173, 181, 189, 0.5) !important;
+}
+
+button.btn-outline-theme-aware:not(.hidden):disabled,
+.btn-outline-theme-aware.btn:not(.hidden):disabled {
+  color: #adb5bd !important;
+  background-color: transparent !important;
+  border-color: #adb5bd !important;
+  opacity: 0.6 !important;
+}
+
