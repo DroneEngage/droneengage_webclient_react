@@ -47,9 +47,9 @@ class ClssHeaderControl extends React.Component {
             );
         }
         return (
-            <div id='rowheader' key='ClssHeaderControl' className='row  css_padding_zero bg-dark fixed-top ps-3'>
+            <div id='rowheader' key='ClssHeaderControl' className='row  css_padding_zero txt-theme-aware-bg fixed-top ps-3'>
                 <div className='col-7  css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
-                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-0">
+                    <nav className="navbar navbar-expand-lg txt-theme-aware-navbar p-0">
                         <a className="navbar-brand fs-3" href=".">
                             <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top pt-2" alt="" />
                             {js_siteConfig.CONST_TITLE}
@@ -57,25 +57,25 @@ class ClssHeaderControl extends React.Component {
                         <div className="collapse navbar-collapse" id="navbarNav">
                             <ul className="navbar-nav">
                                 <li key="Home" className="nav-item active">
-                                    <a className="nav-link" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')} </a>
+                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')} </a>
                                 </li>
                                 <li key="Geo" className="nav-item">
-                                    <a className="nav-link" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a>
+                                    <a className="nav-link txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a>
                                 </li>
                                 <li key="Manual" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Wiki</a>
+                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Wiki</a>
                                 </li>
                                 <li key="FAQ" className="nav-item">
-                                    <a className="nav-link" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
+                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
                                 </li>
                                 <li key="Contact" className="nav-item">
-                                    <a className="nav-link " href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a>
+                                    <a className="nav-link txt-theme-aware " href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a>
                                 </li>
                                 {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK" className="nav-item">
                                     <a className="nav-link text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a>
                                 </li>}
                                 {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account" className="nav-item">
-                                    <a className="nav-link" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a>
+                                    <a className="nav-link txt-theme-aware" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a>
                                 </li>}
                                 <li key="Theme" className="nav-item">
                                     <div className="nav-link p-0">
