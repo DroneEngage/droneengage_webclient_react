@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from '../js/ThemeContext';
 
 const ThemeSwitcher = ({ className = '', showLabel = true }) => {
   const { currentTheme, availableThemes, switchTheme, isLoading } = useTheme();
