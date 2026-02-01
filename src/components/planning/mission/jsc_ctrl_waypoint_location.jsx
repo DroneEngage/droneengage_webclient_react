@@ -127,25 +127,25 @@ export class CWayPointLocation extends React.Component {
         const alt_id = "txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
 
         return (<div className="margin_zero css_margin_top_small">
-                    <p className="form-control-label text-white mb-0">3D-Location </p>
+                    <p className="form-control-label txt-theme-aware mb-0">3D-Location </p>
                     <div className="row margin_zero">
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor={lat_id} className="form-label text-white "><small>lat</small>
+                                <label htmlFor={lat_id} className="form-label txt-theme-aware "><small>lat</small>
                                 <input id={lat_id} ref={this.m_latRef} type="number" min={-90} max={90} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lat} placeholder="0.00"    onChange={this.handleLatChange} />
                                 </label>
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor={lng_id} className="form-label text-white "><small>lng</small>
+                                <label htmlFor={lng_id} className="form-label txt-theme-aware "><small>lng</small>
                                 <input id={lng_id}  ref={this.m_lngRef} type="number" min={-180} max={180} step="0.0001" className="form-control  input-sm  txt_margin " value={lnglat.lng} placeholder="0.00" onChange={this.handleLngChange} />
                                 </label>
                             </div>
                         </div>
                         <div className="col-4">
                             <div className="form-group">
-                                <label htmlFor={alt_id} className="form-label text-white "><small>alt</small>
+                                <label htmlFor={alt_id} className="form-label txt-theme-aware "><small>alt</small>
                                 <div className="input-group mb-3">
                                     <input id={alt_id}  ref={this.m_altRef} type="number" min={0} max={9000} step="1.0" className="form-control  input-sm  txt_margin " placeholder="0.00" aria-label="0.00" aria-describedby="button-addon2" value={this.props.p_shape.m_missionItem.alt} onChange={this.handleAltChange}/>
                                     <button id={"btn_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id}  ref={this.m_baltRef} type="button" className="btn btn-success input-sm line-height-0 border-dark border-1" onClick={ (e) => this.fn_editAltitudeType()} >{this.fn_getAltitudeLabel(this.props.p_shape.m_missionItem.m_frameType)}</button>

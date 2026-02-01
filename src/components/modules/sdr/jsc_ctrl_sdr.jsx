@@ -248,16 +248,16 @@ export class ClssCtrlSDR extends React.Component {
             <div key={v_andruavUnit.getPartyID() + 'sdr2_1'} className="col-12 mt-1">
             <div key={v_andruavUnit.getPartyID() + 'sdr2_2'} className = 'row al_l css_margin_zero d-flex '>
                 <div key={v_andruavUnit.getPartyID() + 'sdr2_21'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'sdr2_211'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_211'} className={' rounded-3 txt-theme-aware  cursor_hand textunit_nowidth al_c ' + btn_activate_css.r} title ='Refresh Data' onClick={() => this.fn_refresh(v_andruavUnit)}>Refresh</p>
                 </div>
                 <div key={v_andruavUnit.getPartyID() + 'sdr2_221'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'sdr2_221'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_221'} className={' rounded-3 txt-theme-aware  cursor_hand textunit_nowidth al_c ' + btn_activate_css.u}  title ='Update Settings' onClick={() => this.fn_UpdateSDR(v_andruavUnit)}>Update</p>
                 </div>
                 <div key={v_andruavUnit.getPartyID() + 'sdr2_23'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'sdr2_231'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.s}  title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit, true)}>Scan Freq</p>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_231'} className={' rounded-3 txt-theme-aware  cursor_hand textunit_nowidth al_c ' + btn_activate_css.s}  title ='Scan Spectrum' onClick={() => this.fn_scanSDR(v_andruavUnit, true)}>Scan Freq</p>
                 </div>
                 <div key={v_andruavUnit.getPartyID() + 'sdr2_24'} className= 'col-4 col-sm-3 user-select-none '>
-                    <p key={v_andruavUnit.getPartyID() + 'sdr2_241'} className={' rounded-3 text-white  cursor_hand textunit_nowidth al_c ' + btn_activate_css.p}  title ='Pause Scaning' onClick={() => this.fn_scanSDR(v_andruavUnit, false)}>Stop Scan</p>
+                    <p key={v_andruavUnit.getPartyID() + 'sdr2_241'} className={' rounded-3 txt-theme-aware  cursor_hand textunit_nowidth al_c ' + btn_activate_css.p}  title ='Pause Scaning' onClick={() => this.fn_scanSDR(v_andruavUnit, false)}>Stop Scan</p>
                 </div>
             </div>
             </div>

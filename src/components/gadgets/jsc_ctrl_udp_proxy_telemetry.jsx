@@ -157,7 +157,7 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
           <div className="css_margin_zero user-select-none">
             <p
               id="udp_get"
-              className="bg-warning cursor_hand rounded-3 textunit_w135 text-center user-select-none text-white"
+              className="bg-warning cursor_hand rounded-3 textunit_w135 text-center user-select-none txt-theme-aware"
               title={t('udpProxyTelemetry:refreshTitle')}
               onClick={(e) => this.fn_requestUdpProxyStatus(v_andruavUnit)}
             >

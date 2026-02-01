@@ -132,7 +132,7 @@ export default class ClssLoginControl extends React.Component {
         
         return (
             <div>
-                <p className="bg-success text-white text-center p-2"><strong>{login}</strong></p>
+                <p className="bg-success txt-theme-aware text-center p-2"><strong>{login}</strong></p>
                 
                 {this.state.errorMessage && (
                     <div className="alert alert-danger" role="alert">

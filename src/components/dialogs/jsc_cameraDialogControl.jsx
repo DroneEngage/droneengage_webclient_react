@@ -100,7 +100,7 @@ class ClssCameraDevice extends React.Component {
             
             return (
                     <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className="row al_l css_margin_zero">
-                            <div className= "col-8   si-09x css_margin_zero text-white">
+                            <div className= "col-8   si-09x css_margin_zero txt-theme-aware">
                             <label>{v_track.ln}</label>
                             </div>
                             <div className= "col-2   si-09x css_margin_zero css_padding_2">

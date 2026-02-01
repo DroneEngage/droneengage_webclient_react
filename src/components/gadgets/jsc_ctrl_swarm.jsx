@@ -185,7 +185,7 @@ class ClssCtrlSWARM extends React.Component {
 
         if (this.props.p_unit.m_Swarm.m_following != null) {
             v_follower_class = "bg-danger";
-            v_leader_dropdown_class = "bg-success text-white";
+            v_leader_dropdown_class = "bg-success txt-theme-aware";
             const v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
             if (v_leaderUnit != null) {
                 v_leader_title_follower = v_leaderUnit.m_unitName;
@@ -202,7 +202,7 @@ class ClssCtrlSWARM extends React.Component {
 
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
             v_leader_class = "btn-danger";
-            v_leader_dropdown_class = "bg-danger text-white";
+            v_leader_dropdown_class = "bg-danger txt-theme-aware";
             v_leader_title_leader = t('swarmCtrl:leader');
             v_class_formation_as_leader = '';
         }

@@ -59,7 +59,7 @@ export default class ClssCtrlOpacityControl extends React.Component {
 
         // Use a small epsilon for float comparison just in case, though usually exact match works for assigned values
         if (this.state.m_opacity >= 0.95) { // ~1.0
-            css_icon = "bi bi-lightbulb-fill text-white cursor_hand";
+            css_icon = "bi bi-lightbulb-fill txt-theme-aware cursor_hand";
             title = "HUD Visible (100%)";
         } else if (this.state.m_opacity >= 0.65) { // ~0.7
             css_icon = "bi bi-lightbulb-fill text-light cursor_hand";

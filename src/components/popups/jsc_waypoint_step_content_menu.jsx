@@ -56,7 +56,7 @@ export class ClssWaypointStepContextMenu extends React.Component {
 
 			switch (this.props.p_waypoint.waypointType) {
 				case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
-					v_contentString.push(<p key={this.key + 'c1'} className={'img-rounded bg-primary text-white '+  v_style}><strong> {"Circle Seq#" + this.props.p_waypoint.m_Sequence + v_icon}</strong></p>);
+					v_contentString.push(<p key={this.key + 'c1'} className={'img-rounded bg-primary txt-theme-aware '+  v_style}><strong> {"Circle Seq#" + this.props.p_waypoint.m_Sequence + v_icon}</strong></p>);
 
                     v_contentString.push(<span key={this.key + 'c2'}  className='help-block'>{this.props.p_waypoint.Latitude + "," + this.props.p_waypoint.Longitude}</span>);
 					v_contentString.push(<p key={this.key + 'c3'} className='text-primary'>{'radius:' + parseInt(this.props.p_waypoint.m_Radius).toFixed(1) + " m x" + parseInt(this.props.p_waypoint.m_Turns).toFixed(0)}</p>);
@@ -64,7 +64,7 @@ export class ClssWaypointStepContextMenu extends React.Component {
 
 					break;
 				default:
-					v_contentString.push(<p key={this.key + 'd1'}  className={'img-rounded bg-primary text-white ' + v_style}><strong>{'Waypoint Seq#' + this.props.p_waypoint.m_Sequence + v_icon }</strong></p>);
+					v_contentString.push(<p key={this.key + 'd1'}  className={'img-rounded bg-primary txt-theme-aware ' + v_style}><strong>{'Waypoint Seq#' + this.props.p_waypoint.m_Sequence + v_icon }</strong></p>);
                     v_contentString.push(<p key={this.key + 'd2'} className="text-primary margin_zero  " >
                         lat:<span className='si-09x text-success'>{lat}</span> 
                     </p>);

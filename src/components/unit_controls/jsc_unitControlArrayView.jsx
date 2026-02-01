@@ -167,7 +167,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         if (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_No_Telemetry)
         {
             v_flight_mode_text = hlp_getFlightMode(v_andruavUnit);
-            v_flight_mode_class= " text-white";
+            v_flight_mode_class= " txt-theme-aware";
             v_flight_mode_title= 'flight mode'
         }
         
@@ -203,7 +203,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
     {
         let gps = new C_GUI_READING_VALUE();
         
-        gps.css = "bg-danger text-white text-center";
+        gps.css = "bg-danger txt-theme-aware text-center";
         if (gps_Info.m_isValid === true)
         {
             switch (gps_Info.GPS3DFix)
@@ -214,7 +214,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 break;
 
                 case 1:
-                    gps.css = ' bg-danger text-white text-center ';
+                    gps.css = ' bg-danger txt-theme-aware text-center ';
                 break;
 
                 case 2:
@@ -304,7 +304,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             {
                 res.abs.value = res.abs.value.toFixed(0);
             }
-            res.abs.css = ' text-white ';
+            res.abs.css = ' txt-theme-aware ';
         }
 
         if (p_andruavUnit.m_Nav_Info.p_Location.alt_relative==null)
@@ -334,7 +334,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             {
                 res.rel.value = res.rel.value.toFixed(0);
             }
-            res.rel.css = ' text-white ';
+            res.rel.css = ' txt-theme-aware ';
         }
 
 
@@ -365,7 +365,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             {
                 res.terC.value = res.terC.value.toFixed(0);
             }
-            res.terC.css = ' text-white ';
+            res.terC.css = ' txt-theme-aware ';
         }
 
         if (p_andruavUnit.m_Terrain_Info.last_terrain_entry == null)
@@ -395,7 +395,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             {
                 res.terH.value = res.terH.value.toFixed(0);
             }
-            res.terH.css = ' text-white ';
+            res.terH.css = ' txt-theme-aware ';
         }
         
         let lidar = p_andruavUnit.m_lidar_info.get(mavlink20.MAV_SENSOR_ROTATION_PITCH_270);
@@ -435,7 +435,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 {
                     res.lidar.value = res.lidar.value.toFixed(0);
                 }
-                res.lidar.css = ' text-white ';
+                res.lidar.css = ' txt-theme-aware ';
             }
         }
 
@@ -556,17 +556,17 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const target = p_andruavUnit.m_Nav_Info._Target;
         if (target.wp_num>0)
         {
-            res.css = ' text-white ';
+            res.css = ' txt-theme-aware ';
             res.cur = target.wp_num;
             res.count = target.wp_count
-            res.wp_dist.css = ' text-white ';
+            res.wp_dist.css = ' txt-theme-aware ';
 
             switch (target.mission_state)
             {
                 case mavlink20.MISSION_STATE_UNKNOWN:
                 case mavlink20.MISSION_STATE_NO_MISSION:
                 {
-                    res.wp_dist.css = ' bg-muted text-white ';
+                    res.wp_dist.css = ' bg-muted txt-theme-aware ';
                 }
                 break;
 
@@ -574,15 +574,15 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 {
                     if (target.wp_dist > js_globals.CONST_DFM_FAR)
                     {
-                        res.wp_dist.css = ' bg-danger text-white ';
+                        res.wp_dist.css = ' bg-danger txt-theme-aware ';
                     }
                     else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
                     {
-                        res.wp_dist.css = ' bg-info  text-white ';
+                        res.wp_dist.css = ' bg-info  txt-theme-aware ';
                     }
                     else
                     {
-                        res.wp_dist.css = ' bg-success text-white ';
+                        res.wp_dist.css = ' bg-success txt-theme-aware ';
                     }
                 }
                 break;
@@ -625,7 +625,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         let v_id_icon = '';
         let v_armed = {};
         v_armed.text = 'Disarmed';
-        v_armed.css = 'text-white';
+        v_armed.css = 'txt-theme-aware';
         let v_mav_id_text = v_andruavUnit.m_FCBParameters.m_systemID;
         const v_flight_mode = this.fn_getFlightMode(v_andruavUnit);
         const v_HUD = this.fn_getHUD(v_andruavUnit);
@@ -644,14 +644,14 @@ class ClssAndruavUnitDroneRow extends React.Component{
         {
             if (v_andruavUnit.m_isArmed === true) 
             {
-                v_id_class = " bg-danger text-white ";
+                v_id_class = " bg-danger txt-theme-aware ";
                 v_armed.text ='ARMED';
-                v_armed.css = 'bg-danger text-white fw-bold';
+                v_armed.css = 'bg-danger txt-theme-aware fw-bold';
                 
             }
             else
             {
-                v_id_class = " bg-success text-white ";
+                v_id_class = " bg-success txt-theme-aware ";
             }
             if ((v_andruavUnit.m_useFCBIMU === false) 
                 ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
@@ -746,9 +746,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 </div>
                 <div key={this.key+'5'} className = 'col-2  col-lg-1   css_margin_zero css_padding_zero  si-07x css_dotted_border  '>
                         <ul className="css_hud_bullets">
-                            <li><span className="text-warning">R:</span><span className="text-white">{v_HUD.r}</span><span className="text-warning">º</span></li>
-                            <li><span className="text-warning">P:</span><span className="text-white">{v_HUD.p}</span><span className="text-warning">º</span></li>
-                            <li><span className="text-warning">H:</span><span className="text-white">{v_HUD.h}</span><span className="text-warning">º</span></li>
+                            <li><span className="text-warning">R:</span><span className="txt-theme-aware">{v_HUD.r}</span><span className="text-warning">º</span></li>
+                            <li><span className="text-warning">P:</span><span className="txt-theme-aware">{v_HUD.p}</span><span className="text-warning">º</span></li>
+                            <li><span className="text-warning">H:</span><span className="txt-theme-aware">{v_HUD.h}</span><span className="text-warning">º</span></li>
                         </ul>
                 </div>
                 <div key={this.key+'6'} className = {'col-4  col-lg-2   d-grid css_margin_zero  si-07x  css_dotted_border  ' + css_battery_enabled}>
@@ -757,20 +757,20 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 </div>
                 <div key={this.key+'7'} className = 'col-4  col-lg-2   d-none d-lg-grid css_margin_zero css_padding_zero css_dotted_border  '>
                     <div className = 'row  css_margin_zero css_padding_zero'>
-                        <div className = {'col-12  css_margin_zero text-white'+ v_gps1.css}><span className='fss-4'>{v_gps1.value}</span></div>
+                        <div className = {'col-12  css_margin_zero txt-theme-aware'+ v_gps1.css}><span className='fss-4'>{v_gps1.value}</span></div>
                     </div>
                     <div className = 'row  css_margin_zero css_padding_zero'>
-                    <div className = {'col-12  css_margin_zero text-white '+ v_gps2.css}><span className='fss-4'>{v_gps2.value}</span></div>
+                    <div className = {'col-12  css_margin_zero txt-theme-aware '+ v_gps2.css}><span className='fss-4'>{v_gps2.value}</span></div>
                     </div>
                 </div>
                 <div key={this.key+'8'} className = {'col-2  col-lg-1   d-grid css_margin_zero  si-07x css_dotted_border  ' + css_speed_enabled}>
                     <div className = {'row  css_margin_zero' + v_speed.GS.css}>
                         <div className = {'col-12  col-xxl-4  css_margin_zero text-warning' + v_speed.AS.css}>AS:</div>
-                        <div className = {'col-12  col-xxl-8  css_margin_zero text-white' + v_speed.AS.css}>{v_speed.AS.value}<span className='text-warning '>{v_speed.AS.unit}</span></div>
+                        <div className = {'col-12  col-xxl-8  css_margin_zero txt-theme-aware' + v_speed.AS.css}>{v_speed.AS.value}<span className='text-warning '>{v_speed.AS.unit}</span></div>
                     </div>
                     <div className = {'row  css_margin_zero' + v_speed.GS.css}>
                         <div className = 'col-12  col-xxl-4  css_margin_zero text-warning '>GS:</div>
-                        <div className = 'col-12  col-xxl-8  css_margin_zero text-white '>{v_speed.GS.value}<span className='text-warning '>{v_speed.GS.unit}</span></div>
+                        <div className = 'col-12  col-xxl-8  css_margin_zero txt-theme-aware '>{v_speed.GS.value}<span className='text-warning '>{v_speed.GS.unit}</span></div>
                     </div>
                 </div>
                 
@@ -788,17 +788,17 @@ class ClssAndruavUnitDroneRow extends React.Component{
                 <div key={this.key+'10'} className = {'col-2  col-lg-1   d-none d-lg-grid  css_margin_zero  padding_zero si-07x  css_dotted_border  ' + v_wind.WS.css   + css_ws_enabled}>
                     <div className = 'row  css_margin_zero'>
                         <div className = 'col-12  col-xxl-4 css_margin_zero text-warning al_l'>WS/Z:</div>
-                        <div className = 'col-12  col-xxl-8 css_margin_zero text-white al_r' > {v_wind.WS.value} / {v_wind.WZ.value}<span className='text-warning'>{v_wind.WS.unit}</span></div>
+                        <div className = 'col-12  col-xxl-8 css_margin_zero txt-theme-aware al_r' > {v_wind.WS.value} / {v_wind.WZ.value}<span className='text-warning'>{v_wind.WS.unit}</span></div>
                     </div>
                     <div className = {'row  css_margin_zero  ' + v_wind.WD.css}>
                         <div  className = 'col-12  col-xxl-4  css_margin_zero text-warning al_l'>WD:</div>
-                        <div  className = 'col-12  col-xxl-8  css_margin_zero text-white al_r'> {v_wind.WD.value}<span className="text-warning">{v_wind.WD.unit}</span></div>
+                        <div  className = 'col-12  col-xxl-8  css_margin_zero txt-theme-aware al_r'> {v_wind.WD.value}<span className="text-warning">{v_wind.WD.unit}</span></div>
                     </div>
                 </div>
                 <div key={this.key+'11'} className = {'col-2  col-lg-1   d-grid css_margin_zero skinny   si-07x css_dotted_border '  + css_wp_enabled}>
                     <div className = {'row  css_margin_zero padding_zero' + v_wp.wp_dist.css}>
-                        <div className = 'col-12  col-xxl-6  css_margin_zero text-white padding_zero '  >{v_wp.wp_dist.value}<span className='text-warning'>{v_wp.wp_dist.unit}</span></div>
-                        <div className = {'col-12  col-xxl-6  css_margin_zero text-white padding_zero ' + v_wp.css}>{v_wp.cur}<span className='text-warning'>{'>>'}</span>{v_wp.count}</div>
+                        <div className = 'col-12  col-xxl-6  css_margin_zero txt-theme-aware padding_zero '  >{v_wp.wp_dist.value}<span className='text-warning'>{v_wp.wp_dist.unit}</span></div>
+                        <div className = {'col-12  col-xxl-6  css_margin_zero txt-theme-aware padding_zero ' + v_wp.css}>{v_wp.cur}<span className='text-warning'>{'>>'}</span>{v_wp.count}</div>
                     </div>
                 </div>
             </div>

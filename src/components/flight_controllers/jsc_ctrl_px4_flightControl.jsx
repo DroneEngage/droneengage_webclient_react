@@ -264,7 +264,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                         js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, true, true);
                         return ;
                     }
-                }, "FORCED-ARM", "bg-danger text-white", "ARM");
+                }, "FORCED-ARM", "bg-danger txt-theme-aware", "ARM");
         }
     }
 
@@ -275,7 +275,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     if (p_approved === false) return;
 					js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
                     js_globals.v_andruavFacade.API_do_Arm(this.props.v_andruavUnit, false, true);
-                }, "KILL-MOTORS", "bg-danger text-white");
+                }, "KILL-MOTORS", "bg-danger txt-theme-aware");
 
 
         }

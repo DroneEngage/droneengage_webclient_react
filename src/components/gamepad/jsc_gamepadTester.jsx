@@ -468,7 +468,7 @@ export default class ClssGamepadTester extends React.Component {
                       <select
                         value={axisFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
-                        className={`form-control h-75 ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success text-white' : 'bg-warning text-dark'} w-75`}
+                        className={`form-control h-75 ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success txt-theme-aware' : 'bg-warning text-dark'} w-75`}
                       >
                         {js_globals.v_gamepad_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
@@ -510,7 +510,7 @@ export default class ClssGamepadTester extends React.Component {
                         id={`1value`}
                         value={buttonFunctions[i] || 'undefined'}
                         onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}
-                        className={`form-control h-75 ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success text-white'} w-50`}
+                        className={`form-control h-75 ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success txt-theme-aware'} w-50`}
                       >
                         {js_globals.v_gamepad_button_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
@@ -522,7 +522,7 @@ export default class ClssGamepadTester extends React.Component {
                         id={`2value`}
                         value={buttonTypes[i] || js_globals.v_gamepad_button_types[0]}
                         onChange={(e) => this.fn_assignButtonType(i, e.target.value)}
-                        className="form-control h-75 ms-2 bg-primary text-white w-25"
+                        className="form-control h-75 ms-2 bg-primary txt-theme-aware w-25"
                       >
                         {js_globals.v_gamepad_button_types.map((type, idx) => (
                           <option key={idx} value={type}>

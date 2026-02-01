@@ -15,6 +15,7 @@ import Accounts from "./pages/accounts";
 import NoPage from "./pages/NoPage";
 import GamePadTesterPage from "./pages/gamepadTester";
 import DebugPage from "./pages/debug";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 
 
@@ -46,6 +47,8 @@ export default function App2() {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <I18nextProvider i18n={i18n}>
-    <App2 />  
+    <ThemeProvider>
+      <App2 />  
+    </ThemeProvider>
   </I18nextProvider>
 );

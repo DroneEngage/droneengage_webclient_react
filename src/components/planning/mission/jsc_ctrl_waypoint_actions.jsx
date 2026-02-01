@@ -150,7 +150,7 @@ export class CWayPointAction extends React.Component {
         return (
 
         <div id={c_id} key={c_id} className={this.props.className + ' form-group text-left '}>
-        <p className="form-control-label text-white mb-0">To Do When Arrive </p>
+        <p className="form-control-label txt-theme-aware mb-0">To Do When Arrive </p>
         {v_event_firing}
         <CFieldChecked  key={'f1' + v_itemID} required={this.props.p_shape.m_missionItem.m_speedRequired === true} txtLabel='speed'  txtValue={this.props.p_shape.m_missionItem.speed}  ref={instance => {this.speed = instance}} />
         <CFieldChecked  key={'f2' + v_itemID} required={this.props.p_shape.m_missionItem.m_yawRequired === true}  txtLabel='yaw'  txtValue={this.props.p_shape.m_missionItem.yaw}  ref={instance => {this.yaw = instance}} />
