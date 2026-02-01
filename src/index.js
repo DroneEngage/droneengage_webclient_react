@@ -15,7 +15,7 @@ import Accounts from "./pages/accounts";
 import NoPage from "./pages/NoPage";
 import GamePadTesterPage from "./pages/gamepadTester";
 import DebugPage from "./pages/debug";
-import { ThemeProvider } from "./js/ThemeContext";
+import { ThemeProvider } from "./js/js_theme_context";
 
 
 
