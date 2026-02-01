@@ -34,7 +34,7 @@ export class ClssSingle_Plan_Header extends React.Component {
             m_partyID: 0,
             is_connected: false,
             //is_collapsed: false,
-            css_pc: "btn  btn-sm css_margin_left_5 text-light border border-primary rounded text-center cursor_hand",
+            css_pc: "btn  btn-sm css_margin_left_5 txt-theme-aware border border-primary rounded text-center cursor_hand",
             css_ph: "btn  btn-sm  text-success border border-success rounded text-center cursor_hand"
         };
 
@@ -183,7 +183,7 @@ export class ClssSingle_Plan_Header extends React.Component {
         }
 
 
-        let v_class = (this.props.p_isCurrent === true) ? "flex-grow-1 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "flex-grow-1  text-light border  border-secondry rounded text-center cursor_hand padding_zero"
+        let v_class = (this.props.p_isCurrent === true) ? "flex-grow-1 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "flex-grow-1  txt-theme-aware border  border-secondry rounded text-center cursor_hand padding_zero"
         return (
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
                 <div className="form-inline  margin_zero padding_zero">

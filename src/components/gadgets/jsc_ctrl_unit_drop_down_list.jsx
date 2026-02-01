@@ -157,7 +157,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
                 let txt_unit = v_andruavUnit.m_unitName;
                 if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
                 {
-                    css_unit = 'text-light';
+                    css_unit = 'txt-theme-aware';
                     txt_unit += ' --- offline';
                 } 
                 

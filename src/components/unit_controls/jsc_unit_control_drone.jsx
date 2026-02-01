@@ -227,7 +227,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 css += 'active ';
             }
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li1'} className="nav-item">
-                <a className={css + ' bi bi-send-fill '} data-bs-toggle="tab" href={"#main" + v_andruavUnit.getPartyID()} title='Main'></a>
+                <a className={css + ' bi bi-send-fill txt-theme-aware '} data-bs-toggle="tab" href={"#main" + v_andruavUnit.getPartyID()} title='Main'></a>
             </li>);
         }
 
@@ -261,7 +261,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if ((js_siteConfig.CONST_FEATURE.DISABLE_GPIO != null) && (js_siteConfig.CONST_FEATURE.DISABLE_GPIO === false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_gpio === true)) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
-                <a className="nav-link user-select-none bi bi-arrow-down-up " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.getPartyID()} title='GPIO'></a>
+                <a className="nav-link user-select-none bi bi-arrow-down-up txt-theme-aware " data-bs-toggle="tab" href={"#gpio" + v_andruavUnit.getPartyID()} title='GPIO'></a>
             </li>);
         }
 
@@ -293,7 +293,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 css += 'active ';
             }
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'liempty'} className="nav-item">
-                <a className={css} data-bs-toggle="tab" href={"#empty" + v_andruavUnit.getPartyID()}>Collapse</a>
+                <a className={css + ' txt-theme-faint'} data-bs-toggle="tab" href={"#empty" + v_andruavUnit.getPartyID()}>Collapse</a>
             </li>);
         }
 

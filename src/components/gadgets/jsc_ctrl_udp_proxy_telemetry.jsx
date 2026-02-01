@@ -112,7 +112,7 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
           </span>
         );
       } else {
-        v_telemetry_lvl_class = 'text-light';
+        v_telemetry_lvl_class = 'txt-theme-aware';
         v_udp_on_off.push(
           <span
             key={v_andruavUnit.getPartyID() + 'active'}
@@ -124,7 +124,7 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
               width="16"
               height="16"
               fill="currentColor"
-              className="bi bi-power text-light"
+              className="bi bi-power txt-theme-aware"
               viewBox="0 0 16 16"
             >
               <path d="M7.5 1v7h1V1h-1z" />
@@ -151,7 +151,7 @@ class ClssCtrlUDPPoxyTelemetry extends React.Component {
         </div>
       );
     } else {
-      v_telemetry_lvl_class = 'text-light';
+      v_telemetry_lvl_class = 'txt-theme-aware';
       v_udp_data.push(
         <div key={v_andruavUnit.getPartyID() + 'refresh'} className="col-12 padding_zero css_user_select_text">
           <div className="css_margin_zero user-select-none">

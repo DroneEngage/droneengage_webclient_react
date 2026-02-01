@@ -608,7 +608,7 @@ export default class ClssConfigGenerator extends React.Component {
           id="modal_ctrl_config_generator"
           key={this.key + "m0"}
           ref={this.popupRef}
-          className="modal bg-dark text-light position-fixed"
+          className="modal bg-dark txt-theme-aware position-fixed"
           style={{
             zIndex: 1000,
             width: '500px',
@@ -666,7 +666,7 @@ export default class ClssConfigGenerator extends React.Component {
             <div className="mb-2">
               <textarea
                 id="output"
-                className="form-control bg-dark text-light w-100"
+                className="form-control bg-dark txt-theme-aware w-100"
                 value={JSON.stringify(this.state.output.fieldNameOutput, null, 4)}
                 readOnly
                 rows={4}

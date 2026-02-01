@@ -184,7 +184,7 @@ class ClssCtrlDroneIMU extends React.Component {
 
         if (target.wp_dist === null || target.wp_dist === undefined || target.wp_dist < 0) {
             wpdst_text = t('unit_control_imu:waypoint.na');
-            distanceToWP_class = 'text-light bi bi-geo-alt-fill';
+            distanceToWP_class = 'txt-theme-aware bi bi-geo-alt-fill';
         } else {
             if (js_globals.v_useMetricSystem === true) {
                 wpdst_text = Number(target.wp_dist.toFixed(1)).toLocaleString() + t('unit_control_imu:waypoint.m');
