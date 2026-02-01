@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import * as themeUtils from '../utils/themeUtils';
+import * as themeUtils from '../js/js_theme_utils';
 import { js_localStorage } from '../js/js_localStorage.js';
 
 const ThemeContext = createContext();
