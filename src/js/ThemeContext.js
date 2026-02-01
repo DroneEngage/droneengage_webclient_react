@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as themeUtils from '../utils/themeUtils';
+import { js_localStorage } from '../js/js_localStorage.js';
 
 const ThemeContext = createContext();
 
@@ -13,7 +14,7 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('selectedTheme') || 'default';
+    return js_localStorage.fn_getSelectedTheme();
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,7 +54,7 @@ export const ThemeProvider = ({ children }) => {
     try {
       await themeUtils.switchTheme(themeId);
       setCurrentTheme(themeId);
-      localStorage.setItem('selectedTheme', themeId);
+      js_localStorage.fn_setSelectedTheme(themeId);
     } catch (error) {
       console.error('Failed to switch theme:', error);
     } finally {
