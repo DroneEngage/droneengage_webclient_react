@@ -1,5 +1,6 @@
 import $ from 'jquery'; 
 import 'jquery-ui-dist/jquery-ui.min.js';
+import 'jquery-knob/dist/jquery.knob.min.js';
 
 import React    from 'react';
 import Draggable from "react-draggable";
@@ -58,7 +59,42 @@ export default class ClssYawDialog extends React.Component
         p_me.setState({'m_update': p_me.state.m_update +1});
         
         p_me.modal_ctrl_yaw.current.style.display = 'block';
+		setTimeout(function () { p_me.fn_initKnob(); }, 0);
     }
+
+
+	fn_initKnob()
+	{
+		if (this.yaw_knob === null || this.yaw_knob === undefined) return;
+		if (this.yaw_knob.current === null || this.yaw_knob.current === undefined) return;
+
+		if (this.yaw_knob.current.dataset && this.yaw_knob.current.dataset.knobInitialized === '1') {
+			return;
+		}
+
+		const $knob = $(this.yaw_knob.current);
+		if (typeof $knob.knob !== 'function') return;
+
+		$knob.knob({
+			fgColor: "#3671AB",
+			bgColor: "#36AB36",
+			thickness: 0.3,
+			cursor: 10,
+			displayPrevious: true,
+			'mousewheel': function (event) {
+				event.preventDefault();
+			},
+			'touchstart': function (event) {
+				event.preventDefault();
+			}
+		});
+
+		$knob.css({ display: 'inline', padding: '0px 10px' });
+
+		if (this.yaw_knob.current.dataset) {
+			this.yaw_knob.current.dataset.knobInitialized = '1';
+		}
+	}
 
 
     fn_initDialog()
@@ -126,9 +162,9 @@ export default class ClssYawDialog extends React.Component
     render ()
     {
         return (
-            <Draggable nodeRef={this.modal_ctrl_yaw} handle=".card-header" cancel="button, input, textarea, select, option, a">
+            <Draggable nodeRef={this.modal_ctrl_yaw} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
-					<div className="card-header text-center">
+					<div className="card-header text-center js-draggable-handle">
 						<div className="row">
 						<div className="col-10">
 						<h3 className="text-success text-start">YAW</h3>
