@@ -63,58 +63,11 @@ The production-ready files will be generated in the `build/` directory.
 
 ## Configuration
 
-### Development Configuration
+Detailed configuration documentation is maintained in `wiki/`:
 
-Default settings are defined in `src/js/js_siteConfig.js`. These can be overridden at runtime using `public/config.json`.
-
-### Production Configuration
-
-After building, edit `config.json` in the `build/` directory to customize the deployed application.
-
-### Configuration Options
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `CONST_TEST_MODE` | Enable test mode (uses test server settings) | `true` |
-| `CONST_PROD_MODE_IP` | Production server IP/hostname | `airgap.droneengage.com` |
-| `CONST_PROD_MODE_PORT` | Production server port | `19408` |
-| `CONST_TEST_MODE_IP` | Test server IP/hostname | `127.0.0.1` |
-| `CONST_TEST_MODE_PORT` | Test server port | `19408` |
-| `CONST_MAP_LEAFLET_URL` | Map tile URL (Mapbox, OpenStreetMap, local) | Mapbox satellite |
-| `CONST_ANDRUAV_URL_ENABLE` | Show Andruav download link | `true` |
-| `CONST_ACCOUNT_URL_ENABLE` | Show account link | `true` |
-| `CONST_DONT_BROADCAST_TO_GCSs` | Disable broadcasting to other GCS | `false` |
-| `CONST_DONT_BROADCAST_GCS_LOCATION` | Hide GCS location from network | `false` |
-
-### Feature Flags (`CONST_FEATURE`)
-
-| Flag | Description |
-|------|-------------|
-| `DISABLE_UNIT_NAMING` | Disable unit renaming |
-| `DISABLE_UDPPROXY_UPDATE` | Disable UDP proxy updates |
-| `DISABLE_SWARM` | Disable swarm features |
-| `DISABLE_SWARM_DESTINATION_PONTS` | Disable swarm destination points |
-| `DISABLE_P2P` | Disable peer-to-peer connections |
-| `DISABLE_SDR` | Disable SDR features |
-| `DISABLE_GPIO` | Disable GPIO controls |
-| `DISABLE_VOICE` | Disable voice features |
-| `DISABLE_TRACKING` | Disable tracking features |
-| `DISABLE_TRACKING_AI` | Disable AI tracking |
-| `DISABLE_EXPERIMENTAL` | Disable experimental features |
-| `DISABLE_VERSION_NOTIFICATION` | Disable version update notifications |
-
-### Module Versions (`CONST_MODULE_VERSIONS`)
-
-Define expected versions for connected modules (de, fcb, andruav, camera) with download URLs and help links.
-
-### Language Settings (`CONST_LANGUAGE`)
-
-- `ENABLED_LANGUAGES` - Array of available languages (en, ar, fr, es, ru)
-- `DEFAULT_LANGUAGE` - Default language code
-
-### WebRTC Settings (`CONST_ICE_SERVERS`)
-
-Configure TURN/STUN servers for video streaming.
+- **Site / startup config** (`public/config.json` overrides `src/js/js_siteConfig.js`): `wiki/Andruav_SiteConfig.md`
+- **Runtime preferences** (`src/js/js_globals.js` + `src/js/js_localStorage.js`): `wiki/Andruav_Configuration.md`
+- **Communication layer** (`src/js/server_comm/*`): `wiki/Andruav_ServerComm.md`
 
 ## Tech Stack
 
