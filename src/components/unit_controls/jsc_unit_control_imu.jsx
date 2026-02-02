@@ -50,39 +50,39 @@ class ClssCtrlDroneIMU extends React.Component {
             m_gps_source: "",
         };
 
-        res.m_gps_class = "bg-danger txt-theme-aware text-center bi bi-globe";
-        res.m_gps_class2 = "txt-theme-aware text-center";
+        res.m_gps_class = "bg-danger text-white text-center bi bi-globe";
+        res.m_gps_class2 = "text-white text-center";
         if (p_andruavUnit.m_GPS_Info1.m_isValid === true) {
             switch (p_andruavUnit.m_GPS_Info1.GPS3DFix) {
                 case 1:
                     res.m_gps_text = t('unit_control_imu:gps.noFix');
-                    res.m_gps_class = "bg-danger txt-theme-aware bi bi-globe";
+                    res.m_gps_class = "bg-danger text-white bi bi-globe";
                     break;
                 case 2:
-                    res.m_gps_class = "bg-warning txt-theme-aware bi bi-globe";
+                    res.m_gps_class = "bg-warning text-white bi bi-globe";
                     break;
                 case 3:
-                    res.m_gps_class = "bg-info txt-theme-aware";
+                    res.m_gps_class = "bg-info text-white";
                     res.m_gps_text = t('unit_control_imu:gps.3dFix');
                     break;
                 case 4:
-                    res.m_gps_class = "bg-primary txt-theme-aware";
+                    res.m_gps_class = "bg-primary text-white";
                     res.m_gps_text = t('unit_control_imu:gps.dgps');
                     break;
                 case 5:
-                    res.m_gps_class = "bg-primary txt-theme-aware";
+                    res.m_gps_class = "bg-primary text-white";
                     res.m_gps_text = t('unit_control_imu:gps.rtkFloat');
                     break;
                 case 6:
-                    res.m_gps_class = "bg-primary txt-theme-aware";
+                    res.m_gps_class = "bg-primary text-white";
                     res.m_gps_text = t('unit_control_imu:gps.rtkFixed');
                     break;
                 case 7:
-                    res.m_gps_class = "bg-primary txt-theme-aware";
+                    res.m_gps_class = "bg-primary text-white";
                     res.m_gps_text = t('unit_control_imu:gps.static');
                     break;
                 case 8:
-                    res.m_gps_class = "bg-primary txt-theme-aware";
+                    res.m_gps_class = "bg-primary text-white";
                     res.m_gps_text = t('unit_control_imu:gps.ppp');
                     break;
             }
@@ -140,10 +140,10 @@ class ClssCtrlDroneIMU extends React.Component {
             } else {
                 v_flight_status_text = t('unit_control_imu:flight.flying');
             }
-            v_flight_status_class = "bg-danger txt-theme-aware cursor_hand";
+            v_flight_status_class = "bg-danger text-white cursor_hand";
         } else {
             v_flight_status_text = t('unit_control_imu:flight.onGround');
-            v_flight_status_class = "bg-success txt-theme-aware";
+            v_flight_status_class = "bg-success text-white";
         }
 
         const c_delta = v_andruavUnit.m_FlyingLastStartTime === 0 ? 0.0 : v_andruavUnit.m_FlyingLastStartTime;
@@ -184,7 +184,7 @@ class ClssCtrlDroneIMU extends React.Component {
 
         if (target.wp_dist === null || target.wp_dist === undefined || target.wp_dist < 0) {
             wpdst_text = t('unit_control_imu:waypoint.na');
-            distanceToWP_class = 'txt-theme-aware bi bi-geo-alt-fill';
+            distanceToWP_class = 'bg-secondary text-white cursor_hand bi bi-geo-alt-fill';
         } else {
             if (js_globals.v_useMetricSystem === true) {
                 wpdst_text = Number(target.wp_dist.toFixed(1)).toLocaleString() + t('unit_control_imu:waypoint.m');
@@ -197,19 +197,19 @@ class ClssCtrlDroneIMU extends React.Component {
             switch (target.mission_state) {
                 case mavlink20.MISSION_STATE_UNKNOWN:
                 case mavlink20.MISSION_STATE_NO_MISSION:
-                    distanceToWP_class = 'bg-light txt-theme-aware cursor_hand bi bi-geo-alt-fill';
+                    distanceToWP_class = 'bg-light text-dark cursor_hand bi bi-geo-alt-fill';
                     break;
                 case mavlink20.MISSION_STATE_NOT_STARTED:
                 case mavlink20.MISSION_STATE_PAUSED:
-                    distanceToWP_class = 'bg-light text-dark-emphasis cursor_hand bi bi-geo-alt-fill';
+                    distanceToWP_class = 'bg-secondary text-white cursor_hand bi bi-geo-alt-fill';
                     break;
                 default:
                     if (target.wp_dist > js_globals.CONST_DFM_FAR) {
-                        distanceToWP_class = 'bg-danger txt-theme-aware cursor_hand bi bi-geo-alt-fill';
+                        distanceToWP_class = 'bg-danger text-white cursor_hand bi bi-geo-alt-fill';
                     } else if (target.wp_dist > js_globals.CONST_DFM_SAFE) {
-                        distanceToWP_class = 'bg-warning cursor_hand bi bi-geo-alt-fill';
+                        distanceToWP_class = 'bg-warning text-dark cursor_hand bi bi-geo-alt-fill';
                     } else {
-                        distanceToWP_class = 'bg-info txt-theme-aware cursor_hand bi bi-geo-alt-fill';
+                        distanceToWP_class = 'bg-info text-white cursor_hand bi bi-geo-alt-fill';
                     }
                     break;
             }
@@ -221,16 +221,16 @@ class ClssCtrlDroneIMU extends React.Component {
         if (v_andruavUnit.m_fencestatus !== null && v_andruavUnit.m_fencestatus !== undefined) {
             if ((v_andruavUnit.m_fencestatus & 0b010) === 0b010) {
                 v_fence_text = t('unit_control_imu:fence.bad');
-                v_fence_class = 'bg-danger txt-theme-aware bi bi-bounding-box-circles';
+                v_fence_class = 'bg-danger text-white bi bi-bounding-box-circles';
             } else if ((v_andruavUnit.m_fencestatus & 0b110) === 0b100) {
                 v_fence_text = t('unit_control_imu:fence.good');
-                v_fence_class = 'bg-success txt-theme-aware bi bi-bounding-box-circles';
+                v_fence_class = 'bg-success text-white bi bi-bounding-box-circles';
             } else if ((v_andruavUnit.m_fencestatus & 0b111) === 0b001) {
                 v_fence_text = t('unit_control_imu:fence.bad');
-                v_fence_class = 'bg-danger txt-theme-aware bi bi-bounding-box-circles';
+                v_fence_class = 'bg-danger text-white bi bi-bounding-box-circles';
             } else {
                 v_fence_text = t('unit_control_imu:fence.noViolation');
-                v_fence_class = 'bg-warning bi bi-bounding-box-circles';
+                v_fence_class = 'bg-warning text-white bi bi-bounding-box-circles';
             }
         }
 
@@ -304,13 +304,13 @@ class ClssCtrlDroneIMU extends React.Component {
 
                 <div key={'yaw_ctrl' + v_andruavUnit.getPartyID()} className="row al_l bg-gradient css_margin_zero user-select-none">
                     <div key="yaw_ctrl1" className="col-6 col-sm-4 padding_zero css_border_right_faint css_padding_horizontal_5">
-                        <p id="yaw" className="rounded-3 txt-theme-aware css_margin_zero">
+                        <p id="yaw" className="rounded-3 text-white css_margin_zero">
                             <small>{v_yaw_text}</small>
                         </p>
                         <div id="imu_v_yaw_knob">{v_yaw_knob}</div>
                     </div>
                     <div key="yaw_ctrl2" className="col-6 col-sm-3 padding_zero css_border_right_faint css_padding_horizontal_5">
-                        <p id="bearing" className="rounded-3 txt-theme-aware css_margin_zero">
+                        <p id="bearing" className="rounded-3 text-white css_margin_zero">
                             <small>{v_bearing_text}</small>
                         </p>
                         <div id="bearing_main" className="css_margin_zero">
