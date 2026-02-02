@@ -1083,11 +1083,12 @@ select.txt-theme-aware option {
   background-color: var(--bs-body-bg) !important;
   color: var(--bs-body-color) !important;
   border-color: var(--bs-border-color) !important;
-  line-height: 0.8 !important;
-  padding-top: 0.075rem !important;
-  padding-bottom: 0.0375rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25 !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
   vertical-align: middle !important;
-  height: auto !important;
+  height: 30px !important;
   padding-right: 2.25rem !important;
   padding-left: 0.75rem !important;
   margin: 0 !important;
