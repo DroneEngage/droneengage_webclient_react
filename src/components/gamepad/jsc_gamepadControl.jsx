@@ -296,7 +296,7 @@ export default class ClssGamePadControl extends React.Component {
 
         $('#modal_ctrl_gamepad').hide();
         $('#modal_ctrl_gamepad').draggable({
-            handle: '#title',
+            handle: '.js-draggable-handle',
             cancel: 'button, input, textarea, select, option, a'
         });
         $('#modal_ctrl_gamepad').on("mouseover", function () {
@@ -367,7 +367,7 @@ export default class ClssGamePadControl extends React.Component {
         }
 
         return (<div id="modal_ctrl_gamepad" key={"m1_" + this.key} title="GamePad Control" className="css_ontop">
-  <h4 id="title" className="modal-title text-warning">GamePad of {v_title}</h4>
+  <h4 id="title" className="modal-title text-warning js-draggable-handle">GamePad of {v_title}</h4>
   {this.m_output}
   <div id="modal_gamepad_footer" className="form-group bg-dark">
     <div>

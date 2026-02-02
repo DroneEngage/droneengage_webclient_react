@@ -603,7 +603,7 @@ export default class ClssConfigGenerator extends React.Component {
     const title = this.state.module ? `Config for ${this.state.module.i || 'Module'}` : 'Configuration Generator';
 
     return (
-      <Draggable nodeRef={this.popupRef} handle=".modal-header" cancel="button, input, textarea, select, option, a">
+      <Draggable nodeRef={this.popupRef} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
         <div
           id="modal_ctrl_config_generator"
           key={this.key + "m0"}
@@ -621,7 +621,7 @@ export default class ClssConfigGenerator extends React.Component {
           }}
         >
           {/* Fixed Header */}
-          <div className="modal-header p-3 border-bottom" style={{ flexShrink: 0 }}>
+          <div className="modal-header p-3 border-bottom js-draggable-handle" style={{ flexShrink: 0 }}>
             <h5 className="modal-title mb-0">{title}</h5>
             <button type="button" className="btn-close btn-close-white" onClick={this.fn_close}></button>
           </div>
