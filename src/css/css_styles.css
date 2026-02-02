@@ -198,6 +198,8 @@ css_cur_move {cursor: move;}
 css_cur_n-resize {cursor: n-resize;}
 css_cur_ne-resize {cursor: ne-resize;}
 css_cur_nesw-resize {cursor: nesw-resize;}
+
+ .js-draggable-handle { cursor: move; }
 css_cur_ns-resize {cursor: ns-resize;}
 css_cur_nw-resize {cursor: nw-resize;}
 css_cur_nwse-resize {cursor: nwse-resize;}
