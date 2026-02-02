@@ -43,7 +43,7 @@ const Home = () => {
       <ClssHeaderControl />
 
       <div id="mainBody" className="row css_mainbody">
-        <div id="row_1" className="col-8">
+        <div id="row_1" className="col-lg-8 col-xl-8 col-xxl-8 col-12">
           <div id="row_1_1" className="row margin_zero">
             <div id="displays" className="container-fluid text-center">
               <div className="monitorview" id="message_notification" style={{ display: 'none' }}>
@@ -115,7 +115,7 @@ const Home = () => {
           <ClssStreamDialog />
         </div>
 
-        <div id="row_2" className="col-4">
+        <div id="row_2" className="col-lg-4 col-xl-4 col-xxl-4 col-12">
           <div id="andruavUnits" className="col-sm-12 padding_zero">
             <div id="andruavUnits_in" className="">
               <ClssGlobalSettings />

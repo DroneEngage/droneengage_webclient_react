@@ -11,14 +11,40 @@ div.css_mainbody
   width: 100%;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
-/* Make left column chain full-height flex so video area can fill */
-#row_1 {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+@media (max-width: 991.98px) {
+  div.css_mainbody {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  #row_1, #row_2 {
+    height: auto;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  
+  #row_1 {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  #div_video_control {
+    height: auto;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 992px) {
+  #row_1 {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
 }
 
 #row_1_1 {
@@ -42,9 +68,11 @@ div#displays {
 }
 
 /* Let the video block consume remaining height within displays */
-#div_video_control {
-  flex: 1 1 auto;
-  min-height: 0;
+@media (min-width: 992px) {
+  #div_video_control {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
 }
 
 img.camera_switch
@@ -651,6 +679,7 @@ div#modal_ctrl_lidar_info
 	min-width: 400px !important;
 	max-width: 600px !important;
 	opacity:0.85;
+	z-index: 2100 !important;
 	float:left;
  }
 
@@ -1221,9 +1250,18 @@ table.css_table_log
 	display:inline-block;
 }
 
-#row_2 {
-  overflow-y: auto;
-  height: 100%;
+@media (min-width: 992px) {
+  #row_2 {
+    overflow-y: auto;
+    height: 100%;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #row_2 {
+    height: auto;
+    overflow-y: visible;
+  }
 }
 
 div#displays
@@ -1233,11 +1271,20 @@ div#displays
 }
 
 /* Make the video area fill available height with no scrollbars */
-#div_video_control {
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+@media (min-width: 992px) {
+  #div_video_control {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #div_video_control {
+    height: auto;
+    overflow: visible;
+  }
 }
 
 #div_video_control > .container-fluid.localcontainer {
