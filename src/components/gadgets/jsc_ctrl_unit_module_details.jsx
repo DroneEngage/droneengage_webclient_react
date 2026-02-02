@@ -92,14 +92,14 @@ export default class ClssModuleDetails extends React.Component {
                                         <strong>{module.i}</strong>
                                     </p>
                                     {this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
-                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
+                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c btn-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
                                         {
                                             // Config Button
                                             (module.c && module.c !== 'comm') && (
                                                 <button
                                                     id={this.key + 'config'}
                                                     key={this.key + 'config'}
-                                                    className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
+                                                    className='btn al_c btn-success cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_configModule(module)}
                                                     title='Configure Module'
                                                 >
@@ -112,7 +112,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'shutdown'}
                                                     key={this.key + 'shutdown'}
-                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2'
+                                                    className='btn al_c btn-danger cursor_hand text-white textunit_nowidth me-2'
                                                     onClick={(e) => this.fn_shutDownBoard(module.k)}
                                                     title='Shutdown Board Completly'
                                                 >
@@ -125,7 +125,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'reboot'}
                                                     key={this.key + 'reboot'}
-                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth'
+                                                    className='btn al_c btn-danger cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_rebootBoard(module.k)}
                                                     title='Reboot Board'
                                                 >
