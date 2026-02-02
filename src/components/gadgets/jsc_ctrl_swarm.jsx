@@ -174,7 +174,7 @@ class ClssCtrlSWARM extends React.Component {
         const c_items = [];
 
         let v_leader_class = "btn-secondary";
-        let v_follower_class = "bg-secondary";
+        let v_follower_class = "btn-secondary";
         let v_leader_title_leader = t('swarmCtrl:notLeader');
         let v_leader_title_follower = t('swarmCtrl:none');
         let v_leader_dropdown_class = "bg-secondary";
@@ -184,7 +184,7 @@ class ClssCtrlSWARM extends React.Component {
         let v_class_formation_as_follower = 'hidden';
 
         if (this.props.p_unit.m_Swarm.m_following != null) {
-            v_follower_class = "bg-danger";
+            v_follower_class = "btn-danger";
             v_leader_dropdown_class = "bg-success txt-theme-aware";
             const v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.p_unit.m_Swarm.m_following);
             if (v_leaderUnit != null) {
@@ -197,12 +197,13 @@ class ClssCtrlSWARM extends React.Component {
             v_class_formation_as_follower = '';
             v_class_follower = '';
         } else {
-            v_follower_class = "bg-secondary";
+            v_follower_class = "btn-secondary";
         }
 
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
             v_leader_class = "btn-danger bg-danger";
             v_leader_dropdown_class = "bg-danger txt-theme-aware";
+            v_follower_class = "btn-danger";
             v_leader_title_leader = t('swarmCtrl:leader');
             v_class_formation_as_leader = '';
         }
@@ -242,21 +243,20 @@ class ClssCtrlSWARM extends React.Component {
                     >
                         {t('swarmCtrl:leader')}
                     </button>
-                    <div key={'swr_12' + this.key} className="btn-group" role="group">
-                        <button
-                            id={"btnGroupDrop2" + this.key}
-                            type="button"
-                            className={"btn btn-sm dropdown-toggle " + v_follower_class}
-                            data-bs-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        ></button>
-                        <div key={'swr_121' + this.key} className="dropdown-menu" aria-labelledby={"btnGroupDrop2" + this.key}>
-                            {c_items}
-                            <a className="dropdown-item" href="#" onClick={() => this.fn_requestToFollow()}>
-                                {t('swarmCtrl:unfollow')}
-                            </a>
-                        </div>
+                    <button
+                        key={'swr_12' + this.key}
+                        id={"btnGroupDrop2" + this.key}
+                        type="button"
+                        className={"btn btn-sm dropdown-toggle dropdown-toggle-split " + v_follower_class}
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                    ></button>
+                    <div key={'swr_121' + this.key} className="dropdown-menu" aria-labelledby={"btnGroupDrop2" + this.key}>
+                        {c_items}
+                        <a className="dropdown-item" href="#" onClick={() => this.fn_requestToFollow()}>
+                            {t('swarmCtrl:unfollow')}
+                        </a>
                     </div>
                 </div>
                 <div key={'swr_2' + this.key} className="row al_l css_margin_zero">
