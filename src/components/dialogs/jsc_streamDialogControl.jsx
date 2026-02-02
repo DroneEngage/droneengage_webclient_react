@@ -226,14 +226,14 @@ export default class ClssStreamDialog extends React.Component
         const isNoStreams = p_andruavUnit === null;
 
         return (
-            <Draggable nodeRef={this.modal_ctrl_stream_dlg} handle=".card-header" cancel="button, input, textarea, select, option, a">
+            <Draggable nodeRef={this.modal_ctrl_stream_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
             <div
                 id="modal_ctrl_stream_dlg"
                 title="Streaming Video"
                 className="card css_ontop border-light p-2"
                 ref={this.modal_ctrl_stream_dlg} // Set the ref here
             >
-                <div className="card-header text-center">
+                <div className="card-header text-center js-draggable-handle">
                     <div className="row">
                         <div className="col-10">
                             <h4 className="text-success text-start">

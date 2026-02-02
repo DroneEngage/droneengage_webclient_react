@@ -263,18 +263,18 @@ export default class ClssCameraDialog extends React.Component
         
 
         return (
-            <Draggable nodeRef={this.modal_ctrl_cam} handle=".card-header" cancel="button, input, textarea, select, option, a">
+            <Draggable nodeRef={this.modal_ctrl_cam} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
             <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2 " ref={this.modal_ctrl_cam}>
-                <div key='camera_hdr' className="card-header text-center">
+                <div key='camera_hdr' className="card-header text-center js-draggable-handle">
 					<div className="row">
 				        <div className="col-10">
-						    <h4 className="text-success text-start">Still Image of' {v_unitName} </h4>
-						</div>
-						<div className="col-2 float-right">
-						    <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
-						</div>
+					    <h4 className="text-success text-start">Still Image of' {v_unitName} </h4>
+					</div>
+					<div className="col-2 float-right">
+					    <button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
 					</div>
 				</div>
+			</div>
                       
                 <div key='camera_body'  id="camera-card-body" className="card-body">
                     <div key='camera_v_streanms'  className='row'>
