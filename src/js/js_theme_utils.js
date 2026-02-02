@@ -4,6 +4,7 @@ const THEME_BASE_PATH = '/css/themes';
 const DEFAULT_BOOTSTRAP_CSS = '/css/bootstrap.min.css';
 // ID attribute for the <link> element that loads the theme CSS
 const THEME_CSS_ID = 'theme-bootstrap-css';
+const THEME_CSS_ID_PENDING = 'theme-bootstrap-css-pending';
 
 /**
  * Applies a theme-specific class to the document body.
@@ -39,10 +40,10 @@ const applyThemeClass = (themeId) => {
  */
 const loadCSS = (href, id) => {
   return new Promise((resolve, reject) => {
-    // Remove any existing theme CSS with the same ID to prevent conflicts
-    const existingLink = document.getElementById(id);
-    if (existingLink) {
-      existingLink.remove();
+    // Remove any previous pending theme CSS
+    const pendingLink = document.getElementById(THEME_CSS_ID_PENDING);
+    if (pendingLink) {
+      pendingLink.remove();
     }
 
     // Create a new <link> element for the CSS file
@@ -50,10 +51,19 @@ const loadCSS = (href, id) => {
     link.rel = 'stylesheet';
     link.type = 'text/css';
     link.href = href;
-    link.id = id;
+    // Always load as "pending" first to avoid a window where no theme CSS is applied
+    link.id = THEME_CSS_ID_PENDING;
 
     // Resolve the promise when CSS loads successfully
-    link.onload = () => resolve(link);
+    link.onload = () => {
+      const existingLink = document.getElementById(id);
+      if (existingLink) {
+        existingLink.remove();
+      }
+
+      link.id = id;
+      resolve(link);
+    };
     // Reject the promise if CSS fails to load
     link.onerror = () => reject(new Error(`Failed to load CSS: ${href}`));
 
@@ -78,6 +88,7 @@ const removeCSS = (id) => {
 // Helper function to clean up any existing theme CSS
 const cleanupThemeCSS = () => {
   removeCSS(THEME_CSS_ID);
+  removeCSS(THEME_CSS_ID_PENDING);
 };
 
 /**
