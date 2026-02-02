@@ -295,7 +295,10 @@ export default class ClssGamePadControl extends React.Component {
     componentDidMount () {
 
         $('#modal_ctrl_gamepad').hide();
-        $('#modal_ctrl_gamepad').draggable();
+        $('#modal_ctrl_gamepad').draggable({
+            handle: '#title',
+            cancel: 'button, input, textarea, select, option, a'
+        });
         $('#modal_ctrl_gamepad').on("mouseover", function () {
             $('#modal_ctrl_gamepad').css('opacity', '1.0');
         });

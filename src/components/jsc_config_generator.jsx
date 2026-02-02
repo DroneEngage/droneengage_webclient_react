@@ -603,7 +603,7 @@ export default class ClssConfigGenerator extends React.Component {
     const title = this.state.module ? `Config for ${this.state.module.i || 'Module'}` : 'Configuration Generator';
 
     return (
-      <Draggable nodeRef={this.popupRef}>
+      <Draggable nodeRef={this.popupRef} handle=".modal-header" cancel="button, input, textarea, select, option, a">
         <div
           id="modal_ctrl_config_generator"
           key={this.key + "m0"}
