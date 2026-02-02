@@ -266,7 +266,7 @@ h1.font-thin {
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .btn-group > .hidden + .btn,
