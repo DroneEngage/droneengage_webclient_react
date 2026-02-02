@@ -99,7 +99,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'config'}
                                                     key={this.key + 'config'}
-                                                    className='btn al_c bg-success cursor_hand txt-theme-aware textunit_nowidth'
+                                                    className='btn al_c bg-success cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_configModule(module)}
                                                     title='Configure Module'
                                                 >

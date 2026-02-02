@@ -334,7 +334,7 @@ export default class ClssServoControl extends React.Component {
         }
             
             return (
-                <Draggable nodeRef={this.modal_ctrl_srv}>
+                <Draggable nodeRef={this.modal_ctrl_srv} handle=".card-header" cancel="button, input, textarea, select, option, a">
                     <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2 col-4 " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
                         <div key='camera_hdr' className="card-header text-center">
 				            <div className="row">

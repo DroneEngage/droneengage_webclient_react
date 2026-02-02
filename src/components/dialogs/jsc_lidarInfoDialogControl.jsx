@@ -132,7 +132,7 @@ export default class ClssLidarInfoDialog extends React.Component
         }    
 
         return (
-            <Draggable nodeRef={this.modal_ctrl_lidar_info}>
+            <Draggable nodeRef={this.modal_ctrl_lidar_info} handle=".card-header" cancel="button, input, textarea, select, option, a">
                 <div  key={this.key + "m0"} id="modal_ctrl_lidar_info" title="Lidar Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_lidar_info}>
 					<div key={this.key + "m1"} className="card-header text-center">
 						<div className="row">

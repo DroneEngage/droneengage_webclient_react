@@ -314,7 +314,7 @@ export default class ClssUnitParametersList extends React.Component {
         const p_params = this.fn_createParametersCtrl(p_andruavUnit);
 
         return (
-            <Draggable nodeRef={this.modalRef}>
+            <Draggable nodeRef={this.modalRef} handle=".card-header" cancel="button, input, textarea, select, option, a">
                 <div
                     id="modal_ctrl_parameters"
                     className="card css_ontop border-light p-2"
