@@ -140,10 +140,10 @@ class ClssCtrlUnitDetails extends React.Component {
                         <div key={this.key + 'settings_cb11'} className="col-12 mt-1">
                             <div key={this.key + 'settings_cb12'} className='row al_l css_margin_zero d-flex '>
                                 <div key={this.key + 'settings_cb121'} className='col-6 col-sm-3 user-select-none '>
-                                    <p key={this.key + 'settings_cb1211'} className=' rounded-3 txt-theme-aware bg-danger cursor_hand textunit_nowidth al_c' title={t('change_udp_proxy_port')} onClick={() => this.fn_changeTelemetryPort(v_andruavUnit)}>{t('proxy_port')}</p>
+                                    <p key={this.key + 'settings_cb1211'} className=' rounded-3 text-white bg-danger cursor_hand textunit_nowidth al_c' title={t('change_udp_proxy_port')} onClick={() => this.fn_changeTelemetryPort(v_andruavUnit)}>{t('proxy_port')}</p>
                                 </div>
                                 <div key={this.key + 'settings_cb122'} className='col-6 col-sm-3 user-select-none '>
-                                    <p key={this.key + 'settings_cb1221'} className=' rounded-3 txt-theme-aware bg-primary cursor_hand textunit_nowidth al_c' title={t('reset_counters')} onClick={() => this.fn_resetMsgCounter(v_andruavUnit)}>{t('reset')}</p>
+                                    <p key={this.key + 'settings_cb1221'} className=' rounded-3 text-white bg-primary cursor_hand textunit_nowidth al_c' title={t('reset_counters')} onClick={() => this.fn_resetMsgCounter(v_andruavUnit)}>{t('reset')}</p>
                                 </div>
                             </div>
                         </div>
