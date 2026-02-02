@@ -41,7 +41,7 @@ export default class ClssModuleDetails extends React.Component {
                 console.log('Submitted:', me.state.output);
                 alert("data submitted. you need to restart the module.");
                 
-              }, "YES", "bg-danger txt-theme-aware");
+              }, "YES", "bg-danger text-white");
     }
 
     fn_shutdownBoard(p_module_key) {
@@ -52,7 +52,7 @@ export default class ClssModuleDetails extends React.Component {
                     "Are you sure you want to completly shutdown the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
                         js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
-                    }, "YES", "bg-danger txt-theme-aware");
+                    }, "YES", "bg-danger text-white");
     }
 
     fn_rebootBoard(p_module_key) {
@@ -63,7 +63,7 @@ export default class ClssModuleDetails extends React.Component {
                     "Are you sure you want to completly reboot the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
                         js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_RESTART_HW);
-                    }, "YES", "bg-danger txt-theme-aware");
+                    }, "YES", "bg-danger text-white");
     }
 
     fn_configModule(p_module) {
@@ -92,7 +92,7 @@ export default class ClssModuleDetails extends React.Component {
                                         <strong>{module.i}</strong>
                                     </p>
                                     {this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
-                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand txt-theme-aware textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
+                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
                                         {
                                             // Config Button
                                             (module.c && module.c !== 'comm') && (
@@ -112,7 +112,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'shutdown'}
                                                     key={this.key + 'shutdown'}
-                                                    className='btn al_c bg-danger cursor_hand txt-theme-aware textunit_nowidth me-2'
+                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth me-2'
                                                     onClick={(e) => this.fn_shutDownBoard(module.k)}
                                                     title='Shutdown Board Completly'
                                                 >
@@ -125,7 +125,7 @@ export default class ClssModuleDetails extends React.Component {
                                                 <button
                                                     id={this.key + 'reboot'}
                                                     key={this.key + 'reboot'}
-                                                    className='btn al_c bg-danger cursor_hand txt-theme-aware textunit_nowidth'
+                                                    className='btn al_c bg-danger cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_rebootBoard(module.k)}
                                                     title='Reboot Board'
                                                 >

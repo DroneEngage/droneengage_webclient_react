@@ -78,14 +78,14 @@ class ClssCtrlDrone_FlightMode_Ctrl extends React.Component {
             case js_andruavMessages.CONST_TelemetryProtocol_CONST_Unknown_Telemetry:
                 const mode = hlp_getFlightMode(p_unit);
                 v_flight_mode_text = t('unit_control_imu:telemetry.mode', { mode: mode });
-                v_flight_mode_class = "bg-info txt-theme-aware";
+                v_flight_mode_class = "bg-info text-white";
                 v_fcb_mode_title = t('unit_control_imu:telemetry.flightModeTitle');
                 v_flight_mode_val = mode;
                 break;
             default:
                  // Fallback
                 v_flight_mode_text = "Unknown";
-                v_flight_mode_class = "bg-secondary txt-theme-aware";
+                v_flight_mode_class = "bg-secondary text-white";
                 v_fcb_mode_title = "";
                 v_flight_mode_val = "UNK";
                 break;
