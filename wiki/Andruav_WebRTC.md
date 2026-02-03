@@ -8,7 +8,7 @@ It enables real-time video communication between drones and web clients using We
 `js_webrtcstream` is a module-scoped variable exported from `js_webrtcthin2.js`, initialized as the singleton instance of the `AndruavStream` class. It serves as the central interface for initiating and handling WebRTC video streams between the web client and remote devices (e.g., drones).
 
 ```javascript
-449:449:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_webrtcthin2.js
+449:449:./src/js/js_webrtcthin2.js
 export const js_webrtcstream = AndruavStream.getInstance();
 ```
 
@@ -32,7 +32,7 @@ It acts as a bridge between the application’s signaling layer (via `js_andruav
 In `js_main.js`, `js_webrtcstream` is used to initiate a WebRTC video stream session when logging into a remote drone video channel.
 
 ```javascript
-599:613:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_main.js
+599:613:./src/js/js_main.js
 function fn_WEBRTC_login(v_partyID, v_trackID) {
 	js_webrtcstream.onOrphanDisconnect = onWEBRTCSessionOrphanEnded;
 
