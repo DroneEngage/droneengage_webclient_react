@@ -1332,10 +1332,60 @@ button.btn-outline-theme-aware:not(.hidden):active,
 }
 
 button.btn-outline-theme-aware:not(.hidden):disabled,
-.btn-outline-theme-aware.btn:not(.hidden):disabled {
+ .btn-outline-theme-aware.btn:not(.hidden):disabled {
   color: #adb5bd !important;
   background-color: transparent !important;
   border-color: #adb5bd !important;
   opacity: 0.6 !important;
-}
+ }
 
+ /*
+  * Morph theme fix: Bootswatch "morph" overrides `.btn` with a neutral background color,
+  * which unintentionally neutralizes Bootstrap variant classes like `.btn-danger`,
+  * `.btn-success`, and `.btn-warning`.
+  *
+  * This block restores variant colors ONLY for Morph by forcing the button to use
+  * Bootstrap's own variant CSS variables (`--bs-btn-*`).
+  *
+  * IMPORTANT:
+  * - Keep this scoped to `body.theme-morph` so other themes are unaffected.
+  * - Do NOT replace these with hardcoded colors; they must follow the active theme.
+  */
+ body.theme-morph .btn.btn-danger,
+ body.theme-morph .btn.btn-success,
+ body.theme-morph .btn.btn-warning {
+   background-color: var(--bs-btn-bg) !important;
+   border-color: var(--bs-btn-border-color) !important;
+   color: var(--bs-btn-color) !important;
+ }
+
+ body.theme-morph .btn.btn-danger:hover,
+ body.theme-morph .btn.btn-danger:focus,
+ body.theme-morph .btn.btn-success:hover,
+ body.theme-morph .btn.btn-success:focus,
+ body.theme-morph .btn.btn-warning:hover,
+ body.theme-morph .btn.btn-warning:focus {
+   background-color: var(--bs-btn-hover-bg) !important;
+   border-color: var(--bs-btn-hover-border-color) !important;
+   color: var(--bs-btn-hover-color) !important;
+ }
+
+ body.theme-morph .btn.btn-danger:active,
+ body.theme-morph .btn.btn-danger.active,
+ body.theme-morph .btn.btn-danger.show,
+ body.theme-morph .btn-check:checked + .btn.btn-danger,
+ body.theme-morph .btn-check:active + .btn.btn-danger,
+ body.theme-morph .btn.btn-success:active,
+ body.theme-morph .btn.btn-success.active,
+ body.theme-morph .btn.btn-success.show,
+ body.theme-morph .btn-check:checked + .btn.btn-success,
+ body.theme-morph .btn-check:active + .btn.btn-success,
+ body.theme-morph .btn.btn-warning:active,
+ body.theme-morph .btn.btn-warning.active,
+ body.theme-morph .btn.btn-warning.show,
+ body.theme-morph .btn-check:checked + .btn.btn-warning,
+ body.theme-morph .btn-check:active + .btn.btn-warning {
+   background-color: var(--bs-btn-active-bg) !important;
+   border-color: var(--bs-btn-active-border-color) !important;
+   color: var(--bs-btn-active-color) !important;
+ }
