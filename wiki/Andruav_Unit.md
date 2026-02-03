@@ -10,7 +10,7 @@ It encapsulates telemetry, status, permissions, and communication state for a si
 Instances are stored in a global list (`AndruavUnitList`) and are identified by a unique `partyID`. The class uses private fields (via `#`) for critical identifiers like `#m_partyID`, `#m_version`, and `#m_isDE` (Drone Engage flag).
 
 ```typescript
-1124:1313:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_andruavUnit.js
+1124:1313:./src/js/js_andruavUnit.js
 export class CAndruavUnitObject {
   #m_partyID;
   #m_version;
@@ -89,7 +89,7 @@ Instances of `CAndruavUnitObject` are created dynamically when the system receiv
 A common usage pattern is in `js_andruav_ws.js`, where a new unit is created when the system connects to the server or receives a message from a new sender.
 
 ```typescript
-173:183:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/server_comm/js_andruav_ws.js
+173:183:./src/js/server_comm/js_andruav_ws.js
 const v_unit = new js_andruavUnit.CAndruavUnitObject();
 v_unit.m_IsMe = true;
 v_unit.m_IsGCS = true;
@@ -103,7 +103,7 @@ this.m_andruavUnit = v_unit;
 Another example is in message parsing, where a unit is created if it doesn't already exist:
 
 ```typescript
-237:248:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/server_comm/js_andruav_parser.js
+237:248:./src/js/server_comm/js_andruav_parser.js
 let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
 if (!p_unit) {
     p_unit = new js_andruavUnit.CAndruavUnitObject();
