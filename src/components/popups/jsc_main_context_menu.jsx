@@ -64,7 +64,7 @@ export class ClssMainContextMenu extends React.Component {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.getPartyID()}  className='row css_txt_center'>
                                 <div className='col-12 mt-1 padding_zero'>
-                                    <p className='bg-primary txt-theme-aware  si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT }</p></div>
+                                    <p className='text-bg-primary si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT }</p></div>
                                 <div className='col-6  p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
                                 <div className='col-6  p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
                             </div>);
@@ -77,7 +77,7 @@ export class ClssMainContextMenu extends React.Component {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.getPartyID()} className='row css_txt_center'>
                                 <div className='col-12 mt-1 padding_zero'>
-                                    <p className='bg-primary txt-theme-aware si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT}</p>
+                                    <p className='text-bg-primary si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT}</p>
                                 </div>
                             </div>
                             );
@@ -110,8 +110,8 @@ export class ClssMainContextMenu extends React.Component {
         return (
             <div className="text-justified one_line col-12">
                 <div className="row">
-                <p className="bg-success txt-theme-aware mb-1 padding_zero">
-                    <span className="text-success margin_zero txt-theme-aware si-09x" >
+                <p className="text-bg-success mb-1 padding_zero">
+                    <span className="margin_zero si-09x" >
                         lat:<span className='si-09x'>{v_lat.toFixed(6)}</span> lng:<span className='si-09x'>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
