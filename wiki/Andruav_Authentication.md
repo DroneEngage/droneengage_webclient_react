@@ -10,7 +10,7 @@ It manages login, logout, access code generation, and permission validation for 
 The class follows the **singleton pattern** via the static `getInstance()` method, ensuring only one instance exists across the application. This is crucial for maintaining consistent authentication state.
 
 ```javascript
-23:489:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_andruav_auth.js
+23:489:./src/js/js_andruav_auth.js
 class CAndruavAuth {
     constructor() {
         this.m_username = '';
@@ -77,7 +77,7 @@ class CAndruavAuth {
 The most common usage is logging in a user via email and access code (password), then checking their permissions.
 
 ```javascript
-183:277:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_andruav_auth.js
+183:277:./src/js/js_andruav_auth.js
 async fn_do_loginAccount(p_userName, p_accessCode) {
     js_eventEmitter.fn_dispatch(js_event.EE_Auth_Login_In_Progress, null);
 
@@ -139,7 +139,7 @@ async fn_do_loginAccount(p_userName, p_accessCode) {
 Another key usage is checking user permissions after login:
 
 ```javascript
-87:89:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_andruav_auth.js
+87:89:./src/js/js_andruav_auth.js
 fn_do_canGCS() {
     return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS) === js_andruavMessages.CONST_ALLOW_GCS;
 }
@@ -150,7 +150,7 @@ This uses bitwise AND to check if the `CONST_ALLOW_GCS` flag is set in the userâ
 The exported instance `js_andruavAuth` is used throughout the codebase:
 
 ```javascript
-491:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/js/js_andruav_auth.js
+491:./src/js/js_andruav_auth.js
 export const js_andruavAuth = CAndruavAuth.getInstance();
 ```
 

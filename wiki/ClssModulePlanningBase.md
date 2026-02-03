@@ -8,7 +8,7 @@ It provides a reusable UI and state management framework for configuring modular
 `ClssModulePlanningBase` is an abstract base component that dynamically renders configuration forms for mission modules (e.g., P2P, SDR, GPIO) in a drone control web interface. It fetches its layout and fields from external JSON templates and manages form state, enabling, and output generation.
 
 ```typescript
-16:228:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/components/planning/modules/jsc_ctrl_dynamic_base.jsx
+16:228:./src/components/planning/modules/jsc_ctrl_dynamic_base.jsx
 class ClssModulePlanningBase extends React.Component {
   constructor(props) {
     super(props);
@@ -96,7 +96,7 @@ class ClssModulePlanningBase extends React.Component {
 For example, `ClssSDR_Planning` enables SDR (Software Defined Radio) configuration in the mission planner:
 
 ```typescript
-4:8:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/components/planning/modules/jsc_ctrl_sdr_planning.jsx
+4:8:./src/components/planning/modules/jsc_ctrl_sdr_planning.jsx
 export class ClssSDR_Planning extends ClssModulePlanningBase {
   constructor(props) {
     super(props);
@@ -108,7 +108,7 @@ export class ClssSDR_Planning extends ClssModulePlanningBase {
 These modules are conditionally rendered in `jsc_ctrl_single_mission_item_card.jsx` based on feature flags:
 
 ```typescript
-120:122:/home/mhefny/TDisk/public_versions/andruav/andruav_webclient_react/src/components/planning/mission/jsc_ctrl_single_mission_item_card.jsx
+120:122:./src/components/planning/mission/jsc_ctrl_single_mission_item_card.jsx
 ctrl.push(<div key={'tab_sdr' + this.key} className="tab-pane fade" id={"tab_sdr"+this.key}>
           <ClssSDR_Planning p_shape={this.props.p_shape} p_unit={this.props.p_unit} ref={instance => {this.sdr = instance}}/>
           </div>);
