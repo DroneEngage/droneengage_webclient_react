@@ -154,7 +154,9 @@ class CAndruavClientFacade {
     */
     API_requestID(p_partyID) {
         const cmd = CCommandAPI.API_requestID();
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
+        if (js_globals.v_andruavWS !== null && js_globals.v_andruavWS !== undefined) {
+            js_globals.v_andruavWS.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
+        }
     }
 
 
@@ -163,18 +165,21 @@ class CAndruavClientFacade {
     * @param {*} p_target is partyID not a unit object.
     */
     API_sendID(p_target) {
+        if (js_globals.v_andruavWS === null || js_globals.v_andruavWS === undefined) return;
+        if (js_globals.v_andruavWS.m_andruavUnit === null || js_globals.v_andruavWS.m_andruavUnit === undefined) return;
+
         let msg = {
             VT: js_andruavUnit.CONST_VEHICLE_GCS, // VehicleType
-            GS: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_IsGCS, // IsCGS
+            GS: js_globals.v_andruavWS.m_andruavUnit.m_IsGCS, // IsCGS
             VR: 0, // VideoRecording [OPTIONAL in later Andruav versions]
             //FI: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_useFCBIMU, // useFCBIMU
             //AR: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isArmed, // m_isArmed
             //FL: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isFlying, // m_isFlying
-            SD: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_IsShutdown,
+            SD: js_globals.v_andruavWS.m_andruavUnit.m_IsShutdown,
             //TP: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_telemetry_protocol,
-            UD: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_unitName,
-            DS: js_andruav_ws.AndruavClientWS.m_andruavUnit.Description,
-            p: js_andruav_ws.AndruavClientWS.m_permissions
+            UD: js_globals.v_andruavWS.m_andruavUnit.m_unitName,
+            DS: js_globals.v_andruavWS.m_andruavUnit.Description,
+            p: js_globals.v_andruavWS.m_permissions
         };
 
         // embedding messages - new technique.
@@ -187,7 +192,7 @@ class CAndruavClientFacade {
         }
 
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_ID, msg);
+        js_globals.v_andruavWS.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_ID, msg);
     };
 
     API_requestP2P(p_andruavUnit) {

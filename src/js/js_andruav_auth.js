@@ -2,6 +2,14 @@ import * as js_siteConfig from './js_siteConfig.js';
 import { EVENTS as js_event } from './js_eventList.js';
 import * as js_andruavMessages from './protocol/js_andruavMessages.js';
 import { js_eventEmitter } from './js_eventEmitter';
+import { js_localStorage } from './js_localStorage.js';
+import {
+    fn_buildAuthUrl,
+    fn_buildHealthBaseUrl,
+    fn_buildLoginPayload,
+    fn_buildPluginSessionPayload,
+    fn_parseLoginResponse,
+} from './shared/andruav_auth_shared.js';
 
 // Constants
 const AUTH_REQUEST_TIMEOUT = 10000; // Timeout for requests (ms)
@@ -41,8 +49,35 @@ class CAndruavAuth {
         this._m_perm = 0;
         this._m_permissions_ = '';
         this._m_session_ID = null;
+        this._m_party_ID = null;
         this._m_logined = false;
         this.C_ERR_SUCCESS_DISPLAY_MESSAGE = 1001; // Legacy error code
+    }
+
+    fn_isPluginEnabled() {
+        const v = js_localStorage.fn_getWSPluginEnabled();
+        if (v !== null) return v;
+        return js_siteConfig.CONST_WS_PLUGIN_ENABLED === true;
+    }
+
+    fn_getPluginAuthHost() {
+        return js_siteConfig.CONST_WS_PLUGIN_AUTH_HOST;
+    }
+
+    fn_getPluginAuthPort() {
+        return js_siteConfig.CONST_WS_PLUGIN_AUTH_PORT;
+    }
+
+    fn_getPluginWSHost() {
+        return js_siteConfig.CONST_WS_PLUGIN_AUTH_HOST;
+    }
+
+    fn_getPluginWSPort() {
+        return js_siteConfig.CONST_WS_PLUGIN_WS_PORT;
+    }
+
+    fn_getPluginApiKey() {
+        return js_siteConfig.CONST_WS_PLUGIN_APIKEY;
     }
 
     /**
@@ -62,6 +97,14 @@ class CAndruavAuth {
      */
     fn_getSessionID() {
         return this._m_session_ID;
+    }
+
+    /**
+     * Gets the party ID (used in plugin mode).
+     * @returns {string|null} The party ID or null if not set.
+     */
+    fn_getPartyID() {
+        return this._m_party_ID;
     }
 
     /**
@@ -183,6 +226,40 @@ class CAndruavAuth {
     async fn_do_loginAccount(p_userName, p_accessCode) {
         js_eventEmitter.fn_dispatch(js_event.EE_Auth_Login_In_Progress, null);
 
+        try {
+            const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+            const pluginEnabled = this.fn_isPluginEnabled() === true;
+            if (pluginEnabled === true) {
+                console.info('[WebPlugin] enabled=true', {
+                    ls: lsPluginEnabled,
+                    cfgEnabled: js_siteConfig.CONST_WS_PLUGIN_ENABLED === true,
+                    autoFallback: js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK === true,
+                    authHost: this.fn_getPluginAuthHost(),
+                    authPort: this.fn_getPluginAuthPort(),
+                    wsPort: this.fn_getPluginWSPort(),
+                    hasApiKey: (this.fn_getPluginApiKey() || '').length > 0,
+                });
+            } else {
+                console.info('[WebPlugin] enabled=false', {
+                    ls: lsPluginEnabled,
+                    cfgEnabled: js_siteConfig.CONST_WS_PLUGIN_ENABLED === true,
+                });
+            }
+        } catch {
+        }
+
+        if (this.fn_isPluginEnabled() === true) {
+            this.m_username = p_userName;
+            this.m_accesscode = p_accessCode;
+
+            const ok = await this.#loginViaPlugin(p_userName, p_accessCode);
+            if (ok === true) return true;
+
+            if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+                return false;
+            }
+        }
+
         if (!this.#validateEmail(p_userName) || !p_accessCode) {
             this._m_logined = false;
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
@@ -194,15 +271,8 @@ class CAndruavAuth {
 
         const url = this.#getBaseUrl(js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
         this.m_accesscode = p_accessCode;
-        const keyValues = {
-            [js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER]: p_userName,
-            [js_andruavMessages.CONST_ACCESS_CODE_PARAMETER]: p_accessCode,
-            [js_andruavMessages.CONST_APP_GROUP_PARAMETER]: '1',
-            [js_andruavMessages.CONST_APP_NAME_PARAMETER]: 'andruav',
-            [js_andruavMessages.CONST_APP_VER_PARAMETER]: this._m_ver,
-            [js_andruavMessages.CONST_EXTRA_PARAMETER]: 'DRONE ENGAGE Web Client',
-            [js_andruavMessages.CONST_ACTOR_TYPE]: AUTH_GCS_TYPE,
-        };
+
+        const keyValues = fn_buildLoginPayload(p_userName, p_accessCode, this._m_ver, js_localStorage.fn_getGroupName());
 
         const probeResult = await this.fn_probeServer(this.#getHealthURL());
         if (!probeResult.success) {
@@ -230,16 +300,22 @@ class CAndruavAuth {
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
             }).then(res => res.json());
 
-            if (response.e === js_andruavMessages.CONST_ERROR_NON) {
+            const parsed = fn_parseLoginResponse(response);
+            if (parsed.ok === true) {
                 this._m_logined = true;
-                this._m_session_ID = response[js_andruavMessages.CONST_SESSION_ID];
-                this.m_server_port = response[js_andruavMessages.CONST_COMM_SERVER].h;
-                this.m_server_ip = response[js_andruavMessages.CONST_COMM_SERVER].g;
-                this.server_AuthKey = response[js_andruavMessages.CONST_COMM_SERVER].f;
+                this._m_session_ID = parsed.sessionId;
+                // `partyId` is only returned by WebPlugin login (/w/wl/) as `plugin_party_id` (preferred) / `pid` (legacy).
+                // Cloud login does not return it.
+                // It is used later ONLY when connecting to plugin WSS.
+                this._m_party_ID = parsed.partyId;
+                this.m_server_port = parsed.commServerPort;
+                this.m_server_ip = parsed.commServerHost;
+                this.server_AuthKey = parsed.commServerAuthKey;
                 this.m_username = p_userName;
-                this._m_permissions_ = response[js_andruavMessages.CONST_PERMISSION];
-                this._m_perm = response[js_andruavMessages.CONST_PERMISSION2] ?? DEFAULT_PERMISSIONS;
-                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logined, response);
+
+                this._m_permissions_ = parsed.permission;
+                this._m_perm = parsed.permission2 ?? DEFAULT_PERMISSIONS;
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logined, parsed.raw);
                 return true;
             } else {
                 this._m_logined = false;
@@ -277,12 +353,115 @@ class CAndruavAuth {
         return false;
     }
 
-    async fn_probeServer(baseUrl) {
+    async #loginViaPlugin(p_userName, p_accessCode) {
+        const pluginAuthHost = this.fn_getPluginAuthHost();
+        const pluginAuthPort = this.fn_getPluginAuthPort();
+        const pluginWsHost = this.fn_getPluginWSHost();
+        const pluginWsPort = this.fn_getPluginWSPort();
+
+        const pluginLoginUrl = fn_buildAuthUrl(true, pluginAuthHost, pluginAuthPort, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
+        const pluginHealthBaseUrl = fn_buildHealthBaseUrl(true, pluginAuthHost, pluginAuthPort);
+
+        const headers = { 'Content-Type': 'application/json' };
+        const apiKey = this.fn_getPluginApiKey();
+        if (apiKey && apiKey.length > 0) {
+            headers['x-de-api-key'] = apiKey;
+        }
+
+        const probeResult = await this.fn_probeServer(pluginHealthBaseUrl, headers);
+        if (!probeResult.success) {
+            console.warn('[WebPlugin] probe failed', {
+                baseUrl: pluginHealthBaseUrl,
+                ssl: probeResult.isSslError === true,
+            });
+            return false;
+        }
+
+        console.info('[WebPlugin] probe OK', { baseUrl: pluginHealthBaseUrl });
+
+        try {
+            this.m_username = p_userName;
+            this.m_accesscode = p_accessCode;
+
+            // Plugin mode: don't send uid, plugin will provide its own partyId
+            const payload = fn_buildPluginSessionPayload(
+                this._m_ver,
+                js_localStorage.fn_getGroupName()
+            );
+
+            const fetchRes = await fetch(pluginLoginUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload),
+                signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
+            });
+
+            const response = await fetchRes.json();
+
+            const parsed = fn_parseLoginResponse(response);
+            if (parsed.ok !== true) {
+                this._m_logined = false;
+                console.warn('[WebPlugin] plugin login reply not OK', {
+                    httpOk: fetchRes.ok === true,
+                    status: fetchRes.status,
+                    e: parsed.error,
+                    em: parsed.errorMessage,
+                });
+                if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+                    js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
+                        e: parsed.error ?? ERROR_CODES.UNKNOWN_ERROR,
+                        em: parsed.errorMessage || 'Plugin login failed',
+                    });
+                }
+                return false;
+            }
+
+            this._m_logined = true;
+            this._m_session_ID = parsed.sessionId;
+            // In plugin mode, partyId (plugin_party_id/pid) is generated by the plugin, not by the cloud.
+            // WebClient must use it as its WS partyID when connecting to plugin WSS.
+            this._m_party_ID = parsed.partyId;
+            this.m_server_ip = parsed.commServerHost || pluginWsHost;
+            this.m_server_port = parsed.commServerPort || pluginWsPort;
+            this.server_AuthKey = parsed.commServerAuthKey;
+            this._m_permissions_ = parsed.permission;
+            this._m_perm = parsed.permission2 ?? DEFAULT_PERMISSIONS;
+
+            // Store plugin's partyId in localStorage so it persists across page reloads
+            if (parsed.partyId) {
+                js_localStorage.fn_setUnitIDShared(parsed.partyId);
+            }
+
+            console.info('[WebPlugin] login response', {
+                receivedPartyId: parsed.partyId,
+                storedPartyId: this._m_party_ID,
+                savedToLocalStorage: !!parsed.partyId,
+                host: this.m_server_ip,
+                port: this.m_server_port,
+                isPluginTarget: String(this.m_server_port) === String(pluginWsPort),
+            });
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logined, parsed.raw);
+            return true;
+        } catch (error) {
+            this._m_logined = false;
+            console.error('[WebPlugin] plugin login exception', error);
+            if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
+                    e: ERROR_CODES.NETWORK_ERROR,
+                    em: 'Plugin connection failed',
+                    error: error.message || 'Unknown error',
+                });
+            }
+            return false;
+        }
+    }
+
+    async fn_probeServer(baseUrl, p_headers) {
         try {
             console.log('Probing URL:', `${baseUrl}/health`);
             const response = await fetch(`${baseUrl}/health`, {
                 method: 'GET', // Use GET for simplicity; HEAD is also viable
-                headers: { 'Content-Type': 'application/json' },
+                headers: p_headers || { 'Content-Type': 'application/json' },
                 mode: 'cors', // Use cors mode to access response status
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
             });
@@ -441,6 +620,10 @@ class CAndruavAuth {
             return;
         }
 
+        if (this.fn_isPluginEnabled() === true) {
+            return this.#logoutViaPlugin();
+        }
+
         const url = this.#getBaseUrl(js_andruavMessages.CONST_WEB_LOGOUT_COMMAND || '/logout'); // Assume endpoint exists
         const keyValues = {
             [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
@@ -481,6 +664,52 @@ class CAndruavAuth {
                 error: error.message || 'Unknown error',
             });
             console.error('Logout error:', error);
+        } finally {
+            this._m_logined = false;
+            this._m_session_ID = null;
+        }
+    }
+
+    async #logoutViaPlugin() {
+        const pluginAuthHost = this.fn_getPluginAuthHost();
+        const pluginAuthPort = this.fn_getPluginAuthPort();
+        const pluginLogoutUrl = fn_buildAuthUrl(true, pluginAuthHost, pluginAuthPort, js_andruavMessages.CONST_WEB_LOGOUT_COMMAND);
+
+        const headers = { 'Content-Type': 'application/json' };
+        const apiKey = this.fn_getPluginApiKey();
+        if (apiKey && apiKey.length > 0) {
+            headers['x-de-api-key'] = apiKey;
+        }
+
+        const keyValues = {
+            [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
+        };
+
+        try {
+            const response = await fetch(pluginLogoutUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(keyValues),
+                signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
+            }).then(res => res.json());
+
+            if (response.e === js_andruavMessages.CONST_ERROR_NON) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Completed, {
+                    e: js_andruavMessages.CONST_ERROR_NON,
+                    em: 'Logout successful',
+                });
+            } else {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Failed, {
+                    e: response.e ?? ERROR_CODES.UNKNOWN_ERROR,
+                    em: response.em || 'Logout failed',
+                });
+            }
+        } catch (error) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Failed, {
+                e: ERROR_CODES.NETWORK_ERROR,
+                em: 'Logout failed due to connection error',
+                error: error.message || 'Unknown error',
+            });
         } finally {
             this._m_logined = false;
             this._m_session_ID = null;
