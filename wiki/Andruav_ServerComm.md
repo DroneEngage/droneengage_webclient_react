@@ -23,6 +23,12 @@ Authentication is handled by `src/js/js_andruav_auth.js`.
   - `h` port
   - `f` temporary login key
 
+When WebPlugin mode is enabled, `/w/wl/` is served by the local plugin and the response also includes:
+
+- `plugin_party_id`: a plugin-generated party id.
+  - The WebClient must use this as its `partyID` ONLY when connecting to the plugin's WSS.
+  - This is independent from `sid`.
+
 These are stored in `js_andruavAuth` fields:
 
 - `js_andruavAuth._m_session_ID`

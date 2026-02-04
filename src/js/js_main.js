@@ -33,7 +33,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
-import {js_websocket_bridge} from './CPC/js_websocket_bridge.js'
+import { js_websocket_bridge } from './CPC/js_websocket_bridge.js'
 import i18n from './i18n.js';
 
 var oldAppend = $.fn.append;
@@ -296,7 +296,7 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 
 export function fn_do_modal_apply_all(p_mission) {
 	if (p_mission === null || p_mission === undefined) return;
-	
+
 	let modal = $('#modal_applyAll');
 	if (!modal.length) {
 		console.error("Apply All modal element not found.");
@@ -354,7 +354,7 @@ export function fn_do_modal_apply_all(p_mission) {
 					}
 				}
 			});
-			
+
 			// Update the mission path display
 			p_mission.fn_updatePath(true);
 		}
@@ -1204,11 +1204,11 @@ export function fn_doSetHome(p_partyID, p_latitude, p_longitude, p_altitude) {
 	if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 		fn_do_modal_confirmation("Set Home Location for  " + p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT,
 			"Changing Home Location changes RTL destination. Are you Sure?", function (p_approved) {
-			if (p_approved === false) return;
-			js_speak.fn_speak('home sent');
-			js_globals.v_andruavFacade.API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude);
+				if (p_approved === false) return;
+				js_speak.fn_speak('home sent');
+				js_globals.v_andruavFacade.API_do_SetHomeLocation(p_partyID, p_latitude, p_longitude, p_altitude);
 
-		}, "YES");
+			}, "YES");
 	}
 }
 
@@ -1803,7 +1803,7 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
-				
+
 				// REACT POPUP LIMITATION: This creates static HTML content
 				// Interactive React elements (links, buttons, events) will not work
 				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
@@ -1841,7 +1841,7 @@ function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
-				
+
 				// REACT POPUP LIMITATION: This creates static HTML content
 				// Interactive React elements (links, buttons, events) will not work
 				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
@@ -1884,7 +1884,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 			OnComplete={(e) => {
 				// Step 3: Extract the HTML
 				const htmlContent = tempContainer.innerHTML;
-				
+
 				// IMPORTANT: React popup limitation
 				// This approach creates a static HTML snapshot for Leaflet popups.
 				// - React event handlers and interactive elements will NOT work after tempContainer.remove()
@@ -1898,7 +1898,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 				//
 				// Current limitation documented: Static popup content only
 				tempContainer.remove();  // the HTML is not linked to REACT object anymore so links will not be working.
-				
+
 				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 				if (v_ignore === true) {
 					info_unit_context_popup.m_ignoreMouseOut = true;
@@ -3170,17 +3170,38 @@ function fn_connectWebSocket(me) {
 			js_common.fn_console_log("js_andruavAuth.fn_logined() === false");
 			return;
 		}
+
 		js_globals.v_andruavClient = js_andruav_parser.AndruavClientParser;
 		js_globals.v_andruavFacade = js_andruav_facade.AndruavClientFacade;
 		js_globals.v_andruavWS = js_andruav_ws.AndruavClientWS;
 
 		js_globals.v_andruavWS.fn_init();
-		js_globals.v_andruavWS.partyID = $('#txtUnitID').val();
-		js_globals.v_andruavWS.unitID = $('#txtUnitID').val();
+		const authPartyID = js_andruavAuth.fn_getPartyID();
+		const uiPartyID = $('#txtUnitID').val();
+		const isPluginMode = js_siteConfig.CONST_WS_PLUGIN_ENABLED && js_localStorage.fn_getWSPluginEnabled();
+
+		// PartyID rules:
+		// - Normal (cloud) mode: partyID is client-determined (UI/localStorage).
+		// - Plugin mode: plugin generates a partyId and returns it as `plugin_party_id` in /w/wl/.
+		//   In this mode we MUST use the plugin-provided partyId for connecting to plugin WSS.
+		if (isPluginMode && authPartyID) {
+			js_globals.v_andruavWS.partyID = authPartyID;
+			js_globals.v_andruavWS.unitID = authPartyID;
+		} else {
+			js_globals.v_andruavWS.partyID = authPartyID || uiPartyID;
+			js_globals.v_andruavWS.unitID = authPartyID || uiPartyID;
+		}
+
 		js_globals.v_andruavWS.m_groupName = $('#txtGroupName').val();
+		console.info('[WS] connecting with partyID', {
+			authPartyID: authPartyID,
+			uiPartyID: uiPartyID,
+			isPluginMode: isPluginMode,
+			finalPartyID: js_globals.v_andruavWS.partyID,
+		});
 		js_globals.v_andruavWS.m_server_ip = js_andruavAuth.m_server_ip;
 		js_globals.v_andruavWS.m_server_port = js_andruavAuth.m_server_port;
-		js_globals.v_andruavWS.m_server_port_ss = js_andruavAuth.m_server_port; // backward compatibility. SSL should be sent as a separate parameter
+		js_globals.v_andruavWS.m_server_port_ss = js_andruavAuth.m_server_port;
 		js_globals.v_andruavWS.server_AuthKey = js_andruavAuth.server_AuthKey;
 		js_globals.v_andruavWS.m_permissions = js_andruavAuth.fn_getPermission();
 		js_eventEmitter.fn_subscribe(js_event.EE_WS_OPEN, this, EVT_onOpen);

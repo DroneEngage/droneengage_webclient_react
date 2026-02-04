@@ -366,15 +366,35 @@ class CAndruavClientWS {
             this.server_accessCode = p_accesscode;
 
             let url = null;
+            const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+            const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WS_PLUGIN_ENABLED === true);
+            const isPluginTarget = usePlugin === true && (this.m_server_port == js_siteConfig.CONST_WS_PLUGIN_WS_PORT);
+            const pluginApiKey = (isPluginTarget === true) ? js_siteConfig.CONST_WS_PLUGIN_APIKEY : '';
+            const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
             if (window.location.protocol === 'https:') {
                 // f: CONST_CS_LOGIN_TEMP_KEY
                 // g: CONST_CS_SERVER_PUBLIC_HOST
                 // s: SID
-                url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';;
+                url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;;
 
             } else {
-                url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
+                url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
 
+            }
+
+            try {
+                const safeUrl = String(url)
+                    .replace(/([?&]f=)[^&]*/i, '$1***')
+                    .replace(/([?&]k=)[^&]*/i, '$1***');
+                console.info('[WS] connect', {
+                    usePlugin: usePlugin === true,
+                    isPluginTarget: isPluginTarget === true,
+                    host: this.m_server_ip,
+                    port: window.location.protocol === 'https:' ? this.m_server_port_ss : this.m_server_port,
+                    hasPluginApiKey: (pluginApiKey && pluginApiKey.length > 0),
+                    url: safeUrl,
+                });
+            } catch {
             }
 
             if ("WebSocket" in window) {
@@ -401,6 +421,24 @@ class CAndruavClientWS {
                 this.ws.onopen = function () {
                     // js_eventEmitter.fn_dispatch(js_event.EE_WS_OPEN, null);
 
+                    try {
+                        console.info('[WS] open', {
+                            readyState: Me.ws ? Me.ws.readyState : null,
+                            host: Me.m_server_ip,
+                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                        });
+                    } catch {
+                    }
+
+                    if (isPluginTarget === true) {
+                        try {
+                            console.info('[WebPlugin][WS] forcing CONNECTED/REGISTERED on open');
+                        } catch {
+                        }
+                        Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
+                        Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
+                    }
+
                 };
 
                 // OnMessage callback of websocket
@@ -424,13 +462,33 @@ class CAndruavClientWS {
                 };
 
                 // OnClose callback of websocket
-                this.ws.onclose = function () {
+                this.ws.onclose = function (evt) {
                     Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_DISCONNECTED);
                     js_eventEmitter.fn_dispatch(js_event.EE_WS_CLOSE, null);
+
+                    try {
+                        console.warn('[WS] close', {
+                            host: Me.m_server_ip,
+                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                            code: evt ? evt.code : null,
+                            reason: evt ? evt.reason : null,
+                            wasClean: evt ? evt.wasClean : null,
+                        });
+                    } catch {
+                    }
                 };
 
                 this.ws.onerror = function (err) {
                     Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_ERROR);
+
+                    try {
+                        console.error('[WS] error', {
+                            host: Me.m_server_ip,
+                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                            err: err,
+                        });
+                    } catch {
+                    }
                 };
             } else { // The browser doesn't support WebSocket
                 alert("WebSocket NOT supported by your Browser!");

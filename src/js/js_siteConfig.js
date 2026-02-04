@@ -21,6 +21,14 @@ export let CONST_TEST_MODE_PORT = '19408';
 export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
+export let CONST_WS_PLUGIN_ENABLED = false;
+export let CONST_WS_PLUGIN_AUTH_HOST = '127.0.0.1';
+export let CONST_WS_PLUGIN_AUTH_PORT = 9211;
+export let CONST_WS_PLUGIN_WS_PORT = 9212;
+export let CONST_WS_PLUGIN_APIKEY = '';
+export let CONST_WS_PLUGIN_TOKEN = '';
+export let CONST_WS_PLUGIN_AUTO_FALLBACK = true;
+
 /**
  * Links that are used in Header
  */
@@ -125,6 +133,15 @@ function loadConfigSync() {
 
             if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
             if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
+
+
+            if (data.CONST_WS_PLUGIN_ENABLED !== undefined) CONST_WS_PLUGIN_ENABLED = data.CONST_WS_PLUGIN_ENABLED;
+            if (data.CONST_WS_PLUGIN_AUTH_HOST !== undefined) CONST_WS_PLUGIN_AUTH_HOST = data.CONST_WS_PLUGIN_AUTH_HOST;
+            if (data.CONST_WS_PLUGIN_AUTH_PORT !== undefined) CONST_WS_PLUGIN_AUTH_PORT = data.CONST_WS_PLUGIN_AUTH_PORT;
+            if (data.CONST_WS_PLUGIN_WS_PORT !== undefined) CONST_WS_PLUGIN_WS_PORT = data.CONST_WS_PLUGIN_WS_PORT;
+            if (data.CONST_WS_PLUGIN_APIKEY !== undefined) CONST_WS_PLUGIN_APIKEY = data.CONST_WS_PLUGIN_APIKEY;
+            if (data.CONST_WS_PLUGIN_TOKEN !== undefined) CONST_WS_PLUGIN_TOKEN = data.CONST_WS_PLUGIN_TOKEN;
+            if (data.CONST_WS_PLUGIN_AUTO_FALLBACK !== undefined) CONST_WS_PLUGIN_AUTO_FALLBACK = data.CONST_WS_PLUGIN_AUTO_FALLBACK;
 
 
             if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
