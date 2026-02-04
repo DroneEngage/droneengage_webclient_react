@@ -92,7 +92,7 @@ async fn_do_loginAccount(p_userName, p_accessCode) {
         [js_andruavMessages.CONST_ACCOUNT_NAME_PARAMETER]: p_userName,
         [js_andruavMessages.CONST_ACCESS_CODE_PARAMETER]: p_accessCode,
         [js_andruavMessages.CONST_APP_GROUP_PARAMETER]: '1',
-        [js_andruavMessages.CONST_APP_NAME_PARAMETER]: 'andruav',
+        [js_andruavMessages.CONST_APP_NAME_PARAMETER]: 'de',
         [js_andruavMessages.CONST_APP_VER_PARAMETER]: this._m_ver,
         [js_andruavMessages.CONST_EXTRA_PARAMETER]: 'DRONE ENGAGE Web Client',
         [js_andruavMessages.CONST_ACTOR_TYPE]: AUTH_GCS_TYPE,

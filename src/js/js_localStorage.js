@@ -93,11 +93,27 @@ class CLocalStorage {
         this._setSessionValue(js_globals.LS_UNIT_ID, value);
     }
 
+    fn_setUnitIDShared(value) {
+        this._setValue(js_globals.LS_UNIT_ID_SHARED, value);
+    }
+
     fn_resetUnitID() {
         this.fn_setUnitID(js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
+
+    fn_resetUnitIDShared() {
+        const v = js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3);
+        this.fn_setUnitIDShared(v);
+        return v;
+    }
     fn_getUnitID() {
         return this._getSessionValue(js_globals.LS_UNIT_ID, js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
+    }
+
+    fn_getUnitIDShared() {
+        const v = this._getValue(js_globals.LS_UNIT_ID_SHARED, null);
+        if (v !== null && v !== undefined && v.length > 0) return v;
+        return this.fn_resetUnitIDShared();
     }
 
     // Group Name
@@ -276,6 +292,14 @@ class CLocalStorage {
 
     fn_getSelectedTheme() {
         return this._getValue(js_globals.LS_SELECTED_THEME, 'default');
+    }
+
+    fn_setWSPluginEnabled(value) {
+        this._setValue(js_globals.LS_WS_PLUGIN_ENABLED, value === true ? 'true' : 'false');
+    }
+
+    fn_getWSPluginEnabled() {
+        return this._getValue(js_globals.LS_WS_PLUGIN_ENABLED, 'true') === 'true';
     }
 }
 

@@ -170,6 +170,7 @@ class GLOBALS {
 
 		// LOCAL STORAGE
 		this.LS_UNIT_ID = '_vUnitID';
+		this.LS_UNIT_ID_SHARED = '_vUnitIDShared';
 		this.LS_EMAIL = '_vEmail;'
 		this.LS_GROUP_NAME = '_vGroupName;'
 		this.LS_LANG = '_vLang';
@@ -187,6 +188,7 @@ class GLOBALS {
 		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
 		this.LS_SELECTED_THEME = '_vSelectedTheme';
+		this.LS_WS_PLUGIN_ENABLED = '_vWSPluginEnabled';
 
 
 
