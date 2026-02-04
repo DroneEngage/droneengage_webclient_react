@@ -231,14 +231,14 @@ class CAndruavClientParser {
 
     parseCommunicationMessage(Me, msg, evt) {
 
-        let p_jmsg;
-        let p_unit = js_globals.m_andruavUnitList.fn_getUnit(msg.senderName);
+        let p_jmsg = msg;
+        let p_unit = js_globals.m_andruavUnitList.fn_getUnit(p_jmsg.senderName);
 
         if (!p_unit) {
             p_unit = new js_andruavUnit.CAndruavUnitObject();
             p_unit.m_IsMe = false;
             p_unit.m_defined = false;
-            p_unit.setPartyID(msg.senderName);
+            p_unit.setPartyID(p_jmsg.senderName);
             p_unit.m_index = js_globals.m_andruavUnitList.count;
             js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
             if (msg.messageType !== js_andruavMessages.CONST_TYPE_AndruavMessage_ID) {

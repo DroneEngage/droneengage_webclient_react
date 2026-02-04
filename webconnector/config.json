@@ -1,0 +1,32 @@
+{
+  "bindAddress": "0.0.0.0",
+  "authPort": 9211,
+  "wsPort": 9212,
+
+  "tls": {
+    "certFile": "../ssl/localssl.crt",
+    "keyFile": "../ssl/localssl.key"
+  },
+
+  "cloud": {
+    "authHost": "127.0.0.1",
+    "authPort": 19408,
+    "authSecure": true,
+    "wsSecure": true,
+    "commSecure": true,
+    "insecureTls": true,
+    "localOnlyMode": false
+  },
+
+  "credentials": {
+    "email": "mhefny@andruav.com",
+    "accessCode": "mhefny",
+    "group": "1"
+  },
+
+  "apiKey": "your-secure-api-key-here",
+  "pluginToken": "static-plugin-token-12345",
+  "reconnect": {
+    "upstreamWsDelayMs": 2000
+  }
+}

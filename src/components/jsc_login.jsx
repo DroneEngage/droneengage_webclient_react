@@ -6,6 +6,7 @@ import * as js_common from '../js/js_common.js';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_globals } from '../js/js_globals.js';
 import { js_localStorage } from '../js/js_localStorage';
+import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
 import { QueryString, fn_connect, fn_logout, getTabStatus } from '../js/js_main';
@@ -21,6 +22,7 @@ class ClssLoginControl extends React.Component {
     this.state = {
       is_connected: CONST_NOT_CONNECTION_OFFLINE,
       m_update: 0,
+      use_plugin: false,
     };
 
     this.m_flag_mounted = false;
@@ -30,6 +32,8 @@ class ClssLoginControl extends React.Component {
     this.txtUnitIDRef = React.createRef();
     this.btnConnectRef = React.createRef();
     this.txtGroupNameRef = React.createRef();
+
+    this.chkUsePluginRef = React.createRef();
 
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
@@ -48,6 +52,7 @@ class ClssLoginControl extends React.Component {
       me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
       me.state.username = me.txtUnitIDRef.current.value;
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
+      me.setState({ m_update: me.state.m_update + 1 });
     } else {
       me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
       me.setState({ m_update: me.state.m_update + 1 });
@@ -76,11 +81,17 @@ class ClssLoginControl extends React.Component {
       // offline
       this.setState({ m_update: this.state.m_update + 1 });
 
+      const usePlugin = (this.chkUsePluginRef.current && this.chkUsePluginRef.current.checked === true);
+      js_localStorage.fn_setWSPluginEnabled(usePlugin);
+
       js_localStorage.fn_setEmail(this.txtEmailRef.current.value);
       js_localStorage.fn_setAccessCode(this.txtAccessCodeRef.current.value);
       let s = this.txtUnitIDRef.current.value;
       if (s !== null) {
         js_localStorage.fn_setUnitID(s);
+        if (usePlugin === true) {
+          js_localStorage.fn_setUnitIDShared(s);
+        }
       }
       js_localStorage.fn_setGroupName(this.txtGroupNameRef.current.value);
 
@@ -98,10 +109,12 @@ class ClssLoginControl extends React.Component {
     
     this.m_flag_mounted = true;
   
-    this.setState({ m_update: 1 });
-
     const tabStatus = getTabStatus();
 
+    const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WS_PLUGIN_ENABLED === true);
+    this.state.use_plugin = usePlugin;
+this.chkUsePluginRef.current.checked = usePlugin;
     switch (tabStatus) {
       case 'new':
         js_globals.m_current_tab_status = 'new';
@@ -114,7 +127,9 @@ class ClssLoginControl extends React.Component {
       case 'duplicate':
         js_globals.m_current_tab_status = 'duplicate';
         console.log('This tab is a duplicate.');
-        js_localStorage.fn_resetUnitID();
+        if (usePlugin !== true) {
+          js_localStorage.fn_resetUnitID();
+        }
         break;
       default:
         js_globals.m_current_tab_status = 'unknown';
@@ -138,12 +153,16 @@ class ClssLoginControl extends React.Component {
       this.txtEmailRef.current.value = js_localStorage.fn_getEmail();
       this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
       this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
-      this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+      this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
     }
 
     if (queryParams.connect !== undefined) {
       this.clickConnect(null);
     }
+
+    this.setState({ m_update: 1 });
+
+    
   }
 
   render() {
@@ -163,6 +182,35 @@ class ClssLoginControl extends React.Component {
         css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'bg-warning':'bg-success';
         ctrls.push(
           <div key={'div_login' + this.key} className="">
+            <div className={`form-group ${dir}`}>
+              <label className="txt-theme-aware">
+                  <input
+                  type="checkbox"
+                  ref={this.chkUsePluginRef}
+                  defaultChecked={this.state.use_plugin === true}
+                  onChange={(e) => {
+                    const enabled = e.target.checked === true;
+                    this.setState({ use_plugin: enabled });
+                    js_localStorage.fn_setWSPluginEnabled(enabled);
+
+                    if (this.txtUnitIDRef.current) {
+                      if (enabled === true) {
+                        this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitIDShared();
+                      } else {
+                        js_localStorage.fn_resetUnitID();
+                        this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+                      }
+                    }
+                    try {
+                      console.info('[WebPlugin] UI toggle', { enabled: enabled });
+                    } catch {
+                    }
+                  }}
+                />
+                &nbsp;Use WebPlugin
+              </label>
+            </div>
+
             <div className={`form-group ${dir}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')}
@@ -229,8 +277,11 @@ class ClssLoginControl extends React.Component {
         );
         break;
       case CONST_NOT_CONNECTION_ONLINE:
+        {
         title = t('title.logout'); // "Logout"
-        css = 'bg-danger';
+          const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+          const usePlugin = (lsPluginEnabled !== null) ? (lsPluginEnabled === true) : (this.state.use_plugin === true);
+          css = usePlugin === true ? 'bg-info' : 'bg-danger';
         ctrls2.push(
           <div key={'div_logout' + this.key} className=" ">
             <div className={`form-group ${dir}`}>
@@ -240,11 +291,12 @@ class ClssLoginControl extends React.Component {
               <p>{js_localStorage.fn_getEmail()}</p>
             </div>
             <div className={`form-group ${dir}`}>
-              <p className="text-muted">{t('label.gcsId')}</p> {/* "GCS ID" */}
+              <p className="text-muted">{t('label.gcsId') + (usePlugin === true ? ' (Plugin)' : '')}</p> 
               <p>{js_localStorage.fn_getUnitID()}</p>
             </div>
           </div>
         );
+        }
         break;
       case CONST_NOT_CONNECTION_IN_PROGRESS:
         title = t('title.connecting'); // "Connecting.."
