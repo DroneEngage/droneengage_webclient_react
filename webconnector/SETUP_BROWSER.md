@@ -1,5 +1,28 @@
 # Browser Setup for WebSocket Connector
 
+## Installation Methods
+
+### Method 1: npm Global Install (Recommended)
+
+```bash
+npm install -g droneengage-webconnector
+droneengage-webconnector
+```
+
+### Method 2: npx (No Installation)
+
+```bash
+npx droneengage-webconnector email@domain.com accessCode
+```
+
+### Method 3: Local Development
+
+```bash
+cd webconnector
+npm install
+node src/index.js
+```
+
 ## Problem
 
 When the web client tries to connect to the connector at `https://127.0.0.1:9211`, the browser blocks the request with:
@@ -42,6 +65,21 @@ This is **expected** - it means the connector is accessible but requires an API 
 
 Now reload your web client and try connecting again. The browser will now allow the HTTPS connection to the plugin.
 
+## Command Line Options
+
+The connector supports command line credential overrides:
+
+```bash
+# Use config.json credentials
+droneengage-webconnector
+
+# Override credentials via command line
+droneengage-webconnector your@email.com yourAccessCode
+
+# Using npx with credentials
+npx droneengage-webconnector your@email.com yourAccessCode
+```
+
 ## For LAN Access
 
 If accessing the connector from another device on your network (e.g., `https://192.168.1.100:9211`):
@@ -74,7 +112,7 @@ For production use, replace the self-signed certificates with proper SSL certifi
 
 ### Still getting "Failed to fetch"?
 
-1. **Check plugin is running**:
+1. **Check connector is running**:
    ```bash
    curl -k https://127.0.0.1:9211/h/health
    ```
@@ -82,8 +120,8 @@ For production use, replace the self-signed certificates with proper SSL certifi
 
 2. **Check browser console** for specific error:
    - `ERR_CERT_AUTHORITY_INVALID` → Need to accept certificate
-   - `ERR_CONNECTION_REFUSED` → Plugin not running
-   - `CORS error` → Plugin CORS headers issue (shouldn't happen)
+   - `ERR_CONNECTION_REFUSED` → Connector not running
+   - `CORS error` → Connector CORS headers issue (shouldn't happen)
 
 3. **Clear browser cache** and try accepting certificate again
 
@@ -98,7 +136,13 @@ cd webconnector
 rm -rf ssl/
 ../local/sh_make_ssl.sh
 # Restart connector
-node src/index.js
+droneengage-webconnector
 ```
 
 Then accept the new certificate in your browser.
+
+### npm/npx Issues
+
+1. **Permission denied**: Use `sudo npm install -g droneengage-webconnector`
+2. **Command not found**: Check npm global path: `npm config get prefix`
+3. **npx fails**: Ensure Node.js >=16.0.0: `node --version`

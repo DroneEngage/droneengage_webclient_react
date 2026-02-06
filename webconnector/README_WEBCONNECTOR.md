@@ -2,7 +2,30 @@
 
 ## Overview
 
-The WebSocket Connector (`webconnector/src/index.js`) implements **a standalone local WebSocket hub** that maintains a single upstream connection to the Andruav cloud communication server while allowing multiple web client instances to connect and share that connection.
+The WebSocket Connector implements **a standalone local WebSocket hub** that maintains a single upstream connection to the Andruav cloud communication server while allowing multiple web client instances to connect and share that connection.
+
+## Installation Methods
+
+### Method 1: npm Global Install (Recommended)
+
+```bash
+npm install -g droneengage-webconnector
+droneengage-webconnector
+```
+
+### Method 2: npx (No Installation)
+
+```bash
+npx droneengage-webconnector email@domain.com accessCode
+```
+
+### Method 3: Local Development
+
+```bash
+cd webconnector
+npm install
+node src/index.js
+```
 
 ## Architecture
 
@@ -37,6 +60,8 @@ The WebSocket Connector (`webconnector/src/index.js`) implements **a standalone 
 ✅ **LAN support** - Can be accessed from other devices on the network
 ✅ **Security** - API key authentication + per-session token validation
 ✅ **Shared party ID** - All clients can share the same party ID across tabs
+✅ **Easy installation** - Available via npm and npx
+✅ **Command line support** - Override credentials via command line arguments
 
 ## Configuration
 
@@ -70,6 +95,7 @@ The WebSocket Connector (`webconnector/src/index.js`) implements **a standalone 
   },
   
   "apiKey": "your-secure-api-key-here",  // Required for LAN access
+  "pluginToken": "static-plugin-token-12345",
   "reconnect": {
     "upstreamWsDelayMs": 2000
   }
@@ -85,13 +111,36 @@ The WebSocket Connector (`webconnector/src/index.js`) implements **a standalone 
   "CONST_WS_PLUGIN_AUTH_PORT": 9211,
   "CONST_WS_PLUGIN_WS_PORT": 9212,
   "CONST_WS_PLUGIN_APIKEY": "your-secure-api-key-here",  // Must match plugin apiKey
+  "CONST_WS_PLUGIN_TOKEN": "static-plugin-token-12345",   // Must match plugin pluginToken
   "CONST_WS_PLUGIN_AUTO_FALLBACK": false
 }
 ```
 
 ## Setup Instructions
 
-### 1. Generate SSL Certificates
+### Quick Start (npm)
+
+```bash
+# Install globally
+npm install -g droneengage-webconnector
+
+# Start with config.json credentials
+droneengage-webconnector
+
+# Or override credentials
+droneengage-webconnector your@email.com yourAccessCode
+```
+
+### Quick Start (npx)
+
+```bash
+# Run without installation
+npx droneengage-webconnector your@email.com yourAccessCode
+```
+
+### Local Development Setup
+
+#### 1. Generate SSL Certificates
 
 ```bash
 cd webconnector
@@ -100,22 +149,24 @@ cd webconnector
 
 This creates self-signed certificates in `ssl/` directory.
 
-### 2. Configure Plugin
+#### 2. Configure Plugin
 
 Edit `webconnector/config.json`:
 - Set `bindAddress` to `"0.0.0.0"` for LAN access
 - Set `apiKey` to a secure random string
+- Set `pluginToken` to a secure random string
 - Set `localOnlyMode` to `false` to enable cloud connection
 - Update `credentials` with your Andruav account
 
-### 3. Configure Web Client
+#### 3. Configure Web Client
 
 Edit `public/config.json`:
 - Set `CONST_WS_PLUGIN_ENABLED` to `true`
 - Set `CONST_WS_PLUGIN_AUTH_HOST` to plugin server IP
 - Set `CONST_WS_PLUGIN_APIKEY` to match plugin's `apiKey`
+- Set `CONST_WS_PLUGIN_TOKEN` to match plugin's `pluginToken`
 
-### 4. Start Plugin
+#### 4. Start Plugin
 
 ```bash
 cd webconnector
@@ -124,19 +175,43 @@ node src/index.js
 
 Expected output:
 ```
+=================================================
+DroneEngage WebClient Connector ver: 0.1.0
+=================================================
+Usage:
+  droneengage-webconnector                    # Use config.json credentials
+  droneengage-webconnector <email> <accessCode> # Override credentials
+  npx droneengage-webconnector <email> <accessCode> # Run without installation
+=================================================
+
 webconnector HTTPS listening on https://0.0.0.0:9211
 webconnector WSS listening on wss://0.0.0.0:9212
 [webconnector] cloud login OK
 [webconnector] upstream ws open
 ```
 
-### 5. Open Web Clients
+#### 5. Open Web Clients
 
 Open multiple browser tabs/windows pointing to your web client. Each will:
 1. Connect to plugin auth endpoint (port 9211)
 2. Receive plugin session + WSS connection details
 3. Connect to plugin WSS endpoint (port 9212)
 4. Share the single upstream connection
+
+## Command Line Options
+
+The connector supports command line credential overrides:
+
+```bash
+# Use config.json credentials
+droneengage-webconnector
+
+# Override credentials via command line
+droneengage-webconnector your@email.com yourAccessCode
+
+# Using npx with credentials
+npx droneengage-webconnector your@email.com yourAccessCode
+```
 
 ## Security Considerations
 
@@ -148,14 +223,20 @@ Open multiple browser tabs/windows pointing to your web client. Each will:
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
 
-2. **Firewall Rules**: Only allow trusted devices on your LAN
+2. **Plugin Token Required**: Set a strong `pluginToken` in `config.json`
+   ```bash
+   # Generate random plugin token
+   node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
+   ```
+
+3. **Firewall Rules**: Only allow trusted devices on your LAN
    ```bash
    # Example: Allow only specific subnet
    sudo ufw allow from 192.168.1.0/24 to any port 9211
    sudo ufw allow from 192.168.1.0/24 to any port 9212
    ```
 
-3. **HTTPS/WSS Only**: Plugin enforces TLS for all connections
+4. **HTTPS/WSS Only**: Plugin enforces TLS for all connections
 
 ### For Localhost Only
 
@@ -179,7 +260,7 @@ Set `bindAddress` to `"127.0.0.1"` and leave `apiKey` empty.
 
 ## Troubleshooting
 
-### Plugin won't start
+### Connector won't start
 
 **Error**: `EADDRINUSE`
 ```bash
@@ -193,24 +274,30 @@ kill -9 <PID>
 
 ### Web client can't connect
 
-1. Check plugin is running: `curl -k https://localhost:9211/h/health`
+1. Check connector is running: `curl -k https://localhost:9211/h/health`
 2. Verify `apiKey` matches in both configs
-3. Check firewall allows ports 9211, 9212
-4. Verify `CONST_WS_PLUGIN_AUTH_HOST` is correct IP
+3. Verify `pluginToken` matches in both configs
+4. Check firewall allows ports 9211, 9212
+5. Verify `CONST_WS_PLUGIN_AUTH_HOST` is correct IP
 
 ### Upstream connection fails
 
 1. Check `cloud.authHost` and `cloud.authPort` are correct
 2. Verify credentials are valid
 3. Check `localOnlyMode` is `false`
-4. Review plugin logs for auth errors
+4. Review connector logs for auth errors
+
+### npm/npx Issues
+
+1. **Permission denied**: Use `sudo npm install -g droneengage-webconnector`
+2. **Command not found**: Check npm global path: `npm config get prefix`
+3. **npx fails**: Ensure Node.js >=16.0.0: `node --version`
 
 ## Testing Multi-Client Scenario
 
 ```bash
 # Terminal 1: Start connector
-cd webconnector
-node src/index.js
+droneengage-webconnector
 
 # Terminal 2: Start web client dev server
 cd ..
@@ -293,3 +380,13 @@ Update web client config to match.
 
 Connector generates a single party ID for its upstream connection and returns it to WebClient as `plugin_party_id`.
 All WebClients connecting through the same connector instance will therefore share the same party identity.
+
+## Browser Certificate Setup
+
+When accessing the connector via browser, you'll need to accept the self-signed SSL certificate:
+
+1. Visit `https://127.0.0.1:9211/h/health`
+2. Accept the certificate warning
+3. Reload your web client
+
+For detailed instructions, see [SETUP_BROWSER.md](SETUP_BROWSER.md).
