@@ -1,14 +1,49 @@
 {
   "name": "droneengage-webconnector",
   "version": "0.1.0",
-  "private": true,
-  "type": "module",
+  "description": "DroneEngage Web Connector - Bridge between DroneEngage cloud and local web clients",
   "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js"
+  "bin": {
+    "droneengage-webconnector": "src/index.js"
   },
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:creds": "node src/index.js"
+  },
+  "keywords": [
+    "drone",
+    "droneengage",
+    "websocket",
+    "connector",
+    "bridge",
+    "ardupilot",
+    "px4",
+    "andruav",
+    "gcs"
+  ],
+  "author": "Mohammad Said Hefny <mohammad.hefny@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "src/",
+    "config.json",
+    "README_WEBCONNECTOR.md",
+    "README_SIMPLIFIED.md",
+    "SETUP_BROWSER.md"
+  ],
   "dependencies": {
     "express": "^4.19.2",
     "ws": "^8.18.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DroneEngage/droneengage_webclient_react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DroneEngage/droneengage_webclient_react/issues"
+  },
+  "homepage": "https://github.com/DroneEngage/droneengage_webclient_react/webconnector#readme"
 }
