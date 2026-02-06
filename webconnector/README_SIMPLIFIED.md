@@ -4,6 +4,29 @@
 
 The web client now connects **directly to the connector's WebSocket server** without requiring an authentication step. This simplifies the architecture and eliminates SSL certificate issues with the auth endpoint.
 
+## Installation Methods
+
+### Method 1: npm Global Install (Recommended)
+
+```bash
+npm install -g droneengage-webconnector
+droneengage-webconnector
+```
+
+### Method 2: npx (No Installation)
+
+```bash
+npx droneengage-webconnector email@domain.com accessCode
+```
+
+### Method 3: Local Development
+
+```bash
+cd webconnector
+npm install
+node src/index.js
+```
+
 ## How It Works
 
 ### Old Flow (Removed)
@@ -65,21 +88,43 @@ Web Client → Direct WSS Connect (9212) with static token
 
 ## Setup Instructions
 
-### 1. Configure Plugin
+### 1. Quick Start (npm)
+
+```bash
+# Install globally
+npm install -g droneengage-webconnector
+
+# Start with config.json credentials
+droneengage-webconnector
+
+# Or override credentials
+droneengage-webconnector your@email.com yourAccessCode
+```
+
+### 2. Quick Start (npx)
+
+```bash
+# Run without installation
+npx droneengage-webconnector your@email.com yourAccessCode
+```
+
+### 3. Local Development Setup
+
+#### Configure Plugin
 
 Edit `webconnector/config.json`:
 - Set `pluginToken` to a secure random string
 - Set `apiKey` for WSS query parameter authentication
 - Configure cloud credentials for upstream connection
 
-### 2. Configure Web Client
+#### Configure Web Client
 
 Edit `public/config.json`:
 - Set `CONST_WS_PLUGIN_TOKEN` to **match** plugin's `pluginToken`
 - Set `CONST_WS_PLUGIN_APIKEY` to **match** plugin's `apiKey`
 - Set `CONST_WS_PLUGIN_ENABLED` to `true`
 
-### 3. Start Plugin
+#### Start Plugin
 
 ```bash
 cd webconnector
@@ -88,19 +133,28 @@ node src/index.js
 
 Expected output:
 ```
+=================================================
+DroneEngage WebClient Connector ver: 0.1.0
+=================================================
+Usage:
+  droneengage-webconnector                    # Use config.json credentials
+  droneengage-webconnector <email> <accessCode> # Override credentials
+  npx droneengage-webconnector <email> <accessCode> # Run without installation
+=================================================
+
 webconnector HTTPS listening on https://0.0.0.0:9211
 webconnector WSS listening on wss://0.0.0.0:9212
 [webconnector] cloud login OK
 [webconnector] upstream ws open
 ```
 
-### 4. Start Web Client
+#### Start Web Client
 
 ```bash
 npm start
 ```
 
-### 5. Connect
+#### Connect
 
 1. Open browser to `http://localhost:3000`
 2. Check "Use WebPlugin" checkbox (or leave checked if default)
@@ -158,6 +212,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ✅ **Faster connection** - No health probe or auth request delay
 ✅ **Fewer failure points** - Auth endpoint can't fail
 ✅ **Same security** - Static token + API key validation on WSS
+✅ **Easy installation** - Available via npm and npx
 
 ## Multi-Client Support
 
@@ -171,7 +226,7 @@ Multiple browser tabs/instances can connect simultaneously:
 
 ### "WebSocket connection failed"
 
-1. **Check plugin is running**:
+1. **Check connector is running**:
    ```bash
    lsof -iTCP:9212 -sTCP:LISTEN
    ```
@@ -186,7 +241,7 @@ Multiple browser tabs/instances can connect simultaneously:
 
 4. **Check browser console** for connection URL (tokens redacted)
 
-### Plugin rejects connection
+### Connector rejects connection
 
 Check connector logs for:
 ```
@@ -204,6 +259,12 @@ If you see SSL errors on WSS connection, your browser needs to trust the certifi
 1. Visit `https://127.0.0.1:9212` (will fail, that's OK)
 2. Accept the certificate warning
 3. Reload web client
+
+### npm/npx Issues
+
+1. **Permission denied**: Use `sudo npm install -g droneengage-webconnector`
+2. **Command not found**: Check npm global path: `npm config get prefix`
+3. **npx fails**: Ensure Node.js >=16.0.0: `node --version`
 
 ## Migration from Old Approach
 

@@ -1,13 +1,80 @@
 import crypto from 'crypto';
+import fs from 'fs/promises';
 
 import { fn_readConfigSync, fn_loadTls } from './js_helpers.js';
 import CDeServerCommunicator from './js_de_server_communicator.js';
 import CLocalServer from './js_local_server.js';
 
 // -----------------------------------------------------------------------------
+// Color utilities
+// -----------------------------------------------------------------------------
+const colors = {
+    reset: '\x1b[0m',
+    bright: '\x1b[1m',
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    magenta: '\x1b[35m',
+    cyan: '\x1b[36m',
+    white: '\x1b[37m'
+};
+
+// -----------------------------------------------------------------------------
+// Usage function
+// -----------------------------------------------------------------------------
+function Usage() {
+    return `${colors.cyan}Usage:${colors.reset}
+  ${colors.green}droneengage-webconnector${colors.reset}                    # Use config.json credentials
+  ${colors.green}droneengage-webconnector${colors.reset} ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Override credentials
+  ${colors.green}npx droneengage-webconnector${colors.reset} ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Run without installation`;
+}
+
+// -----------------------------------------------------------------------------
+// Main async function
+// -----------------------------------------------------------------------------
+async function main() {
+// -----------------------------------------------------------------------------
+// Startup Banner
+// -----------------------------------------------------------------------------
+const packageJson = JSON.parse(await fs.readFile(new URL('../package.json', import.meta.url), 'utf8'));
+console.log(`${colors.cyan}=================================================${colors.reset}`);
+console.log(`${colors.bright}${colors.yellow}DroneEngage WebClient Connector ver: ${colors.green}${packageJson.version}${colors.reset}`);
+console.log(`${colors.cyan}=================================================${colors.reset}`);
+console.log(Usage());
+console.log(`${colors.cyan}=================================================${colors.reset}`);
+console.log('');
+
+// -----------------------------------------------------------------------------
+// Command line argument parsing
+// -----------------------------------------------------------------------------
+const args = process.argv.slice(2);
+let emailOverride = null;
+let accessCodeOverride = null;
+
+if (args.length >= 2) {
+    emailOverride = args[0];
+    accessCodeOverride = args[1];
+} else if (args.length === 1) {
+    console.error('Usage: node index.js <email> <accessCode>');
+    console.error('Please provide both email and accessCode, or run without parameters to use config defaults');
+    process.exit(1);
+}
+
+// -----------------------------------------------------------------------------
 // Config loading
 // -----------------------------------------------------------------------------
 const cfg = fn_readConfigSync(new URL('../config.json', import.meta.url));
+
+// Override credentials if provided via command line
+if (emailOverride && accessCodeOverride) {
+    cfg.credentials = {
+        ...cfg.credentials,
+        email: emailOverride,
+        accessCode: accessCodeOverride
+    };
+    console.log(`[webplugin] Using command line credentials: email=${emailOverride}`);
+}
 
 if (cfg.cloud && cfg.cloud.insecureTls === true) {
     // Allow connecting to upstream HTTPS/WSS endpoints with self-signed certs.
@@ -70,3 +137,8 @@ serverCommunicator.setOnUpstreamMessage((data) => {
 // -----------------------------------------------------------------------------
 localServer.startHttps();
 localServer.startWss();
+
+}
+
+// Run the main function
+main().catch(console.error);
