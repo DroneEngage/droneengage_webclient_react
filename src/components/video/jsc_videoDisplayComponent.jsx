@@ -27,6 +27,7 @@ export class ClssCVideoControl extends React.Component {
 
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
+        js_eventEmitter.fn_subscribe(js_event.EE_videoTabClose, this, this.fn_closeVideoTab);
     }
 
     
@@ -96,11 +97,33 @@ export class ClssCVideoControl extends React.Component {
     }
 
 
+    fn_closeVideoTab(p_me, p_obj) {
+        const vid = p_obj.unitPartyID + p_obj.trackID;
+        if (p_me.state.m_videoScreens.hasOwnProperty(vid)) {
+            delete p_me.state.m_videoScreens[vid];
+        }
+
+        if (p_me.state.lastadded === vid) {
+            p_me.state.lastadded = null;
+            p_me.state.needsTabActivation = false;
+        }
+        
+        if (p_me.m_flag_mounted === false) return;
+        p_me.setState({'m_update': p_me.state.m_update + 1});
+    }
+
+
     fn_videoStopped(p_me, obj) {
 
         obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
-        if (p_me.state.m_videoScreens.hasOwnProperty(obj.andruavUnit.getPartyID()) === false) {
-            p_me.state.m_videoScreens[obj.andruavUnit.getPartyID()] = undefined;
+        const vid = obj.andruavUnit.getPartyID() + obj.talk.targetVideoTrack;
+        if (p_me.state.m_videoScreens.hasOwnProperty(vid)) {
+            delete p_me.state.m_videoScreens[vid];
+        }
+
+        if (p_me.state.lastadded === vid) {
+            p_me.state.lastadded = null;
+            p_me.state.needsTabActivation = false;
         }
 
         if (p_me.m_flag_mounted === false)return ;
@@ -111,17 +134,25 @@ export class ClssCVideoControl extends React.Component {
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_videoTabClose, this);
     }
 
 
     render() {
-        const arr = Object.keys(this.state.m_videoScreens);
+        const arr = Object.keys(this.state.m_videoScreens).filter((k) => {
+            const v_obj = this.state.m_videoScreens[k];
+            return (v_obj !== null && v_obj !== undefined);
+        });
 
         let len = arr.length;
 
         if (len === 0) {
             return (
-                <div> Please press camera icon to start streaming to see video.</div>
+                <div className="container-fluid localcontainer">
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+                        <div> No Camera Active</div>
+                    </div>
+                </div>
             );
         }
 

@@ -46,6 +46,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_videoStreamStarted",
 			"EE_videoStreamRedraw",
 			"EE_videoStreamStopped",
+			"EE_videoTabClose",
 			"EE_unitTelemetryOn",
 			"EE_unitTelemetryOff",
 			"EE_BattViewToggle",

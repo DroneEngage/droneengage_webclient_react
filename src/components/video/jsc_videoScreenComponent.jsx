@@ -206,6 +206,12 @@ export default class ClssCVideoScreen extends React.Component {
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
         v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         
+        // Dispatch event to close the whole tab
+        js_eventEmitter.fn_dispatch(js_event.EE_videoTabClose, {
+            unitPartyID: this.props.obj.v_unit,
+            trackID: this.props.obj.v_track
+        });
+        
         if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
     }
