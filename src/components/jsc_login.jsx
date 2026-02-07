@@ -202,12 +202,12 @@ this.chkUsePluginRef.current.checked = usePlugin;
                       }
                     }
                     try {
-                      console.info('[WebPlugin] UI toggle', { enabled: enabled });
+                      console.info('[WebConnector] UI toggle', { enabled: enabled });
                     } catch {
                     }
                   }}
                 />
-                &nbsp;Use WebPlugin
+                &nbsp;Use WebConnector
               </label>
             </div>
 
@@ -257,7 +257,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
                 }
               />
             </div>
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label htmlFor="txtUnitID" id="unitID" className="text-muted">
                 {t('label.gcsId')}
               </label>
@@ -352,7 +352,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
                 disabled
               />
             </div>
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label htmlFor="txtUnitID" id="unitID" className="text-muted">
                 {t('label.gcsId')} {/* "GCS ID" */}
               </label>
