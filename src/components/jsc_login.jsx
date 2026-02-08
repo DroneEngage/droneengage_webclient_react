@@ -169,7 +169,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
     const { t } = this.props; // Access t function
     let control = [];
     let title;
-    let css = 'bg-success';
+    let css = 'btn-success';
 
     let ctrls = [];
     let ctrls2 = [];
@@ -179,7 +179,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
       case CONST_NOT_CONNECTION_OFFLINE_FAILED:
       case CONST_NOT_CONNECTION_OFFLINE:
         title = t('title.login');
-        css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'bg-warning':'bg-success';
+        css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'btn-warning':'btn-success';
         ctrls.push(
           <div key={'div_login' + this.key} className="">
             <div className={`form-group ${dir}`}>
@@ -211,7 +211,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
               </label>
             </div>
 
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')}
               </label>
@@ -226,7 +226,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
                 }
               />
             </div>
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
@@ -281,7 +281,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
         title = t('title.logout'); // "Logout"
           const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
           const usePlugin = (lsPluginEnabled !== null) ? (lsPluginEnabled === true) : (this.state.use_plugin === true);
-          css = usePlugin === true ? 'bg-info' : 'bg-danger';
+          css = usePlugin === true ? 'btn-info' : 'btn-danger';
         ctrls2.push(
           <div key={'div_logout' + this.key} className=" ">
             <div className={`form-group ${dir}`}>
@@ -303,7 +303,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
         css = 'bg-warning';
         ctrls.push(
           <div key={'div_connecting' + this.key} className="">
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')} {/* "Email" */}
               </label>
@@ -319,7 +319,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
                 disabled
               />
             </div>
-            <div className={`form-group ${dir}`}>
+            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
