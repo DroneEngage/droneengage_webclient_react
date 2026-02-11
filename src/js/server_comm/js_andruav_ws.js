@@ -368,18 +368,23 @@ class CAndruavClientWS {
             let url = null;
             const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
             const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WS_PLUGIN_ENABLED === true);
-            const isPluginTarget = usePlugin === true && (this.m_server_port == js_siteConfig.CONST_WS_PLUGIN_WS_PORT);
-            const pluginApiKey = (isPluginTarget === true) ? js_siteConfig.CONST_WS_PLUGIN_APIKEY : '';
+            const isPluginTarget = usePlugin === true;
+            const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WS_PLUGIN_APIKEY : '';
             const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
-            if (window.location.protocol === 'https:') {
-                // f: CONST_CS_LOGIN_TEMP_KEY
-                // g: CONST_CS_SERVER_PUBLIC_HOST
-                // s: SID
-                url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;;
 
+            if (usePlugin === true) {
+                const wsProtocol = js_siteConfig.CONST_WS_PLUGIN_SECURE === true ? 'wss' : 'ws';
+                const port = this.m_server_port;
+                url = wsProtocol + '://' + this.m_server_ip + ':' + port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
             } else {
-                url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
-
+                if (window.location.protocol === 'https:') {
+                    // f: CONST_CS_LOGIN_TEMP_KEY
+                    // g: CONST_CS_SERVER_PUBLIC_HOST
+                    // s: SID
+                    url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
+                } else {
+                    url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
+                }
             }
 
             try {
@@ -390,7 +395,7 @@ class CAndruavClientWS {
                     usePlugin: usePlugin === true,
                     isPluginTarget: isPluginTarget === true,
                     host: this.m_server_ip,
-                    port: window.location.protocol === 'https:' ? this.m_server_port_ss : this.m_server_port,
+                    port: this.m_server_port,
                     hasPluginApiKey: (pluginApiKey && pluginApiKey.length > 0),
                     url: safeUrl,
                 });
@@ -425,7 +430,7 @@ class CAndruavClientWS {
                         console.info('[WS] open', {
                             readyState: Me.ws ? Me.ws.readyState : null,
                             host: Me.m_server_ip,
-                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                            port: Me.m_server_port,
                         });
                     } catch {
                     }
@@ -469,7 +474,7 @@ class CAndruavClientWS {
                     try {
                         console.warn('[WS] close', {
                             host: Me.m_server_ip,
-                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                            port: Me.m_server_port,
                             code: evt ? evt.code : null,
                             reason: evt ? evt.reason : null,
                             wasClean: evt ? evt.wasClean : null,
@@ -484,7 +489,7 @@ class CAndruavClientWS {
                     try {
                         console.error('[WS] error', {
                             host: Me.m_server_ip,
-                            port: window.location.protocol === 'https:' ? Me.m_server_port_ss : Me.m_server_port,
+                            port: Me.m_server_port,
                             err: err,
                         });
                     } catch {

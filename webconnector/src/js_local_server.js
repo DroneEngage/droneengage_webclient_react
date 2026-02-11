@@ -1,3 +1,4 @@
+import http from 'http';
 import https from 'https';
 import express from 'express';
 import { WebSocketServer, WebSocket } from 'ws';
@@ -38,6 +39,43 @@ class CLocalServer {
         this.#wss = null;
     }
 
+    startHttp() {
+        this.#app = this.#fn_buildExpressApp();
+
+        this.#httpsServer = http.createServer(this.#app);
+        this.#httpsServer.on('error', (e) => {
+            try {
+                if (e && e.code === 'EADDRINUSE') {
+                    console.error('[webplugin] HTTP server port already in use', {
+                        address: this.#cfg.bindAddress,
+                        port: this.#cfg.authPort,
+                    });
+                    console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
+                    console.error(`  lsof -iTCP:${this.#cfg.authPort} -sTCP:LISTEN -n -P`);
+                } else {
+                    console.error('[webplugin] HTTP server error', e);
+                }
+            } catch {
+            }
+            process.exit(1);
+        });
+
+        this.#httpsServer.listen(this.#cfg.authPort, this.#cfg.bindAddress, () => {
+            console.log(`webplugin HTTP listening on http://${this.#cfg.bindAddress}:${this.#cfg.authPort}`);
+
+            setTimeout(async () => {
+                try {
+                    await this.#serverCommunicator.ensureReady();
+                } catch (e) {
+                    try {
+                        console.error('[webplugin] upstream autoconnect failed', e);
+                    } catch {
+                    }
+                }
+            }, 10);
+        });
+    }
+
     /**
      * Broadcast data to all connected local WSS clients.
      * @param {*} data
@@ -74,13 +112,13 @@ class CLocalServer {
     }
 
     // Build the login response expected by webclient "plugin mode".
-    #fn_buildPluginLoginReply(reqHost) {
+    #fn_buildPluginLoginReply(reqHost, reqPort) {
         return {
             e: 0,
             sid: this.#state.pluginSessionId,
             cs: {
                 g: reqHost,
-                h: this.#cfg.wsPort,
+                h: reqPort,
                 f: this.#state.pluginToken,
             },
             // Plugin-generated partyId.
@@ -135,12 +173,21 @@ class CLocalServer {
 
         app.use((req, res, next) => {
             const origin = req.headers.origin;
-            // Allow browser clients to call the plugin from any origin.
-            if (origin) {
-                res.setHeader('Access-Control-Allow-Origin', origin);
-                res.setHeader('Vary', 'Origin');
+            const allowedOrigin = this.#cfg.cors && this.#cfg.cors.allowedOrigin ? String(this.#cfg.cors.allowedOrigin) : null;
+
+            if (allowedOrigin && allowedOrigin.length > 0) {
+                if (origin && origin === allowedOrigin) {
+                    res.setHeader('Access-Control-Allow-Origin', origin);
+                    res.setHeader('Vary', 'Origin');
+                }
             } else {
-                res.setHeader('Access-Control-Allow-Origin', '*');
+                // Allow browser clients to call the plugin from any origin.
+                if (origin) {
+                    res.setHeader('Access-Control-Allow-Origin', origin);
+                    res.setHeader('Vary', 'Origin');
+                } else {
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                }
             }
             res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
             res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-de-api-key');
@@ -212,8 +259,11 @@ class CLocalServer {
                 await this.#serverCommunicator.ensureReady();
 
                 const hostHeader = req.headers.host || `${this.#cfg.bindAddress}:${this.#cfg.wsPort}`;
-                const hostOnly = String(hostHeader).split(':')[0];
-                const reply = this.#fn_buildPluginLoginReply(hostOnly);
+                const hostParts = String(hostHeader).split(':');
+                const hostOnly = hostParts[0];
+                const portOnly = hostParts.length > 1 ? parseInt(hostParts[1], 10) : NaN;
+                const advertisedPort = Number.isFinite(portOnly) ? portOnly : this.#cfg.wsPort;
+                const reply = this.#fn_buildPluginLoginReply(hostOnly, advertisedPort);
                 try {
                     console.info('[webplugin] /w/wl response', reply);
                 } catch { }
@@ -375,6 +425,94 @@ class CLocalServer {
 
         this.#wssServer.listen(this.#cfg.wsPort, this.#cfg.bindAddress, () => {
             console.log(`webplugin WSS listening on wss://${this.#cfg.bindAddress}:${this.#cfg.wsPort}`);
+        });
+    }
+
+    startWs() {
+        this.#wssServer = http.createServer();
+        this.#wssServer.on('error', (e) => {
+            try {
+                if (e && e.code === 'EADDRINUSE') {
+                    console.error('[webplugin] WS server port already in use', {
+                        address: this.#cfg.bindAddress,
+                        port: this.#cfg.wsPort,
+                    });
+                    console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
+                    console.error(`  lsof -iTCP:${this.#cfg.wsPort} -sTCP:LISTEN -n -P`);
+                } else {
+                    console.error('[webplugin] WS server error', e);
+                }
+            } catch {
+            }
+            process.exit(1);
+        });
+
+        this.#wss = new WebSocketServer({ server: this.#wssServer });
+        this.#wss.on('connection', async (socket, req) => {
+            const url = new URL(req.url, `http://${req.headers.host}`);
+
+            try {
+                console.info('[webplugin] ws incoming', {
+                    url: fn_redactUrlSecrets(url.toString()),
+                    host: req.headers.host,
+                });
+            } catch {
+            }
+
+            if (!this.#fn_requireWsApiKey(url)) {
+                try {
+                    console.warn('[webplugin] ws forbidden (apiKey)');
+                } catch {
+                }
+                socket.close(1008, 'Forbidden (apiKey)');
+                return;
+            }
+
+            const f = url.searchParams.get('f');
+            if (!f || f !== this.#state.pluginToken) {
+                try {
+                    console.warn('[webplugin] ws forbidden (token)');
+                } catch {
+                }
+                socket.close(1008, 'Forbidden (token)');
+                return;
+            }
+
+            this.#state.clients.add(socket);
+            try {
+                console.info('[webplugin] ws client connected', { clients: this.#state.clients.size });
+            } catch {
+            }
+
+            try {
+                await this.#serverCommunicator.ensureReady();
+            } catch {
+            }
+
+            socket.on('message', (data, isBinary) => {
+                try {
+                    const len = data ? (data.byteLength ?? data.length ?? null) : null;
+                    console.info('[webplugin] >> client', {
+                        bytes: len,
+                        isBinary: isBinary === true,
+                        upstreamConnected: this.#serverCommunicator.isWsConnected,
+                    });
+                } catch {
+                }
+                this.#serverCommunicator.sendUpstream(data, { binary: isBinary === true });
+            });
+
+            socket.on('close', () => {
+                this.#state.clients.delete(socket);
+                try {
+                    console.info('[webplugin] ws client closed', { clients: this.#state.clients.size });
+                } catch {
+                }
+            });
+        });
+
+        this.#wssServer.listen(this.#cfg.wsPort, this.#cfg.bindAddress, () => {
+            console.log(`webplugin WS listening on ws://${this.#cfg.bindAddress}:${this.#cfg.wsPort}`);
         });
     }
 }

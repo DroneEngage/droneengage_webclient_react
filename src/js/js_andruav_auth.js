@@ -5,7 +5,9 @@ import { js_eventEmitter } from './js_eventEmitter';
 import { js_localStorage } from './js_localStorage.js';
 import {
     fn_buildAuthUrl,
+    fn_buildAuthUrlEx,
     fn_buildHealthBaseUrl,
+    fn_buildHealthBaseUrlEx,
     fn_buildLoginPayload,
     fn_buildPluginSessionPayload,
     fn_parseLoginResponse,
@@ -359,8 +361,10 @@ class CAndruavAuth {
         const pluginWsHost = this.fn_getPluginWSHost();
         const pluginWsPort = this.fn_getPluginWSPort();
 
-        const pluginLoginUrl = fn_buildAuthUrl(true, pluginAuthHost, pluginAuthPort, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
-        const pluginHealthBaseUrl = fn_buildHealthBaseUrl(true, pluginAuthHost, pluginAuthPort);
+        const pluginSecure = js_siteConfig.CONST_WS_PLUGIN_SECURE === true;
+        const pluginBasePath = js_siteConfig.CONST_WS_PLUGIN_BASE_PATH;
+        const pluginLoginUrl = fn_buildAuthUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
+        const pluginHealthBaseUrl = fn_buildHealthBaseUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath);
 
         const headers = { 'Content-Type': 'application/json' };
         const apiKey = this.fn_getPluginApiKey();

@@ -5,12 +5,35 @@ export const fn_buildHttpBaseUrl = (secure, host, port) => {
     return `${protocol}://${host}:${port}`;
 };
 
+const fn_normalizeBasePath = (basePath) => {
+    try {
+        if (!basePath) return '';
+        let p = String(basePath).trim();
+        if (p.length === 0) return '';
+        if (!p.startsWith('/')) p = '/' + p;
+        p = p.replace(/\/+$/, '');
+        return p;
+    } catch {
+        return '';
+    }
+};
+
 export const fn_buildAuthUrl = (secure, host, port, path) => {
     return `${fn_buildHttpBaseUrl(secure, host, port)}${js_andruavMessages.CONST_WEB_FUNCTION}${path}`;
 };
 
+export const fn_buildAuthUrlEx = (secure, host, port, basePath, path) => {
+    const p = fn_normalizeBasePath(basePath);
+    return `${fn_buildHttpBaseUrl(secure, host, port)}${p}${js_andruavMessages.CONST_WEB_FUNCTION}${path}`;
+};
+
 export const fn_buildHealthBaseUrl = (secure, host, port) => {
     return `${fn_buildHttpBaseUrl(secure, host, port)}${js_andruavMessages.CONST_HEALTH_FUNCTION}`;
+};
+
+export const fn_buildHealthBaseUrlEx = (secure, host, port, basePath) => {
+    const p = fn_normalizeBasePath(basePath);
+    return `${fn_buildHttpBaseUrl(secure, host, port)}${p}${js_andruavMessages.CONST_HEALTH_FUNCTION}`;
 };
 
 export const fn_buildLoginPayload = (email, accessCode, ver, group = '1') => {

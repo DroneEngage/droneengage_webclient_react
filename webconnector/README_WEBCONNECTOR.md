@@ -4,6 +4,8 @@
 
 The WebSocket Connector implements **a standalone local WebSocket hub** that maintains a single upstream connection to the Andruav cloud communication server while allowing multiple web client instances to connect and share that connection.
 
+If your WebClient UI is served over **HTTPS** (for example `https://localhost:3000`), and the connector runs locally as `http://` + `ws://`, the browser will block the connection (mixed-content). The recommended solution is to use a local reverse proxy (Caddy) that provides `https://` and `wss://` and proxies to the connector. See [README_CADDY.md](README_CADDY.md).
+
 ## Installation Methods
 
 ### Method 1: npm Global Install (Recommended)
@@ -11,6 +13,13 @@ The WebSocket Connector implements **a standalone local WebSocket hub** that mai
 ```bash
 npm install -g droneengage-webconnector
 droneengage-webconnector
+```
+
+To run with the Caddy reverse proxy (one command):
+
+```bash
+sudo droneengage-webconnector-install-caddy
+droneengage-webconnector-stack
 ```
 
 ### Method 2: npx (No Installation)

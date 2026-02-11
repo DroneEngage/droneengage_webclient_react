@@ -1,0 +1,13 @@
+{
+    auto_https disable_redirects
+}
+
+localhost:9443 {
+    # API requests
+    handle_path /api/* {
+        reverse_proxy localhost:9211
+    }
+
+    # WebSocket and all other traffic
+    reverse_proxy localhost:9212
+}
