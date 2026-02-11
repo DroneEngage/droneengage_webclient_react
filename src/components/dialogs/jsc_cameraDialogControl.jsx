@@ -302,13 +302,10 @@ export default class ClssCameraDialog extends React.Component
                     </div>
                     </div>        
                     <div id="modal_ctrl_cam_footer" className="form-group text-center localcontainer css_ontop">
-                        <div className= "row">
-                            <div className= "col-md-6">
+                        <div className= "btn-group w-100 d-flex flex-wrap">
                             <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
-                            </div>
-                            <div className= "col-md-6">
-                                <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>
-                            </div>
+                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>
+                            
                         </div>
                     </div>
             </div>
