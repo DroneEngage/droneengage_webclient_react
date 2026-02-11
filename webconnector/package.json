@@ -4,7 +4,10 @@
   "description": "DroneEngage Web Connector - Bridge between DroneEngage cloud and local web clients",
   "main": "src/index.js",
   "bin": {
-    "droneengage-webconnector": "src/index.js"
+    "droneengage-webconnector": "src/index.js",
+    "droneengage-webconnector-stack": "src/cli_stack.js",
+    "droneengage-webconnector-caddy": "src/cli_caddy.js",
+    "droneengage-webconnector-install-caddy": "src/cli_install_caddy.js"
   },
   "type": "module",
   "scripts": {
@@ -25,11 +28,14 @@
   "author": "Mohammad Said Hefny <mohammad.hefny@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "files": [
     "src/",
+    "scripts/",
     "config.json",
+    "Caddyfile.localplugin",
+    "run_local_plugin_stack.sh",
     "README.md",
     "README_WEBCONNECTOR.md",
     "README_SIMPLIFIED.md",
