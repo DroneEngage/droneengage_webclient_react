@@ -348,7 +348,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
         switch (this.props.v_andruavUnit.m_VehicleType)
         {
             default:
-                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
                     <button id='btn_auto_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_takeoff_class}  onClick={ () => this.fn_doTakeoff(this.props.v_andruavUnit)}>&nbsp;Takeoff&nbsp;</button>
                     <button id='btn_auto_vtol_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_vtol_takeoff_class}  title='VTOL-Takeoff' onClick={ () => this.fn_doVtolTakeOff(this.props.v_andruavUnit)}>&nbsp;V-TkOff&nbsp;</button>
@@ -360,7 +360,7 @@ export class ClssCtrlPx4FlightControl extends React.Component {
                     <button id='btn_r_attd' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_r_attd_class}  title='R-ATTITUDE' onClick={ () => this.fn_doRAttitude(this.props.v_andruavUnit)}>&nbsp;R-ATT&nbsp;</button>
                     </div></div>);
         
-                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
                     <button id='btn_auto_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_land_class}   onClick={ () => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
                     <button id='btn_auto_hold' type='button' className={'btn btn-sm  flgtctrlbtn '  + btn.btn_auto_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
                     <button id='btn_auto_mission' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_mission_class } onClick={ (e) => this.fn_doMission(this.props.v_andruavUnit)}>&nbsp;Mission&nbsp;</button>
