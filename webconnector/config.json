@@ -1,7 +1,16 @@
 {
-  "bindAddress": "0.0.0.0",
+  "bindAddress": "127.0.0.1",
   "authPort": 9211,
   "wsPort": 9212,
+
+  "local": {
+    "authSecure": false,
+    "wsSecure": false
+  },
+
+  "cors": {
+    "allowedOrigin": "https://localhost:3000"
+  },
 
   "tls": {
     "certFile": "../ssl/localssl.crt",

@@ -28,6 +28,8 @@ export let CONST_WS_PLUGIN_WS_PORT = 9212;
 export let CONST_WS_PLUGIN_APIKEY = '';
 export let CONST_WS_PLUGIN_TOKEN = '';
 export let CONST_WS_PLUGIN_AUTO_FALLBACK = true;
+export let CONST_WS_PLUGIN_SECURE = true;
+export let CONST_WS_PLUGIN_BASE_PATH = '';
 
 /**
  * Links that are used in Header
@@ -109,60 +111,62 @@ export let CONST_ICE_SERVERS = [
 /**
  * This function load overrides values from config.json in public folder.
  */
-function loadConfigSync() {
+function fn_parseConfigJsonText(jsonText) {
+    let jsonString = jsonText;
+    jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, '');
+    jsonString = jsonString.replace(/(^|\s)\/\/.*/g, '');
+    return JSON.parse(jsonString);
+}
+
+export function fn_applyRuntimeConfig(data) {
     try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/config.json', false); // Synchronous request
-        xhr.send(null);
+        if (!data) return;
 
-        if (xhr.status === 200) {
-            let jsonString = xhr.responseText;
+        if (data.CONST_TEST_MODE !== undefined) CONST_TEST_MODE = data.CONST_TEST_MODE;
+        if (data.CONST_PROD_MODE_IP !== undefined) CONST_PROD_MODE_IP = data.CONST_PROD_MODE_IP;
+        if (data.CONST_PROD_MODE_PORT !== undefined) CONST_PROD_MODE_PORT = data.CONST_PROD_MODE_PORT;
 
-            // Remove multi-line comments
-            jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, '');
+        if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
+        if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
-            // Remove single-line comments
-            jsonString = jsonString.replace(/(^|\s)\/\/.*/g, '');
+        if (data.CONST_WS_PLUGIN_ENABLED !== undefined) CONST_WS_PLUGIN_ENABLED = data.CONST_WS_PLUGIN_ENABLED;
+        if (data.CONST_WS_PLUGIN_AUTH_HOST !== undefined) CONST_WS_PLUGIN_AUTH_HOST = data.CONST_WS_PLUGIN_AUTH_HOST;
+        if (data.CONST_WS_PLUGIN_AUTH_PORT !== undefined) CONST_WS_PLUGIN_AUTH_PORT = data.CONST_WS_PLUGIN_AUTH_PORT;
+        if (data.CONST_WS_PLUGIN_WS_PORT !== undefined) CONST_WS_PLUGIN_WS_PORT = data.CONST_WS_PLUGIN_WS_PORT;
+        if (data.CONST_WS_PLUGIN_APIKEY !== undefined) CONST_WS_PLUGIN_APIKEY = data.CONST_WS_PLUGIN_APIKEY;
+        if (data.CONST_WS_PLUGIN_TOKEN !== undefined) CONST_WS_PLUGIN_TOKEN = data.CONST_WS_PLUGIN_TOKEN;
+        if (data.CONST_WS_PLUGIN_AUTO_FALLBACK !== undefined) CONST_WS_PLUGIN_AUTO_FALLBACK = data.CONST_WS_PLUGIN_AUTO_FALLBACK;
+        if (data.CONST_WS_PLUGIN_SECURE !== undefined) CONST_WS_PLUGIN_SECURE = data.CONST_WS_PLUGIN_SECURE;
+        if (data.CONST_WS_PLUGIN_BASE_PATH !== undefined) CONST_WS_PLUGIN_BASE_PATH = data.CONST_WS_PLUGIN_BASE_PATH;
 
-            const data = JSON.parse(jsonString);
+        if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
+        if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
 
-            // Update the exported constants
-            if (data.CONST_TEST_MODE !== undefined) CONST_TEST_MODE = data.CONST_TEST_MODE;
-            if (data.CONST_PROD_MODE_IP !== undefined) CONST_PROD_MODE_IP = data.CONST_PROD_MODE_IP;
-            if (data.CONST_PROD_MODE_PORT !== undefined) CONST_PROD_MODE_PORT = data.CONST_PROD_MODE_PORT;
+        if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
+        if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
+        if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
 
-            if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
-            if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
+        if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
+        if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
+        if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS };
+        if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE };
+    } catch (error) {
+        console.error('Error applying config:', error);
+    }
+}
 
-
-            if (data.CONST_WS_PLUGIN_ENABLED !== undefined) CONST_WS_PLUGIN_ENABLED = data.CONST_WS_PLUGIN_ENABLED;
-            if (data.CONST_WS_PLUGIN_AUTH_HOST !== undefined) CONST_WS_PLUGIN_AUTH_HOST = data.CONST_WS_PLUGIN_AUTH_HOST;
-            if (data.CONST_WS_PLUGIN_AUTH_PORT !== undefined) CONST_WS_PLUGIN_AUTH_PORT = data.CONST_WS_PLUGIN_AUTH_PORT;
-            if (data.CONST_WS_PLUGIN_WS_PORT !== undefined) CONST_WS_PLUGIN_WS_PORT = data.CONST_WS_PLUGIN_WS_PORT;
-            if (data.CONST_WS_PLUGIN_APIKEY !== undefined) CONST_WS_PLUGIN_APIKEY = data.CONST_WS_PLUGIN_APIKEY;
-            if (data.CONST_WS_PLUGIN_TOKEN !== undefined) CONST_WS_PLUGIN_TOKEN = data.CONST_WS_PLUGIN_TOKEN;
-            if (data.CONST_WS_PLUGIN_AUTO_FALLBACK !== undefined) CONST_WS_PLUGIN_AUTO_FALLBACK = data.CONST_WS_PLUGIN_AUTO_FALLBACK;
-
-
-            if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
-            if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
-            
-            if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
-            if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
-            if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
-
-            if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
-            if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
-
-            if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS};
-
-            if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE};
-        } else {
-            console.error('Error loading config:', xhr.status);
+export async function fn_loadConfig() {
+    try {
+        const res = await fetch('/config.json', { cache: 'no-store' });
+        if (!res.ok) {
+            console.error('Error loading config:', res.status);
+            return;
         }
+
+        const txt = await res.text();
+        const data = fn_parseConfigJsonText(txt);
+        fn_applyRuntimeConfig(data);
     } catch (error) {
         console.error('Error loading config:', error);
     }
 }
-
-loadConfigSync(); // Load the config synchronously

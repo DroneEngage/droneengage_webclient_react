@@ -4,6 +4,8 @@
 
 The web client now connects **directly to the connector's WebSocket server** without requiring an authentication step. This simplifies the architecture and eliminates SSL certificate issues with the auth endpoint.
 
+If your WebClient UI is served over **HTTPS** (for example `https://localhost:3000`), the browser will block insecure `http://` and `ws://` calls to a local connector (mixed-content blocking). In this case, use the Caddy reverse proxy setup described in [README_CADDY.md](README_CADDY.md).
+
 ## Installation Methods
 
 ### Method 1: npm Global Install (Recommended)
@@ -11,6 +13,13 @@ The web client now connects **directly to the connector's WebSocket server** wit
 ```bash
 npm install -g droneengage-webconnector
 droneengage-webconnector
+```
+
+To run with the Caddy reverse proxy (one command):
+
+```bash
+sudo droneengage-webconnector-install-caddy
+droneengage-webconnector-stack
 ```
 
 ### Method 2: npx (No Installation)

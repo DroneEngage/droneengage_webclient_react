@@ -25,9 +25,9 @@ const colors = {
 // -----------------------------------------------------------------------------
 function Usage() {
     return `${colors.cyan}Usage:${colors.reset}
-  ${colors.green}droneengage-webconnector${colors.reset}                    # Use config.json credentials
-  ${colors.green}droneengage-webconnector${colors.reset} ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Override credentials
-  ${colors.green}npx droneengage-webconnector${colors.reset} ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Run without installation`;
+  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>]                    # Use config.json credentials
+  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Override credentials
+  ${colors.green}npx droneengage-webconnector${colors.reset} [--config <path>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Run without installation`;
 }
 
 // -----------------------------------------------------------------------------
@@ -48,7 +48,25 @@ console.log('');
 // -----------------------------------------------------------------------------
 // Command line argument parsing
 // -----------------------------------------------------------------------------
-const args = process.argv.slice(2);
+const rawArgs = process.argv.slice(2);
+let configOverride = null;
+const args = [];
+
+for (let i = 0; i < rawArgs.length; ++i) {
+    const a = rawArgs[i];
+    if (a === '--config') {
+        configOverride = rawArgs[i + 1] || null;
+        i++;
+        continue;
+    }
+
+    if (a === '--help' || a === '-h') {
+        console.log(Usage());
+        process.exit(0);
+    }
+
+    args.push(a);
+}
 let emailOverride = null;
 let accessCodeOverride = null;
 
@@ -64,7 +82,7 @@ if (args.length >= 2) {
 // -----------------------------------------------------------------------------
 // Config loading
 // -----------------------------------------------------------------------------
-const cfg = fn_readConfigSync(new URL('../config.json', import.meta.url));
+const cfg = configOverride ? fn_readConfigSync(configOverride) : fn_readConfigSync(new URL('../config.json', import.meta.url));
 
 // Override credentials if provided via command line
 if (emailOverride && accessCodeOverride) {
@@ -119,7 +137,10 @@ const state = {
 // TLS
 // -----------------------------------------------------------------------------
 const webpluginBaseUrl = new URL('../', import.meta.url);
-const tlsOptions = fn_loadTls(cfg, webpluginBaseUrl);
+const localAuthSecure = cfg.local ? (cfg.local.authSecure === true) : true;
+const localWsSecure = cfg.local ? (cfg.local.wsSecure === true) : true;
+const needsTls = localAuthSecure === true || localWsSecure === true;
+const tlsOptions = needsTls === true ? fn_loadTls(cfg, webpluginBaseUrl) : null;
 
 // -----------------------------------------------------------------------------
 // Wire up modules
@@ -135,8 +156,17 @@ serverCommunicator.setOnUpstreamMessage((data) => {
 // -----------------------------------------------------------------------------
 // Start servers
 // -----------------------------------------------------------------------------
-localServer.startHttps();
-localServer.startWss();
+if (localAuthSecure === true) {
+    localServer.startHttps();
+} else {
+    localServer.startHttp();
+}
+
+if (localWsSecure === true) {
+    localServer.startWss();
+} else {
+    localServer.startWs();
+}
 
 }
 

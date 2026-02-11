@@ -33,6 +33,8 @@ TypeError: Failed to fetch
 
 This happens because the connector uses a **self-signed SSL certificate** that the browser doesn't trust.
 
+If you are using the Caddy reverse proxy mode (recommended for HTTPS WebClient), the browser connects to `https://localhost:9443` instead, and you typically do not need to accept the connector's self-signed certificate. See [README_CADDY.md](README_CADDY.md).
+
 ## Solution: Accept the Self-Signed Certificate
 
 ### Step 1: Visit Plugin Health Endpoint
