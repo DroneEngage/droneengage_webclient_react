@@ -426,7 +426,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
 
 
-        ctrl2_1.push(<div key={p_andruavUnit.getPartyID() + "rc3"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+        ctrl2_1.push(<div key={p_andruavUnit.getPartyID() + "rc3"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
             <button id='btn_refreshwp' key={this.key + 'btn_refreshwp'} type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class} onClick={(e) => fn_requestWayPoints(p_andruavUnit, true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
             <button id='btn_writewp' key={this.key + 'btn_writewp'} type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class} onClick={(e) => fn_putWayPoints(p_andruavUnit, true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
             <button id='btn_clearwp' key={this.key + 'btn_clearwp'} type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class} onClick={(e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>
@@ -437,13 +437,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             <button id='btn_lidar_info' key={this.key + 'btn_lidar_info'} type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class} onClick={(e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
         </div></div>);
 
-        ctrl2_2.push(<div key={p_andruavUnit.getPartyID() + "rc3_1"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group flex-wrap '>
+        ctrl2_2.push(<div key={p_andruavUnit.getPartyID() + "rc3_1"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
             <button id='btn_tracking' key={this.key + 'btn_tracking'} type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class} ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker' /></button>
             <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={p_andruavUnit} title='object AI tracker' />
         </div></div>);
 
         return (
-            <div key={'ctrl_flight_controller'} id='ctrl_k' className='ps-2 pb-2'>
+            <div key={'ctrl_flight_controller'} id='ctrl_k' className='ps-2 pb-2 pe-2'>
                 <div className='row'>
                     {ctrl_flight_controller}
                 </div>

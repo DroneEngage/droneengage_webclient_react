@@ -350,19 +350,12 @@ export default class ClssServoControl extends React.Component {
                             {servos}
                         </div>
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
-                            <div className="row">
-                                <div className="col-3">
+                            <div className="btn-group w-100 d-flex flex-wrap">
                                     <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" ref={this.opaqueBtnRef}>opaque</button>
-                                </div>
-                                <div className="col-3">
                                     <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.getPartyID())}>Goto</button>
-                                </div>
-                                <div className="col-3">
                                     <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit)} >Refresh</button>
-                                </div>
-                                <div className="col-3">
                                     <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>

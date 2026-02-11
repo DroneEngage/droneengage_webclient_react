@@ -264,7 +264,7 @@ export default class ClssStreamDialog extends React.Component
 
                 {!isNoStreams && (
                     <div className="form-group text-center localcontainer">
-                        <div className="btn-group">
+                        <div className="btn-group w-100 d-flex flex-wrap">
                             <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" onClick={() => this.fn_opacityDialog()}>Opaque</button>
                             <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={() => this.fn_gotoUnitPressed()}>Goto</button>
                             <button id="btnHelp" type="button" className="btn btn-sm btn-primary">Help</button>

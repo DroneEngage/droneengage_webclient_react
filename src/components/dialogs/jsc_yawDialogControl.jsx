@@ -183,7 +183,7 @@ export default class ClssYawDialog extends React.Component
 					</div>
 					<div id="modal_yaw_knob_footer" className="form-group text-center ">
 						<div className= "row">
-						<div className="btn-group">
+						<div className="btn-group w-100 d-flex flex-wrap">
 							<button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
 							<button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e)=>this.fn_gotoUnit(e)}>Goto</button>
 							<button id="btnYaw" type="button" className="btn btn-sm btn-danger" onClick={(e)=>this.fn_onYaw(e)}>YAW</button>
