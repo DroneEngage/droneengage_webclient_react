@@ -3336,8 +3336,6 @@ export function fn_on_ready() {
 
 	enableDragging();
 
-	// Blink Map Link
-	setInterval(function () { $('#webplugin_span').toggleClass('label-danger'); }, 2000);
 
 	fn_showMap();
 
