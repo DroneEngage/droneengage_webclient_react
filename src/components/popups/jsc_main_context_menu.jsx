@@ -110,8 +110,13 @@ export class ClssMainContextMenu extends React.Component {
         return (
             <div className="text-justified one_line col-12">
                 <div className="row">
+<<<<<<< HEAD
                 <p className="text-bg-success mb-1 padding_zero">
                     <span className="margin_zero si-09x" >
+=======
+                <p className="bg-success text-white mb-1 padding_zero">
+                    <span className="text-success margin_zero text-white si-09x" >
+>>>>>>> 0c614b3 (f)
                         lat:<span className='si-09x'>{v_lat.toFixed(6)}</span> lng:<span className='si-09x'>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
