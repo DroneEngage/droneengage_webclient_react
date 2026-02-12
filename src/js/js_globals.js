@@ -188,7 +188,7 @@ class GLOBALS {
 		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
 		this.LS_SELECTED_THEME = '_vSelectedTheme';
-		this.LS_WS_PLUGIN_ENABLED = '_vWSPluginEnabled';
+		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
 
 
 

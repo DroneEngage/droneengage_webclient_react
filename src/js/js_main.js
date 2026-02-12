@@ -3178,7 +3178,7 @@ function fn_connectWebSocket(me) {
 		js_globals.v_andruavWS.fn_init();
 		const authPartyID = js_andruavAuth.fn_getPartyID();
 		const uiPartyID = $('#txtUnitID').val();
-		const isPluginMode = js_siteConfig.CONST_WS_PLUGIN_ENABLED && js_localStorage.fn_getWSPluginEnabled();
+		const isPluginMode = js_siteConfig.CONST_WEBCONNECTOR_ENABLED && js_localStorage.fn_getWebConnectorEnabled();
 
 		// PartyID rules:
 		// - Normal (cloud) mode: partyID is client-determined (UI/localStorage).

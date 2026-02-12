@@ -97,7 +97,33 @@ These values are used by `src/js/js_andruav_auth.js` to build the login URL.
 - `CONST_MODULE_VERSIONS`
   - **Effect**: expected module versions and URLs; merged into defaults.
 
-## 3.8 Language
+## 3.8 WebConnector
+
+- `CONST_WEBCONNECTOR_ENABLED`
+  - **Effect**: enables WebConnector mode for local development proxy.
+
+- `CONST_WEBCONNECTOR_AUTH_HOST`, `CONST_WEBCONNECTOR_AUTH_PORT`
+  - **Effect**: WebConnector auth server host/port.
+
+- `CONST_WEBCONNECTOR_WS_PORT`
+  - **Effect**: WebConnector WebSocket port.
+
+- `CONST_WEBCONNECTOR_APIKEY`
+  - **Effect**: API key for WebConnector authentication.
+
+- `CONST_WEBCONNECTOR_TOKEN`
+  - **Effect**: Static token for WebConnector sessions.
+
+- `CONST_WEBCONNECTOR_AUTO_FALLBACK`
+  - **Effect**: when `true`, falls back to cloud login if WebConnector unreachable; when `false`, WebConnector only.
+
+- `CONST_WEBCONNECTOR_SECURE`
+  - **Effect**: enables HTTPS/WSS for WebConnector.
+
+- `CONST_WEBCONNECTOR_BASE_PATH`
+  - **Effect**: base path for WebConnector API endpoints.
+
+## 3.9 Language
 
 - `CONST_LANGUAGE`
   - **Effect**: enabled languages and default language; merged into defaults.

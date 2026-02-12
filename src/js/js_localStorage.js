@@ -294,12 +294,12 @@ class CLocalStorage {
         return this._getValue(js_globals.LS_SELECTED_THEME, 'default');
     }
 
-    fn_setWSPluginEnabled(value) {
-        this._setValue(js_globals.LS_WS_PLUGIN_ENABLED, value === true ? 'true' : 'false');
+    fn_setWebConnectorEnabled(value) {
+        this._setValue(js_globals.LS_WEBCONNECTOR_ENABLED, value === true ? 'true' : 'false');
     }
 
-    fn_getWSPluginEnabled() {
-        return this._getValue(js_globals.LS_WS_PLUGIN_ENABLED, 'true') === 'true';
+    fn_getWebConnectorEnabled() {
+        return this._getValue(js_globals.LS_WEBCONNECTOR_ENABLED, 'true') === 'true';
     }
 }
 
