@@ -81,7 +81,7 @@ export const fn_parseLoginResponse = (response) => {
         permission: response ? response[js_andruavMessages.CONST_PERMISSION] : null,
         permission2: response ? response[js_andruavMessages.CONST_PERMISSION2] : null,
         // partyId is NOT part of the cloud auth response.
-        // It is only provided by the local WebPlugin login endpoint (/w/wl/).
+        // It is only provided by the local WebConnector login endpoint (/w/wl/).
         // New name: `plugin_party_id` (preferred). Legacy name: `pid`.
         // The WebClient uses it ONLY when connecting to the plugin's WSS.
         partyId: response ? (response.plugin_party_id || response.pid) : null,

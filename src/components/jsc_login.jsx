@@ -82,7 +82,7 @@ class ClssLoginControl extends React.Component {
       this.setState({ m_update: this.state.m_update + 1 });
 
       const usePlugin = (this.chkUsePluginRef.current && this.chkUsePluginRef.current.checked === true);
-      js_localStorage.fn_setWSPluginEnabled(usePlugin);
+      js_localStorage.fn_setWebConnectorEnabled(usePlugin);
 
       js_localStorage.fn_setEmail(this.txtEmailRef.current.value);
       js_localStorage.fn_setAccessCode(this.txtAccessCodeRef.current.value);
@@ -111,10 +111,12 @@ class ClssLoginControl extends React.Component {
   
     const tabStatus = getTabStatus();
 
-    const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
-    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WS_PLUGIN_ENABLED === true);
+    const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
+    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true);
     this.state.use_plugin = usePlugin;
-this.chkUsePluginRef.current.checked = usePlugin;
+    if (this.chkUsePluginRef.current) {
+      this.chkUsePluginRef.current.checked = usePlugin;
+    }
     switch (tabStatus) {
       case 'new':
         js_globals.m_current_tab_status = 'new';
@@ -182,34 +184,36 @@ this.chkUsePluginRef.current.checked = usePlugin;
         css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'btn-warning':'btn-success';
         ctrls.push(
           <div key={'div_login' + this.key} className="">
-            <div className={`form-group ${dir}`}>
-              <label className="txt-theme-aware">
-                  <input
-                  type="checkbox"
-                  ref={this.chkUsePluginRef}
-                  defaultChecked={this.state.use_plugin === true}
-                  onChange={(e) => {
-                    const enabled = e.target.checked === true;
-                    this.setState({ use_plugin: enabled });
-                    js_localStorage.fn_setWSPluginEnabled(enabled);
+            {js_siteConfig.CONST_WEBCONNECTOR_ENABLE && (
+              <div className={`form-group ${dir}`}>
+                <label className="txt-theme-aware">
+                    <input
+                    type="checkbox"
+                    ref={this.chkUsePluginRef}
+                    defaultChecked={this.state.use_plugin === true}
+                    onChange={(e) => {
+                      const enabled = e.target.checked === true;
+                      this.setState({ use_plugin: enabled });
+                      js_localStorage.fn_setWebConnectorEnabled(enabled);
 
-                    if (this.txtUnitIDRef.current) {
-                      if (enabled === true) {
-                        this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitIDShared();
-                      } else {
-                        js_localStorage.fn_resetUnitID();
-                        this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+                      if (this.txtUnitIDRef.current) {
+                        if (enabled === true) {
+                          this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitIDShared();
+                        } else {
+                          js_localStorage.fn_resetUnitID();
+                          this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+                        }
                       }
-                    }
-                    try {
-                      console.info('[WebConnector] UI toggle', { enabled: enabled });
-                    } catch {
-                    }
-                  }}
-                />
-                &nbsp;Use WebConnector
-              </label>
-            </div>
+                      try {
+                        console.info('[WebConnector] UI toggle', { enabled: enabled });
+                      } catch {
+                      }
+                    }}
+                  />
+                  &nbsp;Use WebConnector
+                </label>
+              </div>
+            )}
 
             <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
@@ -279,7 +283,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
       case CONST_NOT_CONNECTION_ONLINE:
         {
         title = t('title.logout'); // "Logout"
-          const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+          const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
           const usePlugin = (lsPluginEnabled !== null) ? (lsPluginEnabled === true) : (this.state.use_plugin === true);
           css = usePlugin === true ? 'btn-info' : 'btn-danger';
         ctrls2.push(
@@ -303,7 +307,7 @@ this.chkUsePluginRef.current.checked = usePlugin;
         css = 'bg-warning';
         ctrls.push(
           <div key={'div_connecting' + this.key} className="">
-            <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
+            <div className={`form-group ${dir} ${this.state.use_plugin === true ? ' hidden' : ''}`}>
               <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
                 {t('label.email')} {/* "Email" */}
               </label>

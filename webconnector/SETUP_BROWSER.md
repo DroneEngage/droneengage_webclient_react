@@ -88,7 +88,7 @@ If accessing the connector from another device on your network (e.g., `https://1
 
 1. Update `public/config.json`:
    ```json
-   "CONST_WS_PLUGIN_AUTH_HOST": "192.168.1.100"
+   "CONST_WEBCONNECTOR_AUTH_HOST": "192.168.1.100"
    ```
 
 2. Visit `https://192.168.1.100:9211/h/health` in your browser
