@@ -57,29 +57,29 @@ class CAndruavAuth {
     }
 
     fn_isPluginEnabled() {
-        const v = js_localStorage.fn_getWSPluginEnabled();
+        const v = js_localStorage.fn_getWebConnectorEnabled();
         if (v !== null) return v;
-        return js_siteConfig.CONST_WS_PLUGIN_ENABLED === true;
+        return js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true;
     }
 
     fn_getPluginAuthHost() {
-        return js_siteConfig.CONST_WS_PLUGIN_AUTH_HOST;
+        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_HOST;
     }
 
     fn_getPluginAuthPort() {
-        return js_siteConfig.CONST_WS_PLUGIN_AUTH_PORT;
+        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_PORT;
     }
 
     fn_getPluginWSHost() {
-        return js_siteConfig.CONST_WS_PLUGIN_AUTH_HOST;
+        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_HOST;
     }
 
     fn_getPluginWSPort() {
-        return js_siteConfig.CONST_WS_PLUGIN_WS_PORT;
+        return js_siteConfig.CONST_WEBCONNECTOR_WS_PORT;
     }
 
     fn_getPluginApiKey() {
-        return js_siteConfig.CONST_WS_PLUGIN_APIKEY;
+        return js_siteConfig.CONST_WEBCONNECTOR_APIKEY;
     }
 
     /**
@@ -229,22 +229,22 @@ class CAndruavAuth {
         js_eventEmitter.fn_dispatch(js_event.EE_Auth_Login_In_Progress, null);
 
         try {
-            const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
+            const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
             const pluginEnabled = this.fn_isPluginEnabled() === true;
             if (pluginEnabled === true) {
-                console.info('[WebPlugin] enabled=true', {
+                console.info('[WebConnector] enabled=true', {
                     ls: lsPluginEnabled,
-                    cfgEnabled: js_siteConfig.CONST_WS_PLUGIN_ENABLED === true,
-                    autoFallback: js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK === true,
+                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true,
+                    autoFallback: js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK === true,
                     authHost: this.fn_getPluginAuthHost(),
                     authPort: this.fn_getPluginAuthPort(),
                     wsPort: this.fn_getPluginWSPort(),
                     hasApiKey: (this.fn_getPluginApiKey() || '').length > 0,
                 });
             } else {
-                console.info('[WebPlugin] enabled=false', {
+                console.info('[WebConnector] enabled=false', {
                     ls: lsPluginEnabled,
-                    cfgEnabled: js_siteConfig.CONST_WS_PLUGIN_ENABLED === true,
+                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true,
                 });
             }
         } catch {
@@ -257,7 +257,7 @@ class CAndruavAuth {
             const ok = await this.#loginViaPlugin(p_userName, p_accessCode);
             if (ok === true) return true;
 
-            if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+            if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
                 return false;
             }
         }
@@ -306,7 +306,7 @@ class CAndruavAuth {
             if (parsed.ok === true) {
                 this._m_logined = true;
                 this._m_session_ID = parsed.sessionId;
-                // `partyId` is only returned by WebPlugin login (/w/wl/) as `plugin_party_id` (preferred) / `pid` (legacy).
+                // `partyId` is only returned by WebConnector login (/w/wl/) as `plugin_party_id` (preferred) / `pid` (legacy).
                 // Cloud login does not return it.
                 // It is used later ONLY when connecting to plugin WSS.
                 this._m_party_ID = parsed.partyId;
@@ -361,8 +361,8 @@ class CAndruavAuth {
         const pluginWsHost = this.fn_getPluginWSHost();
         const pluginWsPort = this.fn_getPluginWSPort();
 
-        const pluginSecure = js_siteConfig.CONST_WS_PLUGIN_SECURE === true;
-        const pluginBasePath = js_siteConfig.CONST_WS_PLUGIN_BASE_PATH;
+        const pluginSecure = js_siteConfig.CONST_WEBCONNECTOR_SECURE === true;
+        const pluginBasePath = js_siteConfig.CONST_WEBCONNECTOR_BASE_PATH;
         const pluginLoginUrl = fn_buildAuthUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
         const pluginHealthBaseUrl = fn_buildHealthBaseUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath);
 
@@ -374,14 +374,14 @@ class CAndruavAuth {
 
         const probeResult = await this.fn_probeServer(pluginHealthBaseUrl, headers);
         if (!probeResult.success) {
-            console.warn('[WebPlugin] probe failed', {
+            console.warn('[WebConnector] probe failed', {
                 baseUrl: pluginHealthBaseUrl,
                 ssl: probeResult.isSslError === true,
             });
             return false;
         }
 
-        console.info('[WebPlugin] probe OK', { baseUrl: pluginHealthBaseUrl });
+        console.info('[WebConnector] probe OK', { baseUrl: pluginHealthBaseUrl });
 
         try {
             this.m_username = p_userName;
@@ -405,13 +405,13 @@ class CAndruavAuth {
             const parsed = fn_parseLoginResponse(response);
             if (parsed.ok !== true) {
                 this._m_logined = false;
-                console.warn('[WebPlugin] plugin login reply not OK', {
+                console.warn('[WebConnector] login reply not OK', {
                     httpOk: fetchRes.ok === true,
                     status: fetchRes.status,
                     e: parsed.error,
                     em: parsed.errorMessage,
                 });
-                if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+                if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
                     js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                         e: parsed.error ?? ERROR_CODES.UNKNOWN_ERROR,
                         em: parsed.errorMessage || 'Plugin login failed',
@@ -436,7 +436,7 @@ class CAndruavAuth {
                 js_localStorage.fn_setUnitIDShared(parsed.partyId);
             }
 
-            console.info('[WebPlugin] login response', {
+            console.info('[WebConnector] login response', {
                 receivedPartyId: parsed.partyId,
                 storedPartyId: this._m_party_ID,
                 savedToLocalStorage: !!parsed.partyId,
@@ -448,8 +448,8 @@ class CAndruavAuth {
             return true;
         } catch (error) {
             this._m_logined = false;
-            console.error('[WebPlugin] plugin login exception', error);
-            if (js_siteConfig.CONST_WS_PLUGIN_AUTO_FALLBACK !== true) {
+            console.error('[WebConnector] login exception', error);
+            if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                     e: ERROR_CODES.NETWORK_ERROR,
                     em: 'Plugin connection failed',

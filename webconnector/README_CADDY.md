@@ -93,13 +93,13 @@ droneengage-webconnector-caddy --caddyfile ~/.droneengage/webconnector/Caddyfile
 
 In the WebClient `public/config.json`:
 
-- `CONST_WS_PLUGIN_AUTH_HOST`: `localhost`
-- `CONST_WS_PLUGIN_AUTH_PORT`: `9443`
-- `CONST_WS_PLUGIN_WS_PORT`: `9443`
-- `CONST_WS_PLUGIN_SECURE`: `true`
-- `CONST_WS_PLUGIN_BASE_PATH`: `/api`
+- `CONST_WEBCONNECTOR_AUTH_HOST`: `localhost`
+- `CONST_WEBCONNECTOR_AUTH_PORT`: `9443`
+- `CONST_WEBCONNECTOR_WS_PORT`: `9443`
+- `CONST_WEBCONNECTOR_SECURE`: `true`
+- `CONST_WEBCONNECTOR_BASE_PATH`: `/api`
 
-`CONST_WS_PLUGIN_APIKEY` and `CONST_WS_PLUGIN_TOKEN` must match `apiKey` and `pluginToken` in the WebConnector config.
+`CONST_WEBCONNECTOR_APIKEY` and `CONST_WEBCONNECTOR_TOKEN` must match `apiKey` and `pluginToken` in the WebConnector config.
 
 ## Troubleshooting
 
@@ -111,5 +111,5 @@ Make sure `auto_https disable_redirects` exists at the top of the Caddyfile.
 
 WebConnector requires `x-de-api-key` (or `k=` in WS query string). Ensure:
 
-- WebClient `CONST_WS_PLUGIN_APIKEY` == WebConnector `apiKey`
-- WebClient `CONST_WS_PLUGIN_TOKEN` == WebConnector `pluginToken`
+- WebClient `CONST_WEBCONNECTOR_APIKEY` == WebConnector `apiKey`
+- WebClient `CONST_WEBCONNECTOR_TOKEN` == WebConnector `pluginToken`

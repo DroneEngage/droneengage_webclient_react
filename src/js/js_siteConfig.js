@@ -21,15 +21,16 @@ export let CONST_TEST_MODE_PORT = '19408';
 export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
-export let CONST_WS_PLUGIN_ENABLED = false;
-export let CONST_WS_PLUGIN_AUTH_HOST = '127.0.0.1';
-export let CONST_WS_PLUGIN_AUTH_PORT = 9211;
-export let CONST_WS_PLUGIN_WS_PORT = 9212;
-export let CONST_WS_PLUGIN_APIKEY = '';
-export let CONST_WS_PLUGIN_TOKEN = '';
-export let CONST_WS_PLUGIN_AUTO_FALLBACK = true;
-export let CONST_WS_PLUGIN_SECURE = true;
-export let CONST_WS_PLUGIN_BASE_PATH = '';
+export let CONST_WEBCONNECTOR_ENABLED = false;
+export let CONST_WEBCONNECTOR_AUTH_HOST = '127.0.0.1';
+export let CONST_WEBCONNECTOR_AUTH_PORT = 9211;
+export let CONST_WEBCONNECTOR_WS_PORT = 9212;
+export let CONST_WEBCONNECTOR_APIKEY = '';
+export let CONST_WEBCONNECTOR_TOKEN = '';
+// Auto fallback to cloud login when plugin is unreachable (true=enable fallback, false=plugin only)
+export let CONST_WEBCONNECTOR_AUTO_FALLBACK = true;
+export let CONST_WEBCONNECTOR_SECURE = true;
+export let CONST_WEBCONNECTOR_BASE_PATH = '';
 
 /**
  * Links that are used in Header
@@ -57,6 +58,8 @@ export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/sate
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
 export let CONST_DONT_BROADCAST_GCS_LOCATION = false;
 
+// Enable webconnector reverse proxy for local development (true=enable Caddy proxy)
+export let CONST_WEBCONNECTOR_ENABLE = false;
 
 export let CONST_DEBUG_CONTROL_PAGE = true;
 export let CONST_MODULE_VERSIONS = {
@@ -129,23 +132,23 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
         if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
-        if (data.CONST_WS_PLUGIN_ENABLED !== undefined) CONST_WS_PLUGIN_ENABLED = data.CONST_WS_PLUGIN_ENABLED;
-        if (data.CONST_WS_PLUGIN_AUTH_HOST !== undefined) CONST_WS_PLUGIN_AUTH_HOST = data.CONST_WS_PLUGIN_AUTH_HOST;
-        if (data.CONST_WS_PLUGIN_AUTH_PORT !== undefined) CONST_WS_PLUGIN_AUTH_PORT = data.CONST_WS_PLUGIN_AUTH_PORT;
-        if (data.CONST_WS_PLUGIN_WS_PORT !== undefined) CONST_WS_PLUGIN_WS_PORT = data.CONST_WS_PLUGIN_WS_PORT;
-        if (data.CONST_WS_PLUGIN_APIKEY !== undefined) CONST_WS_PLUGIN_APIKEY = data.CONST_WS_PLUGIN_APIKEY;
-        if (data.CONST_WS_PLUGIN_TOKEN !== undefined) CONST_WS_PLUGIN_TOKEN = data.CONST_WS_PLUGIN_TOKEN;
-        if (data.CONST_WS_PLUGIN_AUTO_FALLBACK !== undefined) CONST_WS_PLUGIN_AUTO_FALLBACK = data.CONST_WS_PLUGIN_AUTO_FALLBACK;
-        if (data.CONST_WS_PLUGIN_SECURE !== undefined) CONST_WS_PLUGIN_SECURE = data.CONST_WS_PLUGIN_SECURE;
-        if (data.CONST_WS_PLUGIN_BASE_PATH !== undefined) CONST_WS_PLUGIN_BASE_PATH = data.CONST_WS_PLUGIN_BASE_PATH;
-
+        if (data.CONST_WEBCONNECTOR_ENABLED !== undefined) CONST_WEBCONNECTOR_ENABLED = data.CONST_WEBCONNECTOR_ENABLED;
+        if (data.CONST_WEBCONNECTOR_AUTH_HOST !== undefined) CONST_WEBCONNECTOR_AUTH_HOST = data.CONST_WEBCONNECTOR_AUTH_HOST;
+        if (data.CONST_WEBCONNECTOR_AUTH_PORT !== undefined) CONST_WEBCONNECTOR_AUTH_PORT = data.CONST_WEBCONNECTOR_AUTH_PORT;
+        if (data.CONST_WEBCONNECTOR_WS_PORT !== undefined) CONST_WEBCONNECTOR_WS_PORT = data.CONST_WEBCONNECTOR_WS_PORT;
+        if (data.CONST_WEBCONNECTOR_APIKEY !== undefined) CONST_WEBCONNECTOR_APIKEY = data.CONST_WEBCONNECTOR_APIKEY;
+        if (data.CONST_WEBCONNECTOR_TOKEN !== undefined) CONST_WEBCONNECTOR_TOKEN = data.CONST_WEBCONNECTOR_TOKEN;
+        if (data.CONST_WEBCONNECTOR_AUTO_FALLBACK !== undefined) CONST_WEBCONNECTOR_AUTO_FALLBACK = data.CONST_WEBCONNECTOR_AUTO_FALLBACK;
+        if (data.CONST_WEBCONNECTOR_SECURE !== undefined) CONST_WEBCONNECTOR_SECURE = data.CONST_WEBCONNECTOR_SECURE;
+        if (data.CONST_WEBCONNECTOR_BASE_PATH !== undefined) CONST_WEBCONNECTOR_BASE_PATH = data.CONST_WEBCONNECTOR_BASE_PATH;
+        if (data.CONST_WEBCONNECTOR_ENABLE !== undefined) CONST_WEBCONNECTOR_ENABLE = data.CONST_WEBCONNECTOR_ENABLE;
+        
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
 
         if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
         if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
         if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
-
         if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
         if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
         if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS };

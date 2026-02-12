@@ -115,13 +115,13 @@ node src/index.js
 
 ```json
 {
-  "CONST_WS_PLUGIN_ENABLED": true,
-  "CONST_WS_PLUGIN_AUTH_HOST": "192.168.1.100",  // Plugin server IP (LAN) or "localhost"
-  "CONST_WS_PLUGIN_AUTH_PORT": 9211,
-  "CONST_WS_PLUGIN_WS_PORT": 9212,
-  "CONST_WS_PLUGIN_APIKEY": "your-secure-api-key-here",  // Must match plugin apiKey
-  "CONST_WS_PLUGIN_TOKEN": "static-plugin-token-12345",   // Must match plugin pluginToken
-  "CONST_WS_PLUGIN_AUTO_FALLBACK": false
+  "CONST_WEBCONNECTOR_ENABLED": true,
+  "CONST_WEBCONNECTOR_AUTH_HOST": "192.168.1.100",  // Plugin server IP (LAN) or "localhost"
+  "CONST_WEBCONNECTOR_AUTH_PORT": 9211,
+  "CONST_WEBCONNECTOR_WS_PORT": 9212,
+  "CONST_WEBCONNECTOR_APIKEY": "your-secure-api-key-here",  // Must match plugin apiKey
+  "CONST_WEBCONNECTOR_TOKEN": "static-plugin-token-12345",   // Must match plugin pluginToken
+  "CONST_WEBCONNECTOR_AUTO_FALLBACK": false
 }
 ```
 
@@ -170,10 +170,10 @@ Edit `webconnector/config.json`:
 #### 3. Configure Web Client
 
 Edit `public/config.json`:
-- Set `CONST_WS_PLUGIN_ENABLED` to `true`
-- Set `CONST_WS_PLUGIN_AUTH_HOST` to plugin server IP
-- Set `CONST_WS_PLUGIN_APIKEY` to match plugin's `apiKey`
-- Set `CONST_WS_PLUGIN_TOKEN` to match plugin's `pluginToken`
+- Set `CONST_WEBCONNECTOR_ENABLED` to `true`
+- Set `CONST_WEBCONNECTOR_AUTH_HOST` to plugin server IP
+- Set `CONST_WEBCONNECTOR_APIKEY` to match plugin's `apiKey`
+- Set `CONST_WEBCONNECTOR_TOKEN` to match plugin's `pluginToken`
 
 #### 4. Start Plugin
 
@@ -287,7 +287,7 @@ kill -9 <PID>
 2. Verify `apiKey` matches in both configs
 3. Verify `pluginToken` matches in both configs
 4. Check firewall allows ports 9211, 9212
-5. Verify `CONST_WS_PLUGIN_AUTH_HOST` is correct IP
+5. Verify `CONST_WEBCONNECTOR_AUTH_HOST` is correct IP
 
 ### Upstream connection fails
 

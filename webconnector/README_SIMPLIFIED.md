@@ -85,15 +85,15 @@ Web Client → Direct WSS Connect (9212) with static token
 
 ```json
 {
-  "CONST_WS_PLUGIN_ENABLED": true,
-  "CONST_WS_PLUGIN_AUTH_HOST": "127.0.0.1",
-  "CONST_WS_PLUGIN_WS_PORT": 9212,
-  "CONST_WS_PLUGIN_APIKEY": "your-secure-api-key-here",
-  "CONST_WS_PLUGIN_TOKEN": "static-plugin-token-12345"
+  "CONST_WEBCONNECTOR_ENABLED": true,
+  "CONST_WEBCONNECTOR_AUTH_HOST": "127.0.0.1",
+  "CONST_WEBCONNECTOR_WS_PORT": 9212,
+  "CONST_WEBCONNECTOR_APIKEY": "your-secure-api-key-here",
+  "CONST_WEBCONNECTOR_TOKEN": "static-plugin-token-12345"
 }
 ```
 
-**Note**: `CONST_WS_PLUGIN_AUTH_HOST` is still used to determine the WSS host, but no auth endpoint is called.
+**Note**: `CONST_WEBCONNECTOR_AUTH_HOST` is still used to determine the WSS host, but no auth endpoint is called.
 
 ## Setup Instructions
 
@@ -129,9 +129,9 @@ Edit `webconnector/config.json`:
 #### Configure Web Client
 
 Edit `public/config.json`:
-- Set `CONST_WS_PLUGIN_TOKEN` to **match** plugin's `pluginToken`
-- Set `CONST_WS_PLUGIN_APIKEY` to **match** plugin's `apiKey`
-- Set `CONST_WS_PLUGIN_ENABLED` to `true`
+- Set `CONST_WEBCONNECTOR_TOKEN` to **match** plugin's `pluginToken`
+- Set `CONST_WEBCONNECTOR_APIKEY` to **match** plugin's `apiKey`
+- Set `CONST_WEBCONNECTOR_ENABLED` to `true`
 
 #### Start Plugin
 
@@ -186,10 +186,10 @@ wss://127.0.0.1:9212?f=<pluginToken>&s=<sessionId>&at=g&k=<apiKey>
 ```
 
 Where:
-- `f` = Plugin token (from `CONST_WS_PLUGIN_TOKEN`)
+- `f` = Plugin token (from `CONST_WEBCONNECTOR_TOKEN`)
 - `s` = Session ID (generated locally or from shared unit ID)
 - `at` = Account type (`g` for GCS)
-- `k` = API key (from `CONST_WS_PLUGIN_APIKEY`)
+- `k` = API key (from `CONST_WEBCONNECTOR_APIKEY`)
 
 ## Security
 
@@ -208,7 +208,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 1. **Update both configs** with the same tokens
 2. **Set plugin bindAddress** to `0.0.0.0`
-3. **Update web client** `CONST_WS_PLUGIN_AUTH_HOST` to plugin server IP
+3. **Update web client** `CONST_WEBCONNECTOR_AUTH_HOST` to plugin server IP
 4. **Use firewall rules** to restrict access:
    ```bash
    sudo ufw allow from 192.168.1.0/24 to any port 9212
@@ -242,11 +242,11 @@ Multiple browser tabs/instances can connect simultaneously:
 
 2. **Check tokens match**:
    - `webconnector/config.json` → `pluginToken`
-   - `public/config.json` → `CONST_WS_PLUGIN_TOKEN`
+   - `public/config.json` → `CONST_WEBCONNECTOR_TOKEN`
 
 3. **Check API key matches**:
    - `webconnector/config.json` → `apiKey`
-   - `public/config.json` → `CONST_WS_PLUGIN_APIKEY`
+   - `public/config.json` → `CONST_WEBCONNECTOR_APIKEY`
 
 4. **Check browser console** for connection URL (tokens redacted)
 
@@ -281,7 +281,7 @@ If you were using the auth endpoint approach:
 
 1. ✅ Remove `#loginViaPlugin()` calls (already done)
 2. ✅ Add `pluginToken` to plugin config
-3. ✅ Add `CONST_WS_PLUGIN_TOKEN` to web client config
+3. ✅ Add `CONST_WEBCONNECTOR_TOKEN` to web client config
 4. ✅ Ensure both tokens match
 5. ✅ Restart plugin and web client
 

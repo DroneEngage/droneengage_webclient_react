@@ -366,14 +366,14 @@ class CAndruavClientWS {
             this.server_accessCode = p_accesscode;
 
             let url = null;
-            const lsPluginEnabled = js_localStorage.fn_getWSPluginEnabled();
-            const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WS_PLUGIN_ENABLED === true);
+            const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
+            const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true);
             const isPluginTarget = usePlugin === true;
-            const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WS_PLUGIN_APIKEY : '';
+            const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WEBCONNECTOR_APIKEY : '';
             const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
 
             if (usePlugin === true) {
-                const wsProtocol = js_siteConfig.CONST_WS_PLUGIN_SECURE === true ? 'wss' : 'ws';
+                const wsProtocol = js_siteConfig.CONST_WEBCONNECTOR_SECURE === true ? 'wss' : 'ws';
                 const port = this.m_server_port;
                 url = wsProtocol + '://' + this.m_server_ip + ':' + port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
             } else {
@@ -437,7 +437,7 @@ class CAndruavClientWS {
 
                     if (isPluginTarget === true) {
                         try {
-                            console.info('[WebPlugin][WS] forcing CONNECTED/REGISTERED on open');
+                            console.info('[WebConnector][WS] forcing CONNECTED/REGISTERED on open');
                         } catch {
                         }
                         Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
