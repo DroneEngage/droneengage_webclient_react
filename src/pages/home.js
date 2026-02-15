@@ -8,7 +8,7 @@ import '../css/css_gamepad.css';
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation , withTranslation} from 'react-i18next';
 
 
@@ -29,14 +29,27 @@ import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
 import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
 import { fn_on_ready } from '../js/js_main';
+import Cesium3DView from '../components/map3d/Cesium3DView.jsx';
+import { CONST_ENABLE_3D_VIEW } from '../js/js_siteConfig';
+import { js_leafletmap } from '../js/js_leafletmap';
 
 const Home = () => {
   const { t } = useTranslation('home'); // Use home namespace
+  const [is3DMode, setIs3DMode] = useState(false);
 
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
     fn_on_ready();
   }, []);
+
+
+  useEffect(() => {
+    if (!is3DMode) {
+      setTimeout(() => {
+        js_leafletmap.fn_invalidateSize();
+      }, 200);
+    }
+  }, [is3DMode]);
 
   return (
     <div>
@@ -50,9 +63,26 @@ const Home = () => {
                 &nbsp;
               </div>
               <div id="div_cmp_hud"></div>
-              <div className="monitorview" id="div_map_view">
+              {CONST_ENABLE_3D_VIEW && (
+                <div className="css_3d_toggle_box">
+                  <button
+                    id="btn3DViewToggle"
+                    type="button"
+                    className={`btn btn-sm ${is3DMode ? 'btn-warning' : 'btn-outline-light'}`}
+                    onClick={() => setIs3DMode((v) => !v)}
+                  >
+                    {is3DMode ? '2D Map' : '3D View'}
+                  </button>
+                </div>
+              )}
+              <div className="monitorview" id="div_map_view" style={{ display: is3DMode ? 'none' : 'block' }}>
                 <div id="mapid" className="org_border fullscreen"></div>
               </div>
+              {CONST_ENABLE_3D_VIEW && is3DMode && (
+                <div className="monitorview" id="div_map_view_3d">
+                  <Cesium3DView />
+                </div>
+              )}
               <div className="cameraview" id="div_video_control">
                 <ClssCVideoControl />
               </div>

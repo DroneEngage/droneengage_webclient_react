@@ -32,6 +32,13 @@ export let CONST_WEBCONNECTOR_AUTO_FALLBACK = true;
 export let CONST_WEBCONNECTOR_SECURE = true;
 export let CONST_WEBCONNECTOR_BASE_PATH = '';
 
+// 3D map settings
+export let CONST_ENABLE_3D_VIEW = false;
+export let CONST_3D_PROVIDER = 'cesium';
+export let CONST_CESIUM_SCRIPT_URL = 'https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Cesium.js';
+export let CONST_CESIUM_CSS_URL = 'https://cesium.com/downloads/cesiumjs/releases/1.120/Build/Cesium/Widgets/widgets.css';
+export let CONST_CESIUM_ION_TOKEN = '';
+
 /**
  * Links that are used in Header
  */
@@ -142,6 +149,12 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_WEBCONNECTOR_SECURE !== undefined) CONST_WEBCONNECTOR_SECURE = data.CONST_WEBCONNECTOR_SECURE;
         if (data.CONST_WEBCONNECTOR_BASE_PATH !== undefined) CONST_WEBCONNECTOR_BASE_PATH = data.CONST_WEBCONNECTOR_BASE_PATH;
         if (data.CONST_WEBCONNECTOR_ENABLE !== undefined) CONST_WEBCONNECTOR_ENABLE = data.CONST_WEBCONNECTOR_ENABLE;
+
+        if (data.CONST_ENABLE_3D_VIEW !== undefined) CONST_ENABLE_3D_VIEW = data.CONST_ENABLE_3D_VIEW;
+        if (data.CONST_3D_PROVIDER !== undefined) CONST_3D_PROVIDER = data.CONST_3D_PROVIDER;
+        if (data.CONST_CESIUM_SCRIPT_URL !== undefined) CONST_CESIUM_SCRIPT_URL = data.CONST_CESIUM_SCRIPT_URL;
+        if (data.CONST_CESIUM_CSS_URL !== undefined) CONST_CESIUM_CSS_URL = data.CONST_CESIUM_CSS_URL;
+        if (data.CONST_CESIUM_ION_TOKEN !== undefined) CONST_CESIUM_ION_TOKEN = data.CONST_CESIUM_ION_TOKEN;
         
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
