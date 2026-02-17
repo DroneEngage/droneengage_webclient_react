@@ -18,5 +18,9 @@
   "layoutSmall": {
     "label": "affichage-{{mode}}",
     "title": "Modifier la disposition de l'écran"
+  },
+  "map3d": {
+    "label": "Vue 3D",
+    "title": "Afficher la carte 3D"
   }
 }
