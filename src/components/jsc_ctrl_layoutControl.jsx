@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { js_localStorage } from '../js/js_localStorage';
-import { fn_showSettings, fn_showMap, fn_showVideoMainTab, fn_showControl } from '../js/js_main';
+import { fn_showSettings, fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/js_main';
 import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx';
 
 class ClssCtrlLayout extends React.Component {
@@ -33,6 +33,15 @@ class ClssCtrlLayout extends React.Component {
                     onClick={(e) => fn_showMap()}
                 >
                     <strong>{t('ctrlLayout:map.label')}</strong>
+                </button>
+                <button
+                    type="button"
+                    id="btn_showMap3D"
+                    className="btn btn-secondary btn-sm bi bi-badge-3d"
+                    title={t('ctrlLayout:map3d.title')}
+                    onClick={(e) => fn_showMap3D()}
+                >
+                    <strong>{t('ctrlLayout:map3d.label')}</strong>
                 </button>
                 <button
                     type="button"

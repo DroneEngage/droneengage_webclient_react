@@ -53,6 +53,9 @@ const Home = () => {
               <div className="monitorview" id="div_map_view">
                 <div id="mapid" className="org_border fullscreen"></div>
               </div>
+              <div className="monitorview" id="div_map3d_view" style={{ display: 'none' }}>
+                <div id="mapid3d" className="org_border fullscreen"></div>
+              </div>
               <div className="cameraview" id="div_video_control">
                 <ClssCVideoControl />
               </div>
