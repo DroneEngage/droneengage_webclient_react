@@ -18,5 +18,9 @@
   "layoutSmall": {
     "label": "pantalla-{{mode}}",
     "title": "Cambiar Diseño de Pantalla"
+  },
+  "map3d": {
+    "label": "Vista 3D",
+    "title": "Mostrar vista de mapa 3D"
   }
 }

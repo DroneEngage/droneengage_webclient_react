@@ -24,8 +24,64 @@ class CLeafLetAndruavMap {
         this.m_isMapInit = false;
         this.m_elevator = null;
         this.m_markGuided = null;
+        this.m_urlSyncEnabled = false;
+        this.m_suppressHashUpdate = false;
 
     };
+
+    fn_parseMapHash() {
+        const hash = (window.location.hash || '').replace(/^#/, '').trim();
+        if (!hash) return null;
+
+        const values = hash.split('/').map(Number);
+        if (values.length < 3 || values.some(Number.isNaN)) return null;
+
+        const [zoom, lat, lng] = values;
+        if (!Number.isFinite(zoom) || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return null;
+        }
+
+        return { zoom, lat, lng };
+    }
+
+    fn_updateUrlHashFromMap() {
+        if (this.m_Map == null || this.m_suppressHashUpdate === true) return;
+
+        const center = this.m_Map.getCenter();
+        const zoom = this.m_Map.getZoom();
+        const hash = `${zoom.toFixed(2)}/${center.lat.toFixed(6)}/${center.lng.toFixed(6)}`;
+
+        if (window.location.hash !== `#${hash}`) {
+            window.history.replaceState(null, '', `#${hash}`);
+        }
+    }
+
+    fn_applyHashToMap() {
+        if (this.m_Map == null) return;
+
+        const mapState = this.fn_parseMapHash();
+        if (!mapState) return;
+
+        this.m_suppressHashUpdate = true;
+        this.m_Map.setView([mapState.lat, mapState.lng], mapState.zoom, { animate: false });
+        this.m_suppressHashUpdate = false;
+    }
+
+    fn_enableMapUrlSync() {
+        if (this.m_Map == null || this.m_urlSyncEnabled === true) return;
+
+        this.m_Map.on('moveend zoomend', () => {
+            this.fn_updateUrlHashFromMap();
+        });
+
+        window.addEventListener('hashchange', () => {
+            this.fn_applyHashToMap();
+        });
+
+        this.m_urlSyncEnabled = true;
+        this.fn_applyHashToMap();
+        this.fn_updateUrlHashFromMap();
+    }
 
     static getInstance() {
         if (!CLeafLetAndruavMap.instance) {
@@ -194,6 +250,7 @@ class CLeafLetAndruavMap {
 
 
         this.m_isMapInit = true;
+        this.fn_enableMapUrlSync();
     };
 
     /*

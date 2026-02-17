@@ -18,5 +18,9 @@
   "layoutSmall": {
     "label": "display-{{mode}}",
     "title": "Change Screen Layout"
+  },
+  "map3d": {
+    "label": "3D view",
+    "title": "Show 3D map view"
   }
 }

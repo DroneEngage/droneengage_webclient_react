@@ -1483,3 +1483,20 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
  .btn.bg-dark:active {
    filter: brightness(.85);
  }
+
+.css_map3d_marker {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.css_map3d_marker_icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
+}
