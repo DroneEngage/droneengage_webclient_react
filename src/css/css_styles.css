@@ -1490,6 +1490,7 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
   display: flex;
   align-items: center;
   justify-content: center;
+  transform-origin: center center;
 }
 
 .css_map3d_marker_icon {
@@ -1499,4 +1500,5 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
   background-repeat: no-repeat;
   background-position: center;
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
+  transform-origin: center center;
 }
