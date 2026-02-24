@@ -7,6 +7,86 @@ class CAndruavMap3D {
         this.m_markers = new Map();
         this.m_isVisible = false;
         this.m_hasAutoFocusedUnit = false;
+        this.m_mapDblClickCallbacks = [];
+        this.m_isMapDblClickBound = false;
+    }
+
+    fn_registerMapDblClickHandler() {
+        if (!this.m_map || this.m_isMapDblClickBound === true) return;
+
+        this.m_map.on('dblclick', (event) => {
+            const lngLat = event && event.lngLat ? event.lngLat : null;
+            if (!lngLat) return;
+
+            const lat = lngLat.lat;
+            const lng = lngLat.lng;
+
+            const len = this.m_mapDblClickCallbacks.length;
+            for (let i = 0; i < len; ++i) {
+                this.m_mapDblClickCallbacks[i](lat, lng);
+            }
+        });
+
+        this.m_isMapDblClickBound = true;
+    }
+
+    fn_addListenerOnDblClickMap(p_callback) {
+        if (!p_callback) return;
+        this.m_mapDblClickCallbacks.push(p_callback);
+        this.fn_registerMapDblClickHandler();
+    }
+
+    fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng) {
+        if (!this.m_map) return null;
+
+        this.fn_hideInfoWindow(p_infoWindow);
+
+        const popup = new window.mapboxgl.Popup({ closeOnClick: true })
+            .setLngLat([p_lng, p_lat]);
+
+        if (typeof p_content === 'string') {
+            popup.setHTML(p_content);
+        }
+        else if (p_content instanceof HTMLElement) {
+            popup.setDOMContent(p_content);
+        }
+
+        if (typeof popup.on === 'function') {
+            const originalOn = popup.on.bind(popup);
+            popup.on = function (eventName, callback) {
+                if (eventName === 'remove') {
+                    return originalOn('close', callback);
+                }
+                return originalOn(eventName, callback);
+            };
+        }
+
+        popup.addTo(this.m_map);
+        return popup;
+    }
+
+    fn_bindPopup(p_infoWindow, p_content, p_lat, p_lng) {
+        if (!p_infoWindow) return null;
+
+        if (typeof p_lat === 'number' && typeof p_lng === 'number') {
+            p_infoWindow.setLngLat([p_lng, p_lat]);
+        }
+
+        if (typeof p_content === 'string') {
+            p_infoWindow.setHTML(p_content);
+        }
+        else if (p_content instanceof HTMLElement) {
+            p_infoWindow.setDOMContent(p_content);
+        }
+
+        return p_infoWindow;
+    }
+
+    fn_hideInfoWindow(p_infoWindow) {
+        if (!p_infoWindow) return;
+        if (typeof p_infoWindow.remove === 'function') {
+            p_infoWindow.remove();
+        }
     }
 
     async fn_loadMapboxSdk() {
@@ -61,8 +141,11 @@ class CAndruavMap3D {
             zoom: 15.47,
             pitch: 53,
             bearing: 0,
-            antialias: true
+            antialias: true,
+            doubleClickZoom: false
         });
+
+        this.fn_registerMapDblClickHandler();
 
         this.m_map.on('style.load', () => {
             const hasBuildingLayer = this.m_map.getLayer('add-3d-buildings');
@@ -101,6 +184,60 @@ class CAndruavMap3D {
         this.m_isVisible = false;
     }
 
+    fn_getUnitMarker(unit) {
+        if (!unit) return null;
+        return this.m_markers.get(unit.getPartyID()) || null;
+    }
+
+    fn_addListenerOnMarker(p_marker, p_callback, p_event) {
+        if (!p_marker || !p_callback) return;
+
+        const markerElement = p_marker.getElement ? p_marker.getElement() : null;
+        if (!markerElement) return;
+
+        if (p_marker.m_event_handlers === undefined) {
+            p_marker.m_event_handlers = {};
+        }
+
+        if (p_marker.m_event_handlers[p_event] === undefined) {
+            p_marker.m_event_handlers[p_event] = [];
+        }
+
+        const handler = () => {
+            const lngLat = p_marker.getLngLat ? p_marker.getLngLat() : null;
+            if (!lngLat) return;
+            p_callback(lngLat.lat, lngLat.lng);
+        };
+
+        p_marker.m_event_handlers[p_event].push(handler);
+        markerElement.addEventListener(p_event, handler);
+    }
+
+    fn_addListenerOnClickMarker(p_marker, p_callback) {
+        this.fn_addListenerOnMarker(p_marker, p_callback, 'click');
+    }
+
+    fn_addListenerOnMouseOverMarker(p_marker, p_callback) {
+        this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseover');
+    }
+
+    fn_addListenerOnMouseOutMarker(p_marker, p_callback) {
+        this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseout');
+    }
+
+    fn_removeListenerOnMouseOutClickMarker(p_marker) {
+        if (!p_marker || !p_marker.m_event_handlers || !p_marker.m_event_handlers.mouseout) return;
+
+        const markerElement = p_marker.getElement ? p_marker.getElement() : null;
+        if (!markerElement) return;
+
+        p_marker.m_event_handlers.mouseout.forEach((handler) => {
+            markerElement.removeEventListener('mouseout', handler);
+        });
+
+        p_marker.m_event_handlers.mouseout = [];
+    }
+
     fn_focusUnit(unit) {
         if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
         const { lat, lng } = unit.m_Nav_Info.p_Location;
@@ -126,12 +263,27 @@ class CAndruavMap3D {
             const el = document.createElement('div');
             el.className = 'css_map3d_marker';
             el.title = unit.m_unitName || id;
+            el.style.transformOrigin = 'center center';
 
             const iconEl = document.createElement('div');
             iconEl.className = 'css_map3d_marker_icon';
+            iconEl.style.transformOrigin = 'center center';
             el.appendChild(iconEl);
 
-            marker = new window.mapboxgl.Marker({ element: el, rotationAlignment: 'map', anchor: 'center' });
+            marker = new window.mapboxgl.Marker({
+                element: el,
+                rotationAlignment: 'map',
+                pitchAlignment: 'map',
+                anchor: 'center'
+            });
+
+            if (typeof marker.setRotationAlignment === 'function') {
+                marker.setRotationAlignment('map');
+            }
+
+            if (typeof marker.setPitchAlignment === 'function') {
+                marker.setPitchAlignment('map');
+            }
             
             // Set position before adding to map
             marker.setLngLat([lng, lat]);
@@ -165,8 +317,20 @@ class CAndruavMap3D {
 
         const yaw = unit?.m_Nav_Info?.p_Orientation?.yaw;
         if (Number.isFinite(yaw)) {
-            marker.setRotation(yaw);
+            // Leaflet receives yaw in radians and converts to degrees; do the same here
+            const deg = (yaw * 180 / Math.PI);
+            const normalizedYaw = ((deg % 360) + 360) % 360;
+            if (typeof marker.setRotation === 'function') {
+                marker.setRotation(normalizedYaw);
+            } else {
+                // Fallback: rotate inner icon element if API is unavailable
+                const el = marker.getElement && marker.getElement();
+                const iconEl = el ? el.querySelector('.css_map3d_marker_icon') : null;
+                if (iconEl) iconEl.style.transform = `rotate(${normalizedYaw}deg)`;
+            }
         }
+
+        return marker;
     }
 }
 

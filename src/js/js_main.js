@@ -51,6 +51,7 @@ $.fn.append = function ($el) {
 var v_context_busy = false;
 
 var info_unit_context_popup = null;
+var v_lastHighlightedUnit = null;
 let selectedMissionFilesToRead = "";
 let selectedMissionFilesToWrite = "";
 
@@ -680,6 +681,11 @@ export function fn_showMap3D() {
 	$('#btn_showMap').show();
 	$('#btn_showMap3D').hide();
 	$('#btn_showVideo').show();
+}
+
+function fn_onMap3dDblClick(p_lat, p_lng) {
+	if (js_globals.CONST_MAP_EDITOR === true) return;
+	fn_generateContextMenuHTML(p_lat, p_lng);
 }
 
 export function fn_showSettings() {
@@ -1832,6 +1838,8 @@ function hlp_generateFlyHereMenu(lat, lng) {
 function fn_generateContextMenuHTML(v_lat, v_lng) {
 	if (v_context_busy === true) return;
 
+	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+
 	v_context_busy = true;
 	// Create a temporary container for the popup content
 	const tempContainer = document.createElement('div');
@@ -1849,10 +1857,10 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 				// REACT POPUP LIMITATION: This creates static HTML content
 				// Interactive React elements (links, buttons, events) will not work
 				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
+				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 
 				// now add your div that contains ReactDOM to it.
-				info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
+				info_unit_context_popup = mapAdapter.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
 
 				// now your ReactDom div is under the active popup
 
@@ -1868,6 +1876,8 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 
 function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit) {
 	if (v_context_busy === true) return;
+
+	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
 
 	v_context_busy = true;
 	// Create a temporary container for the popup content
@@ -1887,10 +1897,10 @@ function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_
 				// REACT POPUP LIMITATION: This creates static HTML content
 				// Interactive React elements (links, buttons, events) will not work
 				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
+				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 
 				// now add your div that contains ReactDOM to it.
-				info_unit_context_popup = js_leafletmap.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
+				info_unit_context_popup = mapAdapter.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
 
 				// now your ReactDom div is under the active popup
 
@@ -1910,6 +1920,8 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 
 
 	if (v_context_busy === true) return;
+
+	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
 
 	v_context_busy = true;
 	// Create a temporary container for the popup content
@@ -1941,7 +1953,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 				// Current limitation documented: Static popup content only
 				tempContainer.remove();  // the HTML is not linked to REACT object anymore so links will not be working.
 
-				info_unit_context_popup = js_leafletmap.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
+				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
 				if (v_ignore === true) {
 					info_unit_context_popup.m_ignoreMouseOut = true;
 				}
@@ -1987,6 +1999,7 @@ function initMap() {
 	try {
 		js_leafletmap.fn_initMap('mapid');
 		js_map3d.fn_initMap('mapid3d');
+		js_map3d.fn_addListenerOnDblClickMap(fn_onMap3dDblClick);
 		fn_setLapout();
 		fn_gps_getLocation();
 	}
@@ -2547,6 +2560,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 			js_leafletmap.fn_addListenerOnClickMarker(p_andruavUnit.m_gui.m_marker,
 				function (p_lat, p_lng) {
+					v_lastHighlightedUnit = p_andruavUnit;
 
 					js_eventEmitter.fn_dispatch(js_event.EE_unitHighlighted, p_andruavUnit);
 
@@ -2573,7 +2587,8 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 							clearTimeout(clickTimer);
 							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
 								// hide me if marked hide.
-								js_leafletmap.fn_hideInfoWindow(info_unit_context_popup);
+								const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
 								info_unit_context_popup = null;
 							}
 						});
@@ -2627,7 +2642,51 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 		}
 
 		js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
-		js_map3d.fn_syncUnit(p_andruavUnit, v_image);
+		const marker3d = js_map3d.fn_syncUnit(p_andruavUnit, v_image);
+
+		if (marker3d && p_andruavUnit.m_gui.m_marker3d_events_attached !== true) {
+			p_andruavUnit.m_gui.m_marker3d_events_attached = true;
+
+			js_map3d.fn_addListenerOnClickMarker(marker3d,
+				function (p_lat, p_lng) {
+					v_lastHighlightedUnit = p_andruavUnit;
+
+					js_eventEmitter.fn_dispatch(js_event.EE_unitHighlighted, p_andruavUnit);
+
+					fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, true);
+
+
+				});
+
+			js_map3d.fn_addListenerOnMouseOverMarker(marker3d,
+				function (p_lat, p_lng) {
+
+					if (info_unit_context_popup !== null) return;
+
+
+					let clickTimer = setTimeout(() => {
+						fn_generateContextMenuHTML_MainUnitPopup(p_lat, p_lng, p_andruavUnit, false);
+					}, 200);
+
+					// pointer is over then register in event mouseOut
+					js_map3d.fn_addListenerOnMouseOutMarker(marker3d,
+						function (p_lat, p_lng) {
+							// pointer is out then deregister in mouse-out event.
+							js_map3d.fn_removeListenerOnMouseOutClickMarker(marker3d);
+							clearTimeout(clickTimer);
+							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
+								// hide me if marked hide.
+								const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
+								info_unit_context_popup = null;
+							}
+						});
+
+
+
+
+				});
+		}
 		js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_andruavUnit);
 	}
 	else {
