@@ -53,68 +53,79 @@ import ru_jsc_global_settings from '../locales/ru/jsc_global_settings.json';
 import ar_jsc_global_settings from '../locales/ar/jsc_global_settings.json';
 import fr_jsc_global_settings from '../locales/fr/jsc_global_settings.json';
 
+import en_jsc_viewLinkGimbalControl from '../locales/en/jsc_viewLinkGimbalControl.json';
+import es_jsc_viewLinkGimbalControl from '../locales/es/jsc_viewLinkGimbalControl.json';
+import ru_jsc_viewLinkGimbalControl from '../locales/ru/jsc_viewLinkGimbalControl.json';
+import ar_jsc_viewLinkGimbalControl from '../locales/ar/jsc_viewLinkGimbalControl.json';
+import fr_jsc_viewLinkGimbalControl from '../locales/fr/jsc_viewLinkGimbalControl.json';
+
 
 i18n
   .use(initReactI18next)
   .use(LanguageDetector)
   .init({
     resources: {
-      en: { 
+      en: {
         translation: enTranslation,
         unitBar: enUnitBar,
         home: enHome,
         ctrlLayout: en_jsc_ctrlLayoutControl,
-        unit_control_imu:en_jsc_unit_control_imu,
-        udpProxyTelemetry:en_jsc_ctrl_udp_proxy_telemetry,
-        swarmCtrl:en_jsc_ctrl_swarm,
-        globalSettings:en_jsc_global_settings
+        unit_control_imu: en_jsc_unit_control_imu,
+        udpProxyTelemetry: en_jsc_ctrl_udp_proxy_telemetry,
+        swarmCtrl: en_jsc_ctrl_swarm,
+        globalSettings: en_jsc_global_settings,
+        viewLinkGimbalControl: en_jsc_viewLinkGimbalControl
       },
-      es: { 
+      es: {
         translation: esTranslation,
         unitBar: esUnitBar,
         home: esHome,
         ctrlLayout: es_jsc_ctrlLayoutControl,
-        unit_control_imu:es_jsc_unit_control_imu,
-        udpProxyTelemetry:es_jsc_ctrl_udp_proxy_telemetry,
-        swarmCtrl:es_jsc_ctrl_swarm,
-        globalSettings:es_jsc_global_settings
+        unit_control_imu: es_jsc_unit_control_imu,
+        udpProxyTelemetry: es_jsc_ctrl_udp_proxy_telemetry,
+        swarmCtrl: es_jsc_ctrl_swarm,
+        globalSettings: es_jsc_global_settings,
+        viewLinkGimbalControl: es_jsc_viewLinkGimbalControl
       },
-      ar: { 
+      ar: {
         translation: arTranslation,
         unitBar: arUnitBar,
         home: arHome,
         ctrlLayout: ar_jsc_ctrlLayoutControl,
-        unit_control_imu:ar_jsc_unit_control_imu,
-        udpProxyTelemetry:ar_jsc_ctrl_udp_proxy_telemetry,
-        swarmCtrl:ar_jsc_ctrl_swarm,
-        globalSettings:ar_jsc_global_settings
+        unit_control_imu: ar_jsc_unit_control_imu,
+        udpProxyTelemetry: ar_jsc_ctrl_udp_proxy_telemetry,
+        swarmCtrl: ar_jsc_ctrl_swarm,
+        globalSettings: ar_jsc_global_settings,
+        viewLinkGimbalControl: ar_jsc_viewLinkGimbalControl
       },
-      fr: { 
+      fr: {
         translation: frTranslation,
         unitBar: frUnitBar,
         home: frHome,
         ctrlLayout: fr_jsc_ctrlLayoutControl,
-        unit_control_imu:fr_jsc_unit_control_imu,
-        udpProxyTelemetry:fr_jsc_ctrl_udp_proxy_telemetry,
-        swarmCtrl:fr_jsc_ctrl_swarm,
-        globalSettings:fr_jsc_global_settings
+        unit_control_imu: fr_jsc_unit_control_imu,
+        udpProxyTelemetry: fr_jsc_ctrl_udp_proxy_telemetry,
+        swarmCtrl: fr_jsc_ctrl_swarm,
+        globalSettings: fr_jsc_global_settings,
+        viewLinkGimbalControl: fr_jsc_viewLinkGimbalControl
       },
-      ru: { 
+      ru: {
         translation: ruTranslation,
         unitBar: ruUnitBar,
         home: ruHome,
         ctrlLayout: ru_jsc_ctrlLayoutControl,
-        unit_control_imu:ru_jsc_unit_control_imu,
-        udpProxyTelemetry:ru_jsc_ctrl_udp_proxy_telemetry,
-        swarmCtrl:ru_jsc_ctrl_swarm,
-        globalSettings:ru_jsc_global_settings
+        unit_control_imu: ru_jsc_unit_control_imu,
+        udpProxyTelemetry: ru_jsc_ctrl_udp_proxy_telemetry,
+        swarmCtrl: ru_jsc_ctrl_swarm,
+        globalSettings: ru_jsc_global_settings,
+        viewLinkGimbalControl: ru_jsc_viewLinkGimbalControl
       },
     },
     fallbackLng: 'en', // Default to English
     interpolation: { escapeValue: false }, // React handles escaping
-    detection: { 
+    detection: {
       order: ['localStorage', 'navigator'], // Persist in localStorage, detect from browser
-      caches: ['localStorage'], 
+      caches: ['localStorage'],
     },
   });
 

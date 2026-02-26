@@ -1,0 +1,20 @@
+{
+    "gimbal_control": "Contrôle de Nacelle",
+    "no_unit_selected": "Aucune unité sélectionnée",
+    "laser_off": "Laser OFF",
+    "laser_on": "Laser ON",
+    "tracker_off": "Traceur OFF",
+    "tracker_on": "Traceur ON",
+    "ai_off": "IA OFF",
+    "ai_on": "IA ON",
+    "current_orientation": "Orientation Actuelle:",
+    "vertical": "Vertical:",
+    "horizontal": "Horizontal:",
+    "vertical_control": "Contrôle Vertical:",
+    "horizontal_control": "Contrôle Horizontal:",
+    "read_current_orientation": "Lire l'Orientation Actuelle",
+    "send_to": "Envoyer à ",
+    "drone": "Drone",
+    "clear_selection": "Effacer la Sélection",
+    "opaque": "Opaque"
+}
