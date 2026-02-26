@@ -1,0 +1,93 @@
+# Andruav/DroneEngage WebClient - Project Description
+
+## Overview
+Andruav/DroneEngage WebClient is a browser-based Ground Control Station (GCS) for drone monitoring and control, part of the Ardupilot Cloud Eco System. It provides a comprehensive web interface for real-time drone operations supporting both DroneEngage and Andruav systems.
+
+## Architecture
+- **Frontend Framework**: React 19.1.1 with modern functional components
+- **UI Framework**: Bootstrap 5.3.3 with custom styling
+- **Mapping**: Leaflet 1.8.0 with rotated markers and drawing tools
+- **Communication**: WebSocket-based real-time communication with WebPlugin support
+- **Internationalization**: i18next with support for Arabic, English, French, Spanish, and Russian
+- **Legacy Support**: jQuery 3.7.1 for existing DOM manipulation
+
+## Key Features
+- Real-time drone monitoring and control
+- Interactive map-based visualization with multiple tile sources
+- Multi-language support (i18n) including RTL languages
+- Video streaming and recording via WebRTC
+- Mission planning and waypoint management
+- Gamepad controller support
+- ADS-B traffic integration
+- Swarm/multi-drone operations
+- WebPlugin mode for local deployment
+- Theme system with dark/light modes
+
+## Project Structure
+```
+src/
+├── components/          # React components (login, dialogs, debug)
+├── css/                 # Stylesheets and themes
+├── js/                  # Core JavaScript modules
+│   ├── server_comm/     # WebSocket and server communication
+│   ├── CPC/            # Control Panel Components
+│   ├── gamepad/        # Gamepad integration
+│   └── helpers/        # Utility functions
+├── pages/               # React page components
+└── images/             # Static assets
+```
+
+## Core Modules
+- **Authentication**: `js_andruav_auth.js` - Handles login with WebPlugin fallback
+- **Communication**: `server_comm/js_andruav_ws.js` - WebSocket communication layer
+- **MAVLink**: `js_mavlink_v2.js` - MAVLink protocol parsing
+- **Mapping**: `js_leafletmap.js` - Leaflet map integration
+- **Units**: `js_andruavUnit.js` - Drone unit management
+- **Mission Planning**: `js_plan_mission.js`, `js_plan_fence.js` - Mission and geofence tools
+- **Configuration**: `js_siteConfig.js` - Site and runtime configuration
+
+## WebPlugin Mode
+The application supports WebPlugin deployment for local operations:
+- HTTPS authentication server on port 9443
+- WebSocket hub on port 9212
+- API key authentication for LAN access
+- Automatic fallback to cloud connectivity
+- Shared UnitID storage for multi-tab sessions
+
+## Configuration
+- **Site Config**: `public/config.json` - Runtime settings, server endpoints, feature flags
+- **Module Versions**: Tracks compatible versions for DE, FCB, Andruav, and Camera modules
+- **Feature Flags**: Granular control over experimental features
+- **Map Sources**: Configurable tile providers (Mapbox, Stadia Maps, custom)
+- **WebRTC**: ICE server configuration for video streaming
+
+## Development Setup
+- Node.js v16+ required
+- HTTPS development server with SSL certificates
+- ESLint configuration with React-specific rules
+- Webpack configuration for production builds
+- Legacy OpenSSL provider support for compatibility
+
+## Communication Architecture
+The system follows a modular communication pattern:
+- **WebClient** ↔ **de_comm** (High-level Communication Gateway)
+- **de_comm** ↔ **de_mavlink** (Drone Protocol Handler) via UDP
+- **de_mavlink** ↔ **Physical Drone Interface**
+- **de_common/de_databus** provides shared UDP-based message routing
+
+## Security Features
+- SSL/TLS encryption for development and production
+- API key authentication for WebPlugin mode
+- CORS handling for cross-origin requests
+- Session management with localStorage persistence
+- Captcha integration for login protection
+
+## Target Platforms
+- Modern browsers with ES6+ support
+- Mobile-responsive design
+- Touch-enabled interfaces
+- RTL language support (Arabic)
+- Gamepad controller integration
+
+## Dependencies
+Core runtime dependencies include React ecosystem, Bootstrap, Leaflet mapping, jQuery for legacy support, WebRTC for video, and various specialized libraries for drone operations, gamepad control, and internationalization.
