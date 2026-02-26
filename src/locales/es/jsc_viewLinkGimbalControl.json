@@ -1,0 +1,20 @@
+{
+    "gimbal_control": "Control del Cardán",
+    "no_unit_selected": "Ninguna unidad seleccionada",
+    "laser_off": "Láser OFF",
+    "laser_on": "Láser ON",
+    "tracker_off": "Rastreador OFF",
+    "tracker_on": "Rastreador ON",
+    "ai_off": "IA OFF",
+    "ai_on": "IA ON",
+    "current_orientation": "Orientación Actual:",
+    "vertical": "Vertical:",
+    "horizontal": "Horizontal:",
+    "vertical_control": "Control Vertical:",
+    "horizontal_control": "Control Horizontal:",
+    "read_current_orientation": "Leer Orientación Actual",
+    "send_to": "Enviar a ",
+    "drone": "Dron",
+    "clear_selection": "Borrar Selección",
+    "opaque": "Opaco"
+}
