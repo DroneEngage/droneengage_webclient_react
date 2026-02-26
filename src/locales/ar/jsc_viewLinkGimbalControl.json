@@ -1,0 +1,20 @@
+{
+    "gimbal_control": "تحكم حامل الكاميرا",
+    "no_unit_selected": "لم يتم تحديد وحدة",
+    "laser_off": "إيقاف الليزر",
+    "laser_on": "تشغيل الليزر",
+    "tracker_off": "إيقاف المتتبع",
+    "tracker_on": "تشغيل المتتبع",
+    "ai_off": "إيقاف الذكاء الاصطناعي",
+    "ai_on": "تشغيل الذكاء الاصطناعي",
+    "current_orientation": "الاتجاه الحالي:",
+    "vertical": "عمودي:",
+    "horizontal": "أفقي:",
+    "vertical_control": "التحكم العمودي:",
+    "horizontal_control": "التحكم الأفقي:",
+    "read_current_orientation": "قراءة الاتجاه الحالي",
+    "send_to": "إرسال إلى ",
+    "drone": "طائرة مسيرة",
+    "clear_selection": "مسح التحديد",
+    "opaque": "غير شفاف"
+}
