@@ -74,28 +74,31 @@ class ClssCtrlUnitDetails extends React.Component {
             version_info: v_andruavUnit.m_module_version_info
         };
         const isExpanded = this.state.expandedModule === mainModule.i;
-        const main_module = (<div key={this.key + 'main_module'} className='row'>
-            <div id={this.key + mainModule.i} key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
-                <span>
-                    {isExpanded ? '\u00a0-\u00a0' : '\u00a0+\u00a0'}
-                    {mainModule.d === true ? (
-                        <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
-                    ) : (
-                        <span
-                            className={mainModule.z === -1 ? 'text-warning' : 'text-success'}
-                            title={mainModule.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
-                        >
-                            {mainModule.i}&nbsp;{mainModule.v}
-                            {mainModule.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
-                        </span>
-                    )}
-                    {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}
-                </span>
+        
+        if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION !== true) {
+            const main_module = (<div key={this.key + 'main_module'} className='row'>
+                <div id={this.key + mainModule.i} key={this.key + mainModule.i} onClick={() => this.fn_toggleModuleExpansion(mainModule.i)} style={{ width: '100%' }}>
+                    <span>
+                        {isExpanded ? '\u00a0-\u00a0' : '\u00a0+\u00a0'}
+                        {mainModule.d === true ? (
+                            <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
+                        ) : (
+                            <span
+                                className={mainModule.z === -1 ? 'text-warning' : 'text-success'}
+                                title={mainModule.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
+                            >
+                                {mainModule.i}&nbsp;{mainModule.v}
+                                {mainModule.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                            </span>
+                        )}
+                        {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}
+                    </span>
 
-            </div>
-            <ClssModuleDetails key={this.key + 'mod_' + mainModule.i} module={mainModule} p_unit={this.props.p_unit} isExpanded={isExpanded} t={t} s />
-        </div>);
-        module_version.push(main_module);
+                </div>
+                <ClssModuleDetails key={this.key + 'mod_' + mainModule.i} module={mainModule} p_unit={this.props.p_unit} isExpanded={isExpanded} t={t} s />
+            </div>);
+            module_version.push(main_module);
+        }
 
         if (v_andruavUnit.m_modules.m_list.length === 0) {
             module_version.push(<span key={this.key + 'set_nm'} className='text-warning'>&nbsp;{t('no_modules_connected')} </span>);
