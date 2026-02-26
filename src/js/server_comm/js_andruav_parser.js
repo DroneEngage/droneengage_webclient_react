@@ -259,7 +259,6 @@ class CAndruavClientParser {
         switch (msg.messageType) {
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS: {
-               console.log("CONST_TYPE_AndruavMessage_Target_STATUS");
                p_jmsg = msg.msgPayload;
                
                if (p_jmsg.R === true) { // this is a reply to request.
@@ -282,7 +281,6 @@ class CAndruavClientParser {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Target_STATUS: {
-                console.log("CONST_TYPE_AndruavMessage_Target_STATUS");
                 p_jmsg = msg.msgPayload;
                 p_unit.m_tracker.fn_updateTrackerStatus(p_jmsg.a);
                 js_eventEmitter.fn_dispatch(js_event.EE_onTrackingStatusChanged, p_unit);
