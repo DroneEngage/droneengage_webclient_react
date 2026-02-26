@@ -479,7 +479,7 @@ export const message_names = {
   1037: "Distination Location - 1037",
   1042: "TrackingTarget - 1042",
   1043: "TrackingTargetLocation - 1043",
-  1044: "TargetLost - 1044",
+  1044: "TargetStatus - 1044",
   1049: "Camera Zoom - 1049",
   1050: "Camera Switch - 1050",
   1051: "Camera Flash - 1051",
