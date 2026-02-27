@@ -3,6 +3,7 @@ import { CFieldChecked } from '../micro_gadgets/jsc_mctrl_field_check';
 import { ClssFireEvent } from '../micro_gadgets/jsc_mctrl_fire_event';
 import { Class_Radar_Screen } from '../micro_gadgets/jsc_mctrl_radar_screen';
 import { CTriStateChecked } from '../micro_gadgets/jsc_mctrl_tri_state_check';
+import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import { CONST_DEBUG_CONTROL_PAGE } from '../../js/js_siteConfig';
 
 const DebugControlsPage = () => {
@@ -19,6 +20,11 @@ const DebugControlsPage = () => {
         [5, 4, '#00ff00'],
         [1, 3, '#0000ff']
     ]);
+
+    // 2D Joystick state
+    const [joystickValues, setJoystickValues] = useState({ x: 0, y: 0 });
+    const [joystickEvents, setJoystickEvents] = useState([]);
+    const [joystickResetKey, setJoystickResetKey] = useState(0);
 
     const handleFieldCheck = (checkboxChecked) => {
         setFieldCheckboxChecked(checkboxChecked);
@@ -58,6 +64,41 @@ const DebugControlsPage = () => {
             newPoints.push([section, depth, color]);
         }
         setHighlightedPoints(newPoints);
+    };
+
+    // 2D Joystick event handlers
+    const addJoystickEvent = (eventType, x, y) => {
+        const timestamp = new Date().toLocaleTimeString();
+        const newEvent = `[${timestamp}] ${eventType}: X=${Math.round(x)}, Y=${Math.round(y)}`;
+        setJoystickEvents(prev => [...prev.slice(-4), newEvent]); // Keep last 5 events
+        console.log(newEvent);
+    };
+
+    const handleJoystickClick = (x, y) => {
+        addJoystickEvent('CLICK', x, y);
+    };
+
+    const handleJoystickDoubleClick = (x, y) => {
+        addJoystickEvent('DOUBLE-CLICK', x, y);
+    };
+
+    const handleJoystickRightClick = (x, y) => {
+        addJoystickEvent('RIGHT-CLICK', x, y);
+    };
+
+    const handleJoystickDrag = (x, y) => {
+        setJoystickValues({ x, y });
+        addJoystickEvent('DRAG', x, y);
+    };
+
+    const handleJoystickRelease = (x, y) => {
+        addJoystickEvent('RELEASE', x, y);
+    };
+
+    const resetJoystick = () => {
+        setJoystickValues({ x: 0, y: 0 });
+        setJoystickEvents([]);
+        setJoystickResetKey(prev => prev + 1); // Force re-render with new key
     };
 
     if (!CONST_DEBUG_CONTROL_PAGE) {
@@ -184,6 +225,63 @@ const DebugControlsPage = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* 2D Joystick Component */}
+                <div className="col-md-6 mb-4">
+                    <div className="card bg-secondary txt-theme-aware">
+                        <div className="card-header">
+                            <h5>Class_2D_Joystick Component</h5>
+                        </div>
+                        <div className="card-body">
+                            <div className="d-flex justify-content-center mb-3">
+                                <Class_2D_Joystick
+                                    key={joystickResetKey} // Force re-render when reset
+                                    width={250}
+                                    height={250}
+                                    minValue={-500}
+                                    maxValue={500}
+                                    circleRadius={20}
+                                    initialX={joystickValues.x}
+                                    initialY={joystickValues.y}
+                                    onClick={handleJoystickClick}
+                                    onDoubleClick={handleJoystickDoubleClick}
+                                    onRightClick={handleJoystickRightClick}
+                                    onDrag={handleJoystickDrag}
+                                    onRelease={handleJoystickRelease}
+                                />
+                            </div>
+                            <div className="d-flex gap-2 flex-wrap mb-3">
+                                <button className="btn btn-sm btn-warning" onClick={resetJoystick}>
+                                    Reset Joystick
+                                </button>
+                            </div>
+                            <div className="mb-3">
+                                <strong>Current Values:</strong> X={Math.round(joystickValues.x)}, Y={Math.round(joystickValues.y)}
+                            </div>
+                            <div className="mb-3">
+                                <strong>Event Log:</strong>
+                                <div className="bg-dark text-light p-2 rounded" style={{ fontSize: '12px', fontFamily: 'monospace', maxHeight: '120px', overflowY: 'auto' }}>
+                                    {joystickEvents.length > 0 ? (
+                                        joystickEvents.map((event, index) => (
+                                            <div key={index} className="mb-1">{event}</div>
+                                        ))
+                                    ) : (
+                                        <div className="text-muted">No events yet. Double-click to activate control mode, then drag the circle.</div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="mt-3">
+                                <small className="text-muted">
+                                    <strong>Instructions:</strong><br/>
+                                    • Double-click to toggle control mode<br/>
+                                    • Click on circle to drag when in control mode<br/>
+                                    • Right-click for context menu<br/>
+                                    • Circle position persists across mode changes
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Component Status */}
@@ -210,6 +308,16 @@ const DebugControlsPage = () => {
                                 <div className="col-md-3">
                                     <strong>Class_Radar_Screen:</strong> 
                                     <span className="text-success"> Active</span>
+                                </div>
+                            </div>
+                            <div className="row mt-2">
+                                <div className="col-md-3">
+                                    <strong>Class_2D_Joystick:</strong> 
+                                    <span className="text-success"> Active</span>
+                                </div>
+                                <div className="col-md-9">
+                                    <strong>Test Instructions:</strong> 
+                                    <span className="text-info"> Navigate to /debug to test all components</span>
                                 </div>
                             </div>
                             <div className="mt-3">
