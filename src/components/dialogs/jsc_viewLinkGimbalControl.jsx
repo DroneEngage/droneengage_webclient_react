@@ -9,6 +9,7 @@ import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
+import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
 
 class ClssViewLinkGimbal extends React.Component {
 
@@ -117,6 +118,12 @@ class ClssViewLinkGimbal extends React.Component {
 
     fn_setTargetDrone(p_unit) {
         this.setState({ target_drone: p_unit });
+    }
+
+    fn_gotoUnit() {
+        if (this.state.p_session && this.state.p_session.m_unit) {
+            fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
+        }
     }
 
     // Removed progress functions for range inputs
@@ -330,9 +337,12 @@ class ClssViewLinkGimbal extends React.Component {
                     </div>
 
                     {!isNoUnit && (
-                        <div className="form-group text-center localcontainer">
-                            <div className="btn-group w-100 d-flex flex-wrap">
-                                <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" onClick={() => this.fn_opacityDialog()}>{t('opaque')}</button>
+                        <div id="modal_gimbal_footer" className="form-group text-center">
+                            <div className="row">
+                                <div className="btn-group w-100 d-flex flex-wrap">
+                                    <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" onClick={() => this.fn_opacityDialog()}>{t('opaque')}</button>
+                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnit(e)}>{t('goto', 'Goto')}</button>
+                                </div>
                             </div>
                         </div>
                     )}
