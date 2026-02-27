@@ -21,6 +21,7 @@ import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
 import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx';
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
 import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx';
+import ClssViewLinkGimbal from '../components/dialogs/jsc_viewLinkGimbalControl.jsx';
 import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_details.jsx';
 import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
@@ -116,6 +117,7 @@ const Home = () => {
           <ClssConfigGenerator />
           <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
           <ClssStreamDialog />
+          <ClssViewLinkGimbal />
         </div>
 
         <div id="row_2" className="col-lg-4 col-xl-4 col-xxl-4 col-12">

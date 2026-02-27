@@ -615,8 +615,20 @@ div#modal_ctrl_stream_dlg {
 	max-width: 600px !important;
 	opacity: 0.85;
 	z-index: 2100 !important;
-	float: left;
-}
+	float:left;
+ }
+
+ div#modal_ctrl_gimbal_dlg
+ {
+	position: absolute;
+	top: 200px;
+	left:100px;
+	min-width: 400px !important;
+	max-width: 600px !important;
+	opacity:0.85;
+	z-index: 2100 !important;
+	float:left;
+ }
 
 div#modal_ctrl_gimbal_dlg {
 	position: absolute;

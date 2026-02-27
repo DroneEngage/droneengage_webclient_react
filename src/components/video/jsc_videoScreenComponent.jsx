@@ -35,7 +35,8 @@ export default class ClssCVideoScreen extends React.Component {
             intervalId: null,
             // isDrawing, startX, startY, currentRect are now instance variables
             drawnRectangles: [], // Still in state if you want to render persistent rectangles
-            m_update: 0 // Keep a dummy state update for force-re-renders if needed elsewhere.
+            m_update: 0, // Keep a dummy state update for force-re-renders if needed elsewhere.
+            m_gimbal_enabled: true
         };
 
         
@@ -78,6 +79,11 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_videoFitModeLabels = ["Fit (Contain)", "Fit Width (100%)", "Fit Height (100%)", "Stretch (Fill)"];
         this.m_videoFitModeIcons = ["bi bi-arrows-expand css_large_icon text-primary", "bi bi-arrow-left-right css_large_icon text-success", "bi bi-arrow-down-up css_large_icon text-primary", "bi bi-arrows-fullscreen css_large_icon text-success"];
         this.m_videoFitModeIndex = 0;
+
+        // Gimbal control modes: disabled, enabled
+        this.m_gimbalModeLabels = ["Gimbal Control Disabled", "Gimbal Control Enabled"];
+        this.m_gimbalModeIcons = ["bi bi-arrows-expand txt-theme-aware cursor_hand css_large_icon text-muted", "bi bi-crosshair txt-theme-aware cursor_hand css_large_icon text-warning"];
+        this.m_gimbalModeIndex = 0;
 
         js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
         js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
@@ -391,6 +397,14 @@ export default class ClssCVideoScreen extends React.Component {
         this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
+    fnl_toggleGimbalControl(e) {
+        this.m_gimbalModeIndex = (this.m_gimbalModeIndex + 1) % this.m_gimbalModeIcons.length;
+        this.setState({ m_gimbal_enabled: this.m_gimbalModeIndex === 1 });
+        js_common.fn_console_log("Gimbal control: " + this.m_gimbalModeLabels[this.m_gimbalModeIndex]);
+        if (this.m_flag_mounted === false) return;
+        this.setState({ 'm_update': this.state.m_update + 1 });
+    }
+
     fnl_zoomInOut(e, p_zoomIn, p_obj) {
         js_common.fn_console_log("p_cameraIndex: " + JSON.stringify(p_obj));
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_zoomCamera(p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
@@ -420,6 +434,18 @@ export default class ClssCVideoScreen extends React.Component {
     fnl_trackOnOff (e,obj)
     {
         console.log(obj);
+    }
+
+    fnl_showLaserControl(e) {
+        const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (andruavUnit == null) {
+            return;
+        }
+        
+        // Dispatch event to show gimbal control dialog
+        js_eventEmitter.fn_dispatch(js_event.EE_displayViewLinkGimbal, {
+            m_unit: andruavUnit
+        });
     }
 
     fnl_rotate(v_e) {
@@ -817,6 +843,15 @@ export default class ClssCVideoScreen extends React.Component {
                 </div>
                 <div key={key + "15"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
+                </div>
+                <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                    <i
+                        id="btn_laser_control"
+                        className={this.m_gimbalModeIcons[this.m_gimbalModeIndex]}
+                        alt={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
+                        title={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
+                        onClick={(e) => this.fnl_showLaserControl(e)}
+                    ></i>
                 </div>
             </div>
         );
