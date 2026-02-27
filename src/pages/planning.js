@@ -52,8 +52,7 @@ const Planning = () => {
 					</div>
 
 				</div>
-
-				<div id="row_2" className="col col-sm-6 col-md-4">
+				<div id="row_2" className="col-lg-4 col-xl-4 col-xxl-4 col-12">
 					<div id='andruavUnitList' className='col-12 padding_zero'>
 						<ClssAndruavUnitList gcs_list={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false} />
 					</div>
