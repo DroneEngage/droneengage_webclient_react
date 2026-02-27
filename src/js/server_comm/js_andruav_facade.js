@@ -27,7 +27,7 @@ import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 import * as js_common from '../js_common.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
 import { CCommandAPI } from '../protocol/js_commands_api.js'
-
+import {CCommandAPI_ViewLink} from '../protocol/js_commands_api_viewlinks.js'
 import * as js_andruav_ws from './js_andruav_ws.js';
 import * as js_andruav_parser from './js_andruav_parser.js'
 
@@ -138,9 +138,9 @@ class CAndruavClientFacade {
                 const d1 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[1]) - parseFloat(p_me.lastSentAxes[1])) : null);
                 const d2 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[2]) - parseFloat(p_me.lastSentAxes[2])) : null);
                 const d3 = (p_me.lastSentAxes ? Math.abs(parseFloat(axes[3]) - parseFloat(p_me.lastSentAxes[3])) : null);
-                const maxDeltaLog = (d0===null)?null:Math.max(d0,d1,d2,d3);
-                js_common.fn_console_log({ tag: 'RC_SEND', when: now, reason: reason, maxDelta: maxDeltaLog, axes: [axes[0],axes[1],axes[2],axes[3]] });
-            } catch(e) {}
+                const maxDeltaLog = (d0 === null) ? null : Math.max(d0, d1, d2, d3);
+                js_common.fn_console_log({ tag: 'RC_SEND', when: now, reason: reason, maxDelta: maxDeltaLog, axes: [axes[0], axes[1], axes[2], axes[3]] });
+            } catch (e) { }
             p_me.#API_sendRXChannels(unit, axes);
             p_me.lastSentAxes = [axes[0], axes[1], axes[2], axes[3]];
             p_me.lastSentTime = now;
@@ -354,18 +354,18 @@ class CAndruavClientFacade {
 
     API_do_ChangeAltitude(p_andruavUnit, param_altitude) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        
+
         const cmd = CCommandAPI.API_doChangeAltitude(param_altitude);
-        
+
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
 
     API_do_YAW(p_andruavUnit, v_targetAngle, v_turnRate, v_isClockwise, v_isRelative) {
         if ((p_andruavUnit === null || p_andruavUnit === undefined) || (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined)) return;
-        
+
         const cmd = CCommandAPI.API_doYaw(v_targetAngle, v_turnRate, v_isClockwise, v_isRelative);
-        
+
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
@@ -1225,12 +1225,10 @@ class CAndruavClientFacade {
     }
 
 
-    API_requestMavlinkHeartBeat(p_andruavUnit)
-    {
-        let v_partyID= '';
+    API_requestMavlinkHeartBeat(p_andruavUnit) {
+        let v_partyID = '';
 
-        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
-        {
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
             v_partyID = p_andruavUnit.getPartyID();
         }
 
@@ -1239,18 +1237,61 @@ class CAndruavClientFacade {
     }
 
 
-    API_requestMavlinkServoChannel(p_andruavUnit)
-    {
-        let v_partyID= '';
+    API_requestMavlinkServoChannel(p_andruavUnit) {
+        let v_partyID = '';
 
-        if (p_andruavUnit !== null && p_andruavUnit !== undefined)
-        {
+        if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
             v_partyID = p_andruavUnit.getPartyID();
         }
 
         const cmd = CCommandAPI.API_requestMavlinkMsg(mavlink20.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW);
         js_andruav_ws.AndruavClientWS.API_sendCMD(v_partyID, cmd.mt, cmd.ms);
     }
+
+
+
+    //ViewLink Commands
+    API_do_ViewLink_Laser_Control(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Laser_Control(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_do_ViewLink_Tracker_Control(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Tracker_Control(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_do_ViewLink_AI_Control(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_AI_Control(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_do_ViewLink_Camera_Control(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_Control(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_do_ViewLink_Gimbal_Control(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Gimbal_Control(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    //END OF ViewLink Commands
 
     // receives event from gamepad and store it for sending.
     #fn_sendAxes(p_me) { // game pad should be attached to a unit.
@@ -1283,8 +1324,8 @@ class CAndruavClientFacade {
 
         if (isSudden && (now - p_me.lastSentTime) >= minGap) {
             try {
-                js_common.fn_console_log({ tag: 'RC_SEND_IMMEDIATE', when: now, reason: 'sudden', axes: [p_me.v_axes[0],p_me.v_axes[1],p_me.v_axes[2],p_me.v_axes[3]] });
-            } catch(e) {}
+                js_common.fn_console_log({ tag: 'RC_SEND_IMMEDIATE', when: now, reason: 'sudden', axes: [p_me.v_axes[0], p_me.v_axes[1], p_me.v_axes[2], p_me.v_axes[3]] });
+            } catch (e) { }
             p_me.#API_sendRXChannels(c_currentEngagedUnitRX, p_me.v_axes);
             p_me.lastSentAxes = [p_me.v_axes[0], p_me.v_axes[1], p_me.v_axes[2], p_me.v_axes[3]];
             p_me.lastSentTime = now;
