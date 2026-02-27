@@ -651,7 +651,7 @@ export class CCommandAPI {
     }
 
 
-    
+
 
     static API_doModuleConfigAction(p_module_key, p_action) {
         const msg =
@@ -726,13 +726,12 @@ export class CCommandAPI {
         return msg;
     }
 
-    static API_requestMavlinkMsg(p_msgID)
-    {
+    static API_requestMavlinkMsg(p_msgID) {
         const msg =
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
             'ms': {
-                C:js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink,
+                C: js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink,
                 Act: p_msgID
             }
         };
