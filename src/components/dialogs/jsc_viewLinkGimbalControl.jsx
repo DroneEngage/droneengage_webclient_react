@@ -23,6 +23,8 @@ class ClssViewLinkGimbal extends React.Component {
             'current_vertical': 0,
             'current_horizontal': 0,
             'target_drone': null,
+            'pending_vertical': 0,
+            'pending_horizontal': 0,
         };
 
         this.m_flag_mounted = false;
@@ -87,7 +89,9 @@ class ClssViewLinkGimbal extends React.Component {
             laser_on: false,
             tracker_on: false,
             ai_on: false,
-            target_drone: null
+            target_drone: null,
+            pending_vertical: null,
+            pending_horizontal: null
         });
     }
 
@@ -104,16 +108,28 @@ class ClssViewLinkGimbal extends React.Component {
     fn_toggleLaser() {
         const new_laser_state = !this.state.laser_on;
         this.setState({ laser_on: new_laser_state });
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, 1, new_laser_state ? 1 : 0); 
+        }
     }
 
     fn_toggleTracker() {
         const new_tracker_state = !this.state.tracker_on;
         this.setState({ tracker_on: new_tracker_state });
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, 1, new_tracker_state ? 1 : 0); 
+        }
     }
 
     fn_toggleAI() {
         const new_ai_state = !this.state.ai_on;
         this.setState({ ai_on: new_ai_state });
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, 1, new_ai_state ? 1 : 0); 
+        }
     }
 
     fn_setTargetDrone(p_unit) {
@@ -127,6 +143,30 @@ class ClssViewLinkGimbal extends React.Component {
     }
 
     // Removed progress functions for range inputs
+
+    handleVerticalChange(e) {
+        const val = parseInt(e.target.value, 10);
+        this.setState({ current_vertical: val, pending_vertical: val });
+    }
+
+    handleHorizontalChange(e) {
+        const val = parseInt(e.target.value, 10);
+        this.setState({ current_horizontal: val, pending_horizontal: val });
+    }
+
+    handleVerticalRelease() {
+        if (this.state.pending_vertical !== null) {
+            this.sendOrientation(this.state.pending_vertical, this.state.current_horizontal);
+            this.setState({ pending_vertical: null });
+        }
+    }
+
+    handleHorizontalRelease() {
+        if (this.state.pending_horizontal !== null) {
+            this.sendOrientation(this.state.current_vertical, this.state.pending_horizontal);
+            this.setState({ pending_horizontal: null });
+        }
+    }
 
     fn_readCurrentOrientation() {
         // This function reads the current orientation
@@ -142,11 +182,11 @@ class ClssViewLinkGimbal extends React.Component {
         // This function sends the orientation values
         js_common.fn_console_log('Sending Orientation - Vertical:', vertical, 'Horizontal:', horizontal);
 
-        // You can add the actual API call here
-        // For example:
-        // if (this.state.p_session?.m_unit) {
-        //     js_globals.v_andruavFacade.API_SetLaserOrientation(this.state.p_session.m_unit, vertical, horizontal);
-        // }
+        // Send to target drone if selected, otherwise send to current unit
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        if (targetUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control(targetUnit, 1, vertical, horizontal, 0); 
+        }
     }
 
     render() {
@@ -193,7 +233,7 @@ class ClssViewLinkGimbal extends React.Component {
                                 <h4 className="text-success text-start">
                                     {isNoUnit
                                         ? t('gimbal_control')
-                                        : `${t('gimbal_control_unit')}${this.state.p_session?.m_unit.m_unitName}`}
+                                        : `${t('gimbal_control')} ${this.state.p_session?.m_unit.m_unitName}`}
                                 </h4>
                             </div>
                             <div className="col-2 float-right">
@@ -265,11 +305,9 @@ class ClssViewLinkGimbal extends React.Component {
                                             min="-500"
                                             max="500"
                                             value={this.state.current_vertical}
-                                            onChange={(e) => {
-                                                const val = parseInt(e.target.value, 10);
-                                                this.setState({ current_vertical: val });
-                                                this.sendOrientation(val, this.state.current_horizontal);
-                                            }}
+                                            onChange={this.handleVerticalChange.bind(this)}
+                                            onMouseUp={this.handleVerticalRelease.bind(this)}
+                                            onTouchEnd={this.handleVerticalRelease.bind(this)}
                                             style={{ width: "100%" }}
                                         />
                                     </div>
@@ -283,11 +321,9 @@ class ClssViewLinkGimbal extends React.Component {
                                             min="-500"
                                             max="500"
                                             value={this.state.current_horizontal}
-                                            onChange={(e) => {
-                                                const val = parseInt(e.target.value, 10);
-                                                this.setState({ current_horizontal: val });
-                                                this.sendOrientation(this.state.current_vertical, val);
-                                            }}
+                                            onChange={this.handleHorizontalChange.bind(this)}
+                                            onMouseUp={this.handleHorizontalRelease.bind(this)}
+                                            onTouchEnd={this.handleHorizontalRelease.bind(this)}
                                             style={{ width: "100%" }}
                                         />
                                     </div>
