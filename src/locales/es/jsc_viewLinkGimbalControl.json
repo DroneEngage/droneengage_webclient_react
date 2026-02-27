@@ -16,5 +16,6 @@
     "send_to": "Enviar a ",
     "drone": "Dron",
     "clear_selection": "Borrar Selección",
-    "opaque": "Opaco"
+    "opaque": "Opaco",
+    "goto": "Ir a"
 }
