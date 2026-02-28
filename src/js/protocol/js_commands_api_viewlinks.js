@@ -68,15 +68,29 @@ export class CCommandAPI_ViewLink {
         return msg;
     }
 
-    static API_do_ViewLink_Gimbal_Control(p_gimbal_cmd, p_pitch, p_yaw, p_roll) {
+    static API_do_ViewLink_Gimbal_Control_Absolute_Position(p_pitch, p_yaw) {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
             'ms': {
                 a: js_andruavMessages.CONST_VIEWLINK_ACTION_GIMBAL_CONTROL,
-                b: p_gimbal_cmd,
+                b: js_andruavMessages.VIEWLINK_GIMBAL_ABSOLUTE_POSITION,
                 p: p_pitch,
-                y: p_yaw,
-                r: p_roll
+                y: p_yaw
+            }
+        };
+
+        return msg;
+    }
+
+
+    static API_do_ViewLink_Gimbal_Control_Incremental_Adjust(p_pitch_step, p_yaw_step) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_VIEWLINK_ACTION_GIMBAL_CONTROL,
+                b: js_andruavMessages.VIEWLINK_GIMBAL_INCREMENTAL_ADJUST,
+                p: p_pitch_step,
+                y: p_yaw_step
             }
         };
 
