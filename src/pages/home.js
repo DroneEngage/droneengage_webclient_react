@@ -142,10 +142,8 @@ const Home = () => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <button type="button" className="close" data-bs-dismiss="modal" aria-hidden="true">
-                ×
-              </button>
-              <h4 className="modal-title text-primary">{t('home:modal.altitude.title')}</h4>
+              <h4 className="modal-title bg-warning rounded_10px p-1 text-white">{t('home:modal.altitude.title')}</h4>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="container"></div>
             <div className="modal-body">
@@ -260,7 +258,7 @@ const Home = () => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h4 id="title" className="modal-title bg-success p-1 text-white">
+              <h4 id="title" className="modal-title bg-warning rounded_10px p-1 text-white">
                 <strong>{t('home:modal.saveConfirmation.title')}</strong>
               </h4>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
