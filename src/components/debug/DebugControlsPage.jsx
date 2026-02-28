@@ -25,6 +25,9 @@ const DebugControlsPage = () => {
     const [joystickValues, setJoystickValues] = useState({ x: 0, y: 0 });
     const [joystickEvents, setJoystickEvents] = useState([]);
     const [joystickResetKey, setJoystickResetKey] = useState(0);
+    const [sendOnReleaseOnly, setSendOnReleaseOnly] = useState(true);
+    const [indicatorCircle, setIndicatorCircle] = useState({ x: 100, y: -100, rgb: '#ff0000' });
+    const [programmaticPosition, setProgrammaticPosition] = useState({ x: 0, y: 0 });
 
     const handleFieldCheck = (checkboxChecked) => {
         setFieldCheckboxChecked(checkboxChecked);
@@ -99,6 +102,24 @@ const DebugControlsPage = () => {
         setJoystickValues({ x: 0, y: 0 });
         setJoystickEvents([]);
         setJoystickResetKey(prev => prev + 1); // Force re-render with new key
+    };
+
+    const updateIndicatorCircle = () => {
+        // Random position and color
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        const newIndicator = {
+            x: Math.floor(Math.random() * 1000) - 500,
+            y: Math.floor(Math.random() * 1000) - 500,
+            rgb: colors[Math.floor(Math.random() * colors.length)]
+        };
+        setIndicatorCircle(newIndicator);
+    };
+
+    const setRandomProgrammaticPosition = () => {
+        const newX = Math.floor(Math.random() * 1000) - 500;
+        const newY = Math.floor(Math.random() * 1000) - 500;
+        setProgrammaticPosition({ x: newX, y: newY });
+        addJoystickEvent('PROGRAMMATIC', newX, newY);
     };
 
     if (!CONST_DEBUG_CONTROL_PAGE) {
@@ -238,11 +259,17 @@ const DebugControlsPage = () => {
                                     key={joystickResetKey} // Force re-render when reset
                                     width={250}
                                     height={250}
-                                    minValue={-500}
-                                    maxValue={500}
+                                    rangeX={500}
+                                    rangeY={500}
+                                    labelX="X"
+                                    labelY="Y"
                                     circleRadius={20}
                                     initialX={joystickValues.x}
                                     initialY={joystickValues.y}
+                                    currentX={programmaticPosition.x}
+                                    currentY={programmaticPosition.y}
+                                    sendOnReleaseOnly={sendOnReleaseOnly}
+                                    indicatorCircle={indicatorCircle}
                                     onClick={handleJoystickClick}
                                     onDoubleClick={handleJoystickDoubleClick}
                                     onRightClick={handleJoystickRightClick}
@@ -254,6 +281,24 @@ const DebugControlsPage = () => {
                                 <button className="btn btn-sm btn-warning" onClick={resetJoystick}>
                                     Reset Joystick
                                 </button>
+                                <button 
+                                    className={`btn btn-sm ${sendOnReleaseOnly ? 'btn-success' : 'btn-info'}`}
+                                    onClick={() => setSendOnReleaseOnly(!sendOnReleaseOnly)}
+                                >
+                                    Send On Release: {sendOnReleaseOnly ? 'TRUE' : 'FALSE'}
+                                </button>
+                                <button className="btn btn-sm btn-secondary" onClick={updateIndicatorCircle}>
+                                    Random Indicator
+                                </button>
+                                <button className="btn btn-sm btn-primary" onClick={setRandomProgrammaticPosition}>
+                                    Random Programmatic
+                                </button>
+                            </div>
+                            <div className="mb-3">
+                                <strong>Indicator Circle:</strong> X={indicatorCircle.x}, Y={indicatorCircle.y}, Color={indicatorCircle.rgb}
+                            </div>
+                            <div className="mb-3">
+                                <strong>Programmatic Position:</strong> X={programmaticPosition.x}, Y={programmaticPosition.y}
                             </div>
                             <div className="mb-3">
                                 <strong>Current Values:</strong> X={Math.round(joystickValues.x)}, Y={Math.round(joystickValues.y)}
@@ -276,7 +321,12 @@ const DebugControlsPage = () => {
                                     • Double-click to toggle control mode<br/>
                                     • Click on circle to drag when in control mode<br/>
                                     • Right-click for context menu<br/>
-                                    • Circle position persists across mode changes
+                                    • Circle position persists across mode changes<br/>
+                                    • <strong>Send On Release:</strong> {sendOnReleaseOnly ? 
+                                        'DRAG events only fire on mouse/touch release (like range inputs)' : 
+                                        'DRAG events fire continuously during dragging'}<br/>
+                                    • <strong>Indicator Circle:</strong> Non-draggable circle showing target/reference position<br/>
+                                    • <strong>Programmatic Control:</strong> Use "Random Programmatic" to move circle without events
                                 </small>
                             </div>
                         </div>
