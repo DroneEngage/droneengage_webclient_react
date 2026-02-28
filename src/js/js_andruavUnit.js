@@ -896,6 +896,8 @@ class C_Modules {
     this.has_tracking_alive = false;
     this.has_ai_recognition = false;
     this.has_ai_recognition_alive = false;
+    this.has_viewlink = false;
+    this.has_viewlink_alive = false;
 
     this.m_old_version = false;
 
@@ -1039,6 +1041,14 @@ class C_Modules {
           old_module = old_module || (module.z == -1);
           break;
 
+        case js_andruavMessages.TYPE_MODULE_CLASS_VIEW_LINK:
+          this.has_viewlink = true;
+          this.has_viewlink_alive = module.d === false;
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.vlk ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.vlk.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.vlk;
+          old_module = old_module || (module.z == -1);
+          break;
+          
         default:
           console.warn(`Unknown module class: ${module.c}`);
           break;
@@ -1161,6 +1171,12 @@ export class CAndruavUnitObject {
     this.m_fencestatus = null;
     this.m_VehicleType_TXT = '';
     this.m_wayPoint = {};
+
+    // Module flags
+    this.has_viewlink = false;
+    this.has_viewlink_alive = false;
+    this.has_ai_recognition = false;
+    this.has_ai_recognition_alive = false;
 
     // UNCOMMENT LATER ... make sure that there is no add-on properties.
     Object.seal(this);
