@@ -20,6 +20,7 @@ import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx'
 import ClssCtrlDrone_FlightMode_Ctrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx'
 import ClssCtrlDistanceToMeControl from '../gadgets/jsc_ctrl_distance_to_me_control.jsx'
 import ClssCtrlOpacityControl from '../gadgets/jsc_ctrl_opacity_control.jsx'
+import ClssCtrlViewlinkControl from '../gadgets/jsc_ctrl_viewlink_control.jsx'
 import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
 
 import ClssCVideoTrackerLayer from './jsc_videoTrackerLayer.jsx'
@@ -473,8 +474,9 @@ export default class ClssCVideoScreen extends React.Component {
 
 
         this.m_rotation = (this.m_rotation + 1) % 4;
-        this.m_transform_rotated = "transform: '" + this.m_local_rotations[this.m_rotation] + "'";
-        this.videoRef.current.style.transform =
+        if (this.videoRef && this.videoRef.current) {
+            this.videoRef.current.style.transform = this.m_local_rotations[this.m_rotation] + " " + this.m_transform_mirrored;
+        }
 
         this.setState({'m_update': this.state.m_update +1});
     }
@@ -845,13 +847,7 @@ export default class ClssCVideoScreen extends React.Component {
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
                 </div>
                 <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
-                    <i
-                        id="btn_laser_control"
-                        className={this.m_gimbalModeIcons[this.m_gimbalModeIndex]}
-                        alt={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
-                        title={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
-                        onClick={(e) => this.fnl_showLaserControl(e)}
-                    ></i>
+                    <ClssCtrlViewlinkControl p_unit={andruavUnit} />
                 </div>
             </div>
         );

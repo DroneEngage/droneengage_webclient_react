@@ -10,6 +10,7 @@ import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
+import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 
 class ClssViewLinkGimbal extends React.Component {
 
@@ -23,8 +24,6 @@ class ClssViewLinkGimbal extends React.Component {
             'current_vertical': 0,
             'current_horizontal': 0,
             'target_drone': null,
-            'pending_vertical': 0,
-            'pending_horizontal': 0,
         };
 
         this.m_flag_mounted = false;
@@ -90,8 +89,8 @@ class ClssViewLinkGimbal extends React.Component {
             tracker_on: false,
             ai_on: false,
             target_drone: null,
-            pending_vertical: null,
-            pending_horizontal: null
+            current_vertical: 0,
+            current_horizontal: 0
         });
     }
 
@@ -144,28 +143,22 @@ class ClssViewLinkGimbal extends React.Component {
 
     // Removed progress functions for range inputs
 
-    handleVerticalChange(e) {
-        const val = parseInt(e.target.value, 10);
-        this.setState({ current_vertical: val, pending_vertical: val });
+    handleJoystickDrag = (horizontal, vertical) => {
+        // Map joystick coordinates to gimbal control (keep float precision)
+        // Joystick X = horizontal, Y = vertical
+        this.setState({ 
+            current_horizontal: horizontal,
+            current_vertical: vertical
+        });
     }
 
-    handleHorizontalChange(e) {
-        const val = parseInt(e.target.value, 10);
-        this.setState({ current_horizontal: val, pending_horizontal: val });
-    }
-
-    handleVerticalRelease() {
-        if (this.state.pending_vertical !== null) {
-            this.sendOrientation(this.state.pending_vertical, this.state.current_horizontal);
-            this.setState({ pending_vertical: null });
-        }
-    }
-
-    handleHorizontalRelease() {
-        if (this.state.pending_horizontal !== null) {
-            this.sendOrientation(this.state.current_vertical, this.state.pending_horizontal);
-            this.setState({ pending_horizontal: null });
-        }
+    handleJoystickRelease = (horizontal, vertical) => {
+        // Update state and send orientation when joystick is released (keep float precision)
+        this.setState({ 
+            current_horizontal: horizontal,
+            current_vertical: vertical
+        });
+        this.sendOrientation(vertical, horizontal);
     }
 
     fn_readCurrentOrientation() {
@@ -185,7 +178,7 @@ class ClssViewLinkGimbal extends React.Component {
         // Send to target drone if selected, otherwise send to current unit
         const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control(targetUnit, 1, vertical, horizontal, 0); 
+            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Absolute_Position(targetUnit, horizontal, vertical); 
         }
     }
 
@@ -283,49 +276,25 @@ class ClssViewLinkGimbal extends React.Component {
                                         </button>
                                     </div>
 
-                                    {/* Current Orientation Display */}
+                                    {/* 2D Joystick Control */}
                                     <div className="form-group mb-3">
-                                        <label className="form-label">{t('current_orientation')}</label>
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <small className="text-muted">{t('vertical')} {this.state.current_vertical}</small>
-                                            </div>
-                                            <div className="col-6">
-                                                <small className="text-muted">{t('horizontal')} {this.state.current_horizontal}</small>
-                                            </div>
+                                        <label className="form-label">{t('gimbal_control')}</label>
+                                        <div className="d-flex justify-content-center">
+                                            <Class_2D_Joystick
+                                                width={200}
+                                                height={200}
+                                                rangeX={1}
+                                                rangeY={1}
+                                                labelX={t('horizontal')}
+                                                labelY={t('vertical')}
+                                                circleRadius={15}
+                                                initialX={this.state.current_horizontal}
+                                                initialY={this.state.current_vertical}
+                                                sendOnReleaseOnly={true}
+                                                onDrag={this.handleJoystickDrag}
+                                                onRelease={this.handleJoystickRelease}
+                                            />
                                         </div>
-                                    </div>
-
-                                    {/* Vertical Control */}
-                                    <div className="form-group mb-3">
-                                        <label className="form-label">{t('vertical_control')}</label>
-                                        <input
-                                            type="range"
-                                            className="form-range"
-                                            min="-500"
-                                            max="500"
-                                            value={this.state.current_vertical}
-                                            onChange={this.handleVerticalChange.bind(this)}
-                                            onMouseUp={this.handleVerticalRelease.bind(this)}
-                                            onTouchEnd={this.handleVerticalRelease.bind(this)}
-                                            style={{ width: "100%" }}
-                                        />
-                                    </div>
-
-                                    {/* Horizontal Control */}
-                                    <div className="form-group mb-3">
-                                        <label className="form-label">{t('horizontal_control')}</label>
-                                        <input
-                                            type="range"
-                                            className="form-range"
-                                            min="-500"
-                                            max="500"
-                                            value={this.state.current_horizontal}
-                                            onChange={this.handleHorizontalChange.bind(this)}
-                                            onMouseUp={this.handleHorizontalRelease.bind(this)}
-                                            onTouchEnd={this.handleHorizontalRelease.bind(this)}
-                                            style={{ width: "100%" }}
-                                        />
                                     </div>
 
                                     {/* Read Orientation and Target Drone Selector Buttons */}
