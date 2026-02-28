@@ -9,11 +9,17 @@ import React from 'react';
  * Props:
  * - width: Control width in pixels (default: 200)
  * - height: Control height in pixels (default: 200)
- * - minValue: Minimum value for X/Y axes (default: -500)
- * - maxValue: Maximum value for X/Y axes (default: 500)
+ * - rangeX: X-axis range (default: 500)
+ * - rangeY: Y-axis range (default: 500)
+ * - labelX: X-axis label (default: 'X')
+ * - labelY: Y-axis label (default: 'Y')
  * - circleRadius: Radius of draggable circle in pixels (default: 15)
  * - initialX: Initial X value (default: 0)
  * - initialY: Initial Y value (default: 0)
+ * - currentX: Current X value for programmatic control (overrides internal state)
+ * - currentY: Current Y value for programmatic control (overrides internal state)
+ * - sendOnReleaseOnly: Only fire onDrag event on mouse/touch release (default: false)
+ * - indicatorCircle: Object with x, y, rgb properties for non-draggable indicator circle
  * - onClick: Callback for single clicks (x, y)
  * - onDoubleClick: Callback for double clicks (x, y)
  * - onRightClick: Callback for right clicks (x, y)
@@ -30,20 +36,30 @@ export class Class_2D_Joystick extends React.Component {
         const {
             width = 200,
             height = 200,
-            minValue = -500,
-            maxValue = 500,
+            rangeX = 500,
+            rangeY = 500,
+            labelX = 'X',
+            labelY = 'Y',
             circleRadius = 15,
             initialX = 0,
             initialY = 0
         } = props;
 
+        // Calculate min/max values from ranges
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
+
         this.state = {
             isControlMode: false,
             isDragging: false,
-            circleX: this.valueToPixels(initialX, width, minValue, maxValue),
-            circleY: this.valueToPixels(initialY, height, minValue, maxValue),
+            circleX: this.valueToPixels(initialX, width, minValueX, maxValueX),
+            circleY: this.valueToPixels(initialY, height, minValueY, maxValueY),
             currentX: initialX,
-            currentY: initialY
+            currentY: initialY,
+            pendingX: null,
+            pendingY: null
         };
 
         this.svgRef = React.createRef();
@@ -54,14 +70,51 @@ export class Class_2D_Joystick extends React.Component {
     componentDidUpdate(prevProps) {
         // Reset position if initialX or initialY props change
         if (prevProps.initialX !== this.props.initialX || prevProps.initialY !== this.props.initialY) {
-            const { initialX = 0, initialY = 0, width = 200, height = 200, minValue = -500, maxValue = 500 } = this.props;
-            
+            // Avoid interfering during drag or when values are effectively unchanged
+            if (this.state.isDragging) return;
+
+            const { initialX = 0, initialY = 0, width = 200, height = 200, rangeX = 500, rangeY = 500 } = this.props;
+            const minValueX = -rangeX;
+            const maxValueX = rangeX;
+            const minValueY = -rangeY;
+            const maxValueY = rangeY;
+
+            const eps = 1e-6;
+            const sameX = Math.abs((this.state.currentX ?? 0) - initialX) < eps;
+            const sameY = Math.abs((this.state.currentY ?? 0) - initialY) < eps;
+            if (sameX && sameY) {
+                // No-op if values are already at desired target
+                return;
+            }
+
             this.setState({
-                circleX: this.valueToPixels(initialX, width, minValue, maxValue),
-                circleY: this.valueToPixels(initialY, height, minValue, maxValue),
+                circleX: this.valueToPixels(initialX, width, minValueX, maxValueX),
+                circleY: this.valueToPixels(initialY, height, minValueY, maxValueY),
                 currentX: initialX,
-                currentY: initialY
+                currentY: initialY,
+                pendingX: null,
+                pendingY: null
             });
+        }
+
+        // Update position if currentX or currentY props change (programmatic control)
+        if (prevProps.currentX !== this.props.currentX || prevProps.currentY !== this.props.currentY) {
+            const { currentX, currentY, width = 200, height = 200, rangeX = 500, rangeY = 500 } = this.props;
+            const minValueX = -rangeX;
+            const maxValueX = rangeX;
+            const minValueY = -rangeY;
+            const maxValueY = rangeY;
+            
+            // Only update if props are provided (not undefined) AND different from current state
+            if (currentX !== undefined && currentY !== undefined && 
+                (currentX !== this.state.currentX || currentY !== this.state.currentY)) {
+                this.setState({
+                    circleX: this.valueToPixels(currentX, width, minValueX, maxValueX),
+                    circleY: this.valueToPixels(currentY, height, minValueY, maxValueY),
+                    currentX: currentX,
+                    currentY: currentY
+                });
+            }
         }
     }
 
@@ -86,9 +139,9 @@ export class Class_2D_Joystick extends React.Component {
         const valueRange = maxValue - minValue;
         const circleRadius = this.props.circleRadius || 15;
         
-        // Calculate inner rectangle dimensions
-        const innerDimension = (valueRange / (valueRange + 2 * circleRadius)) * dimension;
-        const innerOffset = (dimension - innerDimension) / 2;
+        // Calculate inner rectangle dimensions (independent of value range)
+        const innerDimension = Math.max(0, dimension - 2 * circleRadius);
+        const innerOffset = circleRadius;
         
         // Map value to inner rectangle, then add offset
         const innerPosition = ((value - minValue) / valueRange) * innerDimension;
@@ -100,13 +153,16 @@ export class Class_2D_Joystick extends React.Component {
         const valueRange = maxValue - minValue;
         const circleRadius = this.props.circleRadius || 15;
         
-        // Calculate inner rectangle dimensions
-        const innerDimension = (valueRange / (valueRange + 2 * circleRadius)) * dimension;
-        const innerOffset = (dimension - innerDimension) / 2;
+        // Calculate inner rectangle dimensions (independent of value range)
+        const innerDimension = Math.max(0, dimension - 2 * circleRadius);
+        const innerOffset = circleRadius;
         
         // Convert to inner rectangle coordinates, then to value
         const innerPosition = pixels - innerOffset;
-        return (innerPosition / innerDimension) * valueRange + minValue;
+        const value = (innerPosition / innerDimension) * valueRange + minValue;
+        
+        // Return float with natural pixel-based resolution (no forced rounding)
+        return value;
     }
 
     isPointInCircle = (mouseX, mouseY, circleX, circleY, radius) => {
@@ -117,14 +173,10 @@ export class Class_2D_Joystick extends React.Component {
     constrainToRectangle = (x, y, width, height, radius) => {
         // Allow circle center to reach inner rectangle edges for max/min values
         // but keep circle edge within outer rectangle bounds
-        const { minValue = -500, maxValue = 500 } = this.props;
-        const valueRange = maxValue - minValue;
-        
-        // Calculate inner rectangle boundaries
-        const innerWidth = (valueRange / (valueRange + 2 * radius)) * width;
-        const innerHeight = (valueRange / (valueRange + 2 * radius)) * height;
-        const innerX = (width - innerWidth) / 2;
-        const innerY = (height - innerHeight) / 2;
+        const innerWidth = Math.max(0, width - 2 * radius);
+        const innerHeight = Math.max(0, height - 2 * radius);
+        const innerX = radius;
+        const innerY = radius;
         
         return {
             x: Math.max(innerX, Math.min(innerX + innerWidth, x)),
@@ -167,8 +219,14 @@ export class Class_2D_Joystick extends React.Component {
     handleGlobalMouseMove = (event) => {
         if (!this.state.isDragging) return;
 
-        const { width, height, minValue, maxValue, circleRadius, onDrag } = this.props;
+        const { width, height, rangeX = 500, rangeY = 500, circleRadius, onDrag, sendOnReleaseOnly = false } = this.props;
         const { x: mouseX, y: mouseY } = this.getMousePosition(event);
+
+        // Calculate min/max values from ranges
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
 
         // Calculate new circle position with drag offset
         let newCircleX = mouseX - this.dragOffset.x;
@@ -180,17 +238,20 @@ export class Class_2D_Joystick extends React.Component {
         newCircleY = constrained.y;
 
         // Convert to value range
-        const valueX = this.pixelsToValue(newCircleX, width, minValue, maxValue);
-        const valueY = this.pixelsToValue(newCircleY, height, minValue, maxValue);
+        const valueX = this.pixelsToValue(newCircleX, width, minValueX, maxValueX);
+        const valueY = this.pixelsToValue(newCircleY, height, minValueY, maxValueY);
 
         this.setState({
             circleX: newCircleX,
             circleY: newCircleY,
             currentX: valueX,
-            currentY: valueY
+            currentY: valueY,
+            pendingX: sendOnReleaseOnly ? valueX : null,
+            pendingY: sendOnReleaseOnly ? valueY : null
         });
 
-        if (onDrag) {
+        // Fire onDrag event immediately if not sendOnReleaseOnly
+        if (onDrag && !sendOnReleaseOnly) {
             onDrag(valueX, valueY);
         }
     }
@@ -198,13 +259,21 @@ export class Class_2D_Joystick extends React.Component {
     handleGlobalMouseUp = (event) => {
         if (!this.state.isDragging) return;
 
-        const { onRelease } = this.props;
-        const { currentX, currentY } = this.state;
+        const { onRelease, onDrag, sendOnReleaseOnly = false } = this.props;
+        const { currentX, currentY, pendingX, pendingY } = this.state;
 
-        this.setState({ isDragging: false });
+        // Just set isDragging to false, don't reset pending values
+        this.setState({ 
+            isDragging: false
+        });
 
         if (onRelease) {
             onRelease(currentX, currentY);
+        }
+
+        // Fire onDrag event on release if sendOnReleaseOnly is true
+        if (onDrag && sendOnReleaseOnly && (pendingX !== null || pendingY !== null)) {
+            onDrag(pendingX, pendingY);
         }
     }
 
@@ -222,7 +291,7 @@ export class Class_2D_Joystick extends React.Component {
     handleClick = (event) => {
         event.preventDefault();
         const { x: mouseX, y: mouseY } = this.getMousePosition(event);
-        const { minValue, maxValue, onClick } = this.props;
+        const { rangeX = 500, rangeY = 500, onClick } = this.props;
         const { isControlMode } = this.state;
 
         if (isControlMode) return; // Don't handle clicks when in control mode
@@ -236,24 +305,32 @@ export class Class_2D_Joystick extends React.Component {
             this.lastClickTime = currentTime;
             
             if (onClick) {
-                const valueX = this.pixelsToValue(mouseX, this.props.width, minValue, maxValue);
-                const valueY = this.pixelsToValue(mouseY, this.props.height, minValue, maxValue);
+                const minValueX = -rangeX;
+                const maxValueX = rangeX;
+                const minValueY = -rangeY;
+                const maxValueY = rangeY;
+                
+                const valueX = this.pixelsToValue(mouseX, this.props.width, minValueX, maxValueX);
+                const valueY = this.pixelsToValue(mouseY, this.props.height, minValueY, maxValueY);
                 onClick(valueX, valueY);
             }
         }
     }
 
     handleDoubleClick = (mouseX, mouseY) => {
-        const { onDoubleClick } = this.props;
-        const { minValue, maxValue } = this.props;
+        const { onDoubleClick, rangeX = 500, rangeY = 500 } = this.props;
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
 
         this.setState(prevState => ({
             isControlMode: !prevState.isControlMode
         }));
 
         if (onDoubleClick) {
-            const valueX = this.pixelsToValue(mouseX, this.props.width, minValue, maxValue);
-            const valueY = this.pixelsToValue(mouseY, this.props.height, minValue, maxValue);
+            const valueX = this.pixelsToValue(mouseX, this.props.width, minValueX, maxValueX);
+            const valueY = this.pixelsToValue(mouseY, this.props.height, minValueY, maxValueY);
             onDoubleClick(valueX, valueY);
         }
     }
@@ -261,11 +338,15 @@ export class Class_2D_Joystick extends React.Component {
     handleContextMenu = (event) => {
         event.preventDefault();
         const { x: mouseX, y: mouseY } = this.getMousePosition(event);
-        const { minValue, maxValue, onRightClick } = this.props;
-
+        const { rangeX = 500, rangeY = 500, onRightClick } = this.props;
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
+        
         if (onRightClick) {
-            const valueX = this.pixelsToValue(mouseX, this.props.width, minValue, maxValue);
-            const valueY = this.pixelsToValue(mouseY, this.props.height, minValue, maxValue);
+            const valueX = this.pixelsToValue(mouseX, this.props.width, minValueX, maxValueX);
+            const valueY = this.pixelsToValue(mouseY, this.props.height, minValueY, maxValueY);
             onRightClick(valueX, valueY);
         }
     }
@@ -274,21 +355,37 @@ export class Class_2D_Joystick extends React.Component {
         const { 
             width = 200, 
             height = 200, 
+            rangeX = 500,
+            rangeY = 500,
+            labelX = 'X',
+            labelY = 'Y',
             circleRadius = 15,
-            minValue = -500,
-            maxValue = 500,
+            indicatorCircle = null,
             className = '',
             style = {}
         } = this.props;
 
         const { isControlMode, isDragging, circleX, circleY, currentX, currentY } = this.state;
 
-        // Calculate inner rectangle dimensions (where circle center can reach max/min values)
-        const valueRange = maxValue - minValue;
-        const innerWidth = (valueRange / (valueRange + 2 * circleRadius)) * width;
-        const innerHeight = (valueRange / (valueRange + 2 * circleRadius)) * height;
-        const innerX = (width - innerWidth) / 2;
-        const innerY = (height - innerHeight) / 2;
+        // Calculate min/max values from ranges
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
+
+        // Inner rectangle (region the circle center can travel): purely geometry-based
+        const innerWidth = Math.max(0, width - 2 * circleRadius);
+        const innerHeight = Math.max(0, height - 2 * circleRadius);
+        const innerX = circleRadius;
+        const innerY = circleRadius;
+
+        // Calculate indicator circle position if provided
+        let indicatorCircleX = null;
+        let indicatorCircleY = null;
+        if (indicatorCircle && indicatorCircle.x !== undefined && indicatorCircle.y !== undefined) {
+            indicatorCircleX = this.valueToPixels(indicatorCircle.x, width, minValueX, maxValueX);
+            indicatorCircleY = this.valueToPixels(indicatorCircle.y, height, minValueY, maxValueY);
+        }
 
         return (
             <div 
@@ -355,6 +452,21 @@ export class Class_2D_Joystick extends React.Component {
                         strokeDasharray="5,5"
                     />
 
+                    {/* Indicator Circle (non-draggable) */}
+                    {indicatorCircleX !== null && indicatorCircleY !== null && (
+                        <circle
+                            cx={indicatorCircleX}
+                            cy={indicatorCircleY}
+                            r={circleRadius}
+                            fill={indicatorCircle.rgb || '#ff0000'}
+                            fillOpacity="0.3"
+                            stroke={indicatorCircle.rgb || '#ff0000'}
+                            strokeWidth="2"
+                            strokeDasharray="5,5"
+                            style={{ pointerEvents: 'none' }} // Make it non-interactive
+                        />
+                    )}
+
                     {/* Draggable circle */}
                     <circle
                         cx={circleX}
@@ -371,12 +483,21 @@ export class Class_2D_Joystick extends React.Component {
                     {/* Coordinate display */}
                     <text
                         x="10"
-                        y={height - 10}
+                        y={height - 20}
                         fill={isControlMode ? '#007bff' : '#6c757d'}
                         fontSize="12"
                         fontFamily="monospace"
                     >
-                        X: {Math.round(currentX)} Y: {Math.round(currentY)}
+                        {labelX}: {Number.isFinite(currentX) ? currentX.toFixed(2) : currentX}
+                    </text>
+                    <text
+                        x="10"
+                        y={height - 5}
+                        fill={isControlMode ? '#007bff' : '#6c757d'}
+                        fontSize="12"
+                        fontFamily="monospace"
+                    >
+                        {labelY}: {Number.isFinite(currentY) ? currentY.toFixed(2) : currentY}
                     </text>
 
                     {/* Control mode indicator */}
@@ -400,7 +521,7 @@ export class Class_2D_Joystick extends React.Component {
                         fontSize="10"
                         textAnchor="middle"
                     >
-                        {maxValue}
+                        {maxValueY}
                     </text>
                     <text
                         x={width / 2}
@@ -409,7 +530,7 @@ export class Class_2D_Joystick extends React.Component {
                         fontSize="10"
                         textAnchor="middle"
                     >
-                        {minValue}
+                        {minValueY}
                     </text>
                     <text
                         x={innerX - 15}
@@ -418,7 +539,7 @@ export class Class_2D_Joystick extends React.Component {
                         fontSize="10"
                         textAnchor="middle"
                     >
-                        {minValue}
+                        {minValueX}
                     </text>
                     <text
                         x={innerX + innerWidth + 15}
@@ -427,7 +548,7 @@ export class Class_2D_Joystick extends React.Component {
                         fontSize="10"
                         textAnchor="middle"
                     >
-                        {maxValue}
+                        {maxValueX}
                     </text>
                 </svg>
             </div>
