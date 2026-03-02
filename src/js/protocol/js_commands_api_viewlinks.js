@@ -56,12 +56,26 @@ export class CCommandAPI_ViewLink {
         return msg;
     }
 
-    static API_do_ViewLink_Camera_Control(p_camera_cmd) {
+    static API_do_ViewLink_Camera_Control(p_optical_zoom) {
+        /*
+            the physical value of level can be from 1 to 20:
+            1.0 = 1x zoom (minimum)
+            20.0 = 20x zoom (maximum for EO optical zoom)
+            Values are in 0.1x increments (e.g., 2.5 = 2.5x)
+        */
+        
+        // Clamp optical zoom value to valid range
+        if (typeof p_optical_zoom !== 'number') {
+            return ;
+        } else {
+            p_optical_zoom = Math.max(1.0, Math.min(20.0, p_optical_zoom));
+        }
+        
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
             'ms': {
                 a: js_andruavMessages.CONST_VIEWLINK_ACTION_CAMERA_CONTROL,
-                b: p_camera_cmd
+                b: p_optical_zoom
             }
         };
 

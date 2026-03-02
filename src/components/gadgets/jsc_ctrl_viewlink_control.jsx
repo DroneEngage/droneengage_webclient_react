@@ -49,11 +49,6 @@ export default class ClssCtrlViewlinkControl extends React.Component {
                 return;
             }
             
-            this.m_gimbalModeIndex = (this.m_gimbalModeIndex + 1) % this.m_gimbalModeIcons.length;
-            this.setState({ m_gimbal_enabled: this.m_gimbalModeIndex === 1, m_update: this.state.m_update + 1 });
-            
-            console.log("Gimbal control: " + this.m_gimbalModeLabels[this.m_gimbalModeIndex]);
-            
             e.preventDefault();
             
             js_eventEmitter.fn_dispatch(js_event.EE_displayViewLinkGimbal, {
@@ -62,20 +57,16 @@ export default class ClssCtrlViewlinkControl extends React.Component {
         }
     
         render() {
-            if (!this.props.p_unit.m_modules.has_viewlink) {
-                return (
-                    <div className="disabled hidden"/>
-                );
-            }
-    
+            const hasViewlink = this.props.p_unit && this.props.p_unit.m_modules && (this.props.p_unit.m_modules.has_viewlink === true);
+
             return (
                 <i 
                     id={this.props.id?this.props.id:"btn_laser_control"} 
                     key={this.key} 
-                    className={this.m_gimbalModeIcons[this.m_gimbalModeIndex] + " css_large_icon " + this.props.className} 
+                    className={this.m_gimbalModeIcons[this.m_gimbalModeIndex] + " css_large_icon " + (this.props.className ? this.props.className : "") + (hasViewlink ? "" : " disabled text-muted")} 
                     alt={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
                     title={this.m_gimbalModeLabels[this.m_gimbalModeIndex]} 
-                    onClick={(e) => this.fnl_showLaserControl(e)}
+                    onClick={hasViewlink ? ((e) => this.fnl_showLaserControl(e)) : undefined}
                 ></i>
             );
         }
