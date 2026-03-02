@@ -1275,11 +1275,11 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
-    API_do_ViewLink_Camera_Control(p_andruavUnit, p_channel_num, p_value) {
+    API_do_ViewLink_Camera_Control(p_andruavUnit, p_optical_zoom) {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_Control(p_channel_num, p_value);
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_Control(p_optical_zoom);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 

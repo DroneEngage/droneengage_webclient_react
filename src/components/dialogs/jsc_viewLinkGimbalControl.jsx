@@ -11,6 +11,12 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
+import {
+    VIEWLINK_CAMERA_ACTIVATE_EO,
+    VIEWLINK_CAMERA_ACTIVATE_IR,
+    VIEWLINK_CAMERA_ACTIVATE_PIP,
+    VIEWLINK_CAMERA_ACTIVATE_PIP_IR
+} from '../../js/protocol/js_andruavMessages.js';
 
 class ClssViewLinkGimbal extends React.Component {
 
@@ -24,6 +30,8 @@ class ClssViewLinkGimbal extends React.Component {
             'current_vertical': 0,
             'current_horizontal': 0,
             'target_drone': null,
+            'current_view_mode': 'EO', // EO, IR, PIP, PIP_IR
+            'zoomLevel': 1.0,
         };
 
         this.m_flag_mounted = false;
@@ -90,7 +98,9 @@ class ClssViewLinkGimbal extends React.Component {
             ai_on: false,
             target_drone: null,
             current_vertical: 0,
-            current_horizontal: 0
+            current_horizontal: 0,
+            current_view_mode: 'EO',
+            zoomLevel: 1.0
         });
     }
 
@@ -109,7 +119,7 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ laser_on: new_laser_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, 1, new_laser_state ? 1 : 0); 
+            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, 1, new_laser_state ? 1 : 0);
         }
     }
 
@@ -118,7 +128,7 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ tracker_on: new_tracker_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, 1, new_tracker_state ? 1 : 0); 
+            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, 1, new_tracker_state ? 1 : 0);
         }
     }
 
@@ -127,8 +137,59 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ ai_on: new_ai_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, 1, new_ai_state ? 1 : 0); 
+            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, 1, new_ai_state ? 1 : 0);
         }
+    }
+
+    fn_toggleViewMode() {
+        const viewModes = ['EO', 'IR', 'PIP', 'PIP_IR'];
+        const viewModeConstants = {
+            'EO': VIEWLINK_CAMERA_ACTIVATE_EO,
+            'IR': VIEWLINK_CAMERA_ACTIVATE_IR,
+            'PIP': VIEWLINK_CAMERA_ACTIVATE_PIP,
+            'PIP_IR': VIEWLINK_CAMERA_ACTIVATE_PIP_IR
+        };
+
+        const currentIndex = viewModes.indexOf(this.state.current_view_mode);
+        const nextIndex = (currentIndex + 1) % viewModes.length;
+        const nextMode = viewModes[nextIndex];
+        const nextModeConstant = viewModeConstants[nextMode];
+
+        this.setState({ current_view_mode: nextMode });
+        js_common.fn_console_log('View mode changed to:', nextMode, 'Constant:', nextModeConstant);
+
+        // Send view mode command to drone
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Control(p_andruavUnit, nextModeConstant);
+        }
+    }
+
+    fn_getViewModeButtonColor() {
+        const colorMap = {
+            'EO': 'btn-primary',
+            'IR': 'btn-warning',
+            'PIP': 'btn-info',
+            'PIP_IR': 'btn-success'
+        };
+        return colorMap[this.state.current_view_mode] || 'btn-primary';
+    }
+
+    fn_setZoomLevel(zoomLevel) {
+        this.setState({ zoomLevel: zoomLevel });
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Control(p_andruavUnit, zoomLevel);
+        }
+    }
+
+    handleZoomMouseUp = (e) => {
+        const zoomLevel = parseFloat(e.target.value);
+        this.fn_setZoomLevel(zoomLevel);
+    }
+
+    handleZoomChange = (e) => {
+        this.setState({ zoomLevel: parseFloat(e.target.value) });
     }
 
     fn_setTargetDrone(p_unit) {
@@ -146,7 +207,7 @@ class ClssViewLinkGimbal extends React.Component {
     handleJoystickDrag = (horizontal, vertical) => {
         // Map joystick coordinates to gimbal control (keep float precision)
         // Joystick X = horizontal, Y = vertical
-        this.setState({ 
+        this.setState({
             current_horizontal: horizontal,
             current_vertical: vertical
         });
@@ -154,11 +215,11 @@ class ClssViewLinkGimbal extends React.Component {
 
     handleJoystickRelease = (horizontal, vertical) => {
         // Update state and send orientation when joystick is released (keep float precision)
-        this.setState({ 
+        this.setState({
             current_horizontal: horizontal,
             current_vertical: vertical
         });
-        this.sendOrientation(vertical, horizontal);
+        this.sendOrientation(horizontal, vertical);
     }
 
     fn_readCurrentOrientation() {
@@ -178,7 +239,7 @@ class ClssViewLinkGimbal extends React.Component {
         // Send to target drone if selected, otherwise send to current unit
         const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Absolute_Position(targetUnit, horizontal, vertical); 
+            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Absolute_Position(targetUnit, horizontal, vertical);
         }
     }
 
@@ -244,42 +305,51 @@ class ClssViewLinkGimbal extends React.Component {
                             <div className='row'>
                                 <div className="col-12">
                                     {/* Action Buttons Row */}
-                                    <div className="form-group mb-3 d-flex gap-2 justify-content-between">
-                                        {/* Laser On/Off Button */}
+                                    <div className="btn-group w-100 d-flex flex-wrap">
                                         <button
                                             id="btn_laser_toggle"
                                             type="button"
-                                            className={`btn flex-fill ${this.state.laser_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.laser_on ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleLaser()}
                                         >
                                             {this.state.laser_on ? t('laser_off') : t('laser_on')}
                                         </button>
 
-                                        {/* Tracker On/Off Button */}
                                         <button
                                             id="btn_tracker_toggle"
                                             type="button"
-                                            className={`btn flex-fill ${this.state.tracker_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.tracker_on ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleTracker()}
                                         >
                                             {this.state.tracker_on ? t('tracker_off') : t('tracker_on')}
                                         </button>
 
-                                        {/* AI On/Off Button */}
                                         <button
                                             id="btn_ai_toggle"
                                             type="button"
-                                            className={`btn flex-fill ${this.state.ai_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.ai_on ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleAI()}
                                         >
                                             {this.state.ai_on ? t('ai_off') : t('ai_on')}
                                         </button>
                                     </div>
 
-                                    {/* 2D Joystick Control */}
+                                    {/* 2D Joystick Control with EO/IR/PIP buttons and Zoom Control */}
                                     <div className="form-group mb-3">
                                         <label className="form-label">{t('gimbal_control')}</label>
-                                        <div className="d-flex justify-content-center">
+                                        <div className="d-flex justify-content-center align-items-center">
+                                            {/* View Mode Toggle Button */}
+                                            <div className="me-3" style={{ width: '80px' }}>
+                                                <button
+                                                    id="btn_view_mode_toggle"
+                                                    type="button"
+                                                    className={`btn btn-sm ${this.fn_getViewModeButtonColor()} w-100`}
+                                                    onClick={() => this.fn_toggleViewMode()}
+                                                    style={{ width: '100%', minWidth: '80px' }}
+                                                >
+                                                    {this.state.current_view_mode}
+                                                </button>
+                                            </div>
                                             <Class_2D_Joystick
                                                 width={200}
                                                 height={200}
@@ -294,6 +364,32 @@ class ClssViewLinkGimbal extends React.Component {
                                                 onDrag={this.handleJoystickDrag}
                                                 onRelease={this.handleJoystickRelease}
                                             />
+                                            <div className="ms-3 d-flex flex-column align-items-center" style={{ height: '200px', width: '24px' }}>
+                                                <input
+                                                    id="zoom_slider"
+                                                    type="range"
+                                                    className="form-range"
+                                                    min={1}
+                                                    max={20}
+                                                    step={0.05}
+                                                    value={this.state.zoomLevel}
+                                                    onChange={this.handleZoomChange}
+                                                    onMouseUp={this.handleZoomMouseUp}
+                                                    onTouchEnd={this.handleZoomMouseUp}
+                                                    style={{
+                                                        appearance: 'slider-vertical',
+                                                        WebkitAppearance: 'slider-vertical',
+                                                        writingMode: 'bt-lr',
+                                                        width: '24px',
+                                                        height: '200px',
+                                                        margin: 0,
+                                                        padding: 0,
+                                                        boxSizing: 'border-box',
+                                                        display: 'block'
+                                                    }}
+                                                />
+                                                <small className="text-muted mt-2">{t('zoom')}: {this.state.zoomLevel.toFixed(2)}</small>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -302,7 +398,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         <button
                                             id="btn_read_orientation"
                                             type="button"
-                                            className="btn btn-info flex-fill"
+                                            className="btn btn-sm btn-info flex-fill"
                                             onClick={() => this.fn_readCurrentOrientation()}
                                         >
                                             {t('read_current_orientation')}
@@ -311,7 +407,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         <div className="btn-group flex-fill" role="group" aria-label="Send to Drone">
                                             <button
                                                 type="button"
-                                                className="btn btn-primary"
+                                                className="btn btn-sm btn-primary"
                                                 onClick={() => {
                                                     if (this.state.target_drone) {
                                                         this.sendOrientation(this.state.current_vertical, this.state.current_horizontal);
@@ -322,7 +418,7 @@ class ClssViewLinkGimbal extends React.Component {
                                             </button>
                                             <button
                                                 type="button"
-                                                className="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                                className="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
                                                 data-bs-toggle="dropdown"
                                                 aria-haspopup="true"
                                                 aria-expanded="false"
