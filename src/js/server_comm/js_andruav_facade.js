@@ -1251,27 +1251,27 @@ class CAndruavClientFacade {
 
 
     //ViewLink Commands
-    API_do_ViewLink_Laser_Control(p_andruavUnit, p_channel_num, p_value) {
+    API_do_ViewLink_Laser_Control(p_andruavUnit, p_value) {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Laser_Control(p_channel_num, p_value);
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Laser_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
-    API_do_ViewLink_Tracker_Control(p_andruavUnit, p_channel_num, p_value) {
+    API_do_ViewLink_Tracker_Control(p_andruavUnit, p_value) {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Tracker_Control(p_channel_num, p_value);
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Tracker_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
-    API_do_ViewLink_AI_Control(p_andruavUnit, p_channel_num, p_value) {
+    API_do_ViewLink_AI_Control(p_andruavUnit, p_value) {
 
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_AI_Control(p_channel_num, p_value);
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_AI_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
