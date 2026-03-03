@@ -15,7 +15,13 @@ import {
     VIEWLINK_CAMERA_ACTIVATE_EO,
     VIEWLINK_CAMERA_ACTIVATE_IR,
     VIEWLINK_CAMERA_ACTIVATE_PIP,
-    VIEWLINK_CAMERA_ACTIVATE_PIP_IR
+    VIEWLINK_CAMERA_ACTIVATE_PIP_IR,
+    VIEWLINK_TRACKER_OFF,
+    VIEWLINK_TRACKER_ON,
+    VIEWLINK_AI_OFF,
+    VIEWLINK_AI_ON,
+    VIEWLINK_LASER_OFF,
+    VIEWLINK_LASER_ON
 } from '../../js/protocol/js_andruavMessages.js';
 
 class ClssViewLinkGimbal extends React.Component {
@@ -24,9 +30,9 @@ class ClssViewLinkGimbal extends React.Component {
         super();
         this.state = {
             'm_update': 0,
-            'laser_on': false,
-            'tracker_on': false,
-            'ai_on': false,
+            'laser_on': VIEWLINK_LASER_OFF,
+            'tracker_on': VIEWLINK_TRACKER_OFF,
+            'ai_on': VIEWLINK_AI_OFF,
             'current_vertical': 0,
             'current_horizontal': 0,
             'target_drone': null,
@@ -93,9 +99,9 @@ class ClssViewLinkGimbal extends React.Component {
         }
 
         this.setState({
-            laser_on: false,
-            tracker_on: false,
-            ai_on: false,
+            laser_on: VIEWLINK_LASER_OFF,
+            tracker_on: VIEWLINK_TRACKER_OFF,
+            ai_on: VIEWLINK_AI_OFF,
             target_drone: null,
             current_vertical: 0,
             current_horizontal: 0,
@@ -115,29 +121,29 @@ class ClssViewLinkGimbal extends React.Component {
     }
 
     fn_toggleLaser() {
-        const new_laser_state = !this.state.laser_on;
+        const new_laser_state = this.state.laser_on === VIEWLINK_LASER_OFF ? VIEWLINK_LASER_ON : VIEWLINK_LASER_OFF;
         this.setState({ laser_on: new_laser_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, 1, new_laser_state ? 1 : 0);
+            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, new_laser_state);
         }
     }
 
     fn_toggleTracker() {
-        const new_tracker_state = !this.state.tracker_on;
+        const new_tracker_state = this.state.tracker_on === VIEWLINK_TRACKER_OFF ? VIEWLINK_TRACKER_ON : VIEWLINK_TRACKER_OFF;
         this.setState({ tracker_on: new_tracker_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, 1, new_tracker_state ? 1 : 0);
+            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, new_tracker_state);
         }
     }
 
     fn_toggleAI() {
-        const new_ai_state = !this.state.ai_on;
+        const new_ai_state = this.state.ai_on === VIEWLINK_AI_OFF ? VIEWLINK_AI_ON : VIEWLINK_AI_OFF;
         this.setState({ ai_on: new_ai_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, 1, new_ai_state ? 1 : 0);
+            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, new_ai_state);
         }
     }
 
@@ -309,28 +315,28 @@ class ClssViewLinkGimbal extends React.Component {
                                         <button
                                             id="btn_laser_toggle"
                                             type="button"
-                                            className={`btn btn-sm ${this.state.laser_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.laser_on === VIEWLINK_LASER_ON ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleLaser()}
                                         >
-                                            {this.state.laser_on ? t('laser_off') : t('laser_on')}
+                                            {this.state.laser_on === VIEWLINK_LASER_OFF ? t('laser_off') : t('laser_on')}
                                         </button>
 
                                         <button
                                             id="btn_tracker_toggle"
                                             type="button"
-                                            className={`btn btn-sm ${this.state.tracker_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.tracker_on === VIEWLINK_TRACKER_ON ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleTracker()}
                                         >
-                                            {this.state.tracker_on ? t('tracker_off') : t('tracker_on')}
+                                            {this.state.tracker_on === VIEWLINK_TRACKER_OFF ? t('tracker_off') : t('tracker_on')}
                                         </button>
 
                                         <button
                                             id="btn_ai_toggle"
                                             type="button"
-                                            className={`btn btn-sm ${this.state.ai_on ? 'btn-danger' : 'btn-success'}`}
+                                            className={`btn btn-sm ${this.state.ai_on === VIEWLINK_AI_ON ? 'btn-danger' : 'btn-success'}`}
                                             onClick={() => this.fn_toggleAI()}
                                         >
-                                            {this.state.ai_on ? t('ai_off') : t('ai_on')}
+                                            {this.state.ai_on === VIEWLINK_AI_OFF ? t('ai_off') : t('ai_on')}
                                         </button>
                                     </div>
 
