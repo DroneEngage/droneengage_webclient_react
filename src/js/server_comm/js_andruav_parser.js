@@ -1063,6 +1063,49 @@ class CAndruavClientParser {
                 break;
 
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_STATUS: {
+                p_jmsg = msg.msgPayload;
+                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
+                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
+                }
+                
+                switch (p_jmsg.a) {
+                    case js_andruavMessages.VIEWLINK_STATUS_GIMBAL_ATTITUDE: {
+                        // Handle gimbal attitude status with yaw, pitch, roll fields
+                        console.log (p_jmsg);
+                        const payload = {
+                            gm: {
+                                y: p_jmsg.y ?? 0,
+                                p: p_jmsg.p ?? 0,
+                                r: p_jmsg.r ?? 0
+                            }
+                        };
+                        js_eventEmitter.fn_dispatch(js_event.EE_viewLinkGimbalAttitude, payload);
+                        break;
+                    }
+                    case js_andruavMessages.VIEWLINK_STATUS_ALL: {
+                        // Handle gimbal attitude status with yaw, pitch, roll fields
+                        console.log (p_jmsg);
+                        const gmSrc = p_jmsg.gm || {};
+                        const statusPayload = {
+                            gm: {
+                                y: gmSrc.y ?? 0,
+                                p: gmSrc.p ?? 0,
+                                r: gmSrc.r ?? 0
+                            },
+                            tr: p_jmsg.tr || p_jmsg.tracking || {},
+                            lrf: p_jmsg.lrf || {},
+                            ai: p_jmsg.ai || {},
+                            g: p_jmsg.g  || {}
+                        };
+                        js_eventEmitter.fn_dispatch(js_event.EE_viewLinkGimbalAttitude, statusPayload);
+                        break;
+                    }
+                }
+            }
+                break;
+
+
         };
 
     };
