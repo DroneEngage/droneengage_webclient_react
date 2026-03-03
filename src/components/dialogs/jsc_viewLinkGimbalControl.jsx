@@ -21,7 +21,8 @@ import {
     VIEWLINK_AI_OFF,
     VIEWLINK_AI_ON,
     VIEWLINK_LASER_OFF,
-    VIEWLINK_LASER_ON
+    VIEWLINK_LASER_ON,
+    VIEWLINK_CAMERA_SET_IR_DIGITAL_ZOOM_LEVEL
 } from '../../js/protocol/js_andruavMessages.js';
 
 class ClssViewLinkGimbal extends React.Component {
@@ -38,6 +39,7 @@ class ClssViewLinkGimbal extends React.Component {
             'target_drone': null,
             'current_view_mode': 'EO', // EO, IR, PIP, PIP_IR
             'zoomLevel': 1.0,
+            'irDigitalZoomLevel': 1.0,
         };
 
         this.m_flag_mounted = false;
@@ -106,7 +108,8 @@ class ClssViewLinkGimbal extends React.Component {
             current_vertical: 0,
             current_horizontal: 0,
             current_view_mode: 'EO',
-            zoomLevel: 1.0
+            zoomLevel: 1.0,
+            irDigitalZoomLevel: 1.0
         });
     }
 
@@ -179,6 +182,23 @@ class ClssViewLinkGimbal extends React.Component {
             'PIP_IR': 'btn-success'
         };
         return colorMap[this.state.current_view_mode] || 'btn-primary';
+    }
+
+    fn_setIRDigitalZoomLevel(irDigitalZoomLevel) {
+        this.setState({ irDigitalZoomLevel: irDigitalZoomLevel });
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_andruavUnit, irDigitalZoomLevel);
+        }
+    }
+
+    handleIRDigitalZoomMouseUp = (e) => {
+        const irDigitalZoomLevel = parseFloat(e.target.value);
+        this.fn_setIRDigitalZoomLevel(irDigitalZoomLevel);
+    }
+
+    handleIRDigitalZoomChange = (e) => {
+        this.setState({ irDigitalZoomLevel: parseFloat(e.target.value) });
     }
 
     fn_setZoomLevel(zoomLevel) {
@@ -378,14 +398,20 @@ class ClssViewLinkGimbal extends React.Component {
                                                     #zoom_slider::-webkit-slider-runnable-track { background: linear-gradient(90deg, transparent 10px, white 10px, white 14px, transparent 14px); border: none; border-radius: 2px; }
                                                     #zoom_slider::-moz-range-thumb { background: #0d6efd; border: none; width: 16px; height: 16px; border-radius: 50%; }
                                                     #zoom_slider::-webkit-slider-thumb { background: #0d6efd; border: none; width: 16px; height: 16px; border-radius: 50%; -webkit-appearance: none; }
+                                                    #ir_digital_zoom_slider { background: transparent; outline: none; accent-color: white; }
+                                                    #ir_digital_zoom_slider::-moz-range-track { background: linear-gradient(90deg, transparent 10px, white 10px, white 14px, transparent 14px); border: none; border-radius: 2px; }
+                                                    #ir_digital_zoom_slider::-moz-range-progress { background: transparent; border: none; }
+                                                    #ir_digital_zoom_slider::-webkit-slider-runnable-track { background: linear-gradient(90deg, transparent 10px, white 10px, white 14px, transparent 14px); border: none; border-radius: 2px; }
+                                                    #ir_digital_zoom_slider::-moz-range-thumb { background: #dc3545; border: none; width: 16px; height: 16px; border-radius: 50%; }
+                                                    #ir_digital_zoom_slider::-webkit-slider-thumb { background: #dc3545; border: none; width: 16px; height: 16px; border-radius: 50%; -webkit-appearance: none; }
                                                 `}</style>
                                                 <input
                                                     id="zoom_slider"
                                                     type="range"
                                                     orient="vertical"
                                                     className="form-range"
-                                                    min={1}
-                                                    max={20}
+                                                    min={js_globals.CONST_OPTICAL_ZOOM_MIN}
+                                                    max={js_globals.CONST_OPTICAL_ZOOM_MAX}
                                                     step={0.05}
                                                     value={this.state.zoomLevel}
                                                     onChange={this.handleZoomChange}
@@ -405,6 +431,34 @@ class ClssViewLinkGimbal extends React.Component {
                                                     }}
                                                 />
                                                 <small className="text-muted mt-2">{t('zoom')}: {this.state.zoomLevel.toFixed(2)}</small>
+                                            </div>
+                                            <div className="ms-3 d-flex flex-column align-items-center" style={{ height: '200px', width: '24px' }}>
+                                                <input
+                                                    id="ir_digital_zoom_slider"
+                                                    type="range"
+                                                    orient="vertical"
+                                                    className="form-range"
+                                                    min={js_globals.CONST_IR_DIGITAL_ZOOM_MIN}
+                                                    max={js_globals.CONST_IR_DIGITAL_ZOOM_MAX}
+                                                    step={0.05}
+                                                    value={this.state.irDigitalZoomLevel}
+                                                    onChange={this.handleIRDigitalZoomChange}
+                                                    onMouseUp={this.handleIRDigitalZoomMouseUp}
+                                                    onTouchEnd={this.handleIRDigitalZoomMouseUp}
+                                                    style={{
+                                                        appearance: 'slider-vertical',
+                                                        WebkitAppearance: 'slider-vertical',
+                                                        writingMode: 'bt-lr',
+                                                        width: '24px',
+                                                        height: '200px',
+                                                        margin: 0,
+                                                        padding: 0,
+                                                        boxSizing: 'border-box',
+                                                        display: 'block',
+                                                        background: 'transparent'
+                                                    }}
+                                                />
+                                                <small className="text-muted mt-2">{t('ir_digital_zoom')}: {this.state.irDigitalZoomLevel.toFixed(2)}</small>
                                             </div>
                                         </div>
                                     </div>

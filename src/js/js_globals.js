@@ -205,6 +205,12 @@ class GLOBALS {
 
 		this.CONST_DISABLE_ADSG = true;
 
+		// VIEW LINK Gimbal Zoom range constants
+		this.CONST_OPTICAL_ZOOM_MIN = 1.0;
+		this.CONST_OPTICAL_ZOOM_MAX = 20.0;
+		this.CONST_IR_DIGITAL_ZOOM_MIN = 1.0;
+		this.CONST_IR_DIGITAL_ZOOM_MAX = 16.0;
+
 	}
 
 	static getInstance() {
