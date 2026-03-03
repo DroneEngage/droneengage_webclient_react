@@ -10,6 +10,7 @@
 
 import * as js_andruavMessages from './js_andruavMessages.js';
 import * as js_common from '../js_common.js'
+import { js_globals } from '../js_globals.js'
 import { mavlink20 } from '../js_mavlink_v2.js'
 
 export class CCommandAPI_ViewLink {
@@ -95,7 +96,7 @@ export class CCommandAPI_ViewLink {
         if (typeof p_optical_zoom !== 'number') {
             return ;
         } else {
-            p_optical_zoom = Math.max(1.0, Math.min(20.0, p_optical_zoom));
+            p_optical_zoom = Math.max(js_globals.CONST_OPTICAL_ZOOM_MIN, Math.min(js_globals.CONST_OPTICAL_ZOOM_MAX, p_optical_zoom));
         }
         
         const msg = {
@@ -104,6 +105,33 @@ export class CCommandAPI_ViewLink {
                 a: js_andruavMessages.CONST_VIEWLINK_ACTION_CAMERA_CONTROL,
                 b: js_andruavMessages.VIEWLINK_CAMERA_SET_OPTICAL_ZOOM_LEVEL,
                 c: p_optical_zoom
+            }
+        };
+
+        return msg;
+    }
+
+    static API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_ir_digital_zoom) {
+        /*
+            the physical value of level can be from 1 to 20:
+            1.0 = 1x zoom (minimum)
+            20.0 = 20x zoom (maximum for IR digital zoom)
+            Values are in 0.05x increments (e.g., 2.5 = 2.5x)
+        */
+        
+        // Clamp IR digital zoom value to valid range
+        if (typeof p_ir_digital_zoom !== 'number') {
+            return ;
+        } else {
+            p_ir_digital_zoom = Math.max(js_globals.CONST_IR_DIGITAL_ZOOM_MIN, Math.min(js_globals.CONST_IR_DIGITAL_ZOOM_MAX, p_ir_digital_zoom));
+        }
+        
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_VIEWLINK_ACTION_CAMERA_CONTROL,
+                b: js_andruavMessages.VIEWLINK_CAMERA_SET_IR_DIGITAL_ZOOM_LEVEL,
+                c: p_ir_digital_zoom
             }
         };
 
