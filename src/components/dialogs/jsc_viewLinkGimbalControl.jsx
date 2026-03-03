@@ -40,6 +40,16 @@ class ClssViewLinkGimbal extends React.Component {
             'current_view_mode': 'EO', // EO, IR, PIP, PIP_IR
             'zoomLevel': 1.0,
             'irDigitalZoomLevel': 1.0,
+            'gimbal_yaw': 0,
+            'gimbal_pitch': 0,
+            'gimbal_roll': 0,
+            'lrf_distance_m': 0,
+            'lrf_age_seconds': 0,
+            'lrf_status_text': '',
+            'tracking_status': 0,
+            'tracking_status_text': '',
+            'tracking_target_type': 0,
+            'tracking_target_type_text': ''
         };
 
         this.m_flag_mounted = false;
@@ -52,6 +62,7 @@ class ClssViewLinkGimbal extends React.Component {
 
         js_eventEmitter.fn_subscribe(js_event.EE_displayViewLinkGimbal, this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_event.EE_hideViewLinkGimbal, this, this.fn_closeDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_viewLinkGimbalAttitude, this, this.fn_onGimbalAttitude);
 
 
     }
@@ -60,6 +71,7 @@ class ClssViewLinkGimbal extends React.Component {
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_displayViewLinkGimbal, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_hideViewLinkGimbal, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_viewLinkGimbalAttitude, this);
     }
 
     componentDidMount() {
@@ -174,6 +186,20 @@ class ClssViewLinkGimbal extends React.Component {
         }
     }
 
+    fn_getGimbalPosition() {
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Get_Status_Gimbal_Attitude(p_andruavUnit);
+        }
+    }
+
+    fn_getAllStatus() {
+        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        if (p_andruavUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Get_Status_All(p_andruavUnit);
+        }
+    }
+
     fn_getViewModeButtonColor() {
         const colorMap = {
             'EO': 'btn-primary',
@@ -182,6 +208,44 @@ class ClssViewLinkGimbal extends React.Component {
             'PIP_IR': 'btn-success'
         };
         return colorMap[this.state.current_view_mode] || 'btn-primary';
+    }
+
+    fn_onGimbalAttitude(p_me, p_status) {
+        if (p_me.m_flag_mounted === false) return;
+        
+        const c_gimbal = (p_status && p_status.gm) ? p_status.gm : p_status;
+        p_me.setState({
+            gimbal_yaw: c_gimbal.y,
+            gimbal_pitch: c_gimbal.p,
+            gimbal_roll: c_gimbal.r
+        });
+        const LRF = (p_status && p_status.lrf) ? p_status.lrf : {};
+        const lrf_age_seconds = LRF.a;
+        const lrf_distance_m = LRF.d;
+        const lrf_status_text = LRF.s;
+
+        const ai = (p_status && p_status.ai) ? p_status.ai : {};
+        const ai_targets_len = ai.tc;
+        const ai_targets = ai.t;
+        
+        const tracking = (p_status && p_status.tr) ? p_status.tr : {};
+        const tracking_status = tracking.s;
+        const tracking_status_text = tracking.st;
+        const tracking_target_type = tracking.tt;
+        const tracking_target_type_text = tracking.ttt;
+
+        p_me.setState({
+            lrf_distance_m: lrf_distance_m,
+            lrf_age_seconds: lrf_age_seconds,
+            lrf_status_text: lrf_status_text,
+            tracking_status: tracking_status,
+            tracking_status_text: tracking_status_text,
+            tracking_target_type: tracking_target_type,
+            tracking_target_type_text: tracking_target_type_text
+        });
+
+        console.log('LRF', LRF);
+        console.log('ai', ai);
     }
 
     fn_setIRDigitalZoomLevel(irDigitalZoomLevel) {
@@ -279,6 +343,12 @@ class ClssViewLinkGimbal extends React.Component {
 
         const isNoUnit = p_andruavUnit === null;
 
+        const lrfAgeDisplay = Number.isFinite(this.state.lrf_age_seconds)
+            ? (this.state.lrf_age_seconds > 99
+                ? 'X'
+                : Math.max(0, Math.floor(this.state.lrf_age_seconds)).toString().padStart(2, '0'))
+            : 'X';
+
         const v_units = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitValues()) ? js_globals.m_andruavUnitList.fn_getUnitValues() : [];
         const len = v_units.length;
         const c_items = [];
@@ -375,6 +445,15 @@ class ClssViewLinkGimbal extends React.Component {
                                                 >
                                                     {this.state.current_view_mode}
                                                 </button>
+                                                <button
+                                                    id="btn_get_position"
+                                                    type="button"
+                                                    className="btn btn-sm btn-primary w-100 mt-1"
+                                                    onClick={() => this.fn_getGimbalPosition()}
+                                                    style={{ width: '100%', minWidth: '80px' }}
+                                                >
+                                                    Pos
+                                                </button>
                                             </div>
                                             <Class_2D_Joystick
                                                 width={200}
@@ -459,6 +538,63 @@ class ClssViewLinkGimbal extends React.Component {
                                                     }}
                                                 />
                                                 <small className="text-muted mt-2">{t('ir_digital_zoom')}: {this.state.irDigitalZoomLevel.toFixed(2)}</small>
+                                            </div>
+                                            <div className="ms-3 d-flex flex-column align-items-stretch" style={{ width: '120px' }}>
+                                                <button
+                                                    id="btn_status_all"
+                                                    type="button"
+                                                    className="btn btn-sm btn-primary mt-2 w-100"
+                                                    onClick={() => this.fn_getAllStatus()}
+                                                >
+                                                    STATUS
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group mb-3">
+                                        <label className="form-label">LRF</label>
+                                        <div className="d-flex justify-content-around text-center">
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Distance</small>
+                                                <span className="badge bg-secondary">{this.state.lrf_distance_m}</span>
+                                                <small className="ms-2">{this.state.lrf_status_text}</small>
+                                                <small className="text-muted ms-2">{lrfAgeDisplay}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group mb-3">
+                                        <label className="form-label">Tracking</label>
+                                        <div className="d-flex justify-content-around text-center">
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Status</small>
+                                                <span className="badge bg-info">{this.state.tracking_status_text}</span>
+                                                <small className="text-muted ms-2">({this.state.tracking_status})</small>
+                                            </div>
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Type</small>
+                                                <span className="badge bg-info">{this.state.tracking_target_type_text}</span>
+                                                <small className="text-muted ms-2">({this.state.tracking_target_type})</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Gimbal Attitude Display */}
+                                    <div className="form-group mb-3">
+                                        <label className="form-label">{t('gimbal_attitude')}</label>
+                                        <div className="d-flex justify-content-around text-center">
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Yaw</small>
+                                                <span className="badge bg-primary">{this.state.gimbal_yaw.toFixed(1)}°</span>
+                                            </div>
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Pitch</small>
+                                                <span className="badge bg-success">{this.state.gimbal_pitch.toFixed(1)}°</span>
+                                            </div>
+                                            <div className="px-2">
+                                                <small className="text-muted d-block">Roll</small>
+                                                <span className="badge bg-warning">{this.state.gimbal_roll.toFixed(1)}°</span>
                                             </div>
                                         </div>
                                     </div>

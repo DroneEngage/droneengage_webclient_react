@@ -88,6 +88,7 @@ const EVENT_LIST = Object.freeze({
 
 			"EE_displayViewLinkGimbal",
 			"EE_hideViewLinkGimbal",
+			"EE_viewLinkGimbalAttitude",
 
 			"EE_displayYawDlgForm",
 			"EE_displayCameraDlgForm",

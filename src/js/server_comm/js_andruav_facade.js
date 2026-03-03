@@ -1307,6 +1307,22 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
+    API_do_ViewLink_Get_Status_Gimbal_Attitude(p_andruavUnit) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Get_Status_Gimbal_Attitude();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_do_ViewLink_Get_Status_All(p_andruavUnit) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Get_Status_All();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
     //END OF ViewLink Commands
 
     // receives event from gamepad and store it for sending.

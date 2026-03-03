@@ -167,14 +167,23 @@ export class CCommandAPI_ViewLink {
         return msg;
     }
 
-    static API_do_ViewLink_Get_Status() {
+    static API_do_ViewLink_Get_Status(p_status) {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_VIEWLINK_ACTION_GET_STATUS
+                a: js_andruavMessages.CONST_VIEWLINK_ACTION_GET_STATUS,
+                b: p_status
             }
         };
 
         return msg;
+    }
+
+    static API_do_ViewLink_Get_Status_Gimbal_Attitude() {
+        return CCommandAPI_ViewLink.API_do_ViewLink_Get_Status(js_andruavMessages.VIEWLINK_STATUS_GIMBAL_ATTITUDE);
+    }
+
+    static API_do_ViewLink_Get_Status_All() {
+        return CCommandAPI_ViewLink.API_do_ViewLink_Get_Status(js_andruavMessages.VIEWLINK_STATUS_ALL);
     }
 }
