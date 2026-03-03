@@ -179,7 +179,7 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ zoomLevel: zoomLevel });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Control(p_andruavUnit, zoomLevel);
+            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Zoom_Control(p_andruavUnit, zoomLevel);
         }
     }
 
@@ -365,9 +365,18 @@ class ClssViewLinkGimbal extends React.Component {
                                                 onRelease={this.handleJoystickRelease}
                                             />
                                             <div className="ms-3 d-flex flex-column align-items-center" style={{ height: '200px', width: '24px' }}>
+                                                <style>{`
+                                                    #zoom_slider { background: transparent; outline: none; accent-color: white; }
+                                                    #zoom_slider::-moz-range-track { background: linear-gradient(90deg, transparent 10px, white 10px, white 14px, transparent 14px); border: none; border-radius: 2px; }
+                                                    #zoom_slider::-moz-range-progress { background: transparent; border: none; }
+                                                    #zoom_slider::-webkit-slider-runnable-track { background: linear-gradient(90deg, transparent 10px, white 10px, white 14px, transparent 14px); border: none; border-radius: 2px; }
+                                                    #zoom_slider::-moz-range-thumb { background: #0d6efd; border: none; width: 16px; height: 16px; border-radius: 50%; }
+                                                    #zoom_slider::-webkit-slider-thumb { background: #0d6efd; border: none; width: 16px; height: 16px; border-radius: 50%; -webkit-appearance: none; }
+                                                `}</style>
                                                 <input
                                                     id="zoom_slider"
                                                     type="range"
+                                                    orient="vertical"
                                                     className="form-range"
                                                     min={1}
                                                     max={20}
@@ -385,7 +394,8 @@ class ClssViewLinkGimbal extends React.Component {
                                                         margin: 0,
                                                         padding: 0,
                                                         boxSizing: 'border-box',
-                                                        display: 'block'
+                                                        display: 'block',
+                                                        background: 'transparent'
                                                     }}
                                                 />
                                                 <small className="text-muted mt-2">{t('zoom')}: {this.state.zoomLevel.toFixed(2)}</small>
