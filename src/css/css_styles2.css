@@ -1330,3 +1330,9 @@ div#displays {
 	height: 30px;
 	/* Adjust based on actual footer height */
 }
+
+button#btn_showMap::before,
+button#btn_showVideo::before,
+button#btn_showControl::before {
+	margin-right: 5px;
+}
