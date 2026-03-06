@@ -1,5 +1,7 @@
 {
     "gimbal_control": "تحكم حامل الكاميرا",
+    "gimbal_control_disabled": "تحكم حامل الكاميرا معطل",
+    "gimbal_control_enabled": "تحكم حامل الكاميرا مفعل",
     "no_unit_selected": "لم يتم تحديد وحدة",
     "laser_off": "إيقاف الليزر",
     "laser_on": "تشغيل الليزر",
