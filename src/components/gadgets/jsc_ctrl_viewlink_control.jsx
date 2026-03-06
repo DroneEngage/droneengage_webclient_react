@@ -1,4 +1,5 @@
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
@@ -7,7 +8,7 @@ import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 
-export default class ClssCtrlViewlinkControl extends React.Component {
+class ClssCtrlViewlinkControl extends React.Component {
     constructor(props) {
             super(props);
             this.state = {
@@ -19,8 +20,8 @@ export default class ClssCtrlViewlinkControl extends React.Component {
             this.m_flag_mounted = false;
             
             // Gimbal control modes: disabled, enabled
-            this.m_gimbalModeLabels = ["Gimbal Control Disabled", "Gimbal Control Enabled"];
-            this.m_gimbalModeIcons = ["bi bi-arrows-expand txt-theme-aware cursor_hand css_large_icon text-muted", "bi bi-crosshair txt-theme-aware cursor_hand css_large_icon text-warning"];
+            this.m_gimbalModeLabels = [this.props.t('gimbal_control_disabled'), this.props.t('gimbal_control_enabled')];
+            this.m_gimbalModeIcons = ["bi bi-binoculars cursor_hand css_large_icon text-muted", "bi bi-binoculars-fill cursor_hand css_large_icon text-success"];
             this.m_gimbalModeIndex = 0;
             
         }
@@ -58,10 +59,10 @@ export default class ClssCtrlViewlinkControl extends React.Component {
     
         render() {
             const hasViewlink = this.props.p_unit && this.props.p_unit.m_modules && (this.props.p_unit.m_modules.has_viewlink === true);
-
+            this.m_gimbalModeIndex = hasViewlink ? 1 : 0;
             return (
                 <i 
-                    id={this.props.id?this.props.id:"btn_laser_control"} 
+                    id={this.props.id?this.props.id:"btn_viewlink_control"} 
                     key={this.key} 
                     className={this.m_gimbalModeIcons[this.m_gimbalModeIndex] + " css_large_icon " + (this.props.className ? this.props.className : "") + (hasViewlink ? "" : " disabled text-muted")} 
                     alt={this.m_gimbalModeLabels[this.m_gimbalModeIndex]}
@@ -72,3 +73,4 @@ export default class ClssCtrlViewlinkControl extends React.Component {
         }
     
     }
+export default withTranslation()(ClssCtrlViewlinkControl);
