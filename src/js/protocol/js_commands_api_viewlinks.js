@@ -186,4 +186,17 @@ export class CCommandAPI_ViewLink {
     static API_do_ViewLink_Get_Status_All() {
         return CCommandAPI_ViewLink.API_do_ViewLink_Get_Status(js_andruavMessages.VIEWLINK_STATUS_ALL);
     }
+
+
+    static API_do_ViewLink_Set_IR_HOT(p_white_hot) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_VIEWLINK_ACTION_CAMERA_CONTROL,
+                b: p_white_hot===true?js_andruavMessages.VIEWLINK_CAMERA_ACTIVATE_IR_HOT_WHITE:js_andruavMessages.VIEWLINK_CAMERA_ACTIVATE_IR_HOT_BLACK
+            }
+        };
+
+        return msg;
+    }
 }

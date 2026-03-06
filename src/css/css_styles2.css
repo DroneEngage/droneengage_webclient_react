@@ -1331,6 +1331,9 @@ div#displays {
 	/* Adjust based on actual footer height */
 }
 
+button#btn_ir_hot_toggle::before,
+button#btn_view_mode_toggle::before,
+button#btn_get_position::before,
 button#btn_showMap::before,
 button#btn_showVideo::before,
 button#btn_showControl::before {
