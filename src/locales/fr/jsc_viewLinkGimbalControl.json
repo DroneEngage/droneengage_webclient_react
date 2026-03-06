@@ -1,5 +1,7 @@
 {
     "gimbal_control": "Contrôle de Nacelle",
+    "gimbal_control_disabled": "Contrôle de Nacelle Désactivé",
+    "gimbal_control_enabled": "Contrôle de Nacelle Activé",
     "no_unit_selected": "Aucune unité sélectionnée",
     "laser_off": "Laser OFF",
     "laser_on": "Laser ON",
