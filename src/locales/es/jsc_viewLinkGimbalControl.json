@@ -1,5 +1,7 @@
 {
     "gimbal_control": "Control del Cardán",
+    "gimbal_control_disabled": "Control del Cardán Desactivado",
+    "gimbal_control_enabled": "Control del Cardán Activado",
     "no_unit_selected": "Ninguna unidad seleccionada",
     "laser_off": "Láser OFF",
     "laser_on": "Láser ON",
