@@ -168,7 +168,7 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ ir_hot: new_ir_hot_state });
         const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Set_IR_HOT(p_andruavUnit, new_ir_hot_state === 'WHITE');
+            js_globals.v_andruavFacade.API_do_ViewLink_Set_IR_HOT(p_andruavUnit, new_ir_hot_state !== 'WHITE'); // we need the GUI to display white when white
         }
     }
 
