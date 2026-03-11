@@ -59,6 +59,12 @@ import ru_jsc_viewLinkGimbalControl from '../locales/ru/jsc_viewLinkGimbalContro
 import ar_jsc_viewLinkGimbalControl from '../locales/ar/jsc_viewLinkGimbalControl.json';
 import fr_jsc_viewLinkGimbalControl from '../locales/fr/jsc_viewLinkGimbalControl.json';
 
+import en_jsc_ctrl_tracker_ai_list from '../locales/en/jsc_ctrl_tracker_ai_list.json';
+import es_jsc_ctrl_tracker_ai_list from '../locales/es/jsc_ctrl_tracker_ai_list.json';
+import ru_jsc_ctrl_tracker_ai_list from '../locales/ru/jsc_ctrl_tracker_ai_list.json';
+import ar_jsc_ctrl_tracker_ai_list from '../locales/ar/jsc_ctrl_tracker_ai_list.json';
+import fr_jsc_ctrl_tracker_ai_list from '../locales/fr/jsc_ctrl_tracker_ai_list.json';
+
 
 i18n
   .use(initReactI18next)
@@ -74,7 +80,8 @@ i18n
         udpProxyTelemetry: en_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: en_jsc_ctrl_swarm,
         globalSettings: en_jsc_global_settings,
-        viewLinkGimbalControl: en_jsc_viewLinkGimbalControl
+        viewLinkGimbalControl: en_jsc_viewLinkGimbalControl,
+        trackerAIList: en_jsc_ctrl_tracker_ai_list
       },
       es: {
         translation: esTranslation,
@@ -85,7 +92,8 @@ i18n
         udpProxyTelemetry: es_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: es_jsc_ctrl_swarm,
         globalSettings: es_jsc_global_settings,
-        viewLinkGimbalControl: es_jsc_viewLinkGimbalControl
+        viewLinkGimbalControl: es_jsc_viewLinkGimbalControl,
+        trackerAIList: es_jsc_ctrl_tracker_ai_list
       },
       ar: {
         translation: arTranslation,
@@ -96,7 +104,8 @@ i18n
         udpProxyTelemetry: ar_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: ar_jsc_ctrl_swarm,
         globalSettings: ar_jsc_global_settings,
-        viewLinkGimbalControl: ar_jsc_viewLinkGimbalControl
+        viewLinkGimbalControl: ar_jsc_viewLinkGimbalControl,
+        trackerAIList: ar_jsc_ctrl_tracker_ai_list
       },
       fr: {
         translation: frTranslation,
@@ -107,7 +116,8 @@ i18n
         udpProxyTelemetry: fr_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: fr_jsc_ctrl_swarm,
         globalSettings: fr_jsc_global_settings,
-        viewLinkGimbalControl: fr_jsc_viewLinkGimbalControl
+        viewLinkGimbalControl: fr_jsc_viewLinkGimbalControl,
+        trackerAIList: fr_jsc_ctrl_tracker_ai_list
       },
       ru: {
         translation: ruTranslation,
@@ -118,7 +128,8 @@ i18n
         udpProxyTelemetry: ru_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: ru_jsc_ctrl_swarm,
         globalSettings: ru_jsc_global_settings,
-        viewLinkGimbalControl: ru_jsc_viewLinkGimbalControl
+        viewLinkGimbalControl: ru_jsc_viewLinkGimbalControl,
+        trackerAIList: ru_jsc_ctrl_tracker_ai_list
       },
     },
     fallbackLng: 'en', // Default to English

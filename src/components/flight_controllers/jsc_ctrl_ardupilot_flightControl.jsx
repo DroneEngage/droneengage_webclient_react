@@ -847,38 +847,38 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case js_andruavUnit.VEHICLE_TRI:
     {
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
-                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
-                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
-                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
-                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
-                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
-                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
-                    <button id="btn_guided_no_gps" type="button" className={"btn btn-sm  flgtctrlbtn " + btn.btn_guided_no_gps_class } onClick={ (e) => this.fn_doGuidedNoGPS(this.props.v_andruavUnit)}>&nbsp;Guided-NG </button>
-                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
-                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
-                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
+                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down btn-with-icon-margin' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>Land</button>
+                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>Surface</button>
+                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>Auto</button>
+                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>Guided</button>
+                    <button id="btn_guided_no_gps" type="button" className={"btn btn-sm  flgtctrlbtn btn-with-icon-margin" + btn.btn_guided_no_gps_class } onClick={ (e) => this.fn_doGuidedNoGPS(this.props.v_andruavUnit)}>G-NG</button>
+                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn btn-with-icon-margin' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>Brake</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>Circle</button>
+                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>Hold</button>
                     </div></div>);
 
                 ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>&nbsp;Pos-H&nbsp;</button>
-                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>&nbsp;Loiter&nbsp;</button>
-                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>&nbsp;Manual&nbsp;</button>
-                    <button id='btn_acro' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_acro_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doAcro.bind(this))}>&nbsp;Acro&nbsp;</button>
-                    <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doStabilize.bind(this))}>&nbsp;Stablize&nbsp;</button>
-                    <button id='btn_altHold' type='button' className={'btn btn-sm flgtctrlbtn css_ontop ' + btn.btn_alt_hold_class } onClick={ (e) => this.fn_doAltHold(this.props.v_andruavUnit)}>&nbsp;Alt-H&nbsp;</button>
-                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>&nbsp;RTL&nbsp;</button>
-                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>&nbsp;S-RTL&nbsp;</button>
-                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
-                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
-                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
+                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
+                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
+                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
+                    <button id='btn_acro' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_acro_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doAcro.bind(this))}>Acro</button>
+                    <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doConfirmMode(this.props.v_andruavUnit, this.fn_doStabilize.bind(this))}>Stablize</button>
+                    <button id='btn_altHold' type='button' className={'btn btn-sm flgtctrlbtn css_ontop btn-with-icon-margin' + btn.btn_alt_hold_class } onClick={ (e) => this.fn_doAltHold(this.props.v_andruavUnit)}>Alt-H</button>
+                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>RTL</button>
+                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>S-RTL</button>
+                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>Cruise</button>
+                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
+                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
                     </div></div>);
 
                 
                 ctrl.push(<div key={this.props.id+"rc3"}   id={this.props.id+"rc3"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-25 me-1' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-25 me-1' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-25' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-25 me-1 btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-25 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-25 btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn w-25' + btn.btn_object_tracking_class}>
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
                     </button>
@@ -890,40 +890,40 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power ' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
-                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
-                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
-                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
-                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
-                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
-                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn ' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
-                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
-                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
-                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>&nbsp;Loiter&nbsp;</button>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
+                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down btn-with-icon-margin' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>Land</button>
+                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>Surface</button>
+                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>Auto</button>
+                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>Guided</button>
+                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn btn-with-icon-margin' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>Brake</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>Circle</button>
+                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>Hold</button>
+                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
                     </div></div>);
         
                 ctrl.push(<div key={this.props.id+"rc2"}  id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>&nbsp;Pos-H&nbsp;</button>
-                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>&nbsp;Manual&nbsp;</button>
-                    <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doStabilize(this.props.v_andruavUnit)}>&nbsp;Stabilize&nbsp;</button>
-                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>&nbsp;RTL&nbsp;</button>
-                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>&nbsp;S-RTL&nbsp;</button>
-                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
-                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
-                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
-                    <button id='btn_speed' type='button' className={'btn btn_sm  flgtctrlbtn bi bi-speedometer2' + btn.btn_speed_class } onClick={ (e) => this.fn_changeSpeedWrapper(this.props.v_andruavUnit)}>&nbsp;GS&nbsp;</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
+                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
+                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
+                    <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doStabilize(this.props.v_andruavUnit)}>Stabilize</button>
+                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>RTL</button>
+                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>S-RTL</button>
+                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>Cruise</button>
+                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
+                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => this.fn_changeSpeedWrapper(this.props.v_andruavUnit)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     </div></div>);
             
             
                 ctrl.push(<div key={this.props.id+"rc22"} id={this.props.id+"rc22"}   className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_q_sblt' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_q_stabilize } onClick={ (e) => this.fn_doQStabilize(this.props.v_andruavUnit)}>&nbsp;QStab&nbsp;</button>
-                    <button id='btn_q_loiter' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_q_loiter } onClick={ (e) => this.fn_doQLoiter(this.props.v_andruavUnit)}>&nbsp;QLoiter&nbsp;</button>
-                    <button id='btn_q_hover' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_q_hover } onClick={ (e) => this.fn_doQHover(this.props.v_andruavUnit)}>&nbsp;QHover&nbsp;</button>
-                    <button id='btn_q_land' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_q_land } title="RTL mode"  onClick={ (e) => this.fn_doQLand(this.props.v_andruavUnit)}>&nbsp;QLand&nbsp;</button>
-                    <button id='btn_q_rtl' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_q_rtl } title="Smart RTL"  onClick={ (e) => this.fn_doQRTL(this.props.v_andruavUnit)}>&nbsp;QRTL&nbsp;</button>
+                    <button id='btn_q_sblt' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_q_stabilize } onClick={ (e) => this.fn_doQStabilize(this.props.v_andruavUnit)}>QStab</button>
+                    <button id='btn_q_loiter' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_q_loiter } onClick={ (e) => this.fn_doQLoiter(this.props.v_andruavUnit)}>QLoiter</button>
+                    <button id='btn_q_hover' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_q_hover } onClick={ (e) => this.fn_doQHover(this.props.v_andruavUnit)}>QHover</button>
+                    <button id='btn_q_land' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_q_land } title="RTL mode"  onClick={ (e) => this.fn_doQLand(this.props.v_andruavUnit)}>QLand</button>
+                    <button id='btn_q_rtl' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_q_rtl } title="Smart RTL"  onClick={ (e) => this.fn_doQRTL(this.props.v_andruavUnit)}>QRTL</button>
                     </div></div>);
     
                 }
@@ -932,31 +932,31 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             default:
                 {
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>&nbsp;ARM&nbsp;</button>
-                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up '  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>&nbsp;{btn.btn_climb_text}&nbsp;</button>
-                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>&nbsp;TakeOff&nbsp;</button>
-                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down ' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>&nbsp;Land&nbsp;</button>
-                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
-                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
-                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
-                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
-                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
-                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
+                    <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
+                    <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
+                    <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
+                    <button id='btn_land' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-down btn-with-icon-margin' + btn.btn_land_class } onClick={ (e) => this.fn_doLand(this.props.v_andruavUnit)}>Land</button>
+                    <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>Surface</button>
+                    <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>Auto</button>
+                    <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>Guided</button>
+                    <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn btn-with-icon-margin' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>Brake</button>
+                    <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>Circle</button>
+                    <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>Hold</button>
                     </div></div>);
 
                 ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
-                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>&nbsp;Pos-H&nbsp;</button>
-                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>&nbsp;Loiter&nbsp;</button>
-                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>&nbsp;Manual&nbsp;</button>
-                    <button id='btn_acro' type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_acro_class } onClick={ (e) => this.fn_doAcro(this.props.v_andruavUnit)}>&nbsp;Acro&nbsp;</button>
-                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>&nbsp;RTL&nbsp;</button>
-                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>&nbsp;S-RTL&nbsp;</button>
-                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>&nbsp;Cruise&nbsp;</button>
-                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>&nbsp;FBWA&nbsp;</button>
-                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>&nbsp;FBWB&nbsp;</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
+                    <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
+                    <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
+                    <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
+                    <button id='btn_acro' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_acro_class } onClick={ (e) => this.fn_doAcro(this.props.v_andruavUnit)}>Acro</button>
+                    <button id='btn_rtl' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_rtl_class } title="RTL mode"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, false)}>RTL</button>
+                    <button id='btn_rtl_s' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-90deg-left btn-with-icon-margin' + btn.btn_srtl_class } title="Smart RTL"  onClick={ (e) => this.fn_doRTL(this.props.v_andruavUnit, true)}>S-RTL</button>
+                    <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>Cruise</button>
+                    <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
+                    <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     </div></div>);
                     }
                 break;
