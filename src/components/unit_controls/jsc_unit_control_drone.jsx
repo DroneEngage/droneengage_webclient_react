@@ -31,8 +31,6 @@ import ClssCtrlDroneIMU from './jsc_unit_control_imu.jsx'
 import { ClssAndruavUnitBase } from './jsc_unit_control_base.jsx'
 import ClssCtrlUnitMainBar from './jsc_ctrl_unit_main_bar.jsx'
 import ClssCtrlUnitPlanningBar from './jsc_ctrl_unit_planning_bar.jsx'
-import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
-import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
 
 /**
  * This class is full control of Drone.
@@ -403,7 +401,6 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         let btn = this.hlp_getflightButtonStyles(p_andruavUnit);
         let ctrl_flight_controller = [];
         let ctrl2_1 = [];
-        let ctrl2_2 = [];
         let cls_ctrl_modes = '  ';
         let cls_ctrl_wp = '  ';
         if (!js_andruavAuth.fn_do_canControlWP()) {   // no permission
@@ -437,11 +434,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             <button id='btn_lidar_info' key={this.key + 'btn_lidar_info'} type='button' title="Display Lidar Info" className={'btn btn-sm flgtctrlbtn ' + btn.btn_lidar_info_class} onClick={(e) => this.fn_displayLidarDialog(p_andruavUnit)}>&nbsp;LIDAR</button>
         </div></div>);
 
-        ctrl2_2.push(<div key={p_andruavUnit.getPartyID() + "rc3_1"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
-            <button id='btn_tracking' key={this.key + 'btn_tracking'} type='button' title="Send Parameters to GCS" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class} ><ClssCtrlObjectTracker className='vstack' p_unit={p_andruavUnit} title='object tracker' /></button>
-            <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={p_andruavUnit} title='object AI tracker' />
-        </div></div>);
-
+        
         return (
             <div key={'ctrl_flight_controller'} id='ctrl_k' className='ps-2 pb-2 pe-2'>
                 <div className='row'>
@@ -449,9 +442,6 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
                 </div>
                 <div key={'ctrl2_1'} className='row'>
                     {ctrl2_1}
-                </div>
-                <div key={'ctrl2_2'} className='row'>
-                    {ctrl2_2}
                 </div>
                 <div key={'ctrl3'} className='row'>
                 </div>

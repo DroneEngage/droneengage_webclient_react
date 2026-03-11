@@ -7,6 +7,9 @@ import * as js_andruavUnit from '../../js/js_andruavUnit'
 import * as js_helpers from '../../js/js_helpers'
 import {js_speak} from '../../js/js_speak'
 import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, gui_doYAW} from '../../js/js_main'
+import * as js_siteConfig from '../../js/js_siteConfig.js'
+import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
+import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -515,6 +518,21 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		res.btn_q_land = this.hlp_adjustFlightModeButtonClass(res.btn_q_land, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
 		res.btn_q_rtl = this.hlp_adjustFlightModeButtonClass(res.btn_q_rtl, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
 
+        // Tracking button styles
+        res.btn_object_tracking_class = " disabled hidden ";
+        res.btn_object_ai_tracking_class = " disabled hidden ";
+
+            if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null)
+                && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false)) {
+                if (this.props.v_andruavUnit.m_modules.has_tracking) {
+                    res.btn_object_tracking_class = " btn-primary   ";
+                }
+
+                if (this.props.v_andruavUnit.m_modules.has_ai_recognition) {
+                    res.btn_object_ai_tracking_class = " btn-primary   ";
+                }
+            }
+
 	    return res;
 	}
 
@@ -861,6 +879,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-25 me-1' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>&nbsp;YAW&nbsp;</button>
                     <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-25 me-1' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>&nbsp;GS&nbsp;</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-25' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>&nbsp;SRV&nbsp;</button>
+                    <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn w-25' + btn.btn_object_tracking_class}>
+                        <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
+                    </button>
+                    <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={this.props.v_andruavUnit} title='object AI tracker' />
                     </div></div>);
                     }
             break;

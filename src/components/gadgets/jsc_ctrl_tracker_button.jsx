@@ -98,10 +98,22 @@ export default class ClssCtrlObjectTracker extends React.Component {
                 
             }
             
-                
-            return (
-                <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_Track + " css_large_icon " + this.props.className} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}></i>
-            );
+            // Check if text display is requested
+            if (this.props.displayText) {
+                // Remove css_large_icon for smaller icon when text is displayed
+                const css_Track_small = css_Track.replace('css_large_icon', '').trim();
+                return (
+                    <span id={this.props.id?this.props.id:this.key} key={this.key} className={this.props.className} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}>
+                        <i className={css_Track_small}></i>
+                        &nbsp;{this.props.displayText}
+                    </span>
+                );
+            }
+            else {
+                return (
+                    <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_Track + " " + this.props.className} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}></i>
+                );
+            }
         }
     
     }
