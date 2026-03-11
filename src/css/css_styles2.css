@@ -1336,6 +1336,7 @@ button#btn_view_mode_toggle::before,
 button#btn_get_position::before,
 button#btn_showMap::before,
 button#btn_showVideo::before,
-button#btn_showControl::before {
+button#btn_showControl::before,
+.btn-with-icon-margin::before  {
 	margin-right: 5px;
 }

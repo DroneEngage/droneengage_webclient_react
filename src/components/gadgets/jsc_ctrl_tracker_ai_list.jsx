@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import { js_globals } from '../../js/js_globals.js';
@@ -16,7 +17,7 @@ import { js_eventEmitter } from '../../js/js_eventEmitter'
  * onMakeSwarm
  * onRequestToFollow
  */
-export default class ClssCtrlObjectTrackerAIList extends React.Component {
+class ClssCtrlObjectTrackerAIList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -103,10 +104,14 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
     }
 
-    fnl_unSelectAll()
+    fnl_unSelectAll(e)
     {
-        const { m_selectedUnits } = this.state;
         const newSelectedUnits = [];
+
+        this.setState({
+            m_selectedUnits: newSelectedUnits,
+            m_update: this.state.m_update + 1
+        });
 
         this.fnl_trackerAIOff();
     }
@@ -245,9 +250,10 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
                                 aria-labelledby={"btnGroupDrop2"+ this.key}
                                 style={{ maxHeight: '200px', overflowY: 'auto' }}
                             >
-                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_unSelectAll(e)}>Unselect all</a>
+                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_unSelectAll(e)}>{this.props.t('unselectAll')}</a>
+                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_selectAll(e)}>{this.props.t('selectAll')}</a>
                                 {c_items}
-                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_selectAll(e)}>select all</a>
+                                
                             </div>
                         </div>
                     </div>
@@ -256,3 +262,5 @@ export default class ClssCtrlObjectTrackerAIList extends React.Component {
 
     }
 }
+
+export default withTranslation('trackerAIList')(ClssCtrlObjectTrackerAIList);
