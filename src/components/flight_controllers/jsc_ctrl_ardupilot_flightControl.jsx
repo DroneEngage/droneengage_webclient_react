@@ -108,6 +108,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         res.btn_surface_class           = " disabled hidden ";
         res.btn_auto_class              = "";
         res.btn_guided_class            = "";
+        res.btn_guided_no_gps_class     = "";
         res.btn_circle_class 	        = "";
         res.btn_brake_class             = " btn-outline-theme-aware ";
         res.btn_hold_class              = " btn-outline-theme-aware ";
@@ -183,6 +184,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-primary  ";
                     res.btn_guided_class 	    = " btn-primary  ";
+                    res.btn_guided_no_gps_class = " btn-primary  ";
                     res.btn_circle_class 	    = " btn-primary ";
                     res.btn_brake_class 	    = " btn-primary  ";
                     res.btn_hold_class 	        = " disabled hidden ";
@@ -400,6 +402,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_surface_class       = " disabled hidden ";
                     res.btn_auto_class 		    = " btn-outline-theme-aware ";
                     res.btn_guided_class 	    = " btn-outline-theme-aware ";
+                    res.btn_guided_no_gps_class = " btn-outline-theme-aware ";
                     res.btn_circle_class 	    = " btn-outline-theme-aware ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
@@ -488,6 +491,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
 		res.btn_auto_class = this.hlp_adjustFlightModeButtonClass(res.btn_auto_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
 		res.btn_guided_class = this.hlp_adjustFlightModeButtonClass(res.btn_guided_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+		res.btn_guided_no_gps_class = this.hlp_adjustFlightModeButtonClass(res.btn_guided_no_gps_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED_NO_GPS);
 		res.btn_circle_class = this.hlp_adjustFlightModeButtonClass(res.btn_circle_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
 		res.btn_brake_class = this.hlp_adjustFlightModeButtonClass(res.btn_brake_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
 		res.btn_hold_class = this.hlp_adjustFlightModeButtonClass(res.btn_hold_class, currentFlightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
@@ -717,6 +721,12 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         });
     }
 
+    fn_doGuidedNoGPS(v_andruavUnit) {
+        this.fn_applyAction(v_andruavUnit, (unit) => {
+            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED_NO_GPS);
+        });
+    }
+
     fn_doAuto(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
             js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
@@ -826,6 +836,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_surface' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_surface_class } onClick={ (e) => this.fn_doSurface(this.props.v_andruavUnit)}>&nbsp;Surface&nbsp;</button>
                     <button id='btn_auto' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_auto_class } onClick={ (e) => this.fn_doAuto(this.props.v_andruavUnit)}>&nbsp;Auto&nbsp;</button>
                     <button id='btn_guided' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_guided_class } onClick={ (e) => this.fn_doGuided(this.props.v_andruavUnit)}>&nbsp;Guided </button>
+                    <button id="btn_guided_no_gps" type="button" className={"btn btn-sm  flgtctrlbtn " + btn.btn_guided_no_gps_class } onClick={ (e) => this.fn_doGuidedNoGPS(this.props.v_andruavUnit)}>&nbsp;Guided-NG </button>
                     <button id='btn_break' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-stop-btn' + btn.btn_brake_class } onClick={ (e) => this.fn_doBrake(this.props.v_andruavUnit)}>&nbsp;Brake&nbsp;</button>
                     <button id='btn_circle' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_circle_class } onClick={ (e) => this.fn_doCircle(this.props.v_andruavUnit)}>&nbsp;Circle </button>
                     <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn ' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>&nbsp;Hold&nbsp;</button>
