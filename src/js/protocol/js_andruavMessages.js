@@ -587,6 +587,6 @@ export const TYPE_MODULE_CLASS_SDR = "sdr";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
 export const TYPE_MODULE_CLASS_GPIO = "gpio";
 export const TYPE_MODULE_CLASS_TRACKING = "trk";
-export const TYPE_MODULE_CLASS_AI_RECOGNITION = "aiq";
+export const TYPE_MODULE_CLASS_AI_RECOGNITION = "ai_rec";
 export const TYPE_MODULE_CLASS_VIEW_LINK = "vlk";
 export const TYPE_MODULE_CLASS_GENERIC = "gen";
