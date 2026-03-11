@@ -1720,6 +1720,9 @@ export function hlp_getFlightMode(p_andruavUnit) {
 			case js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED:
 				text = "Guided";
 				break;
+			case js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED_NO_GPS:
+				text = "Guided-NG";
+				break;
 			case js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER:
 				text = "Loiter";
 				break;
