@@ -1331,6 +1331,14 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
+    API_engageDEPilotControl(p_andruavUnit, p_enable)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_engageDEPilotControl(p_enable);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
     //END OF ViewLink Commands
 
     // receives event from gamepad and store it for sending.

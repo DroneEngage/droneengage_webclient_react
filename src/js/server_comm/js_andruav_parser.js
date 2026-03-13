@@ -1125,7 +1125,8 @@ class CAndruavClientParser {
             onVehicleChanged: false,
             onSwarmStatus: false,
             onSwarmStatus2: false,
-            onBackOnline: false
+            onBackOnline: false,
+            onDroneEngagePilotChanged: false
         };
 
         p_unit.m_IsMe = false;
@@ -1239,6 +1240,21 @@ class CAndruavClientParser {
         if (p_jmsg.z) p_unit.m_FlyingLastStartTime = p_jmsg.z / 1000;
         if (p_jmsg.a) p_unit.m_FlyingTotalDuration = p_jmsg.a / 1000;
 
+        // Handle DroneEngage Pilot fields
+        if (p_jmsg.hasOwnProperty('DE') || p_jmsg.hasOwnProperty('DO')) {
+            const old_de_pilot_enabled = p_unit.m_de_pilot_enabled;
+            const old_de_pilot_operation = p_unit.m_de_pilot_operation;
+            
+            if (p_jmsg.hasOwnProperty('DE')) {
+                p_unit.m_de_pilot_enabled = p_jmsg.DE;
+            }
+            if (p_jmsg.hasOwnProperty('DO')) {
+                p_unit.m_de_pilot_operation = p_jmsg.DO;
+            }
+            
+            triggers.onDroneEngagePilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_de_pilot_operation !== p_unit.m_de_pilot_operation;
+        }
+
         if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
             triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== p_jmsg.n;
             p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
@@ -1290,7 +1306,8 @@ class CAndruavClientParser {
             onVehicleChanged: js_event.EE_andruavUnitVehicleTypeUpdated,
             onBackOnline: js_event.EE_unitOnlineChanged,
             onModuleChanged: js_event.EE_onModuleUpdated,
-            onHomePointChanged: js_event.EE_HomePointChanged
+            onHomePointChanged: js_event.EE_HomePointChanged,
+            onDroneEngagePilotChanged: js_event.EE_onDroneEngagePilotChanged
         };
         Object.keys(triggers).forEach(key => {
             if (triggers[key] && eventMap[key]) {
