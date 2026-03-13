@@ -22,6 +22,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_andruavUnitVehicleTypeUpdated",
 			"EE_onProxyInfoUpdated",
 			"EE_onAndruavUnitSwarmUpdated",
+			"EE_onDroneEngagePilotChanged",
 			"EE_andruavUnitLidarInfo",
 			"EE_andruavUnitLidarShow",
 			"EE_onMessage",
