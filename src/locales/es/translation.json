@@ -60,5 +60,11 @@
   "video_data_colon": "Datos de Video:",
   "received_msgs_colon": "Mensajes Recibidos:",
   "last_active_colon": "Última Actividad:",
-   "download":"descargar"
+   "download":"descargar",
+  "warning_config_change": "¡ADVERTENCIA! - Cambio de Configuración {{unitName}}",
+  "are_you_sure_apply_settings": "¿Está seguro de que desea aplicar la configuración",
+  "yes": "SÍ",
+  "restart": "reiniciar",
+  "config": "config",
+  "configure_module": "Configurar Módulo"
 }

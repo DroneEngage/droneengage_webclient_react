@@ -1243,16 +1243,16 @@ class CAndruavClientParser {
         // Handle DroneEngage Pilot fields
         if (p_jmsg.hasOwnProperty('DE') || p_jmsg.hasOwnProperty('DO')) {
             const old_de_pilot_enabled = p_unit.m_de_pilot_enabled;
-            const old_de_pilot_operation = p_unit.m_de_pilot_operation;
+            const old_m_de_pilot_operation = p_unit.m_m_de_pilot_operation;
             
             if (p_jmsg.hasOwnProperty('DE')) {
                 p_unit.m_de_pilot_enabled = p_jmsg.DE;
             }
             if (p_jmsg.hasOwnProperty('DO')) {
-                p_unit.m_de_pilot_operation = p_jmsg.DO;
+                p_unit.m_m_de_pilot_operation = p_jmsg.DO;
             }
             
-            triggers.onDroneEngagePilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_de_pilot_operation !== p_unit.m_de_pilot_operation;
+            triggers.onDroneEngagePilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_m_de_pilot_operation !== p_unit.m_m_de_pilot_operation;
         }
 
         if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {

@@ -1168,7 +1168,7 @@ export class CAndruavUnitObject {
 
     // DroneEngage Pilot fields
     this.m_de_pilot_enabled = false;
-    this.m_de_pilot_operation = 0;
+    this.m_m_de_pilot_operation = 0;
 
     this.init();
 

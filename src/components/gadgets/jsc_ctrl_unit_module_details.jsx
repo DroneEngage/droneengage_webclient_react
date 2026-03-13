@@ -31,8 +31,8 @@ export default class ClssModuleDetails extends React.Component {
     fn_shutdownModule(p_module_key) {
         const c_module_key = p_module_key;
         const me  = this;
-            fn_do_modal_confirmation("WARNING! - Config Change " + this.props.p_unit.m_unitName,
-              "Are you sure you want to apply settings", function (p_approved) {
+            fn_do_modal_confirmation(this.props.t('warning_config_change', {unitName: this.props.p_unit.m_unitName}),
+              this.props.t('are_you_sure_apply_settings'), function (p_approved) {
                 if (p_approved === false) return;
         
                 js_globals.v_andruavFacade.API_doModuleConfigAction(me.props.p_unit, c_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
@@ -41,7 +41,7 @@ export default class ClssModuleDetails extends React.Component {
                 console.log('Submitted:', me.state.output);
                 alert("data submitted. you need to restart the module.");
                 
-              }, "YES", "bg-danger text-white");
+              }, this.props.t('yes'), "bg-danger text-white");
     }
 
     fn_shutdownBoard(p_module_key) {
@@ -52,7 +52,7 @@ export default class ClssModuleDetails extends React.Component {
                     "Are you sure you want to completly shutdown the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
                         js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
-                    }, "YES", "bg-danger text-white");
+                    }, this.props.t('yes'), "bg-danger text-white");
     }
 
     fn_rebootBoard(p_module_key) {
@@ -63,7 +63,7 @@ export default class ClssModuleDetails extends React.Component {
                     "Are you sure you want to completly reboot the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
                         js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_RESTART_HW);
-                    }, "YES", "bg-danger text-white");
+                    }, this.props.t('yes'), "bg-danger text-white");
     }
 
     fn_configModule(p_module) {
@@ -92,7 +92,7 @@ export default class ClssModuleDetails extends React.Component {
                                         <strong>{module.i}</strong>
                                     </p>
                                     {this.props.p_unit.fn_getIsDE() && <div id={`MD_CB${this.key}`} className='d-flex'>
-                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c btn-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>restart</button>
+                                        <button id={this.key + 'restart'} key={this.key + 'restart'} className='btn al_c btn-danger cursor_hand text-white textunit_nowidth me-2' onClick={(e) => this.fn_shutdownModule(module.k)}>{this.props.t('restart')}</button>
                                         {
                                             // Config Button
                                             (module.c && module.c !== 'comm') && (
@@ -101,9 +101,9 @@ export default class ClssModuleDetails extends React.Component {
                                                     key={this.key + 'config'}
                                                     className='btn al_c btn-success cursor_hand text-white textunit_nowidth'
                                                     onClick={(e) => this.fn_configModule(module)}
-                                                    title='Configure Module'
+                                                    title={this.props.t('configure_module')}
                                                 >
-                                                    config
+                                                    {this.props.t('config')}
                                                 </button>
                                             )
                                         }

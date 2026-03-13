@@ -59,5 +59,11 @@
   "video_data_colon": "بيانات الفيديو:",
   "received_msgs_colon": "الرسائل المستلمة:",
   "last_active_colon": "آخر نشاط:",
-  "download":"تحميل"
+  "download":"تحميل",
+  "warning_config_change": "تحذير! - تغيير التكوين {{unitName}}",
+  "are_you_sure_apply_settings": "هل أنت متأكد من أنك تريد تطبيق الإعدادات",
+  "yes": "نعم",
+  "restart": "إعادة تشغيل",
+  "config": "إعدادات",
+  "configure_module": "تكوين الوحدة"
 }
