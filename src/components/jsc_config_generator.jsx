@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import Draggable from "react-draggable";
+import { withTranslation } from 'react-i18next';
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as js_andruavMessages from '../js/protocol/js_andruavMessages'
@@ -30,7 +31,7 @@ import { fn_do_modal_confirmation } from '../js/js_main.js';
  * ClssConfigGenerator generates a form based on a JSON configuration loaded from a file.
  * It is triggered by the EE_displayConfigGenerator event with {p_unit, module}.
  */
-export default class ClssConfigGenerator extends React.Component {
+class ClssConfigGenerator extends React.Component {
   /**
    * Constructor initializes the component's state and binds methods.
    */
@@ -564,8 +565,8 @@ export default class ClssConfigGenerator extends React.Component {
   fn_handleSubmit() {
     // Implement apply logic, e.g., send to server
     const me  = this;
-    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
-      "Are you sure you want to apply settings", function (p_approved) {
+    fn_do_modal_confirmation(this.props.t('warning_config_change', {unitName: this.state.p_unit.m_unitName}),
+      this.props.t('are_you_sure_apply_settings'), function (p_approved) {
         if (p_approved === false) return;
 
         js_globals.v_andruavFacade.API_updateConfigJSON(me.state.p_unit, me.state.module, me.state.output.fieldNameOutput);
@@ -573,15 +574,15 @@ export default class ClssConfigGenerator extends React.Component {
         console.log('Submitted:', me.state.output);
         alert("data submitted. you need to restart the module.");
 
-      }, "YES", "bg-danger txt-theme-aware");
+      }, this.props.t('yes'), "bg-danger txt-theme-aware");
 
     
   }
 
   fn_shutdownModule() {
     const me  = this;
-    fn_do_modal_confirmation("WARNING! - Config Change " + this.state.p_unit.m_unitName,
-      "Are you sure you want to apply settings", function (p_approved) {
+    fn_do_modal_confirmation(this.props.t('warning_config_change', {unitName: this.state.p_unit.m_unitName}),
+      this.props.t('are_you_sure_apply_settings'), function (p_approved) {
         if (p_approved === false) return;
 
         js_globals.v_andruavFacade.API_doModuleConfigAction(me.state.p_unit, me.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
@@ -589,7 +590,7 @@ export default class ClssConfigGenerator extends React.Component {
         console.log('Submitted:', me.state.output);
         alert("data submitted. you need to restart the module.");
         
-      }, "YES", "bg-danger txt-theme-aware");
+      }, this.props.t('yes'), "bg-danger txt-theme-aware");
   }
 
 
@@ -721,3 +722,5 @@ export default class ClssConfigGenerator extends React.Component {
     );
   }
 }
+
+export default withTranslation()(ClssConfigGenerator);
