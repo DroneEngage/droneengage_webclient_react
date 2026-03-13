@@ -1239,6 +1239,21 @@ class CAndruavClientParser {
         if (p_jmsg.z) p_unit.m_FlyingLastStartTime = p_jmsg.z / 1000;
         if (p_jmsg.a) p_unit.m_FlyingTotalDuration = p_jmsg.a / 1000;
 
+        // Handle DroneEngage Pilot fields
+        if (p_jmsg.hasOwnProperty('DE') || p_jmsg.hasOwnProperty('DO')) {
+            const old_de_pilot_enabled = p_unit.m_de_pilot_enabled;
+            const old_m_de_pilot_operation = p_unit.m_m_de_pilot_operation;
+            
+            if (p_jmsg.hasOwnProperty('DE')) {
+                p_unit.m_de_pilot_enabled = p_jmsg.DE;
+            }
+            if (p_jmsg.hasOwnProperty('DO')) {
+                p_unit.m_m_de_pilot_operation = p_jmsg.DO;
+            }
+            
+            triggers.onDroneEngagePilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_m_de_pilot_operation !== p_unit.m_m_de_pilot_operation;
+        }
+
         if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
             triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== p_jmsg.n;
             p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
