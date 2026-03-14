@@ -409,6 +409,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     res.btn_circle_class 	    = " btn-outline-theme-aware ";
                     res.btn_hold_class 	        = " disabled hidden ";
                     res.btn_manual_class	    = " disabled hidden ";
+                    res.btn_stabilize_class     = " btn-outline-theme-aware ";
                     res.btn_alt_hold_class      = " btn-outline-theme-aware ";
                     res.btn_pos_hold_class      = " btn-outline-theme-aware ";
                     res.btn_loiter_class 	    = " btn-outline-theme-aware ";
