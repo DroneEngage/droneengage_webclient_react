@@ -512,9 +512,9 @@ export class CCommandAPI {
     static API_StopTracking() {
         const msg =
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_STOP
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_STOP
             }
         };
 
@@ -524,9 +524,9 @@ export class CCommandAPI {
     static API_SendTrackPoint(p_center_x, p_center_y, p_radius) {
         const msg =
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_POINT,
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_POINT,
                 b: p_center_x,
                 c: p_center_y,
                 r: p_radius
@@ -539,9 +539,9 @@ export class CCommandAPI {
     static API_PauseTracking() {
         const msg =
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_PAUSE
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_PAUSE
             }
         };
 
@@ -552,9 +552,21 @@ export class CCommandAPI {
     static API_EnableTracking() {
         const msg =
         {
-            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION,
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_ENABLE
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_ENABLE
+            }
+        };
+
+        return msg;
+    }
+
+    static API_EnableTracking_AIDriver( p_enable) {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
+            'ms': {
+                a: (p_enable===true)?js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_AI_DRIVER_ENABLE:js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_AI_DRIVER_DISABLE
             }
         };
 
@@ -567,7 +579,7 @@ export class CCommandAPI {
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH,
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_AI_Recognition_SEARCH,
                 i: selected_object_list, // class index not class names
             }
         };
@@ -581,7 +593,7 @@ export class CCommandAPI {
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_AI_Recognition_DISABLE
             }
         };
 
@@ -594,7 +606,7 @@ export class CCommandAPI {
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_AI_Recognition_ENABLE
             }
         };
 
@@ -606,7 +618,7 @@ export class CCommandAPI {
         {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_ACTION,
             'ms': {
-                a: js_andruavMessages.CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST
+                a: js_andruavMessages.CONST_TargetTracking_ACTION_AI_Recognition_CLASS_LIST
             }
         };
 
