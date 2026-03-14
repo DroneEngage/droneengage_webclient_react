@@ -282,7 +282,7 @@ Binary:
 
 ### Tracking (experimental)
 
-- `CONST_TYPE_AndruavMessage_Target_STATUS`:
+- `CONST_TYPE_AndruavMessage_TargetTracking_STATUS`:
   - Emits: `EE_onTrackingStatusChanged`
 
 - `CONST_TYPE_AndruavMessage_AI_Recognition_STATUS`:
@@ -293,7 +293,7 @@ Binary:
 - `CONST_TYPE_AndruavMessage_SearchTargetList`:
   - Emits: `EE_SearchableTarget`
 
-- `CONST_TYPE_AndruavMessage_TrackingTargetLocation`:
+- `CONST_TYPE_AndruavMessage_TargeTrackingtLocation`:
   - Emits: `EE_DetectedTarget`
 
 ### Errors
