@@ -141,18 +141,18 @@ class C_TRACKER_AI {
     this.m_valid_unit_feedback = true;
 
     switch (status) {
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_LOST:
         this.m_detected = false;
         this.m_active = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_DETECTED:
         this.m_detected = true;
         this.m_active = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_ENABLED:
         this.m_active = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_STOPPED:
         this.m_active = false;
         this.m_detected = false;
         break;
@@ -171,6 +171,9 @@ class C_Tracker {
     this.m_detected = false;
     // updated from unit
     this.m_active = false;
+
+    this.m_camera_orientation = 0;
+    this.m_ai_driven = false;
   }
 
 
@@ -178,25 +181,28 @@ class C_Tracker {
     this.m_enable_gui_tracker = enabled;
   }
 
-  fn_updateTrackerStatus(status) {
+  fn_updateTrackerStatus(full_status) {
     this.m_valid_unit_feedback = true;
 
+    const status = full_status.a;
+    this.m_camera_orientation = full_status.b;
+    this.m_ai_driven = full_status.c;
     switch (status) {
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_LOST:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_LOST:
         this.m_detected = false;
         this.m_active = true;
         this.m_enable_gui_tracker = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_DETECTED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_DETECTED:
         this.m_detected = true;
         this.m_active = true;
         this.m_enable_gui_tracker = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_ENABLED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_ENABLED:
         this.m_active = true;
         this.m_enable_gui_tracker = true;
         break;
-      case js_andruavMessages.CONST_TrackingTarget_STATUS_TRACKING_STOPPED:
+      case js_andruavMessages.CONST_TargetTracking_STATUS_TRACKING_STOPPED:
         this.m_active = false;
         this.m_detected = false;
         this.m_enable_gui_tracker = false;

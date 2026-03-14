@@ -1043,14 +1043,14 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         let msg = {
-            a: js_andruavMessages.CONST_TrackingTarget_ACTION_TRACKING_REGION,
+            a: js_andruavMessages.CONST_TargetTracking_ACTION_TRACKING_REGION,
             b: p_corner1_x,
             c: p_corner1_y,
             d: p_corner2_x,
             e: p_corner2_y
         };
 
-        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTarget_ACTION, msg);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION, msg);
     };
 
 
@@ -1082,6 +1082,14 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         const cmd = CCommandAPI.API_EnableTracking();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+
+    API_EnableTracking_AIDriver(p_andruavUnit, p_enable) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_EnableTracking_AIDriver(p_enable);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 

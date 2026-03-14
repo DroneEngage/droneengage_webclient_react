@@ -280,9 +280,9 @@ class CAndruavClientParser {
             }
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_Target_STATUS: {
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_STATUS: {
                 p_jmsg = msg.msgPayload;
-                p_unit.m_tracker.fn_updateTrackerStatus(p_jmsg.a);
+                p_unit.m_tracker.fn_updateTrackerStatus(p_jmsg);
                 js_eventEmitter.fn_dispatch(js_event.EE_onTrackingStatusChanged, p_unit);
             }
                 break;
@@ -291,7 +291,7 @@ class CAndruavClientParser {
                 console.log("CONST_TYPE_AndruavMessage_AI_Recognition_STATUS");
                 p_jmsg = msg.msgPayload;
                 switch (p_jmsg.a) {
-                    case js_andruavMessages.CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST:
+                    case js_andruavMessages.CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST:
                         p_unit.m_tracker_ai.fn_addObjectClass(p_jmsg.c);
                         js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIObjectListUpdate, p_unit);
                         break;
@@ -835,7 +835,7 @@ class CAndruavClientParser {
             // CODEBLOCK_END
 
             // CODEBLOCK_START
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_TrackingTargetLocation: {
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_TargeTrackingtLocation: {
                 if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
                     return;
                 }
