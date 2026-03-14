@@ -113,9 +113,9 @@ export const CONST_TYPE_AndruavMessage_DistinationLocation = 1037;
 export const CONST_TYPE_AndruavMessage_ChangeSpeed = 1040;
 export const CONST_TYPE_AndruavMessage_Ctrl_Camera = 1041;
 // CODEBLOCK_START
-export const CONST_TYPE_AndruavMessage_TrackingTarget_ACTION = 1042;
-export const CONST_TYPE_AndruavMessage_TrackingTargetLocation = 1043;
-export const CONST_TYPE_AndruavMessage_Target_STATUS = 1044;
+export const CONST_TYPE_AndruavMessage_TargetTracking_ACTION = 1042;
+export const CONST_TYPE_AndruavMessage_TargeTrackingtLocation = 1043;
+export const CONST_TYPE_AndruavMessage_TargetTracking_STATUS = 1044;
 // CODEBLOCK_END
 export const CONST_TYPE_AndruavMessage_GimbalCtrl = 1045;
 export const CONST_TYPE_AndruavMessage_UploadWayPoints = 1046;
@@ -233,33 +233,36 @@ export const CONST_TASHKEEL_SERB_VECTOR = 3;
 export const CONST_TASHKEEL_SERB_COUNT = 2;
 
 
-// Tracking Target Action TYPE_AndruavMessage_TrackingTarget_ACTION
-export const CONST_TrackingTarget_ACTION_TRACKING_POINT = 0;
-export const CONST_TrackingTarget_ACTION_TRACKING_REGION = 1;
-export const CONST_TrackingTarget_ACTION_TRACKING_STOP = 2;
-export const CONST_TrackingTarget_ACTION_TRACKING_PAUSE = 3;
-export const CONST_TrackingTarget_ACTION_TRACKING_ENABLE = 4;
+// Tracking Target Action TYPE_AndruavMessage_TargetTracking_ACTION
+export const CONST_TargetTracking_ACTION_TRACKING_POINT = 0;
+export const CONST_TargetTracking_ACTION_TRACKING_REGION = 1;
+export const CONST_TargetTracking_ACTION_TRACKING_STOP = 2;
+export const CONST_TargetTracking_ACTION_TRACKING_PAUSE = 3;
+export const CONST_TargetTracking_ACTION_TRACKING_ENABLE = 4;
+export const CONST_TargetTracking_ACTION_TRACKING_CONFIG = 5;
+export const CONST_TargetTracking_ACTION_TRACKING_AI_DRIVER_ENABLE = 6;
+export const CONST_TargetTracking_ACTION_TRACKING_AI_DRIVER_DISABLE = 7;
 
-// Tracking Target Action TYPE_AndruavMessage_TrackingTarget_STATUS
-export const CONST_TrackingTarget_STATUS_TRACKING_LOST = 0;
-export const CONST_TrackingTarget_STATUS_TRACKING_DETECTED = 1;
-export const CONST_TrackingTarget_STATUS_TRACKING_ENABLED = 2;
-export const CONST_TrackingTarget_STATUS_TRACKING_STOPPED = 3;
+// Tracking Target Action TYPE_AndruavMessage_TargetTracking_STATUS
+export const CONST_TargetTracking_STATUS_TRACKING_LOST = 0;
+export const CONST_TargetTracking_STATUS_TRACKING_DETECTED = 1;
+export const CONST_TargetTracking_STATUS_TRACKING_ENABLED = 2;
+export const CONST_TargetTracking_STATUS_TRACKING_STOPPED = 3;
 
 
 // TYPE_AndruavMessage_AI_Recognition_ACTION
-export const CONST_TrackingTarget_ACTION_AI_Recognition_POINT = 0;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_SEARCH = 1;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_DISABLE = 2;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_ENABLE = 3;
-export const CONST_TrackingTarget_ACTION_AI_Recognition_CLASS_LIST = 4;
+export const CONST_TargetTracking_ACTION_AI_Recognition_POINT = 0;
+export const CONST_TargetTracking_ACTION_AI_Recognition_SEARCH = 1;
+export const CONST_TargetTracking_ACTION_AI_Recognition_DISABLE = 2;
+export const CONST_TargetTracking_ACTION_AI_Recognition_ENABLE = 3;
+export const CONST_TargetTracking_ACTION_AI_Recognition_CLASS_LIST = 4;
 
 // Tracking Target Action TYPE_AndruavMessage_AI_Recognition_STATUS
-export const CONST_TrackingTarget_STATUS_AI_Recognition_LOST = 0;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_DETECTED = 1;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_ENABLED = 2;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_DISABLED = 3;
-export const CONST_TrackingTarget_STATUS_AI_Recognition_CLASS_LIST = 4;
+export const CONST_TargetTracking_STATUS_AI_Recognition_LOST = 0;
+export const CONST_TargetTracking_STATUS_AI_Recognition_DETECTED = 1;
+export const CONST_TargetTracking_STATUS_AI_Recognition_ENABLED = 2;
+export const CONST_TargetTracking_STATUS_AI_Recognition_DISABLED = 3;
+export const CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST = 4;
 
 // AndruavMessage_RemoteExecute Commands
 export const CONST_RemoteCommand_MAKETILT = 100;
