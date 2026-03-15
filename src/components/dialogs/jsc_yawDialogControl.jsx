@@ -81,6 +81,9 @@ export default class ClssYawDialog extends React.Component
 			thickness: 0.3,
 			cursor: 10,
 			displayPrevious: true,
+			format: function (value) {
+				return value + '°';
+			},
 			'mousewheel': function (event) {
 				event.preventDefault();
 			},

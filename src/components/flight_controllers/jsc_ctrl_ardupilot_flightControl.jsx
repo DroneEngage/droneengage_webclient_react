@@ -888,10 +888,11 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <div className='form-check form-switch me-3'>
                         <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : {}}
+                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
                                type='checkbox' 
                                id={'depilot_switch_' + this.props.id} 
-                               checked={this.state.m_dePilotEnabled} 
+                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
+                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
                                onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
                         <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
                             DE-PILOT
@@ -946,10 +947,11 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <div className='form-check form-switch me-3'>
                         <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : {}}
+                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
                                type='checkbox' 
                                id={'depilot_switch_' + this.props.id} 
-                               checked={this.state.m_dePilotEnabled} 
+                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
+                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
                                onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
                         <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
                             DEPILOT
@@ -1003,10 +1005,11 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <div className='form-check form-switch me-3'>
                         <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : {}}
+                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
                                type='checkbox' 
                                id={'depilot_switch_' + this.props.id} 
-                               checked={this.state.m_dePilotEnabled} 
+                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
+                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
                                onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
                         <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
                             DE-PILOT
