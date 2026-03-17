@@ -343,6 +343,35 @@ class ClssViewLinkGimbal extends React.Component {
         }
     }
 
+
+    fn_updateDrone() {
+        // Use provided parameters or fall back to current state values
+        const h =  this.state.gimbal_yaw;
+        const v = this.state.gimbal_pitch;
+        
+        // Check if distance is valid
+        if (!Number.isFinite(this.state.lrf_distance_m)) {
+            js_common.fn_console_log('Invalid LRF distance, cannot send orientation');
+            return;
+        }
+
+        const distance = this.state.lrf_distance_m;
+
+        // USE DISTANCE IN meter and vertical in degree to calculate altitude
+        // Calculate relative altitude based on distance and vertical angle
+        const relative_altitude = distance * Math.sin(v * Math.PI / 180);
+
+        console.log ("relative_altitude:", relative_altitude, " distance:", distance, " vertical:", v);
+        // This function sends the orientation values
+        js_common.fn_console_log('Sending Orientation - Vertical:', v, 'Horizontal:', h, 'Distance:', distance, 'Calculated Altitude:', relative_altitude);
+
+        // Send to target drone if selected, otherwise send to current unit
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        if (targetUnit) {
+            js_globals.v_andruavFacade.API_do_ChangeAltitude(targetUnit, relative_altitude);
+        }
+    }
+
     render() {
         const { t } = this.props;
         let p_andruavUnit = null;
@@ -377,6 +406,11 @@ class ClssViewLinkGimbal extends React.Component {
 
         for (let i = 0; i < len; ++i) {
             const v_unit = v_units[i];
+
+            // Only show non-GCS units (drones) in the dropdown
+            // if (v_unit.m_IsGCS === false) {
+            //     continue;
+            // }
 
             // Don't show the currently selected unit in the dropdown for sending if it's the exact same unit.
             // Actually, we probably do want to allow sending to any existing unit since Gimbal Control
@@ -479,10 +513,10 @@ class ClssViewLinkGimbal extends React.Component {
                                                     <button
                                                         id="btn_get_position"
                                                         type="button"
-                                                        className="btn btn-sm btn-primary"
+                                                        className="btn btn-sm btn-primary hidden"
                                                         onClick={() => this.fn_getGimbalPosition()}
                                                     >
-                                                        Pos
+                                                        Pos BAD PICTH SHOULD REMOVE - sign
                                                     </button>
                                                     <button
                                                         id="btn_status_all"
@@ -629,7 +663,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                     className="btn btn-primary"
                                                     onClick={() => {
                                                         if (this.state.target_drone) {
-                                                            this.sendOrientation(this.state.current_vertical, this.state.current_horizontal);
+                                                            this.fn_updateDrone();
                                                         }
                                                     }}
                                                 >
