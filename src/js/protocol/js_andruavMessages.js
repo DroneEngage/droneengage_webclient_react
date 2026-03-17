@@ -114,7 +114,7 @@ export const CONST_TYPE_AndruavMessage_ChangeSpeed = 1040;
 export const CONST_TYPE_AndruavMessage_Ctrl_Camera = 1041;
 // CODEBLOCK_START
 export const CONST_TYPE_AndruavMessage_TargetTracking_ACTION = 1042;
-export const CONST_TYPE_AndruavMessage_TargeTrackingtLocation = 1043;
+export const CONST_TYPE_AndruavMessage_TargetTrackingtLocation = 1043;
 export const CONST_TYPE_AndruavMessage_TargetTracking_STATUS = 1044;
 // CODEBLOCK_END
 export const CONST_TYPE_AndruavMessage_GimbalCtrl = 1045;
@@ -521,6 +521,15 @@ export const CONST_SOCKET_STATUS_CONNECTED = 5; // connected to WS
 export const CONST_SOCKET_STATUS_REGISTERED = 6; // connected and executed AddMe
 export const CONST_SOCKET_STATUS_UNREGISTERED = 7; // connected but not registred
 export const CONST_SOCKET_STATUS_ERROR = 8; // Error
+
+
+//DEPILOT MODES
+//CONST_TYPE_AndruavMessage_DEPilot_Control
+export const  CONST_DEPILOT_OP_DISABLED = 0;
+export const  CONST_DEPILOT_OP_CHANGE_ALTITUDE = 1;
+export const  CONST_DEPILOT_OP_STABILIZATION = 2;
+export const  CONST_DEPILOT_OP_TRACKING = 3;
+
 
 // GPIO Reserved Names
 export const GPIO_CAMERA_FLASH_NAME = 'camera_flash';

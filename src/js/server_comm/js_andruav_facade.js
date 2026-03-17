@@ -1339,11 +1339,11 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
-    API_engageDEPilotControl(p_andruavUnit, p_enable)
+    API_engageDEPilotControl(p_andruavUnit, p_enable, p_de_mode)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_engageDEPilotControl(p_enable);
+        const cmd = CCommandAPI.API_engageDEPilotControl(p_enable, p_de_mode);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 

@@ -10,6 +10,7 @@ import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, g
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
+import { ClssCtrlDEPilot } from './jsc_ctrl_depilot.jsx'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -24,32 +25,12 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		        m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
 		        m_isArmed: p_andruavUnit.m_isArmed,
 		        m_applyOnAllSameType: false,
-		        m_hasSameTypeUnits: hasSameTypeUnits,
-		        m_dePilotEnabled: p_andruavUnit.m_de_pilot_enabled || false,
-		        m_dePilotPending: false
+		        m_hasSameTypeUnits: hasSameTypeUnits
 			};
-			
-			// Subscribe to DroneEngage Pilot changes
-			js_eventEmitter.fn_subscribe(js_event.EE_onDroneEngagePilotChanged, this, this.fn_handleDroneEngagePilotChanged);
     }
 
     componentDidMount() {
         // No need to subscribe here since it's done in constructor
-    }
-
-    componentWillUnmount() {
-        // Unsubscribe from DroneEngage Pilot changes
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onDroneEngagePilotChanged, this);
-    }
-
-    fn_handleDroneEngagePilotChanged(me, p_unit) {
-        // Only update if this event is for the current unit
-        if (p_unit && p_unit.getPartyID() === me.props.v_andruavUnit.getPartyID()) {
-            me.setState({
-                m_dePilotEnabled: p_unit.m_de_pilot_enabled,
-                m_dePilotPending: false  // Clear pending state when we receive confirmation
-            });
-        }
     }
 
     hlp_adjustFlightModeButtonClass (p_className, p_isActive)
@@ -593,19 +574,6 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         }
     }
 
-    fn_ToggleDEPilot(v_andruavUnit) {
-        const newEnabledState = !this.state.m_dePilotEnabled;
-        this.setState({ 
-            m_dePilotEnabled: newEnabledState,
-            m_dePilotPending: true  // Set pending state when user toggles
-        });
-        
-        // Call the DEPILOT control API
-        if (js_globals.v_andruavFacade && js_globals.v_andruavFacade.API_engageDEPilotControl) {
-            js_globals.v_andruavFacade.API_engageDEPilotControl(v_andruavUnit, newEnabledState);
-        }
-    }
-
 
     fn_doConfirmMode(v_andruavUnit, fn_callback)
     {
@@ -885,20 +853,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case js_andruavUnit.VEHICLE_TRI:
     {
                 // DEPILOT toggle row
-                ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <div className='form-check form-switch me-3'>
-                        <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
-                               type='checkbox' 
-                               id={'depilot_switch_' + this.props.id} 
-                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
-                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
-                               onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
-                        <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
-                            DE-PILOT
-                        </label>
-                    </div>
-                </div></div>);
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
@@ -944,20 +899,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
                 // DEPILOT toggle row
-                ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <div className='form-check form-switch me-3'>
-                        <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
-                               type='checkbox' 
-                               id={'depilot_switch_' + this.props.id} 
-                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
-                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
-                               onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
-                        <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
-                            DEPILOT
-                        </label>
-                    </div>
-                </div></div>);
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
@@ -1002,20 +944,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             default:
                 {
                 // DEPILOT toggle row
-                ctrl.push(<div key={this.props.id+"depilot"} id={this.props.id+"depilot"} className='col-12 al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <div className='form-check form-switch me-3'>
-                        <input className='form-check-input'
-                               style={this.state.m_dePilotPending ? {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : (!this.props.v_andruavUnit.m_is_ready_to_arm ? {backgroundColor: 'white', borderColor: 'white'} : {})}
-                               type='checkbox' 
-                               id={'depilot_switch_' + this.props.id} 
-                               checked={this.props.v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
-                               disabled={!this.props.v_andruavUnit.m_is_ready_to_arm}
-                               onChange={() => this.fn_ToggleDEPilot(this.props.v_andruavUnit)} />
-                        <label className='form-check-label' htmlFor={'depilot_switch_' + this.props.id}>
-                            DE-PILOT
-                        </label>
-                    </div>
-                </div></div>);
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
