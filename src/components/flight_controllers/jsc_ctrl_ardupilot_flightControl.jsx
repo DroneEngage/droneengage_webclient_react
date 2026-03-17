@@ -10,6 +10,7 @@ import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, g
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
+import { ClssCtrlDEPilot } from './jsc_ctrl_depilot.jsx'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -26,6 +27,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		        m_applyOnAllSameType: false,
 		        m_hasSameTypeUnits: hasSameTypeUnits
 			};
+    }
+
+    componentDidMount() {
+        // No need to subscribe here since it's done in constructor
     }
 
     hlp_adjustFlightModeButtonClass (p_className, p_isActive)
@@ -847,6 +852,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case js_andruavUnit.VEHICLE_QUAD:
             case js_andruavUnit.VEHICLE_TRI:
     {
+                // DEPILOT toggle row
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
+
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
@@ -890,6 +898,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             case js_andruavUnit.VEHICLE_VTOL:
             case  js_andruavUnit.VEHICLE_PLANE:
                 {
+                // DEPILOT toggle row
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
+
                 ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
@@ -932,6 +943,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 
             default:
                 {
+                // DEPILOT toggle row
+                ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
+
                 ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>

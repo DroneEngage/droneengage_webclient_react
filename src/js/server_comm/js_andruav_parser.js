@@ -835,7 +835,7 @@ class CAndruavClientParser {
             // CODEBLOCK_END
 
             // CODEBLOCK_START
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_TargeTrackingtLocation: {
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTrackingtLocation: {
                 if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
                     return;
                 }
@@ -1125,7 +1125,8 @@ class CAndruavClientParser {
             onVehicleChanged: false,
             onSwarmStatus: false,
             onSwarmStatus2: false,
-            onBackOnline: false
+            onBackOnline: false,
+            onDEPilotChanged: false
         };
 
         p_unit.m_IsMe = false;
@@ -1242,16 +1243,16 @@ class CAndruavClientParser {
         // Handle DroneEngage Pilot fields
         if (p_jmsg.hasOwnProperty('DE') || p_jmsg.hasOwnProperty('DO')) {
             const old_de_pilot_enabled = p_unit.m_de_pilot_enabled;
-            const old_m_de_pilot_operation = p_unit.m_m_de_pilot_operation;
+            const old_m_de_pilot_operation = p_unit.m_de_pilot_operation;
             
             if (p_jmsg.hasOwnProperty('DE')) {
                 p_unit.m_de_pilot_enabled = p_jmsg.DE;
             }
             if (p_jmsg.hasOwnProperty('DO')) {
-                p_unit.m_m_de_pilot_operation = p_jmsg.DO;
+                p_unit.m_de_pilot_operation = p_jmsg.DO;
             }
             
-            triggers.onDroneEngagePilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_m_de_pilot_operation !== p_unit.m_m_de_pilot_operation;
+            triggers.onDEPilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_m_de_pilot_operation !== p_unit.m_de_pilot_operation;
         }
 
         if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
@@ -1305,7 +1306,8 @@ class CAndruavClientParser {
             onVehicleChanged: js_event.EE_andruavUnitVehicleTypeUpdated,
             onBackOnline: js_event.EE_unitOnlineChanged,
             onModuleChanged: js_event.EE_onModuleUpdated,
-            onHomePointChanged: js_event.EE_HomePointChanged
+            onHomePointChanged: js_event.EE_HomePointChanged,
+            onDEPilotChanged: js_event.EE_onDroneEngagePilotChanged
         };
         Object.keys(triggers).forEach(key => {
             if (triggers[key] && eventMap[key]) {
