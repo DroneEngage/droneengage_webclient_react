@@ -877,10 +877,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
                 
                 ctrl.push(<div key={this.props.id+"rc3"}   id={this.props.id+"rc3"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-25 me-1 btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-25 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-25 btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
-                    <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn w-25' + btn.btn_object_tracking_class}>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-16 me-1 btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-16 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-16 btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
+                    <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn w-50' + btn.btn_object_tracking_class}>
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
                     </button>
                     <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={this.props.v_andruavUnit} title='object AI tracker' />
