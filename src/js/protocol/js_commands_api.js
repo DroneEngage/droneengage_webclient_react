@@ -751,13 +751,22 @@ export class CCommandAPI {
         return msg;
     }
 
-    static API_engageDEPilotControl(p_activate) {
+    static API_engageDEPilotControl(p_activate, p_de_mode) {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_DEPilot_Control,
             'ms': {
-                e: p_activate
+        
             }
         };
+
+        if (p_activate!== null)
+        {
+        msg.ms.e = p_activate?true:false;
+        }
+        if (p_de_mode)
+        {
+            msg.ms.m = p_de_mode;
+        }
 
         return msg;
     }
