@@ -3,6 +3,7 @@ import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
+import {fn_changeAltitude} from '../../js/js_main'
 
 export class ClssCtrlDEPilot extends React.Component {
     constructor(props)
@@ -40,12 +41,21 @@ export class ClssCtrlDEPilot extends React.Component {
         }
     }
 
-    fn_switchDEPilotMode(v_andruavUnit, p_de_mode) {
+    fn_switchDEPilotMode(p_andruavUnit, p_de_mode) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        if (p_de_mode === js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE)
+        {
+            fn_changeAltitude(p_andruavUnit);
+            return;
+        }
         // Call the DEPILOT mode control API
-        js_globals.v_andruavFacade.API_engageDEPilotControl(v_andruavUnit, null, p_de_mode);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, p_de_mode);
     }
 
-    fn_ToggleDEPilot(v_andruavUnit) {
+    fn_ToggleDEPilot(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
         const newEnabledState = !this.state.m_dePilotEnabled;
         this.setState({ 
             m_dePilotEnabled: newEnabledState,
@@ -53,8 +63,11 @@ export class ClssCtrlDEPilot extends React.Component {
         });
         
         // Call the DEPILOT control API
-        js_globals.v_andruavFacade.API_engageDEPilotControl(v_andruavUnit, newEnabledState, null);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, newEnabledState, null);
     }
+
+    
+
 
     hlp_adjustFlightModeButtonClass (p_className, p_isActive)
     {
@@ -131,7 +144,7 @@ export class ClssCtrlDEPilot extends React.Component {
                     </div>
                 </div>
                 
-                <div key={id+"depilot_modes"} id={id+"depilot_modes"} className='col-12 al_l ctrldiv'>
+                <div key={id+"depilot_buttons"} id={id+"depilot_buttons"} className='col-12 al_l ctrldiv'>
                     <div className='btn-group w-100 d-flex flex-wrap'>
                         <button 
                             id='btn_depilot_disabled' 
@@ -144,11 +157,11 @@ export class ClssCtrlDEPilot extends React.Component {
                         <button 
                             id='btn_depilot_altitude' 
                             type='button' 
-                            className={'btn btn-sm flgtctrlbtn btn-with-icon-margin hidden me-1 ' + buttonStyles.btn_depilot_altitude_class}
+                            className={'btn btn-sm flgtctrlbtn btn-with-icon-margin me-1 ' + buttonStyles.btn_depilot_altitude_class}
                             title='Change Altitude' 
                             onClick={() => this.fn_switchDEPilotMode(v_andruavUnit, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE)}
                             disabled={!this.state.m_dePilotEnabled}
-                        >Altitude</button>
+                        >Climbing</button>
                         <button 
                             id='btn_depilot_stabilization' 
                             type='button' 
