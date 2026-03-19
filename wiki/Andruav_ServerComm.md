@@ -293,7 +293,7 @@ Binary:
 - `CONST_TYPE_AndruavMessage_SearchTargetList`:
   - Emits: `EE_SearchableTarget`
 
-- `CONST_TYPE_AndruavMessage_TargeTrackingtLocation`:
+- `CONST_TYPE_AndruavMessage_TargetTrackingtLocation`:
   - Emits: `EE_DetectedTarget`
 
 ### Errors
