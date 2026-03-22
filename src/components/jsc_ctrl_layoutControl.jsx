@@ -14,6 +14,7 @@ class ClssCtrlLayout extends React.Component {
     render() {
         const { t } = this.props; // Access t function with ctrlLayout namespace
         const v_display_mode = js_localStorage.fn_getDisplayMode() % 5 + 1;
+        const showMap3D = this.props.showMap3D !== false; // Default to true unless explicitly set to false
         return (
             <div id="main_btn_group" role="group" className="d-flex align-items-center gap-1" >
                 <button
@@ -34,15 +35,17 @@ class ClssCtrlLayout extends React.Component {
                 >
                     <strong>{t('ctrlLayout:map.label')}</strong>
                 </button>
-                <button
-                    type="button"
-                    id="btn_showMap3D"
-                    className="btn btn-secondary btn-sm bi bi-badge-3d"
-                    title={t('ctrlLayout:map3d.title')}
-                    onClick={(e) => fn_showMap3D()}
-                >
-                    <strong>{t('ctrlLayout:map3d.label')}</strong>
-                </button>
+                {showMap3D && (
+                    <button
+                        type="button"
+                        id="btn_showMap3D"
+                        className="btn btn-secondary btn-sm bi bi-badge-3d"
+                        title={t('ctrlLayout:map3d.title')}
+                        onClick={(e) => fn_showMap3D()}
+                    >
+                        <strong>{t('ctrlLayout:map3d.label')}</strong>
+                    </button>
+                )}
                 <button
                     type="button"
                     id="btn_showVideo"
