@@ -1331,12 +1331,47 @@ div#displays {
 	/* Adjust based on actual footer height */
 }
 
+button#btn_laser_toggle::before,
+button#btn_tracker_toggle::before,
+button#btn_ai_toggle::before,
 button#btn_ir_hot_toggle::before,
 button#btn_view_mode_toggle::before,
 button#btn_get_position::before,
 button#btn_showMap::before,
 button#btn_showVideo::before,
 button#btn_showControl::before,
+button#btn_showSettings::before,
 .btn-with-icon-margin::before  {
 	margin-right: 5px;
 }
+
+/* Gimbal Control Zoom Slider Styles */
+#gimbal-ir-zoom-slider-vertical,
+#gimbal-zoom-slider-vertical {
+	-webkit-appearance: slider-vertical;
+	appearance: slider-vertical;
+	width: 16px !important;
+	height: 100px;
+	background: transparent;
+	outline: none;
+}
+
+#gimbal-ir-zoom-slider-vertical::-webkit-slider-thumb,
+#gimbal-zoom-slider-vertical::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #0d6efd;
+	border: none;
+}
+
+#gimbal-ir-zoom-slider-vertical::-moz-range-thumb,
+#gimbal-zoom-slider-vertical::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #0d6efd;
+	border: none;
+}
+

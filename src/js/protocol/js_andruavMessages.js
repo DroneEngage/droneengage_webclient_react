@@ -525,10 +525,11 @@ export const CONST_SOCKET_STATUS_ERROR = 8; // Error
 
 //DEPILOT MODES
 //CONST_TYPE_AndruavMessage_DEPilot_Control
-export const  CONST_DEPILOT_OP_DISABLED = 0;
-export const  CONST_DEPILOT_OP_CHANGE_ALTITUDE = 1;
-export const  CONST_DEPILOT_OP_STABILIZATION = 2;
-export const  CONST_DEPILOT_OP_TRACKING = 3;
+export const  CONST_DEPILOT_OP_DISABLED = 0;        // OFF
+export const  CONST_DEPILOT_OP_CHANGE_ALTITUDE = 1; // Changing Altitude
+export const  CONST_DEPILOT_OP_STABILIZATION = 2;   // Stabilizing
+export const  CONST_DEPILOT_OP_TRACKING = 3;        // Tracking
+export const  CONST_DEPILOT_OP_IDLE = 999;          // IDLE
 
 
 // GPIO Reserved Names

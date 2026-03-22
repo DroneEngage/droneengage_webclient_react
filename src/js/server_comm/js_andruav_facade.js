@@ -1265,6 +1265,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Laser_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Tracker_Control(p_andruavUnit, p_value) {
@@ -1273,6 +1275,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Tracker_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_AI_Control(p_andruavUnit, p_value) {
@@ -1281,6 +1285,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_AI_Control(p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Camera_Control(p_andruavUnit, p_optical_zoom) {
@@ -1289,6 +1295,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_Control(p_optical_zoom);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Camera_Zoom_Control(p_andruavUnit, p_optical_zoom) {
@@ -1297,6 +1305,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_Zoom_Control(p_optical_zoom);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_andruavUnit, p_optical_zoom) {
@@ -1305,6 +1315,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_optical_zoom);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Gimbal_Control_Absolute_Position(p_andruavUnit, p_channel_num, p_value) {
@@ -1313,6 +1325,18 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Gimbal_Control_Absolute_Position(p_channel_num, p_value);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
+    }
+
+    API_do_ViewLink_Gimbal_Control_Incremental_Adjust(p_andruavUnit, p_channel_num, p_value) {
+
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Gimbal_Control_Incremental_Adjust(p_channel_num, p_value);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Get_Status_Gimbal_Attitude(p_andruavUnit) {
@@ -1321,6 +1345,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Get_Status_Gimbal_Attitude();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Get_Status_All(p_andruavUnit) {
@@ -1329,6 +1355,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Get_Status_All();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_do_ViewLink_Set_IR_HOT(p_andruavUnit, p_white_hot) {
@@ -1337,6 +1365,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI_ViewLink.API_do_ViewLink_Set_IR_HOT(p_white_hot);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     API_engageDEPilotControl(p_andruavUnit, p_enable, p_de_mode)
@@ -1345,6 +1375,8 @@ class CAndruavClientFacade {
 
         const cmd = CCommandAPI.API_engageDEPilotControl(p_enable, p_de_mode);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+
+        console.log (cmd);
     }
 
     //END OF ViewLink Commands

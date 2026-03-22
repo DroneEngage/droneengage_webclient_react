@@ -296,6 +296,10 @@ h1.font-thin {
 	min-width: 45px;
 }
 
+.smaller {
+  font-size: .75rem
+}
+
 .width_fit {
 	width: fit-content !important;
 }
