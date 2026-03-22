@@ -37,7 +37,7 @@ const Planning = () => {
 	return (
 		<div>
 			<div id="rowheader" className="row mt-0 me-0 mw-0 mb-5">
-				<ClssHeaderControl />
+				<ClssHeaderControl no_3dmap/>
 			</div>
 
 			<div id='mainBody' className='css_mainbody' >
