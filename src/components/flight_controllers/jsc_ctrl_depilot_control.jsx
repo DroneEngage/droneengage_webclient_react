@@ -5,6 +5,7 @@ import {js_eventEmitter} from '../../js/js_eventEmitter'
 import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
 import {fn_changeAltitude} from '../../js/js_main'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
+import * as  js_siteConfig from '../../js/js_siteConfig.js';
 
 export class ClssCtrlDEPilotControl extends React.Component {
     constructor(props)
@@ -153,6 +154,12 @@ export class ClssCtrlDEPilotControl extends React.Component {
     }
 
     render() {
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_DE_PILOT === true))
+        {
+            return (
+                        <div className="disabled hidden"/>
+                    );
+        }
         const v_andruavUnit = this.props.p_unit;
         if (!v_andruavUnit) return null;
 
