@@ -2,6 +2,7 @@
     "gimbal_control": "Gimbal Control",
     "gimbal_control_disabled": "Gimbal Control Disabled",
     "gimbal_control_enabled": "Gimbal Control Enabled",
+    "gimbal_attitude": "Gimbal Attitude",
     "no_unit_selected": "No unit selected",
     "laser_off": "Laser OFF",
     "laser_on": "Laser ON",

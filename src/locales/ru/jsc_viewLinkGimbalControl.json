@@ -2,6 +2,7 @@
     "gimbal_control": "Управление Подвесом",
     "gimbal_control_disabled": "Управление Подвесом Отключено",
     "gimbal_control_enabled": "Управление Подвесом Включено",
+    "gimbal_attitude": "Ориентация Подвеса",
     "no_unit_selected": "Модуль не выбран",
     "laser_off": "Лазер ВЫКЛ",
     "laser_on": "Лазер ВКЛ",

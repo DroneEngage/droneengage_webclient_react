@@ -36,6 +36,8 @@ class ClssViewLinkGimbal extends React.Component {
             'ai_on': VIEWLINK_AI_OFF,
             'current_vertical': 0,
             'current_horizontal': 0,
+            'last_sent_vertical': 0,
+            'last_sent_horizontal': 0,
             'target_drone': null,
             'current_view_mode': 'EO', // EO, IR, PIP, PIP_IR
             'ir_hot': 'WHITE',
@@ -50,7 +52,8 @@ class ClssViewLinkGimbal extends React.Component {
             'tracking_status': 0,
             'tracking_status_text': '',
             'tracking_target_type': 0,
-            'tracking_target_type_text': ''
+            'tracking_target_type_text': '',
+            'joystick_mode': 'location' // 'location' or 'motion'
         };
 
         this.m_flag_mounted = false;
@@ -58,6 +61,7 @@ class ClssViewLinkGimbal extends React.Component {
         this.key = Math.random().toString();
 
         this.modal_ctrl_gimbal_dlg = React.createRef();
+        this.joystick_ref = React.createRef();
 
         // Replaced interval variables with range input
 
@@ -120,9 +124,12 @@ class ClssViewLinkGimbal extends React.Component {
             target_drone: null,
             current_vertical: 0,
             current_horizontal: 0,
+            last_sent_vertical: 0,
+            last_sent_horizontal: 0,
             current_view_mode: 'EO',
             zoomLevel: 1.0,
-            irDigitalZoomLevel: 1.0
+            irDigitalZoomLevel: 1.0,
+            joystick_mode: 'location'
         });
     }
 
@@ -194,6 +201,22 @@ class ClssViewLinkGimbal extends React.Component {
         if (p_andruavUnit) {
             js_globals.v_andruavFacade.API_do_ViewLink_Camera_Control(p_andruavUnit, nextModeConstant);
         }
+    }
+
+    fn_toggleJoystickMode() {
+        const newMode = this.state.joystick_mode === 'location' ? 'motion' : 'location';
+        const stateUpdates = { joystick_mode: newMode };
+        
+        // Reset joystick position to (0,0) when changing to motion mode
+        if (newMode === 'motion') {
+            stateUpdates.current_vertical = 0;
+            stateUpdates.current_horizontal = 0;
+            stateUpdates.last_sent_vertical = 0;
+            stateUpdates.last_sent_horizontal = 0;
+        }
+        
+        this.setState(stateUpdates);
+        js_common.fn_console_log('Joystick mode changed to:', newMode);
     }
 
     fn_getGimbalPosition() {
@@ -311,6 +334,14 @@ class ClssViewLinkGimbal extends React.Component {
             current_horizontal: horizontal,
             current_vertical: vertical
         });
+
+        // Get mode from joystick component to ensure consistency
+        const joystickMode = this.joystick_ref.current?.getMode() || 'location';
+        
+        // In motion mode, send orientation continuously while dragging but only if changed by 4% or more
+        if (joystickMode === 'motion') {
+            this.sendMotionWithThreshold(horizontal, vertical);
+        }
     }
 
     handleJoystickRelease = (horizontal, vertical) => {
@@ -319,17 +350,35 @@ class ClssViewLinkGimbal extends React.Component {
             current_horizontal: horizontal,
             current_vertical: vertical
         });
-        this.sendOrientation(horizontal, vertical);
+
+        // Get mode from joystick component to ensure consistency
+        const joystickMode = this.joystick_ref.current?.getMode() || 'location';
+
+        // In location mode, send orientation only on release
+        if (joystickMode === 'location') {
+            this.sendOrientation(horizontal, vertical);
+        }
+        // In motion mode, the joystick automatically resets to center and sends (0,0)
+        // This is handled by the joystick component itself
     }
 
-    fn_readCurrentOrientation() {
-        // This function reads the current orientation
-        // For now, I'll just log the current values
-        js_common.fn_console_log('Current Orientation - Vertical:', this.state.current_vertical, 'Horizontal:', this.state.current_horizontal);
-
-        // You can add additional logic here to actually read from hardware or API
-        // For example:
-        // js_globals.v_andruavFacade.API_ReadLaserOrientation(this.state.p_session?.m_unit);
+    sendMotionWithThreshold(vertical, horizontal) {
+        // Calculate absolute difference from last sent values
+        const lastSentVertical = this.state.last_sent_vertical;
+        const lastSentHorizontal = this.state.last_sent_horizontal;
+        
+        const verticalDiff = Math.abs(vertical - lastSentVertical);
+        const horizontalDiff = Math.abs(horizontal - lastSentHorizontal);
+        
+        // Send if difference is 0.2 or more for either axis, or if released (0,0)
+        if (verticalDiff >= 0.2 || horizontalDiff >= 0.2 || (vertical === 0 && horizontal === 0)) {
+            this.sendMotion(vertical, horizontal);
+            // Update last sent values
+            this.setState({
+                last_sent_vertical: vertical,
+                last_sent_horizontal: horizontal
+            });
+        }
     }
 
     sendOrientation(vertical, horizontal) {
@@ -343,6 +392,17 @@ class ClssViewLinkGimbal extends React.Component {
         }
     }
 
+
+    sendMotion (vertical, horizontal) {
+        // This function sends the orientation values
+        js_common.fn_console_log('Sending Orientation - Vertical:', vertical, 'Horizontal:', horizontal);
+
+        // Send to target drone if selected, otherwise send to current unit
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        if (targetUnit) {
+            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Incremental_Adjust(targetUnit, horizontal, vertical);
+        }
+    }
 
     fn_updateDrone() {
         // Use provided parameters or fall back to current state values
@@ -455,8 +515,8 @@ class ClssViewLinkGimbal extends React.Component {
                                 <p>{t('no_unit_selected')}</p>
                             </div>
                         ) : (
-                            <div className='row'>
-                                <div className="col-12">
+                            <div key={'gimbal-control-row' + this.key} className='row'>
+                                <div key='gimbal-control-col' className="col-12">
                                     {/* Action Buttons Row */}
                                     <div className="btn-group w-100 mb-3">
                                         <button
@@ -489,47 +549,30 @@ class ClssViewLinkGimbal extends React.Component {
 
                                     {/* 2D Joystick Control with EO/IR/PIP buttons and Zoom Control */}
                                     <div className="mb-3">
-                                        <label className="form-label fw-bold">{t('gimbal_control')}</label>
-                                        <div className="d-flex justify-content-center align-items-center">
-                                            {/* View Mode Toggle Button */}
-                                            <div className="me-3" style={{ width: '80px' }}>
-                                                <div className="d-flex flex-column gap-1">
-                                                    <button
-                                                        id="btn_ir_hot_toggle"
-                                                        type="button"
-                                                        className={`btn btn-sm ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
-                                                        onClick={() => this.fn_toggleIRHot()}
-                                                    >
-                                                        {this.state.ir_hot}
-                                                    </button>
-                                                    <button
-                                                        id="btn_view_mode_toggle"
-                                                        type="button"
-                                                        className={`btn btn-sm ${this.fn_getViewModeButtonColor()}`}
-                                                        onClick={() => this.fn_toggleViewMode()}
-                                                    >
-                                                        {this.state.current_view_mode}
-                                                    </button>
-                                                    <button
-                                                        id="btn_get_position"
-                                                        type="button"
-                                                        className="btn btn-sm btn-primary hidden"
-                                                        onClick={() => this.fn_getGimbalPosition()}
-                                                    >
-                                                        Pos BAD PICTH SHOULD REMOVE - sign
-                                                    </button>
-                                                    <button
-                                                        id="btn_status_all"
-                                                        type="button"
-                                                        className="btn btn-sm btn-primary"
-                                                        onClick={() => this.fn_getAllStatus()}
-                                                    >
-                                                        {t('status')}
-                                                    </button>
-                                                </div>
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <label className="form-label  small mb-0">{t('gimbal_control')}</label>
+                                            
+                                            <div className="form-check form-switch">
+                                                <input
+                                                    type="checkbox"
+                                                    className={`form-check-input ${this.state.joystick_mode === 'motion' ? 'bg-danger' : 'bg-primary'}`}
+                                                    id={`joystickModeSwitch${this.key}`}
+                                                    checked={this.state.joystick_mode === 'motion'}
+                                                    onChange={() => this.fn_toggleJoystickMode()}
+                                                />
+                                                <label 
+                                                    className="form-check-label" 
+                                                    htmlFor={`joystickModeSwitch${this.key}`}
+                                                >
+                                                    {this.state.joystick_mode === 'motion' ? 'Motion' : 'Location'}
+                                                </label>
                                             </div>
+                                        </div>
+                                        <div key={'gimbal_ctrl'+ this.key} id={'gimbal_ctrl'+ this.key} className="d-flex gap-4 w-100 justify-content-center align-items-center">
+                                            
                                             <Class_2D_Joystick
-                                                width={200}
+                                                ref={this.joystick_ref}
+                                                width={420}
                                                 height={200}
                                                 rangeX={1}
                                                 rangeY={1}
@@ -538,56 +581,66 @@ class ClssViewLinkGimbal extends React.Component {
                                                 circleRadius={15}
                                                 initialX={this.state.current_horizontal}
                                                 initialY={this.state.current_vertical}
-                                                sendOnReleaseOnly={true}
+                                                mode={this.state.joystick_mode}
+                                                sendOnReleaseOnly={this.state.joystick_mode === 'location'}
                                                 onDrag={this.handleJoystickDrag}
                                                 onRelease={this.handleJoystickRelease}
                                             />
-                                            <div className="ms-3 d-flex flex-column align-items-center justify-content-between" style={{ height: '200px', width: '24px' }}>
-                                                <style>{`
-                                                    .zoom-slider-vertical { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 24px; height: 200px; background: transparent; outline: none; }
-                                                    .zoom-slider-vertical::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #0d6efd; border: none; }
-                                                    .zoom-slider-vertical::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #0d6efd; border: none; }
-                                                    .ir-zoom-slider-vertical { writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 24px; height: 200px; background: transparent; outline: none; }
-                                                    .ir-zoom-slider-vertical::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #dc3545; border: none; }
-                                                    .ir-zoom-slider-vertical::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #dc3545; border: none; }
-                                                `}</style>
-                                                <input
-                                                    id="zoom_slider"
-                                                    type="range"
-                                                    orient="vertical"
-                                                    className="form-range zoom-slider-vertical"
-                                                    min={js_globals.CONST_OPTICAL_ZOOM_MIN}
-                                                    max={js_globals.CONST_OPTICAL_ZOOM_MAX}
-                                                    step={0.05}
-                                                    value={this.state.zoomLevel}
-                                                    onChange={this.handleZoomChange}
-                                                    onMouseUp={this.handleZoomMouseUp}
-                                                    onTouchEnd={this.handleZoomMouseUp}
-                                                />
-                                                <small className="text-muted text-center">EO-Z: {this.state.zoomLevel.toFixed(2)}</small>
+                                            <div key={'zooms_ctrl'+ this.key} id={'zooms_ctrl'+ this.key} className='d-grid '>
+                                            <div className='d-flex gap-5'>    
+                                            <div key={'eo_zoom_gimbal'+ this.key} id={'eo_zoom_gimbal'+ this.key} className=" d-flex flex-column align-items-center" style={{ width: '24px' }}>
+                                                <div style={{ height: '100px', position: 'relative' }}>
+                                                    <input
+                                                        id="gimbal-zoom-slider-vertical"
+                                                        type="range"
+                                                        orient="vertical"
+                                                        className="form-range"
+                                                        min={js_globals.CONST_OPTICAL_ZOOM_MIN}
+                                                        max={js_globals.CONST_OPTICAL_ZOOM_MAX}
+                                                        step={0.05}
+                                                        value={this.state.zoomLevel}
+                                                        onChange={this.handleZoomChange}
+                                                        onMouseUp={this.handleZoomMouseUp}
+                                                        onTouchEnd={this.handleZoomMouseUp}
+                                                    />
+                                                </div>
+                                                <div className="mt-2" style={{ height: '20px' }}>
+                                                    <small className="text-muted text-center">EO-Z: {this.state.zoomLevel.toFixed(2)}</small>
+                                                </div>
                                             </div>
-                                            <div className="ms-3 d-flex flex-column align-items-center justify-content-between" style={{ height: '200px', width: '24px' }}>
-                                                <input
-                                                    id="ir_digital_zoom_slider"
-                                                    type="range"
-                                                    orient="vertical"
-                                                    className="form-range zoom-slider-vertical"
-                                                    min={js_globals.CONST_IR_DIGITAL_ZOOM_MIN}
-                                                    max={js_globals.CONST_IR_DIGITAL_ZOOM_MAX}
-                                                    step={0.05}
-                                                    value={this.state.irDigitalZoomLevel}
-                                                    onChange={this.handleIRDigitalZoomChange}
-                                                    onMouseUp={this.handleIRDigitalZoomMouseUp}
-                                                    onTouchEnd={this.handleIRDigitalZoomMouseUp}
-                                                />
-                                                <small className="text-muted text-center">IR-Z: {this.state.irDigitalZoomLevel.toFixed(2)}</small>
+                                            <div key={'ir_zoom_gimbal'+ this.key} id={'ir_zoom_gimbal'+ this.key} className="ms-3 d-flex flex-column align-items-center" style={{ width: '24px' }}>
+                                                <div style={{ height: '100px', position: 'relative' }}>
+                                                    <input
+                                                        id="gimbal-ir-zoom-slider-vertical"
+                                                        type="range"
+                                                        orient="vertical"
+                                                        className="form-range"
+                                                        min={js_globals.CONST_IR_DIGITAL_ZOOM_MIN}
+                                                        max={js_globals.CONST_IR_DIGITAL_ZOOM_MAX}
+                                                        step={0.05}
+                                                        value={this.state.irDigitalZoomLevel}
+                                                        onChange={this.handleIRDigitalZoomChange}
+                                                        onMouseUp={this.handleIRDigitalZoomMouseUp}
+                                                        onTouchEnd={this.handleIRDigitalZoomMouseUp}
+                                                    />
+                                                </div>
+                                                <div className="mt-2" style={{ height: '20px' }}>
+                                                    <small className="text-muted text-center">IR-Z: {this.state.irDigitalZoomLevel.toFixed(2)}</small>
+                                                </div>
                                             </div>
+                                            </div>
+
+                                            
+                                            </div>
+                                            
                                         </div>
+                                        
                                     </div>
 
-                                    <div class='d-flex w-100 justify-content-start'>
+                                    <div key={'gimbal_btn_ctrl'+ this.key} id={'gimbal_btn_ctrl'+ this.key} className='d-flex w-100 justify-content-start'>
+                                        
                                     <div className="mb-3 w-25 me-2 ">
-                                        <label className="form-label fw-bold">LRF</label>
+                                        <label className="form-label smaller ">LRF</label>
                                         <div className="card ">
                                             <div className="card-body py-2">
                                                 <div className="d-grid align-items-center">
@@ -597,7 +650,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                         </div>
                                                         <div className="d-block text-center">
                                                             
-                                                            <label className="">Status</label>
+                                                            <label className="">{t('status')}</label>
                                                             <span className="badge bg-success d-block">{this.state.lrf_status_text}</span>
                                                         </div>
                                                         <div className="d-block text-center">
@@ -612,7 +665,7 @@ class ClssViewLinkGimbal extends React.Component {
                                     </div>
 
                                     <div className="mb-3 w-25 me-2 ">
-                                        <label className="form-label fw-bold">Tracking</label>
+                                        <label className="form-label  smaller">Tracking</label>
                                         <div className="card ">
                                             <div className="card-body py-2">
                                                 <div className="align-items-center">
@@ -627,7 +680,7 @@ class ClssViewLinkGimbal extends React.Component {
 
                                     {/* Gimbal Attitude Display */}
                                     <div className="mb-3 w-25 me-2 ">
-                                        <label className="form-label fw-bold">{t('gimbal_attitude')}</label>
+                                        <label className="form-label  smaller">{t('gimbal_attitude')}</label>
                                         <div className="card ">
                                             <div className="card-body py-2">
                                                 <div className="d-grid">
@@ -644,19 +697,47 @@ class ClssViewLinkGimbal extends React.Component {
                                             </div>
                                         </div>
                                     </div>
+                                    <div key='button-controls' className="me-3 mt-5">
+                                                <div className="d-flex flex-column gap-1">
+                                                    <button
+                                                        id="btn_ir_hot_toggle"
+                                                        type="button"
+                                                        className={`btn btn-sm smaller ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
+                                                        onClick={() => this.fn_toggleIRHot()}
+                                                    >
+                                                        {this.state.ir_hot}
+                                                    </button>
+                                                    <button
+                                                        id="btn_view_mode_toggle"
+                                                        type="button"
+                                                        className={`btn btn-sm smaller ${this.fn_getViewModeButtonColor()}`}
+                                                        onClick={() => this.fn_toggleViewMode()}
+                                                    >
+                                                        {this.state.current_view_mode}
+                                                    </button>
+                                                    <button
+                                                        id="btn_get_position"
+                                                        type="button"
+                                                        className="btn btn-sm btn-primary hidden"
+                                                        onClick={() => this.fn_getGimbalPosition()}
+                                                    >
+                                                        Pos BAD PICTH SHOULD REMOVE - sign
+                                                    </button>
+                                                    <button
+                                                        id="btn_status_all"
+                                                        type="button"
+                                                        className="btn btn-sm btn-primary smaller"
+                                                        onClick={() => this.fn_getAllStatus()}
+                                                    >
+                                                        {t('status')}
+                                                    </button>
+                                                </div>
+                                        </div>
+                                        </div>
                                     </div>
                                     {/* Read Orientation and Target Drone Selector Buttons */}
-                                    <div className="mb-3">
-                                        <div className="d-flex gap-2">
-                                            <button
-                                                id="btn_read_orientation"
-                                                type="button"
-                                                className="btn btn-info flex-fill"
-                                                onClick={() => this.fn_readCurrentOrientation()}
-                                            >
-                                                {t('read_current_orientation')}
-                                            </button>
-
+                                    <div key='send-controls' className="mb-3">
+                                        <div key='send-button-group' className="">
                                             <div className="btn-group flex-fill" role="group" aria-label="Send to Drone">
                                                 <button
                                                     type="button"
@@ -685,7 +766,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            
                         )}
                     </div>
 

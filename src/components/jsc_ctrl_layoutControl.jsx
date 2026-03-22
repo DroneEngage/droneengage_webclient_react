@@ -15,7 +15,7 @@ class ClssCtrlLayout extends React.Component {
         const { t } = this.props; // Access t function with ctrlLayout namespace
         const v_display_mode = js_localStorage.fn_getDisplayMode() % 5 + 1;
         return (
-            <div id="main_btn_group" role="group" className="d-flex align-items-center" >
+            <div id="main_btn_group" role="group" className="d-flex align-items-center gap-1" >
                 <button
                     type="button"
                     id="btn_showSettings"

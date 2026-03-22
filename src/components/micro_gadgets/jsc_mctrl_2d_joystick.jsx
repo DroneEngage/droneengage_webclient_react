@@ -19,6 +19,7 @@ import React from 'react';
  * - currentX: Current X value for programmatic control (overrides internal state)
  * - currentY: Current Y value for programmatic control (overrides internal state)
  * - sendOnReleaseOnly: Only fire onDrag event on mouse/touch release (default: false)
+ * - mode: Operating mode - 'location' (default) or 'motion'
  * - indicatorCircle: Object with x, y, rgb properties for non-draggable indicator circle
  * - onClick: Callback for single clicks (x, y)
  * - onDoubleClick: Callback for double clicks (x, y)
@@ -42,7 +43,8 @@ export class Class_2D_Joystick extends React.Component {
             labelY = 'Y',
             circleRadius = 15,
             initialX = 0,
-            initialY = 0
+            initialY = 0,
+            mode = 'location'
         } = props;
 
         // Calculate min/max values from ranges
@@ -59,7 +61,8 @@ export class Class_2D_Joystick extends React.Component {
             currentX: initialX,
             currentY: initialY,
             pendingX: null,
-            pendingY: null
+            pendingY: null,
+            mode: mode
         };
 
         this.svgRef = React.createRef();
@@ -67,7 +70,37 @@ export class Class_2D_Joystick extends React.Component {
         this.dragOffset = { x: 0, y: 0 };
     }
 
+    getMode = () => {
+        return this.state.mode;
+    }
+
+    resetToCenter = () => {
+        const { width = 200, height = 200, rangeX = 500, rangeY = 500 } = this.props;
+        const minValueX = -rangeX;
+        const maxValueX = rangeX;
+        const minValueY = -rangeY;
+        const maxValueY = rangeY;
+
+        // Calculate center position (value 0,0)
+        const centerCircleX = this.valueToPixels(0, width, minValueX, maxValueX);
+        const centerCircleY = this.valueToPixels(0, height, minValueY, maxValueY);
+
+        this.setState({
+            circleX: centerCircleX,
+            circleY: centerCircleY,
+            currentX: 0,
+            currentY: 0,
+            pendingX: null,
+            pendingY: null
+        });
+    }
+
     componentDidUpdate(prevProps) {
+        // Update mode if prop changes
+        if (prevProps.mode !== this.props.mode) {
+            this.setState({ mode: this.props.mode });
+        }
+
         // Reset position if initialX or initialY props change
         if (prevProps.initialX !== this.props.initialX || prevProps.initialY !== this.props.initialY) {
             // Avoid interfering during drag or when values are effectively unchanged
@@ -250,9 +283,17 @@ export class Class_2D_Joystick extends React.Component {
             pendingY: sendOnReleaseOnly ? valueY : null
         });
 
-        // Fire onDrag event immediately if not sendOnReleaseOnly
-        if (onDrag && !sendOnReleaseOnly) {
-            onDrag(valueX, valueY);
+        // Handle different modes
+        if (this.state.mode === 'motion') {
+            // In motion mode, fire events continuously while dragging
+            if (onDrag) {
+                onDrag(valueX, valueY);
+            }
+        } else {
+            // In location mode, fire onDrag event immediately if not sendOnReleaseOnly
+            if (onDrag && !sendOnReleaseOnly) {
+                onDrag(valueX, valueY);
+            }
         }
     }
 
@@ -271,9 +312,18 @@ export class Class_2D_Joystick extends React.Component {
             onRelease(currentX, currentY);
         }
 
-        // Fire onDrag event on release if sendOnReleaseOnly is true
-        if (onDrag && sendOnReleaseOnly && (pendingX !== null || pendingY !== null)) {
-            onDrag(pendingX, pendingY);
+        // Handle different modes
+        if (this.state.mode === 'motion') {
+            // In motion mode, reset to center and send center event
+            this.resetToCenter();
+            if (onDrag) {
+                onDrag(0, 0); // Send center position event
+            }
+        } else {
+            // In location mode, fire onDrag event on release if sendOnReleaseOnly is true
+            if (onDrag && sendOnReleaseOnly && (pendingX !== null || pendingY !== null)) {
+                onDrag(pendingX, pendingY);
+            }
         }
     }
 
@@ -365,7 +415,13 @@ export class Class_2D_Joystick extends React.Component {
             style = {}
         } = this.props;
 
-        const { isControlMode, isDragging, circleX, circleY, currentX, currentY } = this.state;
+        const { isControlMode, isDragging, circleX, circleY, currentX, currentY, mode } = this.state;
+
+        // Determine colors based on mode
+        const isMotionMode = mode === 'motion';
+        const primaryColor = isMotionMode ? '#dc3545' : '#007bff'; // Red for motion, Blue for location
+        const secondaryColor = isMotionMode ? '#a02633' : '#004085'; // Darker shades
+        const bgColor = isControlMode ? '#f8f9fa' : '#e9ecef';
 
         // Calculate min/max values from ranges
         const minValueX = -rangeX;
@@ -391,9 +447,9 @@ export class Class_2D_Joystick extends React.Component {
             <div 
                 className={`d-inline-block ${className}`}
                 style={{ 
-                    border: isControlMode ? '2px solid #007bff' : '2px solid #6c757d',
+                    border: isControlMode ? `2px solid ${primaryColor}` : '2px solid #6c757d',
                     borderRadius: '4px',
-                    backgroundColor: isControlMode ? '#f8f9fa' : '#e9ecef',
+                    backgroundColor: bgColor,
                     cursor: isControlMode ? (isDragging ? 'grabbing' : 'grab') : 'pointer',
                     userSelect: 'none',
                     ...style
@@ -416,7 +472,7 @@ export class Class_2D_Joystick extends React.Component {
                         width={width}
                         height={height}
                         fill="none"
-                        stroke={isControlMode ? '#007bff' : '#6c757d'}
+                        stroke={isControlMode ? primaryColor : '#6c757d'}
                         strokeWidth="2"
                     />
 
@@ -472,8 +528,8 @@ export class Class_2D_Joystick extends React.Component {
                         cx={circleX}
                         cy={circleY}
                         r={circleRadius}
-                        fill={isControlMode ? (isDragging ? '#0056b3' : '#007bff') : '#6c757d'}
-                        stroke={isControlMode ? '#004085' : '#495057'}
+                        fill={isControlMode ? (isDragging ? secondaryColor : primaryColor) : '#6c757d'}
+                        stroke={isControlMode ? secondaryColor : '#495057'}
                         strokeWidth="2"
                         style={{
                             filter: isControlMode ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none'
@@ -484,7 +540,7 @@ export class Class_2D_Joystick extends React.Component {
                     <text
                         x="10"
                         y={height - 20}
-                        fill={isControlMode ? '#007bff' : '#6c757d'}
+                        fill={isControlMode ? primaryColor : '#6c757d'}
                         fontSize="12"
                         fontFamily="monospace"
                     >
@@ -493,7 +549,7 @@ export class Class_2D_Joystick extends React.Component {
                     <text
                         x="10"
                         y={height - 5}
-                        fill={isControlMode ? '#007bff' : '#6c757d'}
+                        fill={isControlMode ? primaryColor : '#6c757d'}
                         fontSize="12"
                         fontFamily="monospace"
                     >
@@ -505,11 +561,11 @@ export class Class_2D_Joystick extends React.Component {
                         <text
                             x="10"
                             y="20"
-                            fill="#007bff"
+                            fill={primaryColor}
                             fontSize="14"
                             fontWeight="bold"
                         >
-                            CONTROL MODE
+                            {isMotionMode ? 'MOTION MODE' : 'LOCATION MODE'}
                         </text>
                     )}
 
