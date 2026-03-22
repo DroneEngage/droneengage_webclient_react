@@ -26,11 +26,20 @@ class ClssHeaderControl extends React.Component {
             );
         }
         else {
-            ctrl.push(
-                <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
-                    <ClssCtrlLayout />
-                </div>
-            );
+            if (this.props.no_3dmap !== null && this.props.no_3dmap !== undefined) {
+                ctrl.push(
+                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                        <ClssCtrlLayout showMap3D={false} />
+                    </div>
+                );
+            }
+            else {
+                ctrl.push(
+                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                        <ClssCtrlLayout />
+                    </div>
+                );
+            }
         }
         if (this.props.no_login !== null && this.props.no_login !== undefined) {
             ctrl.push(
