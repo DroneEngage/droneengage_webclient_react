@@ -1295,7 +1295,9 @@ export function fn_gotoUnit(p_andruavUnit) {
 
 	let marker = p_andruavUnit.m_gui.m_marker;
 	if (marker !== null && marker !== undefined) {
-		js_leafletmap.fn_PanTo(p_andruavUnit.m_gui.m_marker);
+		const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+		const v_loc = p_andruavUnit.m_gui.m_marker.getLatLng()
+		mapAdapter.fn_PanTo_latlng(v_loc.lat, v_loc.lng);
 		// commented because zoom need to be after pan is completed otherwise map pans to wrong location.
 		// if (js_leafletmap.fn_getZoom() < 16) {
 		// 	js_leafletmap.fn_setZoom(17);
@@ -2752,7 +2754,8 @@ function hlp_gotoImage_Map() {
 		// 	js_leafletmap.fn_setZoom(14);
 		// }
 
-		js_leafletmap.fn_PanTo_latlng(location.lat, location.lng);
+		const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+		mapAdapter.fn_PanTo_latlng(location.lat, location.lng);
 	}
 }
 
