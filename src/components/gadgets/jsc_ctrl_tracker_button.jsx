@@ -144,13 +144,13 @@ export default class ClssCtrlObjectTracker extends React.Component {
                 const css_Track_small = css_Track.replace('css_large_icon', '').trim();
                 const css_ai_driver_small = css_ai_driver.replace('css_large_icon', '').trim();
                 return (
-                    <span id={this.props.id?this.props.id:this.key} key={this.key} className={this.props.className}>
-                        <span title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}>
+                    <span id={this.props.id?this.props.id:this.key} key={this.key} className={`${this.props.className}`}>
+                        <span title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)} className='pe-1' >
                             <i className={css_Track_small}></i>
                             &nbsp;{this.props.displayText}
                         </span>
-                        &nbsp;
-                        <span title={css_ai_driver_title} onClick={(e) => this.fn_tracking_ai_driverOnOff(e)}>
+                        
+                        <span title={css_ai_driver_title}  className='ps-2' onClick={(e) => this.fn_tracking_ai_driverOnOff(e)}>
                             <i className={css_ai_driver_small}></i>
                             &nbsp;AI Driver
                         </span>
