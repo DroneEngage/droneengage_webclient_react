@@ -144,22 +144,22 @@ export default class ClssCtrlObjectTracker extends React.Component {
                 const css_Track_small = css_Track.replace('css_large_icon', '').trim();
                 const css_ai_driver_small = css_ai_driver.replace('css_large_icon', '').trim();
                 return (
-                    <span id={this.props.id?this.props.id:this.key} key={this.key} className={`${this.props.className}`}>
+                    <span id={"trackerOnOff_" + this.props.id?this.props.id:this.key} key={this.key} className={`${this.props.className} gap-5`}>
                         <span title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)} className='pe-1' >
                             <i className={css_Track_small}></i>
-                            &nbsp;{this.props.displayText}
+                            {this.props.displayText}
                         </span>
                         
-                        <span title={css_ai_driver_title}  className='ps-2' onClick={(e) => this.fn_tracking_ai_driverOnOff(e)}>
+                        <span id={"ai_" + this.props.id?this.props.id:this.key} title={css_ai_driver_title}  className='ps-2' onClick={(e) => this.fn_tracking_ai_driverOnOff(e)}>
                             <i className={css_ai_driver_small}></i>
-                            &nbsp;AI Driver
+                            AI Driver
                         </span>
                     </span>
                 );
             }
             else {
                 return (
-                    <span id={this.props.id?this.props.id:this.key} key={this.key} className={this.props.className}>
+                    <span id={"trackerOnOff_" + this.props.id?this.props.id:this.key} key={this.key} className={this.props.className}>
                         <i className={css_Track} title={css_Track_title} onClick={(e) => this.fnl_trackerOnOff(e)}></i>
                         &nbsp;
                         <i className={css_ai_driver} title={css_ai_driver_title} onClick={(e) => this.fn_tracking_ai_driverOnOff(e)}></i>
