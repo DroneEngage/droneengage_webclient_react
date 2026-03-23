@@ -79,7 +79,7 @@
     
 
     "CONST_MAPBOX_ACCESS_TOKEN": "pk.eyJ1IjoibWhlZm55IiwiYSI6ImNrZW84Nm9rYTA2ZWgycm9mdmNscmFxYzcifQ.c-zxDjXCthXmRsErPzKhbQ",
-    "CONST_MAPBOX_STYLE": "mapbox://styles/mapbox/standard",
+    "CONST_MAPBOX_STYLE": "mapbox://styles/mapbox/standard-satellite",
 
     // CHOOSE YOUR MAP SOURCE
     //"CONST_MAP_LEAFLET_URL": "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaHNhYWQiLCJhIjoiY2tqZnIwNXRuMndvdTJ4cnV0ODQ4djZ3NiJ9.LKojA3YMrG34L93jRThEGQ",

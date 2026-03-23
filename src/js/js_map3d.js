@@ -11,31 +11,36 @@ class CAndruavMap3D {
         this.m_isMapDblClickBound = false;
     }
 
+    /**
+     * Registers double-click handler on the map (only once).
+     */
     fn_registerMapDblClickHandler() {
-        if (!this.m_map || this.m_isMapDblClickBound === true) return;
+        if (!this.m_map || this.m_isMapDblClickBound) return;
 
         this.m_map.on('dblclick', (event) => {
-            const lngLat = event && event.lngLat ? event.lngLat : null;
+            const lngLat = event?.lngLat;
             if (!lngLat) return;
 
-            const lat = lngLat.lat;
-            const lng = lngLat.lng;
-
-            const len = this.m_mapDblClickCallbacks.length;
-            for (let i = 0; i < len; ++i) {
-                this.m_mapDblClickCallbacks[i](lat, lng);
-            }
+            this.m_mapDblClickCallbacks.forEach(callback => callback(lngLat.lat, lngLat.lng));
         });
 
         this.m_isMapDblClickBound = true;
     }
 
+    /**
+     * Adds a callback to be called on map double-click.
+     * @param {Function} p_callback (lat, lng) => void
+     */
     fn_addListenerOnDblClickMap(p_callback) {
-        if (!p_callback) return;
+        if (typeof p_callback !== 'function') return;
         this.m_mapDblClickCallbacks.push(p_callback);
         this.fn_registerMapDblClickHandler();
     }
 
+    /**
+     * Shows a popup at the given location.
+     * @returns {mapboxgl.Popup | null}
+     */
     fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng) {
         if (!this.m_map) return null;
 
@@ -46,18 +51,15 @@ class CAndruavMap3D {
 
         if (typeof p_content === 'string') {
             popup.setHTML(p_content);
-        }
-        else if (p_content instanceof HTMLElement) {
+        } else if (p_content instanceof HTMLElement) {
             popup.setDOMContent(p_content);
         }
 
+        // Normalize 'remove' event to 'close' for compatibility
         if (typeof popup.on === 'function') {
             const originalOn = popup.on.bind(popup);
             popup.on = function (eventName, callback) {
-                if (eventName === 'remove') {
-                    return originalOn('close', callback);
-                }
-                return originalOn(eventName, callback);
+                return originalOn(eventName === 'remove' ? 'close' : eventName, callback);
             };
         }
 
@@ -65,6 +67,10 @@ class CAndruavMap3D {
         return popup;
     }
 
+    /**
+     * Updates an existing popup's content and/or position.
+     * @returns {mapboxgl.Popup | null}
+     */
     fn_bindPopup(p_infoWindow, p_content, p_lat, p_lng) {
         if (!p_infoWindow) return null;
 
@@ -74,8 +80,7 @@ class CAndruavMap3D {
 
         if (typeof p_content === 'string') {
             p_infoWindow.setHTML(p_content);
-        }
-        else if (p_content instanceof HTMLElement) {
+        } else if (p_content instanceof HTMLElement) {
             p_infoWindow.setDOMContent(p_content);
         }
 
@@ -83,51 +88,58 @@ class CAndruavMap3D {
     }
 
     fn_hideInfoWindow(p_infoWindow) {
-        if (!p_infoWindow) return;
-        if (typeof p_infoWindow.remove === 'function') {
-            p_infoWindow.remove();
-        }
+        p_infoWindow?.remove();
     }
 
+    /**
+     * Dynamically loads Mapbox GL JS + CSS if not already present.
+     */
     async fn_loadMapboxSdk() {
         if (window.mapboxgl) return window.mapboxgl;
 
-        await new Promise((resolve, reject) => {
-            const cssId = 'mapbox-gl-css';
-            if (!document.getElementById(cssId)) {
-                const css = document.createElement('link');
-                css.id = cssId;
-                css.rel = 'stylesheet';
-                css.href = 'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css';
-                document.head.appendChild(css);
-            }
+        const loadCSS = () => {
+            const id = 'mapbox-gl-css';
+            if (document.getElementById(id)) return;
+            const link = document.createElement('link');
+            link.id = id;
+            link.rel = 'stylesheet';
+            link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css';
+            document.head.appendChild(link);
+        };
 
-            const scriptId = 'mapbox-gl-js';
-            const existing = document.getElementById(scriptId);
-            if (existing) {
-                existing.addEventListener('load', () => resolve(), { once: true });
-                existing.addEventListener('error', () => reject(new Error('failed to load mapbox sdk')), { once: true });
+        const loadJS = () => new Promise((resolve, reject) => {
+            const id = 'mapbox-gl-js';
+            if (document.getElementById(id)) {
+                const el = document.getElementById(id);
+                if (el.dataset.loaded) return resolve();
+                el.addEventListener('load', () => { el.dataset.loaded = 'true'; resolve(); }, { once: true });
+                el.addEventListener('error', () => reject(new Error('Failed to load Mapbox GL JS')), { once: true });
                 return;
             }
 
             const script = document.createElement('script');
-            script.id = scriptId;
+            script.id = id;
             script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js';
             script.async = true;
             script.onload = () => resolve();
-            script.onerror = () => reject(new Error('failed to load mapbox sdk'));
+            script.onerror = () => reject(new Error('Failed to load Mapbox GL JS'));
             document.body.appendChild(script);
         });
 
+        loadCSS();
+        await loadJS();
         return window.mapboxgl;
     }
 
+    /**
+     * Initializes the 3D Mapbox map with terrain and buildings.
+     */
     async fn_initMap(containerId) {
-        if (this.m_isReady === true || this.m_map != null) return;
+        if (this.m_isReady || this.m_map) return;
 
         const token = js_siteConfig.CONST_MAPBOX_ACCESS_TOKEN;
         if (!token) {
-            console.warn('Mapbox 3D disabled: CONST_MAPBOX_ACCESS_TOKEN is not configured.');
+            console.warn('Mapbox 3D disabled: CONST_MAPBOX_ACCESS_TOKEN not configured.');
             return;
         }
 
@@ -148,36 +160,57 @@ class CAndruavMap3D {
         this.fn_registerMapDblClickHandler();
 
         this.m_map.on('style.load', () => {
-            const hasBuildingLayer = this.m_map.getLayer('add-3d-buildings');
-            if (!hasBuildingLayer) {
-                this.m_map.addLayer({
-                    id: 'add-3d-buildings',
-                    source: 'composite',
-                    'source-layer': 'building',
-                    filter: ['==', 'extrude', 'true'],
-                    type: 'fill-extrusion',
-                    minzoom: 15,
-                    paint: {
-                        'fill-extrusion-color': '#aaa',
-                        'fill-extrusion-height': ['get', 'height'],
-                        'fill-extrusion-base': ['get', 'min_height'],
-                        'fill-extrusion-opacity': 0.6
-                    }
+            // Add 3D buildings if not already present
+            if (!this.m_map.getLayer('add-3d-buildings')) {
+                const sourceId = this.m_map.getSource('composite') ? 'composite' :
+                                 this.m_map.getSource('mapbox-streets') ? 'mapbox-streets' : null;
+
+                if (sourceId) {
+                    this.m_map.addLayer({
+                        id: 'add-3d-buildings',
+                        source: sourceId,
+                        'source-layer': 'building',
+                        filter: ['==', 'extrude', 'true'],
+                        type: 'fill-extrusion',
+                        minzoom: 15,
+                        paint: {
+                            'fill-extrusion-color': '#aaa',
+                            'fill-extrusion-height': ['get', 'height'],
+                            'fill-extrusion-base': ['get', 'min_height'],
+                            'fill-extrusion-opacity': 0.6
+                        }
+                    });
+                } else {
+                    console.warn('3D buildings skipped: no suitable building source found.');
+                }
+            }
+
+            // Add terrain DEM source if missing
+            if (!this.m_map.getSource('mapbox-dem')) {
+                this.m_map.addSource('mapbox-dem', {
+                    type: 'raster-dem',
+                    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                    tileSize: 512,
+                    maxzoom: 14
                 });
             }
+
+            // Enable terrain (required for marker altitude to be visible)
+            this.m_map.setTerrain({
+                source: 'mapbox-dem',
+                exaggeration: 1.3  // Adjust for visual impact (1.0 = natural, 1.5+ = dramatic)
+            });
         });
 
         this.m_map.on('load', () => {
             this.m_isReady = true;
-            if (this.m_isVisible === true) {
-                this.m_map.resize();
-            }
+            if (this.m_isVisible) this.m_map.resize();
         });
     }
 
     fn_show() {
         this.m_isVisible = true;
-        if (this.m_map) this.m_map.resize();
+        this.m_map?.resize();
     }
 
     fn_hide() {
@@ -185,32 +218,28 @@ class CAndruavMap3D {
     }
 
     fn_getUnitMarker(unit) {
-        if (!unit) return null;
-        return this.m_markers.get(unit.getPartyID()) || null;
+        return unit ? this.m_markers.get(unit.getPartyID()) ?? null : null;
     }
 
+    /**
+     * Generic method to attach DOM event listeners to marker element.
+     */
     fn_addListenerOnMarker(p_marker, p_callback, p_event) {
-        if (!p_marker || !p_callback) return;
+        if (!p_marker || typeof p_callback !== 'function') return;
 
-        const markerElement = p_marker.getElement ? p_marker.getElement() : null;
-        if (!markerElement) return;
+        const el = p_marker.getElement?.();
+        if (!el) return;
 
-        if (p_marker.m_event_handlers === undefined) {
-            p_marker.m_event_handlers = {};
-        }
-
-        if (p_marker.m_event_handlers[p_event] === undefined) {
-            p_marker.m_event_handlers[p_event] = [];
-        }
+        p_marker.m_event_handlers = p_marker.m_event_handlers || {};
+        p_marker.m_event_handlers[p_event] = p_marker.m_event_handlers[p_event] || [];
 
         const handler = () => {
-            const lngLat = p_marker.getLngLat ? p_marker.getLngLat() : null;
-            if (!lngLat) return;
-            p_callback(lngLat.lat, lngLat.lng);
+            const lngLat = p_marker.getLngLat?.();
+            if (lngLat) p_callback(lngLat.lat, lngLat.lng);
         };
 
         p_marker.m_event_handlers[p_event].push(handler);
-        markerElement.addEventListener(p_event, handler);
+        el.addEventListener(p_event, handler);
     }
 
     fn_addListenerOnClickMarker(p_marker, p_callback) {
@@ -226,30 +255,28 @@ class CAndruavMap3D {
     }
 
     fn_removeListenerOnMouseOutClickMarker(p_marker) {
-        if (!p_marker || !p_marker.m_event_handlers || !p_marker.m_event_handlers.mouseout) return;
+        if (!p_marker?.m_event_handlers?.mouseout) return;
 
-        const markerElement = p_marker.getElement ? p_marker.getElement() : null;
-        if (!markerElement) return;
+        const el = p_marker.getElement?.();
+        if (!el) return;
 
-        p_marker.m_event_handlers.mouseout.forEach((handler) => {
-            markerElement.removeEventListener('mouseout', handler);
-        });
-
+        p_marker.m_event_handlers.mouseout.forEach(h => el.removeEventListener('mouseout', h));
         p_marker.m_event_handlers.mouseout = [];
     }
 
     fn_focusUnit(unit) {
         if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
+
         const { lat, lng } = unit.m_Nav_Info.p_Location;
         if (lat == null || lng == null) return;
 
-        this.m_map.easeTo({
-            center: [lng, lat],
-            duration: 500,
-            pitch: 53
-        });
+        this.m_map.easeTo({ center: [lng, lat], duration: 500, pitch: 53 });
     }
 
+    /**
+     * Syncs unit position, altitude, rotation (yaw), and icon.
+     * Now uses proper altitude support + terrain.
+     */
     fn_syncUnit(unit, markerIconUrl = null) {
         if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
 
@@ -259,7 +286,7 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         let marker = this.m_markers.get(id);
 
-        if (!marker) {
+        const createMarkerElement = () => {
             const el = document.createElement('div');
             el.className = 'css_map3d_marker';
             el.title = unit.m_unitName || id;
@@ -270,63 +297,54 @@ class CAndruavMap3D {
             iconEl.style.transformOrigin = 'center center';
             el.appendChild(iconEl);
 
+            return el;
+        };
+
+        if (!marker) {
+            const el = createMarkerElement();
+
             marker = new window.mapboxgl.Marker({
                 element: el,
                 rotationAlignment: 'map',
                 pitchAlignment: 'map',
                 anchor: 'center'
-            });
+            })
+            .setLngLat([lng, lat])
+            .addTo(this.m_map);
 
-            if (typeof marker.setRotationAlignment === 'function') {
-                marker.setRotationAlignment('map');
-            }
-
-            if (typeof marker.setPitchAlignment === 'function') {
-                marker.setPitchAlignment('map');
-            }
-            
-            // Set position before adding to map
-            marker.setLngLat([lng, lat]);
-            
-            // Double-check map is still available before adding marker
-            if (this.m_map) {
-                marker.addTo(this.m_map);
-            } else {
-                return;
-            }
+            // Ensure alignment (some older versions needed explicit calls)
+            if (typeof marker.setRotationAlignment === 'function') marker.setRotationAlignment('map');
+            if (typeof marker.setPitchAlignment === 'function') marker.setPitchAlignment('map');
         } else {
-            // Update position for existing marker
             marker.setLngLat([lng, lat]);
+            
         }
+
         this.m_markers.set(id, marker);
 
-        const markerElement = marker.getElement();
-        const iconElement = markerElement ? markerElement.querySelector('.css_map3d_marker_icon') : null;
-        if (iconElement && markerIconUrl) {
-            iconElement.style.backgroundImage = `url('${markerIconUrl}')`;
+        // Update icon if provided
+        const iconEl = marker.getElement()?.querySelector('.css_map3d_marker_icon');
+        if (iconEl && markerIconUrl) {
+            iconEl.style.backgroundImage = `url('${markerIconUrl}')`;
         }
 
-        if (this.m_hasAutoFocusedUnit === false) {
+        // Auto-focus first unit
+        if (!this.m_hasAutoFocusedUnit) {
             this.m_hasAutoFocusedUnit = true;
-            this.m_map.easeTo({
-                center: [lng, lat],
-                duration: 500,
-                pitch: 53
-            });
+            this.m_map.easeTo({ center: [lng, lat], duration: 500, pitch: 53 });
         }
 
+        // Apply yaw rotation (in degrees)
         const yaw = unit?.m_Nav_Info?.p_Orientation?.yaw;
         if (Number.isFinite(yaw)) {
-            // Leaflet receives yaw in radians and converts to degrees; do the same here
-            const deg = (yaw * 180 / Math.PI);
-            const normalizedYaw = ((deg % 360) + 360) % 360;
+            const deg = (yaw * 180 / Math.PI) % 360;
+            const normalizedYaw = (deg + 360) % 360;
+
             if (typeof marker.setRotation === 'function') {
                 marker.setRotation(normalizedYaw);
             } else {
-                // Fallback: rotate inner icon element if API is unavailable
-                const el = marker.getElement && marker.getElement();
-                const iconEl = el ? el.querySelector('.css_map3d_marker_icon') : null;
-                if (iconEl) iconEl.style.transform = `rotate(${normalizedYaw}deg)`;
+                // Fallback: rotate icon element
+                iconEl?.style.setProperty('transform', `rotate(${normalizedYaw}deg)`);
             }
         }
 
