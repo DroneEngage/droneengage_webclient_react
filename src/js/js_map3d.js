@@ -350,6 +350,17 @@ class CAndruavMap3D {
 
         return marker;
     }
+
+    /**
+     * Pans the map to the specified latitude and longitude coordinates.
+     * @param {number} lat - Latitude coordinate
+     * @param {number} lng - Longitude coordinate
+     */
+    fn_PanTo_latlng(lat, lng) {
+        if (!this.m_map) return;
+        this.m_map.easeTo({ center: [lng, lat], duration: 500 });
+    }
+
 }
 
 export const js_map3d = new CAndruavMap3D();
