@@ -230,15 +230,15 @@ class ClssCtrlObjectTrackerAIList extends React.Component {
                         </div>
                     );
             }
-
+            
             return (
-                    <div key={'aiq_1' + this.key} className={"btn-group flgtctrlbtn_icon_w " + this.props.className} role="group" aria-label="Button group with nested dropdown">
+                    <div id={'aiq_1' + this.key} key={'aiq_1' + this.key} className={"btn-group flgtctrlbtn_icon_w " + this.props.className} role="group" aria-label="Button group with nested dropdown">
                         <button
                             type="button"
                             className={"btn btn-sm  bi bi-eye-fill " + css_Track}
                             title={css_Track_title}
                             onClick={(e) => this.fnl_trackerAIOnOff(e)}></button>
-                        <div key={`aiq_12${this.key}`} className="btn-group" role="group">
+                        <div key={'aiq_12' + this.key} className="btn-group" role="group">
                             <button
                                 id={"btnGroupDrop2"+ this.key}
                                 type="button"
