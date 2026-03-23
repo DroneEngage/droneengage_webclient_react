@@ -112,7 +112,7 @@ class ClssLoginControl extends React.Component {
     const tabStatus = getTabStatus();
 
     const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
-    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true);
+    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true);
     this.state.use_plugin = usePlugin;
     if (this.chkUsePluginRef.current) {
       this.chkUsePluginRef.current.checked = usePlugin;
@@ -184,7 +184,7 @@ class ClssLoginControl extends React.Component {
         css = this.state.is_connected===CONST_NOT_CONNECTION_OFFLINE_FAILED?'btn-warning':'btn-success';
         ctrls.push(
           <div key={'div_login' + this.key} className="">
-            {js_siteConfig.CONST_WEBCONNECTOR_ENABLE && (
+            {js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED && (
               <div className={`form-group ${dir}`}>
                 <label className="txt-theme-aware">
                     <input

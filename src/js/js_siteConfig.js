@@ -21,16 +21,18 @@ export let CONST_TEST_MODE_PORT = '19408';
 export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
-export let CONST_WEBCONNECTOR_ENABLED = false;
-export let CONST_WEBCONNECTOR_AUTH_HOST = '127.0.0.1';
-export let CONST_WEBCONNECTOR_AUTH_PORT = 9211;
-export let CONST_WEBCONNECTOR_WS_PORT = 9212;
-export let CONST_WEBCONNECTOR_APIKEY = '';
-export let CONST_WEBCONNECTOR_TOKEN = '';
-// Auto fallback to cloud login when plugin is unreachable (true=enable fallback, false=plugin only)
-export let CONST_WEBCONNECTOR_AUTO_FALLBACK = true;
-export let CONST_WEBCONNECTOR_SECURE = true;
-export let CONST_WEBCONNECTOR_BASE_PATH = '';
+export let CONST_WEBCONNECTOR_CONFIG = {
+    ENABLED: false,
+    AUTH_HOST: '127.0.0.1',
+    AUTH_PORT: 9211,
+    WS_PORT: 9212,
+    APIKEY: '',
+    TOKEN: '',
+    // Auto fallback to cloud login when plugin is unreachable (true=enable fallback, false=plugin only)
+    AUTO_FALLBACK: true,
+    SECURE: true,
+    BASE_PATH: ''
+};
 
 /**
  * Links that are used in Header
@@ -61,9 +63,6 @@ export let CONST_MAPBOX_STYLE = 'mapbox://styles/mapbox/standard';
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
 export let CONST_DONT_BROADCAST_GCS_LOCATION = false;
 
-// Enable webconnector reverse proxy for local development (true=enable Caddy proxy)
-export let CONST_WEBCONNECTOR_ENABLE = false;
-
 export let CONST_DEBUG_CONTROL_PAGE = true;
 export let CONST_MODULE_VERSIONS = {
         
@@ -87,6 +86,7 @@ export let CONST_FEATURE = {
     DISABLE_TRACKING_AI: false,
     DISABLE_EXPERIMENTAL: true,
     DISABLE_DE_PILOT: false,
+    DISABLE_3D_MAP: false,
     DISABLE_VERSION_NOTIFICATION: true
 };
 
@@ -136,16 +136,7 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_TEST_MODE_IP !== undefined) CONST_TEST_MODE_IP = data.CONST_TEST_MODE_IP;
         if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
-        if (data.CONST_WEBCONNECTOR_ENABLED !== undefined) CONST_WEBCONNECTOR_ENABLED = data.CONST_WEBCONNECTOR_ENABLED;
-        if (data.CONST_WEBCONNECTOR_AUTH_HOST !== undefined) CONST_WEBCONNECTOR_AUTH_HOST = data.CONST_WEBCONNECTOR_AUTH_HOST;
-        if (data.CONST_WEBCONNECTOR_AUTH_PORT !== undefined) CONST_WEBCONNECTOR_AUTH_PORT = data.CONST_WEBCONNECTOR_AUTH_PORT;
-        if (data.CONST_WEBCONNECTOR_WS_PORT !== undefined) CONST_WEBCONNECTOR_WS_PORT = data.CONST_WEBCONNECTOR_WS_PORT;
-        if (data.CONST_WEBCONNECTOR_APIKEY !== undefined) CONST_WEBCONNECTOR_APIKEY = data.CONST_WEBCONNECTOR_APIKEY;
-        if (data.CONST_WEBCONNECTOR_TOKEN !== undefined) CONST_WEBCONNECTOR_TOKEN = data.CONST_WEBCONNECTOR_TOKEN;
-        if (data.CONST_WEBCONNECTOR_AUTO_FALLBACK !== undefined) CONST_WEBCONNECTOR_AUTO_FALLBACK = data.CONST_WEBCONNECTOR_AUTO_FALLBACK;
-        if (data.CONST_WEBCONNECTOR_SECURE !== undefined) CONST_WEBCONNECTOR_SECURE = data.CONST_WEBCONNECTOR_SECURE;
-        if (data.CONST_WEBCONNECTOR_BASE_PATH !== undefined) CONST_WEBCONNECTOR_BASE_PATH = data.CONST_WEBCONNECTOR_BASE_PATH;
-        if (data.CONST_WEBCONNECTOR_ENABLE !== undefined) CONST_WEBCONNECTOR_ENABLE = data.CONST_WEBCONNECTOR_ENABLE;
+        if (data.CONST_WEBCONNECTOR_CONFIG !== undefined) CONST_WEBCONNECTOR_CONFIG = { ...CONST_WEBCONNECTOR_CONFIG, ...data.CONST_WEBCONNECTOR_CONFIG };
         
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;

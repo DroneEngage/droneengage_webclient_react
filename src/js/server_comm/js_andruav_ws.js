@@ -367,13 +367,13 @@ class CAndruavClientWS {
 
             let url = null;
             const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
-            const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true);
+            const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true);
             const isPluginTarget = usePlugin === true;
-            const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WEBCONNECTOR_APIKEY : '';
+            const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WEBCONNECTOR_CONFIG.APIKEY : '';
             const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
 
             if (usePlugin === true) {
-                const wsProtocol = js_siteConfig.CONST_WEBCONNECTOR_SECURE === true ? 'wss' : 'ws';
+                const wsProtocol = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.SECURE === true ? 'wss' : 'ws';
                 const port = this.m_server_port;
                 url = wsProtocol + '://' + this.m_server_ip + ':' + port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
             } else {

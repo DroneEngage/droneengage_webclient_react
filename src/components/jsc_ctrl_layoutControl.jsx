@@ -3,6 +3,7 @@ import { withTranslation } from 'react-i18next';
 import { js_localStorage } from '../js/js_localStorage';
 import { fn_showSettings, fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/js_main';
 import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx';
+import { CONST_FEATURE } from '../js/js_siteConfig';
 
 class ClssCtrlLayout extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ class ClssCtrlLayout extends React.Component {
     render() {
         const { t } = this.props; // Access t function with ctrlLayout namespace
         const v_display_mode = js_localStorage.fn_getDisplayMode() % 5 + 1;
-        const showMap3D = this.props.showMap3D !== false; // Default to true unless explicitly set to false
+        const showMap3D = this.props.showMap3D !== false && !CONST_FEATURE.DISABLE_3D_MAP; // Default to true unless explicitly set to false or feature disabled
         return (
             <div id="main_btn_group" role="group" className="d-flex align-items-center gap-1" >
                 <button
