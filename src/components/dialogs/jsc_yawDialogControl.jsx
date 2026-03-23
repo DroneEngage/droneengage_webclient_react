@@ -173,7 +173,7 @@ export default class ClssYawDialog extends React.Component
 						<h3 className="text-success text-start">YAW</h3>
 						</div>
 						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
+						<button id="btnclose" type="button" className="btn-close smaller" onClick={(e)=>this.fn_closeDialog()}></button>
 						</div>
 						</div>
 					</div>

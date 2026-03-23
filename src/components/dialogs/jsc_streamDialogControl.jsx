@@ -243,7 +243,7 @@ export default class ClssStreamDialog extends React.Component
                             </h4>
                         </div>
                         <div className="col-2 float-right">
-                            <button id="btnclose" type="button" className="btn-close" onClick={() => this.fn_closeDialog()}></button>
+                            <button id="btnclose" type="button" className="btn-close smaller" onClick={() => this.fn_closeDialog()}></button>
                         </div>
                     </div>
                 </div>

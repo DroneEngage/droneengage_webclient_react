@@ -504,7 +504,7 @@ class ClssViewLinkGimbal extends React.Component {
                                 </h5>
                             </div>
                             <div className="col-2 text-end">
-                                <button id="btnclose" type="button" className="btn-close" onClick={() => this.fn_closeDialog()}></button>
+                                <button id="btnclose" type="button" className="btn-close smaller" onClick={() => this.fn_closeDialog()}></button>
                             </div>
                         </div>
                     </div>

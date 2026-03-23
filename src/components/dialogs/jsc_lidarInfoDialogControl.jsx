@@ -140,30 +140,19 @@ export default class ClssLidarInfoDialog extends React.Component
 						<h3 className="text-success text-start">{'Lidar - ' + unitname}</h3>
 						</div>
 						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close" onClick={(e)=>this.fn_closeDialog()}></button>
+						<button id="btnclose" type="button" className="btn-close smaller" onClick={(e)=>this.fn_closeDialog()}></button>
 						</div>
 						</div>
 					</div>
 					<div key={this.key + "m2"} className="card-body">
 						<ClssCtrlLidarDevice p_unit={this.p_andruavUnit} rotation_ticks={this.rotation_ticks} follow_unit={this.follow_unit}/>
 					</div>
-					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"} className="form-group text-center ">
-                        <div className= "row">
-                            <div className= "col-md-3">
+					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"} className="btn-group w-100 d-flex flex-wrap">
+                        <div className= "btn-group w-100 d-flex flex-wrap">
                             <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
-                            </div>
-                            
-                            <div className= "col-md-3">
-                                <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnit()}>Goto</button>
-                            </div>
-                            
-                            <div className= "col-md-3">
-                                <button id="btnFollow" type="button" className="btn btn-sm btn-danger" onClick={(e) => this.fn_follow(true)}>Follow</button>
-                            </div>
-                            <div className= "col-md-3">
-                                <button id="btnReset" type="button" className="btn btn-sm btn-warning" onClick={(e) => this.fn_follow(false)}>Reset</button>
-                            </div>
-                            
+                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnit()}>Goto</button>
+                            <button id="btnFollow" type="button" className="btn btn-sm btn-danger" onClick={(e) => this.fn_follow(true)}>Follow</button>
+                            <button id="btnReset" type="button" className="btn btn-sm btn-warning" onClick={(e) => this.fn_follow(false)}>Reset</button>
                         </div>
 					</div>
 				</div>

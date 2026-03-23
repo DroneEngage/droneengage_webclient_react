@@ -57,19 +57,19 @@ class ClssParameterItem extends React.Component {
         }
         return (
             <tr>
-                <td scope="row">{this.props.prop_param.param_index}</td>
-                <td><p>{this.props.prop_param.param_id}</p></td>
+                <td scope="row" className='smaller'>{this.props.prop_param.param_index}</td>
+                <td><p className='smaller'>{this.props.prop_param.param_id}</p></td>
                 <td>
                     <input
                         type="text"
-                        className={"form-control " + cls_color}
+                        className={"form-control smaller " + cls_color}
                         id={"prop_val" + this.props.prop_param.param_index}
                         value={String(this.state.param_value)}
                         onChange={(e) => this.fn_onParamChanged(e)}
                     />
                 </td>
-                <td>
-                    <button className="btn btn-danger btn-sm btn_prop" onClick={(e) => this.fn_saveParameter(e)}>
+                <td >
+                    <button className="btn btn-danger btn-sm btn_prop smaller" onClick={(e) => this.fn_saveParameter(e)}>
                         Save
                     </button>
                 </td>
@@ -111,10 +111,10 @@ class ClssParametersList extends React.Component {
             <table className="table table-dark table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Param</th>
-                        <th scope="col">Value</th>
-                        <th scope="col">Operation</th>
+                        <th scope="col" className='small'>#</th>
+                        <th scope="col" className='small'>Param</th>
+                        <th scope="col" className='small'>Value</th>
+                        <th scope="col" className='small'>Operation</th>
                     </tr>
                 </thead>
                 <tbody>{p_params}</tbody>
@@ -329,7 +329,7 @@ export default class ClssUnitParametersList extends React.Component {
                             <div className="col-2 float-right">
                                 <button
                                     type="button"
-                                    className="btn-close"
+                                    className="btn-close smaller"
                                     onClick={(e) => this.fn_closeDialog()}
                                 ></button>
                             </div>
@@ -338,9 +338,8 @@ export default class ClssUnitParametersList extends React.Component {
                     <div id="ctrl_main" className="card-body">
                         {p_params}
                     </div>
-                    <div id="modal_ctrl_parameters_footer" className="form-group text-center localcontainer css_ontop">
-                        <div className="row">
-                            <div className="col-6">
+                    <div id="modal_ctrl_parameters_footer" className="btn-group w-100 d-flex flex-wrap">
+                        <div className="btn-group w-100 d-flex flex-wrap">
                                 <button
                                     id="opaque_btn"
                                     type="button"
@@ -349,8 +348,6 @@ export default class ClssUnitParametersList extends React.Component {
                                 >
                                     Opaque
                                 </button>
-                            </div>
-                            <div className="col-6">
                                 <button
                                     id="btnGoto"
                                     type="button"
@@ -359,7 +356,6 @@ export default class ClssUnitParametersList extends React.Component {
                                 >
                                     Goto
                                 </button>
-                            </div>
                         </div>
                     </div>
                 </div>

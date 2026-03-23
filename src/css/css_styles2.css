@@ -1330,6 +1330,7 @@ div#displays {
 	/* Adjust based on actual footer height */
 }
 
+p#fence::before,
 button#btn_laser_toggle::before,
 button#btn_tracker_toggle::before,
 button#btn_ai_toggle::before,

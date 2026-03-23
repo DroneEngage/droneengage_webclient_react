@@ -110,50 +110,50 @@ class ClssServoUnit extends React.Component {
         const sliderPercent = ((currentValue - 1000) / 1000) * 100;
 
         return (
-            <div id='servoblk' key={this.key} className='row margin_zero bg-secondary border rounded-3' title={'value: ' + this.props.prop_value} >
-                <div className='row margin_zero small'>
-                    <div className='col-8'>
-                        <div className='col-12 margin_zero'>
+            <div id='servoblk' key={this.key} className=' margin_zero bg-secondary border rounded-3 p-1' title={'value: ' + this.props.prop_value} >
+                <div className=' margin_zero small'>
+                    <div className='d-inline-grid'>
+                        <div className='margin_zero'>
                             <div className='margin_zero  pt-2'>
                                 <p
                                     id={'max' + this.props.prop_channel}
-                                    className={'label rounded-1 ' + btn_max_css + (btn_disabled ? ' disabled' : '')}
+                                    className={'label rounded-1 mb-1 smaller  ' + btn_max_css + (btn_disabled ? ' disabled' : '')}
                                     onClick={() => this.handleClick('max', 9999)}
                                 >
                                     MAX
                                 </p>
                             </div>
                         </div>
-                        <div className='col-12 margin_zero'>
+                        <div className='margin_zero'>
                             <div className='margin_zero'>
                                 <p
                                     id={'med' + this.props.prop_channel}
-                                    className={'label rounded-1 ' + btn_med_css + (btn_disabled ? ' disabled' : '')}
+                                    className={'label rounded-1 mb-1 smaller ' + btn_med_css + (btn_disabled ? ' disabled' : '')}
                                     onClick={() => this.handleClick('med', 1500)}
                                 >
                                     MED
                                 </p>
                             </div>
                         </div>
-                        <div className='col-12 margin_zero'>
+                        <div className='margin_zero'>
                             <div className='margin_zero'>
                                 <p
                                     id={'min' + this.props.prop_channel}
-                                    className={'label rounded-1 ' + btn_min_css + (btn_disabled ? ' disabled' : '')}
+                                    className={'label rounded-1 mb-1 smaller  ' + btn_min_css + (btn_disabled ? ' disabled' : '')}
                                     onClick={() => this.handleClick('min', 0)}
                                 >
                                     MIN
                                 </p>
                             </div>
                         </div>
-                        <div className='col-12 margin_zero'>
-                            <div className='margin_zero si-09x'>
+                        <div className='margin_zero'>
+                            <div className='margin_zero '>
                                 {this.props.prop_name}
                             </div>
                         </div>
                     </div>
-                    <div className='col-4 d-flex flex-column align-items-center justify-content-center py-2'>
-                        <span className='si-07x txt-theme-aware'>2000</span>
+                    <div className=' d-flex flex-column align-items-center justify-content-center py-2'>
+                        <span className=' txt-theme-aware'>2000</span>
                         <input
                             type='range'
                             min='1000'
@@ -174,8 +174,8 @@ class ClssServoUnit extends React.Component {
                             }}
                             title={`Set PWM: ${this.state.sliderValue}`}
                         />
-                        <span className='si-07x txt-theme-aware'>1000</span>
-                        <span className='si-07x text-warning mt-1'>{this.state.sliderValue}</span>
+                        <span className=' txt-theme-aware'>1000</span>
+                        <span className=' text-warning mt-1'>{this.state.sliderValue}</span>
                     </div>
                 </div>
             </div>
@@ -305,48 +305,44 @@ export default class ClssServoControl extends React.Component {
             for (let i = startServo; i <= endServo; i++) {
                 const servoValue = servo_values[`m_servo${i}`];
                 servoUnits.push(
-                    <div className='col-3 si-07x ' key={this.key + `servo-${i}`}>
                         <ClssServoUnit 
                             prop_party={p_andruavUnit} 
                             prop_channel={String(i)} 
                             prop_value={servoValue} 
                             prop_name={`AP-Srv ${i}`} 
                         />
-                    </div>
                 );
             }
 
-            // Group servo units into rows of 4
-            const rows = [];
-            for (let i = 0; i < servoUnits.length; i += 4) {
-                rows.push(
-                    <div className='row mt-1' key={this.key + `row-${i}`}>
-                        {servoUnits.slice(i, i + 4)}
+            // Group servo units into s of 4
+            const s = [];
+            for (let i = 0; i < servoUnits.length; i += 3) {
+                s.push(
+                    <div className=' mt-1' key={this.key + `-${i}`}>
+                        {servoUnits.slice(i, i + 3)}
                     </div>
                 );
             }
 
             servos.push(
-                <div className='row margin_zero pt-2' key={this.key + 'srvs-keys'}>
-                    {rows}
+                <div className=' margin_zero pt-2 d-inline-flex gap-4' key={this.key + 'srvs-keys '}>
+                    {s}
                 </div>
             );
         }
             
             return (
                 <Draggable nodeRef={this.modal_ctrl_srv} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
-                    <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2 col-4 " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
-                        <div key='camera_hdr' className="card-header text-center js-draggable-handle">
-			            <div className="row">
-                                <div className="col-10">
+                    <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2  " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
+                        <div key='camera_hdr' className="card-header text-center js-draggable-handle d-flex">
+			                    <div className="col-10">
                                     <h4 id="title" className="text-success text-start" ref={this.titleRef}>Servo's of' {v_unitName} </h4>
                                 </div>
                                 <div className="col-2 float-right">
-                                    <button key={this.key + 'modal_ctrl_servo_btnclose'} id="modal_ctrl_servo_btnclose" type="btnclose" className="btn-close" ref={this.btnCloseRef}></button>
+                                    <button key={this.key + 'modal_ctrl_servo_btnclose'} id="modal_ctrl_servo_btnclose" type="btnclose" className="btn-close smaller" ref={this.btnCloseRef}></button>
                                 </div>
                             </div>
-                        </div>
-                        <div id="ctrl_main" className="form-group text-center  modal_dialog_style" ref={this.ctrlMainRef}>
+                        <div id="ctrl_main" className="form-group text-center  " ref={this.ctrlMainRef}>
                             {servos}
                         </div>
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
