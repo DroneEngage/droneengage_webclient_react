@@ -4,16 +4,17 @@
     "CONST_PROD_MODE_PORT": "19408",
     "CONST_TEST_MODE_IP": "127.0.0.1",
     "CONST_TEST_MODE_PORT": "19408",
-    "CONST_WEBCONNECTOR_ENABLED": true,
-    "CONST_WEBCONNECTOR_AUTH_HOST": "localhost",
-    "CONST_WEBCONNECTOR_AUTH_PORT": 9443,
-    "CONST_WEBCONNECTOR_WS_PORT": 9443,
-    "CONST_WEBCONNECTOR_APIKEY": "your-secure-api-key-here",
-    "CONST_WEBCONNECTOR_TOKEN": "static-plugin-token-12345",
-    "CONST_WEBCONNECTOR_AUTO_FALLBACK": false,
-    "CONST_WEBCONNECTOR_SECURE": true,
-    "CONST_WEBCONNECTOR_BASE_PATH": "/api",
-    "CONST_WEBCONNECTOR_ENABLE": true,
+    "CONST_WEBCONNECTOR_CONFIG": {
+        "ENABLED": true,
+        "AUTH_HOST": "localhost",
+        "AUTH_PORT": 9443,
+        "WS_PORT": 9443,
+        "APIKEY": "your-secure-api-key-here",
+        "TOKEN": "static-plugin-token-12345",
+        "AUTO_FALLBACK": false,
+        "SECURE": true,
+        "BASE_PATH": "/api"
+    },
     "CONST_ANDRUAV_URL_ENABLE": true,
     "CONST_ACCOUNT_URL_ENABLE": true,
     "CONST_MODULE_VERSIONS": {
@@ -51,7 +52,8 @@
         "DISABLE_SDR": false,
         "DISABLE_GPIO": false,
         "DISABLE_VOICE": false,
-        "DISABLE_EXPERIMENTAL": true,
+        "DISABLE_EXPERIMENTAL": false,
+        "DISABLE_3D_MAP": true,
         "DISABLE_VERSION_NOTIFICATION": false
     },
     "CONST_LANGUAGE": {

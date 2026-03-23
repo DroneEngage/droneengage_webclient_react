@@ -59,27 +59,27 @@ class CAndruavAuth {
     fn_isPluginEnabled() {
         const v = js_localStorage.fn_getWebConnectorEnabled();
         if (v !== null) return v;
-        return js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true;
     }
 
     fn_getPluginAuthHost() {
-        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_HOST;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTH_HOST;
     }
 
     fn_getPluginAuthPort() {
-        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_PORT;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTH_PORT;
     }
 
     fn_getPluginWSHost() {
-        return js_siteConfig.CONST_WEBCONNECTOR_AUTH_HOST;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTH_HOST;
     }
 
     fn_getPluginWSPort() {
-        return js_siteConfig.CONST_WEBCONNECTOR_WS_PORT;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.WS_PORT;
     }
 
     fn_getPluginApiKey() {
-        return js_siteConfig.CONST_WEBCONNECTOR_APIKEY;
+        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.APIKEY;
     }
 
     /**
@@ -234,8 +234,8 @@ class CAndruavAuth {
             if (pluginEnabled === true) {
                 console.info('[WebConnector] enabled=true', {
                     ls: lsPluginEnabled,
-                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true,
-                    autoFallback: js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK === true,
+                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true,
+                    autoFallback: js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK === true,
                     authHost: this.fn_getPluginAuthHost(),
                     authPort: this.fn_getPluginAuthPort(),
                     wsPort: this.fn_getPluginWSPort(),
@@ -244,7 +244,7 @@ class CAndruavAuth {
             } else {
                 console.info('[WebConnector] enabled=false', {
                     ls: lsPluginEnabled,
-                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_ENABLED === true,
+                    cfgEnabled: js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true,
                 });
             }
         } catch {
@@ -257,7 +257,7 @@ class CAndruavAuth {
             const ok = await this.#loginViaPlugin(p_userName, p_accessCode);
             if (ok === true) return true;
 
-            if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
+            if (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK !== true) {
                 return false;
             }
         }
@@ -361,8 +361,8 @@ class CAndruavAuth {
         const pluginWsHost = this.fn_getPluginWSHost();
         const pluginWsPort = this.fn_getPluginWSPort();
 
-        const pluginSecure = js_siteConfig.CONST_WEBCONNECTOR_SECURE === true;
-        const pluginBasePath = js_siteConfig.CONST_WEBCONNECTOR_BASE_PATH;
+        const pluginSecure = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.SECURE === true;
+        const pluginBasePath = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.BASE_PATH;
         const pluginLoginUrl = fn_buildAuthUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
         const pluginHealthBaseUrl = fn_buildHealthBaseUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath);
 
@@ -411,7 +411,7 @@ class CAndruavAuth {
                     e: parsed.error,
                     em: parsed.errorMessage,
                 });
-                if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
+                if (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK !== true) {
                     js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                         e: parsed.error ?? ERROR_CODES.UNKNOWN_ERROR,
                         em: parsed.errorMessage || 'Plugin login failed',
@@ -449,7 +449,7 @@ class CAndruavAuth {
         } catch (error) {
             this._m_logined = false;
             console.error('[WebConnector] login exception', error);
-            if (js_siteConfig.CONST_WEBCONNECTOR_AUTO_FALLBACK !== true) {
+            if (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK !== true) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                     e: ERROR_CODES.NETWORK_ERROR,
                     em: 'Plugin connection failed',
