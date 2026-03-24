@@ -667,6 +667,47 @@ class C_GPS {
   }
 }
 
+class C_Gimbal {
+  constructor(p_parent)
+  {
+    this.m_parent = p_parent;
+    this.m_roll = 0.0;
+    this.m_pitch = 0.0;
+    this.m_yaw = 0.0;
+    this.m_model = '';
+    this.m_lrf_distance=0.0;
+    this.m_lrf_time_s=-1;
+    
+  }
+
+  setModel(p_model)
+  {
+    this.m_model = p_model;
+  }
+
+  setOrientation (p_yaw, p_pitch, p_roll)
+  {
+    this.m_pitch = p_pitch;
+    this.m_yaw = p_yaw;
+    this.m_roll = p_roll;
+  }
+
+  setLRF (p_distance, p_seconds)
+  {
+    this.m_lrf_distance_m = p_distance;
+    this.m_lrf_time_s = p_seconds;
+  }
+
+  isValidLRF()
+  {
+    if ((this.m_lrf_distance < 0) ||
+      (this.m_lrf_time_s > 10))
+       return false;
+
+    return true;
+  }
+}
+
 export class C_TerrainEntry {
   constructor(
     lat = null,
@@ -1284,7 +1325,7 @@ export class CAndruavUnitObject {
     this.m_Geo_Tags = new C_GeoTags(this);
     this.m_Telemetry = new C_Telemetry(this);
     this.m_Servo = new C_Servo(this);
-    this.m_Gimbal = { m_pitch: 0, m_roll: 0, m_yaw: 0 };
+    this.m_Gimbal = new C_Gimbal(this);
     this.m_Video = new C_Video(this);
     this.m_Obstacles = new C_Obstacles(this);
     this.m_tracker = new C_Tracker(this);

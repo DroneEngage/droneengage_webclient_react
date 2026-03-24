@@ -48,7 +48,6 @@ class ClssViewLinkGimbal extends React.Component {
             'gimbal_roll': 0,
             'lrf_distance_m': 0,
             'lrf_age_seconds': 0,
-            'lrf_status_text': '',
             'tracking_status': 0,
             'tracking_status_text': '',
             'tracking_target_type': 0,
@@ -270,7 +269,6 @@ class ClssViewLinkGimbal extends React.Component {
         p_me.setState({
             lrf_distance_m: lrf_distance_m,
             lrf_age_seconds: lrf_age_seconds,
-            lrf_status_text: lrf_status_text,
             tracking_status: tracking_status,
             tracking_status_text: tracking_status_text,
             tracking_target_type: tracking_target_type,
@@ -442,6 +440,12 @@ class ClssViewLinkGimbal extends React.Component {
 
         const isNoUnit = p_andruavUnit === null;
 
+        const getLrfAgeBadgeClass = (age) => {
+            if (age <= 5) return 'bg-success';
+            if (age <= 10) return 'bg-warning';
+            return 'bg-danger';
+        };
+
         const lrfAgeDisplay = Number.isFinite(this.state.lrf_age_seconds)
             ? (this.state.lrf_age_seconds > 99
                 ? 'X'
@@ -478,7 +482,7 @@ class ClssViewLinkGimbal extends React.Component {
             c_items.push(
                 <li key={"drone_" + v_unit.getPartyID()}>
                     <a
-                        className="dropdown-item"
+                        className="dropdown-item smaller"
                         href="#"
                         onClick={(e) => {
                             e.preventDefault();
@@ -642,24 +646,14 @@ class ClssViewLinkGimbal extends React.Component {
                                     <div className="mb-3 w-25 me-2 ">
                                         <label className="form-label smaller ">LRF</label>
                                         <div className="card ">
-                                            <div className="card-body py-2">
-                                                <div className="d-grid align-items-center">
-                                                        <div className="d-block text-center">
-                                                            <label className="">Distance</label>
-                                                            <span className="badge bg-primary d-block "> {lrfDistanceDisplay}</span>
+                                            <div className="d-grid card-body py-2">
+                                                        <div className="align-items-center">
+                                                            <span className="badge bg-primary d-block m-1  p-1 rounded-2 w-100 "> D: {lrfDistanceDisplay}</span>
                                                         </div>
-                                                        <div className="d-block text-center">
-                                                            
-                                                            <label className="">{t('status')}</label>
-                                                            <span className="badge bg-success d-block">{this.state.lrf_status_text}</span>
-                                                        </div>
-                                                        <div className="d-block text-center">
-                                                            
-                                                            <label className="">Age</label>
-                                                            <span className="badge bg-warning d-block">{lrfAgeDisplay}s</span>
+                                                        <div className="align-items-center">
+                                                            <span className={`badge ${getLrfAgeBadgeClass(lrfAgeDisplay)} d-block m-1  p-1 rounded-2 w-100`}>T: {lrfAgeDisplay}s</span>
                                                         </div>
                                                     
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -667,7 +661,7 @@ class ClssViewLinkGimbal extends React.Component {
                                     <div className="mb-3 w-25 me-2 ">
                                         <label className="form-label  smaller">Tracking</label>
                                         <div className="card ">
-                                            <div className="card-body py-2">
+                                            <div className="d-grid  card-body py-2">
                                                 <div className="align-items-center">
                                                         <span className={`badge d-block ${trackingStatusClass} m-1  p-1 rounded-2 w-100`}>{this.state.tracking_status_text} {this.state.tracking_status}</span>
                                                 </div>
@@ -685,7 +679,7 @@ class ClssViewLinkGimbal extends React.Component {
                                             <div className="card-body py-2">
                                                 <div className="d-grid">
                                                         <div className="align-items-center">
-                                                            <span className="badge bg-primary d-block mb-1">Y: {this.state.gimbal_yaw.toFixed(1)}°</span>
+                                                            <span className="badge bg-primary d-block mb-1 ">Y: {this.state.gimbal_yaw.toFixed(1)}°</span>
                                                         </div>
                                                         <div className="align-items-center">
                                                             <span className="badge bg-success d-block mb-1">P: {this.state.gimbal_pitch.toFixed(1)}°</span>
@@ -697,12 +691,15 @@ class ClssViewLinkGimbal extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div key='button-controls' className="me-3 mt-5">
+                                    <div key='button-controls' className="mb-3 w-25 me-2 ">
+                                        <div className="card p-2 mt-2">
+                                            <div className="card-body py-2">
+                                            
                                                 <div className="d-flex flex-column gap-1">
                                                     <button
                                                         id="btn_ir_hot_toggle"
                                                         type="button"
-                                                        className={`btn btn-sm smaller ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
+                                                        className={`btn btn-sm  smaller  ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
                                                         onClick={() => this.fn_toggleIRHot()}
                                                     >
                                                         {this.state.ir_hot}
@@ -718,7 +715,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                     <button
                                                         id="btn_get_position"
                                                         type="button"
-                                                        className="btn btn-sm btn-primary hidden"
+                                                        className="btn btn-sm btn-primary hidden smaller"
                                                         onClick={() => this.fn_getGimbalPosition()}
                                                     >
                                                         Pos BAD PICTH SHOULD REMOVE - sign
@@ -734,14 +731,17 @@ class ClssViewLinkGimbal extends React.Component {
                                                 </div>
                                         </div>
                                         </div>
+                                        </div>
+                                        </div>
                                     </div>
                                     {/* Read Orientation and Target Drone Selector Buttons */}
                                     <div key='send-controls' className="mb-3">
                                         <div key='send-button-group' className="">
                                             <div className="btn-group flex-fill" role="group" aria-label="Send to Drone">
                                                 <button
+                                                    id='btn_send_to_drone'
                                                     type="button"
-                                                    className="btn btn-primary"
+                                                    className="btn btn-sm btn-primary smaller"
                                                     onClick={() => {
                                                         if (this.state.target_drone) {
                                                             this.fn_updateDrone();
@@ -751,6 +751,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                     {t('send_to')}{this.state.target_drone ? this.state.target_drone.m_unitName : t('drone')}
                                                 </button>
                                                 <button
+                                                    id='btn_send_to_drone_select'
                                                     type="button"
                                                     className="btn btn-primary dropdown-toggle dropdown-toggle-split"
                                                     data-bs-toggle="dropdown"
@@ -760,7 +761,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                 <ul className="dropdown-menu">
                                                     {c_items}
                                                     <li><hr className="dropdown-divider"/></li>
-                                                    <li><a className="dropdown-item text-danger" href="#" onClick={() => this.setState({ target_drone: null })}>{t('clear_selection')}</a></li>
+                                                    <li><a className="dropdown-item text-danger smaller" href="#" onClick={() => this.setState({ target_drone: null })}>{t('clear_selection')}</a></li>
                                                 </ul>
                                             </div>
                                         </div>
