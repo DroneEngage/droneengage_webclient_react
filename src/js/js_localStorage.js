@@ -301,6 +301,15 @@ class CLocalStorage {
     fn_getWebConnectorEnabled() {
         return this._getValue(js_globals.LS_WEBCONNECTOR_ENABLED, 'true') === 'true';
     }
+
+    // WS2WS/Mavlink3D Enabled
+    fn_setWS2WSEnabled(value) {
+        this._setValue('_vWS2WSEnabled', value.toString());
+    }
+
+    fn_getWS2WSEnabled() {
+        return this._getValue('_vWS2WSEnabled', 'false') === 'true';
+    }
 }
 
 export const js_localStorage = CLocalStorage.getInstance();
