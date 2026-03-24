@@ -263,7 +263,7 @@ class ClssPreferences extends React.Component {
     this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
-    this.m_ws2wsRef.current.checked = false;
+    this.m_ws2wsRef.current.checked = js_localStorage.fn_getWS2WSEnabled();
   }
 
   componentWillUnmount() { }
@@ -301,6 +301,8 @@ class ClssPreferences extends React.Component {
   fn_enableWS2WS(e)
   {
     const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setWS2WSEnabled(enabled);
+    
     if (enabled === true)
     {
       js_websocket_bridge.fn_init();
