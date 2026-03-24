@@ -526,7 +526,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         <button
                                             id="btn_laser_toggle"
                                             type="button"
-                                            className={`btn btn-sm bi bi-asterisk me-1 ${this.state.laser_on === VIEWLINK_LASER_ON ? 'btn-danger' : 'border-danger'}`}
+                                            className={`btn btn-sm bi bi-asterisk me-1 btn_bi_fixer ${this.state.laser_on === VIEWLINK_LASER_ON ? 'btn-danger' : 'border-danger'}`}
                                             onClick={() => this.fn_toggleLaser()}
                                         >
                                             {this.state.laser_on === VIEWLINK_LASER_OFF ? t('laser_off') : t('laser_on')}
@@ -535,7 +535,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         <button
                                             id="btn_tracker_toggle"
                                             type="button"
-                                            className={`btn btn-sm bi bi-chevron-bar-contract me-1 ${this.state.tracker_on === VIEWLINK_TRACKER_ON ? 'btn-warning' : 'border-warning'}`}
+                                            className={`btn btn-sm bi bi-chevron-bar-contract me-1 btn_bi_fixer ${this.state.tracker_on === VIEWLINK_TRACKER_ON ? 'btn-warning' : 'border-warning'}`}
                                             onClick={() => this.fn_toggleTracker()}
                                         >
                                             {this.state.tracker_on === VIEWLINK_TRACKER_OFF ? t('tracker_off') : t('tracker_on')}
@@ -544,7 +544,7 @@ class ClssViewLinkGimbal extends React.Component {
                                         <button
                                             id="btn_ai_toggle"
                                             type="button"
-                                            className={`btn btn-sm  bi bi-cpu ${this.state.ai_on === VIEWLINK_AI_ON ? 'btn-success' : 'border-success'}`}
+                                            className={`btn btn-sm  bi bi-cpu btn_bi_fixer ${this.state.ai_on === VIEWLINK_AI_ON ? 'btn-success' : 'border-success'}`}
                                             onClick={() => this.fn_toggleAI()}
                                         >
                                             {this.state.ai_on === VIEWLINK_AI_OFF ? t('ai_off') : t('ai_on')}
@@ -699,7 +699,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                     <button
                                                         id="btn_ir_hot_toggle"
                                                         type="button"
-                                                        className={`btn btn-sm  smaller  ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
+                                                        className={`btn btn-sm  smaller  btn_bi_fixer ${this.state.ir_hot === 'WHITE' ? 'btn-light' : 'btn-secondary'}`}
                                                         onClick={() => this.fn_toggleIRHot()}
                                                     >
                                                         {this.state.ir_hot}
@@ -707,7 +707,7 @@ class ClssViewLinkGimbal extends React.Component {
                                                     <button
                                                         id="btn_view_mode_toggle"
                                                         type="button"
-                                                        className={`btn btn-sm smaller ${this.fn_getViewModeButtonColor()}`}
+                                                        className={`btn btn-sm smaller btn_bi_fixer ${this.fn_getViewModeButtonColor()}`}
                                                         onClick={() => this.fn_toggleViewMode()}
                                                     >
                                                         {this.state.current_view_mode}
