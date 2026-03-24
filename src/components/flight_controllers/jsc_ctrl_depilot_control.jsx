@@ -195,7 +195,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
         const buttonStyles = this.hlp_getDEPilotButtonStyles();
         
         return (
-            <div>
+            <div className='bg-body  pb-2 pe-1 ps-1 rounded-2'>
                 <div key={id+"depilot"} id={id+"depilot"} className='col-12 al_l ctrldiv'>
                     <div className='btn-group w-100 d-flex flex-wrap'>
                         <div className='form-check form-switch me-3'>

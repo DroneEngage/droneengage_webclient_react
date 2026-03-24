@@ -1080,6 +1080,7 @@ class CAndruavClientParser {
                                 r: p_jmsg.r ?? 0
                             }
                         };
+                        p_unit.m_Gimbal.setOrientation(p_jmsg.y ?? 0, p_jmsg.p ?? 0, p_jmsg.r ?? 0);
                         js_eventEmitter.fn_dispatch(js_event.EE_viewLinkGimbalAttitude, payload);
                         break;
                     }
@@ -1087,6 +1088,10 @@ class CAndruavClientParser {
                         // Handle gimbal attitude status with yaw, pitch, roll fields
                         console.log (p_jmsg);
                         const gmSrc = p_jmsg.gm || {};
+                        p_unit.m_Gimbal.setOrientation(gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0);
+                        
+                        const lrt = p_jmsg.lrf || {};
+                        p_unit.m_Gimbal.setLRF(lrt.d, lrt.a)
                         const statusPayload = {
                             gm: {
                                 y: gmSrc.y ?? 0,
@@ -1098,6 +1103,7 @@ class CAndruavClientParser {
                             ai: p_jmsg.ai || {},
                             g: p_jmsg.g  || {}
                         };
+                        p_unit.m_Gimbal.setOrientation(gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0);
                         js_eventEmitter.fn_dispatch(js_event.EE_viewLinkGimbalAttitude, statusPayload);
                         break;
                     }
