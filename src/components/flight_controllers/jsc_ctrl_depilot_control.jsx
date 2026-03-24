@@ -211,10 +211,10 @@ export class ClssCtrlDEPilotControl extends React.Component {
                                 disabled={!v_andruavUnit.m_is_ready_to_arm}
                                 onChange={() => this.fn_ToggleDEPilot(v_andruavUnit)} 
                             />
-                            <label className='form-check-label' htmlFor={'depilot_switch_' + id}>
+                            <label className='form-check-label smaller ' htmlFor={'depilot_switch_' + id}>
                                 DE-PILOT
                             </label>
-                            <span className='ms-2 text-muted small'>
+                            <span className='ms-2 text-muted smaller'>
                                 ({operationText})
                             </span>
                         </div>

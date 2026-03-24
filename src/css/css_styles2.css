@@ -1330,18 +1330,8 @@ div#displays {
 	/* Adjust based on actual footer height */
 }
 
+.btn_bi_fixer::before,
 p#fence::before,
-button#btn_laser_toggle::before,
-button#btn_tracker_toggle::before,
-button#btn_ai_toggle::before,
-button#btn_ir_hot_toggle::before,
-button#btn_view_mode_toggle::before,
-button#btn_get_position::before,
-button#btn_showMap::before,
-button#btn_showMap3D::before,
-button#btn_showVideo::before,
-button#btn_showControl::before,
-button#btn_showSettings::before,
 .btn-with-icon-margin::before  {
 	margin-right: 5px;
 }
