@@ -149,7 +149,7 @@ export class ClssCVideoControl extends React.Component {
         if (len === 0) {
             return (
                 <div className="container-fluid localcontainer">
-                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100px' }}>
                         <div> No Camera Active</div>
                     </div>
                 </div>
