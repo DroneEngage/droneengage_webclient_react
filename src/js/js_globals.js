@@ -202,6 +202,8 @@ class GLOBALS {
 		this.CONST_MAP_GOOLE = false;
 		this.CONST_MAP_EDITOR = false;
 
+		// Debug: Show white dot at anchor point of icons
+		this.CONST_DEBUG_SHOW_ANCHOR_DOTS = false;
 
 		this.CONST_DISABLE_ADSG = true;
 
