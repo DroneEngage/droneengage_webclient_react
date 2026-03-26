@@ -125,10 +125,7 @@ const Home = () => {
           <ClssViewLinkGimbal />
         </div>
 
-        <div id="row_2" className={`col-lg-4 col-xl-4 col-xxl-4 col-12 ${isRow2Collapsed ? 'collapsed-right' : ''}`}>
-          <div className="row-2-toggle-btn" onClick={toggleRow2}>
-            <i className={`bi ${isRow2Collapsed ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
-          </div>
+        <div id="row_2" className={`col-lg-4 col-xl-4 col-xxl-4 col-12 ${isRow2Collapsed ? 'collapsed-right' : ''}`}> 
           <div id="andruavUnits" className="col-sm-12 padding_zero" style={{ display: isRow2Collapsed ? 'none' : 'block' }}>
             <div id="andruavUnits_in" className="">
               <ClssGlobalSettings />
