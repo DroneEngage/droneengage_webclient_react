@@ -528,10 +528,37 @@ class CLeafLetAndruavMap {
         const escapedTitle = (p_htmlTitle || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         
         let v_htmlIcon = `<img src="${escapedImage}" alt="icon"/>`;
+        let hasTextLabel = false;
+        
         if ((p_htmlTitle === null || p_htmlTitle === undefined ) || (p_htmlTitle === '')) {
             
         } else {
-            v_htmlIcon = `${escapedTitle}<img src="${escapedImage}" alt="icon"/>`;
+            hasTextLabel = true;
+            // Position text above the image, with image at anchor point
+            v_htmlIcon = `<div style="position: relative; width: ${p_iconsize[0]}px; height: ${p_iconsize[1]}px;">
+                <div style="position: absolute; bottom: ${p_iconsize[1]}px; left: 50%; transform: translateX(-50%); white-space: nowrap; text-align: center;">${escapedTitle}</div>
+                <img src="${escapedImage}" alt="icon" style="position: absolute; top: 0; left: 0; width: ${p_iconsize[0]}px; height: ${p_iconsize[1]}px;"/>
+            </div>`;
+        }
+
+        // Add debug anchor dot if enabled
+        if (js_globals.CONST_DEBUG_SHOW_ANCHOR_DOTS === true) {
+            // The anchor is relative to iconSize (the icon container), not the text
+            // So the dot position is simply at v_iconAnchor coordinates within the icon container
+            const dotHtml = `<div style="position: absolute; left: ${v_iconAnchor[0]}px; top: ${v_iconAnchor[1]}px; width: 6px; height: 6px; background: white; border: 1px solid black; border-radius: 50%; transform: translate(-50%, -50%); z-index: 1000; pointer-events: none;"></div>`;
+            
+            if (hasTextLabel) {
+                // For labeled icons, add dot before the closing tag of the outer container
+                // Find the last </div> and insert the dot before it
+                const lastDivIndex = v_htmlIcon.lastIndexOf('</div>');
+                v_htmlIcon = v_htmlIcon.substring(0, lastDivIndex) + dotHtml + v_htmlIcon.substring(lastDivIndex);
+            } else {
+                // For simple icons, wrap in container and add dot
+                v_htmlIcon = `<div style="position: relative; width: ${p_iconsize[0]}px; height: ${p_iconsize[1]}px;">
+                    ${v_htmlIcon}
+                    ${dotHtml}
+                </div>`;
+            }
         }
 
         v_image = L.divIcon({
