@@ -524,7 +524,7 @@ div.log_tx_msg {
 }
 
 div #main_btn_group {
-	margin: 5px;
+	margin: 0.85rem !important;
 }
 
 /* ANDUAV STYLES */
