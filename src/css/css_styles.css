@@ -1506,3 +1506,41 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
   transform-origin: center center;
 }
+
+/* Light themes - set dark button close color with higher specificity */
+body.theme-default .btn-close,
+body.theme-cerulean .btn-close,
+body.theme-cosmo .btn-close,
+body.theme-flatly .btn-close,
+body.theme-journal .btn-close,
+body.theme-litera .btn-close,
+body.theme-lumen .btn-close,
+body.theme-lux .btn-close,
+body.theme-materia .btn-close,
+body.theme-minty .btn-close,
+body.theme-pulse .btn-close,
+body.theme-quartz .btn-close,
+body.theme-sandstone .btn-close,
+body.theme-simplex .btn-close,
+body.theme-sketchy .btn-close,
+body.theme-united .btn-close,
+body.theme-yeti .btn-close,
+body.theme-zephyr .btn-close {
+  --bs-btn-close-color: #000 !important;
+  --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") !important;
+  color: #000 !important;
+}
+
+/* Dark themes - ensure white button close color with higher specificity */
+body.theme-cyborg .btn-close,
+body.theme-darkly .btn-close,
+body.theme-morph .btn-close,
+body.theme-slate .btn-close,
+body.theme-solar .btn-close,
+body.theme-spacelab .btn-close,
+body.theme-superhero .btn-close,
+body.theme-vapor .btn-close {
+  --bs-btn-close-color: #fff !important;
+  --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") !important;
+  color: #fff !important;
+}

@@ -8,7 +8,7 @@ import '../css/css_gamepad.css';
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 
@@ -33,11 +33,16 @@ import { fn_on_ready } from '../js/js_main';
 
 const Home = () => {
   const { t } = useTranslation('home'); // Use home namespace
+  const [isRow2Collapsed, setIsRow2Collapsed] = useState(false);
 
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
     fn_on_ready();
   }, []);
+
+  const toggleRow2 = () => {
+    setIsRow2Collapsed(!isRow2Collapsed);
+  };
 
   return (
     <div>
@@ -120,8 +125,11 @@ const Home = () => {
           <ClssViewLinkGimbal />
         </div>
 
-        <div id="row_2" className="col-lg-4 col-xl-4 col-xxl-4 col-12">
-          <div id="andruavUnits" className="col-sm-12 padding_zero">
+        <div id="row_2" className={`col-lg-4 col-xl-4 col-xxl-4 col-12 ${isRow2Collapsed ? 'collapsed-right' : ''}`}>
+          <div className="row-2-toggle-btn" onClick={toggleRow2}>
+            <i className={`bi ${isRow2Collapsed ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
+          </div>
+          <div id="andruavUnits" className="col-sm-12 padding_zero" style={{ display: isRow2Collapsed ? 'none' : 'block' }}>
             <div id="andruavUnits_in" className="">
               <ClssGlobalSettings />
               <div id="andruavUnitGlobals"></div>
@@ -164,10 +172,10 @@ const Home = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">
+              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted btn-sm smaller">
                 {t('home:modal.altitude.cancel')}
               </button>
-              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-success">
+              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-success btn-sm smaller">
                 {t('home:modal.altitude.go')}
               </button>
             </div>
@@ -200,10 +208,10 @@ const Home = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">
+              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted btn-sm smaller">
                 {t('home:modal.speed.cancel')}
               </button>
-              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning">
+              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning btn-sm smaller">
                 {t('home:modal.speed.go')}
               </button>
             </div>
@@ -248,10 +256,10 @@ const Home = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted">
+              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-muted btn-sm smaller">
                 {t('home:modal.unitInfo.cancel')}
               </button>
-              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning">
+              <button id="btnOK" type="button" data-bs-dismiss="modal" className="btn btn-warning btn-sm smaller">
                 {t('home:modal.unitInfo.go')}
               </button>
             </div>
@@ -272,10 +280,10 @@ const Home = () => {
               <p>{t('home:modal.saveConfirmation.message')}</p>
             </div>
             <div className="modal-footer">
-              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-secondary">
+              <button id="btnCancel" type="button" data-bs-dismiss="modal" className="btn btn-secondary btn-sm smaller">
                 {t('home:modal.saveConfirmation.cancel')}
               </button>
-              <button id="modal_btn_confirm" type="button" data-bs-dismiss="modal" className="btn btn-danger">
+              <button id="modal_btn_confirm" type="button" data-bs-dismiss="modal" className="btn btn-danger btn-sm smaller">
                 {t('home:modal.saveConfirmation.submit')}
               </button>
             </div>
