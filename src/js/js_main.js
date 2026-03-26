@@ -244,6 +244,10 @@ function fn_handleKeyBoard() {
 					js_localStorage.fn_setDisplayMode(parseInt(parseInt(key) - 1));
 					fn_applyControl(parseInt(key));
 				}
+
+				if (key === 'Escape') {
+					fn_showSettings();
+				}
 			}
 		}
 	});
