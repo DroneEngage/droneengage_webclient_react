@@ -2560,7 +2560,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			*/
 			const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 			// Add new Vehicle
-			p_andruavUnit.m_gui.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(), null, false, false, v_htmlTitle, [64, 64]);
+			p_andruavUnit.m_gui.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(), [32, 32], false, false, v_htmlTitle, [64, 64]);
 			js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] = p_andruavUnit.m_gui;
 
 			js_leafletmap.fn_addListenerOnClickMarker(p_andruavUnit.m_gui.m_marker,
@@ -2780,7 +2780,7 @@ var EVT_HomePointChanged = function (me, p_andruavUnit) {
 
 	if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
 		const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-		let v_home = js_leafletmap.fn_CreateMarker('/images/home_b_24x24.png', p_andruavUnit.m_unitName, [16, 48], false, false, v_html, [24, 24]);
+		let v_home = js_leafletmap.fn_CreateMarker('/images/home_b_24x24.png', p_andruavUnit.m_unitName, [12, 24], false, false, v_html, [24, 24]);
 
 		js_leafletmap.fn_setPosition(v_home, v_latlng)
 
@@ -2835,11 +2835,11 @@ var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 	let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
 
 	if (gui.m_marker_destination === null || gui.m_marker_destination === undefined) {
-		gui.m_marker_destination = js_leafletmap.fn_CreateMarker('/images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16, 48], false, false, "", [32, 32]);
+		gui.m_marker_destination = js_leafletmap.fn_CreateMarker('/images/destination_bg_32x32.png', "Target of: " + p_andruavUnit.m_unitName, [16, 32], false, false, "", [32, 32]);
 	}
 
 	if (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon === true) {
-		js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit), "Target of: " + p_andruavUnit.m_unitName, [16, 48], false, false, p_andruavUnit.m_unitName, [32, 32]);
+		js_leafletmap.fn_setVehicleIcon(gui.m_marker_destination, getDestinationPointIcon(p_andruavUnit), "Target of: " + p_andruavUnit.m_unitName, [16, 32], false, false, p_andruavUnit.m_unitName, [32, 32]);
 		p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = false;
 	}
 
