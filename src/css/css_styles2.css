@@ -1292,6 +1292,10 @@ div#displays {
 	height: auto;
 }
 
+#login_button {
+	position: absolute;
+	right: 3px !important;
+}
 
 #css_language_switcher {
 	width: 90px !Important;

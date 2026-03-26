@@ -21,21 +21,21 @@ class ClssHeaderControl extends React.Component {
         let ctrl = [];
         if (this.props.no_layout_ctrl !== null && this.props.no_layout_ctrl !== undefined) {
             ctrl.push(
-                <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                <div key='hdr_ctrl2' className='     css_margin_zero css_padding_zero al_r '>
                 </div>
             );
         }
         else {
             if (this.props.no_3dmap !== null && this.props.no_3dmap !== undefined) {
                 ctrl.push(
-                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                    <div key='hdr_ctrl2' className='     css_margin_zero css_padding_zero al_r mt-2 '>
                         <ClssCtrlLayout showMap3D={false} />
                     </div>
                 );
             }
             else {
                 ctrl.push(
-                    <div key='hdr_ctrl2' className='col-9 col-lg-4     css_margin_zero css_padding_zero al_r '>
+                    <div key='hdr_ctrl2' className='     css_margin_zero css_padding_zero al_r mt-2 '>
                         <ClssCtrlLayout />
                     </div>
                 );
@@ -50,14 +50,14 @@ class ClssHeaderControl extends React.Component {
         }
         else {
             ctrl.push(
-                <div key='hdr_ctrl1' className=' col-2 col-lg-1    css_margin_zero  al_r'>
+                <div id='login_button' key='hdr_ctrl1' className='css_margin_zero  al_r mt-2'>
                     <ClssLoginControl simple='true' />
                 </div>
             );
         }
         return (
-            <div id='rowheader' key='ClssHeaderControl' className='row  css_padding_zero txt-theme-aware-bg fixed-top ps-3'>
-                <div className='col-7  css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
+            <div id='rowheader' key='ClssHeaderControl' className=' d-flex  css_padding_zero txt-theme-aware-bg fixed-top ps-3 '>
+                <div className='css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
                     <nav className="navbar navbar-expand-lg txt-theme-aware-navbar p-0">
                         <a className="navbar-brand fs-3" href=".">
                             <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top pt-2" alt="" />
