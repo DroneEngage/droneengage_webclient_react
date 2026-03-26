@@ -351,7 +351,7 @@ class ClssPreferences extends React.Component {
 
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="row mb-12 align-items-center">
+        <div className="row mb-12 align-items-center flex-nowrap">
           <label htmlFor="check_enable_speech" className={`col-sm-4 col-form-label ${dir}`}>
             {t('globalSettings:enableSpeechLabel')}
           </label>
