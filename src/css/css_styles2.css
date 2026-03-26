@@ -1295,6 +1295,7 @@ div#displays {
 #login_button {
 	position: absolute;
 	right: 3px !important;
+	margin: 0.85rem !important;
 }
 
 #css_language_switcher {
