@@ -208,7 +208,6 @@ export class ClssCtrlDEPilotControl extends React.Component {
                                 type='checkbox' 
                                 id={'depilot_switch_' + id} 
                                 checked={v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
-                                disabled={!v_andruavUnit.m_is_ready_to_arm}
                                 onChange={() => this.fn_ToggleDEPilot(v_andruavUnit)} 
                             />
                             <label className='form-check-label smaller ' htmlFor={'depilot_switch_' + id} style={{
