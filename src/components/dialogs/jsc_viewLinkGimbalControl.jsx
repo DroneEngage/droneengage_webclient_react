@@ -9,6 +9,8 @@ import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
+import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
+
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import {
@@ -426,8 +428,9 @@ class ClssViewLinkGimbal extends React.Component {
         // Send to target drone if selected, otherwise send to current unit
         const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_do_ChangeAltitude(targetUnit, relative_altitude);
-        }
+            js_globals.v_andruavFacade.API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, relative_altitude, null);
+            js_globals.v_andruavFacade.API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, h);
+        }    
     }
 
     render() {
