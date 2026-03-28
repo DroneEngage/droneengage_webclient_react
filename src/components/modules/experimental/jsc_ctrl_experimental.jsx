@@ -53,8 +53,12 @@ export class ClssCtrlExperimental extends React.Component {
         
         // Call the DEPILOT mode control API
         
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 40000, null, null);
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 50, null);
+        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
+        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
+        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, 250.0);
+        
     }
 
     fn_unitUpdated(p_me, p_andruavUnit) {
