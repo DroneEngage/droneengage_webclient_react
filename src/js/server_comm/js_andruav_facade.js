@@ -1369,11 +1369,11 @@ class CAndruavClientFacade {
         console.log (cmd);
     }
 
-    API_engageDEPilotControl(p_andruavUnit, p_enable, p_de_mode)
+    API_engageDEPilotControl(p_andruavUnit, p_enable, p_enqueue, p_de_mode, p_de_mode_duration_ms, p_de_altitude_m, p_de_yaw_degree)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-        const cmd = CCommandAPI.API_engageDEPilotControl(p_enable, p_de_mode);
+        const cmd = CCommandAPI.API_engageDEPilotControl(p_enable, p_enqueue, p_de_mode, p_de_mode_duration_ms, p_de_altitude_m, p_de_yaw_degree);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
         console.log (cmd);

@@ -751,7 +751,7 @@ export class CCommandAPI {
         return msg;
     }
 
-    static API_engageDEPilotControl(p_activate, p_de_mode) {
+    static API_engageDEPilotControl(p_enable, p_enqueue, p_de_mode, p_de_time_duration_ms, p_de_altitude_m, p_de_yaw_degree) {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_DEPilot_Control,
             'ms': {
@@ -759,13 +759,29 @@ export class CCommandAPI {
             }
         };
 
-        if (p_activate!== null)
+        if (p_enable!== null)
         {
-        msg.ms.e = p_activate?true:false;
+            msg.ms.e = p_enable?true:false;
         }
         if (p_de_mode)
         {
             msg.ms.m = p_de_mode;
+        }
+        if (p_enqueue)
+        {
+            msg.ms.q =  p_enqueue;
+        }
+        if (p_de_time_duration_ms)
+        {   // duration of modes such as idle of stabilization
+            msg.ms.d = p_de_time_duration_ms;
+        }
+        if (p_de_altitude_m)
+        {   // valid with change altitude
+            msg.ms.l = p_de_altitude_m;
+        }
+        if (p_de_yaw_degree)
+        {  // result in calling change yaw.
+            msg.ms.y = p_de_yaw_degree;
         }
 
         return msg;

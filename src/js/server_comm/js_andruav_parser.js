@@ -288,7 +288,6 @@ class CAndruavClientParser {
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_STATUS: {
-                console.log("CONST_TYPE_AndruavMessage_AI_Recognition_STATUS");
                 p_jmsg = msg.msgPayload;
                 switch (p_jmsg.a) {
                     case js_andruavMessages.CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST:

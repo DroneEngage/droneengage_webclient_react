@@ -47,6 +47,16 @@ export class ClssCtrlExperimental extends React.Component {
         js_globals.v_andruavFacade.API_SetCommunicationChannel(p_andruavUnit, null, null, null, null, local_state, duration);
     }
 
+    fn_setDEPilotTasks(p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        
+        // Call the DEPILOT mode control API
+        
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 40000, null, null);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 50, null);
+    }
+
     fn_unitUpdated(p_me, p_andruavUnit) {
         if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
         if (p_me.m_flag_mounted === false) return;
@@ -102,6 +112,9 @@ export class ClssCtrlExperimental extends React.Component {
                     </div>
                     <div key={v_andruavUnit.getPartyID() + 'exp_24'} className='col-4 col-sm-3 user-select-none '>
                         <p key={v_andruavUnit.getPartyID() + 'exp_214'} className={' rounded-3 txt-theme-aware bg-danger cursor_hand text unit_nowidth al_c bi bi-wifi'} title='Set Channel online/offline' onClick={() => this.fn_setCommunicationChannel_WS(v_andruavUnit, false, 10)}>{txt_channel_ws_offline}</p>
+                    </div>
+                    <div key={v_andruavUnit.getPartyID() + 'exp_25'} className='col-4 col-sm-3 user-select-none '>
+                        <p key={v_andruavUnit.getPartyID() + 'exp_215'} className={' rounded-3 txt-theme-aware bg-danger cursor_hand text unit_nowidth al_c bi bi-wifi'} title='Set Channel online/offline' onClick={() => this.fn_setDEPilotTasks(v_andruavUnit)}>DE-Pilot Task</p>
                     </div>
                 </div>
             </div>
