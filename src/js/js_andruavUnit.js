@@ -1347,6 +1347,63 @@ export class CAndruavUnitObject {
 
   }
 
+  /**
+   * Reset unit object when board connects (FI changes from false to true)
+   * to clear stale data from previous sessions while preserving critical properties
+   * @param {Object} currentValues - Current values from the message to apply after reset
+   */
+  fn_resetOnBoardConnection(currentValues) {
+    // Store important properties that get reset by init()
+    const partyID = this.getPartyID();
+    const isMe = this.m_IsMe;
+    const defined = this.m_defined;
+    const groupName = this.m_groupName;
+    const version = this.fn_getVersion();
+    const isDE = this.fn_getIsDE();
+    const enum_userStatus = this.m_enum_userStatus;
+    const fencestatus = this.m_fencestatus;
+    const VehicleType_TXT = this.m_VehicleType_TXT;
+    const wayPoint = this.m_wayPoint;
+    
+    // Module flags
+    const has_viewlink = this.has_viewlink;
+    const has_viewlink_alive = this.has_viewlink_alive;
+    const has_ai_recognition = this.has_ai_recognition;
+    const has_ai_recognition_alive = this.has_ai_recognition_alive;
+    
+    this.init();
+    
+    // Restore critical properties that shouldn't be reset
+    this.setPartyID(partyID);
+    this.m_IsMe = isMe;
+    this.m_defined = defined;
+    this.m_groupName = groupName;
+    this.fn_setVersion(version);
+    this.fn_setIsDE(isDE);
+    this.m_enum_userStatus = enum_userStatus;
+    this.m_fencestatus = fencestatus;
+    this.m_VehicleType_TXT = VehicleType_TXT;
+    this.m_wayPoint = wayPoint;
+    
+    // Restore module flags
+    this.has_viewlink = has_viewlink;
+    this.has_viewlink_alive = has_viewlink_alive;
+    this.has_ai_recognition = has_ai_recognition;
+    this.has_ai_recognition_alive = has_ai_recognition_alive;
+    
+    // Apply current values from the message
+    if (currentValues.FI !== undefined) this.m_useFCBIMU = currentValues.FI;
+    if (currentValues.TP !== undefined) this.m_telemetry_protocol = currentValues.TP;
+    if (currentValues.T !== undefined) this.m_time_sync = currentValues.T;
+    if (currentValues.AP !== undefined) this.m_autoPilot = currentValues.AP;
+    if (currentValues.VT !== undefined) this.m_VehicleType = currentValues.VT;
+    if (currentValues.GS !== undefined) this.m_IsGCS = currentValues.GS;
+    if (currentValues.UD !== undefined) this.m_unitName = currentValues.UD;
+    if (currentValues.DS !== undefined) this.Description = currentValues.DS;
+    if (currentValues.p !== undefined) this.m_Permissions = currentValues.p;
+    this.m_IsDisconnectedFromGCS = false;
+  }
+
   fullName() {
     return this.fn_getFullName(this.m_groupName, this.#m_partyID);
   }

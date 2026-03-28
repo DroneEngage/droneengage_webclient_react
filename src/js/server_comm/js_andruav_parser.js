@@ -1144,6 +1144,7 @@ class CAndruavClientParser {
         p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
         p_unit.m_Permissions = p_jmsg.p;
         p_unit.m_IsDisconnectedFromGCS = false;
+        const oldUseFCBIMU = p_unit.m_useFCBIMU;
         p_unit.m_useFCBIMU = p_jmsg.FI ?? false;
         p_unit.m_telemetry_protocol = p_jmsg.TP ?? js_andruavMessages.CONST_Unknown_Telemetry;
         p_unit.m_time_sync = p_jmsg.T ?? p_unit.m_time_sync;
@@ -1158,6 +1159,22 @@ class CAndruavClientParser {
         } else {
             triggers.onVehicleChanged = oldVehicleType !== p_jmsg.VT;
             triggers.onFCB = p_unit.m_useFCBIMU !== p_jmsg.FI || p_unit.m_telemetry_protocol !== p_jmsg.TP;
+            
+            // If board just connected (FI changed from false to true), reset unit object
+            // to clear any stale data from previous sessions
+            if (!oldUseFCBIMU && p_unit.m_useFCBIMU) {
+                p_unit.fn_resetOnBoardConnection({
+                    FI: p_jmsg.FI ?? false,
+                    TP: p_jmsg.TP ?? js_andruavMessages.CONST_Unknown_Telemetry,
+                    T: p_jmsg.T,
+                    AP: p_jmsg.AP,
+                    VT: p_jmsg.VT,
+                    GS: p_jmsg.GS,
+                    UD: p_jmsg.UD,
+                    DS: p_jmsg.DS,
+                    p: p_jmsg.p
+                });
+            }
         }
 
         if (p_jmsg.m1) {
