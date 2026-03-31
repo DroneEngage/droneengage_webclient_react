@@ -9,7 +9,7 @@ import { js_localStorage } from '../js/js_localStorage';
 import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
-import { QueryString, fn_connect, fn_logout, getTabStatus } from '../js/js_main';
+import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog } from '../js/js_main';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;
@@ -65,8 +65,19 @@ class ClssLoginControl extends React.Component {
     me.setState({ m_update: me.state.m_update + 1 });
   }
 
-  fn_onAuthBad(me) {
+  fn_onAuthBad(me, data) {
     if (me.m_flag_mounted === false) return;
+    
+    // Check if this is an SSL error and show security dialog
+    if (data && data.ssl === true) {
+      // Get auth server details from the auth module
+      const authModule = js_globals.v_andruavClient.v_auth;
+      const host = authModule.m_auth_ip;
+      const port = authModule._m_auth_port;
+      fn_showSecurityDialog(host, port);
+      return;
+    }
+    
     me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
     me.setState({ m_update: me.state.m_update + 1 });
   }
