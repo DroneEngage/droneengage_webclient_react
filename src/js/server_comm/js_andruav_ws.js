@@ -8,6 +8,7 @@ import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
 import * as js_common from '../js_common.js'
 import { js_localStorage } from '../js_localStorage.js'
 import { js_eventEmitter } from '../js_eventEmitter.js'
+import { fn_showSecurityDialog } from '../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
@@ -355,6 +356,58 @@ class CAndruavClientWS {
     }
 
 
+    #prv_handleSSLError(err) {
+        try {
+            // Check if this is likely an SSL certificate error
+            const isSSLError = this.#prv_isLikelySSLError(err);
+            
+            if (isSSLError) {
+                console.warn('[WS] SSL certificate error detected');
+                this.#prv_showSecurityDialog();
+            }
+        } catch (error) {
+            console.error('[WS] Error handling SSL detection:', error);
+        }
+    }
+
+
+    #prv_isLikelySSLError(err) {
+        // Check various indicators that suggest an SSL certificate issue
+        const errorString = err ? err.toString() : '';
+        const isWSSConnection = this.ws && this.ws.url && this.ws.url.startsWith('wss://');
+        
+        // Common SSL certificate error patterns
+        const sslErrorPatterns = [
+            /SSL/i,
+            /TLS/i,
+            /certificate/i,
+            /secure/i,
+            /connection.*private/i,
+            /net::ERR_CERT/i,
+            /ERR_CERT_AUTHORITY_INVALID/i,
+            /ERR_CERT_COMMON_NAME_INVALID/i,
+            /ERR_CERT_DATE_INVALID/i,
+            /ERR_CERT_INVALID/i
+        ];
+        
+        // Check if any SSL error patterns match
+        const hasSSLErrorPattern = sslErrorPatterns.some(pattern => pattern.test(errorString));
+        
+        // Additional heuristics for WSS connections that fail quickly
+        const isWSSFailure = isWSSConnection && err && (
+            err.type === 'error' && 
+            (!err.message || err.message.length === 0)
+        );
+        
+        return hasSSLErrorPattern || isWSSFailure;
+    }
+
+
+    #prv_showSecurityDialog() {
+        fn_showSecurityDialog(this.m_server_ip, this.m_server_port_ss || this.m_server_port);
+    }
+
+
     fn_connect(p_accesscode) {
         try {
 
@@ -403,7 +456,6 @@ class CAndruavClientWS {
             }
 
             if ("WebSocket" in window) {
-                //TODO: HANDLE if WS is not responding.
                 this.ws = new WebSocket(url);
                 this.ws.binaryType = 'arraybuffer'; // Set to receive binary as ArrayBuffer for efficiency
                 this.ws.parent = this;
@@ -494,6 +546,9 @@ class CAndruavClientWS {
                         });
                     } catch {
                     }
+
+                    // Check if this is likely an SSL certificate error
+                    Me.#prv_handleSSLError(err);
                 };
             } else { // The browser doesn't support WebSocket
                 alert("WebSocket NOT supported by your Browser!");

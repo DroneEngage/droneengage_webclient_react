@@ -3549,3 +3549,77 @@ export function fn_on_ready() {
 	js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, fn_connectWebSocket);
 
 };  // end of onReady
+
+
+/**
+ * Shows a security dialog for SSL certificate errors with clickable link
+ * @param {string} host - The server host
+ * @param {number} port - The server port
+ */
+export function fn_showSecurityDialog(host, port) {
+    // Build the HTTPS URL that user needs to visit to accept the certificate
+    const protocol = 'https';
+    const certUrl = `${protocol}://${host}:${port}`;
+    
+    // Create a modal dialog with clickable link
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    `;
+    
+    dialog.innerHTML = `
+        <h3 style="margin: 0 0 15px 0; color: #d32f2f;">Security Connection Error</h3>
+        <p style="margin: 10px 0; line-height: 1.5;">
+            The connection to <strong>${host}:${port}</strong> uses a self-signed or untrusted SSL certificate.
+        </p>
+        <p style="margin: 10px 0; line-height: 1.5; color: #666;">
+            <em>What's happening?</em> This site requires either a valid SSL certificate, or since you are 
+            running it on your own server with no valid SSL, then you need to open the link and approve it 
+            by clicking "Advanced" → "Proceed to ${host} (unsafe)".
+        </p>
+        <p style="margin: 10px 0; font-weight: bold;">To proceed, please:</p>
+        <ol style="margin: 10px 0; padding-left: 20px;">
+            <li>Visit <a href="${certUrl}" target="_blank" style="color: #1976d2; text-decoration: underline;">${certUrl}</a></li>
+            <li>Click "Advanced" → "Proceed to ${host} (unsafe)"</li>
+            <li>Return here and try connecting again</li>
+        </ol>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="security-ok" style="background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">OK</button>
+        </div>
+    `;
+    
+    modal.appendChild(dialog);
+    document.body.appendChild(modal);
+    
+    // Handle OK button click
+    document.getElementById('security-ok').onclick = () => {
+        document.body.removeChild(modal);
+        window.open(certUrl, '_blank');
+    };
+    
+    // Close modal when clicking outside
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+            window.open(certUrl, '_blank');
+        }
+    };
+}
