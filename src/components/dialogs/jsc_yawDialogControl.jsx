@@ -217,9 +217,9 @@ export default class ClssYawDialog extends React.Component
     {
         const c_actual_angle = this.m_actual_angle_deg;
         const c_rad = (c_actual_angle - 90) * js_helpers.CONST_DEGREE_TO_RADIUS;
-        const c_marker_radius = 76;
-        const c_center = 90;
-        const c_marker_size = 12;
+        const c_marker_radius = 75;
+        const c_center = 100; // Adjusted for jquery-knob padding (90 + 10px)
+        const c_marker_size = 15;
         const c_red_left = c_center + (Math.cos(c_rad) * c_marker_radius) - (c_marker_size / 2);
         const c_red_top = c_center + (Math.sin(c_rad) * c_marker_radius) - (c_marker_size / 2);
 
