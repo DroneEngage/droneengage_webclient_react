@@ -70,10 +70,28 @@ class ClssLoginControl extends React.Component {
     
     // Check if this is an SSL error and show security dialog
     if (data && data.ssl === true) {
-      // Get auth server details from the auth module
-      const authModule = js_globals.v_andruavClient.v_auth;
-      const host = authModule.m_auth_ip;
-      const port = authModule._m_auth_port;
+      // Extract host and port from the actual probed URL
+      let host, port;
+      if (data.probedUrl) {
+        try {
+          const url = new URL(data.probedUrl);
+          host = url.hostname;
+          port = url.port || (url.protocol === 'https:' ? '443' : '80');
+        } catch (e) {
+          console.error('Failed to parse probed URL:', data.probedUrl);
+          host = 'localhost';
+          port = '8080';
+        }
+      } else if (js_globals.v_andruavClient && js_globals.v_andruavClient.v_auth) {
+        // Fallback to auth module if probedUrl not available
+        const authModule = js_globals.v_andruavClient.v_auth;
+        host = authModule.m_auth_ip;
+        port = authModule._m_auth_port;
+      } else {
+        // Last resort fallback
+        host = 'localhost';
+        port = '8080';
+      }
       fn_showSecurityDialog(host, port);
       return;
     }
