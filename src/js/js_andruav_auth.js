@@ -290,6 +290,7 @@ class CAndruavAuth {
                 em: errorMessage,
                 error: 'Probe failed',
                 ssl: isSslError,
+                probedUrl: this.#getHealthURL(), // Add the actual URL that was probed
             });
             return false;
         }
@@ -472,7 +473,10 @@ class CAndruavAuth {
             return { success: response.ok, isSslError: false };
         } catch (error) {
             console.error('Probe error:', error);
-            const isSslError = error.message?.includes('ERR_CERT') || error.message?.includes('SSL');
+            const isSslError = error.message?.includes('ERR_CERT') || 
+                              error.message?.includes('SSL') || 
+                              error.message?.includes('CERT_AUTHORITY_INVALID') ||
+                              error.name === 'TypeError' && error.message === 'Failed to fetch';
             return { success: false, isSslError };
         }
     }
