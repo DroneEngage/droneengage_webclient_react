@@ -10,7 +10,7 @@ import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, g
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
-import { ClssCtrlDEPilot } from './jsc_ctrl_depilot.jsx'
+import { ClssCtrlDEPilot } from '../de_pilot/jsc_ctrl_depilot.jsx'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
