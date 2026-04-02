@@ -31,8 +31,8 @@ export class ClssCtrlDEPilotControl extends React.Component {
 
     componentWillUnmount() {
         // Unsubscribe from DroneEngage Pilot changes
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onDroneEngagePilotChanged, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_onDroneEngagePilotChanged, this);
+		js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
