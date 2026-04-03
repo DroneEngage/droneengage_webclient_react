@@ -300,6 +300,14 @@ h1.font-thin {
   font-size: .75rem
 }
 
+.smaller2 {
+  font-size: .56rem
+}
+
+.smaller3 {
+  font-size: .50rem
+}
+
 .width_fit {
 	width: fit-content !important;
 }
