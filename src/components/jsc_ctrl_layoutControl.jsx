@@ -49,15 +49,6 @@ class ClssCtrlLayout extends React.Component {
                 )}
                 <button
                     type="button"
-                    id="btn_showMap3D"
-                    className="btn btn-secondary btn-sm bi bi-badge-3d btn_bi_fixer "
-                    title={t('ctrlLayout:map3d.title')}
-                    onClick={(e) => fn_showMap3D()}
-                >
-                    <strong>{t('ctrlLayout:map3d.label')}</strong>
-                </button>
-                <button
-                    type="button"
                     id="btn_showVideo"
                     className="btn btn-warning btn-sm  bi bi-camera-fill btn_bi_fixer "
                     title={t('ctrlLayout:camera.title')}

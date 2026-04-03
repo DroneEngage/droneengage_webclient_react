@@ -111,15 +111,15 @@ export class ClssMainContextMenu extends React.Component {
             <div className="text-justified one_line col-12">
                 <div className="row">
                 <p className="bg-success text-white mb-1 padding_zero">
-                    <span className="text-success margin_zero text-white si-09x" >
-                        lat:<span className='si-09x'>{v_lat.toFixed(6)}</span> lng:<span className='si-09x'>{v_lng.toFixed(6)}</span>
+                    <span className="text-success margin_zero text-white smaller2" >
+                        lat:<span className='smaller2'>{v_lat.toFixed(6)}</span> lng:<span className='smaller2'>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
                         <p
-                            className="cursor_hand text-primary margin_zero si-07x al_c"
+                            className="cursor_hand text-primary margin_zero smaller3 al_c"
                             onClick={() =>
                                 window.open(
                                     `./mapeditor?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
