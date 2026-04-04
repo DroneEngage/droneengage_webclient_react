@@ -73,7 +73,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
             return;
         }
         // Call the DEPILOT mode control API
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, p_de_mode);
+        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, false, p_de_mode);
     }
 
     fn_ToggleDEPilot(p_andruavUnit) {
