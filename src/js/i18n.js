@@ -47,6 +47,12 @@ import ru_jsc_ctrl_swarm from '../locales/ru/jsc_ctrl_swarm.json';
 import ar_jsc_ctrl_swarm from '../locales/ar/jsc_ctrl_swarm.json';
 import fr_jsc_ctrl_swarm from '../locales/fr/jsc_ctrl_swarm.json';
 
+import en_jsc_ctrl_depilot from '../locales/en/jsc_ctrl_depilot.json';
+import es_jsc_ctrl_depilot from '../locales/es/jsc_ctrl_depilot.json';
+import ru_jsc_ctrl_depilot from '../locales/ru/jsc_ctrl_depilot.json';
+import ar_jsc_ctrl_depilot from '../locales/ar/jsc_ctrl_depilot.json';
+import fr_jsc_ctrl_depilot from '../locales/fr/jsc_ctrl_depilot.json';
+
 import en_jsc_global_settings from '../locales/en/jsc_global_settings.json';
 import es_jsc_global_settings from '../locales/es/jsc_global_settings.json';
 import ru_jsc_global_settings from '../locales/ru/jsc_global_settings.json';
@@ -79,6 +85,7 @@ i18n
         unit_control_imu: en_jsc_unit_control_imu,
         udpProxyTelemetry: en_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: en_jsc_ctrl_swarm,
+        depilotCtrl: en_jsc_ctrl_depilot,
         globalSettings: en_jsc_global_settings,
         viewLinkGimbalControl: en_jsc_viewLinkGimbalControl,
         trackerAIList: en_jsc_ctrl_tracker_ai_list
@@ -91,6 +98,7 @@ i18n
         unit_control_imu: es_jsc_unit_control_imu,
         udpProxyTelemetry: es_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: es_jsc_ctrl_swarm,
+        depilotCtrl: es_jsc_ctrl_depilot,
         globalSettings: es_jsc_global_settings,
         viewLinkGimbalControl: es_jsc_viewLinkGimbalControl,
         trackerAIList: es_jsc_ctrl_tracker_ai_list
@@ -103,6 +111,7 @@ i18n
         unit_control_imu: ar_jsc_unit_control_imu,
         udpProxyTelemetry: ar_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: ar_jsc_ctrl_swarm,
+        depilotCtrl: ar_jsc_ctrl_depilot,
         globalSettings: ar_jsc_global_settings,
         viewLinkGimbalControl: ar_jsc_viewLinkGimbalControl,
         trackerAIList: ar_jsc_ctrl_tracker_ai_list
@@ -115,6 +124,7 @@ i18n
         unit_control_imu: fr_jsc_unit_control_imu,
         udpProxyTelemetry: fr_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: fr_jsc_ctrl_swarm,
+        depilotCtrl: fr_jsc_ctrl_depilot,
         globalSettings: fr_jsc_global_settings,
         viewLinkGimbalControl: fr_jsc_viewLinkGimbalControl,
         trackerAIList: fr_jsc_ctrl_tracker_ai_list
@@ -127,6 +137,7 @@ i18n
         unit_control_imu: ru_jsc_unit_control_imu,
         udpProxyTelemetry: ru_jsc_ctrl_udp_proxy_telemetry,
         swarmCtrl: ru_jsc_ctrl_swarm,
+        depilotCtrl: ru_jsc_ctrl_depilot,
         globalSettings: ru_jsc_global_settings,
         viewLinkGimbalControl: ru_jsc_viewLinkGimbalControl,
         trackerAIList: ru_jsc_ctrl_tracker_ai_list

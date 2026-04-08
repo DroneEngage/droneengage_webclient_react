@@ -1,0 +1,14 @@
+{
+  "title": "DE-P:",
+  "label": "DE-PILOT",
+  "off": "OFF",
+  "changing_alt": "Cambiando-ALT",
+  "stab": "ESTAB",
+  "track": "RASTREO",
+  "idle": "INACTIVO",
+  "unknown": "DESC",
+  "disabled": "Desactivado",
+  "change_altitude": "Cambiar Altitud",
+  "stabilization": "Estabilización",
+  "tracking": "Rastreo"
+}

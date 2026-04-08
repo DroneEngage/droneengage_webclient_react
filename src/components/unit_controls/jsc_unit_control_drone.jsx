@@ -1,4 +1,5 @@
 import React from 'react';
+import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
@@ -495,3 +496,5 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         );
     }
 }
+
+export default withTranslation()(ClssAndruavUnitDrone);

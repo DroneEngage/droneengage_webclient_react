@@ -1,4 +1,5 @@
 import React    from 'react';
+import { withTranslation } from 'react-i18next';
 import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
@@ -107,19 +108,20 @@ export class ClssCtrlDEPilotControl extends React.Component {
     }
 
     hlp_getDEPilotOperationText () {
+        const { t } = this.props;
         switch (this.state.m_dePilotOperation) {
             case js_andruavMessages.CONST_DEPILOT_OP_DISABLED:
-                return "OFF";
+                return t('depilotCtrl:off');
             case js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE:
-                return "Changing-ALT";
+                return t('depilotCtrl:changing_alt');
             case js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION:
-                return "STAB";
+                return t('depilotCtrl:stab');
             case js_andruavMessages.CONST_DEPILOT_OP_TRACKING:
-                return "TRACK";
+                return t('depilotCtrl:track');
             case js_andruavMessages.CONST_DEPILOT_OP_IDLE:
-                return "IDLE";
+                return t('depilotCtrl:idle');
             default:
-                return "UNK";
+                return t('depilotCtrl:unknown');
         }
     }
 
@@ -154,6 +156,8 @@ export class ClssCtrlDEPilotControl extends React.Component {
     }
 
     render() {
+        const { t } = this.props;
+        
         if ((js_siteConfig.CONST_FEATURE.DISABLE_DE_PILOT === true))
         {
             return (
@@ -185,7 +189,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
                     padding={this.props.padding}
                     pointerEvents={this.props.pointerEvents || 'none'}
                     
-                    p_title={{ text: 'DE-P:', color: ClssCVideoCanvasLabel.defaultProps.title_color }}
+                    p_title={{ text: t('depilotCtrl:title'), color: ClssCVideoCanvasLabel.defaultProps.title_color }}
                     p_value={{ text: operationText, color: this.state.m_dePilotEnabled ? ClssCVideoCanvasLabel.defaultProps.value_color : '#dc3545' }}
                 />
             );
@@ -215,7 +219,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
                                 color: 'inherit',
                                 opacity: 1
                             }}>
-                                DE-PILOT
+                                {t('depilotCtrl:label')}
                             </label>
                             <span className='ms-2 text-muted smaller'>
                                 ({operationText})
@@ -230,37 +234,39 @@ export class ClssCtrlDEPilotControl extends React.Component {
                             id='btn_depilot_disabled' 
                             type='button' 
                             className={'btn btn-sm flgtctrlbtn btn-with-icon-margin me-1 ' + buttonStyles.btn_depilot_disabled_class}
-                            title='Disabled' 
+                            title={t('depilotCtrl:disabled')}
                             onClick={() => this.fn_switchDEPilotMode(v_andruavUnit, js_andruavMessages.CONST_DEPILOT_OP_DISABLED)}
                             disabled={!this.state.m_dePilotEnabled}
-                        >Disabled</button>
+                        >{t('depilotCtrl:disabled')}</button>
                         <button 
                             id='btn_depilot_altitude' 
                             type='button' 
                             className={'btn btn-sm flgtctrlbtn btn-with-icon-margin me-1 ' + buttonStyles.btn_depilot_altitude_class}
-                            title='Change Altitude' 
+                            title={t('depilotCtrl:change_altitude')}
                             onClick={() => this.fn_switchDEPilotMode(v_andruavUnit, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE)}
                             disabled={!this.state.m_dePilotEnabled}
-                        >Changing-Alt</button>
+                        >{t('depilotCtrl:changing_alt')}</button>
                         <button 
                             id='btn_depilot_stabilization' 
                             type='button' 
                             className={'btn btn-sm flgtctrlbtn btn-with-icon-margin me-1 ' + buttonStyles.btn_depilot_stabilization_class}
-                            title='Stabilization' 
+                            title={t('depilotCtrl:stabilization')}
                             onClick={() => this.fn_switchDEPilotMode(v_andruavUnit, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION)}
                             disabled={!this.state.m_dePilotEnabled}
-                        >Stabilization</button>
+                        >{t('depilotCtrl:stabilization')}</button>
                         <button 
                             id='btn_depilot_tracking' 
                             type='button' 
                             className={'btn btn-sm flgtctrlbtn btn-with-icon-margin ' + buttonStyles.btn_depilot_tracking_class}
-                            title='Tracking' 
+                            title={t('depilotCtrl:tracking')}
                             onClick={() => this.fn_switchDEPilotMode(v_andruavUnit, js_andruavMessages.CONST_DEPILOT_OP_TRACKING)}
                             disabled={!this.state.m_dePilotEnabled}
-                        >Tracking</button>
+                        >{t('depilotCtrl:tracking')}</button>
                     </div>
                 </div>
             </div>
         );
     }
 }
+
+export default withTranslation('depilotCtrl')(ClssCtrlDEPilotControl);

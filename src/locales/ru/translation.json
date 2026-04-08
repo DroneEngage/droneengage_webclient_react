@@ -60,11 +60,25 @@
   "video_data_colon": "Видеоданные:",
   "received_msgs_colon": "Полученные сообщения:",
   "last_active_colon": "Последняя активность:",
-   "download":"скачать",
+  "download":"скачать",
   "warning_config_change": "ПРЕДУПРЕЖДЕНИЕ! - Изменение конфигурации {{unitName}}",
   "are_you_sure_apply_settings": "Вы уверены, что хотите применить настройки",
   "yes": "ДА",
   "restart": "перезапустить",
   "config": "конфиг",
-  "configure_module": "Настроить Модуль"
+  "configure_module": "Настроить Модуль",
+  "depilot": {
+    "title": "DE-P:",
+    "label": "DE-PILOT",
+    "off": "OFF",
+    "changing_alt": "Changing-ALT",
+    "stab": "STAB",
+    "track": "TRACK",
+    "idle": "IDLE",
+    "unknown": "UNK",
+    "disabled": "Disabled",
+    "change_altitude": "Change Altitude",
+    "stabilization": "Stabilization",
+    "tracking": "Tracking"
+  }
 }

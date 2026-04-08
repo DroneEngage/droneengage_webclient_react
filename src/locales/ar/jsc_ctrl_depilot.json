@@ -1,0 +1,14 @@
+{
+  "title": "DE-P:",
+  "label": "DE-PILOT",
+  "off": "OFF",
+  "changing_alt": "تغيير-الارتفاع",
+  "stab": "تثبيت",
+  "track": "تتبع",
+  "idle": "خامل",
+  "unknown": "غير معروف",
+  "disabled": "معطّل",
+  "change_altitude": "تغيير الارتفاع",
+  "stabilization": "تثبيت",
+  "tracking": "تتبع"
+}
