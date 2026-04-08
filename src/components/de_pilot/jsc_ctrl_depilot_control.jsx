@@ -207,15 +207,14 @@ export class ClssCtrlDEPilotControl extends React.Component {
                                 className='form-check-input'
                                 style={this.state.m_dePilotPending ? 
                                     {backgroundColor: 'var(--bs-warning)', borderColor: 'var(--bs-warning)'} : 
-                                    (!v_andruavUnit.m_is_ready_to_arm ? 
-                                        {backgroundColor: 'white', borderColor: 'white'} : {})}
+                                    {}}
                                 type='checkbox' 
                                 id={'depilot_switch_' + id} 
-                                checked={v_andruavUnit.m_is_ready_to_arm ? this.state.m_dePilotEnabled : false}
+                                checked={this.state.m_dePilotEnabled}
                                 onChange={() => this.fn_ToggleDEPilot(v_andruavUnit)} 
                             />
                             <label className='form-check-label smaller ' htmlFor={'depilot_switch_' + id} style={{
-                                cursor: v_andruavUnit.m_is_ready_to_arm ? 'pointer' : 'default',
+                                cursor: 'pointer',
                                 color: 'inherit',
                                 opacity: 1
                             }}>
