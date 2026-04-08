@@ -1,4 +1,5 @@
 import React    from 'react';
+import { withTranslation } from 'react-i18next';
 import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter'
@@ -998,3 +999,5 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         );
     }
 }
+
+export default withTranslation()(ClssCtrlArdupilotFlightController);
