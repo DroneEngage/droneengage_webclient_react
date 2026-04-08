@@ -1,0 +1,14 @@
+{
+  "title": "DE-P:",
+  "label": "DE-PILOT",
+  "off": "OFF",
+  "changing_alt": "Смена-ALT",
+  "stab": "СТАБ",
+  "track": "СЛЕЖЕНИЕ",
+  "idle": "ОЖИДАНИЕ",
+  "unknown": "НЕИЗВ",
+  "disabled": "Отключено",
+  "change_altitude": "Изменить высоту",
+  "stabilization": "Стабилизация",
+  "tracking": "Слежение"
+}

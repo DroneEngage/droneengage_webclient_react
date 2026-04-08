@@ -1,5 +1,6 @@
 import React from 'react';
-import { ClssCtrlDEPilotControl } from './jsc_ctrl_depilot_control.jsx';
+import { withTranslation } from 'react-i18next';
+import ClssCtrlDEPilotControl from './jsc_ctrl_depilot_control.jsx';
 
 export class ClssCtrlDEPilot extends React.Component {
     render() {
@@ -15,3 +16,5 @@ export class ClssCtrlDEPilot extends React.Component {
         );
     }
 }
+
+export default withTranslation()(ClssCtrlDEPilot);
