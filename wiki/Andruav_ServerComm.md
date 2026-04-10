@@ -4,7 +4,7 @@ It is implemented in these modules:
 
 - `src/js/server_comm/js_andruav_ws.js` (WebSocket transport + envelope)
 - `src/js/server_comm/js_andruav_parser.js` (inbound parsing/decoding + event dispatch)
-- `src/js/server_comm/js_andruav_facade.js` (outbound high-level API used by UI)
+- `src/js/protocol/server_comm/js_andruav_facade.js` (outbound high-level API used by UI)
 
 ---
 
@@ -12,7 +12,7 @@ It is implemented in these modules:
 
 ## 1.1 Authentication (HTTP)
 
-Authentication is handled by `src/js/js_andruav_auth.js`.
+Authentication is handled by `src/js/protocol/auth/js_andruav_auth.js`.
 
 - The client performs an HTTP login request (`/w/wl/`) using `CAndruavAuth.fn_do_loginAccount()`.
 - On success, the server response includes:
@@ -311,7 +311,7 @@ Binary:
 
 # 4) Outbound API (Facade)
 
-All outbound user actions should use `src/js/server_comm/js_andruav_facade.js` (not the socket directly).
+All outbound user actions should use `src/js/protocol/server_comm/js_andruav_facade.js` (not the socket directly).
 
 ## 4.1 General notes
 

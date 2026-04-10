@@ -6,7 +6,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js'
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
-import { js_andruavAuth } from '../../js/js_andruav_auth.js'
+import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 
 import {
@@ -14,7 +14,7 @@ import {
     fn_clearWayPoints, fn_putWayPoints
 } from '../../js/js_main.js'
 
-import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 
 import { ClssCtrlUnitLog } from './jsc_ctrl_log_tab.jsx' // add extension to allow encryptor to see it as same as file name.

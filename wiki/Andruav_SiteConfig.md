@@ -58,7 +58,7 @@ Below are the keys that `loadConfigSync()` actively reads and applies.
 - `CONST_TEST_MODE_IP`, `CONST_TEST_MODE_PORT`
   - **Effect**: Auth backend host/port used when `CONST_TEST_MODE=true`.
 
-These values are used by `src/js/js_andruav_auth.js` to build the login URL.
+These values are used by `src/js/protocol/auth/js_andruav_auth.js` to build the login URL.
 
 ## 3.2 Header links
 
