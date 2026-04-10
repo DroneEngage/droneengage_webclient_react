@@ -1023,6 +1023,9 @@ export function gui_toggleUnits(dontflip) {
 	}
 	js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
 	js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
+	
+	// Dispatch event to notify components of unit system change
+	js_eventEmitter.fn_dispatch('EE_UnitSystemChanged', { isMetric: js_globals.v_useMetricSystem });
 };
 
 export function fn_convertToMeter(value) {

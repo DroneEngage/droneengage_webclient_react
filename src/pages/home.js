@@ -13,6 +13,9 @@ import { useTranslation, withTranslation } from 'react-i18next';
 
 
 import { js_globals } from '../js/js_globals.js';
+import { js_localStorage } from '../js/js_localStorage.js';
+import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
+import { js_eventEmitter } from '../js/js_eventEmitter';
 import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';
 import ClssGlobalSettings from '../components/jsc_globalSettings';
@@ -34,14 +37,58 @@ import { fn_on_ready } from '../js/js_main';
 const Home = () => {
   const { t } = useTranslation('home'); // Use home namespace
   const [isRow2Collapsed, setIsRow2Collapsed] = useState(false);
+  const [isMetricSystem, setIsMetricSystem] = useState(js_globals.v_useMetricSystem);
 
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
     fn_on_ready();
   }, []);
 
+  useEffect(() => {
+    // Listen for unit system change events
+    const handleUnitSystemChange = (listener, data) => {
+      setIsMetricSystem(data.isMetric);
+    };
+    
+    // Subscribe to the custom event
+    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, handleUnitSystemChange);
+    
+    // Set initial state
+    setIsMetricSystem(js_globals.v_useMetricSystem);
+    
+    // Cleanup on unmount
+    return () => {
+      js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
+    };
+  }, []);
+
   const toggleRow2 = () => {
     setIsRow2Collapsed(!isRow2Collapsed);
+  };
+
+  const handleSpeedPresetClick = (value) => {
+    const speedInput = document.getElementById('txtSpeed');
+    if (speedInput) {
+      speedInput.value = value;
+    }
+  };
+
+  const getSpeedPresets = () => {
+    if (isMetricSystem === true) {
+      return [
+        { value: '5', label: '5m' },
+        { value: '10', label: '10m' },
+        { value: '20', label: '20m' },
+        { value: '50', label: '50m' }
+      ];
+    } else {
+      return [
+        { value: '16', label: '16ft' },
+        { value: '50', label: '50ft' },
+        { value: '90', label: '90ft' },
+        { value: '160', label: '160ft' }
+      ];
+    }
   };
 
   return (
@@ -202,6 +249,18 @@ const Home = () => {
                 <span id="txtSpeedUnit" className="input-group-addon">
                   {t('home:modal.speed.unit')}
                 </span>
+              </div>
+              <div className="mt-2 d-flex flex-wrap gap-2">
+                {getSpeedPresets().map((preset, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="btn btn-outline-primary btn-sm speed-preset"
+                    onClick={() => handleSpeedPresetClick(preset.value)}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
             </div>
             <div className="modal-footer">
