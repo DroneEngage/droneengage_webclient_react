@@ -15,19 +15,19 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-import { js_globals } from '../js_globals.js';
-import { EVENTS as js_event } from '../js_eventList.js'
-import * as js_helpers from '../js_helpers.js';
-import * as js_andruavUnit from '../js_andruavUnit.js';
-import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
+import { js_globals } from '../../js_globals.js';
+import { EVENTS as js_event } from '../../js_eventList.js'
+import * as js_helpers from '../../js_helpers.js';
+import * as js_andruavUnit from '../../js_andruavUnit.js';
+import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
-import * as js_common from '../js_common.js'
-import { js_eventEmitter } from '../js_eventEmitter.js'
+import * as js_common from '../../js_common.js'
+import { js_eventEmitter } from '../../js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
-import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js';
+import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
 
 
-import { mavlink20, MAVLink20Processor } from '../js_mavlink_v2.js'
+import { mavlink20, MAVLink20Processor } from '../../js_mavlink_v2.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;

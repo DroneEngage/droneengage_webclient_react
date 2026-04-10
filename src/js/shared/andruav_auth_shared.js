@@ -1,4 +1,4 @@
-import * as js_andruavMessages from '../protocol/js_andruavMessages.js';
+import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 
 export const fn_buildHttpBaseUrl = (secure, host, port) => {
     const protocol = secure === true ? 'https' : 'http';

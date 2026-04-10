@@ -10,7 +10,7 @@ import Draggable from "react-draggable";
 import { withTranslation } from 'react-i18next';
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import * as js_andruavMessages from '../js/protocol/js_andruavMessages'
+import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages'
 import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/js_eventList.js'
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
