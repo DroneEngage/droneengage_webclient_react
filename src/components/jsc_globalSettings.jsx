@@ -362,12 +362,12 @@ class ClssPreferences extends React.Component {
             id="check_enable_speech"
             onClick={(e) => this.fn_enableSpeech(e)}
           />
-          <label htmlFor="volume_range" className="col-sm-4 col-form-label al_r">
+          <label htmlFor="volume_range" className="col-sm-4 col-form-label al_c">
             {t('globalSettings:volumeLabel')}
           </label>
           <input
             type="range"
-            className="form-range col-sm-4 width_fit ps-5"
+            className="form-range col-sm-4 width_fit "
             id="volume_range"
             ref={this.m_volumeRangeRef}
             disabled={v_speech_disabled === 'true' }
