@@ -1,8 +1,8 @@
-import * as js_siteConfig from './js_siteConfig.js';
-import { EVENTS as js_event } from './js_eventList.js';
-import * as js_andruavMessages from './protocol/js_andruavMessages.js';
-import { js_eventEmitter } from './js_eventEmitter';
-import { js_localStorage } from './js_localStorage.js';
+import * as js_siteConfig from '../../js_siteConfig.js';
+import { EVENTS as js_event } from '../../js_eventList.js';
+import * as js_andruavMessages from '../messages/js_andruavMessages.js';
+import { js_eventEmitter } from '../../js_eventEmitter.js';
+import { js_localStorage } from '../../js_localStorage.js';
 import {
     fn_buildAuthUrl,
     fn_buildAuthUrlEx,
@@ -11,7 +11,7 @@ import {
     fn_buildLoginPayload,
     fn_buildPluginSessionPayload,
     fn_parseLoginResponse,
-} from './shared/andruav_auth_shared.js';
+} from '../../shared/andruav_auth_shared.js';
 
 // Constants
 const AUTH_REQUEST_TIMEOUT = 10000; // Timeout for requests (ms)
@@ -375,9 +375,18 @@ class CAndruavAuth {
 
         const probeResult = await this.fn_probeServer(pluginHealthBaseUrl, headers);
         if (!probeResult.success) {
+            const isSslError = probeResult.isSslError === true;
+            const errorCode = isSslError ? ERROR_CODES.SSL_ERROR : ERROR_CODES.NETWORK_ERROR;
+            const errorMessage = isSslError ? 'SSL Error: Unable to establish a secure connection' : AUTH_ERROR_BAD_CONNECTION;
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
+                e: errorCode,
+                em: errorMessage,
+                error: probeResult.error || 'Probe failed',
+                ssl: isSslError,
+            });
             console.warn('[WebConnector] probe failed', {
                 baseUrl: pluginHealthBaseUrl,
-                ssl: probeResult.isSslError === true,
+                ssl: isSslError,
             });
             return false;
         }

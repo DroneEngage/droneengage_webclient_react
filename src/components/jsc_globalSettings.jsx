@@ -1,14 +1,14 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../js/js_siteConfig.js';
-import * as js_andruav_facade from '../js/server_comm/js_andruav_facade.js';
+import * as js_andruav_facade from '../js/protocol/server_comm/js_andruav_facade.js';
 import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
 import { gui_toggleUnits } from '../js/js_main';
 import { js_localStorage } from '../js/js_localStorage';
-import { js_andruavAuth } from '../js/js_andruav_auth';
+import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { ClssFireEvent } from './micro_gadgets/jsc_mctrl_fire_event.jsx';
 import { setSelectedMissionFilePathToWrite } from '../js/js_main.js';
 import {js_websocket_bridge} from '../js/CPC/js_websocket_bridge.js'

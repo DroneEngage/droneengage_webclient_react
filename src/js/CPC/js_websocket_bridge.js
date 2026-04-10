@@ -1,6 +1,6 @@
 import * as js_siteConfig from '../js_siteConfig.js';
 
-import * as js_andruav_facade from '../server_comm/js_andruav_facade.js';
+import * as js_andruav_facade from '../protocol/server_comm/js_andruav_facade.js';
 
 /**
  * CWebSocketBridge is a WebSocket client implementation that connects to a target port

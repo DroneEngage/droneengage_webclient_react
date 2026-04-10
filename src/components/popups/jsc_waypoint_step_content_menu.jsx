@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as js_andruavMessages from '../../js/protocol/js_andruavMessages.js';
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
 import { fn_doStartMissionFrom} from '../../js/js_main.js'
 
 

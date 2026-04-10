@@ -9,7 +9,7 @@ import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
-import * as js_andruavMessages from '../../js/protocol/js_andruavMessages'
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
@@ -25,7 +25,7 @@ import {
     VIEWLINK_LASER_OFF,
     VIEWLINK_LASER_ON,
     VIEWLINK_CAMERA_SET_IR_DIGITAL_ZOOM_LEVEL
-} from '../../js/protocol/js_andruavMessages.js';
+} from '../../js/protocol/messages/js_andruavMessages.js';
 
 class ClssViewLinkGimbal extends React.Component {
 

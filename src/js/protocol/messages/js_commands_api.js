@@ -9,8 +9,8 @@
 
 
 import * as js_andruavMessages from './js_andruavMessages.js';
-import * as js_common from '../js_common.js'
-import { mavlink20 } from '../js_mavlink_v2.js'
+import * as js_common from '../../js_common.js'
+import { mavlink20 } from '../../js_mavlink_v2.js'
 
 export class CCommandAPI {
 

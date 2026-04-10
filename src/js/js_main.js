@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RecordRTC from 'recordrtc';
 
 
-import * as js_andruavMessages from './protocol/js_andruavMessages.js'
+import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';
@@ -18,11 +18,11 @@ import { EVENTS as js_event } from './js_eventList.js'
 import { js_speak } from './js_speak'
 import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
-import * as js_andruav_ws from './server_comm/js_andruav_ws.js'
-import * as js_andruav_parser from './server_comm/js_andruav_parser.js'
-import * as js_andruav_facade from './server_comm/js_andruav_facade.js'
+import * as js_andruav_ws from './protocol/server_comm/js_andruav_ws.js'
+import * as js_andruav_parser from './protocol/server_comm/js_andruav_parser.js'
+import * as js_andruav_facade from './protocol/server_comm/js_andruav_facade.js'
 import { ClssAndruavFencePlan } from './js_plan_fence.js'
-import { js_andruavAuth } from './js_andruav_auth'
+import { js_andruavAuth } from './protocol/auth/js_andruav_auth'
 import { js_leafletmap } from './js_leafletmap'
 import { js_map3d } from './js_map3d'
 import { js_eventEmitter } from './js_eventEmitter'

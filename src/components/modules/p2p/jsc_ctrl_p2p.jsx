@@ -9,9 +9,9 @@ import React    from 'react';
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import * as js_andruavMessages from '../../../js/protocol/js_andruavMessages'
+import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
-import {js_andruavAuth} from '../../../js/js_andruav_auth.js'
+import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 
 import {CLASS_CTRL_P2P_IN_RANGE_NODEs} from './jsc_ctrl_p2p_inrange_nodes.jsx'
 import {CLASS_CTRL_P2P_IN_RANGE_BSSIDs} from './jsc_ctrl_p2p_inrange_bssid.jsx'
