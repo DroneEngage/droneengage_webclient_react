@@ -215,6 +215,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
     createTabs() {
         const v_andruavUnit = this.props.p_unit;
+        const had_disconnected_module = Array.isArray(v_andruavUnit.m_modules.m_list) && v_andruavUnit.m_modules.m_list.some((module) => module && module.d === true);
+        const had_version_warning = (!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version === true) || (v_andruavUnit.m_module_version_comparison < 0));
 
         let container_tabs = [];
         let container_controls = [];
@@ -238,7 +240,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         if (this.state.tab_details === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li3'} className="nav-item">
-                <a className={`nav-link  user-select-none bi bi-pci-card ${(!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version===true)||(v_andruavUnit.m_module_version_comparison<0))?'text-warning':'txt-theme-aware'}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
+                <a className={`nav-link  user-select-none bi bi-pci-card ${had_disconnected_module ? 'text-danger' : (had_version_warning ? 'text-warning' : 'txt-theme-aware')}`} data-bs-toggle="tab" href={"#details" + v_andruavUnit.getPartyID()} title='Details'></a>
             </li>);
         }
 

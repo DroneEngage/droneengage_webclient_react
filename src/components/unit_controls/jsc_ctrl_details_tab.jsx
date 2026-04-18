@@ -73,6 +73,7 @@ class ClssCtrlUnitDetails extends React.Component {
             z: v_andruavUnit.m_module_version_comparison,  // Version OK; set to -1 if upgrade check fails
             version_info: v_andruavUnit.m_module_version_info
         };
+        const mainModuleNeedsUpgrade = (mainModule.v != null) && (mainModule.v !== 'unknown') && (mainModule.z === -1);
         const isExpanded = this.state.expandedModule === mainModule.i;
         
         if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION !== true) {
@@ -84,11 +85,11 @@ class ClssCtrlUnitDetails extends React.Component {
                             <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
                         ) : (
                             <span
-                                className={mainModule.z === -1 ? 'text-warning' : 'text-success'}
-                                title={mainModule.z === -1 ? t('module_needs_upgrade') : t('version_ok')}
+                                className={mainModuleNeedsUpgrade ? 'text-warning' : 'text-success'}
+                                title={mainModuleNeedsUpgrade ? t('module_needs_upgrade') : t('version_ok')}
                             >
                                 {mainModule.i}&nbsp;{mainModule.v}
-                                {mainModule.z === -1 && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                                {mainModuleNeedsUpgrade && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
                             </span>
                         )}
                         {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}
