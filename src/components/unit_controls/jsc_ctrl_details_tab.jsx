@@ -70,10 +70,14 @@ class ClssCtrlUnitDetails extends React.Component {
             i: (v_andruavUnit.fn_getIsDE() === false) ? 'Andruav' : 'Drone Engage',  // e.g., "Andruav Core" – add 'main_module' to your i18n keys
             v: v_andruavUnit.fn_getVersion(),
             d: false,  // Assume m_isConnected exists; fallback: Date.now() - new Date(v_andruavUnit.m_Messages.m_lastActiveTime) > 30000
-            z: v_andruavUnit.m_module_version_comparison,  // Version OK; set to -1 if upgrade check fails
+            z: 0,
             version_info: v_andruavUnit.m_module_version_info
         };
-        const mainModuleNeedsUpgrade = (mainModule.v != null) && (mainModule.v !== 'unknown') && (mainModule.z === -1);
+        const expected_main_version = mainModule.version_info?.version;
+        if (expected_main_version && mainModule.v != null && mainModule.v !== 'unknown') {
+            mainModule.z = v_andruavUnit.m_modules.compareVersions(mainModule.v, expected_main_version);
+        }
+        const main_module_needs_upgrade = (mainModule.v != null) && (mainModule.v !== 'unknown') && (mainModule.z === -1);
         const isExpanded = this.state.expandedModule === mainModule.i;
         
         if (js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION !== true) {
@@ -85,11 +89,11 @@ class ClssCtrlUnitDetails extends React.Component {
                             <span className='text-danger'>{mainModule.i}&nbsp;{mainModule.v}</span>
                         ) : (
                             <span
-                                className={mainModuleNeedsUpgrade ? 'text-warning' : 'text-success'}
-                                title={mainModuleNeedsUpgrade ? t('module_needs_upgrade') : t('version_ok')}
+                                className={main_module_needs_upgrade ? 'text-warning' : 'text-success'}
+                                title={main_module_needs_upgrade ? t('module_needs_upgrade') : t('version_ok')}
                             >
                                 {mainModule.i}&nbsp;{mainModule.v}
-                                {mainModuleNeedsUpgrade && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
+                                {main_module_needs_upgrade && <>&nbsp;<i className="bi-exclamation-circle-fill"></i></>}
                             </span>
                         )}
                         {mainModule.d === true && <span className='blink_alert animate_iteration_5s'>&nbsp;{t('offline')}</span>}

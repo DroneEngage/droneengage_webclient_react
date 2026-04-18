@@ -216,7 +216,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     createTabs() {
         const v_andruavUnit = this.props.p_unit;
         const had_disconnected_module = Array.isArray(v_andruavUnit.m_modules.m_list) && v_andruavUnit.m_modules.m_list.some((module) => module && module.d === true);
-        const had_version_warning = (!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version === true) || (v_andruavUnit.m_module_version_comparison < 0));
+        const expected_main_version = v_andruavUnit.m_module_version_info?.version;
+        const current_main_version = v_andruavUnit.fn_getVersion();
+        let main_module_version_warning = false;
+        if (expected_main_version && current_main_version != null && current_main_version !== 'unknown') {
+            const main_version_comparison = v_andruavUnit.m_modules.compareVersions(current_main_version, expected_main_version);
+            main_module_version_warning = main_version_comparison < 0;
+        }
+        const had_version_warning = (!js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION) && ((v_andruavUnit.m_modules.m_old_version === true) || main_module_version_warning);
 
         let container_tabs = [];
         let container_controls = [];
