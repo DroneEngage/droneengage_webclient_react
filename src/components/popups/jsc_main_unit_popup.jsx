@@ -42,12 +42,12 @@ class ClssMainUnitPopup extends React.Component {
     );
 
     markerContent.push(
-      <p key={this.key + 'pop110'} className="m-0 p-0 txt-theme-aware bg-primary text-center">
+      <p key={this.key + 'pop110'} className="m-0 padding_zero txt-theme-aware bg-primary text-center">
         <strong>{c_unit.m_unitName}</strong>
       </p>
     );
     markerContent.push(
-      <p key={this.key + 'pop111'} className="m-0 p-0 width_fit_max">
+      <p key={this.key + 'pop111'} className="m-0 padding_zero width_fit_max">
         {armedBadge} - {flying}
       </p>
     );

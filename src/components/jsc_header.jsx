@@ -58,8 +58,8 @@ class ClssHeaderControl extends React.Component {
         return (
             <div id='rowheader' key='ClssHeaderControl' className=' d-flex  css_padding_zero txt-theme-aware-bg fixed-top ps-3 '>
                 <div className='css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
-                    <nav className="navbar navbar-expand-lg txt-theme-aware-navbar p-0">
-                        <a className="navbar-brand fs-3" href=".">
+                    <nav className="navbar navbar-expand-lg txt-theme-aware-navbar padding_zero">
+                        <a className="navbar-brand fs-3 padding_zero" href=".">
                             <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top pt-2" alt="" />
                             {js_siteConfig.CONST_TITLE}
                         </a>
