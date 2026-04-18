@@ -730,10 +730,10 @@ export default class ClssCVideoScreen extends React.Component {
 
         v_btns.push(
             <div key={key + "btn"} id="css_video_ctrl_panel" className="d-flex flex-row css_padding_zero">
-                <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "16"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlVideoFPS p_unit={andruavUnit} track_id={this.props.obj.v_track}/>
                 </div>
-                <div key={key + "1"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "1"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnclose"
                         className="cursor_hand css_video_close"
@@ -742,7 +742,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_stopVideo(e)}
                     />
                 </div>
-                <div key={key + "2"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "2"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnGoto"
                         className="cursor_hand css_goto_drone"
@@ -751,7 +751,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fn_gotoUnit_byPartyID(e)}
                     />
                 </div>
-                <div key={key + "4"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "4"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnPIP"
                         className="cursor_hand css_video_pip"
@@ -760,7 +760,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_requestPIP(e)}
                     />
                 </div>
-                <div key={key + "5"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "5"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_video_fullscreen"
                         className={btn_video_fullscreen}
@@ -769,7 +769,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_requestVideoFullScreen(e)}
                     />
                 </div>
-                <div key={key + "6"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "6"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnSwitchCam"
                         className={css_switchCam + " cursor_hand"}
@@ -778,7 +778,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_switchcam(e, this.props.obj)}
                     />
                 </div>
-                <div key={key + "7"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "7"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_videorecord"
                         className={btn_videorecordClass + " cursor_hand"}
@@ -787,7 +787,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_recordVideo(e)}
                     />
                 </div>
-                <div key={key + "8"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "8"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_takeimage"
                         className="cursor_hand css_camera_ready"
@@ -796,13 +796,13 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_takeLocalImage(e)}
                     />
                 </div>
-                <div key={key + "9"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "9"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <i className={css_zoomCam + " bi-zoom-in cursor_hand css_large_icon "} title="Zoom In" onClick={(e) => this.fnl_zoomInOut(e, true, this.props.obj)}></i>
                 </div>
-                <div key={key + "10"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "10"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <i className={css_zoomCam + " bi-zoom-out cursor_hand css_large_icon "} title="Zoom Out" onClick={(e) => this.fnl_zoomInOut(e, false, this.props.obj)}></i>
                 </div>
-                <div key={key + "11"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "11"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_mirrorX"
                         className={css_rotateCam + " css_camera_mirrorX cursor_hand"}
@@ -811,7 +811,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_mirror_local(e)}
                     />
                 </div>
-                <div key={key + "12"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "12"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_rotate"
                         className={css_rotateCam + " css_camera_rotate cursor_hand"}
@@ -820,7 +820,7 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_rotate_local(e)}
                     />
                 </div>
-                <div key={key + "13"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "13"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_flash"
                         className={css_flashCam + " cursor_hand"}
@@ -829,10 +829,10 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_flashOnOff(e, this.props.obj)}
                     />
                 </div>
-                <div key={key + "14"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "14"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
                 </div>
-                <div key={key + "5c"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "5c"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <i
                         id="btn_video_fit_mode"
                         className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
@@ -841,13 +841,13 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_toggleVideoFitMode(e)}
                     ></i>
                 </div>
-                <div key={key + "5d"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
                 </div>
-                <div key={key + "15"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "15"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
                 </div>
-                <div key={key + "16"} className="d-flex justify-content-center align-items-center p-0 m-0 ms-1">
+                <div key={key + "16"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlViewlinkControl p_unit={andruavUnit} />
                 </div>
             </div>
