@@ -1155,7 +1155,6 @@ class CAndruavClientParser {
             p_unit.setPartyID(p_jmsg.senderName);
             js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
             this.#prv_onNewUnitAdded(p_unit);
-            js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
         } else {
             triggers.onVehicleChanged = oldVehicleType !== p_jmsg.VT;
             triggers.onFCB = p_unit.m_useFCBIMU !== p_jmsg.FI || p_unit.m_telemetry_protocol !== p_jmsg.TP;
@@ -1306,6 +1305,8 @@ class CAndruavClientParser {
         if (!isNewUnit) {
             js_globals.m_andruavUnitList.putUnit(p_unit.getPartyID(), p_unit);
             js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
+        } else {
+            js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
         }
 
         if (p_unit.m_modules.has_p2p && !p_unit.m_P2P.m_initialized) {
