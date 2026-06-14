@@ -23,7 +23,7 @@ checks.json
 .env.test.local
 .env.production.local
 .editorconfig
-
+.devin/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
