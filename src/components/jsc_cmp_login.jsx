@@ -23,7 +23,7 @@ export default class ClssLoginControl extends React.Component {
             successMessage: '',
         };
 
-        this.m_emailRef = React.createRef();
+        this.m_loginNameRef = React.createRef();
         this.m_chk_fullctrl = React.createRef();
         this.m_chk_readonlyctrl = React.createRef();
 
@@ -77,7 +77,7 @@ export default class ClssLoginControl extends React.Component {
         e.preventDefault(); // Prevent default anchor behavior
         this.fn_validateCaptcha(() => {
             const v_permission = '0xffffffff';
-            js_andruavAuth.fn_generateAccessCode(this.m_emailRef.current.value, v_permission);
+            js_andruavAuth.fn_generateAccessCode(this.m_loginNameRef.current.value, v_permission);
         });
     }
 
@@ -95,7 +95,7 @@ export default class ClssLoginControl extends React.Component {
                 v_permission = '0xffffffff';
             }
 
-            js_andruavAuth.fn_regenerateAccessCode(this.m_emailRef.current.value, v_permission);
+            js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission);
         });
     }
 
@@ -122,7 +122,7 @@ export default class ClssLoginControl extends React.Component {
 
         this.state.initialized = true;
 
-        $('#txtEmail').val(js_localStorage.fn_getEmail());
+        $('#txtLoginName').val(js_localStorage.fn_getLoginName());
         loadCaptchaEnginge(6);
     }
 
@@ -148,8 +148,8 @@ export default class ClssLoginControl extends React.Component {
 
                 <div id='login_form' >
                     <div className="form-group al_l">
-                        <label htmlFor="txtEmail" id="email" className="form-label">Email</label>
-                        <input type="email" id="txtEmail" ref={this.m_emailRef} name="txtEmail" className="form-control" defaultValue={js_localStorage.fn_getEmail()} />
+                        <label htmlFor="txtLoginName" id="loginName" className="form-label">LoginName</label>
+                        <input type="text" id="txtLoginName" ref={this.m_loginNameRef} name="txtLoginName" className="form-control" pattern="[a-zA-Z0-9]+" title="LoginName must be alphanumeric" defaultValue={js_localStorage.fn_getLoginName()} />
                         
                         {/* Display the access code as a styled label */}
                         {this.state.accessCode && (

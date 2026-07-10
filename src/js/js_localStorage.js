@@ -79,6 +79,15 @@ class CLocalStorage {
         return this._getValue(js_globals.LS_EMAIL, '');
     }
 
+    // LoginName
+    fn_setLoginName(value) {
+        this._setValue(js_globals.LS_LOGIN_NAME, value);
+    }
+
+    fn_getLoginName() {
+        return this._getValue(js_globals.LS_LOGIN_NAME, '');
+    }
+
     // Access Code
     fn_setAccessCode(value) {
         this._setValue(js_globals.LS_ACCESS_CODE, value);

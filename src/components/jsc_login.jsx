@@ -27,7 +27,7 @@ class ClssLoginControl extends React.Component {
 
     this.m_flag_mounted = false;
     this.key = Math.random().toString();
-    this.txtEmailRef = React.createRef();
+    this.txtLoginNameRef = React.createRef();
     this.txtAccessCodeRef = React.createRef();
     this.txtUnitIDRef = React.createRef();
     this.btnConnectRef = React.createRef();
@@ -113,7 +113,7 @@ class ClssLoginControl extends React.Component {
       const usePlugin = (this.chkUsePluginRef.current && this.chkUsePluginRef.current.checked === true);
       js_localStorage.fn_setWebConnectorEnabled(usePlugin);
 
-      js_localStorage.fn_setEmail(this.txtEmailRef.current.value);
+      js_localStorage.fn_setLoginName(this.txtLoginNameRef.current.value);
       js_localStorage.fn_setAccessCode(this.txtAccessCodeRef.current.value);
       let s = this.txtUnitIDRef.current.value;
       if (s !== null) {
@@ -124,7 +124,7 @@ class ClssLoginControl extends React.Component {
       }
       js_localStorage.fn_setGroupName(this.txtGroupNameRef.current.value);
 
-      fn_connect(this.txtEmailRef.current.value, this.txtAccessCodeRef.current.value);
+      fn_connect(this.txtLoginNameRef.current.value, this.txtAccessCodeRef.current.value);
     }
   }
 
@@ -177,11 +177,11 @@ class ClssLoginControl extends React.Component {
 
     if (hasRequiredParams && this.txtAccessCodeRef.current) {
       this.txtAccessCodeRef.current.value = queryParams.accesscode || '';
-      this.txtEmailRef.current.value = queryParams.email || '';
+      this.txtLoginNameRef.current.value = queryParams.loginName || queryParams.email || '';
       this.txtGroupNameRef.current.value = queryParams.groupName || '';
       this.txtUnitIDRef.current.value = queryParams.unitName || '';
     } else {
-      this.txtEmailRef.current.value = js_localStorage.fn_getEmail();
+      this.txtLoginNameRef.current.value = js_localStorage.fn_getLoginName();
       this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
       this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
       this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
@@ -245,17 +245,19 @@ class ClssLoginControl extends React.Component {
             )}
 
             <div className={`form-group ${dir}${this.state.use_plugin === true ? ' hidden' : ''}`}>
-              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
-                {t('label.email')}
+              <label key={'txtLoginName1' + this.key} htmlFor="txtLoginName" id="loginName" className="txt-theme-aware">
+                {t('label.loginName')}
               </label>
               <input
-                type="email"
-                id="txtEmail"
-                name="txtEmail"
-                ref={this.txtEmailRef}
+                type="text"
+                id="txtLoginName"
+                name="txtLoginName"
+                pattern="[a-zA-Z0-9]+"
+                title="LoginName must be alphanumeric"
+                ref={this.txtLoginNameRef}
                 className="form-control"
                 defaultValue={
-                  QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()
+                  QueryString.loginName != null ? QueryString.loginName : (QueryString.email != null ? QueryString.email : js_localStorage.fn_getLoginName())
                 }
               />
             </div>
@@ -318,10 +320,10 @@ class ClssLoginControl extends React.Component {
         ctrls2.push(
           <div key={'div_logout' + this.key} className=" ">
             <div className={`form-group ${dir}`}>
-              <span key={'txtEmail2' + this.key} className="text-muted">
-                {t('label.email')} {/* "Email" */}
+              <span key={'txtLoginName2' + this.key} className="text-muted">
+                {t('label.loginName')}
               </span>
-              <p>{js_localStorage.fn_getEmail()}</p>
+              <p>{js_localStorage.fn_getLoginName()}</p>
             </div>
             <div className={`form-group ${dir}`}>
               <p className="text-muted">{t('label.gcsId') + (usePlugin === true ? ' (Plugin)' : '')}</p> 
@@ -337,17 +339,19 @@ class ClssLoginControl extends React.Component {
         ctrls.push(
           <div key={'div_connecting' + this.key} className="">
             <div className={`form-group ${dir} ${this.state.use_plugin === true ? ' hidden' : ''}`}>
-              <label key={'txtEmail1' + this.key} htmlFor="txtEmail" id="email" className="txt-theme-aware">
-                {t('label.email')} {/* "Email" */}
+              <label key={'txtLoginName1' + this.key} htmlFor="txtLoginName" id="loginName" className="txt-theme-aware">
+                {t('label.loginName')}
               </label>
               <input
-                type="email"
-                id="txtEmail"
-                name="txtEmail"
-                ref={this.txtEmailRef}
+                type="text"
+                id="txtLoginName"
+                name="txtLoginName"
+                pattern="[a-zA-Z0-9]+"
+                title="LoginName must be alphanumeric"
+                ref={this.txtLoginNameRef}
                 className="form-control"
                 defaultValue={
-                  QueryString.email != null ? QueryString.email : js_localStorage.fn_getEmail()
+                  QueryString.loginName != null ? QueryString.loginName : (QueryString.email != null ? QueryString.email : js_localStorage.fn_getLoginName())
                 }
                 disabled
               />
