@@ -177,6 +177,7 @@ class CAndruavAuth {
         this.m_retry_login = p_enable;
     }
 
+
     /**
      * Validates an email address.
      * @param {string} email - The email to validate.
@@ -185,6 +186,17 @@ class CAndruavAuth {
     #validateEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return email && emailRegex.test(email);
+    }
+    
+    /**
+     * Validates a login name (alphanumeric or email).
+     * @param {string} loginName - The login name to validate.
+     * @returns {boolean} True if valid, false otherwise.
+     */
+    #validateLoginName(loginName) {
+        const loginNameRegex = /^[a-zA-Z0-9]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return loginName && (loginNameRegex.test(loginName) || emailRegex.test(loginName));
     }
 
     /**
@@ -262,7 +274,7 @@ class CAndruavAuth {
             }
         }
 
-        if (!this.#validateEmail(p_userName) || !p_accessCode) {
+        if (!this.#validateLoginName(p_userName) || !p_accessCode) {
             this._m_logined = false;
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                 e: ERROR_CODES.INVALID_INPUT,
@@ -498,10 +510,10 @@ class CAndruavAuth {
      */
     async fn_generateAccessCode(p_accountName, p_permission) {
 
-        if (!this.#validateEmail(p_accountName)) {
+        if (!this.#validateLoginName(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
                 e: ERROR_CODES.INVALID_INPUT,
-                em: 'Invalid or missing email',
+                em: 'Invalid or missing login name',
             });
             return;
         }
@@ -564,10 +576,10 @@ class CAndruavAuth {
      * @returns {Promise<void>}
      */
     async fn_regenerateAccessCode(p_accountName, p_permission) {
-        if (!this.#validateEmail(p_accountName)) {
+        if (!this.#validateLoginName(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
                 e: ERROR_CODES.INVALID_INPUT,
-                em: 'Invalid or missing email',
+                em: 'Invalid or missing login name',
             });
             return;
         }
