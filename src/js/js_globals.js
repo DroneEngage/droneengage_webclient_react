@@ -172,6 +172,7 @@ class GLOBALS {
 		this.LS_UNIT_ID = '_vUnitID';
 		this.LS_UNIT_ID_SHARED = '_vUnitIDShared';
 		this.LS_EMAIL = '_vEmail;'
+		this.LS_LOGIN_NAME = '_vLoginName;'
 		this.LS_GROUP_NAME = '_vGroupName;'
 		this.LS_LANG = '_vLang';
 		this.LS_WEB_GCS = 'WEB_GCS_';
