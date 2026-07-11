@@ -49,11 +49,10 @@ const Accounts = () => {
                 <div id="help" className='col-12 col-md-8 col-lg-6'> 
                     <h3 className="text-primary" >Quick Help</h3>
                     <ol>
-                        <li> You can generate access code easily from this webpage. You can also regenerate your access code i.e. change it.</li>
-                        <li> Make sure you use a valid email as access code is sent to your email.</li>
-                        <li> If this is your first time to use the system then please select press "AccessCode".</li>
-                        <li> "Regenerate" will create a new access code -password- or a secondary account with different permissions.</li>
-                        <li> Secondary account will have the same email but different access code -password-.</li>
+                        <li> Enter your email and press "AccessCode" to create a new account.</li>
+                        <li> The system will generate your account credentials. Please save them.</li>
+                        <li> Make sure you use a valid email.</li>
+                        <li> "Regenerate" will create a new AccessCode under the same account.</li>
                         <li> Check this <a href="https://cloud.ardupilot.org/de-account-create.html" target="_blank">page</a> for simple installation instructions.</li>
                         <li> For Support please contribute to <a href="https://discuss.ardupilot.org/" target="_blank">https://discuss.ardupilot.org/</a></li>
                     </ol>

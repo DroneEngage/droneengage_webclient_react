@@ -25,12 +25,18 @@ const ERROR_CODES = {
     UNKNOWN_ERROR: -4,
     NO_SESSION: -5,
     SSL_ERROR: -6,
+    RATE_LIMITED: -7,
+    REQUEST_IN_PROGRESS: -8,
 };
 
 /**
  * Singleton class for handling authentication operations with the Andruav/Ardupilot-Cloud backend.
  */
 class CAndruavAuth {
+    #m_accessCodeInProgress;
+    #m_lastAccessCodeRequestTime;
+    #m_accessCodeMinInterval;
+
     constructor() {
         this.m_username = '';
         this.m_accesscode = '';
@@ -54,6 +60,10 @@ class CAndruavAuth {
         this._m_party_ID = null;
         this._m_logined = false;
         this.C_ERR_SUCCESS_DISPLAY_MESSAGE = 1001; // Legacy error code
+
+        this.#m_accessCodeInProgress = false;
+        this.#m_lastAccessCodeRequestTime = 0;
+        this.#m_accessCodeMinInterval = 3000; // ms
     }
 
     fn_isPluginEnabled() {
@@ -502,13 +512,28 @@ class CAndruavAuth {
         }
     }
 
-    /**
-     * Generates a new access code for an account.
-     * @param {string} p_accountName - The account email.
-     * @param {string} p_permission - The permission string (hex).
-     * @returns {Promise<void>}
-     */
+    #fn_canRequestAccessCode() {
+        if (this.#m_accessCodeInProgress) {
+            return { ok: false, code: ERROR_CODES.REQUEST_IN_PROGRESS, message: 'Access code request already in progress' };
+        }
+        const now = Date.now();
+        if (this.#m_lastAccessCodeRequestTime && (now - this.#m_lastAccessCodeRequestTime) < this.#m_accessCodeMinInterval) {
+            return { ok: false, code: ERROR_CODES.RATE_LIMITED, message: 'Please wait before requesting another access code' };
+        }
+        this.#m_accessCodeInProgress = true;
+        this.#m_lastAccessCodeRequestTime = now;
+        return { ok: true };
+    }
+
     async fn_generateAccessCode(p_accountName, p_permission) {
+        const rateCheck = this.#fn_canRequestAccessCode();
+        if (!rateCheck.ok) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
+                e: rateCheck.code,
+                em: rateCheck.message,
+            });
+            return;
+        }
 
         if (!this.#validateLoginName(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
@@ -543,8 +568,10 @@ class CAndruavAuth {
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Created, {
-                    ...response,
-                    message: `Access code sent to ${p_accountName}`,
+                    accountId: response[js_andruavMessages.CONST_ACCOUNT_ID_PARAMETER],
+                    loginId: response[js_andruavMessages.CONST_LOGIN_ID_PARAMETER],
+                    accessCode: response[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER],
+                    message: `Access code generated for ${p_accountName}`,
                 });
             } else {
                 const errorMessages = {
@@ -566,6 +593,8 @@ class CAndruavAuth {
                 error: error.message || 'Unknown error',
             });
             console.error('Generate Access Code error:', error);
+        } finally {
+            this.#m_accessCodeInProgress = false;
         }
     }
 
@@ -576,6 +605,15 @@ class CAndruavAuth {
      * @returns {Promise<void>}
      */
     async fn_regenerateAccessCode(p_accountName, p_permission) {
+        const rateCheck = this.#fn_canRequestAccessCode();
+        if (!rateCheck.ok) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
+                e: rateCheck.code,
+                em: rateCheck.message,
+            });
+            return;
+        }
+
         if (!this.#validateLoginName(p_accountName)) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
                 e: ERROR_CODES.INVALID_INPUT,
@@ -609,8 +647,10 @@ class CAndruavAuth {
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Regenerated, {
-                    ...response,
-                    message: `New access code sent to ${p_accountName}`,
+                    accountId: response[js_andruavMessages.CONST_ACCOUNT_ID_PARAMETER],
+                    loginId: response[js_andruavMessages.CONST_LOGIN_ID_PARAMETER],
+                    accessCode: response[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER],
+                    message: `New access code generated for ${p_accountName}`,
                 });
             } else {
                 const errorMessages = {
@@ -632,6 +672,8 @@ class CAndruavAuth {
                 error: error.message || 'Unknown error',
             });
             console.error('Regenerate Access Code error:', error);
+        } finally {
+            this.#m_accessCodeInProgress = false;
         }
     }
 
