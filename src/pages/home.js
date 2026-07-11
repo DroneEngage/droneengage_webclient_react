@@ -32,6 +32,7 @@ import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitContro
 import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
 import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
+import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import { fn_on_ready } from '../js/js_main';
 
 const Home = () => {
@@ -133,6 +134,10 @@ const Home = () => {
                 prob_ws={true}
                 prob_wp={true}
               />
+            </div>
+
+            <div id="gcs_chat_container" className="gcs-chat-container">
+              <ClssGCSChat />
             </div>
           </div>
 

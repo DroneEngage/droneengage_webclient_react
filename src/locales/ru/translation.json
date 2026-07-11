@@ -80,5 +80,13 @@
     "change_altitude": "Change Altitude",
     "stabilization": "Stabilization",
     "tracking": "Tracking"
+  },
+  "gcs_chat": {
+    "title": "Чат GCS",
+    "no_messages": "Пока нет сообщений",
+    "target_title": "Выберите целевой GCS",
+    "target_all": "Все GCS",
+    "send": "Отправить",
+    "input_placeholder": "Введите @name для адресата или сообщение здесь"
   }
 }

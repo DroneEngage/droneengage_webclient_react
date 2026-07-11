@@ -23,6 +23,8 @@ class ClssLoginControl extends React.Component {
       is_connected: CONST_NOT_CONNECTION_OFFLINE,
       m_update: 0,
       use_plugin: false,
+      is_chat_visible: true,
+      chat_unread: 0
     };
 
     this.m_flag_mounted = false;
@@ -35,9 +37,15 @@ class ClssLoginControl extends React.Component {
 
     this.chkUsePluginRef = React.createRef();
 
+    this.fn_onChatMessage = this.fn_onChatMessage.bind(this);
+    this.fn_onChatToggle = this.fn_onChatToggle.bind(this);
+    this.fn_toggleChat = this.fn_toggleChat.bind(this);
+
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
+    js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
+    js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
 
   }
 
@@ -63,6 +71,38 @@ class ClssLoginControl extends React.Component {
     if (me.m_flag_mounted === false) return;
     me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
     me.setState({ m_update: me.state.m_update + 1 });
+  }
+
+  fn_onChatMessage(me, p_data) {
+    if (me.m_flag_mounted === false) return;
+    if (!p_data || !p_data.unit) return;
+
+    // Ignore own messages.
+    if (js_globals.v_andruavWS && js_globals.v_andruavWS.m_andruavUnit) {
+      if (p_data.unit.getPartyID() === js_globals.v_andruavWS.m_andruavUnit.getPartyID()) {
+        return;
+      }
+    }
+
+    if (me.state.is_chat_visible === false) {
+      me.setState(prevState => ({ chat_unread: prevState.chat_unread + 1 }));
+    }
+  }
+
+  fn_onChatToggle(me, p_data) {
+    if (me.m_flag_mounted === false) return;
+    const visible = p_data && p_data.visible === true;
+    me.setState({ is_chat_visible: visible, chat_unread: visible ? 0 : me.state.chat_unread });
+  }
+
+  fn_toggleChat(p_event) {
+    if (p_event) {
+      p_event.preventDefault();
+      p_event.stopPropagation();
+    }
+    const nextVisible = !this.state.is_chat_visible;
+    this.setState({ is_chat_visible: nextVisible, chat_unread: nextVisible ? 0 : this.state.chat_unread });
+    js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: nextVisible });
   }
 
   fn_onAuthBad(me, data) {
@@ -132,6 +172,8 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_onChatMessage, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_onChatToggle, this);
   }
 
   componentDidMount() {
@@ -411,6 +453,23 @@ class ClssLoginControl extends React.Component {
         break;
     }
 
+
+    const v_chatIconClass = this.state.chat_unread > 0
+      ? 'bi-chat-dots-fill text-danger'
+      : (this.state.is_chat_visible ? 'bi-chat-dots-fill' : 'bi-chat');
+    const v_chatBtnClass = this.state.is_chat_visible ? 'btn-primary' : 'btn-secondary';
+
+    control.push(
+      <button
+        key={'btn_chat' + this.key}
+        type="button"
+        className={'btn btn-sm mt-1 ms-1 bi ' + v_chatIconClass + ' btn_bi_fixer me-1 ' + v_chatBtnClass}
+        title={this.state.chat_unread > 0 ? 'GCS Chat (' + this.state.chat_unread + ')' : 'GCS Chat'}
+        onClick={(e) => this.fn_toggleChat(e)}
+      >
+      </button>
+    );
+
     control.push(
       <div key={'ClssLoginControl_complex' + this.key} className="dropdown">
         <button
@@ -439,6 +498,8 @@ class ClssLoginControl extends React.Component {
         </div>
       </div>
     );
+
+    
 
     return control;
   }

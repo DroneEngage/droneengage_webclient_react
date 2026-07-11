@@ -65,5 +65,13 @@
   "yes": "نعم",
   "restart": "إعادة تشغيل",
   "config": "إعدادات",
-  "configure_module": "تكوين الوحدة"
+  "configure_module": "تكوين الوحدة",
+  "gcs_chat": {
+    "title": "دردشة GCS",
+    "no_messages": "لا توجد رسائل بعد",
+    "target_title": "اختر GCS الهدف",
+    "target_all": "كل GCS",
+    "send": "إرسال",
+    "input_placeholder": "اكتب @name للهدف أو رسالة هنا"
+  }
 }

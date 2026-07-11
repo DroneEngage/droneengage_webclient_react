@@ -150,6 +150,7 @@ export const CONST_TYPE_AndruavMessage_Viewlink_ACTION = 1079;
 export const CONST_TYPE_AndruavMessage_Viewlink_STATUS = 1080;
 
 export const CONST_TYPE_AndruavMessage_DEPilot_Control = 1081;
+export const CONST_TYPE_AndruavMessage_Chat = 1082;
 
 // Binary Messages
 export const CONST_TYPE_AndruavMessage_LightTelemetry = 2022;
@@ -564,6 +565,7 @@ export const message_names = {
   1075: "Mission Upload - 1075",
   1076: "P2P AI_Action - 1076",
   1077: "AI-Status - 1077",
+  1082: "Chat Message - 1082",
 
 
   6001: "ServoChannel - 6001",

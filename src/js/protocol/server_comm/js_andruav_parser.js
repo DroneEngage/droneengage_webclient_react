@@ -303,6 +303,15 @@ class CAndruavClientParser {
             }
                 break;
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_Chat: {
+                p_jmsg = msg.msgPayload;
+                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) {
+                    p_jmsg = JSON.parse(p_jmsg);
+                }
+                js_eventEmitter.fn_dispatch(js_event.EE_onChatMessage, { unit: p_unit, message: p_jmsg });
+            }
+                break;
+
             case js_andruavMessages.CONST_TYPE_AndruavMessage_UdpProxy_Info: {
                 p_jmsg = msg.msgPayload;
                 p_unit.m_Telemetry.m_udpProxy_ip = p_jmsg.a;
