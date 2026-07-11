@@ -18,7 +18,9 @@ export default class ClssLoginControl extends React.Component {
             is_connected: false,
             btnConnectText: 'Login',
             initialized: false,
-            accessCode: '', // Added state for the access code value
+            accountId: '',
+            loginId: '',
+            accessCode: '',
             errorMessage: '',
             successMessage: '',
         };
@@ -39,10 +41,12 @@ export default class ClssLoginControl extends React.Component {
     }
 
     fn_EE_permissionReceived(me, params) {
-        // Update the state with the received access code
-        me.setState({ 
-            accessCode: params.pwd,
-            successMessage: "Access Code Generated Successfully. Please check your email as well.",
+        // Update the state with the received account info
+        me.setState({
+            accountId: params.accountId || '',
+            loginId: params.loginId || '',
+            accessCode: params.accessCode || '',
+            successMessage: "Access code generated successfully. Please save your AccountID, LoginID and AccessCode.",
             errorMessage: ''
         });
     }
@@ -148,23 +152,23 @@ export default class ClssLoginControl extends React.Component {
 
                 <div id='login_form' >
                     <div className="form-group al_l">
-                        <label htmlFor="txtLoginName" id="loginName" className="form-label">LoginName</label>
-                        <input type="text" id="txtLoginName" ref={this.m_loginNameRef} name="txtLoginName" className="form-control" pattern="[a-zA-Z0-9]+" title="LoginName must be alphanumeric" defaultValue={js_localStorage.fn_getLoginName()} />
-                        
-                        {/* Display the access code as a styled label */}
+                        <label htmlFor="txtLoginName" id="loginName" className="form-label">Email (LoginID)</label>
+                        <input type="email" id="txtLoginName" ref={this.m_loginNameRef} name="txtLoginName" className="form-control" defaultValue={js_localStorage.fn_getLoginName()} />
+
+                        {/* Display the generated account details */}
                         {this.state.accessCode && (
                             <div className="mt-3">
                                 <label className="form-label">Access Code:</label>
                                 <div className="input-group">
-                                    <input 
-                                        type="text" 
-                                        className="form-control text-warning bg-secondary fw-bold" 
-                                        value={this.state.accessCode} 
-                                        readOnly 
+                                    <input
+                                        type="text"
+                                        className="form-control text-warning bg-secondary fw-bold"
+                                        value={this.state.accessCode}
+                                        readOnly
                                     />
-                                    <button 
-                                        className="btn btn-outline-secondary" 
-                                        type="button" 
+                                    <button
+                                        className="btn btn-outline-secondary"
+                                        type="button"
                                         onClick={() => this.fn_copyToClipboard()}
                                         title="Copy to clipboard"
                                     >

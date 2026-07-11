@@ -72,6 +72,8 @@ export const CONST_CMD_REGENERATE_ACCESSCODE = "r";
 
 export const CONST_ACCOUNT_NAME_PARAMETER = "acc";
 export const CONST_ACCESS_CODE_PARAMETER = "pwd";
+export const CONST_ACCOUNT_ID_PARAMETER = "aid";
+export const CONST_LOGIN_ID_PARAMETER = "lid";
 export const CONST_SUB_COMMAND = "scm";
 export const CONST_ERROR_MSG = "em";
 export const CONST_ACTOR_TYPE = "at";
