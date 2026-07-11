@@ -7,8 +7,9 @@ import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import { CONST_TARGETS_GCS } from '../js/protocol/server_comm/js_andruav_ws.js';
+import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
 
-class ClssGCSChat extends React.Component {
+class ClssGCSChat extends ClssDialogBase {
     constructor(props) {
         super(props);
 
@@ -39,6 +40,8 @@ class ClssGCSChat extends React.Component {
 
     componentDidMount() {
         this.m_flag_mounted = true;
+        this.modalRef = this.m_panelRef;
+        super.componentDidMount();
         this.fn_refreshGCSList();
     }
 
@@ -244,6 +247,42 @@ class ClssGCSChat extends React.Component {
         this.setState(prevState => ({ isMinimized: !prevState.isMinimized }));
     }
 
+    fn_getCurrentPartyID() {
+        if (this.state.selectedTarget && this.state.selectedTarget !== CONST_TARGETS_GCS) {
+            return this.state.selectedTarget;
+        }
+        return null;
+    }
+
+    fn_renderDialogFooter() {
+        const { t } = this.props;
+        const isGCSAll = this.state.selectedTarget === CONST_TARGETS_GCS;
+        return (
+            <div className="text-center">
+                <div className="btn-group w-100 d-flex flex-wrap">
+                    <button
+                        id="opaque_btn"
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => this.fn_opacityDialog()}
+                    >
+                        {t('opaque')}
+                    </button>
+                    <button
+                        id="btnGoto"
+                        type="button"
+                        className="btn btn-success"
+                        onClick={() => this.fn_gotoUnit()}
+                        disabled={isGCSAll}
+                        title={isGCSAll ? (t('goto_disabled') || 'Select a specific GCS to navigate') : ''}
+                    >
+                        {t('goto', 'Goto')}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     render() {
         const { t } = this.props;
         const title = t('gcs_chat.title') || 'GCS Chat';
@@ -333,6 +372,7 @@ class ClssGCSChat extends React.Component {
                         </div>
                     </div>
                 )}
+                {this.fn_renderDialogFooter()}
             </div>
             </Draggable>
         );

@@ -7,10 +7,11 @@ import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {fn_gotoUnit_byPartyID, fn_doYAW} from '../../js/js_main.js'
+import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
-export default class ClssYawDialog extends React.Component
+export default class ClssYawDialog extends ClssDialogBase
 {
     constructor()
     {
@@ -23,7 +24,6 @@ export default class ClssYawDialog extends React.Component
 
         this.key = Math.random().toString();
         
-        this.opaque_clicked = false;
         this.modal_ctrl_yaw = React.createRef();
         this.yaw_knob = React.createRef();
 
@@ -37,10 +37,9 @@ export default class ClssYawDialog extends React.Component
 
 
     componentDidMount () {
-        
+        this.modalRef = this.modal_ctrl_yaw;
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        
-        this.fn_initDialog();
     }
 
 
@@ -148,27 +147,16 @@ export default class ClssYawDialog extends React.Component
 
     fn_initDialog()
     {
-        const me = this;
-        //this.modal_ctrl_yaw.current.draggable = true;
-        this.modal_ctrl_yaw.current.onmousedown = function (e) {
-            me.modal_ctrl_yaw.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_yaw.current.onmouseover = function (e) {
-            me.modal_ctrl_yaw.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_yaw.current.onmouseout =function (e) {
-            if (me.opaque_clicked === false) {
-                me.modal_ctrl_yaw.current.style.opacity = '0.4';
-            }
-        };
-
         this.yaw_knob.current.value = 0;
-		this.modal_ctrl_yaw.current.style.display = 'none';		
+        this.modal_ctrl_yaw.current.style.display = 'none';
+        super.fn_initDialog();
     }
 
-    fn_gotoUnit()
-    {
-        fn_gotoUnit_byPartyID(this.p_andruavUnit.getPartyID())
+    fn_getCurrentPartyID() {
+        if (this.p_andruavUnit) {
+            return this.p_andruavUnit.getPartyID();
+        }
+        return null;
     }
 
     fn_onYaw(e)
@@ -200,18 +188,6 @@ export default class ClssYawDialog extends React.Component
         }
     }
 
-    fn_opacityDialog()
-    {
-        if (this.opaque_clicked === true)
-        {
-            this.opaque_clicked = false;
-        }
-        else
-        {
-            this.opaque_clicked = true;
-            this.modal_ctrl_yaw.current.style.opacity = '1.0';
-        }
-    }
 
     render ()
     {
@@ -265,14 +241,12 @@ export default class ClssYawDialog extends React.Component
 						</div> 
 					</div>
 					<div id="modal_yaw_knob_footer" className="form-group text-center ">
-						<div className= "row">
-						<div className="btn-group w-100 d-flex flex-wrap">
-							<button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
-							<button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e)=>this.fn_gotoUnit(e)}>Goto</button>
-							<button id="btnYaw" type="button" className="btn btn-sm btn-danger" onClick={(e)=>this.fn_onYaw(e)}>YAW</button>
-							<button id="btnResetYaw" type="button" className="btn btn-sm btn-warning" onClick={(e)=>this.fn_Reset(e)}>reset YAW</button>
-						</div>
-						</div>
+						{this.fn_renderDialogFooter(
+							<>
+								<button id="btnYaw" type="button" className="btn btn-sm btn-danger" onClick={(e)=>this.fn_onYaw(e)}>YAW</button>
+								<button id="btnResetYaw" type="button" className="btn btn-sm btn-warning" onClick={(e)=>this.fn_Reset(e)}>reset YAW</button>
+							</>
+						)}
 					</div>
 				</div>
             </Draggable>
