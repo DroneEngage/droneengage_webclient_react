@@ -54,7 +54,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
             'tracking_status_text': '',
             'tracking_target_type': 0,
             'tracking_target_type_text': '',
-            'joystick_mode': 'location' // 'location' or 'motion'
+            'joystick_mode': 'location', // 'location' or 'motion'
         };
 
         this.m_flag_mounted = false;
@@ -481,21 +481,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         return (
             <Draggable nodeRef={this.modal_ctrl_gimbal_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_gimbal_dlg"} id="modal_ctrl_gimbal_dlg" title={t('gimbal_control')} className="card css_ontop border-light p-2 position-fixed" ref={this.modal_ctrl_gimbal_dlg} style={{ zIndex: 1050, top: '100px', left: '100px' }}>
-                    <div className="card-header text-center js-draggable-handle">
-                        <div className="row">
-                            <div className="col-10">
-                                <h5 className="text-success text-start mb-0">
-                                    {isNoUnit
-                                        ? t('gimbal_control')
-                                        : `${t('gimbal_control')} ${this.state.p_session?.m_unit.m_unitName}`}
-                                </h5>
-                            </div>
-                            <div className="col-2 text-end">
-                                <button id="btnclose" type="button" className="btn-close smaller" onClick={() => this.fn_closeDialog()}></button>
-                            </div>
-                        </div>
-                    </div>
+                    {this.fn_renderDialogHeader(isNoUnit ? t('gimbal_control') : t('gimbal_control') + ' ' + this.state.p_session?.m_unit.m_unitName)}
 
+                    {!this.state.isMinimized && (
                     <div className="card-body">
                         {isNoUnit ? (
                             <div key='laser-card-body'>
@@ -753,6 +741,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
                             
                         )}
                     </div>
+                    )}
 
                     {!isNoUnit && (
                         <div id="modal_gimbal_footer" className="text-center ">

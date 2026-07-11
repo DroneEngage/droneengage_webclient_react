@@ -134,6 +134,7 @@ export default class ClssStreamDialog extends ClssDialogBase
 	{
 		super ();
 		this.state = {
+			...this.state,
 			'm_update': 0,
 		};
     
@@ -215,21 +216,9 @@ export default class ClssStreamDialog extends ClssDialogBase
                 className="card css_ontop border-light p-2"
                 ref={this.modal_ctrl_stream_dlg} // Set the ref here
             >
-                <div className="card-header text-center js-draggable-handle">
-                    <div className="row">
-                        <div className="col-10">
-                            <h4 className="text-success text-start">
-                                {isNoStreams 
-                                    ? "No Streams" 
-                                    : `Streams of ${this.state.p_session?.m_unit.m_unitName}`}
-                            </h4>
-                        </div>
-                        <div className="col-2 float-right">
-                            <button id="btnclose" type="button" className="btn-close smaller" onClick={() => this.fn_closeDialog()}></button>
-                        </div>
-                    </div>
-                </div>
+                {this.fn_renderDialogHeader(isNoStreams ? 'No Streams' : 'Streams of ' + this.state.p_session?.m_unit.m_unitName)}
 
+                {!this.state.isMinimized && (
                 <div className="card-body">
                     {isNoStreams ? (
                         <div key='stream-card-body'>
@@ -243,6 +232,7 @@ export default class ClssStreamDialog extends ClssDialogBase
                         </div>
                     )}
                 </div>
+                )}
 
                 {!isNoStreams && (
                     <div className="form-group text-center localcontainer">

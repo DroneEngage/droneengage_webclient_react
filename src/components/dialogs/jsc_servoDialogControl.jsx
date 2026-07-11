@@ -194,9 +194,10 @@ export default class ClssServoControl extends ClssDialogBase {
     constructor(props) {
         super(props);
         this.state = {
+            ...this.state,
             is_connected: false,
             initialized: false,
-            partyID: null
+            partyID: null,
         };
 
         this.key = Math.random().toString();
@@ -305,17 +306,12 @@ export default class ClssServoControl extends ClssDialogBase {
             return (
                 <Draggable nodeRef={this.modal_ctrl_srv} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                     <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2  " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
-                        <div key='camera_hdr' className="card-header text-center js-draggable-handle d-flex">
-			                    <div className="col-10">
-                                    <h4 id="title" className="text-success text-start" ref={this.titleRef}>Servo's of' {v_unitName} </h4>
-                                </div>
-                                <div className="col-2 float-right">
-                                    <button key={this.key + 'modal_ctrl_servo_btnclose'} id="modal_ctrl_servo_btnclose" type="btnclose" className="btn-close smaller" ref={this.btnCloseRef}></button>
-                                </div>
-                            </div>
+                        {this.fn_renderDialogHeader("Servo's of " + v_unitName)}
+                        {!this.state.isMinimized && (
                         <div id="ctrl_main" className="form-group text-center  " ref={this.ctrlMainRef}>
                             {servos}
                         </div>
+                        )}
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
                             {this.fn_renderDialogFooter(
                                 <>
