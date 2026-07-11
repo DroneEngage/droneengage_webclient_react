@@ -14,11 +14,11 @@ class ClssGCSChat extends ClssDialogBase {
         super(props);
 
         this.state = {
+            ...this.state,
             messages: [],
             gcsUnits: [],
             selectedTarget: CONST_TARGETS_GCS,
             text: '',
-            isMinimized: false,
             isVisible: true
         };
 
@@ -243,15 +243,16 @@ class ClssGCSChat extends ClssDialogBase {
         }
     }
 
-    fn_toggleMinimize() {
-        this.setState(prevState => ({ isMinimized: !prevState.isMinimized }));
-    }
-
     fn_getCurrentPartyID() {
         if (this.state.selectedTarget && this.state.selectedTarget !== CONST_TARGETS_GCS) {
             return this.state.selectedTarget;
         }
         return null;
+    }
+
+    fn_closeDialog() {
+        this.setState({ isVisible: false });
+        js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: false });
     }
 
     fn_renderDialogFooter() {
@@ -260,14 +261,6 @@ class ClssGCSChat extends ClssDialogBase {
         return (
             <div className="text-center">
                 <div className="btn-group w-100 d-flex flex-wrap">
-                    <button
-                        id="opaque_btn"
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={() => this.fn_opacityDialog()}
-                    >
-                        {t('opaque')}
-                    </button>
                     <button
                         id="btnGoto"
                         type="button"
@@ -294,16 +287,7 @@ class ClssGCSChat extends ClssDialogBase {
         return (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel=".gcs-chat-minimize-btn, button, input, select, textarea">
             <div className="card css_ontop gcs-chat-panel" ref={this.m_panelRef}>
-                <div className="card-header bg-warning text-dark js-draggable-handle">
-                    <strong>{title}</strong>
-                    <button
-                        type="button"
-                        className="btn btn-sm btn-link text-dark gcs-chat-minimize-btn float-end p-0 ms-2"
-                        onClick={() => this.fn_toggleMinimize()}
-                    >
-                        {this.state.isMinimized ? '▲' : '▼'}
-                    </button>
-                </div>
+                {this.fn_renderDialogHeader(title)}
                 {!this.state.isMinimized && (
                     <div className="card-body p-2">
                         <div className="gcs-chat-messages mb-2">

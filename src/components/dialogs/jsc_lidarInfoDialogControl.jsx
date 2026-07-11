@@ -15,6 +15,7 @@ export default class ClssLidarInfoDialog extends ClssDialogBase
     {
         super();
         this.state = {
+			...this.state,
 			'm_update': 0,
 		};
         
@@ -105,19 +106,12 @@ export default class ClssLidarInfoDialog extends ClssDialogBase
         return (
             <Draggable nodeRef={this.modal_ctrl_lidar_info} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div  key={this.key + "m0"} id="modal_ctrl_lidar_info" title="Lidar Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_lidar_info}>
-					<div key={this.key + "m1"} className="card-header text-center js-draggable-handle">
-						<div className="row">
-						<div className="col-10">
-						<h3 className="text-success text-start">{'Lidar - ' + unitname}</h3>
-						</div>
-						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close smaller" onClick={(e)=>this.fn_closeDialog()}></button>
-						</div>
-						</div>
-					</div>
+					{this.fn_renderDialogHeader('Lidar - ' + unitname)}
+					{!this.state.isMinimized && (
 					<div key={this.key + "m2"} className="card-body">
 						<ClssCtrlLidarDevice p_unit={this.p_andruavUnit} rotation_ticks={this.rotation_ticks} follow_unit={this.follow_unit}/>
 					</div>
+					)}
 					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"}>
                         {this.fn_renderDialogFooter(
                             <>
