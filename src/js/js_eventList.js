@@ -26,6 +26,8 @@ const EVENT_LIST = Object.freeze({
 			"EE_andruavUnitLidarInfo",
 			"EE_andruavUnitLidarShow",
 			"EE_onMessage",
+			"EE_onChatMessage",
+			"EE_onChatToggle",
 			"EE_onModuleUpdated",
 			"EE_onPreferenceChanged",
 			"EE_unitAdded",

@@ -751,6 +751,18 @@ export class CCommandAPI {
         return msg;
     }
 
+    static API_sendChatMessage(p_text) {
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_Chat,
+            'ms': {
+                t: p_text,
+                ts: Date.now()
+            }
+        };
+
+        return msg;
+    }
+
     static API_engageDEPilotControl(p_enable, p_enqueue, p_de_mode, p_de_time_duration_ms, p_de_altitude_m, p_de_yaw_degree) {
         const msg = {
             'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_DEPilot_Control,

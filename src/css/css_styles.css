@@ -1552,3 +1552,69 @@ body.theme-vapor .btn-close {
   --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") !important;
   color: #fff !important;
 }
+
+.gcs-chat-container {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 520px;
+  z-index: 1001;
+}
+
+.gcs-chat-panel .card-body {
+  max-height: 500px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gcs-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.gcs-chat-messages .text-end {
+  background: rgba(0, 123, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.gcs-chat-messages .text-start {
+  background: rgba(255, 193, 7, 0.2);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.gcs-chat-input-wrapper {
+  position: relative;
+}
+
+.gcs-chat-mentions {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1050;
+  margin-bottom: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.gcs-chat-mentions .list-group-item {
+  background: rgba(33, 37, 41, 0.95);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gcs-chat-mentions .list-group-item:hover,
+.gcs-chat-mentions .list-group-item:focus {
+  background: rgba(255, 193, 7, 0.9);
+  color: #000;
+}

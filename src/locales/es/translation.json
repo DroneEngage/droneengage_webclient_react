@@ -80,5 +80,13 @@
     "change_altitude": "Cambiar Altitud",
     "stabilization": "Estabilización",
     "tracking": "Rastreo"
+  },
+  "gcs_chat": {
+    "title": "Chat GCS",
+    "no_messages": "Aún no hay mensajes",
+    "target_title": "Seleccionar GCS objetivo",
+    "target_all": "Todos los GCS",
+    "send": "Enviar",
+    "input_placeholder": "Escribe @nombre para dirigir o un mensaje"
   }
 }

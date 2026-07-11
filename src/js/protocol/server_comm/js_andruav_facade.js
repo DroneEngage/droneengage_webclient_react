@@ -159,6 +159,18 @@ class CAndruavClientFacade {
         }
     }
 
+    /**
+    * 
+    * @param {*} p_target is partyID or special target (e.g. _GCS_). Null/undefined broadcasts to group.
+    * @param {*} p_text chat text message.
+    */
+    API_sendChatMessage(p_target, p_text) {
+        if (js_globals.v_andruavWS === null || js_globals.v_andruavWS === undefined) return;
+
+        const cmd = CCommandAPI.API_sendChatMessage(p_text);
+        js_globals.v_andruavWS.API_sendCMD(p_target, cmd.mt, cmd.ms);
+    };
+
 
     /**
     * 

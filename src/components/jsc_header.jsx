@@ -50,7 +50,7 @@ class ClssHeaderControl extends React.Component {
         }
         else {
             ctrl.push(
-                <div id='login_button' key='hdr_ctrl1' className='css_margin_zero  al_r'>
+                <div id='login_button' key='hdr_ctrl1' className='css_margin_zero  al_r d-flex align-items-center'>
                     <ClssLoginControl simple='true' />
                 </div>
             );
