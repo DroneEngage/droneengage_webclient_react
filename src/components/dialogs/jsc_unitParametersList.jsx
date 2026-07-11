@@ -8,7 +8,8 @@ import * as js_common from '../../js/js_common.js';
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
-import { fn_do_modal_confirmation, fn_gotoUnit, fn_helpPage } from '../../js/js_main.js';
+import { fn_do_modal_confirmation, fn_helpPage } from '../../js/js_main.js';
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
 class ClssParameterItem extends React.Component {
     constructor() {
@@ -123,7 +124,7 @@ class ClssParametersList extends React.Component {
     }
 }
 
-export default class ClssUnitParametersList extends React.Component {
+export default class ClssUnitParametersList extends ClssDialogBase {
     constructor() {
         super();
         this.state = {
@@ -134,7 +135,6 @@ export default class ClssUnitParametersList extends React.Component {
         this.m_close = true;
         this.m_flag_mounted = false;
         this.modalRef = React.createRef();
-        this.opaque_clicked = false;
         this.key = Math.random().toString();
 
         js_eventEmitter.fn_subscribe(js_event.EE_displayParameters, this, this.fn_displayForm);
@@ -142,8 +142,8 @@ export default class ClssUnitParametersList extends React.Component {
     }
 
     componentDidMount() {
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        this.fn_initDialog();
     }
 
     componentWillUnmount() {
@@ -163,18 +163,8 @@ export default class ClssUnitParametersList extends React.Component {
         this.modalRef.current.style.left = '50%';
         this.modalRef.current.style.transform = 'translate(-50%, -50%)';
 
-        this.modalRef.current.onmousedown = function () {
-            me.modalRef.current.style.opacity = '1.0';
-        };
-        this.modalRef.current.onmouseover = function () {
-            me.modalRef.current.style.opacity = '1.0';
-        };
-        this.modalRef.current.onmouseout = function () {
-            if (!me.opaque_clicked) {
-                me.modalRef.current.style.opacity = '0.4';
-            }
-        };
         this.modalRef.current.style.display = 'none';
+        super.fn_initDialog();
     }
 
     fn_displayForm(p_me, p_andruavUnit) {
@@ -202,9 +192,11 @@ export default class ClssUnitParametersList extends React.Component {
         }
     }
 
-    fn_opacityDialog() {
-        this.opaque_clicked = !this.opaque_clicked;
-        this.modalRef.current.style.opacity = this.opaque_clicked ? '1.0' : '0.4';
+    fn_getCurrentPartyID() {
+        if (this.state.p_unit) {
+            return this.state.p_unit.getPartyID();
+        }
+        return null;
     }
 
     fn_doResetParameters() {
@@ -339,24 +331,7 @@ export default class ClssUnitParametersList extends React.Component {
                         {p_params}
                     </div>
                     <div id="modal_ctrl_parameters_footer" className="btn-group w-100 d-flex flex-wrap">
-                        <div className="btn-group w-100 d-flex flex-wrap">
-                                <button
-                                    id="opaque_btn"
-                                    type="button"
-                                    className="btn btn-sm btn-primary"
-                                    onClick={(e) => this.fn_opacityDialog()}
-                                >
-                                    Opaque
-                                </button>
-                                <button
-                                    id="btnGoto"
-                                    type="button"
-                                    className="btn btn-sm btn-success"
-                                    onClick={(e) => fn_gotoUnit(p_andruavUnit)}
-                                >
-                                    Goto
-                                </button>
-                        </div>
+                        {this.fn_renderDialogFooter()}
                     </div>
                 </div>
             </Draggable>
