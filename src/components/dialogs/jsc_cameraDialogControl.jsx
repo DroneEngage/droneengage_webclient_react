@@ -10,7 +10,8 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import * as js_common from '../../js/js_common.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
+import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
 class ClssCameraDevice extends React.Component {
 
@@ -116,7 +117,7 @@ class ClssCameraDevice extends React.Component {
     };
 };
 
-export default class ClssCameraDialog extends React.Component
+export default class ClssCameraDialog extends ClssDialogBase
 {
     constructor()
     {
@@ -129,7 +130,6 @@ export default class ClssCameraDialog extends React.Component
         
         this.key = Math.random().toString();
         
-        this.opaque_clicked = false;
         this.modal_ctrl_cam = React.createRef();
         this.txt_TotalImages = React.createRef();
         this.txt_ShootingInterval = React.createRef();
@@ -141,12 +141,12 @@ export default class ClssCameraDialog extends React.Component
 
 
     componentDidMount () {
-        
+        this.modalRef = this.modal_ctrl_cam;
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        
+
         this.txt_ShootingInterval.current.value = 1;
         this.txt_TotalImages.current.value = 1;
-        this.fn_initDialog();
     }
 
 
@@ -173,11 +173,11 @@ export default class ClssCameraDialog extends React.Component
         p_me.modal_ctrl_cam.current.style.display = 'block';
     }
 
-    fn_gotoUnitPressed()
-    {
-        if (this.m_flag_mounted === false)return ;
-        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
-
+    fn_getCurrentPartyID() {
+        if (this.state.p_session && this.state.p_session.m_unit) {
+            return this.state.p_session.m_unit.getPartyID();
+        }
+        return null;
     }
 
    fn_getInterval()
@@ -190,22 +190,7 @@ export default class ClssCameraDialog extends React.Component
         return $('#txt_TotalImages').val();
     }
 
-    fn_initDialog()
-    {
-        const me = this;
-        //this.modal_ctrl_cam.current.draggable = true;
-        this.modal_ctrl_cam.current.onmousedown = function (e) {
-            me.modal_ctrl_cam.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_cam.current.onmouseover = function (e) {
-            me.modal_ctrl_cam.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_cam.current.onmouseout =function (e) {
-            if (me.opaque_clicked === false) {
-                me.modal_ctrl_cam.current.style.opacity = '0.4';
-            }
-        };
-        
+    fn_initDialog() {
         this.txt_TotalImages.current.onmousedown = function () {
             $(this).parents('tr').removeClass('draggable');
         };
@@ -215,6 +200,7 @@ export default class ClssCameraDialog extends React.Component
         
         this.modal_ctrl_cam.current.style.display = 'none';
         
+        super.fn_initDialog();
     }
 
     fn_closeDialog()
@@ -227,18 +213,6 @@ export default class ClssCameraDialog extends React.Component
         }
     }
 
-    fn_opacityDialog()
-    {
-        if (this.opaque_clicked === true)
-        {
-            this.opaque_clicked = false;
-        }
-        else
-        {
-            this.opaque_clicked = true;
-            this.modal_ctrl_cam.current.style.opacity = '1.0';
-        }
-    }
 
     render ()
     {
@@ -301,13 +275,7 @@ export default class ClssCameraDialog extends React.Component
                         </div>
                     </div>
                     </div>        
-                    <div id="modal_ctrl_cam_footer" className="form-group text-center localcontainer css_ontop">
-                        <div className= "btn-group w-100 d-flex flex-wrap">
-                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
-                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnitPressed()}>Goto</button>
-                            
-                        </div>
-                    </div>
+                    {this.fn_renderDialogFooter()}
             </div>
             </Draggable>
             );

@@ -5,7 +5,8 @@ import * as js_siteConfig from '../../js/js_siteConfig.js'
 import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter.js'
-import {fn_helpPage, fn_gotoUnit_byPartyID} from '../../js/js_main.js';
+import {fn_helpPage} from '../../js/js_main.js';
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
 
 class ClssServoUnit extends React.Component {
@@ -184,7 +185,7 @@ class ClssServoUnit extends React.Component {
 }
 
 
-export default class ClssServoControl extends React.Component {
+export default class ClssServoControl extends ClssDialogBase {
     static defaultProps = {
         startServo: 5,
         endServo: 16
@@ -205,7 +206,6 @@ export default class ClssServoControl extends React.Component {
         this.ctrlMainRef = React.createRef();
         this.footerRef = React.createRef();
         this.btnCloseRef = React.createRef();
-        this.opaqueBtnRef = React.createRef();
         
 
         js_eventEmitter.fn_subscribe(js_event.EE_servoOutputUpdate, this, this.fn_updateData);
@@ -228,34 +228,21 @@ export default class ClssServoControl extends React.Component {
         p_me.setState({ 'partyID': p_andruavUnit.getPartyID() });
     }
 
+    fn_getCurrentPartyID() {
+        return this.state.partyID;
+    }
+
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_servoOutputUpdate, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_displayServoForm, this);
     }
 
     componentDidMount() {
+        this.modalRef = this.modal_ctrl_srv;
+        super.componentDidMount();
+
         if (this.modal_ctrl_srv.current) {
             this.modal_ctrl_srv.current.style.display = 'none';
-
-            // While React doesn't directly support jQuery UI draggable,
-            // if you absolutely need this functionality, you'd integrate it
-            // outside of React's lifecycle or use a React-specific draggable library.
-            // For now, I'm just removing the jQuery references.
-            // $(this.modal_ctrl_srv.current).draggable(); 
-
-            this.modal_ctrl_srv.current.onmouseover = () => {
-                if (this.modal_ctrl_srv.current) {
-                    this.modal_ctrl_srv.current.style.opacity = '1.0';
-                }
-            };
-            this.modal_ctrl_srv.current.onmouseout = () => {
-                if (this.modal_ctrl_srv.current) {
-                    const val = this.modal_ctrl_srv.current.getAttribute('opacity');
-                    if (val === null || val === undefined) {
-                        this.modal_ctrl_srv.current.style.opacity = '0.4';
-                    }
-                }
-            };
         }
 
         if (this.btnCloseRef.current) {
@@ -267,22 +254,6 @@ export default class ClssServoControl extends React.Component {
                 }
             };
         }
-
-        if (this.opaqueBtnRef.current) {
-            this.opaqueBtnRef.current.onclick = () => {
-                if (this.modal_ctrl_srv.current) {
-                    const val = this.modal_ctrl_srv.current.getAttribute('opacity');
-                    if (val === null || val === undefined) {
-                        this.modal_ctrl_srv.current.setAttribute('opacity', '1.0');
-                        this.modal_ctrl_srv.current.style.opacity = '1.0';
-                    } else {
-                        this.modal_ctrl_srv.current.removeAttribute('opacity');
-                    }
-                }
-            };
-        }
-
-        
     }
 
     render() {
@@ -346,13 +317,12 @@ export default class ClssServoControl extends React.Component {
                             {servos}
                         </div>
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
-                            <div className="btn-group w-100 d-flex flex-wrap">
-                                    <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" ref={this.opaqueBtnRef}>opaque</button>
-                                    <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => fn_gotoUnit_byPartyID(p_andruavUnit.getPartyID())}>Goto</button>
+                            {this.fn_renderDialogFooter(
+                                <>
                                     <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit)} >Refresh</button>
                                     <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>
-                                
-                            </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </Draggable>

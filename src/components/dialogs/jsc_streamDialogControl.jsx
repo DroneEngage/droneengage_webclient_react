@@ -8,7 +8,8 @@ import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, fn_gotoUnit_byPartyID, toggleRecrodingVideo} from '../../js/js_main.js';
+import {fn_VIDEO_login, fn_VIDEO_Record, toggleRecrodingVideo} from '../../js/js_main.js';
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
 class ClssStreamChannel extends React.Component {
 
@@ -126,7 +127,7 @@ class ClssStreamChannel extends React.Component {
 };
 
 
-export default class ClssStreamDialog extends React.Component
+export default class ClssStreamDialog extends ClssDialogBase
 {
     
     constructor()
@@ -156,8 +157,9 @@ export default class ClssStreamDialog extends React.Component
     } 
 
     componentDidMount () {
+        this.modalRef = this.modal_ctrl_stream_dlg;
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        this.fn_initDialog();
     }
 
     fn_displayDialog (p_me, p_session)
@@ -171,24 +173,16 @@ export default class ClssStreamDialog extends React.Component
         p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
     }
 
-    fn_initDialog()
-    {
-        const me = this;
-        this.modal_ctrl_stream_dlg.current.onmouseover = function (e) {
-            me.modal_ctrl_stream_dlg.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_stream_dlg.current.onmouseout = function (e) {
-            if (me.opaque_clicked === false) {
-                me.modal_ctrl_stream_dlg.current.style.opacity = '0.4';
-            }
-        };
+    fn_initDialog() {
         this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        super.fn_initDialog();
     }
 
-    fn_gotoUnitPressed()
-    {
-        fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
-
+    fn_getCurrentPartyID() {
+        if (this.state.p_session && this.state.p_session.m_unit) {
+            return this.state.p_session.m_unit.getPartyID();
+        }
+        return null;
     }
 
     fn_closeDialog()
@@ -201,18 +195,6 @@ export default class ClssStreamDialog extends React.Component
         }
     }
 
-    fn_opacityDialog()
-    {
-        if (this.opaque_clicked === true)
-        {
-            this.opaque_clicked = false;
-        }
-        else
-        {
-            this.opaque_clicked = true;
-            this.modal_ctrl_stream_dlg.current.style.opacity = '1.0';
-        }
-    }
 
     
 
@@ -264,11 +246,9 @@ export default class ClssStreamDialog extends React.Component
 
                 {!isNoStreams && (
                     <div className="form-group text-center localcontainer">
-                        <div className="btn-group w-100 d-flex flex-wrap">
-                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" onClick={() => this.fn_opacityDialog()}>Opaque</button>
-                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={() => this.fn_gotoUnitPressed()}>Goto</button>
+                        {this.fn_renderDialogFooter(
                             <button id="btnHelp" type="button" className="btn btn-sm btn-primary">Help</button>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>

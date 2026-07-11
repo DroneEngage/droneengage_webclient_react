@@ -5,11 +5,11 @@ import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
-import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
 import {ClssCtrlLidarDevice} from '../gadgets/jsc_ctrl_lidar_device.jsx'
+import ClssDialogBase from './jsc_dialog_base.jsx';
 
-export default class ClssLidarInfoDialog extends React.Component
+export default class ClssLidarInfoDialog extends ClssDialogBase
 {
     constructor()
     {
@@ -23,9 +23,7 @@ export default class ClssLidarInfoDialog extends React.Component
         this.key = Math.random().toString();
         this.rotation_ticks = 0;
 
-        this.opaque_clicked = false;
-        
-        this.modal_ctrl_lidar_info = React.createRef(); // Assuming you need this ref as well
+        this.modal_ctrl_lidar_info = React.createRef();
         
         js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitLidarShow,this, this.fn_displayDialog);
         
@@ -34,10 +32,9 @@ export default class ClssLidarInfoDialog extends React.Component
     }
 
     componentDidMount () {
-        
+        this.modalRef = this.modal_ctrl_lidar_info;
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        
-        this.fn_initDialog();
     }
 
 
@@ -63,23 +60,9 @@ export default class ClssLidarInfoDialog extends React.Component
     }
 
 
-    fn_initDialog()
-    {
-        const me = this;
-        //this.modal_ctrl_lidar_info.current.draggable = true;
-        this.modal_ctrl_lidar_info.current.onmousedown = function (e) {
-            me.modal_ctrl_lidar_info.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_lidar_info.current.onmouseover = function (e) {
-            me.modal_ctrl_lidar_info.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_lidar_info.current.onmouseout =function (e) {
-            if (me.opaque_clicked === false) {
-                me.modal_ctrl_lidar_info.current.style.opacity = '0.4';
-            }
-        };
-
-		this.modal_ctrl_lidar_info.current.style.display = 'none';		
+    fn_initDialog() {
+        this.modal_ctrl_lidar_info.current.style.display = 'none';
+        super.fn_initDialog();
     }
     
     fn_tick(p_dir)
@@ -104,23 +87,11 @@ export default class ClssLidarInfoDialog extends React.Component
 
 
 
-    fn_gotoUnit()
-    {
-        fn_gotoUnit_byPartyID(this.p_andruavUnit.getPartyID())
-    }
-
-    
-    fn_opacityDialog()
-    {
-        if (this.opaque_clicked === true)
-        {
-            this.opaque_clicked = false;
+    fn_getCurrentPartyID() {
+        if (this.p_andruavUnit) {
+            return this.p_andruavUnit.getPartyID();
         }
-        else
-        {
-            this.opaque_clicked = true;
-            this.modal_ctrl_lidar_info.current.style.opacity = '1.0';
-        }
+        return null;
     }
 
     render()
@@ -147,13 +118,13 @@ export default class ClssLidarInfoDialog extends React.Component
 					<div key={this.key + "m2"} className="card-body">
 						<ClssCtrlLidarDevice p_unit={this.p_andruavUnit} rotation_ticks={this.rotation_ticks} follow_unit={this.follow_unit}/>
 					</div>
-					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"} className="btn-group w-100 d-flex flex-wrap">
-                        <div className= "btn-group w-100 d-flex flex-wrap">
-                            <button id="opaque_btn" type="button" className="btn btn-sm btn-primary" data-bs-toggle="button" aria-pressed="false" autoComplete="off" onClick={(e) => this.fn_opacityDialog()}>opaque</button>
-                            <button id="btnGoto" type="button" className="btn btn-sm btn-success" onClick={(e) => this.fn_gotoUnit()}>Goto</button>
+					<div id="modal_ctrl_lidar_info_footer" key={this.key + "m3"}>
+                        {this.fn_renderDialogFooter(
+                            <>
                             <button id="btnFollow" type="button" className="btn btn-sm btn-danger" onClick={(e) => this.fn_follow(true)}>Follow</button>
                             <button id="btnReset" type="button" className="btn btn-sm btn-warning" onClick={(e) => this.fn_follow(false)}>Reset</button>
-                        </div>
+                            </>
+                        )}
 					</div>
 				</div>
             </Draggable>

@@ -11,7 +11,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
-import { fn_gotoUnit_byPartyID } from '../../js/js_main.js'
+import ClssDialogBase from './jsc_dialog_base.jsx';
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import {
     VIEWLINK_CAMERA_ACTIVATE_EO,
@@ -27,7 +27,7 @@ import {
     VIEWLINK_CAMERA_SET_IR_DIGITAL_ZOOM_LEVEL
 } from '../../js/protocol/messages/js_andruavMessages.js';
 
-class ClssViewLinkGimbal extends React.Component {
+class ClssViewLinkGimbal extends ClssDialogBase {
 
     constructor() {
         super();
@@ -64,8 +64,6 @@ class ClssViewLinkGimbal extends React.Component {
         this.modal_ctrl_gimbal_dlg = React.createRef();
         this.joystick_ref = React.createRef();
 
-        // Replaced interval variables with range input
-
         js_eventEmitter.fn_subscribe(js_event.EE_displayViewLinkGimbal, this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_event.EE_hideViewLinkGimbal, this, this.fn_closeDialog);
         js_eventEmitter.fn_subscribe(js_event.EE_viewLinkGimbalAttitude, this, this.fn_onGimbalAttitude);
@@ -81,8 +79,9 @@ class ClssViewLinkGimbal extends React.Component {
     }
 
     componentDidMount() {
+        this.modalRef = this.modal_ctrl_gimbal_dlg;
+        super.componentDidMount();
         this.m_flag_mounted = true;
-        this.fn_initDialog();
     }
 
     fn_displayDialog(p_me, p_session) {
@@ -96,19 +95,8 @@ class ClssViewLinkGimbal extends React.Component {
     }
 
     fn_initDialog() {
-        const me = this;
-        this.modal_ctrl_gimbal_dlg.current.onmousedown = function (e) {
-            me.modal_ctrl_gimbal_dlg.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_gimbal_dlg.current.onmouseover = function (e) {
-            me.modal_ctrl_gimbal_dlg.current.style.opacity = '1.0';
-        };
-        this.modal_ctrl_gimbal_dlg.current.onmouseout = function (e) {
-            if (me.opaque_clicked === false) {
-                me.modal_ctrl_gimbal_dlg.current.style.opacity = '0.4';
-            }
-        };
         this.modal_ctrl_gimbal_dlg.current.style.display = 'none';
+        super.fn_initDialog();
     }
 
     fn_closeDialog() {
@@ -134,14 +122,11 @@ class ClssViewLinkGimbal extends React.Component {
         });
     }
 
-    fn_opacityDialog() {
-        if (this.opaque_clicked === true) {
-            this.opaque_clicked = false;
+    fn_getCurrentPartyID() {
+        if (this.state.p_session && this.state.p_session.m_unit) {
+            return this.state.p_session.m_unit.getPartyID();
         }
-        else {
-            this.opaque_clicked = true;
-            this.modal_ctrl_gimbal_dlg.current.style.opacity = '1.0';
-        }
+        return null;
     }
 
     fn_toggleLaser() {
@@ -319,11 +304,6 @@ class ClssViewLinkGimbal extends React.Component {
         this.setState({ target_drone: p_unit });
     }
 
-    fn_gotoUnit() {
-        if (this.state.p_session && this.state.p_session.m_unit) {
-            fn_gotoUnit_byPartyID(this.state.p_session.m_unit.getPartyID());
-        }
-    }
 
     // Removed progress functions for range inputs
 
@@ -776,10 +756,7 @@ class ClssViewLinkGimbal extends React.Component {
 
                     {!isNoUnit && (
                         <div id="modal_gimbal_footer" className="text-center ">
-                            <div className="btn-group w-100 d-flex flex-wrap">
-                                <button id="opaque_btn" type="button" className="btn btn-primary" onClick={() => this.fn_opacityDialog()}>{t('opaque')}</button>
-                                <button id="btnGoto" type="button" className="btn btn-success" onClick={() => this.fn_gotoUnit()}>{t('goto', 'Goto')}</button>
-                            </div>
+                            {this.fn_renderDialogFooter()}
                         </div>
                     )}
                 </div>
