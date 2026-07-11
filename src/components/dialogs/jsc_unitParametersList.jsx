@@ -128,6 +128,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
     constructor() {
         super();
         this.state = {
+            ...this.state,
             m_search: "",
             m_update: 0,
             p_unit: null,
@@ -313,23 +314,12 @@ export default class ClssUnitParametersList extends ClssDialogBase {
                     ref={this.modalRef}
                     title="Parameters Control"
                 >
-                    <div className="card-header text-center js-draggable-handle">
-                        <div className="row">
-                            <div className="col-10">
-                                <h4 className="text-success text-start">Parameters of: {v_Name}</h4>
-                            </div>
-                            <div className="col-2 float-right">
-                                <button
-                                    type="button"
-                                    className="btn-close smaller"
-                                    onClick={(e) => this.fn_closeDialog()}
-                                ></button>
-                            </div>
-                        </div>
-                    </div>
+                    {this.fn_renderDialogHeader('Parameters of: ' + v_Name)}
+                    {!this.state.isMinimized && (
                     <div id="ctrl_main" className="card-body">
                         {p_params}
                     </div>
+                    )}
                     <div id="modal_ctrl_parameters_footer" className="btn-group w-100 d-flex flex-wrap">
                         {this.fn_renderDialogFooter()}
                     </div>

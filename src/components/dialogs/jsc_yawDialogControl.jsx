@@ -17,6 +17,7 @@ export default class ClssYawDialog extends ClssDialogBase
     {
         super();
         this.state = {
+			...this.state,
 			'm_update': 0,
 		};
         
@@ -202,16 +203,8 @@ export default class ClssYawDialog extends ClssDialogBase
         return (
             <Draggable nodeRef={this.modal_ctrl_yaw} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
-					<div className="card-header text-center js-draggable-handle">
-						<div className="row">
-						<div className="col-10">
-						<h3 className="text-success text-start">YAW</h3>
-						</div>
-						<div className="col-2 float-right">
-						<button id="btnclose" type="button" className="btn-close smaller" onClick={(e)=>this.fn_closeDialog()}></button>
-						</div>
-						</div>
-					</div>
+					{this.fn_renderDialogHeader('YAW')}
+					{!this.state.isMinimized && (
 					<div className="card-body">
 						<div id="yaw_knob_out" className="form-group text-centermodal_dialog_style">
 						<div style={{position: 'relative', width: '180px', height: '180px', margin: '0 auto'}}>
@@ -240,6 +233,7 @@ export default class ClssYawDialog extends ClssDialogBase
 						</div>
 						</div> 
 					</div>
+					)}
 					<div id="modal_yaw_knob_footer" className="form-group text-center ">
 						{this.fn_renderDialogFooter(
 							<>
