@@ -1,15 +1,16 @@
-# Andruav/DroneEngage WebClient - Project Description
+# DroneEngage WebClient
 
-## Overview
-Andruav/DroneEngage WebClient is a browser-based Ground Control Station (GCS) for drone monitoring and control, part of the Ardupilot Cloud Eco System. It provides a comprehensive web interface for real-time drone operations supporting both DroneEngage and Andruav systems.
+## Project Summary
+DroneEngage WebClient is a browser-based Ground Control Station (GCS) for drone monitoring and control, part of the Ardupilot Cloud Eco System. It provides a comprehensive web interface for real-time drone operations supporting both DroneEngage and Andruav systems with WebSocket communication, interactive mapping, and WebRTC video streaming.
 
-## Architecture
-- **Frontend Framework**: React 19.1.1 with modern functional components
+## Tech Stack
+- **Frontend**: React 19.1.1 with modern functional components
 - **UI Framework**: Bootstrap 5.3.3 with custom styling
 - **Mapping**: Leaflet 1.8.0 with rotated markers and drawing tools
 - **Communication**: WebSocket-based real-time communication with WebPlugin support
 - **Internationalization**: i18next with support for Arabic, English, French, Spanish, and Russian
 - **Legacy Support**: jQuery 3.7.1 for existing DOM manipulation
+- **Build**: Webpack with custom configuration
 
 ## Key Features
 - Real-time drone monitoring and control
@@ -23,36 +24,20 @@ Andruav/DroneEngage WebClient is a browser-based Ground Control Station (GCS) fo
 - WebPlugin mode for local deployment
 - Theme system with dark/light modes
 
-## Project Structure
-```
-src/
-├── components/          # React components (login, dialogs, debug)
-├── css/                 # Stylesheets and themes
-├── js/                  # Core JavaScript modules
-│   ├── server_comm/     # WebSocket and server communication
-│   ├── CPC/            # Control Panel Components
-│   ├── gamepad/        # Gamepad integration
-│   └── helpers/        # Utility functions
-├── pages/               # React page components
-└── images/             # Static assets
-```
-
-## Core Modules
-- **Authentication**: `js_andruav_auth.js` - Handles login with WebPlugin fallback
-- **Communication**: `server_comm/js_andruav_ws.js` - WebSocket communication layer
-- **MAVLink**: `js_mavlink_v2.js` - MAVLink protocol parsing
-- **Mapping**: `js_leafletmap.js` - Leaflet map integration
-- **Units**: `js_andruavUnit.js` - Drone unit management
-- **Mission Planning**: `js_plan_mission.js`, `js_plan_fence.js` - Mission and geofence tools
-- **Configuration**: `js_siteConfig.js` - Site and runtime configuration
-
-## WebPlugin Mode
-The application supports WebPlugin deployment for local operations:
-- HTTPS authentication server on port 9443
-- WebSocket hub on port 9212
-- API key authentication for LAN access
-- Automatic fallback to cloud connectivity
-- Shared UnitID storage for multi-tab sessions
+## Key Files
+- `src/index.js` - React entry point
+- `src/components/` - React components (login, dialogs, debug)
+- `src/js/js_andruav_auth.js` - Authentication with WebPlugin fallback
+- `src/js/server_comm/js_andruav_ws.js` - WebSocket communication layer
+- `src/js/js_mavlink_v2.js` - MAVLink protocol parsing
+- `src/js/js_leafletmap.js` - Leaflet map integration
+- `src/js/js_andruavUnit.js` - Drone unit management
+- `src/js/js_plan_mission.js` - Mission planning tools
+- `src/js/js_plan_fence.js` - Geofence tools
+- `src/js/js_siteConfig.js` - Site and runtime configuration
+- `public/config.json` - Runtime settings, server endpoints, feature flags
+- `webconnector/` - WebPlugin deployment configuration
+- `wiki/` - Detailed documentation
 
 ## Configuration
 - **Site Config**: `public/config.json` - Runtime settings, server endpoints, feature flags
@@ -61,19 +46,29 @@ The application supports WebPlugin deployment for local operations:
 - **Map Sources**: Configurable tile providers (Mapbox, Stadia Maps, custom)
 - **WebRTC**: ICE server configuration for video streaming
 
-## Development Setup
-- Node.js v16+ required
-- HTTPS development server with SSL certificates
-- ESLint configuration with React-specific rules
-- Webpack configuration for production builds
-- Legacy OpenSSL provider support for compatibility
+## WebPlugin Mode
+Supports local deployment for LAN operations:
+- HTTPS authentication server on port 9443
+- WebSocket hub on port 9212
+- API key authentication for LAN access
+- Automatic fallback to cloud connectivity
+- Shared UnitID storage for multi-tab sessions
 
 ## Communication Architecture
-The system follows a modular communication pattern:
-- **WebClient** ↔ **de_comm** (High-level Communication Gateway)
-- **de_comm** ↔ **de_mavlink** (Drone Protocol Handler) via UDP
-- **de_mavlink** ↔ **Physical Drone Interface**
-- **de_common/de_databus** provides shared UDP-based message routing
+Modular communication pattern:
+- WebClient ↔ de_comm (High-level Communication Gateway)
+- de_comm ↔ de_mavlink (Drone Protocol Handler) via UDP
+- de_mavlink ↔ Physical Drone Interface
+- de_common/de_databus provides shared UDP-based message routing
+
+## Development
+```bash
+npm install
+npm run start  # HTTPS development server at https://localhost:3000
+npm run build  # Production build
+npm run lint   # ESLint
+npm run test   # Tests
+```
 
 ## Security Features
 - SSL/TLS encryption for development and production
@@ -82,12 +77,20 @@ The system follows a modular communication pattern:
 - Session management with localStorage persistence
 - Captcha integration for login protection
 
-## Target Platforms
-- Modern browsers with ES6+ support
-- Mobile-responsive design
-- Touch-enabled interfaces
-- RTL language support (Arabic)
-- Gamepad controller integration
+## Related Projects
+- droneegnage_authenticator - Authentication server
+- droneengage_server - Communication server
+- droneengage_communication - Communication protocol
+- droneengage_mavlink - MAVLink integration
 
-## Dependencies
-Core runtime dependencies include React ecosystem, Bootstrap, Leaflet mapping, jQuery for legacy support, WebRTC for video, and various specialized libraries for drone operations, gamepad control, and internationalization.
+## Documentation
+- README.md - User-facing documentation
+- wiki/Andruav_SiteConfig.md - Site/startup config
+- wiki/Andruav_Configuration.md - Runtime preferences
+- wiki/Andruav_ServerComm.md - Communication layer
+- wiki/Andruav_WebRTC.md - WebRTC configuration
+- wiki/Andruav_Unit.md - Unit management
+- wiki/Andruav_Authentication.md - Authentication flow
+
+## Version
+3.0.0
