@@ -1,7 +1,7 @@
 {
   "name": "droneengage_webclient",
   "version": "3.0.0",
-  "build_number": "20260712-01",
+  "build_number": "20260712-02",
   "description": "DroneEngage WebClient GCS Control Station.",
   "author": {
     "email": "mohammad.hefny@gmail.com",
