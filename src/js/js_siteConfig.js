@@ -166,6 +166,21 @@ export async function fn_loadConfig() {
         const txt = await res.text();
         const data = fn_parseConfigJsonText(txt);
         fn_applyRuntimeConfig(data);
+
+        // Try to load local config (for sensitive data like tokens)
+        // Local config fields overwrite public config fields with the same name
+        try {
+            const localRes = await fetch('/config.local.json', { cache: 'no-store' });
+            if (localRes.ok) {
+                const localTxt = await localRes.text();
+                const localData = fn_parseConfigJsonText(localTxt);
+                fn_applyRuntimeConfig(localData);
+                console.log('Local config loaded successfully');
+            }
+        } catch (localError) {
+            // Local config is optional, ignore if not found
+            console.log('No local config found (this is normal)');
+        }
     } catch (error) {
         console.error('Error loading config:', error);
     }

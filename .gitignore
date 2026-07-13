@@ -32,3 +32,4 @@ HEFNY_README.txt
 HEFNY_DEPLOY.txt
 
 local/
+public/config.local.json
