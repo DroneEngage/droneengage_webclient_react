@@ -1,41 +1,35 @@
 {
-  "bindAddress": "127.0.0.1",
-  "authPort": 9211,
-  "wsPort": 9212,
-
-  "local": {
-    "authSecure": false,
-    "wsSecure": false
-  },
+  "authPort": 9211,  // Port for local authentication server
+  "wsPort": 9212,  // Port for local WebSocket server
 
   "cors": {
-    "allowedOrigin": "https://localhost:3000"
+    "allowedOrigin": "https://localhost:3000"  // Allowed CORS origin for cross-origin requests
   },
 
   "tls": {
-    "certFile": "../ssl/localssl.crt",
-    "keyFile": "../ssl/localssl.key"
+    "certFile": "../ssl/localssl.crt",  // Path to TLS certificate file
+    "keyFile": "../ssl/localssl.key"  // Path to TLS private key file
   },
 
   "cloud": {
-    "authHost": "127.0.0.1",
-    "authPort": 19408,
-    "authSecure": true,
-    "wsSecure": true,
-    "commSecure": true,
-    "insecureTls": true,
-    "localOnlyMode": false
+    "authHost": "cloud.ardupilot.org",  // Cloud authentication server host
+    "authPort": 19408,  // Cloud authentication server port
+    "authSecure": true,  // Whether cloud auth uses HTTPS
+    "wsSecure": true,  // Whether cloud WebSocket uses WSS
+    "commSecure": true,  // Whether cloud communication uses HTTPS
+    "insecureTls": true,  // Allow insecure TLS (self-signed certs)
+    "localOnlyMode": false  // Run in local-only mode without cloud connection
   },
 
   "credentials": {
-    "email": "single@airgap.droneengage.com",
-    "accessCode": "test",
-    "group": "1"
+    "email": "mhefny@andruav.com",  // User email for authentication
+    "accessCode": "mhefny",  // Access code/password for authentication
+    "group": "1"  // User group ID
   },
 
-  "apiKey": "your-secure-api-key-here",
-  "pluginToken": "static-plugin-token-12345",
+  "apiKey": "your-secure-api-key-here",  // API key for secure communication
+  "pluginToken": "static-plugin-token-12345",  // Token for plugin authentication
   "reconnect": {
-    "upstreamWsDelayMs": 2000
+    "upstreamWsDelayMs": 2000  // Delay in milliseconds before reconnecting WebSocket
   }
 }

@@ -47,7 +47,7 @@ class CLocalServer {
             try {
                 if (e && e.code === 'EADDRINUSE') {
                     console.error('[webplugin] HTTP server port already in use', {
-                        address: this.#cfg.bindAddress,
+                        address: '127.0.0.1',
                         port: this.#cfg.authPort,
                     });
                     console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
@@ -60,8 +60,8 @@ class CLocalServer {
             process.exit(1);
         });
 
-        this.#httpsServer.listen(this.#cfg.authPort, this.#cfg.bindAddress, () => {
-            console.log(`webplugin HTTP listening on http://${this.#cfg.bindAddress}:${this.#cfg.authPort}`);
+        this.#httpsServer.listen(this.#cfg.authPort, '127.0.0.1', () => {
+            console.log(`webplugin HTTP listening on http://127.0.0.1:${this.#cfg.authPort}`);
 
             setTimeout(async () => {
                 try {
@@ -268,7 +268,7 @@ class CLocalServer {
                 // All webclients connecting to this plugin will use the same partyId.
                 await this.#serverCommunicator.ensureReady();
 
-                const hostHeader = req.headers.host || `${this.#cfg.bindAddress}:${this.#cfg.authPort}`;
+                const hostHeader = req.headers.host || `127.0.0.1:${this.#cfg.authPort}`;
                 const hostParts = String(hostHeader).split(':');
                 const hostOnly = hostParts[0];
                 // Always return the WebSocket port from config, not from request header
@@ -311,7 +311,7 @@ class CLocalServer {
             try {
                 if (e && e.code === 'EADDRINUSE') {
                     console.error('[webplugin] HTTPS server port already in use', {
-                        address: this.#cfg.bindAddress,
+                        address: '127.0.0.1',
                         port: this.#cfg.authPort,
                     });
                     console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
@@ -323,8 +323,8 @@ class CLocalServer {
             }
             process.exit(1);
         });
-        this.#httpsServer.listen(this.#cfg.authPort, this.#cfg.bindAddress, () => {
-            console.log(`webplugin HTTPS listening on https://${this.#cfg.bindAddress}:${this.#cfg.authPort}`);
+        this.#httpsServer.listen(this.#cfg.authPort, '127.0.0.1', () => {
+            console.log(`webplugin HTTPS listening on https://127.0.0.1:${this.#cfg.authPort}`);
 
             // Opportunistic upstream connect on startup (non-fatal if cloud is down).
             setTimeout(async () => {
@@ -362,7 +362,7 @@ class CLocalServer {
             try {
                 if (e && e.code === 'EADDRINUSE') {
                     console.error('[webplugin] WSS server port already in use', {
-                        address: this.#cfg.bindAddress,
+                        address: '127.0.0.1',
                         port: this.#cfg.wsPort,
                     });
                     console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
@@ -446,8 +446,8 @@ class CLocalServer {
             });
         });
 
-        this.#wssServer.listen(this.#cfg.wsPort, this.#cfg.bindAddress, () => {
-            console.log(`webplugin WSS listening on wss://${this.#cfg.bindAddress}:${this.#cfg.wsPort}`);
+        this.#wssServer.listen(this.#cfg.wsPort, '127.0.0.1', () => {
+            console.log(`webplugin WSS listening on wss://127.0.0.1:${this.#cfg.wsPort}`);
         });
     }
 
@@ -457,7 +457,7 @@ class CLocalServer {
             try {
                 if (e && e.code === 'EADDRINUSE') {
                     console.error('[webplugin] WS server port already in use', {
-                        address: this.#cfg.bindAddress,
+                        address: '127.0.0.1',
                         port: this.#cfg.wsPort,
                     });
                     console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
@@ -537,8 +537,8 @@ class CLocalServer {
             });
         });
 
-        this.#wssServer.listen(this.#cfg.wsPort, this.#cfg.bindAddress, () => {
-            console.log(`webplugin WS listening on ws://${this.#cfg.bindAddress}:${this.#cfg.wsPort}`);
+        this.#wssServer.listen(this.#cfg.wsPort, '127.0.0.1', () => {
+            console.log(`webplugin WS listening on ws://127.0.0.1:${this.#cfg.wsPort}`);
         });
     }
 }

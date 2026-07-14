@@ -171,10 +171,10 @@ const state = {
 // TLS
 // -----------------------------------------------------------------------------
 const webpluginBaseUrl = new URL('../', import.meta.url);
-const localAuthSecure = cfg.local ? (cfg.local.authSecure === true) : true;
-const localWsSecure = cfg.local ? (cfg.local.wsSecure === true) : true;
-const needsTls = localAuthSecure === true || localWsSecure === true;
-const tlsOptions = needsTls === true ? fn_loadTls(cfg, webpluginBaseUrl) : null;
+const localAuthSecure = false;
+const localWsSecure = false;
+const needsTls = false;
+const tlsOptions = null;
 
 // -----------------------------------------------------------------------------
 // Wire up modules

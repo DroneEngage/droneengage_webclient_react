@@ -23,15 +23,12 @@ export let CONST_TITLE = 'Drone Engage';
 
 export let CONST_WEBCONNECTOR_CONFIG = {
     ENABLED: true,
-    AUTH_HOST: '127.0.0.1',
     AUTH_PORT: 9211,
     WS_PORT: 9212,
     APIKEY: 'your-secure-api-key-here',
     TOKEN: '',
     // Auto fallback to cloud login when plugin is unreachable (true=enable fallback, false=plugin only)
     AUTO_FALLBACK: false,
-    // Must match webconnector/config.json local.authSecure / local.wsSecure.
-    SECURE: false,
     BASE_PATH: ''
 };
 
