@@ -8,7 +8,24 @@ If your WebClient UI is served over **HTTPS** (for example `https://localhost:30
 
 ## Installation Methods
 
-### Method 1: npm Global Install (Recommended)
+For detailed cross-platform deployment instructions (Windows, macOS, Ubuntu), see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Method 1: Quick Start Scripts (Cross-Platform)
+
+**Windows:**
+```cmd
+cd webconnector
+start.bat
+```
+
+**macOS/Linux:**
+```bash
+cd webconnector
+chmod +x start.sh
+./start.sh
+```
+
+### Method 2: npm Global Install (Recommended)
 
 ```bash
 npm install -g droneengage-webconnector
@@ -18,17 +35,17 @@ droneengage-webconnector
 To run with the Caddy reverse proxy (one command):
 
 ```bash
-sudo droneengage-webconnector-install-caddy
+droneengage-webconnector-install-caddy
 droneengage-webconnector-stack
 ```
 
-### Method 2: npx (No Installation)
+### Method 3: npx (No Installation)
 
 ```bash
 npx droneengage-webconnector email@domain.com accessCode
 ```
 
-### Method 3: Local Development
+### Method 4: Local Development
 
 ```bash
 cd webconnector

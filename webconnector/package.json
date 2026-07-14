@@ -12,7 +12,11 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "start:creds": "node src/index.js"
+    "start:creds": "node src/index.js",
+    "install:caddy": "node scripts/install_caddy.js",
+    "stack": "node src/cli_stack.js",
+    "caddy": "node src/cli_caddy.js",
+    "install:caddy:cli": "node src/cli_install_caddy.js"
   },
   "keywords": [
     "drone",
@@ -35,11 +39,13 @@
     "scripts/",
     "config.json",
     "Caddyfile.localplugin",
-    "run_local_plugin_stack.sh",
+    "start.bat",
+    "start.sh",
     "README.md",
     "README_WEBCONNECTOR.md",
     "README_SIMPLIFIED.md",
-    "SETUP_BROWSER.md"
+    "SETUP_BROWSER.md",
+    "DEPLOYMENT.md"
   ],
   "dependencies": {
     "express": "^4.19.2",
