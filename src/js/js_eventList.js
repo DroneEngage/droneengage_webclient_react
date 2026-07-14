@@ -121,7 +121,9 @@ const EVENT_LIST = Object.freeze({
 			"EE_onWebRTC_Video_Statistics",
 
 			"EE_Language_Changed",
-			"EE_Opacity_Control"
+			"EE_Opacity_Control",
+
+			"EE_WebConnector_Not_Running"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

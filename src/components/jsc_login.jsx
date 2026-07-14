@@ -9,7 +9,7 @@ import { js_localStorage } from '../js/js_localStorage';
 import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
-import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog } from '../js/js_main';
+import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../js/js_main';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;
@@ -40,12 +40,14 @@ class ClssLoginControl extends React.Component {
     this.fn_onChatMessage = this.fn_onChatMessage.bind(this);
     this.fn_onChatToggle = this.fn_onChatToggle.bind(this);
     this.fn_toggleChat = this.fn_toggleChat.bind(this);
+    this.fn_onWebConnectorNotRunning = this.fn_onWebConnectorNotRunning.bind(this);
 
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
     js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
     js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
+    js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
 
   }
 
@@ -140,6 +142,58 @@ class ClssLoginControl extends React.Component {
     me.setState({ m_update: me.state.m_update + 1 });
   }
 
+  fn_onWebConnectorNotRunning(me, data) {
+    if (me.m_flag_mounted === false) return;
+    
+    const autoFallback = data && data.autoFallback === true;
+    const fallbackStatus = autoFallback ? 'ENABLED' : 'DISABLED';
+    const fallbackClass = autoFallback ? 'text-success' : 'text-danger';
+    
+    const message = `
+      <div class="text-center">
+        <h5 class="mb-3">WebConnector is not Reachable</h5>
+        <p class="mb-3">The WebConnector service is not available on this machine.</p>
+        <div class="alert alert-secondary">
+          <strong>AUTO_FALLBACK:</strong> <span class="${fallbackClass}">${fallbackStatus}</span>
+        </div>
+        ${autoFallback ? 
+          '<p class="text-muted">Click OK to proceed with cloud login.</p>' : 
+          '<p class="text-warning">Click OK to disable WebConnector and try again.</p>'
+        }
+      </div>
+    `;
+    
+    fn_do_modal_confirmation(
+      'WebConnector Not Running',
+      message,
+      (confirmed) => {
+        if (confirmed) {
+          if (autoFallback) {
+            // Proceed with cloud login (already in progress)
+            console.info('[WebConnector] User confirmed fallback to cloud login');
+          } else {
+            // Disable WebConnector and retry
+            js_localStorage.fn_setWebConnectorEnabled(false);
+            me.setState({ use_plugin: false });
+            if (me.chkUsePluginRef.current) {
+              me.chkUsePluginRef.current.checked = false;
+            }
+            // Restore UnitID from non-shared storage
+            if (me.txtUnitIDRef.current) {
+              me.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+            }
+            console.info('[WebConnector] User disabled WebConnector, retrying...');
+            // Trigger connect again with WebConnector disabled
+            me.clickConnect(null);
+          }
+        }
+      },
+      'OK',
+      'bg-warning',
+      'Cancel'
+    );
+  }
+
 
   clickConnect(e) {
     if ((this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE) && (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE_FAILED)) {
@@ -174,6 +228,7 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onChatMessage, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onChatToggle, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
   }
 
   componentDidMount() {
