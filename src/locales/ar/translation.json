@@ -33,6 +33,7 @@
   "title.logout": "خروج",
   "title.connecting": "..اتصال",
   "label.email": "بريد الكترونى",
+  "label.loginName": "اسم الدخول",
   "label.password": "كلمة مرور",
   "label.groupName": "المجموعة",
   "label.gcsId": "رقم المحطة",

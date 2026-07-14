@@ -34,6 +34,7 @@
   "title.logout": "Logout",
   "title.connecting": "Connecting..",
   "label.email": "Email",
+  "label.loginName": "Login Name",
   "label.password": "Password",
   "label.groupName": "Group Name",
   "label.gcsId": "GCS ID",

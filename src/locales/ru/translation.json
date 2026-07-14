@@ -34,6 +34,7 @@
   "title.logout": "Выйти",
   "title.connecting": "Подключение..",
   "label.email": "Электронная почта",
+  "label.loginName": "Имя пользователя",
   "label.password": "Пароль",
   "label.groupName": "Название группы",
   "label.gcsId": "ID GCS",
