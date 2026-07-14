@@ -67,9 +67,19 @@ class CLocalServer {
                 try {
                     await this.#serverCommunicator.ensureReady();
                 } catch (e) {
-                    try {
-                        console.error('[webplugin] upstream autoconnect failed', e);
-                    } catch {
+                    // Log network errors cleanly without stack traces
+                    const isNetworkError = e?.isNetworkError === true || 
+                                          e?.code === 'ENETWORK' ||
+                                          e?.message?.includes('Cloud unreachable');
+                    const isNoServerError = e?.message?.includes('No available Server') ||
+                                           e?.message?.includes('Cloud login failed');
+                    
+                    if (isNetworkError) {
+                        console.error('[webplugin] Upstream cloud connection failed (network error):', e.message);
+                        console.error('[webplugin] Local servers continue running in offline mode - will retry automatically');
+                    } else if (isNoServerError) {
+                        console.error('[webplugin] Upstream cloud login failed:', e.message);
+                        console.error('[webplugin] Will retry automatically');
                     }
                 }
             }, 10);
@@ -258,11 +268,11 @@ class CLocalServer {
                 // All webclients connecting to this plugin will use the same partyId.
                 await this.#serverCommunicator.ensureReady();
 
-                const hostHeader = req.headers.host || `${this.#cfg.bindAddress}:${this.#cfg.wsPort}`;
+                const hostHeader = req.headers.host || `${this.#cfg.bindAddress}:${this.#cfg.authPort}`;
                 const hostParts = String(hostHeader).split(':');
                 const hostOnly = hostParts[0];
-                const portOnly = hostParts.length > 1 ? parseInt(hostParts[1], 10) : NaN;
-                const advertisedPort = Number.isFinite(portOnly) ? portOnly : this.#cfg.wsPort;
+                // Always return the WebSocket port from config, not from request header
+                const advertisedPort = this.#cfg.wsPort;
                 const reply = this.#fn_buildPluginLoginReply(hostOnly, advertisedPort);
                 try {
                     console.info('[webplugin] /w/wl response', reply);
@@ -321,9 +331,19 @@ class CLocalServer {
                 try {
                     await this.#serverCommunicator.ensureReady();
                 } catch (e) {
-                    try {
-                        console.error('[webplugin] upstream autoconnect failed', e);
-                    } catch {
+                    // Log network errors cleanly without stack traces
+                    const isNetworkError = e?.isNetworkError === true || 
+                                          e?.code === 'ENETWORK' ||
+                                          e?.message?.includes('Cloud unreachable');
+                    const isNoServerError = e?.message?.includes('No available Server') ||
+                                           e?.message?.includes('Cloud login failed');
+                    
+                    if (isNetworkError) {
+                        console.error('[webplugin] Upstream cloud connection failed (network error):', e.message);
+                        console.error('[webplugin] Local servers continue running in offline mode - will retry automatically');
+                    } else if (isNoServerError) {
+                        console.error('[webplugin] Upstream cloud login failed:', e.message);
+                        console.error('[webplugin] Will retry automatically');
                     }
                 }
             }, 10);
@@ -354,7 +374,10 @@ class CLocalServer {
             }
             process.exit(1);
         });
-        this.#wss = new WebSocketServer({ server: this.#wssServer });
+        this.#wss = new WebSocketServer({ 
+            server: this.#wssServer,
+            maxPayload: 100 * 1024 * 1024, // 100MB
+        });
 
         this.#wss.on('connection', async (socket, req) => {
             const url = new URL(req.url, `https://${req.headers.host}`);
@@ -447,7 +470,10 @@ class CLocalServer {
             process.exit(1);
         });
 
-        this.#wss = new WebSocketServer({ server: this.#wssServer });
+        this.#wss = new WebSocketServer({ 
+            server: this.#wssServer,
+            maxPayload: 100 * 1024 * 1024, // 100MB
+        });
         this.#wss.on('connection', async (socket, req) => {
             const url = new URL(req.url, `http://${req.headers.host}`);
 

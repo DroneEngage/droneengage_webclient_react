@@ -15,8 +15,12 @@ if ! command -v npm >/dev/null 2>&1; then
 fi
 
 if ! command -v caddy >/dev/null 2>&1; then
-  echo "ERROR: caddy is not installed or not in PATH" >&2
-  exit 1
+  echo "Caddy not found. Installing..."
+  if ! sudo bash "${SCRIPT_DIR}/scripts/install_caddy.sh"; then
+    echo "ERROR: Failed to install caddy" >&2
+    exit 1
+  fi
+  echo "Caddy installed successfully."
 fi
 
 if [[ ! -f "${CADDYFILE}" ]]; then

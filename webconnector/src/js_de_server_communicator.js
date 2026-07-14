@@ -27,11 +27,17 @@ class CDeServerCommunicator {
     #cfg;
     #state;
     #onUpstreamMessage;
+    #ensureReadyPromise;
+    #connectWsPromise;
+    #retryTimer;
 
     constructor(cfg, state) {
         this.#cfg = cfg;
         this.#state = state;
         this.#onUpstreamMessage = null;
+        this.#ensureReadyPromise = null;
+        this.#connectWsPromise = null;
+        this.#retryTimer = null;
     }
 
     /**
@@ -102,7 +108,21 @@ class CDeServerCommunicator {
         } catch {
         }
 
-        const healthRes = await fn_fetchLogged(healthUrl, { method: 'GET' }, 'cloud.health');
+        let healthRes;
+        try {
+            healthRes = await fn_fetchLogged(healthUrl, { method: 'GET' }, 'cloud.health');
+        } catch (e) {
+            const errorCode = e?.code || e?.cause?.code;
+            const isNetworkError = errorCode && (errorCode === 'EAI_AGAIN' || errorCode === 'ENOTFOUND' || errorCode === 'ETIMEDOUT' || errorCode === 'ECONNREFUSED');
+            const isFetchError = e?.message?.includes('fetch failed') || e?.cause?.message?.includes('fetch failed');
+            
+            if (isNetworkError || isFetchError) {
+                console.error('[webplugin] Cloud connection failed - network error:', errorCode || 'fetch failed');
+                console.error('[webplugin] Continuing in offline mode (local servers will still work)');
+                throw new Error(`Cloud unreachable (${errorCode || 'network'}): ${e?.message || e?.cause?.message || 'Network error'}`);
+            }
+            throw e;
+        }
         if (!healthRes.ok) {
             throw new Error(`Cloud health failed: ${healthRes.status}`);
         }
@@ -199,12 +219,21 @@ class CDeServerCommunicator {
     // - Maintains a single WS connection to the cloud comm server.
     // - Broadcasts upstream frames to all local plugin clients.
     // - Reconnects automatically on close.
+    // - Uses promise deduplication to prevent race conditions.
     // -------------------------------------------------------------------------
     connectWs() {
         const cfg = this.#cfg;
         const state = this.#state;
 
-        if (state.upstream.wsConnected === true || state.upstream.wsConnecting === true) return;
+        // If already connecting or connected, return existing promise
+        if (state.upstream.wsConnected === true || state.upstream.wsConnecting === true) {
+            return this.#connectWsPromise || Promise.resolve();
+        }
+
+        // If connection attempt already in progress, wait for it
+        if (this.#connectWsPromise) {
+            return this.#connectWsPromise;
+        }
 
         const host = state.upstream.auth.commServerHost;
         const port = state.upstream.auth.commServerPort;
@@ -225,75 +254,85 @@ class CDeServerCommunicator {
 
         state.upstream.wsConnecting = true;
 
-        const ws = new WebSocket(url);
-        ws.binaryType = 'arraybuffer';
+        // Create promise for this connection attempt
+        this.#connectWsPromise = new Promise((resolve, reject) => {
+            const ws = new WebSocket(url);
+            ws.binaryType = 'arraybuffer';
 
-        ws.onopen = () => {
-            state.upstream.ws = ws;
-            state.upstream.wsConnected = true;
-            state.upstream.wsConnecting = false;
+            ws.onopen = () => {
+                state.upstream.ws = ws;
+                state.upstream.wsConnected = true;
+                state.upstream.wsConnecting = false;
 
-            try {
-                console.info('[webplugin] upstream ws open');
-            } catch {
-            }
-        };
-
-        ws.onmessage = (evt) => {
-            // Relay upstream frames to all connected local clients.
-            try {
-                const len = evt && evt.data ? (evt.data.byteLength ?? evt.data.length ?? null) : null;
-                let msgType = null;
-                if (typeof evt.data === 'string') {
-                    try {
-                        const parsed = JSON.parse(evt.data);
-                        msgType = parsed.messageType || parsed.mt;
-
-                        console.info('[webplugin] << upstream', {
-                            bytes: len,
-                            msgType: msgType,
-                            isCameraList: msgType === 1012,
-                        });
-                    } catch { }
-                }
-
-            } catch {
-            }
-
-            if (this.#onUpstreamMessage) {
-                this.#onUpstreamMessage(evt.data);
-            }
-        };
-
-        ws.onerror = (err) => {
-            try {
-                console.error('[webplugin] upstream ws error', err);
-            } catch {
-            }
-        };
-
-        ws.onclose = () => {
-            state.upstream.wsConnected = false;
-            state.upstream.wsConnecting = false;
-            state.upstream.ws = null;
-
-            try {
-                console.warn('[webplugin] upstream ws close');
-            } catch {
-            }
-
-            const delay = cfg.reconnect?.upstreamWsDelayMs || 2000;
-            if (state.upstream.reconnectTimer) clearTimeout(state.upstream.reconnectTimer);
-            state.upstream.reconnectTimer = setTimeout(() => {
                 try {
-                    this.connectWs();
+                    console.info('[webplugin] upstream ws open');
                 } catch {
                 }
-            }, delay);
-        };
+                resolve();
+            };
+
+            ws.onmessage = (evt) => {
+                // Relay upstream frames to all connected local clients.
+                try {
+                    const len = evt && evt.data ? (evt.data.byteLength ?? evt.data.length ?? null) : null;
+                    let msgType = null;
+                    if (typeof evt.data === 'string') {
+                        try {
+                            const parsed = JSON.parse(evt.data);
+                            msgType = parsed.messageType || parsed.mt;
+
+                            console.info('[webplugin] << upstream', {
+                                bytes: len,
+                                msgType: msgType
+                            });
+                        } catch { }
+                    }
+
+                } catch {
+                }
+
+                if (this.#onUpstreamMessage) {
+                    this.#onUpstreamMessage(evt.data);
+                }
+            };
+
+            ws.onerror = (err) => {
+                try {
+                    console.error('[webplugin] upstream ws error - will retry');
+                } catch {
+                }
+                state.upstream.wsConnecting = false;
+                this.#connectWsPromise = null;
+                reject(new Error('WebSocket connection failed - will retry'));
+            };
+
+            ws.onclose = () => {
+                state.upstream.wsConnected = false;
+                state.upstream.wsConnecting = false;
+                state.upstream.ws = null;
+                this.#connectWsPromise = null;
+
+                try {
+                    console.warn('[webplugin] upstream ws close');
+                } catch {
+                }
+
+                const delay = cfg.reconnect?.upstreamWsDelayMs || 2000;
+                if (state.upstream.reconnectTimer) clearTimeout(state.upstream.reconnectTimer);
+                state.upstream.reconnectTimer = setTimeout(() => {
+                    try {
+                        this.connectWs();
+                    } catch {
+                    }
+                }, delay);
+            };
+        });
+
+        return this.#connectWsPromise;
     }
 
     // Ensures the plugin has a valid cloud session and an active upstream WS.
+    // Uses a shared promise to prevent race conditions when multiple clients connect simultaneously.
     async ensureReady() {
         const cfg = this.#cfg;
 
@@ -305,21 +344,64 @@ class CDeServerCommunicator {
             return;
         }
 
-        try {
-            console.info('[webplugin] ensure upstream ready', {
-                hasSession: this.hasSession,
-                wsConnected: this.isWsConnected,
-            });
-        } catch {
+        // If already ensuring ready, wait for the existing promise
+        if (this.#ensureReadyPromise) {
+            try {
+                return await this.#ensureReadyPromise;
+            } catch {
+                // If the previous attempt failed, clear and retry
+                this.#ensureReadyPromise = null;
+            }
         }
 
-        if (!this.hasSession) {
-            await this.login();
-        }
+        // Create new promise for this attempt
+        this.#ensureReadyPromise = (async () => {
+            try {
+                console.info('[webplugin] ensure upstream ready', {
+                    hasSession: this.hasSession,
+                    wsConnected: this.isWsConnected,
+                });
 
-        if (!this.isWsConnected) {
-            this.connectWs();
-        }
+                if (!this.hasSession) {
+                    await this.login();
+                }
+
+                if (!this.isWsConnected) {
+                    await this.connectWs();
+                }
+            } catch (e) {
+                // On network errors or "No available Server" errors, schedule a retry
+                const isNetworkError = e?.isNetworkError === true || 
+                                      e?.code === 'ENETWORK' ||
+                                      e?.message?.includes('Cloud unreachable');
+                const isNoServerError = e?.message?.includes('No available Server') ||
+                                       e?.message?.includes('Cloud login failed');
+                
+                if (isNetworkError || isNoServerError) {
+                    const retryDelay = cfg.reconnect?.upstreamWsDelayMs || 2000;
+                    console.info(`[webplugin] Scheduling upstream retry in ${retryDelay}ms`);
+                    
+                    if (this.#retryTimer) {
+                        clearTimeout(this.#retryTimer);
+                    }
+                    
+                    this.#retryTimer = setTimeout(async () => {
+                        try {
+                            console.info('[webplugin] Retrying upstream connection...');
+                            await this.ensureReady();
+                        } catch {
+                            // Retry failed, will schedule another retry
+                        }
+                    }, retryDelay);
+                }
+                throw e;
+            } finally {
+                // Clear promise after completion (success or failure)
+                this.#ensureReadyPromise = null;
+            }
+        })();
+
+        return await this.#ensureReadyPromise;
     }
 }
 
