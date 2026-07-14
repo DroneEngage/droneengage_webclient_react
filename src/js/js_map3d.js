@@ -137,9 +137,9 @@ class CAndruavMap3D {
     async fn_initMap(containerId) {
         if (this.m_isReady || this.m_map) return;
 
-        const token = js_siteConfig.CONST_MAPBOX_ACCESS_TOKEN;
+        const token = js_siteConfig.CONST_MAPBOX_3D_ACCESS_TOKEN;
         if (!token) {
-            console.warn('Mapbox 3D disabled: CONST_MAPBOX_ACCESS_TOKEN not configured.');
+            console.warn('Mapbox 3D disabled: CONST_MAPBOX_3D_ACCESS_TOKEN not configured.');
             return;
         }
 

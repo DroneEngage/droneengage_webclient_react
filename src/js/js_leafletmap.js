@@ -139,9 +139,9 @@ class CLeafLetAndruavMap {
         });
         
         // Validate tile layer URL before using
-        const tileUrl = js_siteConfig.CONST_MAP_LEAFLET_URL;
+        const tileUrl = js_siteConfig.CONST_MAP_LEAFLET_URL_MAP + js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN;
         if (!tileUrl) {
-            console.error('Map tile URL not configured in js_siteConfig.CONST_MAP_LEAFLET_URL');
+            console.error('Map tile URL not configured in js_siteConfig.CONST_MAP_LEAFLET_URL_MAP or CONST_MAP_LEAFLET_ACCESS_TOKEN');
             return;
         }
         
