@@ -6,6 +6,40 @@ import CDeServerCommunicator from './js_de_server_communicator.js';
 import CLocalServer from './js_local_server.js';
 
 // -----------------------------------------------------------------------------
+// Suppress network error stack traces in async contexts
+// -----------------------------------------------------------------------------
+process.on('unhandledRejection', (reason, promise) => {
+    const isNetworkError = reason?.isNetworkError === true || 
+                          reason?.code === 'ENETWORK' ||
+                          reason?.message?.includes('Cloud unreachable') ||
+                          reason?.message?.includes('fetch failed');
+    
+    if (isNetworkError) {
+        // Network errors are expected and handled - don't log stack traces
+        return;
+    }
+    
+    // Log other unhandled rejections normally
+    console.error('Unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    const isNetworkError = err?.isNetworkError === true || 
+                          err?.code === 'ENETWORK' ||
+                          err?.message?.includes('Cloud unreachable') ||
+                          err?.message?.includes('fetch failed');
+    
+    if (isNetworkError) {
+        // Network errors are expected and handled - don't log stack traces
+        return;
+    }
+    
+    // Log other uncaught exceptions normally
+    console.error('Uncaught exception:', err);
+    process.exit(1);
+});
+
+// -----------------------------------------------------------------------------
 // Color utilities
 // -----------------------------------------------------------------------------
 const colors = {

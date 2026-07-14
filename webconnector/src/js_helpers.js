@@ -69,7 +69,23 @@ export const fn_fetchLogged = async (url, options, tag = 'fetch') => {
     }
 
     const t0 = Date.now();
-    const res = await fetch(url, options);
+    let res;
+    try {
+        res = await fetch(url, options);
+    } catch (e) {
+        const errorCode = e?.code || e?.cause?.code;
+        const isNetworkError = errorCode && (errorCode === 'EAI_AGAIN' || errorCode === 'ENOTFOUND' || errorCode === 'ETIMEDOUT' || errorCode === 'ECONNREFUSED');
+        const isFetchError = e?.message?.includes('fetch failed') || e?.cause?.message?.includes('fetch failed');
+        
+        if (isNetworkError || isFetchError) {
+            // Throw a clean error without the full stack trace
+            const error = new Error(`Network error (${errorCode || 'fetch failed'}): ${e?.cause?.message || e?.message}`);
+            error.code = errorCode || 'ENETWORK';
+            error.isNetworkError = true;
+            throw error;
+        }
+        throw e;
+    }
     const dt = Date.now() - t0;
 
     try {
