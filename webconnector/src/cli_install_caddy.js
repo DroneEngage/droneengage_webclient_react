@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 
 const srcDir = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(srcDir, '..');
-const scriptPath = path.join(pkgRoot, 'scripts', 'install_caddy.sh');
+const scriptPath = path.join(pkgRoot, 'scripts', 'install_caddy.js');
 
-const p = spawn('bash', [scriptPath, ...process.argv.slice(2)], {
+const p = spawn(process.execPath, [scriptPath, ...process.argv.slice(2)], {
     stdio: 'inherit',
 });
 
