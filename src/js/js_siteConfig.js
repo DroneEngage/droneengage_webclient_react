@@ -22,7 +22,7 @@ export let CONST_TEST_MODE_ENABLE_LOG = true;
 export let CONST_TITLE = 'Drone Engage';
 
 export let CONST_WEBCONNECTOR_CONFIG = {
-    ENABLED: false,
+    ENABLED: true,
     AUTH_HOST: '127.0.0.1',
     AUTH_PORT: 9211,
     WS_PORT: 9212,
