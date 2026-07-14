@@ -47,13 +47,16 @@ export let CONST_DEBUG_CONTROL_PAGE = true;
 export let CONST_WEBSOCKET_BRIDGE_PORT = 8812;
 
 // CHOOSE YOUR MAP SOURCE
-export let CONST_MAP_LEAFLET_URL = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=mapbox-YOUR-TOKEN-HERE";
-//export let CONST_MAP_LEAFLET_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-//export let CONST_MAP_LEAFLET_URL = "https://airgap.local:88/sat_{x}_{y}_{z}.png"; // LOCAL MAP
+export let CONST_MAP_LEAFLET_ACCESS_TOKEN = "mapbox-YOUR-TOKEN-HERE";
+export let CONST_MAP_LEAFLET_URL_MAP = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=";
+//export let CONST_MAP_LEAFLET_URL_MAP = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+//export let CONST_MAP_LEAFLET_URL_MAP = "https://airgap.local:88/sat_{x}_{y}_{z}.png"; // LOCAL MAP
 
 
 
-export let CONST_MAPBOX_ACCESS_TOKEN = '';
+
+
+export let CONST_MAPBOX_3D_ACCESS_TOKEN = '';
 export let CONST_MAPBOX_STYLE = 'mapbox://styles/mapbox/standard';
 
 /**
@@ -139,8 +142,9 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
 
-        if (data.CONST_MAP_LEAFLET_URL !== undefined) CONST_MAP_LEAFLET_URL = data.CONST_MAP_LEAFLET_URL;
-        if (data.CONST_MAPBOX_ACCESS_TOKEN !== undefined) CONST_MAPBOX_ACCESS_TOKEN = data.CONST_MAPBOX_ACCESS_TOKEN;
+        if (data.CONST_MAP_LEAFLET_URL_MAP !== undefined) CONST_MAP_LEAFLET_URL_MAP = data.CONST_MAP_LEAFLET_URL_MAP;
+        if (data.CONST_MAP_LEAFLET_ACCESS_TOKEN !== undefined) CONST_MAP_LEAFLET_ACCESS_TOKEN = data.CONST_MAP_LEAFLET_ACCESS_TOKEN;
+        if (data.CONST_MAPBOX_3D_ACCESS_TOKEN !== undefined) CONST_MAPBOX_3D_ACCESS_TOKEN = data.CONST_MAPBOX_3D_ACCESS_TOKEN;
         if (data.CONST_MAPBOX_STYLE !== undefined) CONST_MAPBOX_STYLE = data.CONST_MAPBOX_STYLE;
         if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
         if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
