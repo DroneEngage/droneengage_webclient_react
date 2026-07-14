@@ -73,7 +73,7 @@ class CAndruavAuth {
     }
 
     fn_getPluginAuthHost() {
-        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTH_HOST;
+        return '127.0.0.1';
     }
 
     fn_getPluginAuthPort() {
@@ -81,7 +81,7 @@ class CAndruavAuth {
     }
 
     fn_getPluginWSHost() {
-        return js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTH_HOST;
+        return '127.0.0.1';
     }
 
     fn_getPluginWSPort() {
@@ -384,10 +384,9 @@ class CAndruavAuth {
         const pluginWsHost = this.fn_getPluginWSHost();
         const pluginWsPort = this.fn_getPluginWSPort();
 
-        const pluginSecure = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.SECURE === true;
         const pluginBasePath = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.BASE_PATH;
-        const pluginLoginUrl = fn_buildAuthUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
-        const pluginHealthBaseUrl = fn_buildHealthBaseUrlEx(pluginSecure, pluginAuthHost, pluginAuthPort, pluginBasePath);
+        const pluginLoginUrl = fn_buildAuthUrlEx(false, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGIN_COMMAND);
+        const pluginHealthBaseUrl = fn_buildHealthBaseUrlEx(false, pluginAuthHost, pluginAuthPort, pluginBasePath);
 
         const headers = { 'Content-Type': 'application/json' };
         const apiKey = this.fn_getPluginApiKey();
