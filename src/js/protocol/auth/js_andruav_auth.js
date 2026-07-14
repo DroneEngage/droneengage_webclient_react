@@ -399,6 +399,13 @@ class CAndruavAuth {
             const isSslError = probeResult.isSslError === true;
             const errorCode = isSslError ? ERROR_CODES.SSL_ERROR : ERROR_CODES.NETWORK_ERROR;
             const errorMessage = isSslError ? 'SSL Error: Unable to establish a secure connection' : AUTH_ERROR_BAD_CONNECTION;
+            
+            // Dispatch WebConnector not running event
+            js_eventEmitter.fn_dispatch(js_event.EE_WebConnector_Not_Running, {
+                autoFallback: js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK === true,
+                ssl: isSslError,
+            });
+            
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                 e: errorCode,
                 em: errorMessage,
