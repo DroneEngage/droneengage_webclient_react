@@ -34,6 +34,7 @@
   "title.logout": "Déconnexion",
   "title.connecting": "Connection en cours..",
   "label.email": "Email",
+  "label.loginName": "Nom d'utilisateur",
   "label.password": "Mot de passe",
   "label.groupName": "Nom du Groupe",
   "label.gcsId": "GCS ID",

@@ -504,10 +504,27 @@ class CAndruavAuth {
             return { success: response.ok, isSslError: false };
         } catch (error) {
             console.error('Probe error:', error);
-            const isSslError = error.message?.includes('ERR_CERT') || 
+            // Check if this is likely an SSL certificate error
+            let isSslError = error.message?.includes('ERR_CERT') || 
                               error.message?.includes('SSL') || 
-                              error.message?.includes('CERT_AUTHORITY_INVALID') ||
-                              error.name === 'TypeError' && error.message === 'Failed to fetch';
+                              error.message?.includes('CERT_AUTHORITY_INVALID');
+            
+            // For localhost connections with "Failed to fetch", assume it's SSL certificate issue
+            // since browsers don't provide detailed SSL error info in fetch API
+            if (!isSslError && error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                try {
+                    const url = new URL(baseUrl);
+                    const isLocalhost = url.hostname === '127.0.0.1' || 
+                                       url.hostname === 'localhost' ||
+                                       url.hostname === '::1';
+                    if (isLocalhost && url.protocol === 'https:') {
+                        isSslError = true;
+                    }
+                } catch (e) {
+                    // If URL parsing fails, don't mark as SSL error
+                }
+            }
+            
             return { success: false, isSslError };
         }
     }

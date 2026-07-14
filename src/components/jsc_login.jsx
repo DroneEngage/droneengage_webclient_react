@@ -183,7 +183,7 @@ class ClssLoginControl extends React.Component {
     const tabStatus = getTabStatus();
 
     const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
-    const usePlugin = (lsPluginEnabled !== null) ? lsPluginEnabled : (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true);
+    const usePlugin = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true ? lsPluginEnabled : false;
     this.state.use_plugin = usePlugin;
     if (this.chkUsePluginRef.current) {
       this.chkUsePluginRef.current.checked = usePlugin;
@@ -222,11 +222,15 @@ class ClssLoginControl extends React.Component {
       this.txtLoginNameRef.current.value = queryParams.loginName || queryParams.email || '';
       this.txtGroupNameRef.current.value = queryParams.groupName || '';
       this.txtUnitIDRef.current.value = queryParams.unitName || '';
-    } else {
+    } else if (this.txtLoginNameRef.current && this.txtAccessCodeRef.current) {
       this.txtLoginNameRef.current.value = js_localStorage.fn_getLoginName();
       this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
-      this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
-      this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
+      if (this.txtGroupNameRef.current) {
+        this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
+      }
+      if (this.txtUnitIDRef.current) {
+        this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
+      }
     }
 
     if (queryParams.connect !== undefined) {

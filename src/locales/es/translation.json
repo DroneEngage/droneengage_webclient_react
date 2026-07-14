@@ -34,6 +34,7 @@
   "title.logout": "Cerrar sesión",
   "title.connecting": "Conectando..",
   "label.email": "Correo electrónico",
+  "label.loginName": "Nombre de usuario",
   "label.password": "Contraseña",
   "label.groupName": "Nombre del grupo",
   "label.gcsId": "ID de GCS",
