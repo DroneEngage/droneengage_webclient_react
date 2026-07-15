@@ -3,12 +3,12 @@
   "wsPort": 9212,  // Port for local WebSocket server
 
   "cors": {
-    "allowedOrigin": "https://localhost:3000"  // Allowed CORS origin for cross-origin requests
+    "allowedOrigin": "https://localhost:3000"  // Allowed CORS origin for cross-origin requests (use http:// for HTTP mode)
   },
 
   "tls": {
-    "certFile": "../ssl/localssl.crt",  // Path to TLS certificate file
-    "keyFile": "../ssl/localssl.key"  // Path to TLS private key file
+    "certFile": "../ssl/localssl.crt",  // Path to TLS certificate file (NOT NEEDED for HTTP mode)
+    "keyFile": "../ssl/localssl.key"  // Path to TLS private key file (NOT NEEDED for HTTP mode)
   },
 
   "cloud": {
@@ -18,7 +18,7 @@
     "wsSecure": true,  // Whether cloud WebSocket uses WSS
     "commSecure": true,  // Whether cloud communication uses HTTPS
     "insecureTls": true,  // Allow insecure TLS (self-signed certs)
-    "localOnlyMode": false  // Run in local-only mode without cloud connection
+    "localOnlyMode": false  // Set to true to skip ALL cloud connections (even local airgap servers). For air-gapped envs, set to false and point authHost to local server (e.g., airgap.local)
   },
 
   "credentials": {

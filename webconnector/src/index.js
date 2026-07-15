@@ -60,9 +60,9 @@ const colors = {
 // -----------------------------------------------------------------------------
 function Usage() {
     return `${colors.cyan}Usage:${colors.reset}
-  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>]                    # Use config.json credentials
-  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Override credentials
-  ${colors.green}npx droneengage-webconnector${colors.reset} [--config <path>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Run without installation`;
+  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>] [--host <authHost>] [--port <authPort>]                    # Use config.json
+  ${colors.green}droneengage-webconnector${colors.reset} [--config <path>] [--host <authHost>] [--port <authPort>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Override credentials
+  ${colors.green}npx droneengage-webconnector${colors.reset} [--config <path>] [--host <authHost>] [--port <authPort>] ${colors.yellow}<email>${colors.reset} ${colors.yellow}<accessCode>${colors.reset} # Run without installation`;
 }
 
 // -----------------------------------------------------------------------------
@@ -85,12 +85,26 @@ console.log('');
 // -----------------------------------------------------------------------------
 const rawArgs = process.argv.slice(2);
 let configOverride = null;
+let authHostOverride = null;
+let authPortOverride = null;
 const args = [];
 
 for (let i = 0; i < rawArgs.length; ++i) {
     const a = rawArgs[i];
     if (a === '--config') {
         configOverride = rawArgs[i + 1] || null;
+        i++;
+        continue;
+    }
+
+    if (a === '--host') {
+        authHostOverride = rawArgs[i + 1] || null;
+        i++;
+        continue;
+    }
+
+    if (a === '--port') {
+        authPortOverride = rawArgs[i + 1] || null;
         i++;
         continue;
     }
@@ -118,6 +132,19 @@ if (args.length >= 2) {
 // Config loading
 // -----------------------------------------------------------------------------
 const cfg = configOverride ? fn_readConfigSync(configOverride) : fn_readConfigSync(new URL('../config.json', import.meta.url));
+
+// Override cloud settings if provided via command line
+if (authHostOverride) {
+    if (!cfg.cloud) cfg.cloud = {};
+    cfg.cloud.authHost = authHostOverride;
+    console.log(`[webplugin] Using command line authHost: ${authHostOverride}`);
+}
+
+if (authPortOverride) {
+    if (!cfg.cloud) cfg.cloud = {};
+    cfg.cloud.authPort = parseInt(authPortOverride, 10);
+    console.log(`[webplugin] Using command line authPort: ${authPortOverride}`);
+}
 
 // Override credentials if provided via command line
 if (emailOverride && accessCodeOverride) {
@@ -192,15 +219,15 @@ serverCommunicator.setOnUpstreamMessage((data) => {
 // Start servers
 // -----------------------------------------------------------------------------
 if (localAuthSecure === true) {
-    localServer.startHttps();
+    localServer.startHttps(); // Needs TLS config
 } else {
-    localServer.startHttp();
+    localServer.startHttp(); // No TLS needed
 }
 
 if (localWsSecure === true) {
-    localServer.startWss();
+    localServer.startWss(); // Needs TLS config
 } else {
-    localServer.startWs();
+    localServer.startWs(); // No TLS needed
 }
 
 }

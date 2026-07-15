@@ -228,7 +228,7 @@ Open multiple browser tabs/windows pointing to your web client. Each will:
 
 ## Command Line Options
 
-The connector supports command line credential overrides:
+The connector supports command line parameter overrides:
 
 ```bash
 # Use config.json credentials
@@ -237,9 +237,21 @@ droneengage-webconnector
 # Override credentials via command line
 droneengage-webconnector your@email.com yourAccessCode
 
+# Override cloud server settings
+droneengage-webconnector --host airgap.local --port 19408 your@email.com yourAccessCode
+
 # Using npx with credentials
 npx droneengage-webconnector your@email.com yourAccessCode
+
+# Using npx with cloud server override
+npx droneengage-webconnector --host airgap.local --port 19408 your@email.com yourAccessCode
 ```
+
+**Available options:**
+- `--config <path>` - Override config file path
+- `--host <authHost>` - Override cloud auth server host
+- `--port <authPort>` - Override cloud auth server port
+- `--help` / `-h` - Show usage information
 
 ## Security Considerations
 
