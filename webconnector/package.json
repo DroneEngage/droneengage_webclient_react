@@ -1,6 +1,6 @@
 {
   "name": "droneengage-webconnector",
-  "version": "0.1.2",
+  "version": "0.9.0",
   "description": "DroneEngage Web Connector - Bridge between DroneEngage cloud and local web clients",
   "main": "src/index.js",
   "bin": {
