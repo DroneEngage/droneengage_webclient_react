@@ -86,7 +86,8 @@ class ClssLoginControl extends React.Component {
       }
     }
 
-    if (me.state.is_chat_visible === false) {
+    // Increment unread if chat is hidden or minimized
+    if (me.state.is_chat_visible === false || p_data.minimized === true) {
       me.setState(prevState => ({ chat_unread: prevState.chat_unread + 1 }));
     }
   }
@@ -102,7 +103,8 @@ class ClssLoginControl extends React.Component {
       p_event.preventDefault();
       p_event.stopPropagation();
     }
-    const nextVisible = !this.state.is_chat_visible;
+    // If there are unread messages, always open the chat regardless of current state
+    const nextVisible = this.state.chat_unread > 0 ? true : !this.state.is_chat_visible;
     this.setState({ is_chat_visible: nextVisible, chat_unread: nextVisible ? 0 : this.state.chat_unread });
     js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: nextVisible });
   }

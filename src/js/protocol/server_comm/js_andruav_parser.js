@@ -423,6 +423,7 @@ class CAndruavClientParser {
 
 
                     p_unit.m_Video.m_videoTracks = p_jmsg.T;
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
 
                     if (p_jmsg.R === true) { // this is a reply to request.
                         // if (this.v_callbackListeners.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList) === true) {
