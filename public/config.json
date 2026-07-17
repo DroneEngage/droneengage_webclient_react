@@ -1,0 +1,83 @@
+{
+    "CONST_TEST_MODE": false,
+    "CONST_PROD_MODE_IP": "127.0.0.1",
+    "CONST_PROD_MODE_PORT": "19408",
+    "CONST_TEST_MODE_IP": "127.0.0.1",
+    "CONST_TEST_MODE_PORT": "19408",
+    "CONST_ANDRUAV_URL_ENABLE": true,
+    "CONST_ACCOUNT_URL_ENABLE": true,
+    "CONST_MODULE_VERSIONS": {
+        "de": {
+            "version": "3.10.0",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-rpi-image-module-updater.html"
+        },
+        "fcb": {
+            "version": "5.5.3",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-rpi-image-module-updater.html"
+        },
+        "andruav": {
+            "version": "7.2.0",
+            "url": "https://cloud.ardupilot.org/andruav-how-to-compile.html#apk-download",
+            "help": "https://cloud.ardupilot.org/de-rpi-image-module-updater.html"
+        },
+        "camera": {
+            "version": "3.12.0",
+            "url": "https://cloud.ardupilot.org/downloads/RPI_Full_Images/droneengage_rpi/",
+            "help": "https://cloud.ardupilot.org/de-rpi-image-module-updater.html"
+        }
+    },
+    /**
+    * This is for disable experimental features.
+    * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
+    */
+    "CONST_FEATURE": {
+        "DISABLE_UNIT_NAMING": false,
+        "DISABLE_UDPPROXY_UPDATE": false,
+        "DISABLE_SWARM": false,
+        "DISABLE_SWARM_DESTINATION_PONTS": false,
+        "DISABLE_P2P": false,
+        "DISABLE_SDR": false,
+        "DISABLE_GPIO": false,
+        "DISABLE_VOICE": false,
+        "DISABLE_EXPERIMENTAL": true,
+        "DISABLE_VERSION_NOTIFICATION": false
+    },
+    // CHOOSE YOUR MAP SOURCE
+    "CONST_MAP_LEAFLET_ACCESS_TOKEN": "PRODUCTION-TOKEN",
+    "CONST_MAPBOX_3D_ACCESS_TOKEN": "",
+    "CONST_LANGUAGE": {
+        "ENABLED_LANGUAGES": [
+                    {
+                        "code": "ar",
+                        "label": "عربى",
+                        "className": "rtl"
+                    },
+                    {
+                        "code": "en",
+                        "label": "English",
+                        "className": ""
+                    },
+                    { "code": "fr", "label": "Français", "className": "" },
+                    { "code": "es", "label": "Español", "className": "" },
+                    {
+                        "code": "ru",
+                        "label": "Русский",
+                        "className": ""
+                    }
+                ],
+        "DEFAULT_LANGUAGE": "en"
+    },
+
+
+    /**
+    * WEBRTC Video Streaming Settings
+    */
+
+    "CONST_ICE_SERVERS": [
+        { "urls": "turn:cloud.ardupilot.org", "credential": "1234", "username": "andruav_ap" },
+        { "urls": "stun:stun1.l.google.com:19302" }
+    ]
+
+}
