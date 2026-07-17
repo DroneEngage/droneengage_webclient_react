@@ -19,7 +19,8 @@ class ClssGCSChat extends ClssDialogBase {
             gcsUnits: [],
             selectedTarget: CONST_TARGETS_GCS,
             text: '',
-            isVisible: true
+            isVisible: true,
+            unreadCount: 0
         };
 
         this.m_flag_mounted = false;
@@ -105,6 +106,12 @@ class ClssGCSChat extends ClssDialogBase {
         };
 
         me.fn_appendMessage(msg);
+
+        // If dialog is minimized, increment unread count and re-dispatch with flag to trigger unread highlight
+        if (me.state.isMinimized === true) {
+            me.setState(prevState => ({ unreadCount: prevState.unreadCount + 1 }));
+            js_eventEmitter.fn_dispatch(js_event.EE_onChatMessage, { ...p_data, minimized: true });
+        }
     }
 
     fn_onChatToggle(me, p_data) {
@@ -255,6 +262,17 @@ class ClssGCSChat extends ClssDialogBase {
         js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: false });
     }
 
+    fn_toggleMinimize() {
+        this.setState(prevState => {
+            const newMinimized = !prevState.isMinimized;
+            // Clear unread count when expanding
+            return {
+                isMinimized: newMinimized,
+                unreadCount: newMinimized ? prevState.unreadCount : 0
+            };
+        });
+    }
+
     fn_renderDialogFooter() {
         const { t } = this.props;
         const isGCSAll = this.state.selectedTarget === CONST_TARGETS_GCS;
@@ -278,7 +296,11 @@ class ClssGCSChat extends ClssDialogBase {
 
     render() {
         const { t } = this.props;
-        const title = t('gcs_chat.title') || 'GCS Chat';
+        let title = t('gcs_chat.title') || 'GCS Chat';
+        // Add unread suffix if minimized and has unread messages
+        if (this.state.isMinimized === true && this.state.unreadCount > 0) {
+            title = `${title} *`;
+        }
 
         if (this.state.isVisible === false) {
             return null;
