@@ -351,8 +351,8 @@ class ClssPreferences extends React.Component {
 
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="row mb-12 align-items-center flex-nowrap">
-          <label htmlFor="check_enable_speech" className={`col-sm-4 col-form-label ${dir}`}>
+        <div id='preference_settings' className="row mb-12 align-items-center flex-nowrap">
+          <label htmlFor="check_enable_speech" className={`col-sm-4 col-form-label${dir}`}>
             {t('globalSettings:enableSpeechLabel')}
           </label>
           <input
@@ -367,7 +367,7 @@ class ClssPreferences extends React.Component {
           </label>
           <input
             type="range"
-            className="form-range col-sm-4 width_fit "
+            className="form-range  col"
             id="volume_range"
             ref={this.m_volumeRangeRef}
             disabled={v_speech_disabled === 'true' }
@@ -387,6 +387,7 @@ class ClssPreferences extends React.Component {
             onClick={(e) => this.fn_enableTabsDisplay(e)}
           />
           <label
+            id='check_unit_sort'
             htmlFor="check_unit_sort"
             className="col-sm-4 col-form-label al_r"
             title={t('globalSettings:sortUnitsTitle')}
