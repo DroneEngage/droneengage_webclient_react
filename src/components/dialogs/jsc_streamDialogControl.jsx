@@ -8,7 +8,7 @@ import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
-import {fn_VIDEO_login, fn_VIDEO_Record, toggleRecrodingVideo} from '../../js/js_main.js';
+import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 
 class ClssStreamChannel extends React.Component {
@@ -25,6 +25,7 @@ class ClssStreamChannel extends React.Component {
 
         js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
         js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
+        js_eventEmitter.fn_subscribe (js_event.EE_unitUpdated, this, this.fn_unitUpdated);
 
     }
 
@@ -57,6 +58,14 @@ class ClssStreamChannel extends React.Component {
         console.log ("video stopped");
     }
 
+    fn_unitUpdated(p_me,p_obj)
+    {
+        // p_obj.andruavUnit
+        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.getPartyID()) return ;
+
+        p_me.setState({'m_update': p_me.state.m_update +1});
+    }
+
    
 
     fn_videoStream()
@@ -69,13 +78,13 @@ class ClssStreamChannel extends React.Component {
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         fn_VIDEO_Record (this.props.prop_session, v_track.id, p_startRecord);
-        toggleRecrodingVideo (this.props.prop_session.m_unit);
     }
 
     componentWillUnmount () 
     {
         js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
     }
 
     render ()  {
