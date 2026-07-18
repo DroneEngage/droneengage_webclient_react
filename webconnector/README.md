@@ -144,6 +144,24 @@ node src/index.js
 }
 ```
 
+## Development Notes
+
+### Shared Code with Webclient
+
+The webconnector shares protocol definition files with the main webclient project:
+- `src/shared/js_andruavMessages.js` - Protocol constants and message type definitions
+- `src/shared/andruav_auth_shared.js` - Authentication helper functions
+
+These files are the **single source of truth** in the webclient at `src/js/protocol/messages/js_andruavMessages.js` and `src/js/shared/andruav_auth_shared.js`. They are automatically copied into `src/shared/` by `scripts/sync_shared.js`, which runs on the `prebuild`, `build`, and `prepack` npm lifecycle hooks, guaranteeing the webconnector always ships with the same protocol/auth code as the webclient.
+
+To sync manually:
+
+```bash
+npm run sync:shared
+```
+
+The sync script silently skips when the webclient source is not present (e.g. inside a globally installed package), falling back to the already-bundled copies.
+
 ## Setup Instructions
 
 ### Quick Start (npm)

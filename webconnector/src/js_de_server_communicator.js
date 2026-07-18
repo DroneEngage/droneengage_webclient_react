@@ -1,12 +1,12 @@
 import { WebSocket } from 'ws';
 
-import * as js_andruavMessages from '../../src/js/protocol/messages/js_andruavMessages.js';
+import * as js_andruavMessages from './shared/js_andruavMessages.js';
 import {
     fn_buildAuthUrl,
     fn_buildHealthBaseUrl,
     fn_buildLoginPayload,
     fn_parseLoginResponse,
-} from '../../src/js/shared/andruav_auth_shared.js';
+} from './shared/andruav_auth_shared.js';
 
 import {
     fn_redactUrlSecrets,
