@@ -1,6 +1,6 @@
 {
   "name": "droneengage-webconnector",
-  "version": "0.9.0",
+  "version": "0.2.2",
   "description": "DroneEngage Web Connector - Bridge between DroneEngage cloud and local web clients",
   "main": "src/index.js",
   "bin": {
@@ -11,6 +11,10 @@
   },
   "type": "module",
   "scripts": {
+    "sync:shared": "node scripts/sync_shared.js",
+    "prebuild": "node scripts/sync_shared.js",
+    "build": "node scripts/sync_shared.js",
+    "prepack": "node scripts/sync_shared.js",
     "start": "node src/index.js",
     "start:creds": "node src/index.js",
     "install:caddy": "node scripts/install_caddy.js",
@@ -36,6 +40,7 @@
   },
   "files": [
     "src/",
+    "src/shared/",
     "scripts/",
     "config.json",
     "Caddyfile.localplugin",
@@ -53,7 +58,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/DroneEngage/droneengage_webclient_react.git"
+    "url": "git+https://github.com/DroneEngage/droneengage_webclient_react.git"
   },
   "bugs": {
     "url": "https://github.com/DroneEngage/droneengage_webclient_react/issues"
