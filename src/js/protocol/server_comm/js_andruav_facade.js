@@ -801,7 +801,7 @@ class CAndruavClientFacade {
             enabled: 1
         }
 
-        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruav_ws.CMD_SYS_TASKS, js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, p_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, p_msg);
     };
 
 
