@@ -135,7 +135,7 @@ const Planning = () => {
 				</div>
 			</div>
 
-			<div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
+			<div id="footer_div" className="row mt-0 me-0 mw-0 mb-0">
 				<ClssFooterControl />
 			</div>
 		</div>
