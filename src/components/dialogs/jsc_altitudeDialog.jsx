@@ -41,9 +41,19 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
         if (!p_me.m_flag_mounted) return;
         
         const { p_andruavUnit, p_onApply, p_style } = p_params;
+        let initAltitude = '';
+        
+        if (p_andruavUnit && p_andruavUnit.m_Nav_Info && p_andruavUnit.m_Nav_Info.p_Location) {
+            if (p_andruavUnit.m_Nav_Info.p_Location.alt_relative !== undefined) {
+                initAltitude = p_andruavUnit.m_Nav_Info.p_Location.alt_relative.toString();
+            } else if (p_andruavUnit.m_Nav_Info.p_Location.alt_abs !== undefined) {
+                initAltitude = p_andruavUnit.m_Nav_Info.p_Location.alt_abs.toString();
+            }
+        }
+        
         p_me.setState({ 
             p_andruavUnit: p_andruavUnit,
-            altitude_value: '',
+            altitude_value: initAltitude,
             style: p_style || 'bg-warning',
             is_open: true,
             m_update: p_me.state.m_update + 1 

@@ -36,9 +36,10 @@ class ClssFpvDialog extends ClssModalDialogBase {
     fn_displayDialog(p_me, p_params) {
         if (!p_me.m_flag_mounted) return;
         
-        const { image_src } = p_params || {};
+        const { image_src, party_id } = p_params || {};
         p_me.setState({ 
             image_src: image_src || '/public/images/camera_img.png',
+            party_id: party_id || null,
             is_visible: true,
             is_open: true,
             m_update: p_me.state.m_update + 1 
@@ -50,7 +51,7 @@ class ClssFpvDialog extends ClssModalDialogBase {
     }
 
     fn_getCurrentPartyID() {
-        return null;
+        return this.state.party_id || null;
     }
 
     fn_onSave() {
@@ -99,14 +100,6 @@ class ClssFpvDialog extends ClssModalDialogBase {
                                     onClick={() => this.fn_onSave()}
                                 >
                                     {tFunc('home:modal.image.save', 'Save')}
-                                </button>
-                                <button
-                                    id="btnGoto"
-                                    type="button"
-                                    className="btn btn-success btn-sm"
-                                    onClick={() => this.fn_onGoto()}
-                                >
-                                    {tFunc('home:modal.image.goto', 'Goto')}
                                 </button>
                             </div>
                         </div>

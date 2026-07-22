@@ -41,9 +41,19 @@ class ClssSpeedDialog extends ClssModalDialogBase {
         if (!p_me.m_flag_mounted) return;
         
         const { p_andruavUnit, p_initValue, p_onApply, p_dialogType } = p_params;
+        let initSpeed = p_initValue || '';
+        
+        if (p_andruavUnit && !p_initValue) {
+            if (p_andruavUnit.m_Nav_Info && p_andruavUnit.m_Nav_Info.p_UserDesired && p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed !== undefined) {
+                initSpeed = p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed.toString();
+            } else if (p_andruavUnit.m_Nav_Info && p_andruavUnit.m_Nav_Info.p_Location && p_andruavUnit.m_Nav_Info.p_Location.ground_speed !== undefined) {
+                initSpeed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed.toString();
+            }
+        }
+        
         p_me.setState({ 
             p_andruavUnit: p_andruavUnit,
-            speed_value: p_initValue || '',
+            speed_value: initSpeed,
             dialog_type: p_dialogType || 'speed',
             is_open: true,
             m_update: p_me.state.m_update + 1 
