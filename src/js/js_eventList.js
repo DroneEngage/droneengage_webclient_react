@@ -97,6 +97,13 @@ const EVENT_LIST = Object.freeze({
 			"EE_displayCameraDlgForm",
 			"EE_hideCameraDlgForm",
 
+			"EE_displayAltitudeDialog",
+			"EE_displaySpeedDialog",
+			"EE_displayUnitInfoDialog",
+			"EE_displayFpvDialog",
+			"EE_displayConfirmationDialog",
+			"EE_displayApplyAllDialog",
+
 			"EE_onPlanToggle",
 			"EE_onAdvancedMode",
 			"EE_ErrorMessage",
