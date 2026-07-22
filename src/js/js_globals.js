@@ -214,6 +214,16 @@ class GLOBALS {
 		this.CONST_IR_DIGITAL_ZOOM_MIN = 1.0;
 		this.CONST_IR_DIGITAL_ZOOM_MAX = 32.0; // A40TR-Pro
 
+		// Dialog Icons
+		this.DIALOG_ICONS = {
+			GOTO: '↗',
+			CLOSE: '×',
+			MINIMIZE: '▼',
+			MAXIMIZE: '▲',
+			OPAQUE: '●',
+			TRANSPARENT: '○',
+		};
+
 	}
 
 	static getInstance() {
