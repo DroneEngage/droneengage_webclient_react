@@ -3,6 +3,8 @@ import { withTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { js_leafletmap } from '../../js/js_leafletmap.js';
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 
 class ClssApplyAllDialog extends ClssModalDialogBase {
@@ -114,6 +116,37 @@ class ClssApplyAllDialog extends ClssModalDialogBase {
                             marker.m_missionItem.m_speedRequired = true;
                         }
                     }
+
+                    // Update waypoint icon shape based on mission type
+                    let icon_img = 'bi bi-geo-alt-fill';
+                    const waypointType = marker.m_missionItem.m_missionType;
+                    
+                    switch (waypointType) {
+                        case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
+                            icon_img = 'bi bi-geo-alt-fill';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
+                            icon_img = 'bi bi-dice-6';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
+                            icon_img = 'bi-arrow-bar-up';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
+                            icon_img = 'bi-download';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
+                            icon_img = 'bi-signpost-split-fill';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
+                            icon_img = 'bi-skip-backward-circle';
+                            break;
+                        case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
+                            icon_img = 'bi-c-circle';
+                            break;
+                    }
+                    
+                    marker.m_shape_icon = icon_img;
+                    js_leafletmap.fn_createBootStrapIcon(marker, icon_img, this.p_mission.m_pathColor, [32, 32]);
                 }
             });
 

@@ -691,6 +691,30 @@ export class ClssAndruavMissionPlan {
             nextstep.param7 = 0.0; 							
           */
             break;
+
+          case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_SPLINE, [
+              0,
+              5,
+              0,
+              0.0,
+              marker.getLatLng().lat,
+              marker.getLatLng().lng,
+              parseFloat(marker.m_missionItem.alt),
+            ]);
+            break;
+
+          case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE, [
+              0,
+              5,
+              0,
+              0.0,
+              marker.getLatLng().lat,
+              marker.getLatLng().lng,
+              parseFloat(marker.m_missionItem.alt),
+            ]);
+            break;
         }
 
         mission_item_latest = mission_drift;
@@ -776,9 +800,8 @@ export class ClssAndruavMissionPlan {
         }
       }
 
-      const keys = Object.keys(marker.m_missionItem.modules);
-
       if (marker.m_missionItem.modules === null || marker.m_missionItem.modules === undefined) continue;
+      const keys = Object.keys(marker.m_missionItem.modules);
       const cmds = [];
       for (let key in marker.m_missionItem.modules) {
         const m = marker.m_missionItem.modules[key];
