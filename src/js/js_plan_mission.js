@@ -546,9 +546,9 @@ export class ClssAndruavMissionPlan {
             */
 
           fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_DELAY, [
-            0,
-            1, // param1 - Delay 1 hour
-            0, // param2
+            3600, // Delay 1 hour
+            0, 
+            0, 
             0,
             0,
             0,

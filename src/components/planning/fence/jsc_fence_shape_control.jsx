@@ -48,12 +48,6 @@ class ClssFenceAction extends React.Component {
     }
     
 
-    componentDidUpdate()
-    {
-        if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
-    }
-
     render ()
     {
         const selected_value = ((this.props.shape.m_geofenceInfo.isHardFence === null ||  this.props.shape.m_geofenceInfo.isHardFence === undefined)?0:this.props.shape.m_geofenceInfo.isHardFence);
