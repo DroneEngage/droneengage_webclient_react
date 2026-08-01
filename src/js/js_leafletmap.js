@@ -223,6 +223,14 @@ class CLeafLetAndruavMap {
                     // so we need to check if it was already deleted.
                     
                     if (already_deleted === true) return ;
+
+                    // 'remove' is also fired for programmatic hide/show (fn_hideItem),
+                    // e.g. toggling path visibility. That is NOT a user deletion, so skip it.
+                    if (x.target.m_programmatic_hide === true) {
+                        x.target.m_programmatic_hide = false;
+                        return;
+                    }
+
                     js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, x.target);
                     already_deleted = false;
                 });
@@ -369,6 +377,10 @@ class CLeafLetAndruavMap {
      * @param {*} p_marker 
      */
     fn_hideItem(p_marker) { // p_marker.setMap(null);
+        // Flag this as a programmatic hide so the 'remove' listener does not
+        // mistake it for an actual user deletion (which would splice the
+        // marker out of the mission plan array).
+        p_marker.m_programmatic_hide = true;
         p_marker.remove();
     }
 
