@@ -68,7 +68,7 @@ class ClssMainUnitPopup extends React.Component {
       <p key={`${this.key}-altitude-${keyCounter++}`} className="m-0 p-0">
         {vAlt !== null && vAlt !== undefined ? (
           <span className="text-primary">
-            {vAlt.toFixed(0)}<span className="text-primary"> {t('meters')}</span>
+            {vAlt.toFixed(0)}<span className="text-primary"> {t('meters')} </span>
           </span>
         ) : (
           <span className="text-secondary">?</span>
