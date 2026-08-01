@@ -92,6 +92,14 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
         this.fn_closeDialog();
     }
 
+    fn_onPresetAltitude(p_meters) {
+        const isMetric = js_globals.v_useMetricSystem;
+        const value = isMetric ? p_meters : Math.round(p_meters * CONST_METER_TO_FEET);
+        if (this.altitudeInputRef.current) {
+            this.altitudeInputRef.current.value = value.toString();
+        }
+    }
+
     render() {
         const { t } = this.props;
         const tFunc = t ? t : (key, defaultValue) => defaultValue || key;
@@ -128,8 +136,23 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
                                     ref={this.altitudeInputRef}
                                     defaultValue={this.state.altitude_value}
                                 />
-                                <span className="input-group-addon">{unitLabel}</span>
+                                <span className="input-group-addon ms-2">{unitLabel}</span>
                             </div>
+                        </div>
+                        <div className="d-flex flex-wrap gap-1 mt-2 mb-2 pe-1 ps-1">
+                            {[1, 3, 5, 50, 100].map((meters) => {
+                                const value = isMetric ? meters : Math.round(meters * CONST_METER_TO_FEET);
+                                return (
+                                    <button
+                                        key={meters}
+                                        type="button"
+                                        className="btn btn-outline-primary btn-sm flex-fill"
+                                        onClick={() => this.fn_onPresetAltitude(meters)}
+                                    >
+                                        {value}{unitLabel}
+                                    </button>
+                                );
+                            })}
                         </div>
                         <div className="modal-footer">
                             <div className="btn-group w-100 d-flex flex-wrap">
