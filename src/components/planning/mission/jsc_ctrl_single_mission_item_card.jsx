@@ -30,22 +30,25 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
 
     fn_prevMissionItem()
     {
-        if (!this.props.p_shape) return ;
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'prev');
+        if (!c_shape) return;
         js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, c_shape);
     }
 
     fn_nextMissionItem()
     {
-        if (!this.props.p_shape) return ;
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
         const c_mission = this.props.p_shape.m_main_de_mission;
         const c_shape = c_mission.fn_activateMissionItem(this.props.p_shape.id, 'next');
+        if (!c_shape) return;
         js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, c_shape);
     }
 
     fn_editShape ()
     {
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
         this.m_waypoint_location.fn_editShape();
         this.m_waypoint_actions.fn_editShape();
         if ((js_siteConfig.CONST_FEATURE.DISABLE_P2P !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P !==null) && (js_siteConfig.CONST_FEATURE.DISABLE_P2P===false))
@@ -68,9 +71,15 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         return ;
     }
 
+    fn_deleteMe ()
+    {
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
+        this.props.p_shape.m_main_de_mission.fn_deleteMe(this.props.p_shape.id);
+    }
+
     componentDidUpdate() 
     {
-        if (this.props.p_shape !== null && this.mission_id_txt.current) { // Check if mission_id_txt is not null
+        if (this.props.p_shape && this.props.p_shape.m_main_de_mission && this.mission_id_txt.current) { // Check if mission_id_txt is not null
             this.mission_id_txt.current.value = this.props.p_shape.order; 
         }
     }
@@ -155,6 +164,7 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_location = instance}}/>
+                        <button className="btn border-white btn-danger css_margin_top_small" id='btn_delete'  onClick={ (e) => this.fn_deleteMe()}>Delete</button>
                         <button className="btn border-white btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                     </div>
                     
