@@ -43,7 +43,7 @@ export  class ClssSinglePlanContainer extends React.Component {
 
         js_common.fn_console_log("Mission Selected");
         // not a marker
-        if (p_event.m_main_de_mission === null || p_event.m_main_de_mission === undefined) {
+        if (!p_event || p_event.m_main_de_mission === null || p_event.m_main_de_mission === undefined) {
             js_common.fn_console_log("MISSION:NULL HERE");
             return;
         }

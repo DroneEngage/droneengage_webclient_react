@@ -102,18 +102,13 @@ export class ClssAndruavMissionPlan {
     const len = this.m_all_mission_items_shaps.length;
     if (len === 0) return;
 
-    if (len === 1) {
-      this.fn_disconnectMissionItem(this.m_all_mission_items_shaps[0]);
-      return;
-    }
-
-    for (let i = 0; i < len - 1; ++i) {
+    for (let i = 0; i < len; ++i) {
       const marker = this.m_all_mission_items_shaps[i];
       if (v_enforceRedraw === true) {
         this.fn_disconnectMissionItem(marker);
       }
       js_leafletmap.fn_changeBootStrapIconColor(marker, this.getRelatedColor(this.m_pathColor, 'bgr'));
-      if (marker.m_next == null) {
+      if (i < len - 1 && marker.m_next == null) {
         const arrowCoordinates = {
           from_pos: marker.getLatLng(),
           to_pos: this.m_all_mission_items_shaps[i + 1].getLatLng(),
@@ -141,9 +136,9 @@ export class ClssAndruavMissionPlan {
       }
     }
 
-    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len - 1], this.getRelatedColor(this.m_pathColor, 'bgr'));
-
-    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
+    if (this.m_active_mission_item_id >= 0 && this.m_active_mission_item_id < len) {
+      js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
+    }
 
 
   }
