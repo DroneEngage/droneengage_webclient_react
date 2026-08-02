@@ -5,7 +5,7 @@ import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 
-class ClssConfirmationDialog extends ClssModalDialogBase {
+class ClssAlertDialog extends ClssModalDialogBase {
     constructor(props) {
         super(props);
         this.state = {
@@ -13,15 +13,14 @@ class ClssConfirmationDialog extends ClssModalDialogBase {
             m_update: 0,
             title: '',
             message: '',
-            yes_caption: 'Yes',
-            no_caption: 'Cancel',
-            style: 'bg-success',
+            ok_caption: 'OK',
+            style: 'bg-warning',
         };
         this.p_callback = null;
         this.m_flag_mounted = false;
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayConfirmationDialog, this, this.fn_displayDialog);
+        js_eventEmitter.fn_subscribe(js_event.EE_displayAlertDialog, this, this.fn_displayDialog);
     }
 
     componentDidMount() {
@@ -30,7 +29,7 @@ class ClssConfirmationDialog extends ClssModalDialogBase {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayConfirmationDialog, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_displayAlertDialog, this);
         if (this.modalRef.current) {
             this.modalRef.current.style.display = 'none';
         }
@@ -39,14 +38,13 @@ class ClssConfirmationDialog extends ClssModalDialogBase {
     fn_displayDialog(p_me, p_params) {
         if (!p_me.m_flag_mounted || !p_params) return;
 
-        const { p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption } = p_params;
-        p_me.p_callback = p_callback;
+        const { p_title, p_message, p_callback, p_okCaption, p_style } = p_params;
+        p_me.p_callback = p_callback || null;
         p_me.setState({
-            title: p_title || '',
+            title: p_title || 'Alert',
             message: p_message || '',
-            yes_caption: p_yesCaption || 'Yes',
-            no_caption: p_noCaption || 'Cancel',
-            style: p_style || 'bg-success',
+            ok_caption: p_okCaption || 'OK',
+            style: p_style || 'bg-warning',
             is_open: true,
             m_update: p_me.state.m_update + 1,
         });
@@ -56,58 +54,42 @@ class ClssConfirmationDialog extends ClssModalDialogBase {
         this.setState({ is_open: false });
     }
 
-    fn_onConfirm() {
+    fn_onOk() {
         if (this.p_callback) {
-            this.p_callback(true);
+            this.p_callback();
         }
         this.fn_closeDialog();
-    }
-
-    fn_onCancel() {
-        if (this.p_callback) {
-            this.p_callback(false);
-        }
-        this.fn_closeDialog();
-    }
-
-    fn_hideDialog() {
-        this.setState({ is_open: false });
     }
 
     render() {
+        const { t } = this.props;
+        const tFunc = t ? t : (key, defaultValue) => defaultValue || key;
+
         return this.fn_renderInPortal(
             <>
                 {this.state.is_open && <div className="modal-backdrop fade show" style={{ zIndex: 1060 }}></div>}
                 <div
                     className={this.state.is_open ? "modal fade show" : "modal fade"}
                     style={{ display: this.state.is_open ? 'block' : 'none', zIndex: 1065 }}
-                    id="confirmation_dialog"
+                    id="alert_dialog"
                     ref={this.modalRef}
                     role="dialog"
                 >
                     <div className="modal-dialog">
                         <div className="modal-content">
-                            {this.fn_renderDialogHeader(this.state.title, this.state.style)}
+                            {this.fn_renderDialogHeader(this.state.title, this.state.style, false)}
                             <div className="modal-body text-white">
                                 <p>{this.state.message}</p>
                             </div>
                             <div className="modal-footer">
                                 <div className="btn-group w-100 d-flex flex-wrap">
                                     <button
-                                        id="btnCancel"
+                                        id="btnAlertOk"
                                         type="button"
-                                        className="btn btn-secondary btn-sm"
-                                        onClick={() => this.fn_onCancel()}
+                                        className="btn btn-warning btn-sm w-100"
+                                        onClick={() => this.fn_onOk()}
                                     >
-                                        {this.state.no_caption}
-                                    </button>
-                                    <button
-                                        id="modal_btn_confirm"
-                                        type="button"
-                                        className="btn btn-danger btn-sm"
-                                        onClick={() => this.fn_onConfirm()}
-                                    >
-                                        {this.state.yes_caption}
+                                        {this.state.ok_caption}
                                     </button>
                                 </div>
                             </div>
@@ -119,5 +101,4 @@ class ClssConfirmationDialog extends ClssModalDialogBase {
     }
 }
 
-export default withTranslation('home')(ClssConfirmationDialog);
-
+export default withTranslation('home')(ClssAlertDialog);

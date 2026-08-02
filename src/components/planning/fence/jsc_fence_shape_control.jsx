@@ -200,14 +200,14 @@ class ClssPolygonControl extends ClssShapeControl {
                 <div className="card-body">
                 <div className="form-group">
                     <label>Name</label>
-                    <input type='text' id='name' className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
+                    <input type='text' id='name_edit_shape' className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
                 </div>
                 <div className="form-check form-switch">
-                <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
-                <label className="form-check-label" htmlFor="chk">Restricted Area</label>
+                <input className="form-check-input " type="checkbox" id='chk_restricted_area' onChange={(e) => this.fn_onCheck(e)}/>
+                <label className="form-check-label" htmlFor="chk_restricted_area">Restricted Area</label>
                 </div>
                 <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
-                <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                <button className="button btn-primary" id='btn_fence_apply'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div> 
             </div> 
             );

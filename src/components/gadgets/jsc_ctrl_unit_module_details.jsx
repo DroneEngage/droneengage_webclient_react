@@ -8,7 +8,8 @@ import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {
-    fn_do_modal_confirmation
+    fn_do_modal_confirmation,
+    fn_do_modal_alert
     } from '../../js/js_main.js'
 
 export default class ClssModuleDetails extends React.Component {
@@ -39,7 +40,7 @@ export default class ClssModuleDetails extends React.Component {
 
             
                 console.log('Submitted:', me.state.output);
-                alert("data submitted. you need to restart the module.");
+                fn_do_modal_alert(null, "data submitted. you need to restart the module.");
                 
               }, this.props.t('yes'), "bg-danger text-white");
     }

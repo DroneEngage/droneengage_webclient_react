@@ -19,7 +19,9 @@ import ClssFooterControl from '../components/jsc_footer'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx'
+import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx'
 import ClssApplyAllDialog from '../components/dialogs/jsc_applyAllDialog.jsx'
+import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx'
 import { fn_on_ready } from '../js/js_main'
 
 
@@ -63,7 +65,9 @@ const Planning = () => {
 					</div>
 
 					<ClssConfirmationDialog />
+					<ClssAlertDialog />
 					<ClssApplyAllDialog />
+					<ClssMissionLoadDialog />
 				</div>
 			</div>
 
