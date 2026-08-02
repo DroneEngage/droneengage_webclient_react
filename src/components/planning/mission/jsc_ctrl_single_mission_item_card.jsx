@@ -164,8 +164,14 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_location = instance}}/>
-                        <button className="btn border-white btn-danger css_margin_top_small" id='btn_delete'  onClick={ (e) => this.fn_deleteMe()}>Delete</button>
-                        <button className="btn border-white btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                        <div className='row justify-content-center margin_zero'>
+                            <div className='col-auto'>
+                                <button className="btn border-white btn-danger css_margin_top_small" id='btn_delete'  onClick={ (e) => this.fn_deleteMe()}>Delete</button>
+                            </div>
+                            <div className='col-auto'>
+                                <button className="btn border-white btn-success css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                            </div>
+                        </div>
                     </div>
                     
                     <ul key={'unit_header_div'} className="nav nav-tabs mt-2">
