@@ -153,23 +153,23 @@ export class ClssSingle_Mission_Item_Card extends React.Component {
         
                     <div className='row justify-content-center margin_zero'>
                         <div className='col-2'>
-                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_prevMissionItem()}>{"<<"}</button>
+                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn_prev_m_item'  onClick={ (e) => this.fn_prevMissionItem()}>{"<<"}</button>
                         </div>
                         <div className='col-6'>
                                 <input type='text' id={ordernum_id} className="form-control css_margin_top_small input-sm" disabled="disabled" ref={this.mission_id_txt}/>
                         </div>
                         <div className='col-2'>
-                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn'  onClick={ (e) => this.fn_nextMissionItem()}>{">>"}</button>
+                            <button className="btn btn-sm btn-primary css_margin_top_small" id='btn_next_m_item'  onClick={ (e) => this.fn_nextMissionItem()}>{">>"}</button>
                         </div>
                     </div>
                     <div key={this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id} id="m_bdy" className="geo_fence ">
                         <CWayPointLocation p_shape= {this.props.p_shape}  ref={instance => {this.m_waypoint_location = instance}}/>
                         <div className='row justify-content-center margin_zero'>
                             <div className='col-auto'>
-                                <button className="btn border-white btn-danger css_margin_top_small" id='btn_delete'  onClick={ (e) => this.fn_deleteMe()}>Delete</button>
+                                <button className="btn border-white btn-danger css_margin_top_small" id='btn_delete_mission_item'  onClick={ (e) => this.fn_deleteMe()}>Delete</button>
                             </div>
                             <div className='col-auto'>
-                                <button className="btn border-white btn-success css_margin_top_small" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                                <button className="btn border-white btn-success css_margin_top_small" id='btn_apply_mission_item'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                             </div>
                         </div>
                     </div>

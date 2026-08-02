@@ -1,3 +1,5 @@
+import { fn_do_modal_alert } from '../js_main.js';
+
 // Builds initial values for form fields from the template
 // Recursively processes nested objects and sets default values for text, number, checkbox, combo, and array types
 export function buildInitialValues(template) {
@@ -218,14 +220,14 @@ export function setNested(obj, pathStr, value) {
 // Copies text to the clipboard and displays a confirmation alert
 export function handleCopy(text) {
   navigator.clipboard.writeText(text);
-  alert('JSON copied to clipboard!');
+  fn_do_modal_alert(null, 'JSON copied to clipboard!');
 }
 
 // Saves text as a downloadable file with the specified filename
 // Alerts if no filename is provided
 export function handleSave(text, fileName) {
   if (!fileName) {
-    alert('Please enter a filename.');
+    fn_do_modal_alert(null, 'Please enter a filename.');
     return;
   }
   const blob = new Blob([text], { type: 'application/json' });

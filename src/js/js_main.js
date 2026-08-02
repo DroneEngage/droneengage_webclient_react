@@ -268,12 +268,30 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 	});
 }
 
+export function fn_do_modal_alert(p_title, p_message, p_callback, p_okCaption, p_style) {
+	js_eventEmitter.fn_dispatch(js_event.EE_displayAlertDialog, {
+		p_title: p_title,
+		p_message: p_message,
+		p_callback: p_callback,
+		p_okCaption: p_okCaption,
+		p_style: p_style
+	});
+}
+
 
 export function fn_do_modal_apply_all(p_mission) {
 	if (p_mission === null || p_mission === undefined) return;
 
 	js_eventEmitter.fn_dispatch(js_event.EE_displayApplyAllDialog, {
 		p_mission: p_mission
+	});
+}
+
+
+export function fn_do_modal_mission_load(p_missions, p_callback) {
+	js_eventEmitter.fn_dispatch(js_event.EE_displayMissionLoadDialog, {
+		p_missions: p_missions,
+		p_callback: p_callback
 	});
 }
 
@@ -1911,7 +1929,7 @@ export function fn_readMissionFile(p_mission, p_andruavUnit) {
 	if (p_mission === null || p_mission === undefined) return;
 
 	if (!selectedMissionFilesToRead.length) {
-		alert('Please select a file!');
+		fn_do_modal_alert(null, 'Please select a file!');
 		return;
 	}
 
@@ -1930,12 +1948,12 @@ export function fn_readMissionFile(p_mission, p_andruavUnit) {
 					p_mission.fn_importAsDE_V1(p_andruavUnit, JSON.parse(plan_text));
 				}
 				else {
-					alert('Please select a valid file!');
+					fn_do_modal_alert(null, 'Please select a valid file!');
 				}
 
 			}
 			catch (e) {
-				alert('Please select a valid file!');
+				fn_do_modal_alert(null, 'Please select a valid file!');
 			}
 
 		}
@@ -1968,7 +1986,7 @@ export function fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst, p_files) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 	if (!p_files.length) {
-		alert('Please select a file!');
+		fn_do_modal_alert(null, 'Please select a file!');
 		return;
 	}
 

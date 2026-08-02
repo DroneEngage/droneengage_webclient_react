@@ -206,6 +206,9 @@ export const CONST_TYPE_AndruavSystem_DeleteTasks = 9003;
 export const CONST_TYPE_AndruavSystem_DisableTasks = 9004;
 export const CONST_TYPE_AndruavSystem_LogoutCommServer = 9006;
 export const CONST_TYPE_AndruavSystem_ConnectedCommServer = 9007;
+export const CONST_TYPE_AndruavSystem_LoadMission = 9010;
+export const CONST_TYPE_AndruavSystem_SaveMission = 9011;
+export const CONST_TYPE_AndruavSystem_DeleteMission = 9012;
 
 
 export const CONST_TYPE_SWARM_FOLLOW = 1;

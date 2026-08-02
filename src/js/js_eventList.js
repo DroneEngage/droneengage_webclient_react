@@ -102,6 +102,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_displayUnitInfoDialog",
 			"EE_displayFpvDialog",
 			"EE_displayConfirmationDialog",
+			"EE_displayAlertDialog",
 			"EE_displayApplyAllDialog",
 
 			"EE_onPlanToggle",
@@ -130,7 +131,11 @@ const EVENT_LIST = Object.freeze({
 			"EE_Language_Changed",
 			"EE_Opacity_Control",
 
-			"EE_WebConnector_Not_Running"
+			"EE_WebConnector_Not_Running",
+		"EE_Mission_Loaded",
+		"EE_Mission_Saved",
+		"EE_Mission_Deleted",
+		"EE_displayMissionLoadDialog"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

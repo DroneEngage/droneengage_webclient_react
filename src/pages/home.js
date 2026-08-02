@@ -38,6 +38,8 @@ import ClssSpeedDialog from '../components/dialogs/jsc_speedDialog.jsx';
 import ClssUnitInfoDialog from '../components/dialogs/jsc_unitInfoDialog.jsx';
 import ClssFpvDialog from '../components/dialogs/jsc_fpvDialog.jsx';
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
+import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
+import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx';
 import { fn_on_ready } from '../js/js_main';
 
 const Home = () => {
@@ -161,6 +163,8 @@ const Home = () => {
           <ClssUnitInfoDialog />
           <ClssFpvDialog />
           <ClssConfirmationDialog />
+          <ClssAlertDialog />
+          <ClssMissionLoadDialog />
         </div>
 
         <div id="row_2" className={`col-lg-4 col-xl-4 col-xxl-4 col-12 ${isRow2Collapsed ? 'collapsed-right' : ''}`}> 

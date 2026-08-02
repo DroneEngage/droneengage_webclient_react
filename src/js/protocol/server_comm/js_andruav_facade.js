@@ -804,6 +804,53 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, p_msg);
     };
 
+    /**
+     * Save mission to storage server via comm server
+     * @param {string} p_unitId - Unit ID
+     * @param {string} p_missionId - Mission ID
+     * @param {string} p_name - Mission name
+     * @param {object} p_data - Mission data (DE format JSON)
+     */
+    API_saveMission(p_unitId, p_missionId, p_name, p_data) {
+        let p_msg = {
+            unitId: p_unitId,
+            missionId: p_missionId,
+            name: p_name,
+            data: p_data
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveMission, p_msg);
+    }
+
+    /**
+     * Load mission from storage server via comm server
+     * @param {string} p_unitId - Unit ID
+     * @param {string} p_missionId - Optional mission ID (if null, loads all missions for unit)
+     */
+    API_loadMission(p_unitId, p_missionId = null) {
+        let p_msg = {
+            unitId: p_unitId
+        };
+
+        if (p_missionId !== null && p_missionId !== undefined) {
+            p_msg.missionId = p_missionId;
+        }
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LoadMission, p_msg);
+    }
+
+    /**
+     * Delete mission from storage server via comm server
+     * @param {string} p_missionId - Mission ID to delete
+     */
+    API_deleteMission(p_missionId) {
+        let p_msg = {
+            missionId: p_missionId
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteMission, p_msg);
+    }
+
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
