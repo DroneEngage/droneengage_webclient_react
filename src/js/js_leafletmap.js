@@ -273,15 +273,29 @@ class CLeafLetAndruavMap {
         marker.pm.m_shape_type = 'Marker';
         // add to shapes list.
         js_globals.v_map_shapes.push(marker);
+        let already_deleted = false;
         marker.on('click', function (p_event) {
             if (p_event.originalEvent.ctrlKey===false)
             {
-                js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, p_event);
+                js_eventEmitter.fn_dispatch(js_event.EE_onShapeSelected, p_event.target);
             }
             else
             {
+                already_deleted = true;
                 js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, marker);
             }
+        });
+
+        marker.on('remove', (x) => {
+            if (already_deleted === true) return;
+
+            if (x.target.m_programmatic_hide === true) {
+                x.target.m_programmatic_hide = false;
+                return;
+            }
+
+            js_eventEmitter.fn_dispatch(js_event.EE_onShapeDeleted, x.target);
+            already_deleted = false;
         });
 
         return marker;

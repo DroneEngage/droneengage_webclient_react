@@ -154,22 +154,19 @@ export class ClssAndruavMissionPlan {
     }
 
     const missionCount = this.m_all_mission_items_shaps.length;
-    if (active_mission_item_id < 1 || active_mission_item_id > missionCount) {
+    const currentIndex = this.m_all_mission_items_shaps.findIndex(marker => marker.id === active_mission_item_id);
+    if (currentIndex === -1) {
       return null;
     }
 
     let nextMissionOrder;
 
-
     if (direction === 'next') {
-      nextMissionOrder = (active_mission_item_id % missionCount);
+      nextMissionOrder = (currentIndex + 1) % missionCount;
     } else if (direction === 'prev') {
-      nextMissionOrder = ((active_mission_item_id - 2) % missionCount);
-      if (nextMissionOrder < 0) {
-        nextMissionOrder = missionCount + nextMissionOrder;
-      }
+      nextMissionOrder = (currentIndex - 1 + missionCount) % missionCount;
     } else {
-      nextMissionOrder = active_mission_item_id - 1; // same object ... make if active
+      nextMissionOrder = currentIndex; // same object ... make if active
     }
 
     // activate item
@@ -207,9 +204,9 @@ export class ClssAndruavMissionPlan {
     };
 
     this.m_missionCounter += 1;
-    // activate item
-    this.m_active_mission_item_id = this.m_missionCounter;
     this.m_all_mission_items_shaps.push(p_marker);
+    // activate item (0-based index of the marker just added)
+    this.m_active_mission_item_id = this.m_all_mission_items_shaps.length - 1;
     this.fn_orderItems();
     this.fn_updatePath();
 

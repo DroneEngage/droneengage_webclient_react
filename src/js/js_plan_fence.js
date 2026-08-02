@@ -22,7 +22,7 @@ export class ClssAndruavFencePlan {
 
 	fn_generateAndruavFenceData(shapes) {
 		let shapesData = [];
-		const len = js_globals.v_map_shapes.length;
+		const len = shapes.length;
 
 		for (let i = 0; i < len; ++i) {
 
