@@ -1,0 +1,27 @@
+/* Responsive header adjustments */
+@media (max-width: 991.98px) {
+	#rowheader {
+		height: auto !important;
+		min-height: 50px !important;
+		padding-right: 0.5rem !important;
+	}
+	#rowheader .navbar-brand {
+		font-size: 1rem !important;
+	}
+}
+
+@media (max-width: 575.98px) {
+	#rowheader {
+		padding-left: 0.5rem !important;
+	}
+	#main_btn_group .btn {
+		font-size: 0.75rem !important;
+		padding: 0.25rem 0.4rem !important;
+	}
+	#main_btn_group {
+		gap: 0.25rem !important;
+	}
+	#login_form .form-control {
+		font-size: 0.85rem !important;
+	}
+}

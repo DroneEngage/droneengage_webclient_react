@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
+import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 
 import 'jquery-ui-dist/jquery-ui.min.js';

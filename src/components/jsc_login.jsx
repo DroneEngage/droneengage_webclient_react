@@ -542,7 +542,7 @@ class ClssLoginControl extends React.Component {
         >
           {title}
         </button>
-        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <div className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1" style={{minWidth: '200px', maxWidth: '90vw'}}>
           <div id="login_form" className="card-body">
             {ctrls}
             <button

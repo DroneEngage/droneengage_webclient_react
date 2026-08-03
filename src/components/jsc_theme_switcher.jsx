@@ -86,7 +86,7 @@ export class ClssThemeSwitcher extends React.Component {
                         )}
                     </button>
                     
-                    <div className={`dropdown-menu ${this.state.is_open ? 'show' : ''}`} aria-labelledby="theme-dropdown">
+                    <div className={`dropdown-menu dropdown-menu-end ${this.state.is_open ? 'show' : ''}`} aria-labelledby="theme-dropdown" style={{minWidth: '150px', maxWidth: '90vw'}}>
                         {availableThemes.map((theme) => (
                             <button
                                 key={theme.id}
