@@ -139,6 +139,11 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_loadWayPointsFromFile()
     {
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        if (v_andruavUnit===null) {
+            fn_do_modal_alert("Load Mission", "Please select a drone unit first.");
+            return ;
+        }
         fn_readMissionFile(this.props.p_mission, this.props.m_selected_unit);
     }
 
@@ -149,7 +154,10 @@ export class ClssSingleMissionControlBar extends React.Component {
     fn_requestWayPoints(p_fromFCB)
     {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
-        if (v_andruavUnit===null) return ;
+        if (v_andruavUnit===null) {
+            fn_do_modal_alert("Read Mission", "Please select a drone unit first.");
+            return ;
+        }
         fn_requestWayPoints(v_andruavUnit, p_fromFCB);
     }
 
@@ -159,8 +167,15 @@ export class ClssSingleMissionControlBar extends React.Component {
     fn_clearWayPoints()
     {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
-        if (v_andruavUnit===null) return ;
-        fn_clearWayPoints(v_andruavUnit);
+        if (v_andruavUnit===null) {
+            fn_do_modal_alert("Clear Mission", "Please select a drone unit first.");
+            return ;
+        }
+        fn_do_modal_confirmation("Clear Mission for " + v_andruavUnit.m_unitName,
+            "Are you sure you want to delete all waypoints from this unit?", function (p_approved) {
+                if (p_approved === false) return;
+                fn_clearWayPoints(v_andruavUnit);
+            }, "YES", "bg-danger txt-theme-aware");
     }
 
     /**
@@ -170,8 +185,17 @@ export class ClssSingleMissionControlBar extends React.Component {
     fn_saveDBMission ()
     {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
-        const c_mission_text = this.props.p_mission.fn_exportToDE_V1 ();
-        this.props.p_mission.fn_exportToJSONAndruav (c_mission_text, v_andruavUnit);
+        if (v_andruavUnit===null) {
+            fn_do_modal_alert("Save Mission", "Please select a drone unit first.");
+            return ;
+        }
+        const Me = this;
+        fn_do_modal_confirmation("Save Mission for " + v_andruavUnit.m_unitName,
+            "Are you sure you want to save this mission to the system?", function (p_approved) {
+                if (p_approved === false) return;
+                const c_mission_text = Me.props.p_mission.fn_exportToDE_V1 ();
+                Me.props.p_mission.fn_exportToJSONAndruav (c_mission_text, v_andruavUnit);
+            }, "YES", "bg-danger txt-theme-aware");
     }
 
     /**
@@ -180,7 +204,17 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_deleteDBMission()
     {
-        js_globals.v_andruavFacade.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavWS.m_groupName,this.props.m_selected_unit);
+        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        if (v_andruavUnit===null) {
+            fn_do_modal_alert("Delete Mission", "Please select a drone unit first.");
+            return ;
+        }
+        const Me = this;
+        fn_do_modal_confirmation("Delete Mission for " + v_andruavUnit.m_unitName,
+            "Are you sure you want to delete all related mission tasks from the system?", function (p_approved) {
+                if (p_approved === false) return;
+                js_globals.v_andruavFacade.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavWS.m_groupName,Me.props.m_selected_unit);
+            }, "YES", "bg-danger txt-theme-aware");
     }
 
     /**
@@ -189,9 +223,14 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_deleteMission() {
         if (this.props.p_mission == null) return;
-        js_mapmission_planmanager.fn_deleteMission(this.props.p_mission.m_id);
-        this.setState({ m_deleted: true });
-        js_eventEmitter.fn_dispatch(js_event.EE_onMissionReset);
+        const Me = this;
+        fn_do_modal_confirmation("Reset Mission",
+            "Are you sure you want to reset the mission on the map? All unsaved changes will be lost.", function (p_approved) {
+                if (p_approved === false) return;
+                js_mapmission_planmanager.fn_deleteMission(Me.props.p_mission.m_id);
+                Me.setState({ m_deleted: true });
+                js_eventEmitter.fn_dispatch(js_event.EE_onMissionReset);
+            }, "YES", "bg-warning txt-theme-aware");
     }
 
     /**
