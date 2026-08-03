@@ -851,6 +851,18 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteMission, p_msg);
     }
 
+    /**
+     * Query comm server for storage server connection status.
+     * Reply arrives as CONST_TYPE_AndruavSystem_StateServer system message.
+     */
+    API_queryStorageServerStatus() {
+        const p_msg = {
+            sc: js_andruavMessages.CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_QueryServer, p_msg);
+    }
+
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;

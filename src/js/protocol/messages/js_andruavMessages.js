@@ -209,6 +209,18 @@ export const CONST_TYPE_AndruavSystem_ConnectedCommServer = 9007;
 export const CONST_TYPE_AndruavSystem_LoadMission = 9010;
 export const CONST_TYPE_AndruavSystem_SaveMission = 9011;
 export const CONST_TYPE_AndruavSystem_DeleteMission = 9012;
+export const CONST_TYPE_AndruavSystem_QueryServer = 9013;
+export const CONST_TYPE_AndruavSystem_StateServer = 9014;
+
+// Subcommands for QueryServer / StateServer
+export const CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected = 1;
+
+// Storage/DB connection state codes (short strings)
+export const CONST_STORAGE_STATE_DISCONNECTED = 'dc';
+export const CONST_STORAGE_STATE_CONNECTING   = 'cg';
+export const CONST_STORAGE_STATE_CONNECTED    = 'cd';
+export const CONST_STORAGE_STATE_UNHEALTHY    = 'uh';
+export const CONST_STORAGE_STATE_ERROR        = 'er';
 
 
 export const CONST_TYPE_SWARM_FOLLOW = 1;
