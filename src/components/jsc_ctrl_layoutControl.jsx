@@ -17,11 +17,11 @@ class ClssCtrlLayout extends React.Component {
         const v_display_mode = js_localStorage.fn_getDisplayMode() % 5 + 1;
         const showMap3D = this.props.showMap3D !== false && !CONST_FEATURE.DISABLE_3D_MAP; // Default to true unless explicitly set to false or feature disabled
         return (
-            <div id="main_btn_group" role="group" className="d-flex align-items-center gap-1" >
+            <div id="main_btn_group" role="group" className="d-flex flex-wrap align-items-center gap-1" >
                 <button
                     type="button"
                     id="btn_showSettings"
-                    className="btn btn-success btn-sm  bi bi-gear-fill btn_bi_fixer "
+                    className="btn btn-success btn-sm  bi bi-gear-fill btn_bi_fixer hidden"
                     title={t('ctrlLayout:settings.title')}
                     onClick={(e) => fn_showSettings()}
                 >
