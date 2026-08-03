@@ -319,6 +319,55 @@ class CLocalStorage {
     fn_getWS2WSEnabled() {
         return this._getValue('_vWS2WSEnabled', 'false') === 'true';
     }
+
+    // Map Settings
+    fn_setMapLeafletAccessToken(value) {
+        this._setValue('_vMapLeafletAccessToken', value);
+    }
+
+    fn_getMapLeafletAccessToken() {
+        return this._getValue('_vMapLeafletAccessToken', '');
+    }
+
+    fn_removeMapLeafletAccessToken() {
+        this._removeValue('_vMapLeafletAccessToken');
+    }
+
+    fn_setMapLeafletUrlMap(value) {
+        this._setValue('_vMapLeafletUrlMap', value);
+    }
+
+    fn_getMapLeafletUrlMap() {
+        return this._getValue('_vMapLeafletUrlMap', '');
+    }
+
+    fn_removeMapLeafletUrlMap() {
+        this._removeValue('_vMapLeafletUrlMap');
+    }
+
+    fn_setMapbox3DAccessToken(value) {
+        this._setValue('_vMapbox3DAccessToken', value);
+    }
+
+    fn_getMapbox3DAccessToken() {
+        return this._getValue('_vMapbox3DAccessToken', '');
+    }
+
+    fn_removeMapbox3DAccessToken() {
+        this._removeValue('_vMapbox3DAccessToken');
+    }
+
+    fn_setMapboxStyle(value) {
+        this._setValue('_vMapboxStyle', value);
+    }
+
+    fn_getMapboxStyle() {
+        return this._getValue('_vMapboxStyle', '');
+    }
+
+    fn_removeMapboxStyle() {
+        this._removeValue('_vMapboxStyle');
+    }
 }
 
 export const js_localStorage = CLocalStorage.getInstance();
