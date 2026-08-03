@@ -460,6 +460,7 @@ class ClssGlobalSettings extends React.Component {
     super();
     this.state = {
       m_update: 0,
+      isMinimized: false,
     };
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
@@ -485,6 +486,9 @@ class ClssGlobalSettings extends React.Component {
       return true;
     }
     if (this.state.m_update !== nextState.m_update) {
+      return true;
+    }
+    if (this.state.isMinimized !== nextState.isMinimized) {
       return true;
     }
     return false;
@@ -516,6 +520,10 @@ class ClssGlobalSettings extends React.Component {
 
   fn_fireDeEvent(value) {
     js_andruav_facade.AndruavClientFacade.API_FireDeEvent(null, value);
+  }
+
+  fn_toggleMinimize() {
+    this.setState(prevState => ({ isMinimized: !prevState.isMinimized }));
   }
 
   render() {
@@ -560,8 +568,11 @@ class ClssGlobalSettings extends React.Component {
         <div className="card txt-theme-aware border-light mb-3 padding_zero">
           <div className="card-header text-center user-select-none">
             <strong>{t('globalSettings:settingsTitle')}</strong>
+            <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
+              {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+            </button>
           </div>
-          <div className="card-body">
+          <div className="card-body" style={{ display: this.state.isMinimized ? 'none' : 'block' }}>
             <ul className="nav nav-tabs">
               <li className="nav-item">
                 <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home">
