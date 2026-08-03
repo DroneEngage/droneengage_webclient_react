@@ -248,6 +248,15 @@ class CAndruavClientWS {
             js_eventEmitter.fn_dispatch(js_event.EE_Mission_Deleted, msg.msgPayload);
             return;
         }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_StateServer) {
+            let p_payload = msg.msgPayload;
+            if (typeof p_payload === 'string' || p_payload instanceof String) {
+                try { p_payload = JSON.parse(p_payload); } catch (e) { return; }
+            }
+            js_eventEmitter.fn_dispatch(js_event.EE_StorageServerState, p_payload);
+            return;
+        }
     };
 
     setSocketStatus(status) {
