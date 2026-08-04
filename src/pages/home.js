@@ -21,6 +21,7 @@ import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';
 import ClssGlobalSettings from '../components/jsc_globalSettings';
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx';
+import ClssAndruavUnitGCSList from '../components/unit_controls/jsc_unitControlGCSList.jsx';
 import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
 import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx';
 import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
@@ -44,7 +45,7 @@ import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.j
 import { fn_on_ready } from '../js/js_main';
 
 const Home = () => {
-  const { t } = useTranslation('home'); // Use home namespace
+  useTranslation('home'); // Use home namespace
   const [isRow2Collapsed, setIsRow2Collapsed] = useState(false);
   const [isMetricSystem, setIsMetricSystem] = useState(js_globals.v_useMetricSystem);
 
@@ -173,12 +174,7 @@ const Home = () => {
             <div id="andruavUnits_in" className="">
               <ClssGlobalSettings />
               <div id="andruavUnitGlobals"></div>
-              <p className="bg-warning text-center css_margin_top_small">
-                <strong>{t('home:onlineUnits')}</strong>
-              </p>
-            </div>
-            <div id="guiMessageCtrl" className="row"></div>
-            <div id="andruavUnitList" className="row">
+              <ClssAndruavUnitGCSList />
               <ClssAndruavUnitList
                 tab_planning={false}
                 tab_main={true}

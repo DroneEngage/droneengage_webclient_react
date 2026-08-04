@@ -1,5 +1,6 @@
 {
   "onlineUnits": "Единицы в сети",
+  "onlineGCS": "GCS в сети",
   "modal.image.title": "Изображение",
   "modal.image.save": "Сохранить",
   "modal.image.goto": "Перейти",

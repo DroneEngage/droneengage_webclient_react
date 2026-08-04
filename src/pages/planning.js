@@ -59,7 +59,7 @@ const Planning = () => {
 				</div>
 				<div id="row_2" className="col-lg-4 col-xl-4 col-xxl-4 col-12">
 					<div id='andruavUnitList' className='col-12 padding_zero'>
-						<ClssAndruavUnitList gcs_list={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false} />
+						<ClssAndruavUnitList show_card={false} tab_planning={true} tab_main={false} tab_log={false} tab_details={false} tab_module={false} />
 					</div>
 					<div className="col-12 padding_zero">
 						<ClssMain_Control_Buttons />
