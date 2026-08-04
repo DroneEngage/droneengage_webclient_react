@@ -1,5 +1,6 @@
 {
   "onlineUnits": "Unité en Ligne",
+  "no_online_units": "Aucune unité en ligne",
   "onlineGCS": "GCS en Ligne",
   "modal.image.title": "Image",
   "modal.image.save": "Sauvegarder",

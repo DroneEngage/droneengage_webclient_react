@@ -215,6 +215,7 @@ class ClssAndruavUnitList extends React.Component {
 
         let units_header = [];
         let units_details = [];
+        let onlineCount = 0;
 
         if (this.state.andruavUnitPartyIDs.length === 0)
         {
@@ -251,6 +252,8 @@ class ClssAndruavUnitList extends React.Component {
 
                 // GCS units are displayed by ClssAndruavUnitGCSList, skip them here.
                 if (v_andruavUnit.m_IsGCS === true) return ;
+
+                onlineCount++;
 
                 if (v_andruavUnit.m_IsGCS===false)
                 {
@@ -291,7 +294,7 @@ class ClssAndruavUnitList extends React.Component {
         const v_hasUnits = this.state.andruavUnitPartyIDs.length > 0;
         const v_tabsEnabled = js_localStorage.fn_getTabsDisplayEnabled();
         const v_sortEnabled = js_localStorage.fn_getUnitSortEnabled();
-        const v_headerText = v_hasUnits ? t('home:onlineUnits') : t('msg.no_online_units');
+        const v_headerText = v_hasUnits ? t('home:onlineUnits') + ' - ' + onlineCount : t('home:no_online_units');
 
     return (
                 <div key='main' className='margin_zero width_100'>
