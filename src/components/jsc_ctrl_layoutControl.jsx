@@ -2,7 +2,6 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { js_localStorage } from '../js/js_localStorage';
 import { fn_showSettings, fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/js_main';
-import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx';
 import { CONST_FEATURE } from '../js/js_siteConfig';
 
 class ClssCtrlLayout extends React.Component {
@@ -74,7 +73,6 @@ class ClssCtrlLayout extends React.Component {
                 >
                     <strong>{t('ctrlLayout:layoutSmall.label', { mode: v_display_mode })}</strong>
                 </button>
-                <ClssLanguageSwitcher className="ms-1"/>
             </div>
         );
     }

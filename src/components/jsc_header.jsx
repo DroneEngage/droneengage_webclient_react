@@ -6,6 +6,7 @@ import * as  js_siteConfig from '../js/js_siteConfig'
 import ClssLoginControl from './jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
 import ThemeSwitcher from './jsc_theme_switcher.jsx'
+import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx'
 
 import { withTranslation } from 'react-i18next';
 
@@ -65,7 +66,7 @@ class ClssHeaderControl extends React.Component {
                         </a>
                     </nav>
                     <div className="dropdown ms-2">
-                        <button className="btn btn-sm btn-secondary dropdown-toggle bi bi-list" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button className="btn btn-sm btn-secondary dropdown-toggle bi bi-list" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                             <span className="ms-1">{t('header.menu')}</span>
                         </button>
                         <ul className="dropdown-menu dropdown-menu-start" style={{minWidth: '180px', maxWidth: '90vw'}}>
@@ -76,10 +77,15 @@ class ClssHeaderControl extends React.Component {
                             <li key="Contact"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a></li>
                             {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK"><a className="dropdown-item text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a></li>}
                             {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account"><a className="dropdown-item txt-theme-aware" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a></li>}
+                            <li key="Lang"><hr className="dropdown-divider" /></li>
+                            <li key="LangItem" className="px-3 py-1">
+                                <ClssLanguageSwitcher className="w-100" />
+                            </li>
                             <li key="Theme"><hr className="dropdown-divider" /></li>
                             <li key="ThemeItem" className="px-3 py-1">
                                 <ThemeSwitcher showLabel={true} className="d-inline-block" />
                             </li>
+                            
                         </ul>
                     </div>
                 </div>
