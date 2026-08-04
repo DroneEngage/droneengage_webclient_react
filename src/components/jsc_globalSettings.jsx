@@ -247,8 +247,6 @@ class ClssPreferences extends React.Component {
     js_globals.v_enable_tabs_display = js_localStorage.fn_getTabsDisplayEnabled();
     this.m_volumeRangeRef = React.createRef();
     this.m_enableSpeechRef = React.createRef();
-    this.m_tabsDisplayeRef = React.createRef();
-    this.m_unitSortRef = React.createRef();
     this.m_advancedRef = React.createRef();
     this.m_ws2wsRef = React.createRef();
     this.m_gcsDisplayRef = React.createRef();
@@ -258,8 +256,6 @@ class ClssPreferences extends React.Component {
   componentDidMount() {
     this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
     this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
-    this.m_tabsDisplayeRef.current.checked = js_localStorage.fn_getTabsDisplayEnabled();
-    this.m_unitSortRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
     this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
@@ -313,24 +309,10 @@ class ClssPreferences extends React.Component {
     }
   }
 
-  fn_enableTabsDisplay(e) {
-    const enabled = e.currentTarget.checked;
-    js_globals.v_enable_tabs_display = enabled;
-    js_localStorage.fn_setTabsDisplayEnabled(enabled);
-    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
-  }
-
   fn_GCSShowMe(e) {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setGCSShowMe(enabled);
-    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
-  }
-
-  fn_sortUnits(e) {
-    const enabled = e.currentTarget.checked;
-    js_globals.v_enable_tabs_display = enabled;
-    js_localStorage.fn_setUnitSortEnabled(enabled);
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
@@ -373,33 +355,6 @@ class ClssPreferences extends React.Component {
             disabled={v_speech_disabled === 'true' }
             onChange={(e) => this.fn_changeVolume(e)}
             onMouseUp={(e) => this.fn_handleMouseUp(e)}
-          />
-        </div>
-        <div className="row mb-12 align-items-center">
-          <label htmlFor="check_tabs_display" className={`col-sm-4 col-form-label ${dir}`}>
-            {t('globalSettings:tabsDisplayLabel')}
-          </label>
-          <input
-            className="form-check-input col-sm-4"
-            type="checkbox"
-            id="check_tabs_display"
-            ref={this.m_tabsDisplayeRef}
-            onClick={(e) => this.fn_enableTabsDisplay(e)}
-          />
-          <label
-            id='check_unit_sort'
-            htmlFor="check_unit_sort"
-            className="col-sm-4 col-form-label al_r"
-            title={t('globalSettings:sortUnitsTitle')}
-          >
-            {t('globalSettings:sortUnitsLabel')}
-          </label>
-          <input
-            className="form-check-input col-sm-4"
-            type="checkbox"
-            id="check_unit_sort"
-            ref={this.m_unitSortRef}
-            onClick={(e) => this.fn_sortUnits(e)}
           />
         </div>
         <div className="row mb-12 align-items-center">
