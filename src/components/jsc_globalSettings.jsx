@@ -576,6 +576,7 @@ class ClssGlobalSettings extends React.Component {
     };
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
+    this.defaultTabRef = React.createRef();
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, this.fn_onAuthStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
 
@@ -621,6 +622,9 @@ class ClssGlobalSettings extends React.Component {
   }
 
   componentDidMount() {
+    if (this.defaultTabRef.current) {
+      this.defaultTabRef.current.classList.add('active');
+    }
     this.setState({ m_update: this.state.m_update + 1 });
   }
 
@@ -687,7 +691,7 @@ class ClssGlobalSettings extends React.Component {
           <div className="card-body" style={{ display: this.state.isMinimized ? 'none' : 'block' }}>
             <ul className="nav nav-tabs">
               <li className="nav-item">
-                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home" ref={this.defaultTabRef}>
                   {t('globalSettings:defaultsTab')}
                 </a>
               </li>
