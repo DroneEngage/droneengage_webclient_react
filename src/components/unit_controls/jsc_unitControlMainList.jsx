@@ -298,7 +298,7 @@ class ClssAndruavUnitList extends React.Component {
                     {v_showCard === true
                     ? (
                     <div className="mb-3 padding_zero">
-                        <div className="card-header user-select-none border-bottom border-light rounded-top txt-theme-aware">
+                        <div className="card-header user-select-none border-bottom border-light rounded-top txt-theme-aware mb-1">
                             <strong>{v_headerText}</strong>
                             {v_hasUnits === true
                             ? <>
