@@ -1,5 +1,6 @@
 {
   "onlineUnits": "الوحدات المتصلة",
+  "no_online_units": "لا توجد وحدات متصلة",
   "onlineGCS": "محطات أرضية متصلة",
   "modal.image.title": "صورة",
   "modal.image.save": "حفظ",
