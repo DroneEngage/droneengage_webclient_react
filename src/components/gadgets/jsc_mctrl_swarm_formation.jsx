@@ -39,7 +39,10 @@ class ClssCtrlSWARMFormation extends React.Component {
 
         if (this.props.p_editable === true) {
             let newFormation = this.props.p_formation_as_leader + 1;
-            if (newFormation >= 3) {
+            if (newFormation === 3) {
+                newFormation = js_andruavMessages.CONST_TASHKEEL_SERB_ARROW_DYNAMIC;
+            }
+            if (newFormation > js_andruavMessages.CONST_TASHKEEL_SERB_ARROW_DYNAMIC) {
                 newFormation = 1;
             }
 
