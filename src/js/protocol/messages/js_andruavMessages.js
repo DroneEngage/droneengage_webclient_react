@@ -249,7 +249,8 @@ export const CONST_TASHKEEL_SERB_NO_SWARM = 0;
 export const CONST_TASHKEEL_SERB_THREAD = 1;
 export const CONST_TASHKEEL_SERB_ARROW = 2; // requires angle
 export const CONST_TASHKEEL_SERB_VECTOR = 3;
-export const CONST_TASHKEEL_SERB_COUNT = 2;
+export const CONST_TASHKEEL_SERB_ARROW_DYNAMIC = 4; // dynamic role assignment — followers keep physical side
+export const CONST_TASHKEEL_SERB_COUNT = 3;
 
 
 // Tracking Target Action TYPE_AndruavMessage_TargetTracking_ACTION
@@ -603,6 +604,7 @@ export const swarm_formation_names = {
   1: "Thread",
   2: "V-Arrow",
   3: "V-Shape",
+  4: "V-Arrow Dyn",
 };
 
 // Pre-process message_names to ensure all keys have a value

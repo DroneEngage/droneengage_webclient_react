@@ -123,7 +123,10 @@ class ClssCtrlSWARM extends React.Component {
         if (this.props.p_unit === null || this.props.p_unit === undefined) return;
         if (this.props.p_unit.m_Swarm.m_isLeader === true) {
             let newFormation = this.state.m_formation_as_leader + 1;
-            if (newFormation >= 3) {
+            if (newFormation === 3) {
+                newFormation = js_andruavMessages.CONST_TASHKEEL_SERB_ARROW_DYNAMIC;
+            }
+            if (newFormation > js_andruavMessages.CONST_TASHKEEL_SERB_ARROW_DYNAMIC) {
                 newFormation = 1;
             }
             js_globals.v_andruavFacade.API_makeSwarm(
