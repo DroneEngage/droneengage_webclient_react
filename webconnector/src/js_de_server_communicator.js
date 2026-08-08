@@ -27,6 +27,7 @@ class CDeServerCommunicator {
     #cfg;
     #state;
     #onUpstreamMessage;
+    #onMavlinkMessage;
     #ensureReadyPromise;
     #connectWsPromise;
     #retryTimer;
@@ -35,6 +36,7 @@ class CDeServerCommunicator {
         this.#cfg = cfg;
         this.#state = state;
         this.#onUpstreamMessage = null;
+        this.#onMavlinkMessage = null;
         this.#ensureReadyPromise = null;
         this.#connectWsPromise = null;
         this.#retryTimer = null;
@@ -46,6 +48,39 @@ class CDeServerCommunicator {
      */
     setOnUpstreamMessage(callback) {
         this.#onUpstreamMessage = callback;
+    }
+
+    /**
+     * Register a callback invoked for every extracted raw MAVLink payload.
+     * @param {function} callback - fn(mavlinkArrayBuffer)
+     */
+    setOnMavlinkMessage(callback) {
+        this.#onMavlinkMessage = callback;
+    }
+
+    /**
+     * Extract raw MAVLink payload from an Andruav binary frame.
+     * Andruav binary frame format: [JSON header string][0x00][binary payload]
+     * When the JSON header's mt === CONST_TYPE_AndruavBinaryMessage_Mavlink (6502),
+     * the binary payload after the null terminator is raw MAVLink.
+     * @param {ArrayBuffer} buffer
+     * @returns {ArrayBuffer|null} raw MAVLink payload, or null if not a MAVLink frame
+     */
+    #fn_extractMavlink(buffer) {
+        try {
+            const data = new Uint8Array(buffer);
+            const nullIdx = data.indexOf(0);
+            if (nullIdx <= 0) return null;
+
+            const headerStr = new TextDecoder().decode(data.subarray(0, nullIdx));
+            const header = JSON.parse(headerStr);
+            if (header.mt === js_andruavMessages.CONST_TYPE_AndruavBinaryMessage_Mavlink) {
+                return buffer.slice(nullIdx + 1);
+            }
+        } catch {
+            // Not a valid Andruav binary frame or not MAVLink — silently skip
+        }
+        return null;
     }
 
     get isWsConnected() {
@@ -273,26 +308,16 @@ class CDeServerCommunicator {
 
             ws.onmessage = (evt) => {
                 // Relay upstream frames to all connected local clients.
-                try {
-                    const len = evt && evt.data ? (evt.data.byteLength ?? evt.data.length ?? null) : null;
-                    let msgType = null;
-                    if (typeof evt.data === 'string') {
-                        try {
-                            const parsed = JSON.parse(evt.data);
-                            msgType = parsed.messageType || parsed.mt;
-
-                            console.info('[webplugin] << upstream', {
-                                bytes: len,
-                                msgType: msgType
-                            });
-                        } catch { }
-                    }
-
-                } catch {
-                }
-
                 if (this.#onUpstreamMessage) {
                     this.#onUpstreamMessage(evt.data);
+                }
+
+                // Extract raw MAVLink from Andruav binary frames and forward to MAVLink hub clients.
+                if (evt.data instanceof ArrayBuffer && this.#onMavlinkMessage) {
+                    const mavlinkPayload = this.#fn_extractMavlink(evt.data);
+                    if (mavlinkPayload) {
+                        this.#onMavlinkMessage(mavlinkPayload);
+                    }
                 }
             };
 

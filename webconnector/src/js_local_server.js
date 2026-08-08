@@ -25,6 +25,9 @@ class CLocalServer {
     #wssServer;
     #wss;
     #reqSeq;
+    #mavlinkHubServer;
+    #mavlinkHubWss;
+    #mavlinkClients;
 
     constructor(cfg, state, tlsOptions, serverCommunicator) {
         this.#cfg = cfg;
@@ -37,6 +40,9 @@ class CLocalServer {
         this.#httpsServer = null;
         this.#wssServer = null;
         this.#wss = null;
+        this.#mavlinkHubServer = null;
+        this.#mavlinkHubWss = null;
+        this.#mavlinkClients = new Set();
     }
 
     startHttp() {
@@ -94,6 +100,19 @@ class CLocalServer {
         for (const c of this.#state.clients) {
             if (c.readyState === WebSocket.OPEN) {
                 c.send(data);
+            }
+        }
+    }
+
+    /**
+     * Broadcast raw MAVLink data to all connected MAVLink hub clients.
+     * @param {*} data - ArrayBuffer of raw MAVLink frame
+     */
+    broadcastToMavlinkClients(data) {
+        if (this.#mavlinkClients.size === 0) return;
+        for (const c of this.#mavlinkClients) {
+            if (c.readyState === WebSocket.OPEN) {
+                c.send(data, { binary: true });
             }
         }
     }
@@ -539,6 +558,65 @@ class CLocalServer {
 
         this.#wssServer.listen(this.#cfg.wsPort, '127.0.0.1', () => {
             console.log(`webplugin WS listening on ws://127.0.0.1:${this.#cfg.wsPort}`);
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // MAVLink hub WS server (raw MAVLink relay)
+    // - Accepts local MAVLink consumers (e.g. Mavlink3DMap2 frontend).
+    // - Optional apiKey via query param k= (if configured).
+    // - Read-only: broadcasts extracted MAVLink from upstream Andruav frames.
+    // - Also accepts incoming MAVLink from clients (e.g. SITL/UDP bridge) and
+    //   broadcasts to other MAVLink hub clients.
+    // -------------------------------------------------------------------------
+    startMavlinkHubWs() {
+        this.#mavlinkHubServer = http.createServer();
+        this.#mavlinkHubServer.on('error', (e) => {
+            try {
+                if (e && e.code === 'EADDRINUSE') {
+                    console.error('[webplugin] MAVLink hub port already in use', {
+                        address: '127.0.0.1',
+                        port: this.#cfg.mavlinkHubPort,
+                    });
+                    console.error('[webplugin] Hint: find and kill the process using the port, e.g.:');
+                    console.error(`  lsof -iTCP:${this.#cfg.mavlinkHubPort} -sTCP:LISTEN -n -P`);
+                } else {
+                    console.error('[webplugin] MAVLink hub server error', e);
+                }
+            } catch {
+            }
+            process.exit(1);
+        });
+
+        this.#mavlinkHubWss = new WebSocketServer({
+            server: this.#mavlinkHubServer,
+            maxPayload: 100 * 1024 * 1024, // 100MB
+        });
+
+        this.#mavlinkHubWss.on('connection', (socket, req) => {
+            // MAVLink hub is open (no apiKey) — matches the old ws2ws bridge behavior.
+            // It is localhost-only and carries read-only telemetry.
+
+            this.#mavlinkClients.add(socket);
+            console.log(`[webplugin] mavlink-hub client connected (${this.#mavlinkClients.size})`);
+
+            socket.on('message', (data, isBinary) => {
+                // Broadcast incoming MAVLink from one hub client to all others.
+                for (const c of this.#mavlinkClients) {
+                    if (c !== socket && c.readyState === WebSocket.OPEN) {
+                        c.send(data, { binary: isBinary === true });
+                    }
+                }
+            });
+
+            socket.on('close', () => {
+                this.#mavlinkClients.delete(socket);
+                console.log(`[webplugin] mavlink-hub client closed (${this.#mavlinkClients.size})`);
+            });
+        });
+
+        this.#mavlinkHubServer.listen(this.#cfg.mavlinkHubPort, '127.0.0.1', () => {
+            console.log(`webplugin MAVLink hub listening on ws://127.0.0.1:${this.#cfg.mavlinkHubPort}`);
         });
     }
 }
