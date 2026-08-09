@@ -206,6 +206,21 @@ export const CONST_TYPE_AndruavSystem_DeleteTasks = 9003;
 export const CONST_TYPE_AndruavSystem_DisableTasks = 9004;
 export const CONST_TYPE_AndruavSystem_LogoutCommServer = 9006;
 export const CONST_TYPE_AndruavSystem_ConnectedCommServer = 9007;
+export const CONST_TYPE_AndruavSystem_LoadMission = 9010;
+export const CONST_TYPE_AndruavSystem_SaveMission = 9011;
+export const CONST_TYPE_AndruavSystem_DeleteMission = 9012;
+export const CONST_TYPE_AndruavSystem_QueryServer = 9013;
+export const CONST_TYPE_AndruavSystem_StateServer = 9014;
+
+// Subcommands for QueryServer / StateServer
+export const CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected = 1;
+
+// Storage/DB connection state codes (short strings)
+export const CONST_STORAGE_STATE_DISCONNECTED = 'dc';
+export const CONST_STORAGE_STATE_CONNECTING   = 'cg';
+export const CONST_STORAGE_STATE_CONNECTED    = 'cd';
+export const CONST_STORAGE_STATE_UNHEALTHY    = 'uh';
+export const CONST_STORAGE_STATE_ERROR        = 'er';
 
 
 export const CONST_TYPE_SWARM_FOLLOW = 1;
@@ -234,7 +249,8 @@ export const CONST_TASHKEEL_SERB_NO_SWARM = 0;
 export const CONST_TASHKEEL_SERB_THREAD = 1;
 export const CONST_TASHKEEL_SERB_ARROW = 2; // requires angle
 export const CONST_TASHKEEL_SERB_VECTOR = 3;
-export const CONST_TASHKEEL_SERB_COUNT = 2;
+export const CONST_TASHKEEL_SERB_ARROW_DYNAMIC = 4; // dynamic role assignment — followers keep physical side
+export const CONST_TASHKEEL_SERB_COUNT = 3;
 
 
 // Tracking Target Action TYPE_AndruavMessage_TargetTracking_ACTION
@@ -588,6 +604,7 @@ export const swarm_formation_names = {
   1: "Thread",
   2: "V-Arrow",
   3: "V-Shape",
+  4: "V-Arrow Dyn",
 };
 
 // Pre-process message_names to ensure all keys have a value

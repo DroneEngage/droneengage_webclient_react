@@ -1,10 +1,12 @@
 /**
- * 
+ *
  * SITE Configuration File
- * 
+ *
  * Auth: Mohammad Hefny
- * 
+ *
  */
+
+import { js_localStorage } from './js_localStorage.js';
 
 
 /**
@@ -13,7 +15,9 @@
 
 
 // Default Configuration
-export let CONST_TEST_MODE = true;
+// NOTE: These values are overwritten at runtime by /public/config.json
+// and /public/config.local.json (local has higher priority) via fn_loadConfig()/fn_applyRuntimeConfig().
+export let CONST_TEST_MODE = false;
 export let CONST_PROD_MODE_IP = 'airgap.droneengage.com';
 export let CONST_PROD_MODE_PORT = '19408';
 export let CONST_TEST_MODE_IP = '127.0.0.1';
@@ -88,7 +92,7 @@ export let CONST_FEATURE = {
     DISABLE_EXPERIMENTAL: true,
     DISABLE_DE_PILOT: true,
     DISABLE_3D_MAP: false,
-    DISABLE_VERSION_NOTIFICATION: true
+    DISABLE_VERSION_NOTIFICATION: false
 };
 
 /**
@@ -138,7 +142,7 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
         if (data.CONST_WEBCONNECTOR_CONFIG !== undefined) CONST_WEBCONNECTOR_CONFIG = { ...CONST_WEBCONNECTOR_CONFIG, ...data.CONST_WEBCONNECTOR_CONFIG };
-        
+
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
 
@@ -152,6 +156,19 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
         if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS };
         if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE };
+
+        // Apply localStorage overrides for map settings (localStorage has highest priority)
+        const localStorageLeafletToken = js_localStorage.fn_getMapLeafletAccessToken();
+        if (localStorageLeafletToken) CONST_MAP_LEAFLET_ACCESS_TOKEN = localStorageLeafletToken;
+
+        const localStorageLeafletUrl = js_localStorage.fn_getMapLeafletUrlMap();
+        if (localStorageLeafletUrl) CONST_MAP_LEAFLET_URL_MAP = localStorageLeafletUrl;
+
+        const localStorage3DToken = js_localStorage.fn_getMapbox3DAccessToken();
+        if (localStorage3DToken) CONST_MAPBOX_3D_ACCESS_TOKEN = localStorage3DToken;
+
+        const localStorageStyle = js_localStorage.fn_getMapboxStyle();
+        if (localStorageStyle) CONST_MAPBOX_STYLE = localStorageStyle;
     } catch (error) {
         console.error('Error applying config:', error);
     }

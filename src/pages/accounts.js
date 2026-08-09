@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
+import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 
 
@@ -61,7 +62,7 @@ const Accounts = () => {
      
         </div>
     </div>
-    <div id="footer_div" className="row mt-0 me-0 mw-0 mb-5">
+    <div id="footer_div" className="row mt-0 me-0 mw-0  mb-0">
     <ClssFooterControl />
     </div>
   </div>

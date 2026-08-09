@@ -5,6 +5,7 @@ import { Class_Radar_Screen } from '../micro_gadgets/jsc_mctrl_radar_screen';
 import { CTriStateChecked } from '../micro_gadgets/jsc_mctrl_tri_state_check';
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import { CONST_DEBUG_CONTROL_PAGE } from '../../js/js_siteConfig';
+import { fn_do_modal_alert } from '../../js/js_main.js';
 
 const DebugControlsPage = () => {
     const [fieldCheckValue, setFieldCheckValue] = useState('');
@@ -47,7 +48,7 @@ const DebugControlsPage = () => {
 
     const handleFireEvent = (value) => {
         console.log('Fire event value:', value);
-        alert(`Event fired with value: ${value}`);
+        fn_do_modal_alert(null, `Event fired with value: ${value}`);
     };
 
     const handleRadarRotationChange = () => {

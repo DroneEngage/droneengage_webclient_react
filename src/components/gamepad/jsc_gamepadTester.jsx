@@ -3,7 +3,7 @@ import { js_globals } from '../../js/js_globals.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import { js_speak } from '../../js/js_speak.js';
-import { fn_helpPage } from '../../js/js_main.js';
+import { fn_helpPage, fn_do_modal_alert } from '../../js/js_main.js';
 
 const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
 const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';
@@ -117,7 +117,7 @@ export default class ClssGamepadTester extends React.Component {
         console.log('Game pad configurations imported successfully');
       } catch (error) {
         console.error('Error importing configurations:', error);
-        alert('Failed to import configurations. Invalid JSON file.');
+        fn_do_modal_alert(null, 'Failed to import configurations. Invalid JSON file.');
       }
     }.bind(this);
 

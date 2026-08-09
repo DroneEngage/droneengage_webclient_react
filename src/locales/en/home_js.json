@@ -1,5 +1,7 @@
 {
   "onlineUnits": "Online Units",
+  "no_online_units": "No Online Units",
+  "onlineGCS": "Online GCS",
   "modal.image.title": "Image",
   "modal.image.save": "Save",
   "modal.image.goto": "Goto",

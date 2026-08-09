@@ -93,6 +93,7 @@ export class CWayPointLocation extends React.Component {
 
     fn_editShape ()
     {
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
         const c_shap_id = this.props.p_shape.id;
         const c_mission_id = this.props.p_shape.m_main_de_mission.m_id;
 

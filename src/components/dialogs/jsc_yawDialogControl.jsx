@@ -206,7 +206,7 @@ export default class ClssYawDialog extends ClssDialogBase
         return (
             <Draggable nodeRef={this.modal_ctrl_yaw} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
-					{this.fn_renderDialogHeader('YAW')}
+					{this.fn_renderDialogHeader('YAW' + (this.p_andruavUnit ? ' of ' + this.p_andruavUnit.m_unitName : ''))}
 					{!this.state.isMinimized && (
 					<div className="card-body">
 						<div id="yaw_knob_out" className="form-group text-centermodal_dialog_style">

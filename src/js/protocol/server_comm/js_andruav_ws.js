@@ -8,7 +8,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import * as js_common from '../../js_common.js'
 import { js_localStorage } from '../../js_localStorage.js'
 import { js_eventEmitter } from '../../js_eventEmitter.js'
-import { fn_showSecurityDialog } from '../../js_main.js'
+import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
@@ -233,6 +233,30 @@ class CAndruavClientWS {
             }
             return;
         }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LoadMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Loaded, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_SaveMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Saved, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Deleted, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_StateServer) {
+            let p_payload = msg.msgPayload;
+            if (typeof p_payload === 'string' || p_payload instanceof String) {
+                try { p_payload = JSON.parse(p_payload); } catch (e) { return; }
+            }
+            js_eventEmitter.fn_dispatch(js_event.EE_StorageServerState, p_payload);
+            return;
+        }
     };
 
     setSocketStatus(status) {
@@ -412,7 +436,7 @@ class CAndruavClientWS {
         try {
 
             if (p_accesscode === null || p_accesscode === undefined) {
-                alert("Password cannot be empty");
+                fn_do_modal_alert(null, "Password cannot be empty");
                 return;
             }
 
@@ -551,13 +575,13 @@ class CAndruavClientWS {
                     Me.#prv_handleSSLError(err);
                 };
             } else { // The browser doesn't support WebSocket
-                alert("WebSocket NOT supported by your Browser!");
+                fn_do_modal_alert(null, "WebSocket NOT supported by your Browser!");
             }
         }
         catch (e) {
             console.error("WebSocket initialization error:", e);
             if (e.message.includes("SSL") || e.message.includes("TLS")) {
-                alert("SSL/TLS error detected. Please check your certificate configuration.");
+                fn_do_modal_alert(null, "SSL/TLS error detected. Please check your certificate configuration.");
             }
             console.log("Web Socket Failed");
             console.log(e);
