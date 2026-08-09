@@ -18,6 +18,7 @@ async function fn_startApp() {
   const NoPage = (await import('./pages/NoPage')).default;
   const GamePadTesterPage = (await import('./pages/gamepadTester')).default;
   const DebugPage = (await import('./pages/debug')).default;
+  const Mobile = (await import('./pages/mobile')).default;
   const { ThemeProvider } = await import('./js/js_theme_context');
 
 
@@ -38,6 +39,7 @@ async function fn_startApp() {
             <Route path="accounts" element={<Accounts />} />
             <Route path="gamepad" element={<GamePadTesterPage />} />
             <Route path="debug" element={<DebugPage />} />
+            <Route path="mobile" element={<Mobile />} />
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
