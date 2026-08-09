@@ -79,7 +79,7 @@ class ClssAlertDialog extends ClssModalDialogBase {
                         <div className="modal-content">
                             {this.fn_renderDialogHeader(this.state.title, this.state.style, false)}
                             <div className="modal-body text-white">
-                                <p>{this.state.message}</p>
+                                <p dangerouslySetInnerHTML={{ __html: this.state.message }} />
                             </div>
                             <div className="modal-footer">
                                 <div className="btn-group w-100 d-flex flex-wrap">

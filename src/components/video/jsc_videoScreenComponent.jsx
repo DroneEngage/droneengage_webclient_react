@@ -625,6 +625,9 @@ export default class ClssCVideoScreen extends React.Component {
 
     render() {
         const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (andruavUnit === null || andruavUnit === undefined) {
+            return null;
+        }
         const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const divID = "cam_" + andruavUnit.getPartyID() + this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
         
@@ -635,7 +638,7 @@ export default class ClssCVideoScreen extends React.Component {
             activeClass = "active show";
         }
         
-        if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
+        if (talk === null || talk === undefined || talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
                     <h4 key="h" className='bg-danger txt-theme-aware rounded_6px'>{andruavUnit.m_unitName}</h4>
