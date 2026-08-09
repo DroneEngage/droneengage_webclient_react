@@ -32,12 +32,18 @@ export default class ClssLoginControl extends React.Component {
         js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_EE_permissionReceived);
         js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_EE_permissionBadLogin);
         js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
+        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_EE_authInProgress);
+        js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_EE_authBadLogin);
+        js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_EE_socketStatus);
     }
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_BAD_Operation, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
     }
 
     fn_EE_permissionReceived(me, params) {
@@ -57,6 +63,30 @@ export default class ClssLoginControl extends React.Component {
             successMessage: ''
         });
         loadCaptchaEnginge(6); 
+    }
+
+    fn_EE_authInProgress(me) {
+        me.setState({
+            errorMessage: '',
+            successMessage: 'Connecting...',
+        });
+    }
+
+    fn_EE_authBadLogin(me, params) {
+        const msg = params && params.em ? params.em : 'Login failed';
+        me.setState({
+            errorMessage: 'Login Error: ' + msg,
+            successMessage: '',
+        });
+    }
+
+    fn_EE_socketStatus(me, params) {
+        if (params && params.status === 'registered') {
+            me.setState({
+                errorMessage: '',
+                successMessage: 'Connected successfully.',
+            });
+        }
     }
 
     fn_validateCaptcha(callback) {
@@ -140,7 +170,7 @@ export default class ClssLoginControl extends React.Component {
                 
                 {this.state.errorMessage && (
                     <div className="alert alert-danger" role="alert">
-                        {this.state.errorMessage}
+                        {this.state.errorMessage} dsdsssd
                     </div>
                 )}
                 

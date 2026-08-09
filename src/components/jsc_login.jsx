@@ -24,7 +24,9 @@ class ClssLoginControl extends React.Component {
       m_update: 0,
       use_plugin: false,
       is_chat_visible: true,
-      chat_unread: 0
+      chat_unread: 0,
+      errorMessage: '',
+      successMessage: '',
     };
 
     this.m_flag_mounted = false;
@@ -62,7 +64,7 @@ class ClssLoginControl extends React.Component {
       me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
       me.state.username = me.txtUnitIDRef.current.value;
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
-      me.setState({ m_update: me.state.m_update + 1 });
+      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected successfully.' });
     } else {
       me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
       me.setState({ m_update: me.state.m_update + 1 });
@@ -72,7 +74,7 @@ class ClssLoginControl extends React.Component {
   fn_onAuthInProgress(me) {
     if (me.m_flag_mounted === false) return;
     me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
-    me.setState({ m_update: me.state.m_update + 1 });
+    me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
   }
 
   fn_onChatMessage(me, p_data) {
@@ -140,8 +142,9 @@ class ClssLoginControl extends React.Component {
       return;
     }
     
+    const msg = data && data.em ? data.em : 'Login failed';
     me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
-    me.setState({ m_update: me.state.m_update + 1 });
+    me.setState({ m_update: me.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
   }
 
   fn_onWebConnectorNotRunning(me, data) {
@@ -544,10 +547,20 @@ class ClssLoginControl extends React.Component {
         </button>
         <div className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1" style={{minWidth: '200px', maxWidth: '90vw'}}>
           <div id="login_form" className="card-body">
+            {this.state.errorMessage && (
+              <div className="alert alert-danger py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+                {this.state.errorMessage}
+              </div>
+            )}
+            {this.state.successMessage && (
+              <div className="alert alert-success py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+                {this.state.successMessage}
+              </div>
+            )}
             {ctrls}
             <button
               id="btnConnect"
-              className={'btn button_large rounded-3 m-2 user-select-none ' + css + ' p-0'}
+              className={'btn button_large rounded-3 user-select-none w-100 ' + css + ' p-1'}
               title={this.state.username}
               onClick={(e) => this.clickConnect(e)}
               ref={this.btnConnectRef}
