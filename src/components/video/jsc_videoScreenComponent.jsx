@@ -127,7 +127,6 @@ export default class ClssCVideoScreen extends React.Component {
 
     componentDidUpdate() {
         this.fn_lnkVideo();
-        js_common.fn_console_log("componentDidUpdate");
     }
 
 
@@ -313,6 +312,13 @@ export default class ClssCVideoScreen extends React.Component {
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
         if (v_video === null || v_video === undefined) return;
+
+        // componentDidUpdate runs on every re-render of this component, including ones
+        // unrelated to this video (e.g. mobile telemetry ticks re-rendering the whole page
+        // tree). Reassigning srcObject / calling play() unconditionally on each of those
+        // resets the live WebRTC frame and is what was causing the compact-mode flicker.
+        // Only touch the element when the stream actually changed.
+        if (v_video.srcObject === c_talk.stream) return;
         v_video.srcObject = c_talk.stream;
 
         // Compact mode (mobile): ensure autoplay works outside a user gesture by
