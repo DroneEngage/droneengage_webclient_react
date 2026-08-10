@@ -182,16 +182,22 @@ export default class ClssStreamDialog extends ClssDialogBase
     fn_displayDialog (p_me, p_session)
     {
         if (p_me.m_flag_mounted === false)return ;
-        
+
         p_me.state.p_session = p_session;
-        
+
         p_me.setState({'m_update': p_me.state.m_update +1});
-        
-        p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
+
+        // Compact mode: mobile sheet visibility is handled by state, not DOM manipulation
+        if (p_me.modal_ctrl_stream_dlg.current) {
+            p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
+        }
     }
 
     fn_initDialog() {
-        this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        // Compact mode: mobile sheet doesn't use this ref, only desktop card does
+        if (this.modal_ctrl_stream_dlg.current) {
+            this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        }
         super.fn_initDialog();
     }
 
@@ -204,11 +210,14 @@ export default class ClssStreamDialog extends ClssDialogBase
 
     fn_closeDialog()
     {
-        this.modal_ctrl_stream_dlg.current.style.opacity = '';
-        this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        // Compact mode: mobile sheet doesn't use this ref, only desktop card does
+        if (this.modal_ctrl_stream_dlg.current) {
+            this.modal_ctrl_stream_dlg.current.style.opacity = '';
+            this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        }
         if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
-            this.state.p_session = null;            
+            this.state.p_session = null;
         }
     }
 
