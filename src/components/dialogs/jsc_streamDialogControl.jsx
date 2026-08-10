@@ -210,20 +210,22 @@ export default class ClssStreamDialog extends ClssDialogBase
 
     render() {
         let p_andruavUnit = null;
-        
+
         if (this.state.p_session) {
             p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID());
         }
 
         const isNoStreams = p_andruavUnit === null;
+        const isCompact = this.fn_isCompact();
+        const cardClassName = 'card css_ontop border-light p-2' + (isCompact ? ' css_dialog_compact' : '');
 
         return (
             <Draggable nodeRef={this.modal_ctrl_stream_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
             <div
                 id="modal_ctrl_stream_dlg"
                 title="Streaming Video"
-                className="card css_ontop border-light p-2"
-                ref={this.modal_ctrl_stream_dlg} // Set the ref here
+                className={cardClassName}
+                ref={this.modal_ctrl_stream_dlg}
             >
                 {this.fn_renderDialogHeader(isNoStreams ? 'No Streams' : 'Streams of ' + this.state.p_session?.m_unit.m_unitName)}
 

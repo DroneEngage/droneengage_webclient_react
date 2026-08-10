@@ -11,6 +11,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 import { js_globals } from '../js/js_globals.js';
@@ -18,7 +19,7 @@ import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
-import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, fn_VIDEO_login } from '../js/js_main';
+import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, fn_VIDEO_login, toggleVideo } from '../js/js_main';
 import { fn_getMobileActions, fn_startVideo, fn_stopVideo } from '../js/js_mobile_commands.js';
 
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
@@ -75,43 +76,9 @@ const Mobile = () => {
     };
   }, []);
 
-  // jsc_videoScreenComponent.jsx's <video autoPlay> has no `muted` attribute, and its
-  // `srcObject` is only assigned once WebRTC negotiation finishes - well after the tap that
-  // started it, i.e. outside any "user gesture" window. Desktop browsers are lenient enough
-  // that this still autoplays, but mobile browsers enforce their autoplay-with-sound policy
-  // much more strictly and silently reject the implicit play(), so the feed connects (Android
-  // shows the camera as active) but the mobile page never actually renders a frame. Mute + kick
-  // play() ourselves whenever the underlying <video> element for the live feed appears/changes.
-  useEffect(() => {
-    const container = document.querySelector('.mobile-video-container');
-    if (!container) return;
-
-    const fnl_unlockVideo = (v_video) => {
-      if (!v_video || v_video.dataset.mobileAutoplayUnlocked === '1') return;
-      v_video.dataset.mobileAutoplayUnlocked = '1';
-      v_video.muted = true;
-      v_video.playsInline = true;
-      const playPromise = v_video.play();
-      if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => { /* will retry via MutationObserver/srcObject changes */ });
-      }
-    };
-
-    container.querySelectorAll('video').forEach(fnl_unlockVideo);
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType !== 1) return;
-          if (node.tagName === 'VIDEO') fnl_unlockVideo(node);
-          node.querySelectorAll?.('video').forEach(fnl_unlockVideo);
-        });
-      });
-    });
-    observer.observe(container, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, []);
+  // Mobile autoplay is now handled inside ClssCVideoScreen via its p_compact prop:
+  // muted + playsInline on the <video> element and an explicit play() call in fn_lnkVideo()
+  // after srcObject is assigned - no external MutationObserver needed.
 
   useEffect(() => {
     const handleUnitSystemChange = (listener, data) => {
@@ -400,9 +367,9 @@ const Mobile = () => {
           <div id="mapid" className="fullscreen" />
         </div>
         <div className={`mobile-video-container ${viewMode === 'map' ? 'hidden' : ''}`}>
-          <ClssCVideoControl />
+          <ClssCVideoControl p_compact={true} />
           {viewMode === 'video' && selectedUnit && !isVideoActive && (
-            <button className="mobile-video-retry-btn" onClick={retryVideo}>
+            <button className="mobile-video-retry-btn" onClick={() => toggleVideo(selectedUnit)}>
               <i className="bi bi-arrow-repeat" />
               Tap to Start Camera
             </button>
@@ -564,24 +531,31 @@ const Mobile = () => {
         <div id="row_2" />
       </div>
 
-      {/* Dialogs - need to be mounted for functionality */}
-      <ClssConfirmationDialog />
-      <ClssAlertDialog />
-      <ClssFpvDialog />
-      <ClssAltitudeDialog />
-      <ClssSpeedDialog />
-      <ClssUnitInfoDialog />
-      <ClssMissionLoadDialog />
-      <ClssCameraDialog />
-      <ClssStreamDialog />
-      <ClssYawDialog />
-      <ClssLidarInfoDialog />
-      <ClssServoControl />
-      <ClssUnitParametersList />
-      <ClssViewLinkGimbal />
-      <ClssModuleDetails />
-      <ClssConfigGenerator />
-      <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+      {/* Dialogs - rendered in a portal to document.body so the draggable
+          cards (position: absolute) escape .mobile-page's overflow: hidden
+          and are not clipped on mobile screens. */}
+      {ReactDOM.createPortal(
+        <>
+          <ClssConfirmationDialog />
+          <ClssAlertDialog />
+          <ClssFpvDialog />
+          <ClssAltitudeDialog />
+          <ClssSpeedDialog />
+          <ClssUnitInfoDialog />
+          <ClssMissionLoadDialog />
+          <ClssCameraDialog p_compact={true} />
+          <ClssStreamDialog p_compact={true} />
+          <ClssYawDialog />
+          <ClssLidarInfoDialog />
+          <ClssServoControl />
+          <ClssUnitParametersList />
+          <ClssViewLinkGimbal />
+          <ClssModuleDetails />
+          <ClssConfigGenerator />
+          <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+        </>,
+        document.body
+      )}
     </div>
   );
 };

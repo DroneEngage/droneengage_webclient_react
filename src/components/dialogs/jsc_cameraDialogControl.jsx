@@ -237,9 +237,12 @@ export default class ClssCameraDialog extends ClssDialogBase
         
         
 
+        const isCompact = this.fn_isCompact();
+        const camCardClassName = 'card css_ontop border-light p-2' + (isCompact ? ' css_dialog_compact' : '');
+
         return (
             <Draggable nodeRef={this.modal_ctrl_cam} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
-            <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2 " ref={this.modal_ctrl_cam}>
+            <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className={camCardClassName} ref={this.modal_ctrl_cam}>
                 {this.fn_renderDialogHeader('Still Image of ' + v_unitName)}
                       
                 {!this.state.isMinimized && (

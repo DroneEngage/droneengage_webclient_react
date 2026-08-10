@@ -211,6 +211,25 @@ class CAndruavMap3D {
     fn_show() {
         this.m_isVisible = true;
         this.m_map?.resize();
+
+        // Re-sync all markers after resize. When the map container is hidden
+        // (zero size), marker.setLngLat() projects to wrong screen coordinates
+        // via requestAnimationFrame. resize() fires a 'resize' event but NOT
+        // a 'move' event, so markers are never repositioned automatically.
+        // Manually calling setLngLat forces a re-projection with the correct
+        // container dimensions.
+        if (this.m_map && this.m_isReady) {
+            this.m_markers.forEach(marker => {
+                const lngLat = marker.getLngLat?.();
+                if (lngLat) marker.setLngLat(lngLat);
+
+                // Re-apply the last icon URL (stored on the marker instance)
+                if (marker._lastIconUrl) {
+                    const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
+                    if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
+                }
+            });
+        }
     }
 
     fn_hide() {
@@ -219,6 +238,19 @@ class CAndruavMap3D {
 
     fn_getUnitMarker(unit) {
         return unit ? this.m_markers.get(unit.getPartyID()) ?? null : null;
+    }
+
+    /**
+     * Sets/updates a marker's icon image and remembers it so fn_show() can re-apply it.
+     */
+    fn_setMarkerIcon(marker, markerIconUrl) {
+        if (!marker || !markerIconUrl) return;
+
+        marker._lastIconUrl = markerIconUrl;
+        const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
+        if (iconEl) {
+            iconEl.style.backgroundImage = `url('${markerIconUrl}')`;
+        }
     }
 
     /**
@@ -274,8 +306,10 @@ class CAndruavMap3D {
     }
 
     /**
-     * Syncs unit position, altitude, rotation (yaw), and icon.
-     * Now uses proper altitude support + terrain.
+     * Syncs unit position, rotation (yaw), and icon.
+     * Note: Mapbox GL JS v3.9.4 LngLat.convert silently ignores the third
+     * array element (altitude). Markers are auto-draped on terrain by the
+     * map when setTerrain() is enabled, so [lng, lat] is sufficient.
      */
     fn_syncUnit(unit, markerIconUrl = null) {
         if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
@@ -306,7 +340,10 @@ class CAndruavMap3D {
             marker = new window.mapboxgl.Marker({
                 element: el,
                 rotationAlignment: 'map',
-                pitchAlignment: 'map',
+                // 'viewport' keeps the icon billboarded toward the camera (like the 2D
+                // Leaflet map) instead of laid flat on the terrain, which at typical
+                // camera pitch angles foreshortens small icons into near-invisible slivers.
+                pitchAlignment: 'viewport',
                 anchor: 'center'
             })
             .setLngLat([lng, lat])
@@ -314,19 +351,15 @@ class CAndruavMap3D {
 
             // Ensure alignment (some older versions needed explicit calls)
             if (typeof marker.setRotationAlignment === 'function') marker.setRotationAlignment('map');
-            if (typeof marker.setPitchAlignment === 'function') marker.setPitchAlignment('map');
+            if (typeof marker.setPitchAlignment === 'function') marker.setPitchAlignment('viewport');
         } else {
             marker.setLngLat([lng, lat]);
-            
         }
 
         this.m_markers.set(id, marker);
 
-        // Update icon if provided
-        const iconEl = marker.getElement()?.querySelector('.css_map3d_marker_icon');
-        if (iconEl && markerIconUrl) {
-            iconEl.style.backgroundImage = `url('${markerIconUrl}')`;
-        }
+        // Update icon if provided — store last URL so fn_show can re-apply it
+        this.fn_setMarkerIcon(marker, markerIconUrl);
 
         // Auto-focus first unit
         if (!this.m_hasAutoFocusedUnit) {
@@ -344,6 +377,7 @@ class CAndruavMap3D {
                 marker.setRotation(normalizedYaw);
             } else {
                 // Fallback: rotate icon element
+                const iconEl = marker.getElement()?.querySelector('.css_map3d_marker_icon');
                 iconEl?.style.setProperty('transform', `rotate(${normalizedYaw}deg)`);
             }
         }

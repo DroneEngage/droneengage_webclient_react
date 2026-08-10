@@ -860,3 +860,40 @@ body.mobile-mode {
 .mobile-login-copy-btn:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* ── Compact dialog mode (mobile) ──────────────────────────────────────────
+   Applied via the p_compact prop on ClssDialogBase subclasses. Overrides the
+   desktop positioning in css_styles2.css (top:200px; left:100px; min-width:400px)
+   so draggable card dialogs fit a phone screen: centered horizontally, pinned
+   below the status bar, full-width minus margins, and fully opaque. */
+.css_dialog_compact {
+  position: fixed !important;
+  top: 50px !important;
+  left: 8px !important;
+  right: 8px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  opacity: 1 !important;
+  float: none !important;
+  z-index: 2100 !important;
+}
+
+.css_dialog_compact .card-header {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.css_dialog_compact .card-body {
+  padding: 8px;
+}
+
+.css_dialog_compact .row {
+  --bs-gutter-x: 4px;
+}
+
+.css_dialog_compact .btn-sm {
+  font-size: 0.8rem;
+  padding: 2px 6px;
+}
+

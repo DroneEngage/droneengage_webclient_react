@@ -2263,7 +2263,13 @@ function changedeg(element, degree) {
 
 function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
 	const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
+	const v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
+	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
+
+	const marker3d = js_map3d.fn_getUnitMarker(p_andruavUnit);
+	if (marker3d) {
+		js_map3d.fn_setMarkerIcon(marker3d, v_image);
+	}
 }
 
 
@@ -3110,7 +3116,13 @@ function fn_connectWebSocket(me) {
 
 		js_globals.v_andruavWS.fn_init();
 		const authPartyID = js_andruavAuth.fn_getPartyID();
-		const uiPartyID = $('#txtUnitID').val();
+		// Desktop's login form (#txtUnitID) persists whatever the user submits via
+		// js_localStorage.fn_setUnitID() before fn_connect() is called, so reading it back
+		// from storage here returns the same value the DOM field would have. Pages without
+		// that field (e.g. mobile.js's login form) still resolve to a real, persisted ID
+		// instead of undefined, which would otherwise register the WS session under a bogus
+		// "&s=undefined" SID and silently blackhole any server reply targeted back at us.
+		const uiPartyID = js_localStorage.fn_getUnitID();
 		const isPluginMode = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED && js_localStorage.fn_getWebConnectorEnabled();
 
 		// PartyID rules:
@@ -3125,7 +3137,7 @@ function fn_connectWebSocket(me) {
 			js_globals.v_andruavWS.unitID = authPartyID || uiPartyID;
 		}
 
-		js_globals.v_andruavWS.m_groupName = $('#txtGroupName').val();
+		js_globals.v_andruavWS.m_groupName = js_localStorage.fn_getGroupName();
 		console.info('[WS] connecting with partyID', {
 			authPartyID: authPartyID,
 			uiPartyID: uiPartyID,

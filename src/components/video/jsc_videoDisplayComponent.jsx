@@ -89,11 +89,44 @@ export class ClssCVideoControl extends React.Component {
             p_me.state.needsTabActivation = true; // Flag to activate tab after render
         }
 
+        if (p_me.props.p_compact === true) {
+            // Compact (mobile) view only ever shows one camera at a time. Keeping more than
+            // one tab-pane mounted is what was flickering: each pane runs its own live WebRTC
+            // <video>, and the active/show classes get juggled between React props and the
+            // imperative DOM patch in componentDidUpdate. Closing the others removes the
+            // second pane instead of just hiding it.
+            p_me.fn_closeOtherScreens(vid);
+        }
+
         fn_showVideoMainTab();
 
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
 
+    }
+
+
+    fn_closeOtherScreens(p_keepVid) {
+        Object.keys(this.state.m_videoScreens).forEach((v_key) => {
+            if (v_key === p_keepVid) return;
+            const v_screen = this.state.m_videoScreens[v_key];
+            if (!v_screen) return;
+
+            const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_screen.v_unit);
+            if (andruavUnit) {
+                const talk = andruavUnit.m_Video.m_videoactiveTracks[v_screen.v_track];
+                if (talk) {
+                    talk.hangup(true);
+                    js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(andruavUnit, false, talk.number, v_screen.v_track);
+                }
+                andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+            }
+
+            delete this.state.m_videoScreens[v_key];
+            if (this.state.lastadded === v_key) {
+                this.state.lastadded = null;
+            }
+        });
     }
 
 
@@ -176,7 +209,7 @@ export class ClssCVideoControl extends React.Component {
                 out_h.push(<li key={'h' + v_key} className="nav-item">
                     <a className={"nav-link user-select-none  txt-theme-aware  " + _first} data-bs-toggle="tab" href={'#cam_' + andruavUnit.getPartyID() + v_obj.v_track}>{andruavUnit.m_unitName + ' #' + v_obj.v_index}</a>
                 </li>);
-                out_b.push(<ClssCVideoScreen key={v_key} first={_first} obj={v_obj} />);
+                out_b.push(<ClssCVideoScreen key={v_key} first={_first} obj={v_obj} p_compact={this.props.p_compact} />);
             }
         }
 
