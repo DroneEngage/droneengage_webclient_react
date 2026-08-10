@@ -7,7 +7,6 @@ import { js_globals } from './js_globals.js';
 import { mavlink20 } from './js_mavlink_v2.js';
 import { js_andruavAuth } from './protocol/auth/js_andruav_auth.js';
 import * as js_andruavUnit from './js_andruavUnit.js';
-import { fn_VIDEO_login } from './js_main.js';
 
 function fn_isPX4(p_unit) {
     return p_unit.m_autoPilot === mavlink20.MAV_AUTOPILOT_PX4;
@@ -161,48 +160,6 @@ export function fn_getMobileActions(p_unit) {
     return actions;
 }
 
-// PartyIDs with a camera-list round trip currently in flight for fn_startVideo(). Guards
-// against firing a second `joinme` on top of one whose SDP/ICE negotiation hasn't finished yet -
-// mobile.js's own toggle/retry button can only ever queue one call at a time by itself, but the
-// mobile page re-renders far more often than the desktop one (it also refreshes on every nav/pow
-// telemetry tick), so any accidental double-invocation here would otherwise tear down and restart
-// a still-negotiating join (joinStream() treats "not yet connected" as stale) - never letting it
-// finish, i.e. camera shows as active on the drone side while nothing ever renders on the page.
-const v_pendingVideoRequests = new Set();
-
-/**
- * Starts video for a unit. If the unit has a single camera track it logs in directly.
- * If it has multiple tracks, p_onTracks(session, tracks) is called so the caller can
- * present a picker instead of opening the desktop draggable stream dialog.
- */
-export function fn_startVideo(p_andruavUnit, p_onTracks) {
-    if (!p_andruavUnit || !fn_canConnect()) return;
-
-    const partyID = p_andruavUnit.getPartyID();
-    if (v_pendingVideoRequests.has(partyID)) return;
-    v_pendingVideoRequests.add(partyID);
-
-    function fn_callback(p_session) {
-        v_pendingVideoRequests.delete(partyID);
-
-        if (!p_session || p_session.status !== 'connected') return;
-
-        const tracks = p_session.m_unit.m_Video.m_videoTracks;
-        if (!tracks || tracks.length === 0) return;
-
-        if (tracks.length === 1) {
-            fn_VIDEO_login(p_session, tracks[0].id);
-            return;
-        }
-
-        if (p_onTracks) {
-            p_onTracks(p_session, tracks);
-        }
-    }
-
-    js_globals.v_andruavFacade.API_requestCameraList(p_andruavUnit, fn_callback);
-}
-
 /**
  * Stops any live/negotiating video session(s) for a unit - mirrors the desktop video panel's
  * close button (fnl_stopVideo in jsc_videoScreenComponent.jsx) so navigating away from the
@@ -212,8 +169,6 @@ export function fn_startVideo(p_andruavUnit, p_onTracks) {
  */
 export function fn_stopVideo(p_andruavUnit) {
     if (!p_andruavUnit || !fn_canConnect()) return;
-
-    v_pendingVideoRequests.delete(p_andruavUnit.getPartyID());
 
     const activeTracks = p_andruavUnit.m_Video.m_videoactiveTracks;
     Object.keys(activeTracks).forEach((trackId) => {
