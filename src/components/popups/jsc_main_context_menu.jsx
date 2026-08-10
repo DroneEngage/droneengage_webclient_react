@@ -38,6 +38,15 @@ export class ClssMainContextMenu extends React.Component {
     }
 
 
+    /** True when rendered on the mobile page. This component is mounted
+     *  dynamically via ReactDOM.createRoot() from js_main.js (see
+     *  fn_generateContextMenuHTML), not composed into mobile.js's JSX tree,
+     *  so it has no p_compact prop to read - body.mobile-mode is the same
+     *  flag mobile.js itself toggles on mount/unmount. */
+    fn_isCompact() {
+        return document.body.classList.contains('mobile-mode');
+    }
+
     listUnits() {
         let v_contextMenu = [];
         let sortedPartyIDs;
@@ -48,9 +57,13 @@ export class ClssMainContextMenu extends React.Component {
         else {
             sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
         }
-        
+
         const p_lat = this.props.p_lat;
         const p_lng = this.props.p_lng;
+        const isCompact = this.fn_isCompact();
+        const unitLabelClass = 'text-bg-primary margin_zero padding_zero ' + (isCompact ? 'mobile-context-menu-label' : 'si-07x');
+        const actionClass = 'cursor_hand margin_zero text-primary ' + (isCompact ? 'mobile-context-menu-action' : 'si-07x');
+        const rowColClass = isCompact ? 'col-6 p-1' : 'col-6 p-0';
 
         sortedPartyIDs.map(function (p_andruavUnit) {
 
@@ -58,34 +71,34 @@ export class ClssMainContextMenu extends React.Component {
             if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (p_andruavUnit.m_IsGCS !== true)) {
                 if ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER)
                     || (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) {
-                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) 
+                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED)
                         || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
                         || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.getPartyID()}  className='row css_txt_center'>
                                 <div className='col-12 mt-1 padding_zero'>
-                                    <p className='text-bg-primary si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT }</p></div>
-                                <div className='col-6  p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
-                                <div className='col-6  p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
+                                    <p className={unitLabelClass}> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT }</p></div>
+                                <div className={rowColClass}><p className={actionClass} onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
+                                <div className={rowColClass}><p className={actionClass} onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
                             </div>);
                     }
                 }
                 else {
-                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED) 
+                    if ((p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED)
                         || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO)
                         || (p_andruavUnit.m_flightMode === js_andruavUnit.CONST_FLIGHT_PX4_AUTO_HOLD)) {
                         v_contextMenu.push(
                             <div key={'cmc1' + p_andruavUnit.getPartyID()} className='row css_txt_center'>
                                 <div className='col-12 mt-1 padding_zero'>
-                                    <p className='text-bg-primary si-07x margin_zero padding_zero'> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT}</p>
+                                    <p className={unitLabelClass}> {p_andruavUnit.m_unitName + "   " + p_andruavUnit.m_VehicleType_TXT}</p>
                                 </div>
                             </div>
                             );
 
                             v_contextMenu.push(
-                                <div key={'cmc2' + p_andruavUnit.getPartyID()} className='row '>                           
-                                <div className='col-6 p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
-                                <div className='col-6 p-0'><p className='cursor_hand margin_zero text-primary si-07x' onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
+                                <div key={'cmc2' + p_andruavUnit.getPartyID()} className='row '>
+                                <div className={rowColClass}><p className={actionClass} onClick={() =>fn_doFlyHere(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Goto Here</p></div>
+                                <div className={rowColClass}><p className={actionClass} onClick={() =>fn_doSetHome(p_andruavUnit.getPartyID(), p_lat, p_lng, p_andruavUnit.m_Nav_Info.p_Location.alt_abs - p_andruavUnit.m_Nav_Info.p_Location.alt_relative)}>Set Home</p></div>
                             </div>);
 
                     }
@@ -107,19 +120,24 @@ export class ClssMainContextMenu extends React.Component {
             v_lng = 0.0;
         }
 
+        const isCompact = this.fn_isCompact();
+        const rootClass = 'text-justified one_line col-12' + (isCompact ? ' mobile-context-menu' : '');
+        const coordClass = 'text-success margin_zero text-white ' + (isCompact ? 'mobile-context-menu-coord' : 'smaller2');
+        const geoFenceClass = 'cursor_hand text-primary margin_zero al_c' + (isCompact ? ' mobile-context-menu-action' : ' smaller3');
+
         return (
-            <div className="text-justified one_line col-12">
+            <div className={rootClass}>
                 <div className="row">
                 <p className="bg-success text-white mb-1 padding_zero">
-                    <span className="text-success margin_zero text-white smaller2" >
-                        lat:<span className='smaller2'>{v_lat.toFixed(6)}</span> lng:<span className='smaller2'>{v_lng.toFixed(6)}</span>
+                    <span className={coordClass} >
+                        lat:<span className={isCompact ? 'mobile-context-menu-coord' : 'smaller2'}>{v_lat.toFixed(6)}</span> lng:<span className={isCompact ? 'mobile-context-menu-coord' : 'smaller2'}>{v_lng.toFixed(6)}</span>
                     </span>
                 </p>
                 </div>
                 <div className="row">
                     <div className="col-sm-12">
                         <p
-                            className="cursor_hand text-primary margin_zero smaller3 al_c"
+                            className={geoFenceClass}
                             onClick={() =>
                                 window.open(
                                     `./mapeditor?zoom=${js_leafletmap.fn_getZoom()}&lat=${v_lat}&lng=${v_lng}`,
@@ -133,7 +151,7 @@ export class ClssMainContextMenu extends React.Component {
                 </div>
                 {listUnitsElement}
             </div>
-            
+
         );
     }
 
