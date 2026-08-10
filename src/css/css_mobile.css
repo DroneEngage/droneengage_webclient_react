@@ -458,14 +458,28 @@ body.mobile-mode {
   font-size: 0.85rem;
 }
 
-/* Bottom sheets: Smart Telemetry panel, video track picker */
+/* Bottom sheets: Smart Telemetry panel, stream dialog.
+   position:fixed (not absolute) because some of these - e.g. ClssStreamDialog
+   in compact mode - are rendered through mobile.js's document.body portal
+   (added so draggable desktop dialogs can escape .mobile-page's
+   overflow:hidden), so they have no .mobile-page ancestor to be absolute
+   against. The max-width/margin pair below mirrors .mobile-page's own
+   768px breakpoint so the sheet still lines up with the phone-width column
+   instead of spanning the full desktop viewport. */
 .mobile-sheet-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 200;
   display: flex;
   align-items: flex-end;
+}
+
+@media (min-width: 768px) {
+  .mobile-sheet-backdrop {
+    max-width: 480px;
+    margin: 0 auto;
+  }
 }
 
 .mobile-sheet {
