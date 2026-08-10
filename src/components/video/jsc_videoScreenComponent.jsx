@@ -749,8 +749,9 @@ export default class ClssCVideoScreen extends React.Component {
         const key = this.key;
         let v_btn_items = [];
 
-        // Compact mode: only essential controls (close, switch cam, snapshot, rotate, mirror, flash).
-        // Full mode: all controls including FPS, goto, PIP, fullscreen, record, zoom, tracker, fit, opacity, GPIO, viewlink.
+        // Compact mode: essential controls (close, switch cam, snapshot, zoom, mirror, rotate, flash).
+        // Zoom/flash self-hide per camera via css_zoomCam/css_flashCam when the track doesn't support them.
+        // Full mode adds: FPS, goto, PIP, fullscreen, record, tracker, fit mode, opacity, GPIO, viewlink.
         if (!isCompact) {
             v_btn_items.push(
                 <div key={key + "fps"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
@@ -841,16 +842,14 @@ export default class ClssCVideoScreen extends React.Component {
             </div>
         );
 
-        if (!isCompact) {
-            v_btn_items.push(
-                <div key={key + "9"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i className={css_zoomCam + " bi-zoom-in cursor_hand css_large_icon "} title="Zoom In" onClick={(e) => this.fnl_zoomInOut(e, true, this.props.obj)}></i>
-                </div>,
-                <div key={key + "10"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i className={css_zoomCam + " bi-zoom-out cursor_hand css_large_icon "} title="Zoom Out" onClick={(e) => this.fnl_zoomInOut(e, false, this.props.obj)}></i>
-                </div>
-            );
-        }
+        v_btn_items.push(
+            <div key={key + "9"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i id="btn_zoom_in" className={css_zoomCam + " bi-zoom-in cursor_hand css_large_icon "} title="Zoom In" onClick={(e) => this.fnl_zoomInOut(e, true, this.props.obj)}></i>
+            </div>,
+            <div key={key + "10"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i id="btn_zoom_out" className={css_zoomCam + " bi-zoom-out cursor_hand css_large_icon "} title="Zoom Out" onClick={(e) => this.fnl_zoomInOut(e, false, this.props.obj)}></i>
+            </div>
+        );
 
         v_btn_items.push(
             <div key={key + "11"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">

@@ -195,13 +195,14 @@ body.mobile-mode {
   justify-content: center;
 }
 
-/* #css_video_ctrl_panel's children are, in DOM order: FPS, close, goto,
-   PIP, fullscreen, switch-cam, record, snapshot, zoom x2, mirror, rotate,
-   flash, tracker, fit-mode, opacity, GPIO-flash, viewlink. Keep only
-   close (2nd), fullscreen (5th), record (7th) and snapshot (8th). */
-.mobile-video-container #css_video_ctrl_panel > div:not(:nth-child(2)):not(:nth-child(5)):not(:nth-child(7)):not(:nth-child(8)) {
-  display: none !important;
-}
+/* jsc_videoScreenComponent.jsx's isCompact branch already only renders
+   close/switch-cam/snapshot/zoom/mirror/rotate/flash into the DOM for
+   compact mode (see the p_compact prop threaded down from mobile.js), so
+   there's nothing left to hide here by position. This used to be a
+   nth-child rule keyed to the desktop button order, which broke silently
+   every time that order changed (it started hiding close/flash/zoom once
+   compact rendering was split out) - removed rather than re-pinned to a
+   DOM position that will just drift again. */
 
 .mobile-video-container #css_video_ctrl_panel img {
   width: 32px;
