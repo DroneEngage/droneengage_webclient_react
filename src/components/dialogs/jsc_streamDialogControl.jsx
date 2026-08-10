@@ -236,6 +236,11 @@ export default class ClssStreamDialog extends ClssDialogBase
 
         // Compact mode: render as mobile bottom sheet instead of draggable card
         if (isCompact) {
+            // Only show mobile sheet when there's an active session
+            if (!this.state.p_session) {
+                return null;
+            }
+
             return (
                 <div className="mobile-sheet-backdrop" onClick={() => this.fn_closeDialog()}>
                     <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
