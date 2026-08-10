@@ -20,7 +20,7 @@ import { js_eventEmitter } from '../js/js_eventEmitter';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
 import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, fn_VIDEO_login, toggleVideo } from '../js/js_main';
-import { fn_getMobileActions, fn_startVideo, fn_stopVideo } from '../js/js_mobile_commands.js';
+import { fn_getMobileActions, fn_stopVideo } from '../js/js_mobile_commands.js';
 
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
 import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
@@ -57,7 +57,6 @@ const Mobile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(js_andruavAuth.fn_logined() === true);
   const [showControls, setShowControls] = useState(true);
   const [showTelemetrySheet, setShowTelemetrySheet] = useState(false);
-  const [videoTrackPicker, setVideoTrackPicker] = useState(null); // { session, tracks } | null
   const tickRef = useRef(0);
   const unitSystemListenerRef = useRef({});
 
@@ -170,7 +169,7 @@ const Mobile = () => {
 
   const retryVideo = () => {
     if (selectedUnit) {
-      fn_startVideo(selectedUnit, (session, tracks) => setVideoTrackPicker({ session, tracks }));
+      toggleVideo(selectedUnit);
     }
   };
 
@@ -187,12 +186,6 @@ const Mobile = () => {
     }
   };
 
-  const handleSelectVideoTrack = (track) => {
-    if (videoTrackPicker) {
-      fn_VIDEO_login(videoTrackPicker.session, track.id);
-    }
-    setVideoTrackPicker(null);
-  };
 
   const runAction = (action) => {
     if (!selectedUnit || !action.enabled) return;
@@ -385,30 +378,6 @@ const Mobile = () => {
           </button>
         </div>
 
-        {/* Video track picker sheet */}
-        {videoTrackPicker && (
-          <div className="mobile-sheet-backdrop" onClick={() => setVideoTrackPicker(null)}>
-            <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
-              <div className="mobile-sheet-handle" />
-              <div className="mobile-sheet-header">
-                <span className="mobile-sheet-title"><i className="bi bi-camera-video" /> Select Camera</span>
-                <button className="mobile-sheet-close" onClick={() => setVideoTrackPicker(null)}>
-                  <i className="bi bi-x-lg" />
-                </button>
-              </div>
-              {videoTrackPicker.tracks.map((track) => (
-                <div
-                  key={track.id}
-                  className="mobile-sheet-row mobile-sheet-row-clickable"
-                  onClick={() => handleSelectVideoTrack(track)}
-                >
-                  <span className="mobile-sheet-value">{track.ln}</span>
-                  <i className="bi bi-chevron-right" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Telemetry grid - hidden when not logged in or controls hidden */}
