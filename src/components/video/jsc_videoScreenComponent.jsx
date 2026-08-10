@@ -881,19 +881,22 @@ export default class ClssCVideoScreen extends React.Component {
             </div>
         );
 
+        v_btn_items.push(
+            <div key={key + "5c"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i
+                    id="btn_video_fit_mode"
+                    className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
+                    alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                    title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                    onClick={(e) => this.fnl_toggleVideoFitMode(e)}
+                ></i>
+            </div>
+        );
+
         if (!isCompact) {
             v_btn_items.push(
                 <div key={key + "14"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
-                </div>,
-                <div key={key + "5c"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i
-                        id="btn_video_fit_mode"
-                        className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
-                        alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        onClick={(e) => this.fnl_toggleVideoFitMode(e)}
-                    ></i>
                 </div>,
                 <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
