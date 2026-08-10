@@ -17,6 +17,7 @@ body.mobile-mode {
   height: 100dvh;
   overflow: hidden;
   background: var(--bs-body-bg, #1a1a2e);
+  position: relative;
 }
 
 /* Thin status bar */
@@ -459,7 +460,7 @@ body.mobile-mode {
 
 /* Bottom sheets: Smart Telemetry panel, video track picker */
 .mobile-sheet-backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 200;
