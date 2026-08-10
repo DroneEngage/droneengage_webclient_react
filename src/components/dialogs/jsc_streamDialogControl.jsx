@@ -90,16 +90,17 @@ class ClssStreamChannel extends React.Component {
     render ()  {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         const v_unit = this.props.prop_session.m_unit;
+        const isCompact = this.props.p_compact === true;
         if ((v_unit == null) || (v_track == null))
         {
-            
+
             return (
                 <div></div>
             );
         }
         else
         {
-            
+
             let v_stream_class = 'btn-primary';
             let v_record_class = 'btn-primary';
             let v_startRecord = true;
@@ -111,23 +112,29 @@ class ClssStreamChannel extends React.Component {
                 actual_fps = track_id.a>=0?track_id.a:0;
                 v_stream_class = 'btn-danger';
             }
-            if ((track_id.r !== null && track_id.r !== undefined) 
+            if ((track_id.r !== null && track_id.r !== undefined)
                 && (track_id.r === true))
             { // recording
                 v_record_class = 'btn-danger';
                 v_startRecord = false;
             }
-            
+
+            // Compact (mobile): full-width layout with label on top, buttons below stacked
+            // Desktop: 3-column (label, stream button, record button)
+            const labelColClass = isCompact ? 'col-12 mb-2' : 'col-8';
+            const streamColClass = isCompact ? 'col-6' : 'col-2';
+            const recordColClass = isCompact ? 'col-6' : 'col-2';
+
             return (
                     <div className="row al_l css_margin_zero">
-                            <div className= "col-8   si-09x css_margin_zero txt-theme-aware">
+                            <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
+                            <div className={streamColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm w-100 " + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
+                            <div className={recordColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm w-100 " + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
                             </div>
                         </div>
             );
@@ -238,7 +245,7 @@ export default class ClssStreamDialog extends ClssDialogBase
                     ) : (
                         <div className='row'>
                             {this.state.p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
-                                <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} />
+                                <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} p_compact={isCompact} />
                             ))}
                         </div>
                     )}
