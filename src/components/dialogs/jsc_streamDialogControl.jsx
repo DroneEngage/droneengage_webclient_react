@@ -224,7 +224,35 @@ export default class ClssStreamDialog extends ClssDialogBase
 
         const isNoStreams = p_andruavUnit === null;
         const isCompact = this.fn_isCompact();
-        const cardClassName = 'card css_ontop border-light p-2' + (isCompact ? ' css_dialog_compact' : '');
+
+        // Compact mode: render as mobile bottom sheet instead of draggable card
+        if (isCompact) {
+            return (
+                <div className="mobile-sheet-backdrop" onClick={() => this.fn_closeDialog()}>
+                    <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-sheet-handle" />
+                        <div className="mobile-sheet-header">
+                            <span className="mobile-sheet-title">
+                                <i className="bi bi-camera-video" /> {isNoStreams ? 'No Streams' : 'Streams of ' + this.state.p_session?.m_unit.m_unitName}
+                            </span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_closeDialog()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        {!isNoStreams && (
+                            <>
+                                {this.state.p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
+                                    <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} p_compact={isCompact} />
+                                ))}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop mode: render as draggable card
+        const cardClassName = 'card css_ontop border-light p-2';
 
         return (
             <Draggable nodeRef={this.modal_ctrl_stream_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
