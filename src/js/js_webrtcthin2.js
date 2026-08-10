@@ -300,8 +300,24 @@ class AndruavStream {
     const conversationKey = dialConfig.targetVideoTrack ?? dialConfig.number;
     let talk = this.conversations[conversationKey];
 
-    if (talk && talk.status === "connecting") {
+    // A join request always means "start streaming now", so any leftover conversation that is not
+    // actually delivering video is stale and must be dropped - `joinme` is only ever transmitted
+    // when a NEW CTalk is created below.
+    //
+    // Previously only status "connecting" was treated as stale. A talk left in "routing"/"closing"
+    // (offer half-negotiated, ICE failed, or the drone tore its side down without us receiving a
+    // hangup) was returned untouched, so joinStream() became a silent no-op: every retry did
+    // nothing at all and video could not be restarted. The only thing that cleared it was an
+    // inbound hangup from the drone (closeConversation deletes the entry) - which is why the
+    // stream could only be revived by pressing exit on the Andruav FPV screen.
+    const isLive = talk && talk.status === "connected" && !talk.isClosed;
+    if (talk && !isLive) {
       talk.setStatus("cancelled");
+      try {
+        talk.pc.close();
+      } catch (ex) {
+        // already closed / never opened - nothing to release
+      }
       delete this.conversations[conversationKey];
       talk = null;
     }

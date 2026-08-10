@@ -2564,7 +2564,7 @@ function EVT_msgFromUnit_IMG(me, data) { //,p_andruavUnit, bin, description, lat
 		reader.readAsDataURL(blob);
 
 		const imageSrc = 'data:image/jpeg;base64,' + js_helpers.fn_arrayBufferToBase64(data.img);
-		js_eventEmitter.fn_dispatch(js_event.EE_displayFpvDialog, { image_src: imageSrc });
+		js_eventEmitter.fn_dispatch(js_event.EE_displayFpvDialog, { image_src: imageSrc, party_id: data.v_unit ? data.v_unit.getPartyID() : null });
 	}
 
 	const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);

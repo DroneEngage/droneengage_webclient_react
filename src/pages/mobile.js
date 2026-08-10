@@ -17,8 +17,9 @@ import { js_globals } from '../js/js_globals.js';
 import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { EVENTS as js_event } from '../js/js_eventList.js';
-import { CONST_FLIGHT_CONTROL_RTL, CONST_FLIGHT_CONTROL_LOITER, CONST_FLIGHT_CONTROL_LAND } from '../js/js_andruavUnit.js';
-import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready } from '../js/js_main';
+import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
+import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, fn_VIDEO_login } from '../js/js_main';
+import { fn_getMobileActions, fn_startVideo, fn_stopVideo } from '../js/js_mobile_commands.js';
 
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
 import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
@@ -41,6 +42,7 @@ import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import MobileLoginPanel from '../components/jsc_mobileLogin.jsx';
+import ClssMobileTelemetryPanel from '../components/gadgets/jsc_mobile_telemetry_panel.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 
 
@@ -53,7 +55,10 @@ const Mobile = () => {
   const [selectedPartyId, setSelectedPartyId] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(js_andruavAuth.fn_logined() === true);
   const [showControls, setShowControls] = useState(true);
+  const [showTelemetrySheet, setShowTelemetrySheet] = useState(false);
+  const [videoTrackPicker, setVideoTrackPicker] = useState(null); // { session, tracks } | null
   const tickRef = useRef(0);
+  const unitSystemListenerRef = useRef({});
 
   const refresh = useCallback(() => {
     tickRef.current++;
@@ -63,6 +68,49 @@ const Mobile = () => {
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
     fn_on_ready();
+
+    document.body.classList.add('mobile-mode');
+    return () => {
+      document.body.classList.remove('mobile-mode');
+    };
+  }, []);
+
+  // jsc_videoScreenComponent.jsx's <video autoPlay> has no `muted` attribute, and its
+  // `srcObject` is only assigned once WebRTC negotiation finishes - well after the tap that
+  // started it, i.e. outside any "user gesture" window. Desktop browsers are lenient enough
+  // that this still autoplays, but mobile browsers enforce their autoplay-with-sound policy
+  // much more strictly and silently reject the implicit play(), so the feed connects (Android
+  // shows the camera as active) but the mobile page never actually renders a frame. Mute + kick
+  // play() ourselves whenever the underlying <video> element for the live feed appears/changes.
+  useEffect(() => {
+    const container = document.querySelector('.mobile-video-container');
+    if (!container) return;
+
+    const fnl_unlockVideo = (v_video) => {
+      if (!v_video || v_video.dataset.mobileAutoplayUnlocked === '1') return;
+      v_video.dataset.mobileAutoplayUnlocked = '1';
+      v_video.muted = true;
+      v_video.playsInline = true;
+      const playPromise = v_video.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => { /* will retry via MutationObserver/srcObject changes */ });
+      }
+    };
+
+    container.querySelectorAll('video').forEach(fnl_unlockVideo);
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType !== 1) return;
+          if (node.tagName === 'VIDEO') fnl_unlockVideo(node);
+          node.querySelectorAll?.('video').forEach(fnl_unlockVideo);
+        });
+      });
+    });
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -70,7 +118,8 @@ const Mobile = () => {
       setIsMetricSystem(data.isMetric);
     };
 
-    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', {}, handleUnitSystemChange);
+    const unitSystemListener = unitSystemListenerRef.current;
+    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', unitSystemListener, handleUnitSystemChange);
 
     const events = [
       js_event.EE_unitAdded,
@@ -84,6 +133,8 @@ const Mobile = () => {
       js_event.EE_andruavUnitVehicleTypeUpdated,
       js_event.EE_unitOnlineChanged,
       js_event.EE_onSocketStatus,
+      js_event.EE_videoStreamStarted,
+      js_event.EE_videoStreamStopped,
     ];
 
     const listenerObj = {};
@@ -108,7 +159,7 @@ const Mobile = () => {
     setIsMetricSystem(js_globals.v_useMetricSystem);
 
     return () => {
-      js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', {});
+      js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', unitSystemListener);
       events.forEach((evt) => {
         js_eventEmitter.fn_unsubscribe(evt, listenerObj);
       });
@@ -144,38 +195,50 @@ const Mobile = () => {
     const unit = js_globals.m_andruavUnitList
       ? js_globals.m_andruavUnitList.fn_getUnit(partyId)
       : null;
-    if (unit) {
+    if (unit && js_globals.v_andruavFacade) {
       js_globals.v_andruavFacade.API_requestID(partyId);
       fn_gotoUnit_byPartyID(partyId);
     }
   };
 
-  const toggleView = () => {
-    setViewMode((prev) => (prev === 'map' ? 'video' : 'map'));
-  };
-
-  const sendCommand = (flightMode) => {
-    if (!selectedUnit) return;
-    if (js_globals.v_andruavFacade) {
-      js_globals.v_andruavFacade.API_do_FlightMode(selectedUnit, flightMode);
-    }
-  };
-
-  const doRTL = () => sendCommand(CONST_FLIGHT_CONTROL_RTL);
-  const doPause = () => sendCommand(CONST_FLIGHT_CONTROL_LOITER);
-  const doLand = () => sendCommand(CONST_FLIGHT_CONTROL_LAND);
-
-  const doArmDisarm = () => {
-    if (!selectedUnit) return;
-    if (js_globals.v_andruavFacade) {
-      js_globals.v_andruavFacade.API_do_Arm(selectedUnit, !selectedUnit.m_isArmed, false);
-    }
-  };
-
-  const doFPV = () => {
+  const retryVideo = () => {
     if (selectedUnit) {
-      js_eventEmitter.fn_dispatch(js_event.EE_displayFpvDialog, selectedUnit);
+      fn_startVideo(selectedUnit, (session, tracks) => setVideoTrackPicker({ session, tracks }));
     }
+  };
+
+  const toggleView = () => {
+    if (viewMode === 'map') {
+      retryVideo();
+      setViewMode('video');
+    } else {
+      if (selectedUnit) {
+        fn_stopVideo(selectedUnit);
+      }
+      fn_showMap();
+      setViewMode('map');
+    }
+  };
+
+  const handleSelectVideoTrack = (track) => {
+    if (videoTrackPicker) {
+      fn_VIDEO_login(videoTrackPicker.session, track.id);
+    }
+    setVideoTrackPicker(null);
+  };
+
+  const runAction = (action) => {
+    if (!selectedUnit || !action.enabled) return;
+    fn_do_modal_confirmation(
+      action.confirmTitle,
+      action.confirmMessage,
+      (approved) => {
+        if (approved) action.run(selectedUnit);
+      },
+      'CONFIRM',
+      'bg-danger txt-theme-aware',
+      'Cancel'
+    );
   };
 
   // Telemetry helpers
@@ -257,6 +320,10 @@ const Mobile = () => {
   const wpInfo = getWaypointInfo(selectedUnit);
   const flightModeText = getFlightModeText(selectedUnit);
   const drones = getDroneUnits();
+  const mobileActions = selectedUnit ? fn_getMobileActions(selectedUnit) : [];
+  const isBlocked = selectedUnit && selectedUnit.m_Telemetry.m_isGCSBlocked === true;
+  const isTelemetryOn = selectedUnit && selectedUnit.m_Telemetry.m_udpProxy_active === true && selectedUnit.m_Telemetry.m_udpProxy_paused === false;
+  const isVideoActive = !!(selectedUnit && selectedUnit.m_Video.fn_getVideoStreaming() === CONST_VIDEOSTREAMING_ON);
 
   const batteryClass = batteryPct == null ? '' : batteryPct <= 20 ? 'danger' : batteryPct <= 40 ? 'warn' : 'success';
   const gpsClass = !gpsInfo.valid ? 'danger' : gpsInfo.fix === 'No Fix' || gpsInfo.fix === 'No GPS' ? 'danger' : gpsInfo.fix === '2D' ? 'warn' : 'success';
@@ -276,11 +343,20 @@ const Mobile = () => {
               <span>{selectedUnit ? selectedUnit.m_unitName : 'No Unit'}</span>
               {drones.length > 1 && <i className="bi bi-chevron-down" style={{ fontSize: '0.7rem' }} />}
             </div>
-            <div className="mobile-flight-mode">
-              {selectedUnit && selectedUnit.m_isArmed === true ? (
-                <span className="text-danger">ARMED</span>
-              ) : null}{' '}
-              {flightModeText}
+            <div className="mobile-status-bar-right">
+              <button
+                className={`mobile-telemetry-toggle ${isTelemetryOn ? 'active' : ''}`}
+                onClick={() => setShowTelemetrySheet(true)}
+                title="Smart Telemetry"
+              >
+                <i className="bi bi-broadcast" />
+              </button>
+              <div className="mobile-flight-mode">
+                {selectedUnit && selectedUnit.m_isArmed === true ? (
+                  <span className="text-danger">ARMED</span>
+                ) : null}{' '}
+                {flightModeText}
+              </div>
             </div>
           </>
         ) : (
@@ -325,6 +401,12 @@ const Mobile = () => {
         </div>
         <div className={`mobile-video-container ${viewMode === 'map' ? 'hidden' : ''}`}>
           <ClssCVideoControl />
+          {viewMode === 'video' && selectedUnit && !isVideoActive && (
+            <button className="mobile-video-retry-btn" onClick={retryVideo}>
+              <i className="bi bi-arrow-repeat" />
+              Tap to Start Camera
+            </button>
+          )}
         </div>
 
         <div className="mobile-top-toggles">
@@ -335,10 +417,35 @@ const Mobile = () => {
             <i className={`bi ${showControls ? 'bi-sliders2' : 'bi-sliders2-vertical'}`} />
           </button>
         </div>
+
+        {/* Video track picker sheet */}
+        {videoTrackPicker && (
+          <div className="mobile-sheet-backdrop" onClick={() => setVideoTrackPicker(null)}>
+            <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-sheet-handle" />
+              <div className="mobile-sheet-header">
+                <span className="mobile-sheet-title"><i className="bi bi-camera-video" /> Select Camera</span>
+                <button className="mobile-sheet-close" onClick={() => setVideoTrackPicker(null)}>
+                  <i className="bi bi-x-lg" />
+                </button>
+              </div>
+              {videoTrackPicker.tracks.map((track) => (
+                <div
+                  key={track.id}
+                  className="mobile-sheet-row mobile-sheet-row-clickable"
+                  onClick={() => handleSelectVideoTrack(track)}
+                >
+                  <span className="mobile-sheet-value">{track.ln}</span>
+                  <i className="bi bi-chevron-right" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Telemetry grid - hidden when not logged in */}
-      {isLoggedIn && (
+      {/* Telemetry grid - hidden when not logged in or controls hidden */}
+      {isLoggedIn && showControls && (
       <div className="mobile-telemetry">
         <div className={`mobile-telemetry-item ${batteryClass}`}>
           <span className="mobile-tel-label">Battery</span>
@@ -381,61 +488,39 @@ const Mobile = () => {
 
       {/* Action buttons or Login panel */}
       {isLoggedIn ? (
-        <div className="mobile-actions">
-          <button
-            className="mobile-action-btn rtl"
-            onClick={doRTL}
-            disabled={!selectedUnit}
-          >
-            <span className="mobile-btn-icon">
-              <i className="bi bi-house-fill" />
-            </span>
-            RTL
-          </button>
-          <button
-            className={`mobile-action-btn arm ${selectedUnit && selectedUnit.m_isArmed ? 'armed' : ''}`}
-            onClick={doArmDisarm}
-            disabled={!selectedUnit}
-          >
-            <span className="mobile-btn-icon">
-              <i className={`bi ${selectedUnit && selectedUnit.m_isArmed ? 'bi-stop-circle-fill' : 'bi-play-circle-fill'}`} />
-            </span>
-            {selectedUnit && selectedUnit.m_isArmed ? 'DISARM' : 'ARM'}
-          </button>
-          <button
-            className="mobile-action-btn pause"
-            onClick={doPause}
-            disabled={!selectedUnit}
-          >
-            <span className="mobile-btn-icon">
-              <i className="bi bi-pause-fill" />
-            </span>
-            Pause
-          </button>
-          <button
-            className="mobile-action-btn land"
-            onClick={doLand}
-            disabled={!selectedUnit}
-          >
-            <span className="mobile-btn-icon">
-              <i className="bi bi-arrow-down-circle-fill" />
-            </span>
-            Land
-          </button>
-          <button
-            className="mobile-action-btn fpv"
-            onClick={doFPV}
-            disabled={!selectedUnit}
-          >
-            <span className="mobile-btn-icon">
-              <i className="bi bi-camera-fill" />
-            </span>
-            FPV
-          </button>
-        </div>
+        showControls && (
+          isBlocked ? (
+            <div className="mobile-blocked-banner">
+              <i className="bi bi-exclamation-triangle-fill" /> BLOCKED By RC in the Field
+            </div>
+          ) : (
+            <div className="mobile-actions">
+              {mobileActions.map((action) => (
+                <button
+                  key={action.id}
+                  className={`mobile-action-btn ${action.style}`}
+                  onClick={() => runAction(action)}
+                  disabled={!action.enabled}
+                >
+                  <span className="mobile-btn-icon">
+                    <i className={`bi ${action.icon}`} />
+                  </span>
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )
+        )
       ) : (
         <MobileLoginPanel />
       )}
+
+      {/* Smart Telemetry bottom sheet */}
+      <ClssMobileTelemetryPanel
+        p_unit={selectedUnit}
+        p_isOpen={showTelemetrySheet}
+        p_onClose={() => setShowTelemetrySheet(false)}
+      />
 
       {/* Hidden but mounted: essential dialogs and infrastructure */}
       <div style={{ display: 'none' }}>
@@ -469,6 +554,14 @@ const Mobile = () => {
         <div className="monitorview" id="div_map3d_view" style={{ display: 'none' }}>
           <div id="mapid3d" className="org_border fullscreen" />
         </div>
+        {/* fn_on_ready()/initMap() -> fn_setLapout() -> fn_applyControl() assume the desktop
+            layout's #row_1/#row_2 exist (fn_activateClassicalView() reads $('#row_2').offset().top).
+            Without them jQuery returns an empty selection, .offset() is undefined, and the .top
+            access throws - silently caught by initMap()'s try/catch, but that also skips the rest
+            of its try block (fn_gps_getLocation(), and fn_applyControl()'s own trailing
+            js_leafletmap.fn_invalidateSize()) on every mobile page load. */}
+        <div id="row_1" />
+        <div id="row_2" />
       </div>
 
       {/* Dialogs - need to be mounted for functionality */}
