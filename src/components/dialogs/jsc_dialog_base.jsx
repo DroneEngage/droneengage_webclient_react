@@ -58,11 +58,11 @@ class ClssDialogBase extends React.Component {
         }
     }
 
-    fn_renderDialogHeader(p_title, showGotoButton = true) {
+    fn_renderDialogHeader(p_title, showGotoButton = true, extraHeaderButtons = null) {
         const { t } = this.props;
         const tFunc = t ? t : (key, defaultValue) => defaultValue || key;
         const hasValidPartyID = this.fn_getCurrentPartyID() !== null;
-        
+
         return (
             <div className="card-header bg-warning text-dark js-draggable-handle">
                 <strong>{p_title}</strong>
@@ -80,6 +80,7 @@ class ClssDialogBase extends React.Component {
                         {js_globals.DIALOG_ICONS.GOTO}
                     </button>
                 )}
+                {extraHeaderButtons}
             </div>
         );
     }
