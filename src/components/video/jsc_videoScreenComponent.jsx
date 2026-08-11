@@ -855,7 +855,7 @@ export default class ClssCVideoScreen extends React.Component {
             <div key={key + "11"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                 <img
                     id="btn_mirrorX"
-                    className={css_rotateCam + " css_camera_mirrorX cursor_hand"}
+                    className="css_camera_mirrorX cursor_hand"
                     alt="Mirror"
                     title="Mirror"
                     onClick={(e) => this.fnl_mirror_local(e)}
@@ -864,7 +864,7 @@ export default class ClssCVideoScreen extends React.Component {
             <div key={key + "12"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                 <img
                     id="btn_rotate"
-                    className={css_rotateCam + " css_camera_rotate cursor_hand"}
+                    className="css_camera_rotate cursor_hand"
                     alt="Rotate"
                     title="Rotate"
                     onClick={(e) => this.fnl_rotate_local(e)}
@@ -893,13 +893,16 @@ export default class ClssCVideoScreen extends React.Component {
             </div>
         );
 
+        v_btn_items.push(
+            <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
+            </div>
+        );
+
         if (!isCompact) {
             v_btn_items.push(
                 <div key={key + "14"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
-                </div>,
-                <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
                 </div>,
                 <div key={key + "15"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
@@ -998,13 +1001,11 @@ export default class ClssCVideoScreen extends React.Component {
                 pointerEvents='none'
             />
             )}
-            {!isCompact && (
             <ClssCVideoHUDOverlay
                 p_unit={andruavUnit}
                 p_videoRef={this.videoRef}
                 p_containerRef={this.drawingContainerRef}
             />
-            )}
             {!isCompact && (
             <ClssCtrlDrone_Altitude_Ctrl
                 p_unit={andruavUnit}

@@ -48,6 +48,7 @@ export default class ClssCVideoHUDOverlay extends React.Component {
         if (this.state.m_update !== nextState.m_update) return true;
         if (this.state.m_opacity !== nextState.m_opacity) return true;
         if (this.props.p_unit !== nextProps.p_unit) return true;
+        if (this.props.p_visible !== nextProps.p_visible) return true;
 
         return false;
     }

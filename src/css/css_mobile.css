@@ -192,7 +192,7 @@ body.mobile-mode {
 
 .mobile-video-container #css_video_ctrl_panel {
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* jsc_videoScreenComponent.jsx's isCompact branch already only renders
