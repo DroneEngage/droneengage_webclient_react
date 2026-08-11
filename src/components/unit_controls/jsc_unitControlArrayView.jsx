@@ -8,7 +8,7 @@ import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
 import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
-import {js_leafletmap} from '../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';

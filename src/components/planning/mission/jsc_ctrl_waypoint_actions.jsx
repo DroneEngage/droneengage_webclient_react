@@ -2,7 +2,7 @@
 import React    from 'react';
 import L from 'leaflet';
 
-import {js_leafletmap} from '../../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'
 import {js_globals} from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 

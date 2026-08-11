@@ -1,4 +1,4 @@
-import * as js_siteConfig from './js_siteConfig';
+import * as js_siteConfig from '../js_siteConfig';
 
 class CAndruavMap3D {
     constructor() {

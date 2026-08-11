@@ -3,10 +3,10 @@
     Mirrors the mode numbers used by components/flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx
     and jsc_ctrl_px4_flightControl.jsx so mobile taps send the same messages desktop buttons do.
 */
-import { js_globals } from './js_globals.js';
-import { mavlink20 } from './js_mavlink_v2.js';
-import { js_andruavAuth } from './protocol/auth/js_andruav_auth.js';
-import * as js_andruavUnit from './js_andruavUnit.js';
+import { js_globals } from '../js_globals.js';
+import { mavlink20 } from '../js_mavlink_v2.js';
+import { js_andruavAuth } from '../protocol/auth/js_andruav_auth.js';
+import * as js_andruavUnit from '../js_andruavUnit.js';
 
 function fn_isPX4(p_unit) {
     return p_unit.m_autoPilot === mavlink20.MAV_AUTOPILOT_PX4;

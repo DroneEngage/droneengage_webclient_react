@@ -10,12 +10,12 @@ import L from 'leaflet';
 import 'leaflet-rotatedmarker';
 
 
-import * as js_siteConfig from './js_siteConfig'
-import {js_globals} from './js_globals.js';
-import {EVENTS as js_event} from './js_eventList.js'
-import {js_eventEmitter} from './js_eventEmitter'
+import * as js_siteConfig from '../js_siteConfig.js'
+import {js_globals} from '../js_globals.js';
+import {EVENTS as js_event} from '../js_eventList.js'
+import {js_eventEmitter} from '../js_eventEmitter.js'
 
-import {fn_contextMenu} from './js_main'
+import {fn_contextMenu} from '../js_main.js'
 class CLeafLetAndruavMap {
 
     constructor() {

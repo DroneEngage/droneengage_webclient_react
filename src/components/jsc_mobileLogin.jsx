@@ -5,7 +5,7 @@ import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_globals } from '../js/js_globals.js';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { js_localStorage } from '../js/js_localStorage';
-import { fn_connect, fn_logout, fn_do_modal_confirmation, fn_showSecurityDialog } from '../js/js_main';
+import { fn_connect, fn_logout, fn_showSecurityDialog } from '../js/js_main';
 
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
 
@@ -29,6 +29,7 @@ class MobileLoginPanel extends React.Component {
     this.m_accessCodeRef = React.createRef();
     this.m_chk_fullctrl = React.createRef();
     this.m_chk_readonlyctrl = React.createRef();
+    this.m_webConnectorRetried = false;
 
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_onAccessCodeGenerated);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_onAccessCodeError);
@@ -114,27 +115,19 @@ class MobileLoginPanel extends React.Component {
 
   fn_onWebConnectorNotRunning(me) {
     if (me.m_flag_mounted === false) return;
-
-    fn_do_modal_confirmation(
-      'WebConnector Not Running',
-      'The WebConnector service is not available on this device. Disable WebConnector and retry with cloud login?',
-      (confirmed) => {
-        if (confirmed) {
-          // Disable WebConnector and retry with cloud login.
-          js_localStorage.fn_setWebConnectorEnabled(false);
-          if (me.m_loginNameRef.current && me.m_accessCodeRef.current) {
-            const email = me.m_loginNameRef.current.value.trim();
-            const accessCode = me.m_accessCodeRef.current.value.trim();
-            if (email && accessCode) {
-              fn_connect(email, accessCode);
-            }
-          }
-        }
-      },
-      'OK',
-      'bg-warning',
-      'Cancel'
-    );
+    // Auto-fallback: WebConnector plugin (127.0.0.1:9211) is not available on this
+    // device (typical for mobile/Android). Silently disable it and retry with cloud
+    // login instead of showing a modal dialog — better UX on touch devices.
+    if (me.m_webConnectorRetried === true) return;
+    me.m_webConnectorRetried = true;
+    js_localStorage.fn_setWebConnectorEnabled(false);
+    if (me.m_loginNameRef.current && me.m_accessCodeRef.current) {
+      const email = me.m_loginNameRef.current.value.trim();
+      const accessCode = me.m_accessCodeRef.current.value.trim();
+      if (email && accessCode) {
+        fn_connect(email, accessCode);
+      }
+    }
   }
 
   fn_onAccessCodeGenerated(me, params) {
@@ -182,6 +175,7 @@ class MobileLoginPanel extends React.Component {
       this.setState({ errorMessage: 'Enter email and access code' });
       return;
     }
+    this.m_webConnectorRetried = false;
     js_localStorage.fn_setLoginName(email);
     js_localStorage.fn_setAccessCode(accessCode);
     fn_connect(email, accessCode);

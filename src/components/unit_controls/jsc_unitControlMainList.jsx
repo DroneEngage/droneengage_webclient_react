@@ -13,7 +13,7 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import {js_localStorage} from '../../js/js_localStorage.js'
-import {js_leafletmap} from '../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 
 
 

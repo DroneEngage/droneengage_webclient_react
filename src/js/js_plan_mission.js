@@ -6,7 +6,7 @@ import * as js_helpers from "./js_helpers.js";
 import { js_globals } from "./js_globals.js";
 import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from "./js_eventEmitter.js";
-import { js_leafletmap } from "./js_leafletmap.js";
+import { js_leafletmap } from "./maps/js_leafletmap.js";
 
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import { js_andruavAuth } from "./protocol/auth/js_andruav_auth.js";

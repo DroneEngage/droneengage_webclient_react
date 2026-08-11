@@ -3,7 +3,7 @@ import { withTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
-import { js_leafletmap } from '../../js/js_leafletmap.js';
+import { js_leafletmap } from '../../js/maps/js_leafletmap.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 

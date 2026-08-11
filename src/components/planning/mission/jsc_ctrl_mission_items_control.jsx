@@ -4,7 +4,7 @@ import * as js_common from '../../../js/js_common.js';
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
-import { js_leafletmap } from '../../../js/js_leafletmap.js';
+import { js_leafletmap } from '../../../js/maps/js_leafletmap.js';
 import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
 import { setSelectedMissionFilePathToRead } from '../../../js/js_main.js';
 import ClssFence_Shape_Control from '../fence/jsc_fence_shape_control.jsx';
