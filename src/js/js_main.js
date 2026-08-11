@@ -2215,6 +2215,9 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 
 
 function EVT_andruavUnitFCBUpdated(me, p_andruavUnit) {
+	if (p_andruavUnit.m_IsGCS === true) {
+		return;
+	}
 	if (p_andruavUnit.m_useFCBIMU === true) {
 		js_speak.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
 	}
