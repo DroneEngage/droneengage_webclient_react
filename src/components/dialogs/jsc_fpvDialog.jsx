@@ -38,6 +38,10 @@ class ClssFpvDialog extends ClssDialogBase {
             img_natural_height: 0,
             // current fit mode
             fit_mode: CONST_FIT_IMAGE_IN,
+            // Compact mode: whether the fullscreen overlay is currently shown
+            m_visible: false,
+            // Current image rotation (0/90/180/270 degrees)
+            m_rotation: 0,
         };
 
         this.m_flag_mounted = false;
@@ -73,6 +77,7 @@ class ClssFpvDialog extends ClssDialogBase {
             img_natural_width: 0,
             img_natural_height: 0,
             m_update: p_me.state.m_update + 1,
+            m_visible: true,
         });
 
         if (p_me.modal_ctrl_fpv.current) {
@@ -96,6 +101,7 @@ class ClssFpvDialog extends ClssDialogBase {
             this.modal_ctrl_fpv.current.style.opacity = '';
             this.modal_ctrl_fpv.current.style.display = 'none';
         }
+        this.setState({ m_visible: false });
     }
 
     fn_onSave() {
@@ -136,8 +142,14 @@ class ClssFpvDialog extends ClssDialogBase {
             h = CONST_DEFAULT_BODY_HEIGHT;
         }
 
-        const maxW = window.innerWidth - 40;
-        const maxH = window.innerHeight - 120; // leave room for header/footer
+        // When the image is rotated 90/270 degrees, its width and height are
+        // swapped visually: the body must be sized so the unrotated dimensions
+        // fit within the available viewport after rotation. To guarantee the
+        // rotated image never exceeds the screen width (or height), we swap the
+        // width/height budgets used for fitting.
+        const isRotatedSideways = this.state.m_rotation === 90 || this.state.m_rotation === 270;
+        const maxW = isRotatedSideways ? (window.innerHeight - 120) : (window.innerWidth - 40);
+        const maxH = isRotatedSideways ? (window.innerWidth - 40) : (window.innerHeight - 120);
 
         const ratio = w / h;
         if (w > maxW) { w = maxW; h = Math.round(w / ratio); }
@@ -150,6 +162,12 @@ class ClssFpvDialog extends ClssDialogBase {
     fn_setFitToImage() {
         this.setState({ fit_mode: CONST_FIT_TO_IMAGE });
         this.fn_applyFitToImage();
+    }
+
+    fn_rotateImage90() {
+        this.setState({
+            m_rotation: (this.state.m_rotation + 90) % 360,
+        });
     }
 
     fn_setFitImageIn() {
@@ -186,6 +204,14 @@ class ClssFpvDialog extends ClssDialogBase {
                 >
                     {tFunc('home:modal.image.fit_image_in', 'Contain')}
                 </button>
+                <button
+                    type="button"
+                    title={tFunc('home:modal.image.rotate_90', 'Rotate 90°')}
+                    className="btn btn-sm btn-link text-dark float-end p-0 ms-2"
+                    onClick={() => this.fn_rotateImage90()}
+                >
+                    {tFunc('home:modal.image.rotate_90', '↻ 90°')}
+                </button>
             </>
         );
     }
@@ -204,11 +230,20 @@ class ClssFpvDialog extends ClssDialogBase {
 
         // The image always uses object-fit: contain so it never exceeds the
         // dialog body. Small images are enlarged, large images are shrunk,
-        // and the aspect ratio is always preserved.
-        const imgStyle = {
+        // and the aspect ratio is always preserved. The transform rotates the
+        // image in place without changing its layout box.
+        const baseImgStyle = {
+            objectFit: 'contain',
+            transform: 'rotate(' + this.state.m_rotation + 'deg)',
+            transformOrigin: 'center center',
+        };
+
+        // Desktop: the image fills the dialog body, which is sized by
+        // fn_applyFitToImage or the default fixed size.
+        const desktopImgStyle = {
+            ...baseImgStyle,
             width: '100%',
             height: '100%',
-            objectFit: 'contain',
         };
 
         // In FIT_TO_IMAGE mode the body width/height are set dynamically by
@@ -225,6 +260,71 @@ class ClssFpvDialog extends ClssDialogBase {
             justifyContent: 'center',
         };
 
+        const titleText = tFunc('home:modal.image.title', 'FPV Image') + (unitName ? ' of ' + unitName : '');
+
+        // Compact mode: render as a fullscreen dark overlay instead of a
+        // draggable card. The image is centered and scaled with object-fit:
+        // contain so it always fits the screen. The fit buttons are kept but
+        // their px-resizing targets bodyRef, which is not attached here, so
+        // fn_applyFitToImage's null guard makes them no-ops in this mode.
+        const isCompact = this.fn_isCompact();
+        if (isCompact) {
+            if (!this.state.m_visible) return null;
+
+            // In compact mode the image is constrained to the available screen
+            // size using viewport-relative units (vw/vh) so it never exceeds
+            // the mobile view, regardless of window resize or the image's
+            // natural dimensions. When rotated 90/270, the width and height
+            // budgets are swapped so the visual width of the rotated image
+            // never exceeds the screen width.
+            //   - maxWidth uses ~96vw (leaving 2vw padding each side)
+            //   - maxHeight uses ~80vh (leaving room for header/footer)
+            const isCompactRotated = this.state.m_rotation === 90 || this.state.m_rotation === 270;
+            const compactImgMaxW = isCompactRotated ? '80vh' : '96vw';
+            const compactImgMaxH = isCompactRotated ? '96vw' : '80vh';
+
+            return (
+                <div className="mobile-fpv-overlay" onClick={() => this.fn_closeDialog()}>
+                    <div className="mobile-fpv-overlay-inner" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-fpv-overlay-header">
+                            <span>{titleText}</span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_closeDialog()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        <div className="mobile-fpv-overlay-body">
+                            <img
+                                id="unitImg"
+                                className="img-rounded"
+                                alt="camera"
+                                src={this.state.image_src}
+                                style={{
+                                    ...baseImgStyle,
+                                    maxWidth: compactImgMaxW,
+                                    maxHeight: compactImgMaxH,
+                                    width: 'auto',
+                                    height: 'auto',
+                                }}
+                                ref={this.imgRef}
+                                onLoad={(e) => this.fn_onImageLoad(e)}
+                            />
+                        </div>
+                        <div className="mobile-fpv-overlay-footer">
+                            {this.fn_renderFitButtons()}
+                            <button
+                                id="unitImg_save"
+                                type="button"
+                                className="btn btn-danger btn-sm"
+                                onClick={() => this.fn_onSave()}
+                            >
+                                {tFunc('home:modal.image.save', 'Save')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <Draggable nodeRef={this.modal_ctrl_fpv} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div
@@ -235,7 +335,7 @@ class ClssFpvDialog extends ClssDialogBase {
                     ref={this.modal_ctrl_fpv}
                 >
                     {this.fn_renderDialogHeader(
-                        tFunc('home:modal.image.title', 'FPV Image') + (unitName ? ' of ' + unitName : ''),
+                        titleText,
                         true,
                         this.fn_renderFitButtons()
                     )}
@@ -253,7 +353,7 @@ class ClssFpvDialog extends ClssDialogBase {
                                 className="img-rounded"
                                 alt="camera"
                                 src={this.state.image_src}
-                                style={imgStyle}
+                                style={desktopImgStyle}
                                 ref={this.imgRef}
                                 onLoad={(e) => this.fn_onImageLoad(e)}
                             />

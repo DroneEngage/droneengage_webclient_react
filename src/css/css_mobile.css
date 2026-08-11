@@ -648,6 +648,66 @@ body.mobile-mode {
   background: #fd7e14;
 }
 
+/* ── FPV image dialog compact mode (mobile) ────────────────────────────────
+   A near-fullscreen dark overlay used by ClssFpvDialog when p_compact is set.
+   The image is centered and scaled with object-fit: contain so it always fits
+   the screen regardless of orientation. Tap the backdrop (or the X) to close. */
+.mobile-fpv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.mobile-fpv-overlay-inner {
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.mobile-fpv-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mobile-fpv-overlay-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Safety net: the FPV image must never exceed the mobile viewport, even if
+   the inline max-width/max-height calculation becomes stale. The inline
+   style may swap vw/vh for rotated images; this guarantees a hard cap. */
+.mobile-fpv-overlay-body img {
+  max-width: 96vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+}
+
+.mobile-fpv-overlay-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px;
+}
+
 /* Fullscreen map */
 .mobile-center.fullscreen-map .mobile-view-toggle,
 .mobile-center.fullscreen-map .mobile-unit-selector {

@@ -173,6 +173,15 @@ const Mobile = () => {
     }
   };
 
+  const openCameraDialog = () => {
+    if (!selectedUnit) return;
+    js_globals.v_andruavFacade.API_requestCameraList(selectedUnit, (p_session) => {
+      if (p_session && p_session.status === 'connected') {
+        js_eventEmitter.fn_dispatch(js_event.EE_displayCameraDlgForm, p_session);
+      }
+    });
+  };
+
   const toggleView = () => {
     if (viewMode === 'map') {
       retryVideo();
@@ -373,6 +382,9 @@ const Mobile = () => {
           <button className="mobile-view-toggle" onClick={toggleView} title="Toggle Map/Video">
             <i className={`bi ${viewMode === 'map' ? 'bi-camera-video' : 'bi-map'}`} />
           </button>
+          <button className="mobile-view-toggle" onClick={openCameraDialog} title="Camera" disabled={!selectedUnit}>
+            <i className="bi bi-camera" />
+          </button>
           <button className="mobile-view-toggle" onClick={() => setShowControls((s) => !s)} title="Toggle Controls">
             <i className={`bi ${showControls ? 'bi-sliders2' : 'bi-sliders2-vertical'}`} />
           </button>
@@ -507,7 +519,7 @@ const Mobile = () => {
         <>
           <ClssConfirmationDialog />
           <ClssAlertDialog />
-          <ClssFpvDialog />
+          <ClssFpvDialog p_compact={true} />
           <ClssAltitudeDialog />
           <ClssSpeedDialog />
           <ClssUnitInfoDialog />
