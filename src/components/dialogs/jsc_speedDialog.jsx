@@ -67,6 +67,10 @@ class ClssSpeedDialog extends ClssModalDialogBase {
         }, 100);
     }
 
+    fn_isCompact() {
+        return this.props.p_compact === true;
+    }
+
     fn_closeDialog() {
         this.setState({ is_open: false, p_andruavUnit: null });
     }
@@ -144,7 +148,88 @@ class ClssSpeedDialog extends ClssModalDialogBase {
         }
 
         const presets = showPresets ? this.fn_getSpeedPresets() : [];
+        const isCompact = this.fn_isCompact();
 
+        const inputField = (
+            <div className="input-group">
+                <input
+                    id="txtSpeed"
+                    type="text"
+                    className="form-control rounded-3 me-3"
+                    placeholder={placeholder}
+                    aria-describedby="basic-addon2"
+                    ref={this.speedInputRef}
+                    defaultValue={this.state.speed_value}
+                />
+                {unitLabel && (
+                    <span id="txtSpeedUnit" className="input-group-addon">
+                        {unitLabel}
+                    </span>
+                )}
+            </div>
+        );
+
+        const presetButtons = showPresets && (
+            <div className="mt-2 d-flex flex-wrap gap-2">
+                {presets.map((preset, index) => (
+                    <button
+                        key={index}
+                        type="button"
+                        className="btn btn-outline-primary btn-sm speed-preset"
+                        onClick={() => this.fn_handlePresetClick(preset.value)}
+                    >
+                        {preset.label}
+                    </button>
+                ))}
+            </div>
+        );
+
+        const actionButtons = (
+            <div className="btn-group w-100 d-flex flex-wrap">
+                <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => this.fn_onCancel()}
+                >
+                    {tFunc('home:modal.speed.cancel', 'Cancel')}
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-warning btn-sm"
+                    onClick={() => this.fn_onApply()}
+                >
+                    {tFunc('home:modal.speed.go', 'Go')}
+                </button>
+            </div>
+        );
+
+        // Compact mode: render as mobile bottom sheet
+        if (isCompact) {
+            if (!this.state.is_open) return null;
+
+            return this.fn_renderInPortal(
+                <div className="mobile-sheet-backdrop" onClick={() => this.fn_onCancel()}>
+                    <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-sheet-handle" />
+                        <div className="mobile-sheet-header">
+                            <span className="mobile-sheet-title">
+                                <i className="bi bi-speedometer2" /> {title + ' of ' + unitName}
+                            </span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_onCancel()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        <div className="mobile-sheet-body">
+                            {inputField}
+                            {presetButtons}
+                            {actionButtons}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop mode: render as modal dialog
         return this.fn_renderInPortal(
             <>
                 {this.state.is_open && <div className="modal-backdrop fade show" style={{ zIndex: 1050 }}></div>}
@@ -159,54 +244,11 @@ class ClssSpeedDialog extends ClssModalDialogBase {
                     <div className="modal-content">
                         {this.fn_renderDialogHeader(title + ' of ' + unitName, 'bg-warning')}
                         <div className="modal-body">
-                            <div className="input-group">
-                                <input
-                                    id="txtSpeed"
-                                    type="text"
-                                    className="form-control rounded-3 me-3"
-                                    placeholder={placeholder}
-                                    aria-describedby="basic-addon2"
-                                    ref={this.speedInputRef}
-                                    defaultValue={this.state.speed_value}
-                                />
-                                {unitLabel && (
-                                    <span id="txtSpeedUnit" className="input-group-addon">
-                                        {unitLabel}
-                                    </span>
-                                )}
-                            </div>
-                            {showPresets && (
-                                <div className="mt-2 d-flex flex-wrap gap-2">
-                                    {presets.map((preset, index) => (
-                                        <button
-                                            key={index}
-                                            type="button"
-                                            className="btn btn-outline-primary btn-sm speed-preset"
-                                            onClick={() => this.fn_handlePresetClick(preset.value)}
-                                        >
-                                            {preset.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            {inputField}
+                            {presetButtons}
                         </div>
                         <div className="modal-footer">
-                            <div className="btn-group w-100 d-flex flex-wrap">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={() => this.fn_onCancel()}
-                                >
-                                    {tFunc('home:modal.speed.cancel', 'Cancel')}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-warning btn-sm"
-                                    onClick={() => this.fn_onApply()}
-                                >
-                                    {tFunc('home:modal.speed.go', 'Go')}
-                                </button>
-                            </div>
+                            {actionButtons}
                         </div>
                     </div>
                 </div>

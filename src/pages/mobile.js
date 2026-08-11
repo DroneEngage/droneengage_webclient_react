@@ -19,7 +19,7 @@ import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
-import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, toggleVideo } from '../js/js_main';
+import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_do_modal_confirmation, fn_showMap, toggleVideo, fn_changeAltitude, fn_changeSpeed } from '../js/js_main';
 import { fn_getMobileActions, fn_stopVideo } from '../js/js_mobile_commands.js';
 
 import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
@@ -410,14 +410,14 @@ const Mobile = () => {
           <span className="mobile-tel-label">Signal</span>
           <span className="mobile-tel-value">{signalInfo.text}</span>
         </div>
-        <div className="mobile-telemetry-item">
+        <div className="mobile-telemetry-item mobile-tel-clickable" onClick={() => selectedUnit && fn_changeAltitude(selectedUnit)}>
           <span className="mobile-tel-label">Altitude</span>
           <span className="mobile-tel-value">
             {altitude ? altitude.value : 'N/A'}
           </span>
           {altitude && <span className="mobile-tel-unit">{altitude.unit}</span>}
         </div>
-        <div className="mobile-telemetry-item">
+        <div className="mobile-telemetry-item mobile-tel-clickable" onClick={() => selectedUnit && fn_changeSpeed(selectedUnit)}>
           <span className="mobile-tel-label">Speed</span>
           <span className="mobile-tel-value">
             {speed ? speed.value : 'N/A'}
@@ -520,8 +520,8 @@ const Mobile = () => {
           <ClssConfirmationDialog />
           <ClssAlertDialog />
           <ClssFpvDialog p_compact={true} />
-          <ClssAltitudeDialog />
-          <ClssSpeedDialog />
+          <ClssAltitudeDialog p_compact={true} />
+          <ClssSpeedDialog p_compact={true} />
           <ClssUnitInfoDialog />
           <ClssMissionLoadDialog />
           <ClssCameraDialog p_compact={true} />

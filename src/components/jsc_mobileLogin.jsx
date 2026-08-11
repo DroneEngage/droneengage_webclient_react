@@ -2,9 +2,10 @@ import React from 'react';
 
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
+import { js_globals } from '../js/js_globals.js';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { js_localStorage } from '../js/js_localStorage';
-import { fn_connect, fn_logout } from '../js/js_main';
+import { fn_connect, fn_logout, fn_do_modal_confirmation, fn_showSecurityDialog } from '../js/js_main';
 
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
 
@@ -35,6 +36,7 @@ class MobileLoginPanel extends React.Component {
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
+    js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
   }
 
   componentWillUnmount() {
@@ -45,6 +47,7 @@ class MobileLoginPanel extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
   }
 
   componentDidMount() {
@@ -76,11 +79,62 @@ class MobileLoginPanel extends React.Component {
   }
 
   fn_onAuthBad(me, data) {
+    if (me.m_flag_mounted === false) return;
+
+    // SSL errors get their own security dialog, mirroring jsc_login.jsx.
+    if (data && data.ssl === true) {
+      let host, port;
+      if (data.probedUrl) {
+        try {
+          const url = new URL(data.probedUrl);
+          host = url.hostname;
+          port = url.port || (url.protocol === 'https:' ? '443' : '80');
+        } catch (e) {
+          host = 'localhost';
+          port = '8080';
+        }
+      } else if (js_globals.v_andruavClient && js_globals.v_andruavClient.v_auth) {
+        const authModule = js_globals.v_andruavClient.v_auth;
+        host = authModule.m_auth_ip;
+        port = authModule._m_auth_port;
+      } else {
+        host = 'localhost';
+        port = '8080';
+      }
+      fn_showSecurityDialog(host, port);
+      return;
+    }
+
     me.setState({
       is_connected: CONST_FAILED,
       errorMessage: data && data.em ? data.em : 'Login failed',
       successMessage: '',
     });
+  }
+
+  fn_onWebConnectorNotRunning(me) {
+    if (me.m_flag_mounted === false) return;
+
+    fn_do_modal_confirmation(
+      'WebConnector Not Running',
+      'The WebConnector service is not available on this device. Disable WebConnector and retry with cloud login?',
+      (confirmed) => {
+        if (confirmed) {
+          // Disable WebConnector and retry with cloud login.
+          js_localStorage.fn_setWebConnectorEnabled(false);
+          if (me.m_loginNameRef.current && me.m_accessCodeRef.current) {
+            const email = me.m_loginNameRef.current.value.trim();
+            const accessCode = me.m_accessCodeRef.current.value.trim();
+            if (email && accessCode) {
+              fn_connect(email, accessCode);
+            }
+          }
+        }
+      },
+      'OK',
+      'bg-warning',
+      'Cancel'
+    );
   }
 
   fn_onAccessCodeGenerated(me, params) {

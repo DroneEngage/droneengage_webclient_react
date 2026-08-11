@@ -67,6 +67,10 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
         }, 100);
     }
 
+    fn_isCompact() {
+        return this.props.p_compact === true;
+    }
+
     fn_closeDialog() {
         this.setState({ is_open: false, p_andruavUnit: null });
     }
@@ -111,7 +115,87 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
 
         const isMetric = js_globals.v_useMetricSystem;
         const unitLabel = isMetric ? 'm' : 'ft';
+        const isCompact = this.fn_isCompact();
 
+        const presetButtons = (
+            <div className="d-flex flex-wrap gap-1 mt-2 mb-2 pe-1 ps-1">
+                {[1, 3, 5, 50, 100].map((meters) => {
+                    const value = isMetric ? meters : Math.round(meters * CONST_METER_TO_FEET);
+                    return (
+                        <button
+                            key={meters}
+                            type="button"
+                            className="btn btn-outline-primary btn-sm flex-fill"
+                            onClick={() => this.fn_onPresetAltitude(meters)}
+                        >
+                            {value}{unitLabel}
+                        </button>
+                    );
+                })}
+            </div>
+        );
+
+        const inputField = (
+            <div className="input-group">
+                <input
+                    id="txtAltitude"
+                    type="text"
+                    className="form-control"
+                    placeholder={tFunc('home:modal.altitude.placeholder', 'Enter altitude')}
+                    aria-describedby="basic-addon2"
+                    ref={this.altitudeInputRef}
+                    defaultValue={this.state.altitude_value}
+                />
+                <span className="input-group-addon ms-2">{unitLabel}</span>
+            </div>
+        );
+
+        const actionButtons = (
+            <div className="btn-group w-100 d-flex flex-wrap">
+                <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => this.fn_onCancel()}
+                >
+                    {tFunc('home:modal.altitude.cancel', 'Cancel')}
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-success btn-sm"
+                    onClick={() => this.fn_onApply()}
+                >
+                    {tFunc('home:modal.altitude.go', 'Go')}
+                </button>
+            </div>
+        );
+
+        // Compact mode: render as mobile bottom sheet
+        if (isCompact) {
+            if (!this.state.is_open) return null;
+
+            return this.fn_renderInPortal(
+                <div className="mobile-sheet-backdrop" onClick={() => this.fn_onCancel()}>
+                    <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-sheet-handle" />
+                        <div className="mobile-sheet-header">
+                            <span className="mobile-sheet-title">
+                                <i className="bi bi-arrow-up-circle" /> {tFunc('home:modal.altitude.title', 'Change Altitude of ' + unitName)}
+                            </span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_onCancel()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        <div className="mobile-sheet-body">
+                            {inputField}
+                            {presetButtons}
+                            {actionButtons}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop mode: render as modal dialog
         return this.fn_renderInPortal(
             <>
                 {this.state.is_open && <div className="modal-backdrop fade show" style={{ zIndex: 1050 }}></div>}
@@ -126,51 +210,11 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
                     <div className="modal-content">
                         {this.fn_renderDialogHeader(tFunc('home:modal.altitude.title', 'Change Altitude of ' + unitName), this.state.style)}
                         <div className="modal-body">
-                            <div className="input-group">
-                                <input
-                                    id="txtAltitude"
-                                    type="text"
-                                    className="form-control"
-                                    placeholder={tFunc('home:modal.altitude.placeholder', 'Enter altitude')}
-                                    aria-describedby="basic-addon2"
-                                    ref={this.altitudeInputRef}
-                                    defaultValue={this.state.altitude_value}
-                                />
-                                <span className="input-group-addon ms-2">{unitLabel}</span>
-                            </div>
+                            {inputField}
                         </div>
-                        <div className="d-flex flex-wrap gap-1 mt-2 mb-2 pe-1 ps-1">
-                            {[1, 3, 5, 50, 100].map((meters) => {
-                                const value = isMetric ? meters : Math.round(meters * CONST_METER_TO_FEET);
-                                return (
-                                    <button
-                                        key={meters}
-                                        type="button"
-                                        className="btn btn-outline-primary btn-sm flex-fill"
-                                        onClick={() => this.fn_onPresetAltitude(meters)}
-                                    >
-                                        {value}{unitLabel}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                        {presetButtons}
                         <div className="modal-footer">
-                            <div className="btn-group w-100 d-flex flex-wrap">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={() => this.fn_onCancel()}
-                                >
-                                    {tFunc('home:modal.altitude.cancel', 'Cancel')}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-success btn-sm"
-                                    onClick={() => this.fn_onApply()}
-                                >
-                                    {tFunc('home:modal.altitude.go', 'Go')}
-                                </button>
-                            </div>
+                            {actionButtons}
                         </div>
                     </div>
                 </div>

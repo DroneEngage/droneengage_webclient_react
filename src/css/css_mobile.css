@@ -292,6 +292,16 @@ body.mobile-mode {
   color: #28a745;
 }
 
+.mobile-telemetry-item.mobile-tel-clickable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.15);
+  transition: background 0.15s ease;
+}
+
+.mobile-telemetry-item.mobile-tel-clickable:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 /* Action buttons */
 .mobile-actions {
   display: grid;
@@ -531,6 +541,10 @@ body.mobile-mode {
   min-width: 44px;
   min-height: 44px;
   cursor: pointer;
+}
+
+.mobile-sheet-body {
+  padding: 0 4px;
 }
 
 .mobile-sheet-empty {
