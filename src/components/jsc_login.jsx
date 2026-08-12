@@ -10,6 +10,7 @@ import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { js_speak } from '../js/js_speak';
 import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../js/js_main';
+import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;
@@ -143,6 +144,13 @@ class ClssLoginControl extends React.Component {
     }
     
     const msg = data && data.em ? data.em : 'Login failed';
+    // If the user has already stopped retrying (clicked Login to stop), do not
+    // override the green OFFLINE state when an in-flight request finally fails.
+    if (js_andruavAuth.m_retry_login === false) {
+      me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
+      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: '' });
+      return;
+    }
     me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
     me.setState({ m_update: me.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
   }
@@ -200,13 +208,16 @@ class ClssLoginControl extends React.Component {
   }
 
 
+  fn_onInputKeyDown(e) {
+    if (e && e.key === 'Enter') {
+      e.preventDefault();
+      this.clickConnect(e);
+    }
+  }
+
   clickConnect(e) {
-    if ((this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE) && (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE_FAILED)) {
-      // online or connecting
-      fn_logout();
-      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE });
-    } else {
-      // offline
+    if (this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE) {
+      // offline (green) - start a new connection
       this.setState({ m_update: this.state.m_update + 1 });
 
       const usePlugin = (this.chkUsePluginRef.current && this.chkUsePluginRef.current.checked === true);
@@ -224,6 +235,11 @@ class ClssLoginControl extends React.Component {
       js_localStorage.fn_setGroupName(this.txtGroupNameRef.current.value);
 
       fn_connect(this.txtLoginNameRef.current.value, this.txtAccessCodeRef.current.value);
+    } else {
+      // OFFLINE_FAILED (retrying), IN_PROGRESS, or ONLINE
+      // Stop retrying and go back to green OFFLINE so the user can edit fields
+      fn_logout();
+      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE, errorMessage: '', successMessage: '' });
     }
   }
 
@@ -362,6 +378,7 @@ class ClssLoginControl extends React.Component {
                 title="LoginName must be alphanumeric"
                 ref={this.txtLoginNameRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.loginName != null ? QueryString.loginName : (QueryString.email != null ? QueryString.email : js_localStorage.fn_getLoginName())
                 }
@@ -378,6 +395,7 @@ class ClssLoginControl extends React.Component {
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
                 }
@@ -408,6 +426,7 @@ class ClssLoginControl extends React.Component {
                 name="txtUnitID"
                 ref={this.txtUnitIDRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()
                 }
@@ -565,7 +584,7 @@ class ClssLoginControl extends React.Component {
               onClick={(e) => this.clickConnect(e)}
               ref={this.btnConnectRef}
             >
-              {title}
+              {css.includes('warning') ? t('title.cancelLogging') : title}
             </button>
             {ctrls2}
           </div>
