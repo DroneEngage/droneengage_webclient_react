@@ -7,7 +7,6 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
-import {ClssCtrlUnitIcon} from '../gadgets/jsc_ctrl_unit_icon.jsx'
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 
 
@@ -119,14 +118,16 @@ class ClssAndruavUnitGCSList extends React.Component {
             const partyID = object.getPartyID();
             const v_andruavUnit = object;
 
+            // hide offline GCS units
             const v_shutdown = v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS;
+            if (v_shutdown) return;
+
             units_gcs.push(
                 <span
                     key={'gcs_badge_' + partyID}
                     className={`d-inline-flex align-items-center badge bg-secondary text-warning css_margin_zero margin_right_4px margin_left_4px cursor_hand IsGCS_true IsShutdown_${v_shutdown}`}
                     onClick={ () => me.fn_gotoIfLocationExists(v_andruavUnit) }
                 >
-                    <ClssCtrlUnitIcon p_unit={v_andruavUnit} className="small_icon" />
                     <strong className="ms-1">{v_andruavUnit.m_unitName}</strong>
                 </span>
             );
