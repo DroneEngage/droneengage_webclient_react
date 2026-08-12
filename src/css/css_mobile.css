@@ -458,8 +458,12 @@ body.mobile-mode {
   background: #dc3545;
 }
 
-.mobile-unit-list-item .mobile-unit-dot.armed {
-  background: #fd7e14;
+.mobile-unit-list-item .mobile-unit-armed {
+  margin-left: auto;
+  color: #dc3545;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .mobile-no-units {
