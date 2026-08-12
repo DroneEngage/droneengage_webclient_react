@@ -100,22 +100,22 @@ class ClssCameraDevice extends React.Component {
             const v_record_class = 'btn-primary';
 
             // Compact (mobile): full-width layout with label on top, buttons below stacked
-            // Desktop: 3-column (label, one-shot button, multi-shot button)
+            // Desktop: flex row - label grows (can wrap), buttons keep fixed width on one line
             const isCompact = this.props.p_compact === true;
-            const labelColClass = isCompact ? 'col-12 mb-2' : 'col-8';
-            const oneShotColClass = isCompact ? 'col-6' : 'col-2';
-            const multiShotColClass = isCompact ? 'col-6' : 'col-2';
+            const labelColClass = isCompact ? 'col-12 mb-2' : 'flex-grow-1';
+            const oneShotColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+            const multiShotColClass = isCompact ? 'col-6' : 'flex-shrink-0';
 
             return (
-                    <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className="row al_l css_margin_zero">
+                    <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className={isCompact ? "row al_l css_margin_zero" : "d-flex al_l css_margin_zero"}>
                             <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{v_track.ln}</label>
                             </div>
                             <div className={oneShotColClass + " si-09x css_margin_zero css_padding_2"}>
-                                <button type="button" className={"btn btn-sm w-100 " + v_cam_class}  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
+                                <button type="button" className={"btn btn-sm w-100 text-nowrap " + v_cam_class}  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
                             </div>
                             <div className={multiShotColClass + " si-09x css_margin_zero css_padding_2"}>
-                                <button type="button" className={"btn btn-sm w-100 " + v_record_class} onClick={ (e) => this.fn_shot()}>Multi Shot</button>
+                                <button type="button" className={"btn btn-sm w-100 text-nowrap " + v_record_class} onClick={ (e) => this.fn_shot()}>Multi Shot</button>
                             </div>
                     </div>
 
