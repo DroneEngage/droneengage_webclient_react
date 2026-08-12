@@ -2265,6 +2265,18 @@ function changedeg(element, degree) {
 }
 
 function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
+	// After fn_resetOnBoardConnection, m_gui is recreated and m_marker is lost.
+	// Restore the previous m_gui (with marker) from v_vehicle_gui if available.
+	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
+		if (js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== null && js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== undefined) {
+			p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()];
+		}
+	}
+	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
+		console.warn(`Marker not found for unit ${p_andruavUnit.getPartyID()}, skipping icon update`);
+		return;
+	}
+
 	const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 	const v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
 	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);

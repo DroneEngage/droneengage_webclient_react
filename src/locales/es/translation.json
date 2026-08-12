@@ -35,6 +35,7 @@
   "title.login": "Iniciar sesión",
   "title.logout": "Cerrar sesión",
   "title.connecting": "Conectando..",
+  "title.cancelLogging": "Cancel Login",
   "label.email": "Correo electrónico",
   "label.loginName": "Nombre de usuario",
   "label.password": "Contraseña",

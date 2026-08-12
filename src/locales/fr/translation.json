@@ -35,6 +35,7 @@
   "title.login": "Connexion",
   "title.logout": "Déconnexion",
   "title.connecting": "Connection en cours..",
+  "title.cancelLogging": "Cancel Login",
   "label.email": "Email",
   "label.loginName": "Nom d'utilisateur",
   "label.password": "Mot de passe",
