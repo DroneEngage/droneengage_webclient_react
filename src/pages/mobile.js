@@ -269,11 +269,10 @@ const Mobile = () => {
                 onClick={() => handleSelectUnit(unit.getPartyID())}
               >
                 <span
-                  className={`mobile-unit-dot ${
-                    unit.m_isArmed ? 'armed' : isUnitOnline(unit) ? 'online' : 'offline'
-                  }`}
+                  className={`mobile-unit-dot ${isUnitOnline(unit) ? 'online' : 'offline'}`}
                 />
                 <span>{unit.m_unitName}</span>
+                {unit.m_isArmed === true ? <span className="mobile-unit-armed">ARMED</span> : null}
               </div>
             ))
           )}

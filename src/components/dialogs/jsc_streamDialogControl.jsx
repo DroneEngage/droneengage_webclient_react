@@ -120,21 +120,21 @@ class ClssStreamChannel extends React.Component {
             }
 
             // Compact (mobile): full-width layout with label on top, buttons below stacked
-            // Desktop: 3-column (label, stream button, record button)
-            const labelColClass = isCompact ? 'col-12 mb-2' : 'col-8';
-            const streamColClass = isCompact ? 'col-6' : 'col-2';
-            const recordColClass = isCompact ? 'col-6' : 'col-2';
+            // Desktop: flex row - label flexes (and wraps if long), buttons keep natural width and never wrap
+            const labelColClass = isCompact ? 'col-12 mb-2' : 'flex-grow-1 flex-shrink-1';
+            const streamColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+            const recordColClass = isCompact ? 'col-6' : 'flex-shrink-0';
 
             return (
-                    <div className="row al_l css_margin_zero">
+                    <div className={isCompact ? "row al_l css_margin_zero" : "d-flex al_l css_margin_zero"}>
                             <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>
                             <div className={streamColClass + " si-09x css_margin_zero css_padding_2"}>
-                                <button type="button" className={"btn btn-sm w-100 " + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
+                                <button type="button" className={"btn btn-sm text-nowrap " + (isCompact ? "w-100 " : "") + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
                             </div>
                             <div className={recordColClass + " si-09x css_margin_zero css_padding_2"}>
-                                <button type="button" className={"btn btn-sm w-100 " + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
+                                <button type="button" className={"btn btn-sm text-nowrap " + (isCompact ? "w-100 " : "") + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
                             </div>
                         </div>
             );
