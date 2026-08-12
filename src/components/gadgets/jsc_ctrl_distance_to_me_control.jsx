@@ -29,9 +29,10 @@ class ClssCtrlDistanceToMeControl extends React.Component {
     shouldComponentUpdate(nextProps, nextState) {
         if (this.state.m_update !== nextState.m_update) return true;
         if (this.state.m_opacity !== nextState.m_opacity) return true;
-        
+
         if (this.props.p_unit !== nextProps.p_unit) return true;
         if (this.props.isHUD !== nextProps.isHUD) return true;
+        if (this.props.p_compact !== nextProps.p_compact) return true;
 
         return false;
     }
@@ -48,8 +49,38 @@ class ClssCtrlDistanceToMeControl extends React.Component {
         }
     }
 
+    // Compact (mobile): tap to request browser location if not known.
+    // Uses the standard navigator.geolocation API which triggers the
+    // browser's native "allow location access" permission prompt.
+    fn_requestMyLocation() {
+        if (js_globals.myposition != null) return;
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                js_globals.myposition = position;
+                this.setState({ m_update: this.state.m_update + 1 });
+            },
+            () => {
+                js_globals.myposition = null;
+                this.setState({ m_update: this.state.m_update + 1 });
+            }
+        );
+    }
+
     render() {
         const { t, p_unit } = this.props;
+
+        // Compact (mobile) mode: always render a grid cell, even with no unit,
+        // so the mobile telemetry grid layout stays consistent.
+        if (this.props.p_compact === true && !p_unit) {
+            return (
+                <div className="mobile-telemetry-item">
+                    <span className="mobile-tel-label">{t('unit_control_imu:distance.label')}</span>
+                    <span className="mobile-tel-value">N/A</span>
+                </div>
+            );
+        }
+
         if (!p_unit) return null;
 
         let v_distanceToMe_text;
@@ -119,18 +150,38 @@ class ClssCtrlDistanceToMeControl extends React.Component {
                     height={this.props.height}
                     style={this.props.style}
                     css_class={this.props.css_class}
-                    
+
                     backgroundColor={this.props.backgroundColor || ClssCVideoCanvasLabel.defaultProps.background_color}
                     opacity={this.state.m_opacity}
                     borderRadius={this.props.borderRadius || '6px'}
                     padding={this.props.padding}
                     pointerEvents={this.props.pointerEvents || 'none'}
-                    
+
                     p_title={{ text: 'Dist:', color: ClssCVideoCanvasLabel.defaultProps.title_color }}
                     p_value={{ text: v_distance_val, color: ClssCVideoCanvasLabel.defaultProps.value_color }}
                     p_unit={{ text: v_distance_unit, color: ClssCVideoCanvasLabel.defaultProps.unit_color }}
                 />
              );
+        }
+
+        // COMPACT (mobile) MODE: renders as a mobile-telemetry-item cell.
+        // Tapping it requests browser location if not known (standard
+        // navigator.geolocation API -> native permission prompt).
+        if (this.props.p_compact === true) {
+            let v_mobile_cls = 'success';
+            if (v_distanceToMe_class.indexOf('bg-danger') >= 0) v_mobile_cls = 'danger';
+            else if (v_distanceToMe_class.indexOf('bg-info') >= 0) v_mobile_cls = 'warn';
+
+            return (
+                <div
+                    className={`mobile-telemetry-item mobile-tel-clickable ${v_mobile_cls}`}
+                    onClick={() => this.fn_requestMyLocation()}
+                    title={t('unit_control_imu:distance.title')}
+                >
+                    <span className="mobile-tel-label">{t('unit_control_imu:distance.label')}</span>
+                    <span className="mobile-tel-value">{v_distanceToMe_text}</span>
+                </div>
+            );
         }
 
         return (

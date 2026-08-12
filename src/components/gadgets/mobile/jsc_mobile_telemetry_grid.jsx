@@ -1,11 +1,12 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { CONST_METER_TO_FEET } from '../../js/js_helpers.js';
-import { fn_changeAltitude, fn_changeSpeed } from '../../js/js_main.js';
+import { CONST_METER_TO_FEET } from '../../../js/js_helpers.js';
+import { fn_changeAltitude, fn_changeSpeed } from '../../../js/js_main.js';
+import ClssCtrlDistanceToMeControl from '../jsc_ctrl_distance_to_me_control.jsx';
 
 /**
- * Mobile telemetry grid - compact 3-column strip showing Battery, GPS, Signal,
+ * Mobile telemetry grid - compact 3-column strip showing Battery, GPS, DFM,
  * Altitude, Speed and Waypoint status for the selected unit.
  *
  * Follows the same approach as ClssCtrlDroneIMU (jsc_unit_control_imu.jsx):
@@ -13,6 +14,9 @@ import { fn_changeAltitude, fn_changeSpeed } from '../../js/js_main.js';
  *  - Self-contained helper methods that derive display data from the andruavUnit.
  *  - Bootstrap contextual classes (bg-danger/bg-warning/bg-success) for status,
  *    adapted to the mobile grid via the .mobile-telemetry-item layout classes.
+ *
+ * DFM is rendered by the shared ClssCtrlDistanceToMeControl in p_compact mode,
+ * which also handles tap-to-enable-browser-location.
  */
 class ClssMobileTelemetryGrid extends React.Component {
     constructor(props) {
@@ -47,22 +51,6 @@ class ClssMobileTelemetryGrid extends React.Component {
         return { fix, sats: gps.m_satCount || 0, valid: true, cls };
     }
 
-    // -- Signal ------------------------------------------------------------
-    hlp_getSignal(p_andruavUnit) {
-        if (!p_andruavUnit) return { text: 'N/A', level: 0 };
-        const sig = p_andruavUnit.m_SignalStatus;
-        if (sig.m_mobile) {
-            const networkTypes = ['NA', '2G', '2.5G', '2.75G', '3G', '3.5G', '3.75G', '3.9G', '4G'];
-            const netType = networkTypes[sig.m_mobileNetworkTypeRank] || 'Unknown';
-            const bars = sig.m_mobileSignalLevel || 0;
-            const barStr = '▮'.repeat(Math.min(bars, 4)) + '▯'.repeat(Math.max(0, 4 - bars));
-            return { text: `${netType} ${barStr}`, level: bars };
-        }
-        if (sig.m_wifi) return { text: 'WiFi', level: 3 };
-        if (sig.m_websocket) return { text: 'WS', level: 2 };
-        return { text: 'N/A', level: 0 };
-    }
-
     // -- Altitude ----------------------------------------------------------
     hlp_getAltitude(p_andruavUnit) {
         if (!p_andruavUnit || p_andruavUnit.m_Nav_Info.p_Location.alt_relative == null) return null;
@@ -92,43 +80,39 @@ class ClssMobileTelemetryGrid extends React.Component {
 
         const v_battery = this.hlp_getBattery(p_unit);
         const v_gps     = this.hlp_getGPS(p_unit);
-        const v_signal  = this.hlp_getSignal(p_unit);
         const v_alt     = this.hlp_getAltitude(p_unit);
         const v_speed   = this.hlp_getSpeed(p_unit);
         const v_wp      = this.hlp_getWaypoint(p_unit);
 
         return (
-            <div className="mobile-telemetry">
-                <div className={`mobile-telemetry-item ${v_battery.cls}`}>
+            <div className="mobile-telemetry" id="mobile-telemetry-grid">
+                <div id="mobile-tel-battery" className={`mobile-telemetry-item ${v_battery.cls}`}>
                     <span className="mobile-tel-label">Battery</span>
                     <span className="mobile-tel-value">
                         {v_battery.pct != null ? `${v_battery.pct}%` : 'N/A'}
                     </span>
                 </div>
-                <div className={`mobile-telemetry-item ${v_gps.cls}`}>
+                <div id="mobile-tel-gps" className={`mobile-telemetry-item ${v_gps.cls}`}>
                     <span className="mobile-tel-label">GPS</span>
                     <span className="mobile-tel-value">{v_gps.fix}</span>
                     <span className="mobile-tel-unit">{v_gps.sats > 0 ? `${v_gps.sats} sats` : ''}</span>
                 </div>
-                <div className="mobile-telemetry-item">
-                    <span className="mobile-tel-label">Signal</span>
-                    <span className="mobile-tel-value">{v_signal.text}</span>
-                </div>
-                <div className="mobile-telemetry-item mobile-tel-clickable" onClick={() => p_unit && fn_changeAltitude(p_unit)}>
+                <ClssCtrlDistanceToMeControl p_unit={p_unit} p_compact={true} />
+                <div id="mobile-tel-altitude" className="mobile-telemetry-item mobile-tel-clickable" onClick={() => p_unit && fn_changeAltitude(p_unit)}>
                     <span className="mobile-tel-label">Altitude</span>
                     <span className="mobile-tel-value">
                         {v_alt ? v_alt.value : 'N/A'}
                     </span>
                     {v_alt && <span className="mobile-tel-unit">{v_alt.unit}</span>}
                 </div>
-                <div className="mobile-telemetry-item mobile-tel-clickable" onClick={() => p_unit && fn_changeSpeed(p_unit)}>
+                <div id="mobile-tel-speed" className="mobile-telemetry-item mobile-tel-clickable" onClick={() => p_unit && fn_changeSpeed(p_unit)}>
                     <span className="mobile-tel-label">Speed</span>
                     <span className="mobile-tel-value">
                         {v_speed ? v_speed.value : 'N/A'}
                     </span>
                     {v_speed && <span className="mobile-tel-unit">{v_speed.unit}</span>}
                 </div>
-                <div className="mobile-telemetry-item">
+                <div id="mobile-tel-waypoint" className="mobile-telemetry-item">
                     <span className="mobile-tel-label">Waypoint</span>
                     <span className="mobile-tel-value">
                         {v_wp.current > 0 ? `#${v_wp.current}` : '--'}

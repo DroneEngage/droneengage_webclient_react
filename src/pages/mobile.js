@@ -43,8 +43,8 @@ import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import MobileLoginPanel from '../components/jsc_mobileLogin.jsx';
-import ClssMobileTelemetryPanel from '../components/gadgets/jsc_mobile_telemetry_panel.jsx';
-import ClssMobileTelemetryGrid from '../components/gadgets/jsc_mobile_telemetry_grid.jsx';
+import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
+import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 
 
@@ -208,7 +208,23 @@ const Mobile = () => {
     return unit && unit.m_IsDisconnectedFromGCS !== true && unit.m_IsShutdown !== true;
   };
 
+  const getSignalInfo = (unit) => {
+    if (!unit) return null;
+    const sig = unit.m_SignalStatus;
+    if (!sig) return null;
+    if (sig.m_mobile) {
+      const networkTypes = ['NA', '2G', '2.5G', '2.75G', '3G', '3.5G', '3.75G', '3.9G', '4G'];
+      const netType = networkTypes[sig.m_mobileNetworkTypeRank] || 'Unknown';
+      const bars = Math.min(sig.m_mobileSignalLevel || 0, 4);
+      return { text: netType, icon: `bi-reception-${bars}`, level: bars };
+    }
+    if (sig.m_wifi) return { text: 'WiFi', icon: 'bi-wifi', level: 3 };
+    if (sig.m_websocket) return { text: 'WS', icon: 'bi-broadcast', level: 2 };
+    return null;
+  };
+
   const flightModeText = getFlightModeText(selectedUnit);
+  const signalInfo = getSignalInfo(selectedUnit);
   const drones = getDroneUnits();
   const isBlocked = selectedUnit && selectedUnit.m_Telemetry.m_isGCSBlocked === true;
   const isTelemetryOn = selectedUnit && selectedUnit.m_Telemetry.m_udpProxy_active === true && selectedUnit.m_Telemetry.m_udpProxy_paused === false;
@@ -230,13 +246,12 @@ const Mobile = () => {
               {drones.length > 1 && <i className="bi bi-chevron-down" style={{ fontSize: '0.7rem' }} />}
             </div>
             <div className="mobile-status-bar-right">
-              <button
-                className={`mobile-telemetry-toggle ${isTelemetryOn ? 'active' : ''}`}
-                onClick={() => setShowTelemetrySheet(true)}
-                title="Smart Telemetry"
-              >
-                <i className="bi bi-broadcast" />
-              </button>
+              {signalInfo && (
+                <span className="mobile-signal-info" title={`Signal: ${signalInfo.text}`}>
+                  <i className={`bi ${signalInfo.icon}`} />
+                  <span className="mobile-signal-text">{signalInfo.text}</span>
+                </span>
+              )}
               <div className="mobile-flight-mode">
                 {selectedUnit && selectedUnit.m_isArmed === true ? (
                   <span className="text-danger">ARMED</span>
@@ -300,6 +315,14 @@ const Mobile = () => {
           </button>
           <button className="mobile-view-toggle" onClick={openCameraDialog} title="Camera" disabled={!selectedUnit}>
             <i className="bi bi-camera" />
+          </button>
+          <button
+            className={`mobile-view-toggle ${isTelemetryOn ? 'active' : ''}`}
+            onClick={() => setShowTelemetrySheet(true)}
+            title="Smart Telemetry"
+            disabled={!selectedUnit}
+          >
+            <i className="bi bi-broadcast" />
           </button>
           <button className="mobile-view-toggle" onClick={() => setShowControls((s) => !s)} title="Toggle Controls">
             <i className={`bi ${showControls ? 'bi-sliders2' : 'bi-sliders2-vertical'}`} />
