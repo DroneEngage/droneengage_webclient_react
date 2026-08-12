@@ -85,6 +85,28 @@ body.mobile-mode {
   color: #28a745;
 }
 
+/* Passive signal indicator shown in the status bar when signal info exists */
+.mobile-status-bar .mobile-signal-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #28a745;
+  font-size: 0.8rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mobile-status-bar .mobile-signal-info .mobile-signal-text {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* Active state for the round telemetry toggle in mobile-top-toggles */
+.mobile-view-toggle.active {
+  background: rgba(40, 167, 69, 0.85);
+  border-color: rgba(40, 167, 69, 0.9);
+}
+
 /* Map / FPV center area */
 .mobile-center {
   flex: 1 1 auto;
@@ -373,6 +395,10 @@ body.mobile-mode {
 
 .mobile-action-btn.land {
   background: #dc3545;
+}
+
+.mobile-action-btn.guided {
+  background: #198754;
 }
 
 .mobile-blocked-banner {

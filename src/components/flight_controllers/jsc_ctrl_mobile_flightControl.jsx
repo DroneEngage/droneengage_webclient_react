@@ -146,6 +146,12 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         res.btn_land_confirmTitle   = 'LAND ' + p_andruavUnit.m_unitName;
         res.btn_land_confirmMessage = 'Command the vehicle to land. Are you sure?';
 
+        // GUIDED
+        res.btn_guided_style          = 'guided';
+        res.btn_guided_enabled        = canControl && isArmed;
+        res.btn_guided_confirmTitle   = 'GUIDED ' + p_andruavUnit.m_unitName;
+        res.btn_guided_confirmMessage = 'Switch to GUIDED mode. Are you sure?';
+
 	    return res;
 	}
 
@@ -248,6 +254,21 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         });
     }
 
+    fn_doGuided ()
+    {
+        const v_andruavUnit = this.props.v_andruavUnit;
+        if (v_andruavUnit === null || v_andruavUnit === undefined) return;
+
+        const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        const me = this;
+        this.fn_doConfirm(btn.btn_guided_confirmTitle, btn.btn_guided_confirmMessage, function () {
+            const flightMode = me.hlp_isPX4()
+                ? js_andruavUnit.CONST_FLIGHT_PX4_OFF_BOARD
+                : js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED;
+            js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, flightMode);
+        });
+    }
+
     render ()
     {
         const p_andruavUnit = this.props.v_andruavUnit;
@@ -330,6 +351,21 @@ export class ClssCtrlMobileFlightControl extends React.Component {
                     <i className="bi bi-arrow-down-circle-fill" />
                 </span>
                 LAND
+            </button>
+        );
+
+        // GUIDED
+        actions.push(
+            <button
+                key="guided"
+                className={`mobile-action-btn ${btn.btn_guided_style}`}
+                onClick={() => this.fn_doGuided()}
+                disabled={!btn.btn_guided_enabled}
+            >
+                <span className="mobile-btn-icon">
+                    <i className="bi bi-geo-alt-fill" />
+                </span>
+                GUIDED
             </button>
         );
 

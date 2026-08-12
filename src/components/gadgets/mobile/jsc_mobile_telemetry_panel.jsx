@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { js_globals } from '../../js/js_globals.js';
-import { EVENTS as js_event } from '../../js/js_eventList.js';
-import { js_eventEmitter } from '../../js/js_eventEmitter';
-import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
+import { js_globals } from '../../../js/js_globals.js';
+import { EVENTS as js_event } from '../../../js/js_eventList.js';
+import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 
 const TELEMETRY_LEVEL_LABEL = ['OFF', '1', '2', '3'];
 
@@ -106,7 +106,8 @@ const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
         ) : (
           <>
             <button
-              className={`mobile-sheet-btn full ${isPaused ? 'success' : 'warning'}`}
+              id='mobile-sheet-toggle-btn'
+              className={`mobile-sheet-btn full ${isPaused ? 'secondary' : 'warning'}`}
               onClick={fn_toggleOnOff}
               title={isPaused ? t('activateTitle') : t('pauseTitle')}
             >
