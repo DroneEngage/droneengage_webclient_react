@@ -34,6 +34,7 @@
   "title.login": "دخول",
   "title.logout": "خروج",
   "title.connecting": "..اتصال",
+  "title.cancelLogging": "Cancel Login",
   "label.email": "بريد الكترونى",
   "label.loginName": "اسم الدخول",
   "label.password": "كلمة مرور",

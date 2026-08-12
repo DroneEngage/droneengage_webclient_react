@@ -1197,6 +1197,7 @@ class CAndruavClientParser {
             triggers.onHomePointChanged = true;
         }
 
+        const oldIsDE = p_unit.fn_getIsDE();
         if (p_jmsg.dv) {
             // .dv meanse DRONEENGAGE-VERSION
             p_unit.fn_setIsDE(true);
@@ -1225,6 +1226,10 @@ class CAndruavClientParser {
                     }, 1000);
                 }
             }
+        }
+        // If DE status changed (DE <-> Andruav), force marker icon refresh
+        if (oldIsDE !== p_unit.fn_getIsDE()) {
+            triggers.onVehicleChanged = true;
         }
 
         if (p_jmsg.hasOwnProperty('B')) {

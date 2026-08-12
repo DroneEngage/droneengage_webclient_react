@@ -35,6 +35,7 @@
   "title.login": "Войти",
   "title.logout": "Выйти",
   "title.connecting": "Подключение..",
+  "title.cancelLogging": "Cancel Login",
   "label.email": "Электронная почта",
   "label.loginName": "Имя пользователя",
   "label.password": "Пароль",
