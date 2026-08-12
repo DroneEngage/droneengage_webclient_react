@@ -72,6 +72,7 @@ class ClssHeaderControl extends React.Component {
                         <ul className="dropdown-menu dropdown-menu-start" style={{minWidth: '180px', maxWidth: '90vw'}}>
                             <li key="Home"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')}</a></li>
                             <li key="Geo"><a className="dropdown-item txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a></li>
+                            <li key="Mobile"><a className="dropdown-item txt-theme-aware" id='mobile' href="./mobile" target='_blank' rel="noopener noreferrer">{t('header.mobile')}</a></li>
                             <li key="Manual"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer">Wiki</a></li>
                             <li key="FAQ"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a></li>
                             <li key="Contact"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a></li>
