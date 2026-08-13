@@ -50,6 +50,29 @@ export let CONST_DEBUG_CONTROL_PAGE = true;
 
 export let CONST_WEBSOCKET_BRIDGE_PORT = 8812;
 
+/**
+ * WS authentication transport (security item 2.1).
+ *
+ * When false (default, backward compatible): the session auth key (f), party ID
+ * (s), actor type (at) and plugin API key (k) are sent in the WebSocket URL
+ * query string. These values appear in proxy/access logs and browser history.
+ *
+ * When true: the URL contains no credentials. Instead, the client sends a
+ * JSON auth frame as the first message after onopen, and waits for an
+ * auth-ack frame before sending any other traffic.
+ *
+ * NOTE: Enabling this requires the Communication Server (AndruavServer) and/or
+ * the WebConnector plugin to accept the auth frame. See the protocol spec in
+ * js_andruav_ws.js fn_connect().
+ *
+ * The auth frame format (client -> server, first message after open):
+ *   {"ty":"s","mt":"de_auth","f":"<authKey>","s":"<partyID>","at":"g","k":"<apiKey?>"}
+ * The auth-ack frame (server -> client):
+ *   {"ty":"s","mt":"de_auth_ack","r":"ok"}   -- success
+ *   {"ty":"s","mt":"de_auth_ack","r":"fail","em":"<reason>"}  -- failure (server then closes)
+ */
+export let CONST_WS_AUTH_VIA_FRAME = false;
+
 // CHOOSE YOUR MAP SOURCE
 export let CONST_MAP_LEAFLET_ACCESS_TOKEN = "mapbox-YOUR-TOKEN-HERE";
 export let CONST_MAP_LEAFLET_URL_MAP = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=";
@@ -142,6 +165,8 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_TEST_MODE_PORT !== undefined) CONST_TEST_MODE_PORT = data.CONST_TEST_MODE_PORT;
 
         if (data.CONST_WEBCONNECTOR_CONFIG !== undefined) CONST_WEBCONNECTOR_CONFIG = { ...CONST_WEBCONNECTOR_CONFIG, ...data.CONST_WEBCONNECTOR_CONFIG };
+
+        if (data.CONST_WS_AUTH_VIA_FRAME !== undefined) CONST_WS_AUTH_VIA_FRAME = data.CONST_WS_AUTH_VIA_FRAME === true;
 
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
