@@ -30,9 +30,9 @@ const CMD_COMM_INDIVIDUAL = 'i';
 // System Commands:
 const CMD_SYS_PING = 'ping'; //'ping'; // group broadcast
 
-// Auth-frame protocol (security item 2.1): when CONST_WS_AUTH_VIA_FRAME is
-// true, credentials are sent as the first WS message instead of in the URL
-// query string. See js_siteConfig.js for the full protocol spec.
+// Auth-frame protocol (security item 2.1): credentials are always sent as
+// the first WS message instead of in the URL query string (cloud mode).
+// See js_siteConfig.js for the full protocol spec.
 const CMD_SYS_DE_AUTH = 'de_auth';        // client -> server: auth frame
 const CMD_SYS_DE_AUTH_ACK = 'de_auth_ack'; // server -> client: auth result
 const CONST_AUTH_FRAME_TIMEOUT = 8000;     // ms to wait for auth-ack
@@ -471,16 +471,15 @@ class CAndruavClientWS {
             const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WEBCONNECTOR_CONFIG.APIKEY : '';
             const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
 
-            // Security item 2.1: when CONST_WS_AUTH_VIA_FRAME is true, credentials
-            // are sent as a post-open JSON frame instead of in the URL query string
-            // (which leaks into proxy/access logs and browser history).
+            // Security item 2.1: credentials are always sent as a post-open
+            // JSON frame instead of in the URL query string (which leaks into
+            // proxy/access logs and browser history).
             //
-            // The flag applies to CLOUD mode only. The WebConnector plugin runs on
-            // localhost and does not understand the de_auth frame, so plugin mode
-            // always uses query-string auth (the localhost leak risk is negligible).
-            // If the WebConnector plugin is ever updated to support the auth frame,
-            // add a separate CONST_WS_AUTH_VIA_FRAME_PLUGIN flag here.
-            const authViaFrame = (usePlugin !== true) && (js_siteConfig.CONST_WS_AUTH_VIA_FRAME === true);
+            // The auth frame applies to CLOUD mode only. The WebConnector
+            // plugin runs on localhost and does not understand the de_auth
+            // frame, so plugin mode always uses query-string auth (the
+            // localhost leak risk is negligible).
+            const authViaFrame = (usePlugin !== true);
             this.m_authViaFrame = authViaFrame;
             this.m_authPending = false;
             if (this.m_authTimeoutHandle) {
@@ -491,27 +490,15 @@ class CAndruavClientWS {
             if (usePlugin === true) {
                 const wsProtocol = 'ws';
                 const port = this.m_server_port;
-                if (authViaFrame === true) {
-                    url = wsProtocol + '://' + this.m_server_ip + ':' + port;
-                } else {
-                    url = wsProtocol + '://' + this.m_server_ip + ':' + port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
-                }
+                url = wsProtocol + '://' + this.m_server_ip + ':' + port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g' + pluginApiKeyQS;
             } else {
                 if (window.location.protocol === 'https:') {
                     // f: CONST_CS_LOGIN_TEMP_KEY
                     // g: CONST_CS_SERVER_PUBLIC_HOST
                     // s: SID
-                    if (authViaFrame === true) {
-                        url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss;
-                    } else {
-                        url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
-                    }
+                    url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss;
                 } else {
-                    if (authViaFrame === true) {
-                        url = 'ws://' + this.m_server_ip + ':' + this.m_server_port;
-                    } else {
-                        url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
-                    }
+                    url = 'ws://' + this.m_server_ip + ':' + this.m_server_port;
                 }
             }
 
