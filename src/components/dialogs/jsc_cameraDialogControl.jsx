@@ -365,26 +365,32 @@ export default class ClssCameraDialog extends ClssDialogBase
                     </div>
                     <div className="tab-content">
                         <div className="row margin_5px">
-                            <div className="col-12 mb-2">
-                                <button type="button" id="small_gcs"
-                                    title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
-                                    className={'btn btn-sm ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
-                                    onClick={() => this.fn_toggleGcsSmall()}>
-                                    <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
-                                </button>
+                            <div className="col-4">
+                                <div className="form-group">
+                                    <div>
+                                        <label className="text-warning"><small>GCS&nbsp;Img</small></label>
+                                        <button type="button" id="small_gcs"
+                                            title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
+                                            className={'btn btn-sm d-block w-100 ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
+                                            style={{ height: 'calc(1.5em + 0.5rem + 2px)' }}
+                                            onClick={() => this.fn_toggleGcsSmall()}>
+                                            <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-4">
                                     <div className="form-group">
                                     <div>
-                                        <label htmlFor="txt_ShootingInterval" className="text-primary"><small>Each&nbsp;N&nbsp;sec</small></label>
+                                        <label htmlFor="txt_ShootingInterval" className="text-warning"><small>Each&nbsp;N&nbsp;sec</small></label>
                                         <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"  ref={this.txt_ShootingInterval} defaultValue={1} />
                                     </div>
                                     </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-4">
                                     <div className="form-group">
                                         <div>
-                                        <label htmlFor="txt_TotalImages" className="text-primary"  ><small>Total&nbsp;Img</small></label>
+                                        <label htmlFor="txt_TotalImages" className="text-warning"  ><small>Total&nbsp;Img</small></label>
                                         <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm" ref={this.txt_TotalImages} defaultValue={1} />
                                         </div>
                                     </div>

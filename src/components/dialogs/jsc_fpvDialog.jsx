@@ -8,6 +8,7 @@ import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import * as js_common from '../../js/js_common.js';
 import { js_globals } from '../../js/js_globals.js';
+import { fn_saveData } from '../../js/js_helpers.js';
 
 import ClssDialogBase from './jsc_dialog_base.jsx';
 
@@ -105,8 +106,52 @@ class ClssFpvDialog extends ClssDialogBase {
     }
 
     fn_onSave() {
-        // Save image logic would go here
-        js_common.fn_console_log('FPV: save image');
+        const src = this.state.image_src;
+        if (!src) return;
+
+        // Build a descriptive filename: fpv_<unitName>_<timestamp>.png
+        let unitName = 'image';
+        if (this.state.party_id) {
+            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.party_id);
+            if (p_andruavUnit && p_andruavUnit.m_unitName) {
+                unitName = p_andruavUnit.m_unitName;
+            }
+        }
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const fileName = 'fpv_' + unitName + '_' + stamp + '.png';
+
+        // If the image is rotated, render the rotated result to a canvas and
+        // save that. Fall back to a direct download of the original src when
+        // the canvas is tainted (cross-origin image without CORS) or when
+        // there is no rotation.
+        const rotation = this.state.m_rotation || 0;
+        if (rotation !== 0 && this.imgRef.current) {
+            const img = this.imgRef.current;
+            const w = img.naturalWidth || img.width;
+            const h = img.naturalHeight || img.height;
+            if (w > 0 && h > 0) {
+                try {
+                    const canvas = document.createElement('canvas');
+                    // For 90/270 the output dimensions are swapped.
+                    const sideways = rotation === 90 || rotation === 270;
+                    canvas.width = sideways ? h : w;
+                    canvas.height = sideways ? w : h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(rotation * Math.PI / 180);
+                    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    fn_saveData(dataUrl, fileName);
+                    return;
+                } catch (e) {
+                    // Canvas tainted by a cross-origin image: fall through to
+                    // a direct download of the unrotated source.
+                    js_common.fn_console_log('FPV: canvas save failed, falling back: ' + e);
+                }
+            }
+        }
+
+        fn_saveData(src, fileName);
     }
 
     fn_onGoto() {
@@ -271,17 +316,40 @@ class ClssFpvDialog extends ClssDialogBase {
         if (isCompact) {
             if (!this.state.m_visible) return null;
 
-            // In compact mode the image is constrained to the available screen
-            // size using viewport-relative units (vw/vh) so it never exceeds
-            // the mobile view, regardless of window resize or the image's
-            // natural dimensions. When rotated 90/270, the width and height
-            // budgets are swapped so the visual width of the rotated image
-            // never exceeds the screen width.
-            //   - maxWidth uses ~96vw (leaving 2vw padding each side)
-            //   - maxHeight uses ~80vh (leaving room for header/footer)
+            // In compact mode there is no resizable dialog body (bodyRef is not
+            // attached), so fn_applyFitToImage's px-resizing is a no-op here.
+            // Instead the two fit modes drive the image style directly:
+            //   - FIT_TO_IMAGE : show the image at its natural size, capped to
+            //                    the available screen via vw/vh (capped with
+            //                    min(..., 100%) so it can never exceed its
+            //                    container either - the overlay is constrained
+            //                    to the 480px mobile column on >=768px screens,
+            //                    see css_mobile.css).
+            //   - FIT_IMAGE_IN : fill the overlay body and let object-fit:
+            //                    contain scale the image inside it (small images
+            //                    enlarged, large images shrunk, aspect ratio
+            //                    preserved).
+            // When rotated 90/270 the width and height budgets are swapped so
+            // the visual width of the rotated image never exceeds the screen.
             const isCompactRotated = this.state.m_rotation === 90 || this.state.m_rotation === 270;
-            const compactImgMaxW = isCompactRotated ? '80vh' : '96vw';
-            const compactImgMaxH = isCompactRotated ? '96vw' : '80vh';
+            const compactImgMaxW = isCompactRotated ? 'min(80vh, 100%)' : 'min(96vw, 100%)';
+            const compactImgMaxH = isCompactRotated ? 'min(96vw, 100%)' : 'min(80vh, 100%)';
+
+            const isCompactFitToImage = this.state.fit_mode === CONST_FIT_TO_IMAGE;
+            const compactImgStyle = isCompactFitToImage
+                ? {
+                    ...baseImgStyle,
+                    maxWidth: compactImgMaxW,
+                    maxHeight: compactImgMaxH,
+                    width: 'auto',
+                    height: 'auto',
+                }
+                : {
+                    ...baseImgStyle,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                };
 
             return (
                 <div className="mobile-fpv-overlay" onClick={() => this.fn_closeDialog()}>
@@ -292,24 +360,12 @@ class ClssFpvDialog extends ClssDialogBase {
                                 <i className="bi bi-x-lg" />
                             </button>
                         </div>
-                        <div className="mobile-fpv-overlay-body">
-                            <img
-                                id="unitImg"
-                                className="img-rounded"
-                                alt="camera"
-                                src={this.state.image_src}
-                                style={{
-                                    ...baseImgStyle,
-                                    maxWidth: compactImgMaxW,
-                                    maxHeight: compactImgMaxH,
-                                    width: 'auto',
-                                    height: 'auto',
-                                }}
-                                ref={this.imgRef}
-                                onLoad={(e) => this.fn_onImageLoad(e)}
-                            />
-                        </div>
-                        <div className="mobile-fpv-overlay-footer">
+                        {/* Controls on top: Fit / Contain / Rotate / Save.
+                            bodyRef is not attached in compact mode, so the fit
+                            buttons only flip fit_mode (fn_applyFitToImage's
+                            px-resizing is a guarded no-op) and the image style
+                            above reacts to it. */}
+                        <div className="mobile-fpv-overlay-toolbar">
                             {this.fn_renderFitButtons()}
                             <button
                                 id="unitImg_save"
@@ -319,6 +375,17 @@ class ClssFpvDialog extends ClssDialogBase {
                             >
                                 {tFunc('home:modal.image.save', 'Save')}
                             </button>
+                        </div>
+                        <div className="mobile-fpv-overlay-body">
+                            <img
+                                id="unitImg"
+                                className="img-rounded"
+                                alt="camera"
+                                src={this.state.image_src}
+                                style={compactImgStyle}
+                                ref={this.imgRef}
+                                onLoad={(e) => this.fn_onImageLoad(e)}
+                            />
                         </div>
                     </div>
                 </div>

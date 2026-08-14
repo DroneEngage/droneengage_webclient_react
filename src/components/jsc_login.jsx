@@ -63,7 +63,7 @@ class ClssLoginControl extends React.Component {
 
     if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
       me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
-      me.state.username = me.txtUnitIDRef.current.value;
+      me.state.username = me.txtUnitIDRef.current ? me.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
       me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected successfully.' });
     } else {
