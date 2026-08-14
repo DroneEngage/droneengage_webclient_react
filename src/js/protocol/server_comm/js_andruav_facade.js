@@ -922,12 +922,14 @@ class CAndruavClientFacade {
     };
 
 
-    API_CONST_RemoteCommand_takeImage2(p_target, _cameraSource, _numberofImages, _timeBetweenShots, _distanceBetweenShots) {
+    API_CONST_RemoteCommand_takeImage2(p_target, _cameraSource, _numberofImages, _timeBetweenShots, _distanceBetweenShots, _gcsSmall) {
         const msg = {
             a: _cameraSource,
             b: parseInt(_numberofImages),
             c: parseFloat(_timeBetweenShots),
-            d: parseFloat(_distanceBetweenShots)
+            d: parseFloat(_distanceBetweenShots),
+            // e: 1 = send a low-res PNG to GCS (saved file stays full-res). 0/absent = full-res.
+            e: (_gcsSmall === true) ? 1 : 0
         };
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_Ctrl_Camera, msg);
     };
