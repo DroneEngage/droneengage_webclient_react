@@ -20,6 +20,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
 		        m_autoPilot: p_andruavUnit ? p_andruavUnit.m_autoPilot : null,
 		        m_flightMode: p_andruavUnit ? p_andruavUnit.m_flightMode : null,
 		        m_isGCSBlocked: p_andruavUnit ? p_andruavUnit.m_Telemetry.m_isGCSBlocked : false,
+		        m_useFCBIMU: p_andruavUnit ? p_andruavUnit.m_useFCBIMU : false,
 			};
     }
 
@@ -34,6 +35,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             || s.m_autoPilot != v_andruavUnit.m_autoPilot
             || s.m_flightMode != v_andruavUnit.m_flightMode
             || s.m_isGCSBlocked != v_andruavUnit.m_Telemetry.m_isGCSBlocked
+            || s.m_useFCBIMU != v_andruavUnit.m_useFCBIMU
         );
 
         return update;
@@ -48,7 +50,8 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             v_andruavUnit.m_isArmed !== prevState.m_isArmed ||
             v_andruavUnit.m_autoPilot !== prevState.m_autoPilot ||
             v_andruavUnit.m_flightMode !== prevState.m_flightMode ||
-            v_andruavUnit.m_Telemetry.m_isGCSBlocked !== prevState.m_isGCSBlocked) {
+            v_andruavUnit.m_Telemetry.m_isGCSBlocked !== prevState.m_isGCSBlocked ||
+            v_andruavUnit.m_useFCBIMU !== prevState.m_useFCBIMU) {
             return {
                 m_VehicleType: v_andruavUnit.m_VehicleType,
                 m_is_ready_to_arm: v_andruavUnit.m_is_ready_to_arm,
@@ -56,6 +59,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
                 m_autoPilot: v_andruavUnit.m_autoPilot,
                 m_flightMode: v_andruavUnit.m_flightMode,
                 m_isGCSBlocked: v_andruavUnit.m_Telemetry.m_isGCSBlocked,
+                m_useFCBIMU: v_andruavUnit.m_useFCBIMU,
             };
         }
         return null;
@@ -99,6 +103,13 @@ export class ClssCtrlMobileFlightControl extends React.Component {
     hlp_baseEnabled ()
     {
         return this.hlp_canConnect() && !this.hlp_isBlocked() && js_andruavAuth.fn_do_canControlModes();
+    }
+
+    fn_connectToFCB (p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        if (js_globals.v_andruavFacade === null || js_globals.v_andruavFacade === undefined) return;
+        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
     }
 
     hlp_getMobileButtonStyles (p_andruavUnit)
@@ -273,6 +284,21 @@ export class ClssCtrlMobileFlightControl extends React.Component {
     {
         const p_andruavUnit = this.props.v_andruavUnit;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return null;
+
+        if (p_andruavUnit.m_useFCBIMU !== true) {
+            const isAndruav = p_andruavUnit.fn_isAndruav();
+            return (
+                <div className="mobile-actions">
+                    <p
+                        className={"mobile-fcb-not-connected" + (isAndruav ? " cursor_hand" : "")}
+                        title={isAndruav ? "Click to connect to FCB if not active" : ""}
+                        onClick={isAndruav ? () => this.fn_connectToFCB(p_andruavUnit) : undefined}
+                    >
+                        <i className="bi bi-exclamation-diamond" /> Flight Control Board is not Connected
+                    </p>
+                </div>
+            );
+        }
 
         const btn = this.hlp_getMobileButtonStyles(p_andruavUnit);
         let actions = [];

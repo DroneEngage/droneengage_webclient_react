@@ -1257,6 +1257,10 @@ export class CAndruavUnitObject {
     return this.#m_isDE;
   }
 
+  fn_isAndruav() {
+    return this.#m_isDE === false;
+  }
+
   fn_setVersion(p_version) {
     this.#m_version = p_version;
     let module_version_comparison = 0;
