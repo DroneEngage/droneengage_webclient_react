@@ -757,12 +757,32 @@ body.mobile-mode {
   height: auto;
 }
 
-.mobile-fpv-overlay-footer {
+/* Toolbar sits above the image (not below) so Fit/Contain/Rotate/Save stay
+   reachable. Same layout as the old footer - a centered flex row. */
+.mobile-fpv-overlay-toolbar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 10px;
+  padding: 6px 10px;
+  flex: 0 0 auto;
+}
+
+/* The FPV overlay is rendered through mobile.js's document.body portal (so
+   draggable desktop dialogs can escape .mobile-page's overflow:hidden), so it
+   has no .mobile-page ancestor. On >=768px screens .mobile-page is capped to
+   480px and centered, but the overlay would otherwise span the full viewport
+   and let the image exceed the mobile column. Mirror .mobile-page's breakpoint
+   (same as .mobile-sheet-backdrop above) so the overlay lines up with the
+   phone-width column and the image is capped to that width. */
+@media (min-width: 768px) {
+  .mobile-fpv-overlay {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .mobile-fpv-overlay-body img {
+    max-width: calc(480px - 16px);
+  }
 }
 
 /* Fullscreen map */

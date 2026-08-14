@@ -46,6 +46,8 @@ import MobileLoginPanel from '../components/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
 import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
+import { js_speak } from '../js/js_speak.js';
+import { js_localStorage } from '../js/js_localStorage';
 
 
 const Mobile = () => {
@@ -58,6 +60,7 @@ const Mobile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(js_andruavAuth.fn_logined() === true);
   const [showControls, setShowControls] = useState(true);
   const [showTelemetrySheet, setShowTelemetrySheet] = useState(false);
+  const [speechEnabled, setSpeechEnabled] = useState(js_localStorage.fn_getSpeechEnabled() === true);
   const tickRef = useRef(0);
   const unitSystemListenerRef = useRef({});
 
@@ -137,9 +140,12 @@ const Mobile = () => {
   }, [refresh]);
 
   const getDroneUnits = () => {
-    const units = js_globals.m_andruavUnitList
-      ? js_globals.m_andruavUnitList.fn_getUnitValues()
-      : null;
+    // Use fn_getUnitsSorted() — same method ClssAndruavUnitList uses in home.js.
+    // Unlike fn_getUnitValues(), it does not guard on js_globals.v_andruavClient,
+    // which can be unset during reconnection/session-restore and cause the mobile
+    // status bar to show "No Unit" even when units exist in the global list.
+    if (!js_globals.m_andruavUnitList) return [];
+    const units = js_globals.m_andruavUnitList.fn_getUnitsSorted();
     if (!units) return [];
     return units.filter((u) => u && u.m_defined === true && u.m_IsGCS === false);
   };
@@ -233,7 +239,7 @@ const Mobile = () => {
   return (
     <div className="mobile-page">
       {/* Status bar */}
-      <div className="mobile-status-bar">
+      <div id='mobile-status-bar' className="mobile-status-bar">
         {isLoggedIn ? (
           <>
             <div className="mobile-unit-name" onClick={() => setShowUnitList(!showUnitList)}>
@@ -246,6 +252,24 @@ const Mobile = () => {
               {drones.length > 1 && <i className="bi bi-chevron-down" style={{ fontSize: '0.7rem' }} />}
             </div>
             <div className="mobile-status-bar-right">
+              <i
+                className={`bi bi-megaphone mobile-telemetry-toggle${speechEnabled ? ' active' : ''}`}
+                title={speechEnabled ? 'Speech Enabled - click to disable' : 'Speech Disabled - click to enable'}
+                onClick={() => {
+                  const next = !speechEnabled;
+                  js_localStorage.fn_setSpeechEnabled(next);
+                  js_speak.fn_updateSettings();
+                  if (next) {
+                    js_speak.fn_speak('speech enabled');
+                  } else {
+                    if (window.speechSynthesis) {
+                      window.speechSynthesis.cancel();
+                    }
+                    js_speak.fn_stopSpeaking();
+                  }
+                  setSpeechEnabled(next);
+                }}
+              />
               {signalInfo && (
                 <span className="mobile-signal-info" title={`Signal: ${signalInfo.text}`}>
                   <i className={`bi ${signalInfo.icon}`} />
