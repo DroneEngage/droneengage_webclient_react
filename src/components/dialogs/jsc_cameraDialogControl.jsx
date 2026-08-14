@@ -27,6 +27,13 @@ class ClssCameraDevice extends React.Component {
     fn_videoStream()
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+
+        // Tell the unit which camera to actually capture from (built-in front/back, or e.g. an
+        // attached USB webcam reported in CAMERA_LIST_MESSAGE) before joining its WebRTC track -
+        // same AndruavMessage_CameraSwitch already used by the live-view "switch camera" button,
+        // just driven by the selected track id instead of a plain front/back toggle.
+        js_globals.v_andruavFacade.API_SwitchCamera(this.props.prop_session.m_unit.getPartyID(), v_track.id);
+
         fn_VIDEO_login (this.props.prop_session, v_track.id);
         js_eventEmitter.fn_dispatch (js_event.EE_hideStreamDlgForm);
     }
@@ -53,8 +60,9 @@ class ClssCameraDevice extends React.Component {
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             camera_index,
             1,
-            0, 
-            0);
+            0,
+            0,
+            this.props.prop_parent.fn_getGCSSmall());
     }
 
     fn_shot()
@@ -68,11 +76,12 @@ class ClssCameraDevice extends React.Component {
             camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(), 
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
             this.props.prop_parent.fn_getNumOfShots(),
-            this.props.prop_parent.fn_getInterval(), 
-            0);
+            this.props.prop_parent.fn_getInterval(),
+            0,
+            this.props.prop_parent.fn_getGCSSmall());
     }
 
     
@@ -132,8 +141,11 @@ export default class ClssCameraDialog extends ClssDialogBase
         this.state = {
 			...this.state,
 			'm_update': 0,
+			// GCS still image resolution toggle: true = low-res downlink (saved file stays full-res),
+			// false = full-res downlink. Default small to protect RPi/downlink bandwidth.
+			'm_gcsSmall': true,
 		};
-        
+
         this.m_flag_mounted = false;
         
         this.key = Math.random().toString();
@@ -207,6 +219,16 @@ export default class ClssCameraDialog extends ClssDialogBase
     fn_getNumOfShots()
     {
         return $('#txt_TotalImages').val();
+    }
+
+    fn_getGCSSmall()
+    {
+        return this.state.m_gcsSmall === true;
+    }
+
+    fn_toggleGcsSmall()
+    {
+        this.setState((s) => ({ 'm_gcsSmall': !(s.m_gcsSmall === true) }));
     }
 
     fn_initDialog() {
@@ -294,6 +316,16 @@ export default class ClssCameraDialog extends ClssDialogBase
                                     <ClssCameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id + 'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} p_compact={isCompact} />
                                 ))}
                                 <div className="row margin_5px">
+                                    <div className="col-12 mb-2 d-flex align-items-center">
+                                        <button type="button" id="small_gcs"
+                                            title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
+                                            className={'btn btn-sm ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
+                                            onClick={() => this.fn_toggleGcsSmall()}>
+                                            <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="row margin_5px">
                                     <div className="col-6">
                                         <div className="form-group">
                                             <div>
@@ -333,6 +365,14 @@ export default class ClssCameraDialog extends ClssDialogBase
                     </div>
                     <div className="tab-content">
                         <div className="row margin_5px">
+                            <div className="col-12 mb-2">
+                                <button type="button" id="small_gcs"
+                                    title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
+                                    className={'btn btn-sm ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
+                                    onClick={() => this.fn_toggleGcsSmall()}>
+                                    <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
+                                </button>
+                            </div>
                             <div className="col-6">
                                     <div className="form-group">
                                     <div>
