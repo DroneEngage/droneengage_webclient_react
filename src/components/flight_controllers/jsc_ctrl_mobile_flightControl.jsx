@@ -120,7 +120,75 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         const isArmed     = p_andruavUnit.m_isArmed === true;
         const canControl  = this.hlp_baseEnabled();
         const canArm      = canControl && js_andruavAuth.fn_do_canControl();
-        const showTakeoff = isPX4 || this.hlp_ardupilotHasTakeoff();
+        const isCopter    = p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_QUAD
+                            || p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_TRI;
+        const isPlaneOrVTOL = p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_PLANE
+                              || p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_VTOL;
+        const showTakeoff = isPX4
+            ? (isCopter || isPlaneOrVTOL)
+            : this.hlp_ardupilotHasTakeoff();
+
+        // Non-ARM mode changes that the ArduPilot/PX4 desktop panels allow while disarmed.
+        let allowTakeoff = isArmed;
+        let allowAuto    = isArmed;
+        let allowBrake   = isArmed;
+        let allowLand    = isArmed;
+        let allowGuided  = isArmed;
+
+        if (!isArmed) {
+            switch (p_andruavUnit.m_VehicleType) {
+                case js_andruavUnit.VEHICLE_SUBMARINE:
+                    if (!isPX4) {
+                        // ArduPilot submarine: takeoff, auto, guided allowed while disarmed
+                        allowTakeoff = true;
+                        allowAuto    = true;
+                        allowGuided  = true;
+                    }
+                    break;
+                case js_andruavUnit.VEHICLE_BOAT:
+                case js_andruavUnit.VEHICLE_ROVER:
+                    // Both autopilots allow AUTO for rovers/boats while disarmed
+                    allowAuto = true;
+                    if (!isPX4) {
+                        // ArduPilot: GUIDED and HOLD (mobile BRAKE -> HOLD) are allowed while disarmed
+                        allowGuided = true;
+                        allowBrake  = true;
+                    }
+                    break;
+                case js_andruavUnit.VEHICLE_TRI:
+                case js_andruavUnit.VEHICLE_QUAD:
+                    if (isPX4) {
+                        // PX4 quads can select takeoff while disarmed
+                        allowTakeoff = true;
+                    }
+                    allowAuto   = true;
+                    allowBrake  = true;
+                    allowLand   = true;
+                    allowGuided = true;
+                    break;
+                case js_andruavUnit.VEHICLE_VTOL:
+                case js_andruavUnit.VEHICLE_PLANE:
+                    // TAKEOFF, AUTO, GUIDED and BRAKE -> LOITER/HOLD are allowed while disarmed
+                    allowTakeoff = true;
+                    allowAuto    = true;
+                    allowBrake   = true;
+                    allowLand    = isPX4;
+                    allowGuided  = true;
+                    break;
+                default:
+                    if (isPX4) {
+                        // PX4 default class names are empty, so mode buttons are enabled
+                        allowAuto   = true;
+                        allowBrake  = true;
+                        allowLand   = true;
+                        allowGuided = true;
+                    } else {
+                        // ArduPilot default: only GUIDED is not disabled.
+                        allowGuided = true;
+                    }
+                    break;
+            }
+        }
 
         // ARM / DISARM
         res.btn_arm_label          = isArmed ? 'DISARM' : 'ARM';
@@ -135,31 +203,31 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         // TAKEOFF
         res.btn_takeoff_show           = showTakeoff;
         res.btn_takeoff_style          = 'takeoff';
-        res.btn_takeoff_enabled        = canControl && isArmed;
+        res.btn_takeoff_enabled        = canControl && allowTakeoff;
         res.btn_takeoff_confirmTitle   = 'TAKEOFF ' + p_andruavUnit.m_unitName;
         res.btn_takeoff_confirmMessage = 'Command the vehicle to take off. Are you sure?';
 
         // AUTO
         res.btn_auto_style          = 'auto';
-        res.btn_auto_enabled        = canControl && isArmed;
+        res.btn_auto_enabled        = canControl && allowAuto;
         res.btn_auto_confirmTitle   = 'AUTO ' + p_andruavUnit.m_unitName;
         res.btn_auto_confirmMessage = 'Switch to AUTO mission mode. Are you sure?';
 
         // BRAKE
         res.btn_brake_style          = 'brake';
-        res.btn_brake_enabled        = canControl && isArmed;
+        res.btn_brake_enabled        = canControl && allowBrake;
         res.btn_brake_confirmTitle   = 'BRAKE ' + p_andruavUnit.m_unitName;
         res.btn_brake_confirmMessage = 'Stop the vehicle in place. Are you sure?';
 
         // LAND
         res.btn_land_style          = 'land';
-        res.btn_land_enabled        = canControl && isArmed;
+        res.btn_land_enabled        = canControl && allowLand;
         res.btn_land_confirmTitle   = 'LAND ' + p_andruavUnit.m_unitName;
         res.btn_land_confirmMessage = 'Command the vehicle to land. Are you sure?';
 
         // GUIDED
         res.btn_guided_style          = 'guided';
-        res.btn_guided_enabled        = canControl && isArmed;
+        res.btn_guided_enabled        = canControl && allowGuided;
         res.btn_guided_confirmTitle   = 'GUIDED ' + p_andruavUnit.m_unitName;
         res.btn_guided_confirmMessage = 'Switch to GUIDED mode. Are you sure?';
 
@@ -187,7 +255,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
-        const me = this;
+        if (!btn.btn_arm_enabled) return;
         this.fn_doConfirm(btn.btn_arm_confirmTitle, btn.btn_arm_confirmMessage, function () {
             js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, !v_andruavUnit.m_isArmed, false);
         });
@@ -199,6 +267,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        if (!btn.btn_takeoff_enabled) return;
         const me = this;
         this.fn_doConfirm(btn.btn_takeoff_confirmTitle, btn.btn_takeoff_confirmMessage, function () {
             const flightMode = me.hlp_isPX4()
@@ -214,6 +283,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        if (!btn.btn_auto_enabled) return;
         const me = this;
         this.fn_doConfirm(btn.btn_auto_confirmTitle, btn.btn_auto_confirmMessage, function () {
             const flightMode = me.hlp_isPX4()
@@ -229,6 +299,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        if (!btn.btn_brake_enabled) return;
         const me = this;
         this.fn_doConfirm(btn.btn_brake_confirmTitle, btn.btn_brake_confirmMessage, function () {
             let flightMode;
@@ -254,6 +325,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        if (!btn.btn_land_enabled) return;
         const me = this;
         this.fn_doConfirm(btn.btn_land_confirmTitle, btn.btn_land_confirmMessage, function () {
             if (me.hlp_isPX4()) {
@@ -271,6 +343,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
+        if (!btn.btn_guided_enabled) return;
         const me = this;
         this.fn_doConfirm(btn.btn_guided_confirmTitle, btn.btn_guided_confirmMessage, function () {
             const flightMode = me.hlp_isPX4()

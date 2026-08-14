@@ -361,6 +361,7 @@ body.mobile-mode {
 .mobile-action-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .mobile-action-btn .mobile-btn-icon {
