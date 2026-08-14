@@ -45,7 +45,7 @@ These are practical “options you can change” without rebuilding the app.
 | `CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE` | Default swarm formation horizontal distance. Enforced by `CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN`. | `_vDefaultSHD` via `js_localStorage.fn_setDefaultSwarmHorizontalDistance()` |
 | `CONST_DEFAULT_SWARM_VERTICAL_DISTANCE` | Default swarm formation vertical distance. Enforced by `CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN`. | `_vDefaultSVD` via `js_localStorage.fn_setDefaultSwarmVerticalDistance()` |
 | `CONST_DEFAULT_VOLUME` | Default volume for speech/voice features. | `LS_DEFAULT_VOLUME` via `js_localStorage.fn_setVolume()` |
-| `LS_ENABLE_SPEECH` (via `js_localStorage.fn_getSpeechEnabled`) | Enables/disables speech. When disabled, volume slider is disabled in UI. | `LS_ENABLE_SPEECH` |
+| `LS_ENABLE_SPEECH` (via `js_localStorage.fn_getSpeechEnabled`) | Enables/disables speech. When disabled, volume slider is disabled in UI. On the mobile view (`/mobile`) it can also be toggled from the status bar via the megaphone icon, which calls `js_localStorage.fn_setSpeechEnabled()` and `js_speak.fn_updateSettings()`. | `LS_ENABLE_SPEECH` |
 | `v_enable_tabs_display` | UI preference: enable/disable tabbed settings display. | `LS_TAB_DISPLAY_ENABLED` |
 | `v_enable_unit_sort` | UI preference: auto-sort unit list. | `LS_UNIT_SORTED_ENABLED` |
 | `v_enable_gcs_display` | UI preference: show GCS units in UI lists. | `_vGCSDisplay` |
