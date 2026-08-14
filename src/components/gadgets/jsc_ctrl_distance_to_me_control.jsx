@@ -4,6 +4,7 @@ import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter.js';
 import * as js_helpers from '../../js/js_helpers.js';
+import { fn_do_modal_alert } from '../../js/js_main.js';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
 
 class ClssCtrlDistanceToMeControl extends React.Component {
@@ -52,9 +53,18 @@ class ClssCtrlDistanceToMeControl extends React.Component {
     // Compact (mobile): tap to request browser location if not known.
     // Uses the standard navigator.geolocation API which triggers the
     // browser's native "allow location access" permission prompt.
+    // When permission is denied (or previously refused) the browser will
+    // not show the prompt again, so we inform the user via the standard
+    // webclient alert dialog instead of failing silently.
     fn_requestMyLocation() {
         if (js_globals.myposition != null) return;
-        if (!navigator.geolocation) return;
+        if (!navigator.geolocation) {
+            fn_do_modal_alert(
+                this.props.t('unit_control_imu:distance.locationDeniedTitle'),
+                this.props.t('unit_control_imu:distance.locationUnsupported')
+            );
+            return;
+        }
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 js_globals.myposition = position;
@@ -63,6 +73,16 @@ class ClssCtrlDistanceToMeControl extends React.Component {
             () => {
                 js_globals.myposition = null;
                 this.setState({ m_update: this.state.m_update + 1 });
+                // PERMISSION_DENIED (also returned when the user previously
+                // selected "Block", in which case the browser no longer
+                // prompts). Inform the user how to re-enable it.
+                fn_do_modal_alert(
+                    this.props.t('unit_control_imu:distance.locationDeniedTitle'),
+                    this.props.t('unit_control_imu:distance.locationDeniedMessage'),
+                    null,
+                    this.props.t('unit_control_imu:distance.locationDeniedOk'),
+                    'bg-warning'
+                );
             }
         );
     }
