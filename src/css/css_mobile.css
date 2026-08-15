@@ -85,6 +85,22 @@ body.mobile-mode {
   color: #28a745;
 }
 
+/* Module version/details toggle in the status bar - mirrors the desktop
+   details tab icon (bi-pci-card) with danger/warning/ok color states. */
+.mobile-module-toggle {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  padding: 4px;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-module-toggle.mobile-status-icon-ok {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 /* Passive signal indicator shown in the status bar when signal info exists */
 .mobile-status-bar .mobile-signal-info {
   display: inline-flex;
@@ -703,6 +719,96 @@ body.mobile-mode {
 
 .mobile-sheet-btn.warning {
   background: #fd7e14;
+}
+
+/* ── Module details rows (compact mobile sheet) ────────────────────────────
+   Collapsible rows used by ClssMobileModuleDetailsPanel. Each row shows the
+   module name, version and a status dot; tapping expands inline details. */
+.mobile-module-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-module-row:last-child {
+  border-bottom: none;
+}
+
+.mobile-module-row-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 4px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-module-row-header:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mobile-module-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mobile-module-status-dot.online {
+  background: #28a745;
+}
+
+.mobile-module-status-dot.offline {
+  background: #dc3545;
+}
+
+.mobile-module-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-module-version {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mobile-module-offline-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #dc3545;
+  text-transform: uppercase;
+}
+
+.mobile-module-chevron {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.mobile-module-details {
+  padding: 4px 4px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-module-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.mobile-module-detail-row .mobile-sheet-label {
+  flex-shrink: 0;
+  min-width: 90px;
+}
+
+.mobile-module-detail-row .mobile-sheet-value {
+  word-break: break-all;
 }
 
 /* ── FPV image dialog compact mode (mobile) ────────────────────────────────

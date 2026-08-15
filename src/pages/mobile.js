@@ -15,6 +15,7 @@ import ReactDOM from 'react-dom';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 import { js_globals } from '../js/js_globals.js';
+import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
@@ -44,6 +45,7 @@ import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import MobileLoginPanel from '../components/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
+import ClssMobileModuleDetailsPanel from '../components/gadgets/mobile/jsc_mobile_module_details_panel.jsx';
 import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { js_speak } from '../js/js_speak.js';
@@ -60,6 +62,7 @@ const Mobile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(js_andruavAuth.fn_logined() === true);
   const [showControls, setShowControls] = useState(true);
   const [showTelemetrySheet, setShowTelemetrySheet] = useState(false);
+  const [showModuleDetailsSheet, setShowModuleDetailsSheet] = useState(false);
   const [speechEnabled, setSpeechEnabled] = useState(js_localStorage.fn_getSpeechEnabled() === true);
   const tickRef = useRef(0);
   const unitSystemListenerRef = useRef({});
@@ -105,6 +108,7 @@ const Mobile = () => {
       js_event.EE_onSocketStatus,
       js_event.EE_videoStreamStarted,
       js_event.EE_videoStreamStopped,
+      js_event.EE_OldModule,
     ];
 
     const listenerObj = {};
@@ -236,6 +240,25 @@ const Mobile = () => {
   const isTelemetryOn = selectedUnit && selectedUnit.m_Telemetry.m_udpProxy_active === true && selectedUnit.m_Telemetry.m_udpProxy_paused === false;
   const isVideoActive = !!(selectedUnit && selectedUnit.m_Video.fn_getVideoStreaming() === CONST_VIDEOSTREAMING_ON);
 
+  // Module version / connection status - mirrors the logic in
+  // ClssAndruavUnitDrone.createTabs() for the desktop details tab icon.
+  const had_disconnected_module = !!(selectedUnit
+    && Array.isArray(selectedUnit.m_modules.m_list)
+    && selectedUnit.m_modules.m_list.some((module) => module && module.d === true));
+  const expected_main_version = selectedUnit ? selectedUnit.m_module_version_info?.version : undefined;
+  const current_main_version = selectedUnit ? selectedUnit.fn_getVersion() : null;
+  let main_module_version_warning = false;
+  if (expected_main_version && current_main_version != null && current_main_version !== 'unknown') {
+    const main_version_comparison = selectedUnit.m_modules.compareVersions(current_main_version, expected_main_version);
+    main_module_version_warning = main_version_comparison < 0;
+  }
+  const had_version_warning = !!(selectedUnit
+    && !js_siteConfig.CONST_FEATURE.DISABLE_VERSION_NOTIFICATION
+    && ((selectedUnit.m_modules.m_old_version === true) || main_module_version_warning));
+  const moduleIconClass = had_disconnected_module
+    ? 'text-danger'
+    : (had_version_warning ? 'text-warning' : 'mobile-status-icon-ok');
+
   return (
     <div className="mobile-page">
       {/* Status bar */}
@@ -269,6 +292,15 @@ const Mobile = () => {
                   }
                   setSpeechEnabled(next);
                 }}
+              />
+              <i
+                className={`bi bi-pci-card mobile-module-toggle ${moduleIconClass}`}
+                title={
+                  had_disconnected_module
+                    ? 'Module(s) offline - tap for details'
+                    : (had_version_warning ? 'Module version warning - tap for details' : 'Module details')
+                }
+                onClick={() => setShowModuleDetailsSheet(true)}
               />
               {signalInfo && (
                 <span className="mobile-signal-info" title={`Signal: ${signalInfo.text}`}>
@@ -384,6 +416,13 @@ const Mobile = () => {
         p_unit={selectedUnit}
         p_isOpen={showTelemetrySheet}
         p_onClose={() => setShowTelemetrySheet(false)}
+      />
+
+      {/* Module details bottom sheet */}
+      <ClssMobileModuleDetailsPanel
+        p_unit={selectedUnit}
+        p_isOpen={showModuleDetailsSheet}
+        p_onClose={() => setShowModuleDetailsSheet(false)}
       />
 
       {/* Hidden but mounted: essential dialogs and infrastructure */}
