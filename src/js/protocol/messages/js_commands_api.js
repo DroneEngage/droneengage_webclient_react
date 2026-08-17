@@ -799,5 +799,50 @@ export class CCommandAPI {
         return msg;
     }
 
+
+    static API_makeFlash() {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms': {
+                C: js_andruavMessages.CONST_RemoteCommand_MAKEFLASH
+            }
+        };
+
+        return msg;
+    }
+
+
+    static API_makeSiren() {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms': {
+                C: js_andruavMessages.CONST_RemoteCommand_MAKEBEEP
+            }
+        };
+
+        return msg;
+    }
+
+
+    static API_sendSMSLocation(p_phoneNumber) {
+        let p_msg = {
+            C: js_andruavMessages.CONST_RemoteCommand_SMSwGPS
+        };
+
+        if (p_phoneNumber !== '' && p_phoneNumber != null && p_phoneNumber !== undefined) {
+            p_msg.n = p_phoneNumber;
+        }
+
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
+            'ms': p_msg
+        };
+
+        return msg;
+    }
+
 }
 

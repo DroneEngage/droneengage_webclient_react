@@ -463,6 +463,30 @@ class CAndruavClientFacade {
     };
 
 
+    API_makeFlash(p_andruavUnit) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_makeFlash();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
+    API_makeSiren(p_andruavUnit) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_makeSiren();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
+    API_sendSMSLocation(p_andruavUnit, p_phoneNumber) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_sendSMSLocation(p_phoneNumber);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
     API_WebRTC_Signalling(p_partyID, p_webrtcMsg) {
         let v_msg = {
             w: p_webrtcMsg

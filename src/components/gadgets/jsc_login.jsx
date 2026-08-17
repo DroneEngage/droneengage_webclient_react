@@ -1,16 +1,16 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
-import * as js_common from '../js/js_common.js';
-import { EVENTS as js_event } from '../js/js_eventList.js';
-import { js_globals } from '../js/js_globals.js';
-import { js_localStorage } from '../js/js_localStorage';
-import * as js_siteConfig from '../js/js_siteConfig.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
-import { js_speak } from '../js/js_speak';
-import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../js/js_main';
-import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
+import * as js_common from '../../js/js_common.js';
+import { EVENTS as js_event } from '../../js/js_eventList.js';
+import { js_globals } from '../../js/js_globals.js';
+import { js_localStorage } from '../../js/js_localStorage.js';
+import * as js_siteConfig from '../../js/js_siteConfig.js';
+import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { js_speak } from '../../js/js_speak.js';
+import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../../js/js_main.js';
+import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;

@@ -190,6 +190,7 @@ class GLOBALS {
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
 		this.LS_SELECTED_THEME = '_vSelectedTheme';
 		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
+		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
 
 
 

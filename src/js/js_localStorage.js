@@ -368,6 +368,15 @@ class CLocalStorage {
     fn_removeMapboxStyle() {
         this._removeValue('_vMapboxStyle');
     }
+
+    // SMS Phone Number (used by Andruav SMS-with-location control)
+    fn_setSMSPhoneNumber(value) {
+        this._setValue(js_globals.LS_SMS_PHONE_NUMBER, value);
+    }
+
+    fn_getSMSPhoneNumber() {
+        return this._getValue(js_globals.LS_SMS_PHONE_NUMBER, '');
+    }
 }
 
 export const js_localStorage = CLocalStorage.getInstance();

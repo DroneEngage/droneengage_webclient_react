@@ -3,7 +3,7 @@ import React from 'react';
 
 import * as  js_siteConfig from '../js/js_siteConfig'
 
-import ClssLoginControl from './jsc_login.jsx'
+import ClssLoginControl from './gadgets/jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
 import ThemeSwitcher from './jsc_theme_switcher.jsx'
 import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx'

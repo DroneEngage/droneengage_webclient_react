@@ -19,7 +19,7 @@ import {js_globals} from '../js/js_globals.js'
 
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
-import ClssLoginControl from '../components/jsc_cmp_login.jsx'
+import ClssLoginControl from '../components/gadgets/jsc_cmp_login.jsx'
 const Accounts = () => {
 
     useEffect(() => {

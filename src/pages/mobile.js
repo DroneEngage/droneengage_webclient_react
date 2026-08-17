@@ -42,7 +42,7 @@ import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_detail
 import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
-import MobileLoginPanel from '../components/jsc_mobileLogin.jsx';
+import MobileLoginPanel from '../components/gadgets/mobile/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
 import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';

@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { EVENTS as js_event } from '../js/js_eventList.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
-import { js_globals } from '../js/js_globals.js';
-import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
-import { js_localStorage } from '../js/js_localStorage';
-import { fn_connect, fn_logout, fn_showSecurityDialog } from '../js/js_main';
+import { EVENTS as js_event } from '../../../js/js_eventList.js';
+import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import { js_globals } from '../../../js/js_globals.js';
+import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
+import { js_localStorage } from '../../../js/js_localStorage.js';
+import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/js_main.js';
 
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
 
