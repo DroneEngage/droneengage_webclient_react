@@ -92,25 +92,11 @@ img.camera_switch {
 	content: url('/public/images/mode-portrait_b.png');
 }
 
-/* fire fox */
-img.camera_switch:after {
-	content: url('/public/images/mode-portrait_b.png');
-}
-
 img.video_ready {
 	content: url('/public/images/camera-movie_b.png');
 	display: inline-flex;
 	width: 32px;
 	padding: 1px;
-}
-
-/* fire fox */
-img.video_ready:before {
-	content: url('/public/images/camera-movie_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-	text-indent: -9999px;
 }
 
 img.video_active {
@@ -120,15 +106,6 @@ img.video_active {
 	padding: 1px;
 }
 
-/* fire fox */
-img.video_active:before {
-	content: url('/public/images/camera-movie_r.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
 img.video_semi_active {
 	content: url('/public/images/camera-movie_w.png');
 	display: inline-flex;
@@ -136,23 +113,7 @@ img.video_semi_active {
 	padding: 1px;
 }
 
-/* fire fox */
-img.video_semi_active:before {
-	content: url('/public/images/camera-movie_w.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
 img.video_inactive {
-	content: url('/public/images/camera-movie_gr.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-/* fire fox */
-img.video_inactive:before {
 	content: url('/public/images/camera-movie_gr.png');
 	display: inline-flex;
 	width: 32px;
@@ -169,11 +130,6 @@ img.css_goto_drone {
 	content: url('/public/images/gps_fix_32x32.png');
 }
 
-/* fire fox */
-img.css_goto_drone:before {
-	content: url('/public/images/gps_fix_32x32.png');
-}
-
 img.css_camera_switch {
 	content: url('/public/images/mode-portrait_b.png');
 	display: inline-flex;
@@ -181,22 +137,7 @@ img.css_camera_switch {
 	padding: 1px;
 }
 
-/* fire fox */
-img.css_camera_switch:after {
-	content: url('/public/images/mode-portrait_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
 img.css_video_ready {
-	content: url('/public/images/camera-movie_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-img.css_video_ready:after {
 	content: url('/public/images/camera-movie_b.png');
 	display: inline-flex;
 	width: 32px;
@@ -224,25 +165,7 @@ img.css_video_fullscreen_active {
 	content: url('/public/images/fullscreen_rb_32x32.png');
 }
 
-/* fire fox */
-img.css_video_ready:before {
-	content: url('/public/images/camera-movie_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-	text-indent: -9999px;
-}
-
 img.css_camera_ready {
-	content: url('/public/images/camera_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
-/* fire fox */
-img.css_camera_ready:after {
 	content: url('/public/images/camera_g.png');
 	display: inline-flex;
 	width: 32px;
@@ -256,24 +179,7 @@ img.css_recvideo_ready {
 	padding: 1px;
 }
 
-/* fire fox */
-img.css_recvideo_ready:after {
-	content: url('/public/images/tape_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
 img.css_recvideo_active {
-	content: url('/public/images/tape_r.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-/* fire fox */
-img.css_recvideo_active:after {
 	content: url('/public/images/tape_r.png');
 	display: inline-flex;
 	width: 32px;
@@ -287,41 +193,11 @@ img.recvideo_inactive {
 	padding: 1px;
 }
 
-
-/* fire fox */
-img.recvideo_inactive:after {
-	content: url('/public/images/video_recording_disabled_32x32.png');
-}
-
 img.camera_ready {
 	content: url('/public/images/camera_bg_32x32.png');
 }
 
-
-/* fire fox */
-img.camera_ready:after {
-	content: url('/public/images/camera_bg_32x32.png');
-}
-
-
-
 img.camera_active {
-	content: url('/public/images/camera_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
-/* fire fox */
-img.camera_active:before {
-	content: url('/public/images/camera_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-img.camera_active:after {
 	content: url('/public/images/camera_g.png');
 	display: inline-flex;
 	width: 32px;
@@ -335,25 +211,7 @@ img.camera_inactive {
 	padding: 1px;
 }
 
-/* fire fox */
-img.camera_inactive:before {
-	content: url('/public/images/camera_gr.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
 img.css_camera_zoom_in {
-	content: url('/public/images/zoom-in_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
-/* fire fox */
-img.css_camera_zoom_in:after {
 	content: url('/public/images/zoom-in_b.png');
 	display: inline-flex;
 	width: 32px;
@@ -367,17 +225,6 @@ img.css_camera_zoom_out {
 	padding: 1px;
 }
 
-
-/* fire fox */
-img.css_camera_zoom_out:after {
-	content: url('/public/images/zoom-out_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-
-}
-
-
 img.css_camera_mirrorX {
 	content: url('/public/images/flip-horizontal_b.png');
 	display: inline-flex;
@@ -385,24 +232,7 @@ img.css_camera_mirrorX {
 	padding: 1px;
 }
 
-
-img.css_camera_mirrorX:after {
-	content: url('/public/images/flip-horizontal_b.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
 img.css_camera_rotate {
-	content: url('/public/images/camera-rotate_g.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
-img.css_camera_rotate:after {
 	content: url('/public/images/camera-rotate_g.png');
 	display: inline-flex;
 	width: 32px;
@@ -416,13 +246,6 @@ img.css_camera_flash_off {
 	padding: 1px;
 }
 
-img.css_camera_flash_off:after {
-	content: url('/public/images/circle-bolt_gr.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
 img.css_tracking_on {
 	content: url('/public/images/following_enabled_32x32.png');
 }
@@ -431,10 +254,6 @@ img.css_tracking_off {
 	content: url('/public/images/following_inactive_32x32.png');
 }
 
-/* fire fox */
-
-
-
 img.css_camera_flash_on {
 	content: url('/public/images/circle-bolt_r.png');
 	display: inline-flex;
@@ -442,42 +261,15 @@ img.css_camera_flash_on {
 	padding: 1px;
 }
 
-
-/* fire fox */
-img.css_camera_flash_on:after {
-	content: url('/public/images/circle-bolt_r.png');
-	display: inline-flex;
-	width: 32px;
-	padding: 1px;
-}
-
-
 img.battery_inactive {
 	content: url('/public/images/battery_gy_32x32.png');
 }
-
-/* fire fox */
-img.battery_inactive:before {
-	content: url('/public/images/battery_gy_32x32.png');
-}
-
 
 img.battery_4 {
 	content: url('/public/images/battery_g_32x32.png');
 }
 
-/* fire fox */
-img.battery_4:before {
-	content: url('/public/images/battery_g_32x32.png');
-}
-
-
 img.battery_3 {
-	content: url('/public/images/battery_rg_32x32.png');
-}
-
-/* fire fox */
-img.battery_3:before {
 	content: url('/public/images/battery_rg_32x32.png');
 }
 
@@ -485,31 +277,13 @@ img.battery_2 {
 	content: url('/public/images/battery_rg_3_32x32.png');
 }
 
-/* fire fox */
-img.battery_2:before {
-	content: url('/public/images/battery_rg_3_32x32.png');
-}
-
 img.battery_1 {
 	content: url('/public/images/battery_r_32x32.png');
 }
 
-/* fire fox */
-img.battery_1:before {
-	content: url('/public/images/battery_r_32x32.png');
-}
-
-
 img.battery_charging {
 	content: url('/public/images/battery_bg_32x32.png');
 }
-
-/* fire fox */
-img.battery_charging:before {
-	content: url('/public/images/battery_bg_32x32.png');
-}
-
-
 
 div#imu_yaw_knob {
 	width: 45px;
