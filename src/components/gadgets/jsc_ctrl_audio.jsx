@@ -11,7 +11,9 @@ export class ClssCtrlAUDIO extends React.Component {
         super();
         this.state = {
             m_update: 0,
-            m_currentLanguage: 'en'
+            m_currentLanguage: 'en',
+            m_flashActive: false,
+            m_sirenActive: false
 
         };
 
@@ -51,10 +53,12 @@ export class ClssCtrlAUDIO extends React.Component {
 
     fn_makeFlash(p_andruavUnit) {
         js_globals.v_andruavFacade.API_makeFlash(p_andruavUnit);
+        this.setState((s) => ({ m_flashActive: !s.m_flashActive }));
     }
 
     fn_makeSiren(p_andruavUnit) {
         js_globals.v_andruavFacade.API_makeSiren(p_andruavUnit);
+        this.setState((s) => ({ m_sirenActive: !s.m_sirenActive }));
     }
 
     fn_sendSMS(p_andruavUnit) {
@@ -137,13 +141,15 @@ export class ClssCtrlAUDIO extends React.Component {
                 <div className="row mt-2">
                     <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
                         <button type="button"
-                            className="btn btn-sm btn-warning"
+                            className={"btn btn-sm " + (this.state.m_flashActive ? "btn-warning active" : "btn-outline-warning")}
                             title='Toggle Flash'
+                            aria-pressed={this.state.m_flashActive}
                             onClick={() => this.fn_makeFlash(v_andruavUnit)}>Flash</button>
 
                         <button type="button"
-                            className="btn btn-sm btn-danger"
+                            className={"btn btn-sm " + (this.state.m_sirenActive ? "btn-danger active" : "btn-outline-danger")}
                             title='Toggle Siren'
+                            aria-pressed={this.state.m_sirenActive}
                             onClick={() => this.fn_makeSiren(v_andruavUnit)}>Siren</button>
 
                         <input type="text"
