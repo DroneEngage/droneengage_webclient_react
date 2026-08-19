@@ -478,6 +478,9 @@ class C_SignalStatus {
     this.m_mobileSignalLevel = 0;
     this.m_mobileNetworkType = 0;
     this.m_mobileNetworkTypeRank = 0;
+    this.m_operatorName = '';
+    this.m_countryIso = '';
+    this.m_dataState = 0; // 0=disconnected, 1=connected, 2=roaming
   }
 }
 class C_P2P {

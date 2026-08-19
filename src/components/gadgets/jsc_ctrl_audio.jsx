@@ -83,17 +83,17 @@ export class ClssCtrlAUDIO extends React.Component {
             v_pitch_disabled = 'true';
             v_language_disabled = 'true';
         }
-
+        const id = v_andruavUnit.getPartyID() + "_ctl_audio";
         return (
-            <div key={v_andruavUnit.getPartyID() + "_ctl_audio"} className="">
+            <div id={id} key={id} className="ms-1">
                 <div className="row ">
                     <div className="col-6">
                         <div key={v_andruavUnit.getPartyID() + 'audio_111'} className='col-12 user-select-none '>
                             <p key={v_andruavUnit.getPartyID() + 'audio_2214'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand  al_c'} title='Set Channel online/offline' onClick={() => this.fn_textToSpeech(v_andruavUnit)}>Speak</p>
                         </div>
 
-                        <div key={v_andruavUnit.getPartyID() + 'audio_121'} className='col-12 user-select-none h-100 w-100 m-1 pb-1'>
-                            <textarea id={v_andruavUnit.getPartyID() + 'atxt'} ref={this.m_textRef} className="h-75 w-100 m-1" rows="3" placeholder="What's up?" required
+                        <div key={v_andruavUnit.getPartyID() + 'audio_121'} className='col-12 user-select-none w-100 m-1 pb-1'>
+                            <textarea id={v_andruavUnit.getPartyID() + 'atxt'} ref={this.m_textRef} className="w-100 m-1" rows="2" style={{ height: 'auto' }} placeholder="What's up?" required
                                 onKeyDown={(e) => e.stopPropagation()}
                                 onKeyUp={(e) => e.stopPropagation()}></textarea>
 
@@ -138,7 +138,7 @@ export class ClssCtrlAUDIO extends React.Component {
                     </div>
                 </div>
 
-                <div className="row mt-2">
+                <div className="row mt-2 mb-3">
                     <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
                         <button type="button"
                             className={"btn btn-sm " + (this.state.m_flashActive ? "btn-warning active" : "btn-outline-warning")}

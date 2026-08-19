@@ -495,6 +495,9 @@ class CAndruavClientParser {
                 p_unit.m_SignalStatus.m_mobileSignalLevel = p_jmsg.r;
                 p_unit.m_SignalStatus.m_mobileNetworkType = p_jmsg.s;
                 p_unit.m_SignalStatus.m_mobileNetworkTypeRank = js_helpers.fn_getNetworkType(p_jmsg.s);
+                if (p_jmsg.op != null) p_unit.m_SignalStatus.m_operatorName = p_jmsg.op;
+                if (p_jmsg.c != null)  p_unit.m_SignalStatus.m_countryIso = p_jmsg.c;
+                if (p_jmsg.ds != null) p_unit.m_SignalStatus.m_dataState = p_jmsg.ds;
             }
                 break;
 
