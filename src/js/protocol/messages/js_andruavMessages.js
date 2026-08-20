@@ -170,6 +170,7 @@ export const CONST_TYPE_AndruavMessage_Set_Communication_Line = 6509;
 export const CONST_TYPE_AndruavMessage_Communication_Line_Status = 6510;
 export const CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH = 6511;
 export const CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE = 6512;
+export const CONST_TYPE_AndruavMessage_SOUND_LIST = 6530;
 
 export const CONST_TYPE_AndruavMessage_SDR_TRIGGER = 6513;
 export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
@@ -598,6 +599,7 @@ export const message_names = {
   6510: "Comm Line Status - 6510",
   6511: "Text to Speech - 6511",
   6512: "Play Sound File - 6512",
+  6530: "Sound List - 6530",
   6520: "GPIO Status - 6520",
 };
 

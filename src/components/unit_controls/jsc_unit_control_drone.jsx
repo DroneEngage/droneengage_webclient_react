@@ -283,6 +283,9 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6'} className="nav-item">
                 <a className="nav-link user-select-none bi bi-megaphone-fill txt-theme-aware " data-bs-toggle="tab" href={"#audio" + v_andruavUnit.getPartyID()} title='Audio'></a>
             </li>);
+        }
+
+        if (v_andruavUnit.fn_isAndruav() === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6ctrl'} className="nav-item">
                 <a className="nav-link user-select-none bi bi-sliders txt-theme-aware " data-bs-toggle="tab" href={"#andruavctrl" + v_andruavUnit.getPartyID()} title='Andruav Ctrl'></a>
             </li>);
@@ -360,6 +363,9 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAUDIO p_unit={v_andruavUnit} />
             </div>);
+        }
+
+        if (v_andruavUnit.fn_isAndruav() === true) {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAndruavCtrl'} className="tab-pane fade pt-2" id={"andruavctrl" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAndruavCtrl p_unit={v_andruavUnit} />
             </div>);

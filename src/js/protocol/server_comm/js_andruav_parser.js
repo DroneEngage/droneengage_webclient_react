@@ -440,6 +440,29 @@ class CAndruavClientParser {
                 break;
 
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST: {
+                p_jmsg = msg.msgPayload;
+                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
+                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
+                }
+
+                let v_session = {};
+                v_session.status = 'connected';
+                v_session.m_unit = p_unit;
+
+                // "T" is the sound file library: list of { n: name, f: file_path }.
+                // Store it on the unit and notify the audio gadget to refresh its
+                // dropdown. An empty list is valid (no configured sounds).
+                p_unit.m_Sound.m_files = Array.isArray(p_jmsg.T) ? p_jmsg.T : [];
+                js_eventEmitter.fn_dispatch(js_event.EE_onSoundListUpdated, p_unit);
+
+                if (p_jmsg.R === true) { // this is a reply to request.
+                    this.fn_callbackOnMessageID_Answer(js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST, v_session);
+                }
+            }
+                break;
+
+
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_Node:
                 p_jmsg = msg.msgPayload;
                 if (!p_jmsg || typeof p_jmsg !== 'object') break;

@@ -21,14 +21,36 @@ export class ClssCtrlAUDIO extends React.Component {
         this.m_pitchRef = React.createRef();
         this.m_volumeRef = React.createRef();
         this.m_languageRef = React.createRef();
-        this.m_fileRef = React.createRef();
+        this.m_soundSelectRef = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle, this, this.fn_toggle_global);
+        js_eventEmitter.fn_subscribe(js_event.EE_onSoundListUpdated, this, this.fn_onSoundListUpdated);
     }
 
 
     componentDidMount() {
         this.m_flag_mounted = true;
+        // Request the sound file library from the unit's sound module so the
+        // dropdown can be populated. The request is a RemoteExecute that is
+        // forwarded to subscribed modules; non-DE units simply have no module
+        // to handle it, so sending unconditionally is safe.
+        const v_andruavUnit = this.props.p_unit;
+        if (v_andruavUnit && v_andruavUnit.getPartyID && v_andruavUnit.getPartyID()) {
+            js_globals.v_andruavFacade.API_requestSoundList(v_andruavUnit, null);
+        }
+    }
+
+    componentWillUnmount() {
+        js_eventEmitter.fn_unsubscribe(js_event.EE_BattViewToggle, this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_onSoundListUpdated, this);
+    }
+
+    fn_onSoundListUpdated(p_me, p_unit) {
+        // The sound module pushed (or replied with) an updated library. Force a
+        // re-render so the dropdown reflects the current p_unit.m_Sound.m_files.
+        if (p_me.m_flag_mounted) {
+            p_me.setState((prevState) => ({ m_update: prevState.m_update + 1 }));
+        }
     }
 
     fn_setLanguage(en) {
@@ -48,7 +70,7 @@ export class ClssCtrlAUDIO extends React.Component {
     }
 
     fn_playFile(p_andruavUnit) {
-        const p_file = this.m_fileRef.current.value;
+        const p_file = this.m_soundSelectRef.current ? this.m_soundSelectRef.current.value : '';
         if (p_file === '' || p_file === null || p_file === undefined) return;
         js_globals.v_andruavFacade.API_soundPlayFile(p_andruavUnit, p_file);
     }
@@ -71,6 +93,11 @@ export class ClssCtrlAUDIO extends React.Component {
             v_file_disabled = 'true';
         }
         const id = v_andruavUnit.getPartyID() + "_ctl_audio";
+        // Sound file library received from the unit's sound module via
+        // CONST_TYPE_AndruavMessage_SOUND_LIST. Each entry: { n: name, f: file_path }.
+        const v_soundFiles = (v_andruavUnit.m_Sound && Array.isArray(v_andruavUnit.m_Sound.m_files))
+            ? v_andruavUnit.m_Sound.m_files
+            : [];
         return (
             <div id={id} key={id} className="ms-1">
                 <div className="row ">
@@ -124,8 +151,13 @@ export class ClssCtrlAUDIO extends React.Component {
 
                             <div className="row ">
                                 <div key={v_andruavUnit.getPartyID() + 'audio_214'} className='col-12 col-sm-12 user-select-none d-flex'>
-                                    <input type="text" className="form-control form-control-sm w-100 m-1" id={v_andruavUnit.getPartyID() + 'afile'} ref={this.m_fileRef} placeholder="/path/to/file.wav" disabled={v_file_disabled === 'true'} />
-                                    <p key={v_andruavUnit.getPartyID() + 'audio_2215'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand al_c m-1'} title='Play a sound file on the unit' onClick={() => this.fn_playFile(v_andruavUnit)}>Play</p>
+                                    <select className="form-select form-select-sm w-100 m-1" id={v_andruavUnit.getPartyID() + 'asnd'} ref={this.m_soundSelectRef} disabled={v_file_disabled === 'true'} defaultValue="">
+                                        <option value="" disabled>Select sound...</option>
+                                        {v_soundFiles.map((entry, index) => (
+                                            <option key={v_andruavUnit.getPartyID() + 'asnd_' + index} value={entry.f}>{entry.n}</option>
+                                        ))}
+                                    </select>
+                                    <p key={v_andruavUnit.getPartyID() + 'audio_2215'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand al_c m-1'} title='Play selected sound on the unit' onClick={() => this.fn_playFile(v_andruavUnit)}>Play</p>
                                 </div>
                             </div>
                         </div>

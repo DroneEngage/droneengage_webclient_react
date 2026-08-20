@@ -121,6 +121,8 @@ const EVENT_LIST = Object.freeze({
 			"EE_Video_State_Change",
 			"EE_unitGPIOUpdated",
 
+			"EE_onSoundListUpdated",
+
 			"EE_onMissionItemToggle",
 			"EE_onTrackingStatusChanged",
 			"EE_onTrackingAIStatusChanged",

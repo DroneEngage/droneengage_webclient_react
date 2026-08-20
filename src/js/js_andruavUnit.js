@@ -222,6 +222,14 @@ class C_Obstacles {
   }
 
 }
+class C_Sound {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    // Sound file library received from the sound module via
+    // CONST_TYPE_AndruavMessage_SOUND_LIST. Each entry: { n: name, f: file_path }.
+    this.m_files = [];
+  }
+}
 class C_Video {
   constructor(p_parent) {
     this.m_parent = p_parent;
@@ -1334,6 +1342,7 @@ export class CAndruavUnitObject {
     this.m_Servo = new C_Servo(this);
     this.m_Gimbal = new C_Gimbal(this);
     this.m_Video = new C_Video(this);
+    this.m_Sound = new C_Sound(this);
     this.m_Obstacles = new C_Obstacles(this);
     this.m_tracker = new C_Tracker(this);
     this.m_tracker_ai = new C_TRACKER_AI(this);

@@ -811,6 +811,20 @@ class CAndruavClientFacade {
     };
 
 
+    API_requestSoundList(p_andruavUnit, p_callback) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        if (p_callback !== null && p_callback !== undefined) {
+            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST);
+        }
+
+        let p_msg = {
+            C: js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST
+        };
+
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, p_msg);
+    };
+
+
     /*
         * Disable Geo Fence info to Offline Tasks
         * */
