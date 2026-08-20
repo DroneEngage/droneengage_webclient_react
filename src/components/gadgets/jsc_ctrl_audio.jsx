@@ -3,7 +3,6 @@ import React from 'react';
 import { js_globals } from '../../js/js_globals';
 import { EVENTS as js_event } from '../../js/js_eventList.js'
 import { js_eventEmitter } from '../../js/js_eventEmitter'
-import { js_localStorage } from '../../js/js_localStorage'
 
 export class ClssCtrlAUDIO extends React.Component {
 
@@ -11,10 +10,7 @@ export class ClssCtrlAUDIO extends React.Component {
         super();
         this.state = {
             m_update: 0,
-            m_currentLanguage: 'en',
-            m_flashActive: false,
-            m_sirenActive: false
-
+            m_currentLanguage: 'en'
         };
 
         this.m_flag_mounted = false;
@@ -25,7 +21,6 @@ export class ClssCtrlAUDIO extends React.Component {
         this.m_pitchRef = React.createRef();
         this.m_volumeRef = React.createRef();
         this.m_languageRef = React.createRef();
-        this.m_smsNumberRef = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle, this, this.fn_toggle_global);
     }
@@ -33,9 +28,6 @@ export class ClssCtrlAUDIO extends React.Component {
 
     componentDidMount() {
         this.m_flag_mounted = true;
-        if (this.m_smsNumberRef.current) {
-            this.m_smsNumberRef.current.value = js_localStorage.fn_getSMSPhoneNumber();
-        }
     }
 
     fn_setLanguage(en) {
@@ -49,25 +41,6 @@ export class ClssCtrlAUDIO extends React.Component {
         const p_pitch = parseInt(this.m_pitchRef.current.value);
         const p_volume = parseInt(this.m_volumeRef.current.value);
         js_globals.v_andruavFacade.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
-    }
-
-    fn_makeFlash(p_andruavUnit) {
-        js_globals.v_andruavFacade.API_makeFlash(p_andruavUnit);
-        this.setState((s) => ({ m_flashActive: !s.m_flashActive }));
-    }
-
-    fn_makeSiren(p_andruavUnit) {
-        js_globals.v_andruavFacade.API_makeSiren(p_andruavUnit);
-        this.setState((s) => ({ m_sirenActive: !s.m_sirenActive }));
-    }
-
-    fn_sendSMS(p_andruavUnit) {
-        const p_phoneNumber = this.m_smsNumberRef.current.value;
-        js_globals.v_andruavFacade.API_sendSMSLocation(p_andruavUnit, p_phoneNumber);
-    }
-
-    fn_saveSMSNumber() {
-        js_localStorage.fn_setSMSPhoneNumber(this.m_smsNumberRef.current.value);
     }
 
     render() {
@@ -135,37 +108,6 @@ export class ClssCtrlAUDIO extends React.Component {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div className="row mt-2 mb-3">
-                    <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
-                        <button type="button"
-                            className={"btn btn-sm " + (this.state.m_flashActive ? "btn-warning active" : "btn-outline-warning")}
-                            title='Toggle Flash'
-                            aria-pressed={this.state.m_flashActive}
-                            onClick={() => this.fn_makeFlash(v_andruavUnit)}>Flash</button>
-
-                        <button type="button"
-                            className={"btn btn-sm " + (this.state.m_sirenActive ? "btn-danger active" : "btn-outline-danger")}
-                            title='Toggle Siren'
-                            aria-pressed={this.state.m_sirenActive}
-                            onClick={() => this.fn_makeSiren(v_andruavUnit)}>Siren</button>
-
-                        <input type="text"
-                            ref={this.m_smsNumberRef}
-                            className="form-control form-control-sm"
-                            style={{ maxWidth: '180px' }}
-                            placeholder="Phone number"
-                            onKeyDown={(e) => e.stopPropagation()}
-                            onKeyUp={(e) => e.stopPropagation()}
-                            onChange={() => this.fn_saveSMSNumber()}
-                            onBlur={() => this.fn_saveSMSNumber()} />
-
-                        <button type="button"
-                            className="btn btn-sm btn-primary"
-                            title='Send SMS with GPS location'
-                            onClick={() => this.fn_sendSMS(v_andruavUnit)}>Send SMS</button>
                     </div>
                 </div>
             </div>
