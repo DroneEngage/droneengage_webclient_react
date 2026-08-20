@@ -265,6 +265,13 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
+    API_soundPlayFile(p_andruavUnit, p_file) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        const cmd = CCommandAPI.API_soundPlayFile(p_andruavUnit, p_file);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
 
     API_scanP2P(p_andruavUnit) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;

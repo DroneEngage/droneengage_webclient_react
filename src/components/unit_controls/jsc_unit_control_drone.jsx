@@ -351,7 +351,12 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </div>);
         }
 
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== undefined) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE !== null) && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false) && (this.state.tab_module === true) && ((v_andruavUnit.m_modules.has_sound === true) || (v_andruavUnit.fn_getIsDE() === false))) {
+        if (((js_siteConfig.CONST_FEATURE.DISABLE_VOICE != null)
+            && (js_siteConfig.CONST_FEATURE.DISABLE_VOICE === false)
+            && (this.state.tab_module === true)
+            && (v_andruavUnit.m_modules.has_sound === true))
+            || (v_andruavUnit.fn_getIsDE() === false))// de already has audio
+        {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAUDIO p_unit={v_andruavUnit} />
             </div>);

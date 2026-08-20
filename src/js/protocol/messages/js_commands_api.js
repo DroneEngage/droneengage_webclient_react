@@ -215,6 +215,22 @@ export class CCommandAPI {
         return msg;
     }
 
+    static API_soundPlayFile(p_andruavUnit, p_file) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        let p_msg = {
+            f: p_file
+        };
+
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE,
+            'ms': p_msg
+        };
+
+        return msg;
+    }
+
     static API_scanP2P() {
         const msg =
         {

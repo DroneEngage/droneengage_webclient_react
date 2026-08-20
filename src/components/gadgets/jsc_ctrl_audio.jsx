@@ -15,12 +15,13 @@ export class ClssCtrlAUDIO extends React.Component {
 
         this.m_flag_mounted = false;
 
-        this.m_langs = ['en', 'ar', 'es', 'ru']
+        this.m_langs = ['en', 'ar', 'es', 'ru', 'ja']
 
         this.m_textRef = React.createRef();
         this.m_pitchRef = React.createRef();
         this.m_volumeRef = React.createRef();
         this.m_languageRef = React.createRef();
+        this.m_fileRef = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle, this, this.fn_toggle_global);
     }
@@ -31,8 +32,11 @@ export class ClssCtrlAUDIO extends React.Component {
     }
 
     fn_setLanguage(en) {
+        const langNames = { 'en': 'english', 'ar': 'عربي', 'es': 'español', 'ru': 'Русский', 'ja': '日本語' };
         this.state.m_currentLanguage = en;
-        this.m_languageRef.current.value(en);
+        if (this.m_languageRef.current) {
+            this.m_languageRef.current.textContent = langNames[en] || en;
+        }
     }
 
     fn_textToSpeech(p_andruavUnit) {
@@ -43,18 +47,28 @@ export class ClssCtrlAUDIO extends React.Component {
         js_globals.v_andruavFacade.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
     }
 
+    fn_playFile(p_andruavUnit) {
+        const p_file = this.m_fileRef.current.value;
+        if (p_file === '' || p_file === null || p_file === undefined) return;
+        js_globals.v_andruavFacade.API_soundPlayFile(p_andruavUnit, p_file);
+    }
+
     render() {
         let css_txt_channel_ws_offline = ' txt-theme-aware bg-danger ';
         const v_andruavUnit = this.props.p_unit;
         let v_vol_disabled;
         let v_pitch_disabled;
         let v_language_disabled;
+        let v_file_disabled;
 
         if (v_andruavUnit.fn_getIsDE() === false)
         {
             v_vol_disabled = 'true';
             v_pitch_disabled = 'true';
             v_language_disabled = 'true';
+            // Play-file is only supported by the DroneEngage sound module, not
+            // native Andruav firmware, which only implements text-to-speech.
+            v_file_disabled = 'true';
         }
         const id = v_andruavUnit.getPartyID() + "_ctl_audio";
         return (
@@ -105,6 +119,13 @@ export class ClssCtrlAUDIO extends React.Component {
                                 <div key={v_andruavUnit.getPartyID() + 'audio_213'} className='col-12 col-sm-12 user-select-none '>
                                     <label htmlFor={v_andruavUnit.getPartyID() + 'vrng'} className="col-sm-4 col-form-label al_r flex" >Volume</label>
                                     <input type="range" min="0" max="100" className="form-range col-sm-4 width_fit ps-5 " id={v_andruavUnit.getPartyID() + 'vrng'} ref={this.m_volumeRef} disabled={v_vol_disabled === 'true'} />
+                                </div>
+                            </div>
+
+                            <div className="row ">
+                                <div key={v_andruavUnit.getPartyID() + 'audio_214'} className='col-12 col-sm-12 user-select-none d-flex'>
+                                    <input type="text" className="form-control form-control-sm w-100 m-1" id={v_andruavUnit.getPartyID() + 'afile'} ref={this.m_fileRef} placeholder="/path/to/file.wav" disabled={v_file_disabled === 'true'} />
+                                    <p key={v_andruavUnit.getPartyID() + 'audio_2215'} className={css_txt_channel_ws_offline + ' rounded-3 cursor_hand al_c m-1'} title='Play a sound file on the unit' onClick={() => this.fn_playFile(v_andruavUnit)}>Play</p>
                                 </div>
                             </div>
                         </div>
