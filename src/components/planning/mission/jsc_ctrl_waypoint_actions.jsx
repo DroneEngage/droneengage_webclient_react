@@ -2,7 +2,7 @@
 import React    from 'react';
 import L from 'leaflet';
 
-import {js_leafletmap} from '../../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'
 import {js_globals} from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
@@ -24,6 +24,7 @@ export class CWayPointAction extends React.Component {
 
     fn_editShape ()
     {
+        if (!this.props.p_shape || !this.props.p_shape.m_main_de_mission) return;
         let waypointType = parseInt(this.m_missionTypeRef.current.value, 10); //parseInt($('#msnaction' + this.props.p_shape.id + '_' + this.props.p_shape.m_main_de_mission.m_id + ' #msnsel option:selected').val());
         this.props.p_shape.m_missionItem.m_missionType = waypointType;
         

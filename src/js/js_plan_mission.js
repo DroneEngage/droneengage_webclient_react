@@ -6,7 +6,7 @@ import * as js_helpers from "./js_helpers.js";
 import { js_globals } from "./js_globals.js";
 import { EVENTS as js_event } from './js_eventList.js'
 import { js_eventEmitter } from "./js_eventEmitter.js";
-import { js_leafletmap } from "./js_leafletmap.js";
+import { js_leafletmap } from "./maps/js_leafletmap.js";
 
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import { js_andruavAuth } from "./protocol/auth/js_andruav_auth.js";
@@ -102,18 +102,13 @@ export class ClssAndruavMissionPlan {
     const len = this.m_all_mission_items_shaps.length;
     if (len === 0) return;
 
-    if (len === 1) {
-      this.fn_disconnectMissionItem(this.m_all_mission_items_shaps[0]);
-      return;
-    }
-
-    for (let i = 0; i < len - 1; ++i) {
+    for (let i = 0; i < len; ++i) {
       const marker = this.m_all_mission_items_shaps[i];
       if (v_enforceRedraw === true) {
         this.fn_disconnectMissionItem(marker);
       }
       js_leafletmap.fn_changeBootStrapIconColor(marker, this.getRelatedColor(this.m_pathColor, 'bgr'));
-      if (marker.m_next == null) {
+      if (i < len - 1 && marker.m_next == null) {
         const arrowCoordinates = {
           from_pos: marker.getLatLng(),
           to_pos: this.m_all_mission_items_shaps[i + 1].getLatLng(),
@@ -141,9 +136,9 @@ export class ClssAndruavMissionPlan {
       }
     }
 
-    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[len - 1], this.getRelatedColor(this.m_pathColor, 'bgr'));
-
-    js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
+    if (this.m_active_mission_item_id >= 0 && this.m_active_mission_item_id < len) {
+      js_leafletmap.fn_changeBootStrapIconColor(this.m_all_mission_items_shaps[this.m_active_mission_item_id], '#ffffff');
+    }
 
 
   }
@@ -154,22 +149,19 @@ export class ClssAndruavMissionPlan {
     }
 
     const missionCount = this.m_all_mission_items_shaps.length;
-    if (active_mission_item_id < 1 || active_mission_item_id > missionCount) {
+    const currentIndex = this.m_all_mission_items_shaps.findIndex(marker => marker.id === active_mission_item_id);
+    if (currentIndex === -1) {
       return null;
     }
 
     let nextMissionOrder;
 
-
     if (direction === 'next') {
-      nextMissionOrder = (active_mission_item_id % missionCount);
+      nextMissionOrder = (currentIndex + 1) % missionCount;
     } else if (direction === 'prev') {
-      nextMissionOrder = ((active_mission_item_id - 2) % missionCount);
-      if (nextMissionOrder < 0) {
-        nextMissionOrder = missionCount + nextMissionOrder;
-      }
+      nextMissionOrder = (currentIndex - 1 + missionCount) % missionCount;
     } else {
-      nextMissionOrder = active_mission_item_id - 1; // same object ... make if active
+      nextMissionOrder = currentIndex; // same object ... make if active
     }
 
     // activate item
@@ -207,9 +199,9 @@ export class ClssAndruavMissionPlan {
     };
 
     this.m_missionCounter += 1;
-    // activate item
-    this.m_active_mission_item_id = this.m_missionCounter;
     this.m_all_mission_items_shaps.push(p_marker);
+    // activate item (0-based index of the marker just added)
+    this.m_active_mission_item_id = this.m_all_mission_items_shaps.length - 1;
     this.fn_orderItems();
     this.fn_updatePath();
 
@@ -546,9 +538,9 @@ export class ClssAndruavMissionPlan {
             */
 
           fn_addMissionItem(marker, mavlink20.MAV_CMD_NAV_DELAY, [
-            0,
-            1, // param1 - Delay 1 hour
-            0, // param2
+            3600, // Delay 1 hour
+            0, 
+            0, 
             0,
             0,
             0,
@@ -691,6 +683,30 @@ export class ClssAndruavMissionPlan {
             nextstep.param7 = 0.0; 							
           */
             break;
+
+          case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_SPLINE, [
+              0,
+              5,
+              0,
+              0.0,
+              marker.getLatLng().lat,
+              marker.getLatLng().lng,
+              parseFloat(marker.m_missionItem.alt),
+            ]);
+            break;
+
+          case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE:
+            fn_addMissionItem(marker, js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE, [
+              0,
+              5,
+              0,
+              0.0,
+              marker.getLatLng().lat,
+              marker.getLatLng().lng,
+              parseFloat(marker.m_missionItem.alt),
+            ]);
+            break;
         }
 
         mission_item_latest = mission_drift;
@@ -776,12 +792,12 @@ export class ClssAndruavMissionPlan {
         }
       }
 
-      const keys = Object.keys(marker.m_missionItem.modules);
-
       if (marker.m_missionItem.modules === null || marker.m_missionItem.modules === undefined) continue;
+      const keys = Object.keys(marker.m_missionItem.modules);
       const cmds = [];
       for (let key in marker.m_missionItem.modules) {
         const m = marker.m_missionItem.modules[key];
+        if (m == null) continue;
         if (m.cmd_msgs !== null && m.cmd_msgs !== undefined) {
           const cmd_msg = m.cmd_msgs;
           for (let key2 in cmd_msg) {

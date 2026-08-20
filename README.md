@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DroneEngage/droneengage_webclient_react)
+
 # DroneEngage & Andruav WebClient
 
 WebClient is a Ground Control Station (GCS) for [DroneEngage](https://droneengage.com/) and [Andruav](https://www.andruav.com) systems. It provides a browser-based interface for monitoring and controlling drones.
@@ -13,6 +15,10 @@ WebClient is a Ground Control Station (GCS) for [DroneEngage](https://droneengag
 - Support for Ardupilot and PX4 flight controllers
 - Multi-language support (i18n)
 - Video streaming and recording
+- Mobile GCS view (`/mobile`) with a phone-width responsive layout:
+  - Status bar with unit selector, signal info, and a speech enable/disable toggle
+  - FPV image viewer with Fit / Contain modes, rotation, and one-tap image save (rotation-aware PNG download)
+  - Camera dialog with GCS image size toggle and timed capture controls
 
 ## Documentation
 

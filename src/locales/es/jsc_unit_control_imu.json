@@ -42,7 +42,11 @@
         "km": " km",
         "m": " m",
         "mi": " mi",
-        "ft": " ft"
+        "ft": " ft",
+        "locationDeniedTitle": "Ubicación del navegador no disponible",
+        "locationDeniedMessage": "No se pudo acceder a la ubicación del navegador. Habilita los permisos de ubicación en la configuración del navegador y vuelve a pulsar DFM.",
+        "locationDeniedOk": "Aceptar",
+        "locationUnsupported": "Tu navegador no admite geolocalización."
     },
     "fence": {
         "title": "Estado de violación de la valla",

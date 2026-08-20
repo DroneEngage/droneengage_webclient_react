@@ -389,12 +389,27 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     }
 
 
+    fn_connectToFCB (p_andruavUnit)
+    {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        if (js_globals.v_andruavFacade === null || js_globals.v_andruavFacade === undefined) return;
+        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
+    }
+
+
     renderControl(p_andruavUnit) {
 
         if (p_andruavUnit.m_useFCBIMU !== true) {
+            const isAndruav = p_andruavUnit.fn_isAndruav();
             return (
                 <div id='ctrl_k' className='text-center'>
-                    <p className="text-warning bg-black user-select-none bi bi-exclamation-diamond "> Flight Control Board is not Connected</p>
+                    <p
+                        className={"text-warning bg-black user-select-none bi bi-exclamation-diamond" + (isAndruav ? " cursor_hand" : "")}
+                        title={isAndruav ? "Click to connect to FCB if not active" : ""}
+                        onClick={isAndruav ? () => this.fn_connectToFCB(p_andruavUnit) : undefined}
+                    >
+                        &nbsp;Flight Control Board is not Connected
+                    </p>
                 </div>
             );
         }

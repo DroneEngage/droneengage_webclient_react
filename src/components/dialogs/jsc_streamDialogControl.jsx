@@ -90,16 +90,17 @@ class ClssStreamChannel extends React.Component {
     render ()  {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
         const v_unit = this.props.prop_session.m_unit;
+        const isCompact = this.props.p_compact === true;
         if ((v_unit == null) || (v_track == null))
         {
-            
+
             return (
                 <div></div>
             );
         }
         else
         {
-            
+
             let v_stream_class = 'btn-primary';
             let v_record_class = 'btn-primary';
             let v_startRecord = true;
@@ -111,23 +112,29 @@ class ClssStreamChannel extends React.Component {
                 actual_fps = track_id.a>=0?track_id.a:0;
                 v_stream_class = 'btn-danger';
             }
-            if ((track_id.r !== null && track_id.r !== undefined) 
+            if ((track_id.r !== null && track_id.r !== undefined)
                 && (track_id.r === true))
             { // recording
                 v_record_class = 'btn-danger';
                 v_startRecord = false;
             }
-            
+
+            // Compact (mobile): full-width layout with label on top, buttons below stacked
+            // Desktop: flex row - label flexes (and wraps if long), buttons keep natural width and never wrap
+            const labelColClass = isCompact ? 'col-12 mb-2' : 'flex-grow-1 flex-shrink-1';
+            const streamColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+            const recordColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+
             return (
-                    <div className="row al_l css_margin_zero">
-                            <div className= "col-8   si-09x css_margin_zero txt-theme-aware">
+                    <div className={isCompact ? "row al_l css_margin_zero" : "d-flex al_l css_margin_zero"}>
+                            <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
+                            <div className={streamColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm text-nowrap " + (isCompact ? "w-100 " : "") + v_stream_class}  onClick={ (e) => this.fn_videoStream()}>stream</button>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
+                            <div className={recordColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm text-nowrap " + (isCompact ? "w-100 " : "") + v_record_class} onClick={ (e) => this.fn_videoRecord(v_startRecord)}>record</button>
                             </div>
                         </div>
             );
@@ -175,16 +182,22 @@ export default class ClssStreamDialog extends ClssDialogBase
     fn_displayDialog (p_me, p_session)
     {
         if (p_me.m_flag_mounted === false)return ;
-        
+
         p_me.state.p_session = p_session;
-        
+
         p_me.setState({'m_update': p_me.state.m_update +1});
-        
-        p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
+
+        // Compact mode: mobile sheet visibility is handled by state, not DOM manipulation
+        if (p_me.modal_ctrl_stream_dlg.current) {
+            p_me.modal_ctrl_stream_dlg.current.style.display = 'block';
+        }
     }
 
     fn_initDialog() {
-        this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        // Compact mode: mobile sheet doesn't use this ref, only desktop card does
+        if (this.modal_ctrl_stream_dlg.current) {
+            this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        }
         super.fn_initDialog();
     }
 
@@ -197,11 +210,14 @@ export default class ClssStreamDialog extends ClssDialogBase
 
     fn_closeDialog()
     {
-        this.modal_ctrl_stream_dlg.current.style.opacity = '';
-        this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        // Compact mode: mobile sheet doesn't use this ref, only desktop card does
+        if (this.modal_ctrl_stream_dlg.current) {
+            this.modal_ctrl_stream_dlg.current.style.opacity = '';
+            this.modal_ctrl_stream_dlg.current.style.display = 'none';
+        }
         if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
-            this.state.p_session = null;            
+            this.state.p_session = null;
         }
     }
 
@@ -210,20 +226,55 @@ export default class ClssStreamDialog extends ClssDialogBase
 
     render() {
         let p_andruavUnit = null;
-        
+
         if (this.state.p_session) {
             p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID());
         }
 
         const isNoStreams = p_andruavUnit === null;
+        const isCompact = this.fn_isCompact();
+
+        // Compact mode: render as mobile bottom sheet instead of draggable card
+        if (isCompact) {
+            // Only show mobile sheet when there's an active session
+            if (!this.state.p_session) {
+                return null;
+            }
+
+            return (
+                <div className="mobile-sheet-backdrop" onClick={() => this.fn_closeDialog()}>
+                    <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-sheet-handle" />
+                        <div className="mobile-sheet-header">
+                            <span className="mobile-sheet-title">
+                                <i className="bi bi-camera-video" /> {isNoStreams ? 'No Streams' : 'Streams of ' + this.state.p_session?.m_unit.m_unitName}
+                            </span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_closeDialog()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        {!isNoStreams && (
+                            <>
+                                {this.state.p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
+                                    <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} p_compact={isCompact} />
+                                ))}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop mode: render as draggable card
+        const cardClassName = 'card css_ontop border-light p-2';
 
         return (
             <Draggable nodeRef={this.modal_ctrl_stream_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
             <div
                 id="modal_ctrl_stream_dlg"
                 title="Streaming Video"
-                className="card css_ontop border-light p-2"
-                ref={this.modal_ctrl_stream_dlg} // Set the ref here
+                className={cardClassName}
+                ref={this.modal_ctrl_stream_dlg}
             >
                 {this.fn_renderDialogHeader(isNoStreams ? 'No Streams' : 'Streams of ' + this.state.p_session?.m_unit.m_unitName)}
 
@@ -236,7 +287,7 @@ export default class ClssStreamDialog extends ClssDialogBase
                     ) : (
                         <div className='row'>
                             {this.state.p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
-                                <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} />
+                                <ClssStreamChannel key={i} prop_session={this.state.p_session} prop_track_number={i} p_compact={isCompact} />
                             ))}
                         </div>
                     )}

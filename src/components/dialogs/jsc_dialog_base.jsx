@@ -1,6 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js';
+import { js_globals } from '../../js/js_globals.js';
 
 class ClssDialogBase extends React.Component {
     constructor(props) {
@@ -12,19 +13,29 @@ class ClssDialogBase extends React.Component {
         };
     }
 
+    /** True when the dialog should render in compact (mobile) mode. */
+    fn_isCompact() {
+        return this.props.p_compact === true;
+    }
+
     componentDidMount() {
         this.fn_initDialog();
     }
 
     fn_initDialog() {
         if (this.modalRef.current) {
-            this.modalRef.current.style.opacity = '0.4';
-            this.modalRef.current.onmouseover = () => {
+            // Compact mode: full opacity, centered via CSS class — no hover opacity tricks.
+            if (this.fn_isCompact()) {
                 this.modalRef.current.style.opacity = '1.0';
-            };
-            this.modalRef.current.onmouseout = () => {
-                this.modalRef.current.style.opacity = this.state.opaque_clicked ? '1.0' : '0.4';
-            };
+            } else {
+                this.modalRef.current.style.opacity = '0.4';
+                this.modalRef.current.onmouseover = () => {
+                    this.modalRef.current.style.opacity = '1.0';
+                };
+                this.modalRef.current.onmouseout = () => {
+                    this.modalRef.current.style.opacity = this.state.opaque_clicked ? '1.0' : '0.4';
+                };
+            }
         }
     }
 
@@ -57,19 +68,34 @@ class ClssDialogBase extends React.Component {
         }
     }
 
-    fn_renderDialogHeader(p_title) {
+    fn_renderDialogHeader(p_title, showGotoButton = true, extraHeaderButtons = null) {
+        const { t } = this.props;
+        const tFunc = t ? t : (key, defaultValue) => defaultValue || key;
+        const hasValidPartyID = this.fn_getCurrentPartyID() !== null;
+        const isCompact = this.fn_isCompact();
+
         return (
             <div className="card-header bg-warning text-dark js-draggable-handle">
                 <strong>{p_title}</strong>
                 <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_closeDialog()}>
-                    &times;
+                    {js_globals.DIALOG_ICONS.CLOSE}
                 </button>
-                <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
-                    {this.state.isMinimized ? '▲' : '▼'}
-                </button>
-                <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_opacityDialog()}>
-                    {this.state.opaque_clicked ? '●' : '○'}
-                </button>
+                {!isCompact && (
+                    <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
+                        {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+                    </button>
+                )}
+                {!isCompact && (
+                    <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_opacityDialog()}>
+                        {this.state.opaque_clicked ? js_globals.DIALOG_ICONS.OPAQUE : js_globals.DIALOG_ICONS.TRANSPARENT}
+                    </button>
+                )}
+                {showGotoButton && hasValidPartyID && (
+                    <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_gotoUnit()}>
+                        {js_globals.DIALOG_ICONS.GOTO}
+                    </button>
+                )}
+                {extraHeaderButtons}
             </div>
         );
     }
@@ -80,14 +106,6 @@ class ClssDialogBase extends React.Component {
         return (
             <div className="text-center">
                 <div className="btn-group w-100 d-flex flex-wrap">
-                    <button
-                        id="btnGoto"
-                        type="button"
-                        className="btn btn-success"
-                        onClick={() => this.fn_gotoUnit()}
-                    >
-                        {tFunc('goto', 'Goto')}
-                    </button>
                     {extraButtons}
                 </div>
             </div>

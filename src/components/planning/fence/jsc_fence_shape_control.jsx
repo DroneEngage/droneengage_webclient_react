@@ -48,12 +48,6 @@ class ClssFenceAction extends React.Component {
     }
     
 
-    componentDidUpdate()
-    {
-        if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
-    }
-
     render ()
     {
         const selected_value = ((this.props.shape.m_geofenceInfo.isHardFence === null ||  this.props.shape.m_geofenceInfo.isHardFence === undefined)?0:this.props.shape.m_geofenceInfo.isHardFence);
@@ -206,14 +200,14 @@ class ClssPolygonControl extends ClssShapeControl {
                 <div className="card-body">
                 <div className="form-group">
                     <label>Name</label>
-                    <input type='text' id='name' className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
+                    <input type='text' id='name_edit_shape' className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
                 </div>
                 <div className="form-check form-switch">
-                <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
-                <label className="form-check-label" htmlFor="chk">Restricted Area</label>
+                <input className="form-check-input " type="checkbox" id='chk_restricted_area' onChange={(e) => this.fn_onCheck(e)}/>
+                <label className="form-check-label" htmlFor="chk_restricted_area">Restricted Area</label>
                 </div>
-                <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
-                <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
+                <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
+                <button className="button btn-primary" id='btn_fence_apply'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div> 
             </div> 
             );
@@ -278,7 +272,7 @@ class ClssPolylineControl extends ClssShapeControl {
                     <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                     <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-                <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+                <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
                 <div className="form-group text-left"><label className="control-label">Minimum Distance</label> <div className="form-inline text-left"><input type='number' 		id='distance' className="form-control" /> &nbsp; meters</div></div>
 		        <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div> 
@@ -342,7 +336,7 @@ class ClssCircleControl extends ClssShapeControl {
                 <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-		        <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+		        <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
                 <div className="form-group text-left">
                         <label className="control-label">Radius</label> 
                         <div className="form-inline text-left">
@@ -394,7 +388,7 @@ class ClssRectangleControl extends ClssShapeControl {
                 <input className="form-check-input " type="checkbox" id='chk' onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk">Restricted Area</label>
                 </div>
-		        <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.isHardFence==null?0:this.props.shape.isHardFence}/>
+		        <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
                 <button className="button btn-primary" id='btn'  onClick={ (e) => this.fn_editShape()}>Apply</button>
                 </div>
             </div>
@@ -440,6 +434,9 @@ export default class ClssFence_Shape_Control extends React.Component {
 
     fn_onShapeCreated (me, p_shape) 
     {
+        // Mission waypoint markers are not fences; ignore them here.
+        if (p_shape.pm.m_shape_type === 'Marker') return;
+
         js_common.fn_console_log ("fn_onShapeCreated: " + p_shape);
         me.setState({m_shape: p_shape});
     }
@@ -462,11 +459,14 @@ export default class ClssFence_Shape_Control extends React.Component {
 
     fn_onShapeEdited(me, p_shape)
     {
+        if (p_shape.pm.m_shape_type === 'Marker') return;
         me.setState({m_shape: p_shape});
     }
 
     fn_onShapeDeleted (me, p_shape) 
     {
+        if (p_shape.pm.m_shape_type === 'Marker') return;
+
         if (p_shape.m_geofenceInfo!= null) 
         {
             p_shape.m_geofenceInfo.m_deleted = true;

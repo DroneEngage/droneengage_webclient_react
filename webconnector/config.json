@@ -1,6 +1,7 @@
 {
   "authPort": 9211,  // Port for local authentication server
   "wsPort": 9212,  // Port for local WebSocket server
+  "mavlinkHubPort": 8811,  // Port for raw MAVLink hub (Mavlink3DMap2 connects here)
 
   "cors": {
     "allowedOrigin": "https://localhost:3000"  // Allowed CORS origin for cross-origin requests (use http:// for HTTP mode)
@@ -22,8 +23,8 @@
   },
 
   "credentials": {
-    "email": "mhefny@andruav.com",  // User email for authentication
-    "accessCode": "mhefny",  // Access code/password for authentication
+    "email": "single@airgap.droneengage.com",  // User email for authentication
+    "accessCode": "test",  // Access code/password for authentication
     "group": "1"  // User group ID
   },
 

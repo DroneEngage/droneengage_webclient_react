@@ -4,6 +4,8 @@
 
 The WebSocket Connector implements **a standalone local WebSocket hub** that maintains a single upstream connection to the Andruav cloud communication server while allowing multiple web client instances to connect and share that connection.
 
+It also includes a **MAVLink hub** that extracts raw MAVLink frames from Andruav binary messages and exposes them on a separate WebSocket port, so tools like Mavlink3DMap2 can consume telemetry directly without needing a separate ws2ws bridge process or a running browser tab.
+
 If your WebClient UI is served over **HTTPS** (for example `https://localhost:3000`), and the connector runs locally as `http://` + `ws://`, the browser will block the connection (mixed-content). The recommended solution is to use a local reverse proxy (Caddy) that provides `https://` and `wss://` and proxies to the connector. See [README_CADDY.md](README_CADDY.md).
 
 ## Installation Methods
@@ -45,25 +47,54 @@ node src/index.js
 └──────────────────────────┬──────────────────────────────────┘
                            │ Single upstream WS connection
                            │
-                ┌──────────▼──────────┐
-                │  WebSocket Connector   │
-                │  (Node.js process)  │
-                │  - Auth: :9211      │
-                │  - WSS:  :9212      │
-                └──────────┬──────────┘
-                           │ Broadcasts to all clients
-          ┌────────────────┼────────────────┐
-          │                │                │
-    ┌─────▼─────┐    ┌─────▼─────┐   ┌─────▼─────┐
-    │ Browser 1 │    │ Browser 2 │   │ Browser N │
-    │  (Tab 1)  │    │  (Tab 2)  │   │  (Tab N)  │
-    └───────────┘    └───────────┘   └───────────┘
+                ┌──────────▼──────────────────────┐
+                │       WebSocket Connector         │
+                │       (Node.js process)           │
+                │                                   │
+                │  ┌─────────┐  ┌────────────────┐  │
+                │  │ Auth API│  │ Andruav Relay  │  │
+                │  │ HTTP    │  │ WS  :9212      │  │
+                │  │ :9211   │  │ (to cloud)     │  │
+                │  └─────────┘  └───────┬────────┘  │
+                │                       │           │
+                │  ┌────────────────────▼────────┐  │
+                │  │ MAVLink Extraction           │  │
+                │  │ (mt=6502 → raw MAVLink)      │  │
+                │  └────────────┬────────────────┘  │
+                │               │                   │
+                │  ┌────────────▼────────────────┐  │
+                │  │ MAVLink Hub WS :8811         │  │
+                │  └────────────┬────────────────┘  │
+                └───────────────┼───────────────────┘
+                                │
+           ┌────────────────────┼────────────────────┐
+           │                    │                    │
+     ┌─────▼─────┐       ┌──────▼──────┐      ┌──────▼──────┐
+     │ Browser 1 │       │ Browser 2   │      │ Mavlink3DMap2│
+     │ (Tab 1)   │       │ (Tab 2)     │      │ 3D map UI    │
+     │ → :9212   │       │ → :9212     │      │ → :8811      │
+     └───────────┘       └─────────────┘      └──────────────┘
 ```
+
+### Data paths
+
+| Path | Port | Direction | Payload |
+|---|---|---|---|
+| Auth API | 9211 (HTTP) | WebClient → Connector | Login request/response |
+| Andruav relay | 9212 (WS) | Bidirectional | Andruav protocol (JSON + binary) |
+| MAVLink hub | 8811 (WS) | Connector → consumers | Raw MAVLink v2 binary frames |
+
+The Andruav relay (:9212) carries full Andruav protocol frames to/from browser tabs.
+The MAVLink hub (:8811) carries only extracted raw MAVLink — the connector parses
+Andruav binary frames (message type 6502), strips the JSON header, and forwards
+the MAVLink payload. This lets Mavlink3DMap2 receive telemetry directly from the
+connector without a browser tab being open and without a separate ws2ws bridge.
 
 ## Features
 
 ✅ **Single upstream connection** - Only one connection to cloud server regardless of client count
 ✅ **Multi-client support** - Multiple browser tabs/instances can connect simultaneously
+✅ **MAVLink hub** - Extracts raw MAVLink from Andruav frames and serves on :8811 for tools like Mavlink3DMap2
 ✅ **Bidirectional forwarding** - Messages flow both upstream and downstream
 ✅ **Auto-reconnect** - Automatically reconnects to cloud server on disconnect
 ✅ **LAN support** - Can be accessed from other devices on the network
@@ -81,6 +112,7 @@ node src/index.js
   "bindAddress": "0.0.0.0",          // "0.0.0.0" for LAN, "127.0.0.1" for localhost only
   "authPort": 9211,                   // HTTPS auth endpoint port
   "wsPort": 9212,                     // WSS communication port
+  "mavlinkHubPort": 8811,             // Raw MAVLink hub port (Mavlink3DMap2 connects here)
   
   "tls": {
     "certFile": "../ssl/localssl.crt",
@@ -197,6 +229,7 @@ Usage:
 
 webconnector HTTPS listening on https://0.0.0.0:9211
 webconnector WSS listening on wss://0.0.0.0:9212
+webconnector MAVLink hub listening on ws://127.0.0.1:8811
 [webconnector] cloud login OK
 [webconnector] upstream ws open
 ```
@@ -208,6 +241,13 @@ Open multiple browser tabs/windows pointing to your web client. Each will:
 2. Receive plugin session + WSS connection details
 3. Connect to plugin WSS endpoint (port 9212)
 4. Share the single upstream connection
+
+#### 6. (Optional) Connect Mavlink3DMap2
+
+Mavlink3DMap2's frontend connects directly to the MAVLink hub on `ws://127.0.0.1:8811`.
+No additional bridge process is needed — the connector extracts MAVLink from
+Andruav frames and serves raw MAVLink on port 8811. Simply open the Mavlink3DMap2
+web UI and it will receive telemetry as long as the connector is running.
 
 ## Command Line Options
 
@@ -245,6 +285,7 @@ npx droneengage-webconnector your@email.com yourAccessCode
    # Example: Allow only specific subnet
    sudo ufw allow from 192.168.1.0/24 to any port 9211
    sudo ufw allow from 192.168.1.0/24 to any port 9212
+   sudo ufw allow from 192.168.1.0/24 to any port 8811
    ```
 
 4. **HTTPS/WSS Only**: Plugin enforces TLS for all connections
@@ -259,15 +300,30 @@ Set `bindAddress` to `"127.0.0.1"` and leave `apiKey` empty.
 
 1. Cloud server sends message to plugin
 2. Plugin receives on upstream WebSocket
-3. Plugin broadcasts to all connected clients
+3. Plugin broadcasts to all connected clients on :9212
 4. Each client processes message independently
+5. If the frame is an Andruav binary message with `mt=6502` (MAVLink),
+   the connector also extracts the raw MAVLink payload and broadcasts it
+   to all MAVLink hub clients on :8811
 
 ### Downstream (Clients → Cloud)
 
 1. Any client sends message to plugin
-2. Plugin receives on client WebSocket
+2. Plugin receives on client WebSocket (:9212)
 3. Plugin forwards to upstream WebSocket
 4. Cloud server receives single message
+
+### MAVLink Hub (Connector → Mavlink3DMap2)
+
+1. Cloud sends an Andruav binary frame containing MAVLink (`mt=6502`)
+2. Connector parses the frame: `[JSON header][0x00][raw MAVLink bytes]`
+3. Connector extracts the bytes after the null terminator
+4. Connector broadcasts the raw MAVLink ArrayBuffer to all :8811 clients
+5. Mavlink3DMap2 parses the MAVLink and updates the 3D scene
+
+The MAVLink hub is read-only from the cloud's perspective — it does not
+send data back upstream. However, hub clients can send MAVLink to each
+other (e.g. a SITL/UDP publisher can feed MAVLink to other hub consumers).
 
 ## Troubleshooting
 
@@ -278,6 +334,7 @@ Set `bindAddress` to `"127.0.0.1"` and leave `apiKey` empty.
 # Find process using port
 lsof -iTCP:9211 -sTCP:LISTEN -n -P
 lsof -iTCP:9212 -sTCP:LISTEN -n -P
+lsof -iTCP:8811 -sTCP:LISTEN -n -P
 
 # Kill process
 kill -9 <PID>
@@ -350,12 +407,16 @@ npm start
 
 ### Message Format
 
-Plugin forwards messages **verbatim** between upstream and clients:
+The connector forwards Andruav protocol messages **verbatim** between upstream and clients on :9212:
 
 - **Text frames**: JSON strings (e.g., `{"ty":"c","sd":"...","mt":1234,...}`)
 - **Binary frames**: ArrayBuffer with JSON header + binary payload
 
-No message transformation occurs - plugin is transparent relay.
+No message transformation occurs on the :9212 relay — it is a transparent relay.
+
+For the MAVLink hub (:8811), the connector performs lightweight extraction:
+binary frames with `mt=6502` are parsed as `[JSON header][0x00][MAVLink payload]`
+and only the raw MAVLink payload is forwarded to :8811 clients.
 
 ## Performance
 
@@ -370,12 +431,14 @@ No message transformation occurs - plugin is transparent relay.
 
 ```json
 {
-  "authPort": 19211,  // Custom auth port
-  "wsPort": 19212     // Custom WSS port
+  "authPort": 19211,       // Custom auth port
+  "wsPort": 19212,         // Custom WSS port
+  "mavlinkHubPort": 18811  // Custom MAVLink hub port
 }
 ```
 
-Update web client config to match.
+Update web client config to match the auth/WSS ports. If you change the
+MAVLink hub port, update Mavlink3DMap2's frontend WebSocket URL accordingly.
 
 ### Reconnect Tuning
 

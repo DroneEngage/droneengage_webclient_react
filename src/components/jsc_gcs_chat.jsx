@@ -282,7 +282,7 @@ class ClssGCSChat extends ClssDialogBase {
                     <button
                         id="btnGoto"
                         type="button"
-                        className="btn btn-success"
+                        className={'btn ' + (isGCSAll ? 'btn-secondary' : 'btn-success')}
                         onClick={() => this.fn_gotoUnit()}
                         disabled={isGCSAll}
                         title={isGCSAll ? (t('goto_disabled') || 'Select a specific GCS to navigate') : ''}

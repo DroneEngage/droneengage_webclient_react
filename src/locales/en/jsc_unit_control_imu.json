@@ -13,7 +13,11 @@
         "km": " km",
         "m": " m",
         "mi": " mi",
-        "ft": " ft"
+        "ft": " ft",
+        "locationDeniedTitle": "Browser Location Unavailable",
+        "locationDeniedMessage": "Unable to access your browser location. Please enable location permissions in your browser settings, then tap DFM again.",
+        "locationDeniedOk": "OK",
+        "locationUnsupported": "Your browser does not support geolocation."
     },
     "fence": {
         "title": "Fence Violation Status",

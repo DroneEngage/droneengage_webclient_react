@@ -14,6 +14,7 @@ import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages'
 import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/js_eventList.js'
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
+import { fn_do_modal_alert, fn_do_modal_confirmation } from '../js/js_main.js';
 import {
   buildInitialValues,
   buildInitialEnabled,
@@ -26,7 +27,6 @@ import {
   setNested,
 } from '../js/helpers/js_form_utils.js';
 
-import { fn_do_modal_confirmation } from '../js/js_main.js';
 /**
  * ClssConfigGenerator generates a form based on a JSON configuration loaded from a file.
  * It is triggered by the EE_displayConfigGenerator event with {p_unit, module}.
@@ -572,7 +572,7 @@ class ClssConfigGenerator extends React.Component {
         js_globals.v_andruavFacade.API_updateConfigJSON(me.state.p_unit, me.state.module, me.state.output.fieldNameOutput);
 
         console.log('Submitted:', me.state.output);
-        alert("data submitted. you need to restart the module.");
+        fn_do_modal_alert(null, "data submitted. you need to restart the module.");
 
       }, this.props.t('yes'), "bg-danger txt-theme-aware");
 
@@ -588,7 +588,7 @@ class ClssConfigGenerator extends React.Component {
         js_globals.v_andruavFacade.API_doModuleConfigAction(me.state.p_unit, me.state.module.k, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
     
         console.log('Submitted:', me.state.output);
-        alert("data submitted. you need to restart the module.");
+        fn_do_modal_alert(null, "data submitted. you need to restart the module.");
         
       }, this.props.t('yes'), "bg-danger txt-theme-aware");
   }

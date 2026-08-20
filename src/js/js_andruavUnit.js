@@ -478,6 +478,9 @@ class C_SignalStatus {
     this.m_mobileSignalLevel = 0;
     this.m_mobileNetworkType = 0;
     this.m_mobileNetworkTypeRank = 0;
+    this.m_operatorName = '';
+    this.m_countryIso = '';
+    this.m_dataState = 0; // 0=disconnected, 1=connected, 2=roaming
   }
 }
 class C_P2P {
@@ -1255,6 +1258,10 @@ export class CAndruavUnitObject {
 
   fn_getIsDE() {
     return this.#m_isDE;
+  }
+
+  fn_isAndruav() {
+    return this.#m_isDE === false;
   }
 
   fn_setVersion(p_version) {

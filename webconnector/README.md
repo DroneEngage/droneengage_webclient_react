@@ -4,6 +4,8 @@
 
 The WebSocket Connector implements **a standalone local WebSocket hub** that maintains a single upstream connection to the Andruav cloud communication server while allowing multiple web client instances to connect and share that connection.
 
+It also includes a **MAVLink hub** (port 8811) that extracts raw MAVLink frames from Andruav binary messages, allowing tools like Mavlink3DMap2 to consume telemetry directly without a separate bridge process.
+
 If your WebClient UI is served over **HTTPS** (for example `https://localhost:3000`), and you want the local connector to run without TLS (`http://` + `ws://`), you must use a TLS terminator reverse proxy to avoid browser mixed-content blocking. See [README_CADDY.md](README_CADDY.md).
 
 ## Installation Methods
@@ -62,25 +64,35 @@ node src/index.js
 └──────────────────────────┬──────────────────────────────────┘
                            │ Single upstream WS connection
                            │
-                ┌──────────▼──────────┐
-                │  WebSocket Connector│
-                │  (Node.js process)  │
-                │  - Auth: :9211      │
-                │  - WSS:  :9212      │
-                └──────────┬──────────┘
-                           │ Broadcasts to all clients
-          ┌────────────────┼────────────────┐
-          │                │                │
-    ┌─────▼─────┐    ┌─────▼─────┐    ┌─────▼─────┐
-    │ Browser 1 │    │ Browser 2 │    │ Browser N │
-    │  (Tab 1)  │    │  (Tab 2)  │    │  (Tab N)  │
-    └───────────┘    └───────────┘    └───────────┘
+                ┌──────────▼──────────────────────┐
+                │       WebSocket Connector         │
+                │       (Node.js process)           │
+                │                                   │
+                │  Auth API:  HTTP :9211            │
+                │  Andruav:    WS   :9212           │
+                │  MAVLink:    WS   :8811  (new)    │
+                │                                   │
+                │  Andruav frames → :9212 clients   │
+                │  mt=6502 frames → extract MAVLink │
+                │                  → :8811 clients  │
+                └──────────┬──────────────┬──────────┘
+                           │              │
+          ┌────────────────┼──────────┐   │
+          │                │          │   │
+    ┌─────▼─────┐    ┌─────▼─────┐    │ ┌─▼──────────────┐
+    │ Browser 1 │    │ Browser 2 │    │ │ Mavlink3DMap2  │
+    │  (Tab 1)  │    │  (Tab 2)  │    │ │ 3D map UI      │
+    │ → :9212   │    │ → :9212   │    │ │ → :8811        │
+    └───────────┘    └───────────┘    │ └────────────────┘
+                                       │
+                          (no browser tab needed)
 ```
 
 ## Features
 
 ✅ **Single upstream connection** - Only one connection to cloud server regardless of client count
 ✅ **Multi-client support** - Multiple browser tabs/instances can connect simultaneously
+✅ **MAVLink hub** - Extracts raw MAVLink from Andruav frames on :8811 for Mavlink3DMap2 and other tools
 ✅ **Bidirectional forwarding** - Messages flow both upstream and downstream
 ✅ **Auto-reconnect** - Automatically reconnects to cloud server on disconnect
 ✅ **LAN support** - Can be accessed from other devices on the network
@@ -98,6 +110,7 @@ node src/index.js
   "bindAddress": "0.0.0.0",          // "0.0.0.0" for LAN, "127.0.0.1" for localhost only
   "authPort": 9211,                   // HTTPS auth endpoint port
   "wsPort": 9212,                     // WSS communication port
+  "mavlinkHubPort": 8811,             // Raw MAVLink hub port (Mavlink3DMap2 connects here)
   
   "tls": {
     "certFile": "../ssl/localssl.crt",

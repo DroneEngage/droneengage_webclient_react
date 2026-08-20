@@ -190,6 +190,7 @@ class GLOBALS {
 		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
 		this.LS_SELECTED_THEME = '_vSelectedTheme';
 		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
+		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
 
 
 
@@ -213,6 +214,16 @@ class GLOBALS {
 		this.CONST_OPTICAL_ZOOM_MAX = 40.0; // A40TR-Pro
 		this.CONST_IR_DIGITAL_ZOOM_MIN = 1.0;
 		this.CONST_IR_DIGITAL_ZOOM_MAX = 32.0; // A40TR-Pro
+
+		// Dialog Icons
+		this.DIALOG_ICONS = {
+			GOTO: '↗',
+			CLOSE: '×',
+			MINIMIZE: '▼',
+			MAXIMIZE: '▲',
+			OPAQUE: '●',
+			TRANSPARENT: '○',
+		};
 
 	}
 

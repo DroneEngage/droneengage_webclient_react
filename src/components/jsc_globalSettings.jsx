@@ -247,8 +247,6 @@ class ClssPreferences extends React.Component {
     js_globals.v_enable_tabs_display = js_localStorage.fn_getTabsDisplayEnabled();
     this.m_volumeRangeRef = React.createRef();
     this.m_enableSpeechRef = React.createRef();
-    this.m_tabsDisplayeRef = React.createRef();
-    this.m_unitSortRef = React.createRef();
     this.m_advancedRef = React.createRef();
     this.m_ws2wsRef = React.createRef();
     this.m_gcsDisplayRef = React.createRef();
@@ -258,8 +256,6 @@ class ClssPreferences extends React.Component {
   componentDidMount() {
     this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
     this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
-    this.m_tabsDisplayeRef.current.checked = js_localStorage.fn_getTabsDisplayEnabled();
-    this.m_unitSortRef.current.checked = js_localStorage.fn_getUnitSortEnabled();
     this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
@@ -313,24 +309,10 @@ class ClssPreferences extends React.Component {
     }
   }
 
-  fn_enableTabsDisplay(e) {
-    const enabled = e.currentTarget.checked;
-    js_globals.v_enable_tabs_display = enabled;
-    js_localStorage.fn_setTabsDisplayEnabled(enabled);
-    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
-  }
-
   fn_GCSShowMe(e) {
     const enabled = e.currentTarget.checked;
     js_globals.v_enable_tabs_display = enabled;
     js_localStorage.fn_setGCSShowMe(enabled);
-    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
-  }
-
-  fn_sortUnits(e) {
-    const enabled = e.currentTarget.checked;
-    js_globals.v_enable_tabs_display = enabled;
-    js_localStorage.fn_setUnitSortEnabled(enabled);
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
@@ -373,33 +355,6 @@ class ClssPreferences extends React.Component {
             disabled={v_speech_disabled === 'true' }
             onChange={(e) => this.fn_changeVolume(e)}
             onMouseUp={(e) => this.fn_handleMouseUp(e)}
-          />
-        </div>
-        <div className="row mb-12 align-items-center">
-          <label htmlFor="check_tabs_display" className={`col-sm-4 col-form-label ${dir}`}>
-            {t('globalSettings:tabsDisplayLabel')}
-          </label>
-          <input
-            className="form-check-input col-sm-4"
-            type="checkbox"
-            id="check_tabs_display"
-            ref={this.m_tabsDisplayeRef}
-            onClick={(e) => this.fn_enableTabsDisplay(e)}
-          />
-          <label
-            id='check_unit_sort'
-            htmlFor="check_unit_sort"
-            className="col-sm-4 col-form-label al_r"
-            title={t('globalSettings:sortUnitsTitle')}
-          >
-            {t('globalSettings:sortUnitsLabel')}
-          </label>
-          <input
-            className="form-check-input col-sm-4"
-            type="checkbox"
-            id="check_unit_sort"
-            ref={this.m_unitSortRef}
-            onClick={(e) => this.fn_sortUnits(e)}
           />
         </div>
         <div className="row mb-12 align-items-center">
@@ -455,14 +410,128 @@ class ClssPreferences extends React.Component {
   }
 }
 
+class ClssMapSettings extends React.Component {
+  constructor() {
+    super();
+    this.key = Math.random().toString();
+    this.leafletAccessTokenRef = React.createRef();
+    this.leafletUrlMapRef = React.createRef();
+    this.mapbox3DAccessTokenRef = React.createRef();
+    this.mapboxStyleRef = React.createRef();
+  }
+
+  componentDidMount() {
+    const localStorageToken = js_localStorage.fn_getMapLeafletAccessToken();
+    const localStorageUrl = js_localStorage.fn_getMapLeafletUrlMap();
+    const localStorage3DToken = js_localStorage.fn_getMapbox3DAccessToken();
+    const localStorageStyle = js_localStorage.fn_getMapboxStyle();
+
+    this.leafletAccessTokenRef.current.value = localStorageToken || js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN;
+    this.leafletUrlMapRef.current.value = localStorageUrl || js_siteConfig.CONST_MAP_LEAFLET_URL_MAP;
+    this.mapbox3DAccessTokenRef.current.value = localStorage3DToken || js_siteConfig.CONST_MAPBOX_3D_ACCESS_TOKEN;
+    this.mapboxStyleRef.current.value = localStorageStyle || js_siteConfig.CONST_MAPBOX_STYLE;
+  }
+
+  fn_saveMapSettings(e) {
+    const leafletToken = this.leafletAccessTokenRef.current.value;
+    const leafletUrl = this.leafletUrlMapRef.current.value;
+    const mapbox3DToken = this.mapbox3DAccessTokenRef.current.value;
+    const mapboxStyle = this.mapboxStyleRef.current.value;
+
+    if (leafletToken && leafletToken.trim() !== '') {
+      js_localStorage.fn_setMapLeafletAccessToken(leafletToken);
+    } else {
+      js_localStorage.fn_removeMapLeafletAccessToken();
+    }
+
+    if (leafletUrl && leafletUrl.trim() !== '') {
+      js_localStorage.fn_setMapLeafletUrlMap(leafletUrl);
+    } else {
+      js_localStorage.fn_removeMapLeafletUrlMap();
+    }
+
+    if (mapbox3DToken && mapbox3DToken.trim() !== '') {
+      js_localStorage.fn_setMapbox3DAccessToken(mapbox3DToken);
+    } else {
+      js_localStorage.fn_removeMapbox3DAccessToken();
+    }
+
+    if (mapboxStyle && mapboxStyle.trim() !== '') {
+      js_localStorage.fn_setMapboxStyle(mapboxStyle);
+    } else {
+      js_localStorage.fn_removeMapboxStyle();
+    }
+  }
+
+  render() {
+    const { t } = this.props;
+    const dir = this.props.i18n.language === 'ar' ? 'rtl' : 'ltr';
+
+    return (
+      <fieldset dir={dir}>
+        <div className="row mb-2 align-items-center">
+          <label htmlFor="txt_leaflet_access_token" className="col-sm-4 col-form-label">
+            Leaflet Access Token
+          </label>
+          <input
+            type="text"
+            className="form-control col-sm-8"
+            id="txt_leaflet_access_token"
+            ref={this.leafletAccessTokenRef}
+            onChange={(e) => this.fn_saveMapSettings(e)}
+          />
+        </div>
+        <div className="row mb-2 align-items-center">
+          <label htmlFor="txt_leaflet_url_map" className="col-sm-4 col-form-label">
+            Leaflet URL Map
+          </label>
+          <input
+            type="text"
+            className="form-control col-sm-8"
+            id="txt_leaflet_url_map"
+            ref={this.leafletUrlMapRef}
+            onChange={(e) => this.fn_saveMapSettings(e)}
+          />
+        </div>
+        <div className="row mb-2 align-items-center">
+          <label htmlFor="txt_mapbox_3d_access_token" className="col-sm-4 col-form-label">
+            Mapbox 3D Access Token
+          </label>
+          <input
+            type="text"
+            className="form-control col-sm-8"
+            id="txt_mapbox_3d_access_token"
+            ref={this.mapbox3DAccessTokenRef}
+            onChange={(e) => this.fn_saveMapSettings(e)}
+          />
+        </div>
+        <div className="row mb-2 align-items-center">
+          <label htmlFor="txt_mapbox_style" className="col-sm-4 col-form-label">
+            Mapbox Style
+          </label>
+          <input
+            type="text"
+            className="form-control col-sm-8"
+            id="txt_mapbox_style"
+            ref={this.mapboxStyleRef}
+            onChange={(e) => this.fn_saveMapSettings(e)}
+          />
+        </div>
+      </fieldset>
+    );
+  }
+}
+
 class ClssGlobalSettings extends React.Component {
   constructor() {
     super();
     this.state = {
       m_update: 0,
+      isMinimized: false,
     };
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
+    this.defaultTabRef = React.createRef();
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, this.fn_onAuthStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
 
@@ -487,6 +556,9 @@ class ClssGlobalSettings extends React.Component {
     if (this.state.m_update !== nextState.m_update) {
       return true;
     }
+    if (this.state.isMinimized !== nextState.isMinimized) {
+      return true;
+    }
     return false;
   }
 
@@ -505,6 +577,9 @@ class ClssGlobalSettings extends React.Component {
   }
 
   componentDidMount() {
+    if (this.defaultTabRef.current) {
+      this.defaultTabRef.current.classList.add('active');
+    }
     this.setState({ m_update: this.state.m_update + 1 });
   }
 
@@ -516,6 +591,10 @@ class ClssGlobalSettings extends React.Component {
 
   fn_fireDeEvent(value) {
     js_andruav_facade.AndruavClientFacade.API_FireDeEvent(null, value);
+  }
+
+  fn_toggleMinimize() {
+    this.setState(prevState => ({ isMinimized: !prevState.isMinimized }));
   }
 
   render() {
@@ -560,11 +639,14 @@ class ClssGlobalSettings extends React.Component {
         <div className="card txt-theme-aware border-light mb-3 padding_zero">
           <div className="card-header text-center user-select-none">
             <strong>{t('globalSettings:settingsTitle')}</strong>
+            <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
+              {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+            </button>
           </div>
-          <div className="card-body">
+          <div className="card-body" style={{ display: this.state.isMinimized ? 'none' : 'block' }}>
             <ul className="nav nav-tabs">
               <li className="nav-item">
-                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_home" ref={this.defaultTabRef}>
                   {t('globalSettings:defaultsTab')}
                 </a>
               </li>
@@ -582,6 +664,11 @@ class ClssGlobalSettings extends React.Component {
                   {t('globalSettings:preferencesTab')}
                 </a>
               </li>
+              <li className="nav-item">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_map">
+                  Map
+                </a>
+              </li>
             </ul>
             <div id="main_settings_tab" className="tab-content">
               <div className="tab-pane fade active show pt-2" id="settings_home">
@@ -597,6 +684,9 @@ class ClssGlobalSettings extends React.Component {
               </div>
               <div className="tab-pane fade" id="settings_preference">
                 <ClssPreferences t={t} i18n={this.props.i18n} />
+              </div>
+              <div className="tab-pane fade" id="settings_map">
+                <ClssMapSettings t={t} i18n={this.props.i18n} />
               </div>
             </div>
           </div>

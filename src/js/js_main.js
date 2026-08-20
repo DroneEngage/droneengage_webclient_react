@@ -23,8 +23,8 @@ import * as js_andruav_parser from './protocol/server_comm/js_andruav_parser.js'
 import * as js_andruav_facade from './protocol/server_comm/js_andruav_facade.js'
 import { ClssAndruavFencePlan } from './js_plan_fence.js'
 import { js_andruavAuth } from './protocol/auth/js_andruav_auth'
-import { js_leafletmap } from './js_leafletmap'
-import { js_map3d } from './js_map3d'
+import { js_leafletmap } from './maps/js_leafletmap.js'
+import { js_map3d } from './maps/js_map3d.js'
 import { js_eventEmitter } from './js_eventEmitter'
 import { js_localStorage } from './js_localStorage'
 import { js_webrtcstream } from './js_webrtcthin2.js'
@@ -258,121 +258,41 @@ function fn_handleKeyBoard() {
 
 
 export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption) {
-	if (p_style === null || p_style === undefined) {
-		p_style = "bg-success";
-	}
-	p_style += " p-1 rounded_10px ";
-	let callback = p_callback;
-	let modal = $('#modal_saveConfirmation');
+	js_eventEmitter.fn_dispatch(js_event.EE_displayConfirmationDialog, {
+		p_title: p_title,
+		p_message: p_message,
+		p_callback: p_callback,
+		p_yesCaption: p_yesCaption,
+		p_noCaption: p_noCaption,
+		p_style: p_style
+	});
+}
 
-	if (modal.length) { // Check if modal exists
-		modal.find('h4#title').html(p_title).attr('class', "modal-title " + p_style); //set class directly
-		modal.find('div.modal-body').html(p_message);
-		modal.find('button#modal_btn_confirm').off('click').on('click', function () {
-			callback(true);
-			js_common.showModal('#modal_saveConfirmation', false);
-		});
-		modal.find('button#btnCancel').off('click').on('click', function () {
-			callback(false);
-			js_common.showModal('#modal_saveConfirmation', false);
-		});
-
-		if (p_yesCaption === null || p_yesCaption === undefined) {
-			p_yesCaption = "Yes";
-		}
-		if (p_noCaption === null || p_noCaption === undefined) {
-			p_noCaption = "Cancel";
-		}
-
-		modal.find('button#modal_btn_confirm').html(p_yesCaption);
-		modal.find('button#btnCancel').html(p_noCaption);
-
-		modal.attr({
-			'aria-modal': 'true',
-			'aria-labelledby': 'title',
-			'tabindex': '-1'
-		}).trigger('focus'); // Focus the modal
-
-		js_common.showModal('#modal_saveConfirmation', true);
-	} else {
-		console.error("Modal element not found.");
-	}
+export function fn_do_modal_alert(p_title, p_message, p_callback, p_okCaption, p_style) {
+	js_eventEmitter.fn_dispatch(js_event.EE_displayAlertDialog, {
+		p_title: p_title,
+		p_message: p_message,
+		p_callback: p_callback,
+		p_okCaption: p_okCaption,
+		p_style: p_style
+	});
 }
 
 
 export function fn_do_modal_apply_all(p_mission) {
 	if (p_mission === null || p_mission === undefined) return;
 
-	let modal = $('#modal_applyAll');
-	if (!modal.length) {
-		console.error("Apply All modal element not found.");
-		return;
-	}
-
-	// Reset checkboxes and get current values from first mission item if available
-	const missionItems = p_mission.m_all_mission_items_shaps;
-	if (missionItems && missionItems.length > 0) {
-		const firstItem = missionItems[0];
-		if (firstItem.m_missionItem) {
-			$('#txt_apply_altitude').val(firstItem.m_missionItem.alt || 30);
-			$('#sel_apply_frametype').val(firstItem.m_missionItem.m_frameType || 3);
-			if (firstItem.m_missionItem.m_speedRequired) {
-				$('#txt_apply_speed').val(firstItem.m_missionItem.speed || 5);
-			}
-		}
-	}
-
-	modal.find('button#btnApplyAllConfirm').off('click').on('click', function () {
-		const overrideExisting = $('#chk_override_existing').is(':checked');
-		const applyAltitude = $('#chk_apply_altitude').is(':checked');
-		const applyFrameType = $('#chk_apply_frametype').is(':checked');
-		const applySpeed = $('#chk_apply_speed').is(':checked');
-
-		const altitudeValue = parseFloat($('#txt_apply_altitude').val());
-		const frameTypeValue = parseInt($('#sel_apply_frametype').val());
-		const speedValue = parseFloat($('#txt_apply_speed').val());
-
-		// Default altitude value (used to detect if user has modified it)
-		const defaultAltitude = 30;
-
-		// Apply to all mission items
-		if (missionItems && missionItems.length > 0) {
-			missionItems.forEach(marker => {
-				if (marker.m_missionItem) {
-					if (applyAltitude && !isNaN(altitudeValue)) {
-						// Only apply if override is checked OR if altitude is still at default
-						if (overrideExisting || marker.m_missionItem.alt === defaultAltitude) {
-							marker.m_missionItem.alt = altitudeValue;
-						}
-					}
-					if (applyFrameType) {
-						// Only apply if override is checked OR if frame type hasn't been set
-						if (overrideExisting || marker.m_missionItem.m_frameType === undefined) {
-							marker.m_missionItem.m_frameType = frameTypeValue;
-						}
-					}
-					if (applySpeed && !isNaN(speedValue)) {
-						// Only apply if override is checked OR if speed is not required (not set)
-						if (overrideExisting || !marker.m_missionItem.m_speedRequired) {
-							marker.m_missionItem.speed = speedValue;
-							marker.m_missionItem.m_speedRequired = true;
-						}
-					}
-				}
-			});
-
-			// Update the mission path display
-			p_mission.fn_updatePath(true);
-		}
-
-		js_common.showModal('#modal_applyAll', false);
+	js_eventEmitter.fn_dispatch(js_event.EE_displayApplyAllDialog, {
+		p_mission: p_mission
 	});
+}
 
-	modal.find('button#btnApplyAllCancel').off('click').on('click', function () {
-		js_common.showModal('#modal_applyAll', false);
+
+export function fn_do_modal_mission_load(p_missions, p_callback) {
+	js_eventEmitter.fn_dispatch(js_event.EE_displayMissionLoadDialog, {
+		p_missions: p_missions,
+		p_callback: p_callback
 	});
-
-	js_common.showModal('#modal_applyAll', true);
 }
 
 
@@ -1321,72 +1241,25 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-	$('#modal_changeUnitInfo').find('#title').html('Change Unit Name of ' + p_andruavUnit.m_unitName);
-	$('#modal_changeUnitInfo').find('#txtUnitName').val(p_andruavUnit.m_unitName);
-	$('#modal_changeUnitInfo').find('#txtDescription').val(p_andruavUnit.Description);
-	$('#modal_changeUnitInfo').find('#btnOK').off("click");
-	$('#modal_changeUnitInfo').find('#btnOK').on('click', function () {
-		let v_unitName = $('#modal_changeUnitInfo').find('#txtUnitName').val();
-		if (v_unitName === '' || v_unitName === undefined) return;
-
-		let v_unitDescription = $('#modal_changeUnitInfo').find('#txtDescription').val();
-		if (v_unitDescription === '' || v_unitDescription === undefined) return;
-
-		js_globals.v_andruavFacade.API_setUnitName(p_andruavUnit, v_unitName, v_unitDescription);
-	});
-
-	js_common.showModal('#modal_changeUnitInfo', true);
+	js_eventEmitter.fn_dispatch(js_event.EE_displayUnitInfoDialog, p_andruavUnit);
 }
 
 export function fn_changeAltitude(p_andruavUnit, p_onApply) {
-
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-	const v_modal = $('#changespeed_modal');
-	const v_txtSpeed = v_modal.find('#txtSpeed');
-	v_modal.off('shown.bs.modal.changespeed_modal');
-	v_modal.on('shown.bs.modal.changespeed_modal', function () {
-		v_txtSpeed.trigger('focus');
-	});
-	v_txtSpeed.off('keydown.changespeed_modal');
-	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
-		if (e.key === 'Enter' || e.keyCode === 13) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnOK').trigger('click');
-			return;
-		}
-		if (e.key === 'Escape' || e.keyCode === 27) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnCancel').trigger('click');
-		}
-	});
-
 
 	let v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt_relative != null ? (p_andruavUnit.m_Nav_Info.p_Location.alt_relative).toFixed(1) : 0;
 	if (v_altitude_val < js_globals.CONST_DEFAULT_ALTITUDE_min) {
 		v_altitude_val = fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()).toFixed(1);
 	}
 
-	let v_altitude_unit = 'm';
-
 	if (js_globals.v_useMetricSystem === false) {
 		v_altitude_val = (v_altitude_val * js_helpers.CONST_METER_TO_FEET).toFixed(1);
-		v_altitude_unit = 'ft';
 	}
 
-
-
-	$('#changespeed_modal').find('#title').html('Change Altitude of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#txtSpeed').val(v_altitude_val);
-	$('#changespeed_modal').find('#txtSpeedUnit').html(v_altitude_unit);
-	$('#changespeed_modal').find('#btnOK').off('click');
-	$('#changespeed_modal').find('#btnOK').on('click', function () {
-		let v_alt = $('#changespeed_modal').find('#txtSpeed').val();
+	const applyCallback = (p_unit, p_value) => {
+		let v_alt = p_value;
 		if (v_alt === '' || v_alt === undefined || isNaN(v_alt)) return;
 		if (js_globals.v_useMetricSystem === false) {
-			// the GUI in feet and FCB in meters
 			v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 		}
 		let v_alt_cmd;
@@ -1402,37 +1275,19 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 		else {
 			js_globals.v_andruavFacade.API_do_ChangeAltitude(p_andruavUnit, v_alt_cmd);
 		}
-	});
+	};
 
-	js_common.showModal('#changespeed_modal', true);
+	js_eventEmitter.fn_dispatch(js_event.EE_displayAltitudeDialog, {
+		p_andruavUnit: p_andruavUnit,
+		p_onApply: applyCallback
+	});
 }
 
 /**
- Open Change Speed Modal 
+ Open Change Speed Modal
 **/
 export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-	const v_modal = $('#changespeed_modal');
-	const v_txtSpeed = v_modal.find('#txtSpeed');
-	v_modal.off('shown.bs.modal.changespeed_modal');
-	v_modal.on('shown.bs.modal.changespeed_modal', function () {
-		v_txtSpeed.trigger('focus');
-	});
-	v_txtSpeed.off('keydown.changespeed_modal');
-	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
-		if (e.key === 'Enter' || e.keyCode === 13) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnOK').trigger('click');
-			return;
-		}
-		if (e.key === 'Escape' || e.keyCode === 27) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnCancel').trigger('click');
-		}
-	});
 
 	let v_speed_val = p_initSpeed;
 	if (v_speed_val === null || v_speed_val === undefined) {
@@ -1445,36 +1300,24 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 		}
 	}
 
-	let v_speed_unit;
 	if (v_speed_val === null || v_speed_val === undefined) {
 		return;
-	} else {
-
-
-		if (js_globals.v_useMetricSystem === true) {
-			v_speed_val = v_speed_val.toFixed(1);
-			v_speed_unit = 'm/s';
-		}
-		else {
-			v_speed_val = (v_speed_val * js_helpers.CONST_METER_TO_MILE).toFixed(1);
-			v_speed_unit = 'mph';
-		}
-
 	}
 
-	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').off("click");
-	$('#changespeed_modal').find('#txtSpeed').val(v_speed_val);
-	$('#changespeed_modal').find('#txtSpeedUnit').html(v_speed_unit);
-	$('#changespeed_modal').find('#btnOK').on('click', function () {
-		let v_speed = $('#changespeed_modal').find('#txtSpeed').val();
+	if (js_globals.v_useMetricSystem === true) {
+		v_speed_val = v_speed_val.toFixed(1);
+	}
+	else {
+		v_speed_val = (v_speed_val * js_helpers.CONST_METER_TO_MILE).toFixed(1);
+	}
+
+	const applyCallback = (p_unit, p_value) => {
+		let v_speed = p_value;
 		if (v_speed === '' || v_speed === undefined || isNaN(v_speed)) return;
 		if (js_globals.v_useMetricSystem === false) {
-			// the GUI in miles and the FCB is meters
 			v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
 		}
 		const v_speed_cmd = parseFloat(v_speed);
-		// save target speed as indication.
 		p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = v_speed_cmd;
 		if (typeof p_onApply === 'function') {
 			p_onApply(p_andruavUnit, v_speed_cmd);
@@ -1482,51 +1325,36 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 		else {
 			js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, v_speed_cmd);
 		}
-	});
+	};
 
-	js_common.showModal('#changespeed_modal', true);
+	js_eventEmitter.fn_dispatch(js_event.EE_displaySpeedDialog, {
+		p_andruavUnit: p_andruavUnit,
+		p_initValue: v_speed_val,
+		p_onApply: applyCallback,
+		p_dialogType: 'speed'
+	});
 }
 
 export function fn_changeUDPPort(p_andruavUnit, init_pot) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-
-	const v_modal = $('#changespeed_modal');
-	const v_txtSpeed = v_modal.find('#txtSpeed');
-	v_modal.off('shown.bs.modal.changespeed_modal');
-	v_modal.on('shown.bs.modal.changespeed_modal', function () {
-		v_txtSpeed.trigger('focus');
-	});
-	v_txtSpeed.off('keydown.changespeed_modal');
-	v_txtSpeed.on('keydown.changespeed_modal', function (e) {
-		if (e.key === 'Enter' || e.keyCode === 13) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnOK').trigger('click');
-			return;
-		}
-		if (e.key === 'Escape' || e.keyCode === 27) {
-			e.preventDefault();
-			e.stopPropagation();
-			v_modal.find('#btnCancel').trigger('click');
-		}
-	});
 
 	let v_port_val = init_pot;
 	if (v_port_val === null || v_port_val === undefined) {
 		v_port_val = p_andruavUnit.m_Telemetry.m_udpProxy_port;
 	}
 
-	$('#changespeed_modal').find('#title').html('Change Speed of ' + p_andruavUnit.m_unitName);
-	$('#changespeed_modal').find('#btnOK').off("click");
-	$('#changespeed_modal').find('#txtSpeed').val(v_port_val);
-	$('#changespeed_modal').find('#txtSpeedUnit').html("");
-	$('#changespeed_modal').find('#btnOK').on('click', function () {
-		let v_port_val = $('#changespeed_modal').find('#txtSpeed').val();
+	const applyCallback = (p_unit, p_value) => {
+		let v_port_val = p_value;
 		if (v_port_val === '' || v_port_val === undefined || isNaN(v_port_val) || v_port_val >= 0xffff) return;
 		js_globals.v_andruavFacade.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
-	});
+	};
 
-	js_common.showModal('#changespeed_modal', true);
+	js_eventEmitter.fn_dispatch(js_event.EE_displaySpeedDialog, {
+		p_andruavUnit: p_andruavUnit,
+		p_initValue: v_port_val,
+		p_onApply: applyCallback,
+		p_dialogType: 'port'
+	});
 }
 
 /**
@@ -2010,8 +1838,10 @@ var infowindow = null;
 function initMap() {
 	try {
 		js_leafletmap.fn_initMap('mapid');
-		js_map3d.fn_initMap('mapid3d');
-		js_map3d.fn_addListenerOnDblClickMap(fn_onMap3dDblClick);
+		if (document.getElementById('mapid3d')) {
+			js_map3d.fn_initMap('mapid3d');
+			js_map3d.fn_addListenerOnDblClickMap(fn_onMap3dDblClick);
+		}
 		fn_setLapout();
 		fn_gps_getLocation();
 	}
@@ -2099,7 +1929,7 @@ export function fn_readMissionFile(p_mission, p_andruavUnit) {
 	if (p_mission === null || p_mission === undefined) return;
 
 	if (!selectedMissionFilesToRead.length) {
-		alert('Please select a file!');
+		fn_do_modal_alert(null, 'Please select a file!');
 		return;
 	}
 
@@ -2118,12 +1948,12 @@ export function fn_readMissionFile(p_mission, p_andruavUnit) {
 					p_mission.fn_importAsDE_V1(p_andruavUnit, JSON.parse(plan_text));
 				}
 				else {
-					alert('Please select a valid file!');
+					fn_do_modal_alert(null, 'Please select a valid file!');
 				}
 
 			}
 			catch (e) {
-				alert('Please select a valid file!');
+				fn_do_modal_alert(null, 'Please select a valid file!');
 			}
 
 		}
@@ -2156,7 +1986,7 @@ export function fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst, p_files) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 	if (!p_files.length) {
-		alert('Please select a file!');
+		fn_do_modal_alert(null, 'Please select a file!');
 		return;
 	}
 
@@ -2385,6 +2215,9 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 
 
 function EVT_andruavUnitFCBUpdated(me, p_andruavUnit) {
+	if (p_andruavUnit.m_IsGCS === true) {
+		return;
+	}
 	if (p_andruavUnit.m_useFCBIMU === true) {
 		js_speak.fn_speak(p_andruavUnit.m_unitName + ' connected to flying board');
 	}
@@ -2432,8 +2265,26 @@ function changedeg(element, degree) {
 }
 
 function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
+	// After fn_resetOnBoardConnection, m_gui is recreated and m_marker is lost.
+	// Restore the previous m_gui (with marker) from v_vehicle_gui if available.
+	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
+		if (js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== null && js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== undefined) {
+			p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()];
+		}
+	}
+	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
+		console.warn(`Marker not found for unit ${p_andruavUnit.getPartyID()}, skipping icon update`);
+		return;
+	}
+
 	const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true)), p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
+	const v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
+	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
+
+	const marker3d = js_map3d.fn_getUnitMarker(p_andruavUnit);
+	if (marker3d) {
+		js_map3d.fn_setMarkerIcon(marker3d, v_image);
+	}
 }
 
 
@@ -2733,8 +2584,8 @@ function EVT_msgFromUnit_IMG(me, data) { //,p_andruavUnit, bin, description, lat
 
 		reader.readAsDataURL(blob);
 
-		$('#unitImg').attr('src', 'data:image/jpeg;base64,' + js_helpers.fn_arrayBufferToBase64(data.img));
-		$('#modal_fpv').show();
+		const imageSrc = 'data:image/jpeg;base64,' + js_helpers.fn_arrayBufferToBase64(data.img);
+		js_eventEmitter.fn_dispatch(js_event.EE_displayFpvDialog, { image_src: imageSrc, party_id: data.v_unit ? data.v_unit.getPartyID() : null });
 	}
 
 	const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
@@ -3251,21 +3102,8 @@ function fn_gui_init_unitList() {
 }
 
 function fn_gui_init_fpvVtrl() {
-	$('#modal_fpv').hide();
-	$('#modal_fpv').draggable();
-	$('#modal_fpv').on('mouseover', function () {
-		$('#modal_fpv').css('opacity', '1.0');
-	});
-	$('#modal_fpv').on('mouseout', function () {
-		$('#modal_fpv').css('opacity', '0.4');
-	});
-	$('#modal_fpv').find('#btnclose').on('click', function () {
-		$('#modal_fpv').hide();
-	});
-	//http://www.bootply.com/XyZeggFcK7
-
-	$('#unitImg_save').click(hlp_saveImage_html);
-	$('#modal_fpv').find('#btnGoto').click(hlp_gotoImage_Map);
+	// FPV dialog is now handled by React component ClssFpvDialog
+	// This function is kept for backward compatibility but does nothing
 }
 
 
@@ -3293,7 +3131,13 @@ function fn_connectWebSocket(me) {
 
 		js_globals.v_andruavWS.fn_init();
 		const authPartyID = js_andruavAuth.fn_getPartyID();
-		const uiPartyID = $('#txtUnitID').val();
+		// Desktop's login form (#txtUnitID) persists whatever the user submits via
+		// js_localStorage.fn_setUnitID() before fn_connect() is called, so reading it back
+		// from storage here returns the same value the DOM field would have. Pages without
+		// that field (e.g. mobile.js's login form) still resolve to a real, persisted ID
+		// instead of undefined, which would otherwise register the WS session under a bogus
+		// "&s=undefined" SID and silently blackhole any server reply targeted back at us.
+		const uiPartyID = js_localStorage.fn_getUnitID();
 		const isPluginMode = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED && js_localStorage.fn_getWebConnectorEnabled();
 
 		// PartyID rules:
@@ -3308,7 +3152,7 @@ function fn_connectWebSocket(me) {
 			js_globals.v_andruavWS.unitID = authPartyID || uiPartyID;
 		}
 
-		js_globals.v_andruavWS.m_groupName = $('#txtGroupName').val();
+		js_globals.v_andruavWS.m_groupName = js_localStorage.fn_getGroupName();
 		console.info('[WS] connecting with partyID', {
 			authPartyID: authPartyID,
 			uiPartyID: uiPartyID,

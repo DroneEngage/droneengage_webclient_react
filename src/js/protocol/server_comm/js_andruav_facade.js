@@ -463,6 +463,30 @@ class CAndruavClientFacade {
     };
 
 
+    API_makeFlash(p_andruavUnit) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_makeFlash();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
+    API_makeSiren(p_andruavUnit) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_makeSiren();
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
+    API_sendSMSLocation(p_andruavUnit, p_phoneNumber) {
+
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_sendSMSLocation(p_phoneNumber);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    };
+
+
     API_WebRTC_Signalling(p_partyID, p_webrtcMsg) {
         let v_msg = {
             w: p_webrtcMsg
@@ -801,8 +825,67 @@ class CAndruavClientFacade {
             enabled: 1
         }
 
-        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruav_ws.CMD_SYS_TASKS, js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, p_msg);
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DisableTasks, p_msg);
     };
+
+    /**
+     * Save mission to storage server via comm server
+     * @param {string} p_unitId - Unit ID
+     * @param {string} p_missionId - Mission ID
+     * @param {string} p_name - Mission name
+     * @param {object} p_data - Mission data (DE format JSON)
+     */
+    API_saveMission(p_unitId, p_missionId, p_name, p_data) {
+        let p_msg = {
+            unitId: p_unitId,
+            missionId: p_missionId,
+            name: p_name,
+            data: p_data
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveMission, p_msg);
+    }
+
+    /**
+     * Load mission from storage server via comm server
+     * @param {string} p_unitId - Unit ID
+     * @param {string} p_missionId - Optional mission ID (if null, loads all missions for unit)
+     */
+    API_loadMission(p_unitId, p_missionId = null) {
+        let p_msg = {
+            unitId: p_unitId
+        };
+
+        if (p_missionId !== null && p_missionId !== undefined) {
+            p_msg.missionId = p_missionId;
+        }
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LoadMission, p_msg);
+    }
+
+    /**
+     * Delete mission from storage server via comm server
+     * @param {string} p_missionId - Mission ID to delete
+     */
+    API_deleteMission(p_missionId) {
+        let p_msg = {
+            missionId: p_missionId
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteMission, p_msg);
+    }
+
+    /**
+     * Query comm server for storage server connection status.
+     * Reply arrives as CONST_TYPE_AndruavSystem_StateServer system message.
+     */
+    API_queryStorageServerStatus() {
+        const p_msg = {
+            sc: js_andruavMessages.CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_QueryServer, p_msg);
+    }
 
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
@@ -863,12 +946,14 @@ class CAndruavClientFacade {
     };
 
 
-    API_CONST_RemoteCommand_takeImage2(p_target, _cameraSource, _numberofImages, _timeBetweenShots, _distanceBetweenShots) {
+    API_CONST_RemoteCommand_takeImage2(p_target, _cameraSource, _numberofImages, _timeBetweenShots, _distanceBetweenShots, _gcsSmall) {
         const msg = {
             a: _cameraSource,
             b: parseInt(_numberofImages),
             c: parseFloat(_timeBetweenShots),
-            d: parseFloat(_distanceBetweenShots)
+            d: parseFloat(_distanceBetweenShots),
+            // e: 1 = send a low-res PNG to GCS (saved file stays full-res). 0/absent = full-res.
+            e: (_gcsSmall === true) ? 1 : 0
         };
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_Ctrl_Camera, msg);
     };

@@ -13,7 +13,11 @@
         "km": " km",
         "m": " m",
         "mi": " mi",
-        "ft": " ft"
+        "ft": " ft",
+        "locationDeniedTitle": "Localisation du navigateur indisponible",
+        "locationDeniedMessage": "Impossible d'accéder à la localisation du navigateur. Veuillez activer les autorisations de localisation dans les paramètres de votre navigateur, puis appuyez à nouveau sur DFM.",
+        "locationDeniedOk": "OK",
+        "locationUnsupported": "Votre navigateur ne prend pas en charge la géolocalisation."
     },
     "fence": {
         "title": "Status VIolation Geofence",

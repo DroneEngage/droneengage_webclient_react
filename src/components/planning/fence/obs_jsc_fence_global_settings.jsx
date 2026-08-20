@@ -9,7 +9,7 @@ import * as js_mission_plan from '../../../js/js_plan_mission.js'
 import * as js_fence_plan from '../../../js/js_mission_fence.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
-import {js_leafletmap} from '../../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'
 import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../../js/js_main.js'
 
 

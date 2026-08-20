@@ -215,6 +215,11 @@ serverCommunicator.setOnUpstreamMessage((data) => {
     localServer.broadcastToClients(data);
 });
 
+// Extracted MAVLink frames are broadcast to all MAVLink hub clients (e.g. Mavlink3DMap2).
+serverCommunicator.setOnMavlinkMessage((data) => {
+    localServer.broadcastToMavlinkClients(data);
+});
+
 // -----------------------------------------------------------------------------
 // Start servers
 // -----------------------------------------------------------------------------
@@ -229,6 +234,9 @@ if (localWsSecure === true) {
 } else {
     localServer.startWs(); // No TLS needed
 }
+
+// Start the MAVLink hub (always WS, no TLS — local telemetry tap for Mavlink3DMap2)
+localServer.startMavlinkHubWs();
 
 }
 

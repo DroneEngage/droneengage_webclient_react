@@ -13,14 +13,13 @@ import {js_eventEmitter} from '../../js/js_eventEmitter.js'
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import {js_localStorage} from '../../js/js_localStorage.js'
-import {js_leafletmap} from '../../js/js_leafletmap.js'
+import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 
 
 
 
 
 
-import {ClssAndruavUnitGCS} from './jsc_unit_control_gcs.jsx'
 import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
 
 
@@ -44,7 +43,8 @@ class ClssAndruavUnitList extends React.Component {
 		this.state = {
 			andruavUnitPartyIDs : [],
             rnd:Math.random(),
-		    'm_update': 0
+		    'm_update': 0,
+            isMinimized: false,
 		};
 
         this.m_flag_mounted = false;
@@ -111,6 +111,23 @@ class ClssAndruavUnitList extends React.Component {
     {
         if (me.m_flag_mounted === false) return ;
         me.setState({'m_update': me.state.m_update +1});
+    }
+
+    fn_toggleMinimize() {
+        this.setState(prevState => ({ isMinimized: !prevState.isMinimized }));
+    }
+
+    fn_toggleTabsDisplay() {
+        const enabled = !js_localStorage.fn_getTabsDisplayEnabled();
+        js_globals.v_enable_tabs_display = enabled;
+        js_localStorage.fn_setTabsDisplayEnabled(enabled);
+        js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+    }
+
+    fn_toggleSortUnits() {
+        const enabled = !js_localStorage.fn_getUnitSortEnabled();
+        js_localStorage.fn_setUnitSortEnabled(enabled);
+        js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
     }
 
     fn_updateMapStatus(p_andruavUnit)
@@ -193,22 +210,22 @@ class ClssAndruavUnitList extends React.Component {
     
     render() {
         const { t } = this.props; // Access t function
-        
+
         let unit = [];
-        
+
         let units_header = [];
         let units_details = [];
-        let units_gcs = [];
+        let onlineCount = 0;
 
-        if (this.state.andruavUnitPartyIDs.length === 0) 
+        if (this.state.andruavUnitPartyIDs.length === 0)
         {
 
-            unit.push (<div key={'no_online_units'} className='text-center text-uppercase' >{t('msg.no_online_units')}</div>);
+            // no units; header will show the message instead.
         }
-        else 
+        else
         {
             const me = this;
-            
+
             let sortedPartyIDs;
             if (js_localStorage.fn_getUnitSortEnabled() === true)
             {
@@ -221,34 +238,34 @@ class ClssAndruavUnitList extends React.Component {
                 // returns list
                 sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
             }
-            
+
             const v_prop = this.props;
-            
+
             sortedPartyIDs.map(function (object)
             {
-                
+
                 const partyID = object.getPartyID();
                 const v_andruavUnit = object;
-                
+
                 // dont display if unit is not defined yet.
                 if ((v_andruavUnit==null) || (v_andruavUnit.m_defined !== true))return ;
-                
-                if ((v_prop.gcs_list !== false) && (v_andruavUnit.m_IsGCS === true))
-                {
-                    units_gcs.push (<ClssAndruavUnitGCS key={'ClssAndruavUnitGCS' + partyID} v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
-                }
-                else 
+
+                // GCS units are displayed by ClssAndruavUnitGCSList, skip them here.
+                if (v_andruavUnit.m_IsGCS === true) return ;
+
+                onlineCount++;
+
                 if (v_andruavUnit.m_IsGCS===false)
                 {
                     // Display Units (Vehicles)
                     if (js_localStorage.fn_getTabsDisplayEnabled() === true)
-                    { 
+                    {
                         // Display in Tabs
                         const header_info = me.getHeaderInfo(v_andruavUnit);
                         const c_active = me.state.m_active_partyID === v_andruavUnit.getPartyID();
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
-                                <a 
+                                <a
                                 className={`nav-link user-select-none txt-theme-aware  ${c_active === true ? '' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
@@ -269,17 +286,47 @@ class ClssAndruavUnitList extends React.Component {
 
             });
         }
-       
+
         unit.push (<ul key={'unit_header_div'} className="nav nav-tabs"> {units_header} </ul>    );
         unit.push (<div key={'unit_details_div'} id="myTabContent3" className="tab-content padding_zero"> {units_details} </div>);
-        unit.push (units_gcs);
-        
-    return (
 
-                <div key='main' className='margin_zero width_100'>{unit}</div>
+        const v_showCard = this.props.show_card !== false;
+        const v_hasUnits = this.state.andruavUnitPartyIDs.length > 0;
+        const v_tabsEnabled = js_localStorage.fn_getTabsDisplayEnabled();
+        const v_sortEnabled = js_localStorage.fn_getUnitSortEnabled();
+        const v_headerText = v_hasUnits ? t('home:onlineUnits') + ' - ' + onlineCount : t('home:no_online_units');
+
+    return (
+                <div key='main' className='margin_zero width_100'>
+                    {v_showCard === true
+                    ? (
+                    <div className="mb-3 padding_zero">
+                        <div className="card-header user-select-none border-bottom border-light rounded-top txt-theme-aware mb-1">
+                            <strong>{v_headerText}</strong>
+                            {v_hasUnits === true
+                            ? <>
+                                <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
+                                    {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+                                </button>
+                                <button type="button" className={`btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2 ${v_tabsEnabled ? 'bi bi-list-ul' : 'bi bi-list-nested'}`} title={t('globalSettings:tabsDisplayLabel')} onClick={() => this.fn_toggleTabsDisplay()}>
+                                </button>
+                                <button type="button" className={`btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2 ${v_sortEnabled ? 'bi bi-sort-alpha-down' : 'bi bi-sort-alpha-up'}`} title={t('globalSettings:sortUnitsTitle')} onClick={() => this.fn_toggleSortUnits()}>
+                                </button>
+                              </>
+                            : null
+                            }
+                        </div>
+                        <div style={{ display: this.state.isMinimized ? 'none' : 'block' }}>
+                            {unit}
+                        </div>
+                    </div>
+                    )
+                    : unit
+                    }
+                </div>
             );
     }
 };
 
 
-export default withTranslation()(ClssAndruavUnitList);
+export default withTranslation(['', 'home', 'globalSettings'])(ClssAndruavUnitList);

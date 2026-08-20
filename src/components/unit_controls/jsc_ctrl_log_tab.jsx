@@ -39,9 +39,9 @@ class ClssAndruavMessageItem extends React.Component {
         const m_index = this.props.p_index;
         return (
         <tr key={m_index} className = {'si-09x ' + v_text_color + this.props.className}>
-            <td  scope="row">{m_time}</td>
-            <td scope="row">{m_notification_Type}</td>
-            <td scope="row">{m_description}</td>
+            <td  scope="row" className={v_text_color}>{m_time}</td>
+            <td scope="row" className={v_text_color}>{m_notification_Type}</td>
+            <td scope="row" className={v_text_color}>{m_description}</td>
         </tr>
         );
     }

@@ -1,0 +1,244 @@
+[
+    {
+        "name": "Communication",
+        "template": {
+            "module id": {
+                "fieldName": "module_id",
+                "type": "text",
+                "defaultvalue": "HorusEye",
+                "optional": false,
+                "desc": "unique module name shown to the DroneEngage server and WebClient"
+            },
+            "s2s udp target ip": {
+                "fieldName": "s2s_udp_target_ip",
+                "type": "text",
+                "defaultvalue": "127.0.0.1",
+                "optional": false,
+                "desc": "DroneEngage communication server IP address"
+            },
+            "s2s udp target port": {
+                "fieldName": "s2s_udp_target_port",
+                "type": "text",
+                "defaultvalue": "60000",
+                "optional": false,
+                "desc": "DroneEngage communication server port"
+            },
+            "s2s udp listening ip": {
+                "fieldName": "s2s_udp_listening_ip",
+                "type": "text",
+                "defaultvalue": "0.0.0.0",
+                "optional": false,
+                "desc": "local IP the module listens on (0.0.0.0 = all interfaces)"
+            },
+            "s2s udp listening port": {
+                "fieldName": "s2s_udp_listening_port",
+                "type": "text",
+                "defaultvalue": "60029",
+                "optional": false,
+                "desc": "local port the module listens on"
+            },
+            "s2s udp packet size": {
+                "fieldName": "s2s_udp_packet_size",
+                "type": "text",
+                "defaultvalue": "8192",
+                "optional": true,
+                "desc": "UDP datagram payload size in bytes. If omitted, the default databus packet size is used."
+            },
+            "use unix socket": {
+                "fieldName": "use_unix_socket",
+                "type": "boolean",
+                "defaultvalue": "false",
+                "optional": true,
+                "desc": "use a unix domain socket instead of UDP to talk to the communication server (co-located server only). Default false."
+            }
+        }
+    },
+    {
+        "name": "Camera",
+        "template": {
+            "camera": {
+                "fieldName": "camera",
+                "type": "object",
+                "fields": {
+                    "camera_start_index": {
+                        "order": 1,
+                        "type": "number",
+                        "defaultvalue": "0",
+                        "desc": "first /dev/video index to scan (scan-range style)"
+                    },
+                    "camera_end_index": {
+                        "order": 2,
+                        "type": "number",
+                        "defaultvalue": "11",
+                        "desc": "last /dev/video index to scan (scan-range style)"
+                    },
+                    "camera_list": {
+                        "fieldName": "camera_list",
+                        "type": "array",
+                        "optional": true,
+                        "desc": "explicit camera list (alternative to scan range). Define specific cameras and assign custom names.",
+                        "array_template": {
+                            "name": {
+                                "order": 1,
+                                "type": "text",
+                                "defaultvalue": "CAM1",
+                                "desc": "name appears on webclient"
+                            },
+                            "device_num": {
+                                "order": 2,
+                                "type": "number",
+                                "optional": true,
+                                "defaultvalue": "1",
+                                "desc": "/dev/videoX"
+                            },
+                            "device_name": {
+                                "order": 3,
+                                "type": "text",
+                                "optional": true,
+                                "defaultvalue": "DE-CAM1",
+                                "desc": "Virtual video driver name or WebCam Name - advanced."
+                            }
+                        }
+                    }
+                },
+                "optional": false,
+                "desc": "camera selection - scan range (camera_start_index/camera_end_index) OR camera_list. See Streaming group for resolution/framerate settings."
+            }
+        }
+    },
+    {
+        "name": "Streaming",
+        "template": {
+            "streaming": {
+                "fieldName": "streaming",
+                "type": "object",
+                "fields": {
+                    "capture_width": {
+                        "order": 1,
+                        "type": "number",
+                        "defaultvalue": "1024",
+                        "desc": "Capture width requested from V4L2 device (MAX, not exact - closest mode is picked)"
+                    },
+                    "capture_height": {
+                        "order": 2,
+                        "type": "number",
+                        "defaultvalue": "720",
+                        "desc": "Capture height requested from V4L2 device (MAX, not exact - closest mode is picked)"
+                    },
+                    "capture_fps": {
+                        "order": 3,
+                        "type": "number",
+                        "defaultvalue": "30",
+                        "desc": "Capture framerate requested from V4L2 device"
+                    },
+                    "video_recording_fps": {
+                        "order": 4,
+                        "type": "number",
+                        "defaultvalue": "10",
+                        "desc": "Video recording framerate passed to ffmpeg. 0 = use capture_fps. MAX, not exact."
+                    },
+                    "stream_max_width": {
+                        "order": 5,
+                        "type": "number",
+                        "defaultvalue": "1280",
+                        "desc": "Stream downscale cap (WebRTC). 0 or -1 = unlimited"
+                    },
+                    "stream_max_height": {
+                        "order": 6,
+                        "type": "number",
+                        "defaultvalue": "720",
+                        "desc": "Stream downscale cap (WebRTC). 0 or -1 = unlimited"
+                    },
+                    "gcs_image_small_width": {
+                        "order": 7,
+                        "type": "number",
+                        "defaultvalue": "320",
+                        "desc": "Small GCS still image width. 0 or -1 = unlimited (full-res to GCS)"
+                    },
+                    "gcs_image_small_height": {
+                        "order": 8,
+                        "type": "number",
+                        "defaultvalue": "200",
+                        "desc": "Small GCS still image height. 0 or -1 = unlimited (full-res to GCS)"
+                    }
+                },
+                "optional": false,
+                "desc": "streaming and media settings - apply to all cameras regardless of selection style"
+            }
+        }
+    },
+    {
+        "name": "Media Settings",
+        "template": {
+            "media folder": {
+                "fieldName": "media_folder",
+                "type": "text",
+                "defaultvalue": "./img",
+                "optional": true,
+                "desc": "folder used to store video and images"
+            },
+            "media image png": {
+                "fieldName": "media_image_png",
+                "type": "boolean",
+                "defaultvalue": "true",
+                "optional": true,
+                "desc": "save still images as PNG (true) or BMP (false)"
+            },
+            "send image gcs": {
+                "fieldName": "send_image_gcs",
+                "type": "boolean",
+                "defaultvalue": "true",
+                "optional": true,
+                "desc": "send captured still images to GCS"
+            },
+            "video recording bitrate kbps": {
+                "fieldName": "video_recording_bitrate_kbps",
+                "type": "number",
+                "defaultvalue": "2000",
+                "optional": true,
+                "desc": "H.264 target bitrate (kbps) passed to ffmpeg for MP4 recording. Default 2000."
+            },
+            "video recording hw encoder": {
+                "fieldName": "video_recording_hw_encoder",
+                "type": "boolean",
+                "defaultvalue": "true",
+                "optional": true,
+                "desc": "use the Raspberry Pi V4L2 M2M hardware H.264 encoder (h264_v4l2m2m) instead of software libx264. Auto-detected from device-tree; set to false to force software encoding."
+            }
+        }
+    },
+    {
+        "name": "ICE Servers",
+        "template": {
+            "ice servers": {
+                "fieldName": "iceServers",
+                "type": "array",
+                "optional": true,
+                "desc": "WebRTC ICE/STUN/TURN servers. Omit to use the WebRTC default STUN server.",
+                "array_template": {
+                    "urls": {
+                        "order": 1,
+                        "type": "text",
+                        "defaultvalue": "stun:stun.l.google.com:19302",
+                        "desc": "STUN/TURN server URL (e.g. stun:host:port or turn:host:port)"
+                    },
+                    "username": {
+                        "order": 2,
+                        "type": "text",
+                        "optional": true,
+                        "defaultvalue": "",
+                        "desc": "TURN username (required only for TURN servers)"
+                    },
+                    "password": {
+                        "order": 3,
+                        "type": "text",
+                        "optional": true,
+                        "defaultvalue": "",
+                        "desc": "TURN password/credential (required only for TURN servers)"
+                    }
+                }
+            }
+        }
+    }
+
+]

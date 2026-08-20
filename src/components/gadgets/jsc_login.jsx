@@ -1,15 +1,16 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
-import * as js_common from '../js/js_common.js';
-import { EVENTS as js_event } from '../js/js_eventList.js';
-import { js_globals } from '../js/js_globals.js';
-import { js_localStorage } from '../js/js_localStorage';
-import * as js_siteConfig from '../js/js_siteConfig.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
-import { js_speak } from '../js/js_speak';
-import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../js/js_main';
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
+import * as js_common from '../../js/js_common.js';
+import { EVENTS as js_event } from '../../js/js_eventList.js';
+import { js_globals } from '../../js/js_globals.js';
+import { js_localStorage } from '../../js/js_localStorage.js';
+import * as js_siteConfig from '../../js/js_siteConfig.js';
+import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { js_speak } from '../../js/js_speak.js';
+import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../../js/js_main.js';
+import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;
 const CONST_NOT_CONNECTION_IN_PROGRESS = 1;
@@ -24,7 +25,9 @@ class ClssLoginControl extends React.Component {
       m_update: 0,
       use_plugin: false,
       is_chat_visible: true,
-      chat_unread: 0
+      chat_unread: 0,
+      errorMessage: '',
+      successMessage: '',
     };
 
     this.m_flag_mounted = false;
@@ -60,9 +63,9 @@ class ClssLoginControl extends React.Component {
 
     if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
       me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
-      me.state.username = me.txtUnitIDRef.current.value;
+      me.state.username = me.txtUnitIDRef.current ? me.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
-      me.setState({ m_update: me.state.m_update + 1 });
+      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected successfully.' });
     } else {
       me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
       me.setState({ m_update: me.state.m_update + 1 });
@@ -72,7 +75,7 @@ class ClssLoginControl extends React.Component {
   fn_onAuthInProgress(me) {
     if (me.m_flag_mounted === false) return;
     me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
-    me.setState({ m_update: me.state.m_update + 1 });
+    me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
   }
 
   fn_onChatMessage(me, p_data) {
@@ -140,8 +143,16 @@ class ClssLoginControl extends React.Component {
       return;
     }
     
+    const msg = data && data.em ? data.em : 'Login failed';
+    // If the user has already stopped retrying (clicked Login to stop), do not
+    // override the green OFFLINE state when an in-flight request finally fails.
+    if (js_andruavAuth.m_retry_login === false) {
+      me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
+      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: '' });
+      return;
+    }
     me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
-    me.setState({ m_update: me.state.m_update + 1 });
+    me.setState({ m_update: me.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
   }
 
   fn_onWebConnectorNotRunning(me, data) {
@@ -197,13 +208,16 @@ class ClssLoginControl extends React.Component {
   }
 
 
+  fn_onInputKeyDown(e) {
+    if (e && e.key === 'Enter') {
+      e.preventDefault();
+      this.clickConnect(e);
+    }
+  }
+
   clickConnect(e) {
-    if ((this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE) && (this.state.is_connected !== CONST_NOT_CONNECTION_OFFLINE_FAILED)) {
-      // online or connecting
-      fn_logout();
-      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE });
-    } else {
-      // offline
+    if (this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE) {
+      // offline (green) - start a new connection
       this.setState({ m_update: this.state.m_update + 1 });
 
       const usePlugin = (this.chkUsePluginRef.current && this.chkUsePluginRef.current.checked === true);
@@ -221,6 +235,11 @@ class ClssLoginControl extends React.Component {
       js_localStorage.fn_setGroupName(this.txtGroupNameRef.current.value);
 
       fn_connect(this.txtLoginNameRef.current.value, this.txtAccessCodeRef.current.value);
+    } else {
+      // OFFLINE_FAILED (retrying), IN_PROGRESS, or ONLINE
+      // Stop retrying and go back to green OFFLINE so the user can edit fields
+      fn_logout();
+      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE, errorMessage: '', successMessage: '' });
     }
   }
 
@@ -359,6 +378,7 @@ class ClssLoginControl extends React.Component {
                 title="LoginName must be alphanumeric"
                 ref={this.txtLoginNameRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.loginName != null ? QueryString.loginName : (QueryString.email != null ? QueryString.email : js_localStorage.fn_getLoginName())
                 }
@@ -375,6 +395,7 @@ class ClssLoginControl extends React.Component {
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
                 }
@@ -405,6 +426,7 @@ class ClssLoginControl extends React.Component {
                 name="txtUnitID"
                 ref={this.txtUnitIDRef}
                 className="form-control"
+                onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.unitName != null ? QueryString.unitName : js_localStorage.fn_getUnitID()
                 }
@@ -542,17 +564,27 @@ class ClssLoginControl extends React.Component {
         >
           {title}
         </button>
-        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <div className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1" style={{minWidth: '200px', maxWidth: '90vw'}}>
           <div id="login_form" className="card-body">
+            {this.state.errorMessage && (
+              <div className="alert alert-danger py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+                {this.state.errorMessage}
+              </div>
+            )}
+            {this.state.successMessage && (
+              <div className="alert alert-success py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+                {this.state.successMessage}
+              </div>
+            )}
             {ctrls}
             <button
               id="btnConnect"
-              className={'btn button_large rounded-3 m-2 user-select-none ' + css + ' p-0'}
+              className={'btn button_large rounded-3 user-select-none w-100 ' + css + ' p-1'}
               title={this.state.username}
               onClick={(e) => this.clickConnect(e)}
               ref={this.btnConnectRef}
             >
-              {title}
+              {css.includes('warning') ? t('title.cancelLogging') : title}
             </button>
             {ctrls2}
           </div>

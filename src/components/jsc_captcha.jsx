@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { loadCaptchaEnginge, LoadCanvasTemplate, LoadCanvasTemplateNoReload, validateCaptcha } from 'react-simple-captcha';
+import { fn_do_modal_alert } from '../js/js_main.js';
 
 
 
@@ -13,13 +14,13 @@ export class CaptchaTest extends Component {
        let user_captcha = document.getElementById('user_captcha_input').value;
 
        if (validateCaptcha(user_captcha)===true) {
-           alert('Captcha Matched');
+           fn_do_modal_alert(null, 'Captcha Matched');
            loadCaptchaEnginge(6,'yellow','black'); 
            document.getElementById('user_captcha_input').value = "";
        }
 
        else {
-           alert('Captcha Does Not Match');
+           fn_do_modal_alert(null, 'Captcha Does Not Match');
            document.getElementById('user_captcha_input').value = "";
        }
    };

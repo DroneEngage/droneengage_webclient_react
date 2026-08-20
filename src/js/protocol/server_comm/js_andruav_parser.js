@@ -495,6 +495,9 @@ class CAndruavClientParser {
                 p_unit.m_SignalStatus.m_mobileSignalLevel = p_jmsg.r;
                 p_unit.m_SignalStatus.m_mobileNetworkType = p_jmsg.s;
                 p_unit.m_SignalStatus.m_mobileNetworkTypeRank = js_helpers.fn_getNetworkType(p_jmsg.s);
+                if (p_jmsg.op != null) p_unit.m_SignalStatus.m_operatorName = p_jmsg.op;
+                if (p_jmsg.c != null)  p_unit.m_SignalStatus.m_countryIso = p_jmsg.c;
+                if (p_jmsg.ds != null) p_unit.m_SignalStatus.m_dataState = p_jmsg.ds;
             }
                 break;
 
@@ -1197,6 +1200,7 @@ class CAndruavClientParser {
             triggers.onHomePointChanged = true;
         }
 
+        const oldIsDE = p_unit.fn_getIsDE();
         if (p_jmsg.dv) {
             // .dv meanse DRONEENGAGE-VERSION
             p_unit.fn_setIsDE(true);
@@ -1225,6 +1229,10 @@ class CAndruavClientParser {
                     }, 1000);
                 }
             }
+        }
+        // If DE status changed (DE <-> Andruav), force marker icon refresh
+        if (oldIsDE !== p_unit.fn_getIsDE()) {
+            triggers.onVehicleChanged = true;
         }
 
         if (p_jmsg.hasOwnProperty('B')) {

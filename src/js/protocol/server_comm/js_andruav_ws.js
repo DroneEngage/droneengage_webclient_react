@@ -8,7 +8,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import * as js_common from '../../js_common.js'
 import { js_localStorage } from '../../js_localStorage.js'
 import { js_eventEmitter } from '../../js_eventEmitter.js'
-import { fn_showSecurityDialog } from '../../js_main.js'
+import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
@@ -29,6 +29,13 @@ const CMD_COMM_INDIVIDUAL = 'i';
 
 // System Commands:
 const CMD_SYS_PING = 'ping'; //'ping'; // group broadcast
+
+// Auth-frame protocol (security item 2.1): credentials are always sent as
+// the first WS message instead of in the URL query string (cloud mode).
+// See js_siteConfig.js for the full protocol spec.
+const CMD_SYS_DE_AUTH = 'de_auth';        // client -> server: auth frame
+const CMD_SYS_DE_AUTH_ACK = 'de_auth_ack'; // server -> client: auth result
+const CONST_AUTH_FRAME_TIMEOUT = 8000;     // ms to wait for auth-ack
 
 const c_SOCKET_STATUS = [
     'Fresh',
@@ -78,6 +85,11 @@ class CAndruavClientWS {
 
         this.m_timer_id = null;
 
+        // Auth-frame state (security item 2.1)
+        this.m_authViaFrame = false;   // true when credentials are sent via a post-open frame
+        this.m_authPending = false;    // true while waiting for de_auth_ack
+        this.m_authTimeoutHandle = null;
+
         js_andruav_parser.AndruavClientParser.fn_init();
         js_andruav_facade.AndruavClientFacade.fn_init();
     }
@@ -96,7 +108,12 @@ class CAndruavClientWS {
         // Clear timer if active
         this._clearTimer();
 
-
+        // Clear auth-frame timeout (security item 2.1)
+        this.m_authPending = false;
+        if (this.m_authTimeoutHandle) {
+            clearTimeout(this.m_authTimeoutHandle);
+            this.m_authTimeoutHandle = null;
+        }
     }
 
 
@@ -197,6 +214,11 @@ class CAndruavClientWS {
 
     sendex(msg, is_binary) {
         try {
+            // Security item 2.1: block all outgoing traffic until the auth
+            // frame has been acknowledged by the server.
+            if (this.m_authPending === true) {
+                return;
+            }
             if (this.ws) {
                 this.ws.sendex(msg, is_binary);
             }
@@ -231,6 +253,30 @@ class CAndruavClientWS {
 
             } else { /*Me.onLog ("refused to delete, maybe not existed. pls use dell instead of del to enforce addition.");*/
             }
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LoadMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Loaded, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_SaveMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Saved, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteMission) {
+            js_eventEmitter.fn_dispatch(js_event.EE_Mission_Deleted, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_StateServer) {
+            let p_payload = msg.msgPayload;
+            if (typeof p_payload === 'string' || p_payload instanceof String) {
+                try { p_payload = JSON.parse(p_payload); } catch (e) { return; }
+            }
+            js_eventEmitter.fn_dispatch(js_event.EE_StorageServerState, p_payload);
             return;
         }
     };
@@ -412,7 +458,7 @@ class CAndruavClientWS {
         try {
 
             if (p_accesscode === null || p_accesscode === undefined) {
-                alert("Password cannot be empty");
+                fn_do_modal_alert(null, "Password cannot be empty");
                 return;
             }
 
@@ -425,6 +471,22 @@ class CAndruavClientWS {
             const pluginApiKey = (usePlugin === true) ? js_siteConfig.CONST_WEBCONNECTOR_CONFIG.APIKEY : '';
             const pluginApiKeyQS = (pluginApiKey && pluginApiKey.length > 0) ? ('&k=' + encodeURIComponent(pluginApiKey)) : '';
 
+            // Security item 2.1: credentials are always sent as a post-open
+            // JSON frame instead of in the URL query string (which leaks into
+            // proxy/access logs and browser history).
+            //
+            // The auth frame applies to CLOUD mode only. The WebConnector
+            // plugin runs on localhost and does not understand the de_auth
+            // frame, so plugin mode always uses query-string auth (the
+            // localhost leak risk is negligible).
+            const authViaFrame = (usePlugin !== true);
+            this.m_authViaFrame = authViaFrame;
+            this.m_authPending = false;
+            if (this.m_authTimeoutHandle) {
+                clearTimeout(this.m_authTimeoutHandle);
+                this.m_authTimeoutHandle = null;
+            }
+
             if (usePlugin === true) {
                 const wsProtocol = 'ws';
                 const port = this.m_server_port;
@@ -434,9 +496,9 @@ class CAndruavClientWS {
                     // f: CONST_CS_LOGIN_TEMP_KEY
                     // g: CONST_CS_SERVER_PUBLIC_HOST
                     // s: SID
-                    url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
+                    url = 'wss://' + this.m_server_ip + ':' + this.m_server_port_ss;
                 } else {
-                    url = 'ws://' + this.m_server_ip + ':' + this.m_server_port + '?f=' + this.server_AuthKey + '&s=' + this.partyID + '&at=g';
+                    url = 'ws://' + this.m_server_ip + ':' + this.m_server_port;
                 }
             }
 
@@ -447,6 +509,7 @@ class CAndruavClientWS {
                 console.info('[WS] connect', {
                     usePlugin: usePlugin === true,
                     isPluginTarget: isPluginTarget === true,
+                    authViaFrame: authViaFrame === true,
                     host: this.m_server_ip,
                     port: this.m_server_port,
                     hasPluginApiKey: (pluginApiKey && pluginApiKey.length > 0),
@@ -457,7 +520,7 @@ class CAndruavClientWS {
 
             if ("WebSocket" in window) {
                 this.ws = new WebSocket(url);
-                this.ws.binaryType = 'arraybuffer'; // Set to receive binary as ArrayBuffer for efficiency
+                this.ws.binaryType = 'arraybuffer'; // Set to receive ArrayBuffer as ArrayBuffer for efficiency
                 this.ws.parent = this;
                 this.ws.sendex = function (msg, isbinary) {
                     if (this.readyState === WebSocket.OPEN) {
@@ -483,8 +546,17 @@ class CAndruavClientWS {
                             readyState: Me.ws ? Me.ws.readyState : null,
                             host: Me.m_server_ip,
                             port: Me.m_server_port,
+                            authViaFrame: Me.m_authViaFrame === true,
                         });
                     } catch {
+                    }
+
+                    if (Me.m_authViaFrame === true) {
+                        // Send credentials as the first WS message (auth frame).
+                        // The server must reply with a de_auth_ack frame before
+                        // any other traffic is processed.
+                        Me.#fn_sendAuthFrame(pluginApiKey);
+                        return;
                     }
 
                     if (isPluginTarget === true) {
@@ -501,6 +573,13 @@ class CAndruavClientWS {
                 // OnMessage callback of websocket
                 this.ws.onmessage = function (evt) {
                     if (typeof evt.data === "string") { // This is a text message
+                        // Security item 2.1: intercept the auth-ack frame before
+                        // normal message processing while auth is pending.
+                        if (Me.m_authPending === true) {
+                            if (Me.#fn_handleAuthAck(evt.data) === true) {
+                                return; // consumed by auth handler
+                            }
+                        }
                         const p_jmsg = Me.#prv_parseJSONMessage(evt.data);
                         switch (p_jmsg._ty) {
                             case CMDTYPE_SYS: Me.#prv_parseSystemMessage(Me, p_jmsg);
@@ -520,6 +599,11 @@ class CAndruavClientWS {
 
                 // OnClose callback of websocket
                 this.ws.onclose = function (evt) {
+                    Me.m_authPending = false;
+                    if (Me.m_authTimeoutHandle) {
+                        clearTimeout(Me.m_authTimeoutHandle);
+                        Me.m_authTimeoutHandle = null;
+                    }
                     Me.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_DISCONNECTED);
                     js_eventEmitter.fn_dispatch(js_event.EE_WS_CLOSE, null);
 
@@ -551,13 +635,13 @@ class CAndruavClientWS {
                     Me.#prv_handleSSLError(err);
                 };
             } else { // The browser doesn't support WebSocket
-                alert("WebSocket NOT supported by your Browser!");
+                fn_do_modal_alert(null, "WebSocket NOT supported by your Browser!");
             }
         }
         catch (e) {
             console.error("WebSocket initialization error:", e);
             if (e.message.includes("SSL") || e.message.includes("TLS")) {
-                alert("SSL/TLS error detected. Please check your certificate configuration.");
+                fn_do_modal_alert(null, "SSL/TLS error detected. Please check your certificate configuration.");
             }
             console.log("Web Socket Failed");
             console.log(e);
@@ -565,6 +649,88 @@ class CAndruavClientWS {
         }
     };
 
+    /**
+     * Security item 2.1: build and send the auth frame as the first WS message
+     * after onopen. The frame carries the session auth key (f), party ID (s),
+     * actor type (at) and optional plugin API key (k) out of the URL query
+     * string so they do not leak into proxy/access logs or browser history.
+     *
+     * Server-side requirement: the Communication Server / WebConnector plugin
+     * must accept a connection with no query-string credentials, read this
+     * frame, validate f/s/at/k, and reply with:
+     *   {"ty":"s","mt":"de_auth_ack","r":"ok"}      (success)
+     *   {"ty":"s","mt":"de_auth_ack","r":"fail","em":"<reason>"}  (failure)
+     */
+    #fn_sendAuthFrame(pluginApiKey) {
+        const authFrame = {
+            ty: CMDTYPE_SYS,
+            mt: CMD_SYS_DE_AUTH,
+            f: this.server_AuthKey,
+            s: this.partyID,
+            at: 'g',
+        };
+        if (pluginApiKey && pluginApiKey.length > 0) {
+            authFrame.k = pluginApiKey;
+        }
+
+        this.m_authPending = true;
+
+        // Timeout: if no auth-ack arrives, close the socket.
+        const Me = this;
+        this.m_authTimeoutHandle = setTimeout(function () {
+            if (Me.m_authPending === true) {
+                console.error('[WS] auth frame timeout \u2014 no de_auth_ack received');
+                Me.m_authPending = false;
+                try { Me.ws.close(); } catch (e) { /* ignore */ }
+            }
+        }, CONST_AUTH_FRAME_TIMEOUT);
+
+        // Send the frame directly via the raw WebSocket (bypasses the class
+        // sendex guard which blocks while m_authPending is true).
+        try {
+            this.ws.send(JSON.stringify(authFrame));
+        } catch (e) {
+            console.error('[WS] failed to send auth frame:', e);
+            this.m_authPending = false;
+            if (this.m_authTimeoutHandle) {
+                clearTimeout(this.m_authTimeoutHandle);
+                this.m_authTimeoutHandle = null;
+            }
+        }
+    }
+
+    /**
+     * Security item 2.1: handle the de_auth_ack frame received from the server.
+     * Returns true if the message was an auth-ack (consumed), false otherwise.
+     */
+    #fn_handleAuthAck(rawData) {
+        let parsed;
+        try {
+            parsed = JSON.parse(rawData);
+        } catch (e) {
+            return false;
+        }
+        if (parsed == null || parsed.ty !== CMDTYPE_SYS || parsed.mt !== CMD_SYS_DE_AUTH_ACK) {
+            return false;
+        }
+
+        this.m_authPending = false;
+        if (this.m_authTimeoutHandle) {
+            clearTimeout(this.m_authTimeoutHandle);
+            this.m_authTimeoutHandle = null;
+        }
+
+        if (parsed.r === 'ok') {
+            console.info('[WS] auth frame accepted');
+            this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_CONNECTED);
+            this.setSocketStatus(js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);
+        } else {
+            const reason = parsed.em || 'auth rejected';
+            console.error('[WS] auth frame rejected:', reason);
+            try { this.ws.close(); } catch (e) { /* ignore */ }
+        }
+        return true;
+    }
 
     fn_isRegistered() {
         return (this.socketStatus === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED);

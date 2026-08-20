@@ -3,9 +3,10 @@ import React from 'react';
 
 import * as  js_siteConfig from '../js/js_siteConfig'
 
-import ClssLoginControl from './jsc_login.jsx'
+import ClssLoginControl from './gadgets/jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
 import ThemeSwitcher from './jsc_theme_switcher.jsx'
+import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx'
 
 import { withTranslation } from 'react-i18next';
 
@@ -56,46 +57,42 @@ class ClssHeaderControl extends React.Component {
             );
         }
         return (
-            <div id='rowheader' key='ClssHeaderControl' className=' d-flex  css_padding_zero txt-theme-aware-bg fixed-top ps-3 '>
-                <div className='css_margin_zero css_padding_zero d-lg-block d-none d-xl-block'>
-                    <nav className="navbar navbar-expand-lg txt-theme-aware-navbar padding_zero">
-                        <a className="navbar-brand fs-3 padding_zero" href=".">
-                            <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top pt-2" alt="" />
-                            {js_siteConfig.CONST_TITLE}
+            <div id='rowheader' key='ClssHeaderControl' className=' d-flex flex-wrap align-items-center css_padding_zero txt-theme-aware-bg fixed-top ps-3 pe-2'>
+                <div className='css_margin_zero css_padding_zero d-flex align-items-center'>
+                    <nav className="navbar txt-theme-aware-navbar padding_zero">
+                        <a className="navbar-brand fs-3 padding_zero d-flex align-items-center" href=".">
+                            <img src="/images/de/DE_logo_w_title.png" width="48" height="48" className="d-inline-block align-top" alt="" />
+                            <span className="ms-1 text-truncate d-none d-sm-inline">{js_siteConfig.CONST_TITLE}</span>
                         </a>
-                        <div className="collapse navbar-collapse" id="navbarNav">
-                            <ul className="navbar-nav">
-                                <li key="Home" className="nav-item active">
-                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')} </a>
-                                </li>
-                                <li key="Geo" className="nav-item">
-                                    <a className="nav-link txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a>
-                                </li>
-                                <li key="Manual" className="nav-item">
-                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer" >Wiki</a>
-                                </li>
-                                <li key="FAQ" className="nav-item">
-                                    <a className="nav-link txt-theme-aware" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a>
-                                </li>
-                                <li key="Contact" className="nav-item">
-                                    <a className="nav-link txt-theme-aware " href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a>
-                                </li>
-                                {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK" className="nav-item">
-                                    <a className="nav-link text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a>
-                                </li>}
-                                {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account" className="nav-item">
-                                    <a className="nav-link txt-theme-aware" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a>
-                                </li>}
-                                <li key="Theme" className="nav-item">
-                                    <div className="nav-link p-0">
-                                        <ThemeSwitcher showLabel={false} className="d-inline-block" />
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
                     </nav>
+                    <div className="dropdown ms-2">
+                        <button className="btn btn-sm btn-secondary dropdown-toggle bi bi-list" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                            <span className="ms-1">{t('header.menu')}</span>
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-start" style={{minWidth: '180px', maxWidth: '90vw'}}>
+                            <li key="Home"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')}</a></li>
+                            <li key="Geo"><a className="dropdown-item txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a></li>
+                            <li key="Mobile"><a className="dropdown-item txt-theme-aware" id='mobile' href="./mobile" target='_blank' rel="noopener noreferrer">{t('header.mobile')}</a></li>
+                            <li key="Manual"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer">Wiki</a></li>
+                            <li key="FAQ"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a></li>
+                            <li key="Contact"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a></li>
+                            {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK"><a className="dropdown-item text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a></li>}
+                            {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account"><a className="dropdown-item txt-theme-aware" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a></li>}
+                            <li key="Lang"><hr className="dropdown-divider" /></li>
+                            <li key="LangItem" className="px-3 py-1">
+                                <ClssLanguageSwitcher className="w-100" />
+                            </li>
+                            <li key="Theme"><hr className="dropdown-divider" /></li>
+                            <li key="ThemeItem" className="px-3 py-1">
+                                <ThemeSwitcher showLabel={true} className="d-inline-block" />
+                            </li>
+                            
+                        </ul>
+                    </div>
                 </div>
-                {ctrl}
+                <div className='d-flex flex-wrap align-items-center ms-auto css_margin_zero css_padding_zero'>
+                    {ctrl}
+                </div>
             </div>
         );
     }

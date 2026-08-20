@@ -8,6 +8,7 @@ import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 import { fn_changeUDPPort } from '../../js/js_main.js';
 import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_message_control.jsx';
 import { ClssModuleDetails } from '../gadgets/jsc_ctrl_unit_module_details.jsx';
+import { ClssAndruavExtraData } from '../gadgets/mobile/jsc_ctrl_andruav_extra_data.jsx';
 
 class ClssCtrlUnitDetails extends React.Component {
     constructor(props) {
@@ -218,6 +219,9 @@ class ClssCtrlUnitDetails extends React.Component {
                         </p>
                     </div>
                 </div>
+                {v_andruavUnit.fn_isAndruav() && (
+                    <ClssAndruavExtraData key={this.key + 'extra_data'} p_unit={v_andruavUnit} t={t} />
+                )}
                 <div key={v_andruavUnit.getPartyID() + 'settings_2'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'settings_21'} className="col-12 ">
                         <div key={v_andruavUnit.getPartyID() + 'settings_211'} className="textunit user-select-none cursor_hand m-0">

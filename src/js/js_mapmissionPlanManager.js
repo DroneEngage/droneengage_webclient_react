@@ -92,7 +92,7 @@ class ClssAndruavMissionPlanManager {
             return null; // Exit if there are none
         }
 
-        const currentIndex = c_mission_keys.indexOf(v_id2);
+        const currentIndex = c_mission_keys.indexOf(String(v_id2));
 
         if (currentIndex === -1) {
             return null; // v_id2 not found

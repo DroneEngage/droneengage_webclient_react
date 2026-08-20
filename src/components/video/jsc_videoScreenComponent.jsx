@@ -127,7 +127,6 @@ export default class ClssCVideoScreen extends React.Component {
 
     componentDidUpdate() {
         this.fn_lnkVideo();
-        js_common.fn_console_log("componentDidUpdate");
     }
 
 
@@ -313,7 +312,25 @@ export default class ClssCVideoScreen extends React.Component {
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
         if (v_video === null || v_video === undefined) return;
+
+        // componentDidUpdate runs on every re-render of this component, including ones
+        // unrelated to this video (e.g. mobile telemetry ticks re-rendering the whole page
+        // tree). Reassigning srcObject / calling play() unconditionally on each of those
+        // resets the live WebRTC frame and is what was causing the compact-mode flicker.
+        // Only touch the element when the stream actually changed.
+        if (v_video.srcObject === c_talk.stream) return;
         v_video.srcObject = c_talk.stream;
+
+        // Compact mode (mobile): ensure autoplay works outside a user gesture by
+        // forcing muted + playsInline and kicking play() after srcObject is assigned.
+        if (this.props.p_compact === true) {
+            v_video.muted = true;
+            v_video.playsInline = true;
+            const p = v_video.play();
+            if (p && typeof p.catch === 'function') {
+                p.catch(() => {});
+            }
+        }
     }
 
     fnl_requestPictureInPicture(p_andruavUnit, videoTrackID) {
@@ -625,6 +642,10 @@ export default class ClssCVideoScreen extends React.Component {
 
     render() {
         const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        if (andruavUnit === null || andruavUnit === undefined) {
+            return null;
+        }
+        const isCompact = this.props.p_compact === true;
         const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const divID = "cam_" + andruavUnit.getPartyID() + this.props.obj.v_track;  //party ids can start with numbers you need to adda prefix
         
@@ -635,7 +656,7 @@ export default class ClssCVideoScreen extends React.Component {
             activeClass = "active show";
         }
         
-        if (talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
+        if (talk === null || talk === undefined || talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
                     <h4 key="h" className='bg-danger txt-theme-aware rounded_6px'>{andruavUnit.m_unitName}</h4>
@@ -726,22 +747,33 @@ export default class ClssCVideoScreen extends React.Component {
 
 
         const key = this.key;
-        let v_btns = [];
+        let v_btn_items = [];
 
-        v_btns.push(
-            <div key={key + "btn"} id="css_video_ctrl_panel" className="d-flex flex-row css_padding_zero">
-                <div key={key + "16"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+        // Compact mode: essential controls (close, switch cam, snapshot, zoom, mirror, rotate, flash).
+        // Zoom/flash self-hide per camera via css_zoomCam/css_flashCam when the track doesn't support them.
+        // Full mode adds: FPS, goto, PIP, fullscreen, record, tracker, fit mode, opacity, GPIO, viewlink.
+        if (!isCompact) {
+            v_btn_items.push(
+                <div key={key + "fps"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlVideoFPS p_unit={andruavUnit} track_id={this.props.obj.v_track}/>
                 </div>
-                <div key={key + "1"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btnclose"
-                        className="cursor_hand css_video_close"
-                        alt="Close Camera"
-                        title="Close Camera"
-                        onClick={(e) => this.fnl_stopVideo(e)}
-                    />
-                </div>
+            );
+        }
+
+        v_btn_items.push(
+            <div key={key + "1"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btnclose"
+                    className="cursor_hand css_video_close"
+                    alt="Close Camera"
+                    title="Close Camera"
+                    onClick={(e) => this.fnl_stopVideo(e)}
+                />
+            </div>
+        );
+
+        if (!isCompact) {
+            v_btn_items.push(
                 <div key={key + "2"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnGoto"
@@ -750,7 +782,7 @@ export default class ClssCVideoScreen extends React.Component {
                         title="Goto Agent"
                         onClick={(e) => this.fn_gotoUnit_byPartyID(e)}
                     />
-                </div>
+                </div>,
                 <div key={key + "4"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btnPIP"
@@ -759,7 +791,7 @@ export default class ClssCVideoScreen extends React.Component {
                         title="Picture in Picture"
                         onClick={(e) => this.fnl_requestPIP(e)}
                     />
-                </div>
+                </div>,
                 <div key={key + "5"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_video_fullscreen"
@@ -769,15 +801,23 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_requestVideoFullScreen(e)}
                     />
                 </div>
-                <div key={key + "6"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btnSwitchCam"
-                        className={css_switchCam + " cursor_hand"}
-                        alt={css_switchCam_title}
-                        title={css_switchCam_title}
-                        onClick={(e) => this.fnl_switchcam(e, this.props.obj)}
-                    />
-                </div>
+            );
+        }
+
+        v_btn_items.push(
+            <div key={key + "6"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btnSwitchCam"
+                    className={css_switchCam + " cursor_hand"}
+                    alt={css_switchCam_title}
+                    title={css_switchCam_title}
+                    onClick={(e) => this.fnl_switchcam(e, this.props.obj)}
+                />
+            </div>
+        );
+
+        if (!isCompact) {
+            v_btn_items.push(
                 <div key={key + "7"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <img
                         id="btn_videorecord"
@@ -787,71 +827,97 @@ export default class ClssCVideoScreen extends React.Component {
                         onClick={(e) => this.fnl_recordVideo(e)}
                     />
                 </div>
-                <div key={key + "8"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btn_takeimage"
-                        className="cursor_hand css_camera_ready"
-                        alt="Take Snapshot"
-                        title="Take Snapshot"
-                        onClick={(e) => this.fnl_takeLocalImage(e)}
-                    />
-                </div>
-                <div key={key + "9"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i className={css_zoomCam + " bi-zoom-in cursor_hand css_large_icon "} title="Zoom In" onClick={(e) => this.fnl_zoomInOut(e, true, this.props.obj)}></i>
-                </div>
-                <div key={key + "10"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i className={css_zoomCam + " bi-zoom-out cursor_hand css_large_icon "} title="Zoom Out" onClick={(e) => this.fnl_zoomInOut(e, false, this.props.obj)}></i>
-                </div>
-                <div key={key + "11"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btn_mirrorX"
-                        className={css_rotateCam + " css_camera_mirrorX cursor_hand"}
-                        alt="Mirror"
-                        title="Mirror"
-                        onClick={(e) => this.fnl_mirror_local(e)}
-                    />
-                </div>
-                <div key={key + "12"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btn_rotate"
-                        className={css_rotateCam + " css_camera_rotate cursor_hand"}
-                        alt="Rotate"
-                        title="Rotate"
-                        onClick={(e) => this.fnl_rotate_local(e)}
-                    />
-                </div>
-                <div key={key + "13"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <img
-                        id="btn_flash"
-                        className={css_flashCam + " cursor_hand"}
-                        alt="Flash (Tourch)"
-                        title={css_flashCam_title}
-                        onClick={(e) => this.fnl_flashOnOff(e, this.props.obj)}
-                    />
-                </div>
-                <div key={key + "14"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
-                </div>
-                <div key={key + "5c"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <i
-                        id="btn_video_fit_mode"
-                        className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
-                        alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
-                        onClick={(e) => this.fnl_toggleVideoFitMode(e)}
-                    ></i>
-                </div>
-                <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
-                </div>
-                <div key={key + "15"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
-                </div>
-                <div key={key + "16"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlViewlinkControl p_unit={andruavUnit} />
-                </div>
+            );
+        }
+
+        v_btn_items.push(
+            <div key={key + "8"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btn_takeimage"
+                    className="cursor_hand css_camera_ready"
+                    alt="Take Snapshot"
+                    title="Take Snapshot"
+                    onClick={(e) => this.fnl_takeLocalImage(e)}
+                />
             </div>
         );
+
+        v_btn_items.push(
+            <div key={key + "9"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i id="btn_zoom_in" className={css_zoomCam + " bi-zoom-in cursor_hand css_large_icon "} title="Zoom In" onClick={(e) => this.fnl_zoomInOut(e, true, this.props.obj)}></i>
+            </div>,
+            <div key={key + "10"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i id="btn_zoom_out" className={css_zoomCam + " bi-zoom-out cursor_hand css_large_icon "} title="Zoom Out" onClick={(e) => this.fnl_zoomInOut(e, false, this.props.obj)}></i>
+            </div>
+        );
+
+        v_btn_items.push(
+            <div key={key + "11"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btn_mirrorX"
+                    className="css_camera_mirrorX cursor_hand"
+                    alt="Mirror"
+                    title="Mirror"
+                    onClick={(e) => this.fnl_mirror_local(e)}
+                />
+            </div>,
+            <div key={key + "12"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btn_rotate"
+                    className="css_camera_rotate cursor_hand"
+                    alt="Rotate"
+                    title="Rotate"
+                    onClick={(e) => this.fnl_rotate_local(e)}
+                />
+            </div>,
+            <div key={key + "13"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <img
+                    id="btn_flash"
+                    className={css_flashCam + " cursor_hand"}
+                    alt="Flash (Tourch)"
+                    title={css_flashCam_title}
+                    onClick={(e) => this.fnl_flashOnOff(e, this.props.obj)}
+                />
+            </div>
+        );
+
+        v_btn_items.push(
+            <div key={key + "5c"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <i
+                    id="btn_video_fit_mode"
+                    className={"cursor_hand " + this.m_videoFitModeIcons[this.m_videoFitModeIndex]}
+                    alt={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                    title={this.m_videoFitModeLabels[this.m_videoFitModeIndex]}
+                    onClick={(e) => this.fnl_toggleVideoFitMode(e)}
+                ></i>
+            </div>
+        );
+
+        v_btn_items.push(
+            <div key={key + "5d"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                <ClssCtrlOpacityControl id="btn_opacity_ctrl" />
+            </div>
+        );
+
+        if (!isCompact) {
+            v_btn_items.push(
+                <div key={key + "14"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                    <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
+                </div>,
+                <div key={key + "15"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                    <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
+                </div>,
+                <div key={key + "vl"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
+                    <ClssCtrlViewlinkControl p_unit={andruavUnit} />
+                </div>
+            );
+        }
+
+        let v_btns = [
+            <div key={key + "btn"} id="css_video_ctrl_panel" className="d-flex flex-row css_padding_zero">
+                {v_btn_items}
+            </div>
+        ];
 
 
 
@@ -863,6 +929,7 @@ export default class ClssCVideoScreen extends React.Component {
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>
                 {!isVideoFullScreen && v_btns}
+                {!isCompact && (
                 <div key="d2" className="row">
                     <div id="gimbaldiv" className="col-4">
                         <div>
@@ -889,6 +956,7 @@ export default class ClssCVideoScreen extends React.Component {
                         </div>
                     </div>
                 </div>
+                )}
                 <div
                     key={"tv" + talk.targetVideoTrack}
             id={'css_tvideo-div' + talk.targetVideoTrack}
@@ -905,13 +973,15 @@ export default class ClssCVideoScreen extends React.Component {
             )}
             <video
                 autoPlay
+                muted={isCompact}
+                playsInline={isCompact}
                 className={"videoObject " + this.m_videoFitModes[this.m_videoFitModeIndex]}
                 id={"videoObject" + talk.targetVideoTrack}
                 style={video_style}
                 data-number={talk.number}
                 ref={this.videoRef}
             ></video>
-            <div 
+            <div
                 ref={this.selectionBoxRef}
                 style={{
                     position: 'absolute',
@@ -922,18 +992,21 @@ export default class ClssCVideoScreen extends React.Component {
                     pointerEvents: 'none'
                 }}
             />
+            {!isCompact && (
             <ClssCVideoTrackerLayer
-                id={"canvasoObject" + talk.targetVideoTrack} 
+                id={"canvasoObject" + talk.targetVideoTrack}
                 p_videoRef={this.videoRef}
                 p_obj={this.props.obj}
                 zIndex={210}
                 pointerEvents='none'
             />
+            )}
             <ClssCVideoHUDOverlay
                 p_unit={andruavUnit}
                 p_videoRef={this.videoRef}
                 p_containerRef={this.drawingContainerRef}
             />
+            {!isCompact && (
             <ClssCtrlDrone_Altitude_Ctrl
                 p_unit={andruavUnit}
                 isHUD={true}
@@ -945,6 +1018,8 @@ export default class ClssCVideoScreen extends React.Component {
                 height="30px"
                 style={{zIndex: 1000}}
             />
+            )}
+            {!isCompact && (
             <ClssCtrlDEPilot
                 v_andruavUnit={andruavUnit}
                 id="video_depilot"
@@ -957,6 +1032,8 @@ export default class ClssCVideoScreen extends React.Component {
                 height="30px"
                 style={{zIndex: 1000}}
             />
+            )}
+            {!isCompact && (
             <ClssCtrlDrone_Speed_Ctrl
                 p_unit={andruavUnit}
                 isHUD={true}
@@ -968,6 +1045,8 @@ export default class ClssCVideoScreen extends React.Component {
                 height="30px"
                 style={{zIndex: 1000}}
             />
+            )}
+            {!isCompact && (
             <ClssCtrlDrone_FlightMode_Ctrl
                 p_unit={andruavUnit}
                 isHUD={true}
@@ -979,6 +1058,8 @@ export default class ClssCVideoScreen extends React.Component {
                 height="30px"
                 style={{zIndex: 1000}}
             />
+            )}
+            {!isCompact && (
             <ClssCtrlDistanceToMeControl
                 p_unit={andruavUnit}
                 isHUD={true}
@@ -990,6 +1071,7 @@ export default class ClssCVideoScreen extends React.Component {
                 height="30px"
                 style={{zIndex: 1000}}
             />
+            )}
         </div>
     </div>
 );

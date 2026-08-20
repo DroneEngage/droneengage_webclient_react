@@ -27,6 +27,13 @@ class ClssCameraDevice extends React.Component {
     fn_videoStream()
     {
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
+
+        // Tell the unit which camera to actually capture from (built-in front/back, or e.g. an
+        // attached USB webcam reported in CAMERA_LIST_MESSAGE) before joining its WebRTC track -
+        // same AndruavMessage_CameraSwitch already used by the live-view "switch camera" button,
+        // just driven by the selected track id instead of a plain front/back toggle.
+        js_globals.v_andruavFacade.API_SwitchCamera(this.props.prop_session.m_unit.getPartyID(), v_track.id);
+
         fn_VIDEO_login (this.props.prop_session, v_track.id);
         js_eventEmitter.fn_dispatch (js_event.EE_hideStreamDlgForm);
     }
@@ -53,8 +60,9 @@ class ClssCameraDevice extends React.Component {
         js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             camera_index,
             1,
-            0, 
-            0);
+            0,
+            0,
+            this.props.prop_parent.fn_getGCSSmall());
     }
 
     fn_shot()
@@ -68,11 +76,12 @@ class ClssCameraDevice extends React.Component {
             camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(), 
+        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
             this.props.prop_parent.fn_getNumOfShots(),
-            this.props.prop_parent.fn_getInterval(), 
-            0);
+            this.props.prop_parent.fn_getInterval(),
+            0,
+            this.props.prop_parent.fn_getGCSSmall());
     }
 
     
@@ -85,33 +94,40 @@ class ClssCameraDevice extends React.Component {
     render ()  {
         const v_unit = this.props.prop_session.m_unit;
         const v_track = this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number];
-        
+
         if ((v_unit == null) || (v_track == null))
         {
-            
+
             return (
                 <div></div>
             );
         }
         else
         {
-            
+
             const v_cam_class = 'btn-warning';
             const v_record_class = 'btn-primary';
-            
+
+            // Compact (mobile): full-width layout with label on top, buttons below stacked
+            // Desktop: flex row - label grows (can wrap), buttons keep fixed width on one line
+            const isCompact = this.props.p_compact === true;
+            const labelColClass = isCompact ? 'col-12 mb-2' : 'flex-grow-1';
+            const oneShotColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+            const multiShotColClass = isCompact ? 'col-6' : 'flex-shrink-0';
+
             return (
-                    <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className="row al_l css_margin_zero">
-                            <div className= "col-8   si-09x css_margin_zero txt-theme-aware">
+                    <div key={'cam_dev' + this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id} className={isCompact ? "row al_l css_margin_zero" : "d-flex al_l css_margin_zero"}>
+                            <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{v_track.ln}</label>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_cam_class}  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
+                            <div className={oneShotColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm w-100 text-nowrap " + v_cam_class}  onClick={ (e) => this.fn_oneShot()}>One Shot</button>
                             </div>
-                            <div className= "col-2   si-09x css_margin_zero css_padding_2">
-                                <button type="button" className={"btn btn-sm " + v_record_class} onClick={ (e) => this.fn_shot()}>Multi Shot</button>
+                            <div className={multiShotColClass + " si-09x css_margin_zero css_padding_2"}>
+                                <button type="button" className={"btn btn-sm w-100 text-nowrap " + v_record_class} onClick={ (e) => this.fn_shot()}>Multi Shot</button>
                             </div>
                     </div>
-                
+
             );
         }
     };
@@ -125,8 +141,11 @@ export default class ClssCameraDialog extends ClssDialogBase
         this.state = {
 			...this.state,
 			'm_update': 0,
+			// GCS still image resolution toggle: true = low-res downlink (saved file stays full-res),
+			// false = full-res downlink. Default small to protect RPi/downlink bandwidth.
+			'm_gcsSmall': true,
 		};
-        
+
         this.m_flag_mounted = false;
         
         this.key = Math.random().toString();
@@ -146,8 +165,15 @@ export default class ClssCameraDialog extends ClssDialogBase
         super.componentDidMount();
         this.m_flag_mounted = true;
 
-        this.txt_ShootingInterval.current.value = 1;
-        this.txt_TotalImages.current.value = 1;
+        // Compact mode: the mobile sheet is not rendered until a session exists,
+        // so the input refs are null at mount time. defaultValue on the inputs
+        // handles the initial value in that case.
+        if (this.txt_ShootingInterval.current) {
+            this.txt_ShootingInterval.current.value = 1;
+        }
+        if (this.txt_TotalImages.current) {
+            this.txt_TotalImages.current.value = 1;
+        }
     }
 
 
@@ -170,8 +196,12 @@ export default class ClssCameraDialog extends ClssDialogBase
         p_me.state.p_session = p_session;
 		
         p_me.setState({'m_update': p_me.state.m_update +1});
-        
-        p_me.modal_ctrl_cam.current.style.display = 'block';
+
+        // Compact mode: mobile sheet visibility is handled by render (returns
+        // null when there is no session), so the ref may be null.
+        if (p_me.modal_ctrl_cam.current) {
+            p_me.modal_ctrl_cam.current.style.display = 'block';
+        }
     }
 
     fn_getCurrentPartyID() {
@@ -191,26 +221,46 @@ export default class ClssCameraDialog extends ClssDialogBase
         return $('#txt_TotalImages').val();
     }
 
+    fn_getGCSSmall()
+    {
+        return this.state.m_gcsSmall === true;
+    }
+
+    fn_toggleGcsSmall()
+    {
+        this.setState((s) => ({ 'm_gcsSmall': !(s.m_gcsSmall === true) }));
+    }
+
     fn_initDialog() {
-        this.txt_TotalImages.current.onmousedown = function () {
-            $(this).parents('tr').removeClass('draggable');
-        };
-        this.txt_ShootingInterval.current.onmousedown = function () {
-            $(this).parents('tr').removeClass('draggable');
-        };
-        
-        this.modal_ctrl_cam.current.style.display = 'none';
-        
+        // Compact mode: the mobile sheet is not rendered at mount, so the input
+        // and card refs may be null here.
+        if (this.txt_TotalImages.current) {
+            this.txt_TotalImages.current.onmousedown = function () {
+                $(this).parents('tr').removeClass('draggable');
+            };
+        }
+        if (this.txt_ShootingInterval.current) {
+            this.txt_ShootingInterval.current.onmousedown = function () {
+                $(this).parents('tr').removeClass('draggable');
+            };
+        }
+
+        if (this.modal_ctrl_cam.current) {
+            this.modal_ctrl_cam.current.style.display = 'none';
+        }
+
         super.fn_initDialog();
     }
 
     fn_closeDialog()
     {
-	    this.modal_ctrl_cam.current.style.opacity = '';
-        this.modal_ctrl_cam.current.style.display = 'none';
+        if (this.modal_ctrl_cam.current) {
+            this.modal_ctrl_cam.current.style.opacity = '';
+            this.modal_ctrl_cam.current.style.display = 'none';
+        }
         if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
         {
-            this.state.p_session = null;            
+            this.state.p_session = null;
         }
     }
 
@@ -237,11 +287,77 @@ export default class ClssCameraDialog extends ClssDialogBase
         
         
 
+        const isCompact = this.fn_isCompact();
+
+        // Compact mode: render as mobile bottom sheet instead of draggable card
+        if (isCompact) {
+            // Only show mobile sheet when there's an active session
+            if (!this.state.p_session) {
+                return null;
+            }
+
+            const isNoCameras = v_streanms.length === 0;
+
+            return (
+                <div className="mobile-sheet-backdrop" onClick={() => this.fn_closeDialog()}>
+                    <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+                        <div className="mobile-sheet-handle" />
+                        <div className="mobile-sheet-header">
+                            <span className="mobile-sheet-title">
+                                <i className="bi bi-camera" /> {'Still Image of ' + v_unitName}
+                            </span>
+                            <button className="mobile-sheet-close" onClick={() => this.fn_closeDialog()}>
+                                <i className="bi bi-x-lg" />
+                            </button>
+                        </div>
+                        {!isNoCameras && (
+                            <>
+                                {p_session.m_unit.m_Video.m_videoTracks.map((_, i) => (
+                                    <ClssCameraDevice key={p_session.m_unit.m_Video.m_videoTracks[i].id + 'cd'} prop_session={p_session} prop_track_number={i} prop_parent={this} p_compact={isCompact} />
+                                ))}
+                                <div className="row margin_5px">
+                                    <div className="col-12 mb-2 d-flex align-items-center">
+                                        <button type="button" id="small_gcs"
+                                            title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
+                                            className={'btn btn-sm ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
+                                            onClick={() => this.fn_toggleGcsSmall()}>
+                                            <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="row margin_5px">
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <div>
+                                                <label htmlFor="txt_ShootingInterval" className="text-primary"><small>Each&nbsp;N&nbsp;sec</small></label>
+                                                <input id="txt_ShootingInterval" type="number" className="form-control input-xs input-sm" ref={this.txt_ShootingInterval} defaultValue={1} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <div className="form-group">
+                                            <div>
+                                                <label htmlFor="txt_TotalImages" className="text-primary"><small>Total&nbsp;Img</small></label>
+                                                <input id="txt_TotalImages" type="number" className="form-control input-xs input-sm" ref={this.txt_TotalImages} defaultValue={1} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop mode: render as draggable card
+        const camCardClassName = 'card css_ontop border-light p-2';
+
         return (
             <Draggable nodeRef={this.modal_ctrl_cam} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
-            <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2 " ref={this.modal_ctrl_cam}>
+            <div key={this.key + 'modal_ctrl_cam'} id="modal_ctrl_cam" title="Camera Control" data-bs-toggle="tooltip"  className={camCardClassName} ref={this.modal_ctrl_cam}>
                 {this.fn_renderDialogHeader('Still Image of ' + v_unitName)}
-                      
+
                 {!this.state.isMinimized && (
                 <div key='camera_body'  id="camera-card-body" className="card-body">
                     <div key='camera_v_streanms'  className='row'>
@@ -249,19 +365,33 @@ export default class ClssCameraDialog extends ClssDialogBase
                     </div>
                     <div className="tab-content">
                         <div className="row margin_5px">
-                            <div className="col-6">
+                            <div className="col-4">
+                                <div className="form-group">
+                                    <div>
+                                        <label className="text-warning"><small>GCS&nbsp;Img</small></label>
+                                        <button type="button" id="small_gcs"
+                                            title={this.state.m_gcsSmall ? 'GCS Image: Small' : 'GCS Image: Full'}
+                                            className={'btn btn-sm d-block w-100 ' + (this.state.m_gcsSmall ? 'btn-outline-danger' : 'btn-danger')}
+                                            style={{ height: 'calc(1.5em + 0.5rem + 2px)' }}
+                                            onClick={() => this.fn_toggleGcsSmall()}>
+                                            <i className={this.state.m_gcsSmall ? 'bi bi-image' : 'bi bi-image-fill'} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-4">
                                     <div className="form-group">
                                     <div>
-                                        <label htmlFor="txt_ShootingInterval" className="text-primary"><small>Each&nbsp;N&nbsp;sec</small></label>
-                                        <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"  ref={this.txt_ShootingInterval} />
+                                        <label htmlFor="txt_ShootingInterval" className="text-warning"><small>Each&nbsp;N&nbsp;sec</small></label>
+                                        <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"  ref={this.txt_ShootingInterval} defaultValue={1} />
                                     </div>
                                     </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-4">
                                     <div className="form-group">
                                         <div>
-                                        <label htmlFor="txt_TotalImages" className="text-primary"  ><small>Total&nbsp;Img</small></label>
-                                        <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm" ref={this.txt_TotalImages} />
+                                        <label htmlFor="txt_TotalImages" className="text-warning"  ><small>Total&nbsp;Img</small></label>
+                                        <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm" ref={this.txt_TotalImages} defaultValue={1} />
                                         </div>
                                     </div>
                             </div>
