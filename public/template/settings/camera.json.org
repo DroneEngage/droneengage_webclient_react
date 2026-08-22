@@ -42,7 +42,7 @@
                 "type": "text",
                 "defaultvalue": "8192",
                 "optional": true,
-                "desc": "UDP datagram payload size in bytes. If omitted, the default databus packet size is used."
+                "desc": "Sender-local UDP datagram payload size in bytes used to fragment outgoing messages. Does not need to match across modules; receivers accept any datagram up to 65507 bytes. Must be > 0 and < 65535. If omitted, auto-detect: 8192 for localhost, 1472 for remote (avoids IP fragmentation on standard Ethernet MTU)."
             },
             "use unix socket": {
                 "fieldName": "use_unix_socket",
