@@ -163,6 +163,7 @@ export function fn_applyRuntimeConfig(data) {
 
         if (data.CONST_WEBCONNECTOR_CONFIG !== undefined) CONST_WEBCONNECTOR_CONFIG = { ...CONST_WEBCONNECTOR_CONFIG, ...data.CONST_WEBCONNECTOR_CONFIG };
 
+        if (data.CONST_ANDRUAV_URL !== undefined) CONST_ANDRUAV_URL = data.CONST_ANDRUAV_URL;
         if (data.CONST_ANDRUAV_URL_ENABLE !== undefined) CONST_ANDRUAV_URL_ENABLE = data.CONST_ANDRUAV_URL_ENABLE;
         if (data.CONST_ACCOUNT_URL_ENABLE !== undefined) CONST_ACCOUNT_URL_ENABLE = data.CONST_ACCOUNT_URL_ENABLE;
 
