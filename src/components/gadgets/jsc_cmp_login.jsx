@@ -84,7 +84,7 @@ export default class ClssLoginControl extends React.Component {
         if (params && params.status === 'registered') {
             me.setState({
                 errorMessage: '',
-                successMessage: 'Connected successfully.',
+                successMessage: 'Connected Successfully',
             });
         }
     }
@@ -169,13 +169,13 @@ export default class ClssLoginControl extends React.Component {
                 <p className="bg-success txt-theme-aware text-center p-2"><strong>{login}</strong></p>
                 
                 {this.state.errorMessage && (
-                    <div className="alert alert-danger" role="alert">
+                    <div className="alert alert-danger text-center" role="alert">
                         {this.state.errorMessage} dsdsssd
                     </div>
                 )}
                 
                 {this.state.successMessage && (
-                    <div className="alert alert-success" role="alert">
+                    <div className="alert alert-success text-center" role="alert">
                         {this.state.successMessage}
                     </div>
                 )}

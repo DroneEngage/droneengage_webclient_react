@@ -65,7 +65,7 @@ class ClssLoginControl extends React.Component {
       me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
       me.state.username = me.txtUnitIDRef.current ? me.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
-      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected successfully.' });
+      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected Successfully' });
     } else {
       me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
       me.setState({ m_update: me.state.m_update + 1 });
@@ -567,12 +567,12 @@ class ClssLoginControl extends React.Component {
         <div className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1" style={{minWidth: '200px', maxWidth: '90vw'}}>
           <div id="login_form" className="card-body">
             {this.state.errorMessage && (
-              <div className="alert alert-danger py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+              <div className="alert alert-danger text-center py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
                 {this.state.errorMessage}
               </div>
             )}
             {this.state.successMessage && (
-              <div className="alert alert-success py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
+              <div className="alert alert-success text-center py-1 px-2 mb-2" role="alert" style={{ fontSize: '0.8rem' }}>
                 {this.state.successMessage}
               </div>
             )}
