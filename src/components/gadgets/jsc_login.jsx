@@ -579,7 +579,7 @@ class ClssLoginControl extends React.Component {
             {ctrls}
             <button
               id="btnConnect"
-              className={'btn button_large rounded-3 user-select-none w-100 ' + css + ' p-1'}
+              className={'btn btn-sm button_large rounded-3 user-select-none w-100 ' + css + ' p-1'}
               title={this.state.username}
               onClick={(e) => this.clickConnect(e)}
               ref={this.btnConnectRef}

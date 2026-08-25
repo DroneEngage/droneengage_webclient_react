@@ -242,12 +242,12 @@ export default class ClssLoginControl extends React.Component {
                         <div className="col mt-3">
                             <div className="row g-2">
                                 <div className="col-6">
-                                    <button id='login_btn' className="btn btn-primary w-100" onClick={(e) => this.fn_clickConnect(e)}>
+                                    <button id='login_btn' className="btn btn-sm btn-primary w-100" onClick={(e) => this.fn_clickConnect(e)}>
                                         <i className="bi bi-download"></i> AccessCode
                                     </button>
                                 </div>
                                 <div className="col-6">
-                                    <button id='regenerate_btn' className="btn btn-danger w-100" onClick={(e) => this.fn_clickRegenerate(e)}>
+                                    <button id='regenerate_btn' className="btn btn-sm btn-danger w-100" onClick={(e) => this.fn_clickRegenerate(e)}>
                                         <i className="bi bi-arrow-repeat"></i> Regenerate
                                     </button>
                                 </div>

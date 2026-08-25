@@ -171,9 +171,9 @@ class ClssCtrlUnitMainBar extends React.Component {
     let online_class;
     let online_class2;
     let online_text;
-    let camera_class = ' camera_inactive ';
-    let video_class = ' video_inactive ';
-    let recvideo_class = 'recvideo_inactive ';
+    let camera_class = ' bi bi-camera css_large_icon txt-theme-aware ';
+    let video_class = ' bi bi-camera-video css_large_icon txt-theme-aware ';
+    let recvideo_class = ' bi bi-record-circle css_large_icon txt-theme-aware ';
     let v_battery_display_fcb = this.hlp_getFCBBatteryCSSClass(v_andruavUnit);
     let v_battery_display = this.hlp_getBatteryCSSClass(v_andruavUnit);
     const id = v_andruavUnit.getPartyID() + '_c_u_m_b';
@@ -194,26 +194,26 @@ class ClssCtrlUnitMainBar extends React.Component {
         online_text = t('unitBar:online'); // "online"
       }
       if (v_andruavUnit.fn_canCamera() === true) {
-        camera_class = 'cursor_hand camera_active';
+        camera_class = 'bi bi-camera-fill css_large_icon cursor_hand text-success';
       } else {
-        camera_class = 'camera_inactive';
+        camera_class = 'bi bi-camera css_large_icon txt-theme-aware';
       }
       if (v_andruavUnit.m_Video.fn_getVideoStreaming() === js_andruavUnit.CONST_VIDEOSTREAMING_ON) {
         if (v_andruavUnit.fn_canVideo() === true) {
-          video_class = 'cursor_hand video_active';
+          video_class = 'bi bi-camera-video-fill css_large_icon cursor_hand text-danger';
         } else {
-          video_class = 'cursor_hand video_semi_active';
+          video_class = 'bi bi-camera-video-fill css_large_icon cursor_hand text-white';
         }
       } else {
         if (v_andruavUnit.fn_canVideo() === true) {
-          video_class = 'cursor_hand video_ready';
+          video_class = 'bi bi-camera-video-fill css_large_icon cursor_hand text-primary';
           if (v_andruavUnit.m_Video.VideoRecording === js_andruavUnit.CONST_VIDEORECORDING_ON) {
-            recvideo_class = 'cursor_hand css_recvideo_active';
+            recvideo_class = 'bi bi-record-circle-fill css_large_icon cursor_hand text-danger';
           } else {
-            recvideo_class = 'cursor_hand css_recvideo_ready';
+            recvideo_class = 'bi bi-record-circle-fill css_large_icon cursor_hand text-primary';
           }
         } else {
-          video_class = 'video_inactive';
+          video_class = 'bi bi-camera-video css_large_icon txt-theme-aware';
         }
       }
 
@@ -272,7 +272,7 @@ class ClssCtrlUnitMainBar extends React.Component {
     ) {
       if (v_andruavUnit.fn_getIsDE() !== true) {
         rows.push(
-          <div key={id + '__5'} className="col-1 padding_zero align-baseline">
+          <div key={id + '__5'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
             <img
               className={v_battery_display.css}
               src={v_battery_display.m_battery_src}
@@ -286,7 +286,7 @@ class ClssCtrlUnitMainBar extends React.Component {
         );
       }
       rows.push(
-        <div key={id + 'fc1'} className="col-1 padding_zero align-baseline">
+        <div key={id + 'fc1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <img
             className={v_battery_display_fcb.css}
             src={v_battery_display_fcb.m_battery_src}
@@ -301,13 +301,18 @@ class ClssCtrlUnitMainBar extends React.Component {
         </div>
       );
       rows.push(
-        <div key={id + 'fc2'} className="col-1 padding_zero align-self-baseline" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}></div>
+        <div key={id + 'fc2'} className="col-1 padding_zero d-flex align-items-center" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}></div>
       );
       rows.push(
-        <div key={id + 'fc3'} className="col-4 padding_zero text-end align-baseline" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}>
+        <div
+          key={id + 'fc3'}
+          className="col col-sm-4 padding_zero d-flex align-items-center justify-content-end text-end"
+          style={{ minWidth: 0 }}
+          onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}
+        >
           <p
             id="id"
-            className={'cursor_hand text-right ' + online_class2}
+            className={'cursor_hand text-right text-truncate w-100 mb-0 ' + online_class2}
             title={module_version}
             onClick={() => fn_changeUnitInfo(v_andruavUnit)}
           >
@@ -320,7 +325,7 @@ class ClssCtrlUnitMainBar extends React.Component {
     } else {
       if (v_andruavUnit.fn_getIsDE() !== true) {
         rows.push(
-          <div key={id + '__5'} className="col-1 padding_zero align-baseline">
+          <div key={id + '__5'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
             <img
               className={v_battery_display.css}
               src={v_battery_display.m_battery_src}
@@ -334,13 +339,18 @@ class ClssCtrlUnitMainBar extends React.Component {
         );
       }
       rows.push(
-        <div key={id + 'fc4'} className="col-2 padding_zero align-baseline" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}></div>
+        <div key={id + 'fc4'} className="col-2 padding_zero d-flex align-items-center" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}></div>
       );
       rows.push(
-        <div key={id + 'fc5'} className="col-4 padding_zero text-end align-baseline" onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}>
+        <div
+          key={id + 'fc5'}
+          className="col col-sm-4 padding_zero d-flex align-items-center justify-content-end text-end"
+          style={{ minWidth: 0 }}
+          onClick={() => fn_gotoUnit_byPartyID(v_andruavUnit)}
+        >
           <p
             id="id"
-            className={'cursor_hand text-right ' + online_class2}
+            className={'cursor_hand text-right text-truncate w-100 mb-0 ' + online_class2}
             title={module_version}
             onClick={() => fn_changeUnitInfo(v_andruavUnit)}
           >
@@ -353,17 +363,17 @@ class ClssCtrlUnitMainBar extends React.Component {
 
     return (
       <div key={id} className="row ms-1 padding_zero user-select-none">
-        <div key={id + '__1'} className="col-1 padding_zero d-flex align-self-baseline">
+        <div key={id + '__1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <ClssCtrlUnitIcon p_unit={v_andruavUnit} />
         </div>
-        <div key={id + '__2'} className="col-1 padding_zero d-none d-sm-flex align-self-baseline">
-          <img className={camera_class} title={t('unitBar:takePhoto')} onClick={() => this.fn_toggleCamera(v_andruavUnit)} />
+        <div key={id + '__2'} className="col-1 padding_zero d-none d-sm-flex justify-content-center align-items-center">
+          <i className={camera_class} title={t('unitBar:takePhoto')} onClick={() => this.fn_toggleCamera(v_andruavUnit)}></i>
         </div>
-        <div key={id + '__3'} className="col-1 padding_zero d-none d-sm-flex align-self-baseline">
-          <img className={video_class} title={t('unitBar:startLiveStream')} onClick={() => toggleVideo(v_andruavUnit)} />
+        <div key={id + '__3'} className="col-1 padding_zero d-none d-sm-flex justify-content-center align-items-center">
+          <i className={video_class} title={t('unitBar:startLiveStream')} onClick={() => toggleVideo(v_andruavUnit)}></i>
         </div>
-        <div key={id + '__4'} className="col-1 padding_zero d-none d-sm-flex align-self-baseline">
-          <img className={recvideo_class} title={t('unitBar:startRecordingOnDrone')} onClick={() => toggleRecrodingVideo(v_andruavUnit)} />
+        <div key={id + '__4'} className="col-1 padding_zero d-none d-sm-flex justify-content-center align-items-center">
+          <i className={recvideo_class} title={t('unitBar:startRecordingOnDrone')} onClick={() => toggleRecrodingVideo(v_andruavUnit)}></i>
         </div>
         {rows}
       </div>
