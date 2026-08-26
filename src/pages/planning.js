@@ -8,6 +8,11 @@ import '../css/css_header_responsive.css';
 import '../css/css_planning.css';
 import '../css/css_gamepad.css';
 
+import 'leaflet';              // side-effect: sets window.L. Must load before
+                               // leaflet.pm — the plugin extends leaflet's
+                               // global L, and with code splitting leaflet.pm
+                               // can otherwise evaluate before L exists
+                               // ("L is not defined").
 import 'leaflet.pm';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
@@ -34,10 +39,8 @@ const Planning = () => {
 	js_globals.CONST_MAP_EDITOR = true;
 
 	useEffect(() => {
-
 		fn_on_ready();
-	}
-	);
+	}, []);
 
 	return (
 		<div>
