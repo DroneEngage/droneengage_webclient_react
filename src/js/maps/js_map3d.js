@@ -9,6 +9,20 @@ class CAndruavMap3D {
         this.m_hasAutoFocusedUnit = false;
         this.m_mapDblClickCallbacks = [];
         this.m_isMapDblClickBound = false;
+
+        // ---- 3D tether line + ground circle + path trail ----
+        // - Path trail: elevated dotted line along the drone's flight path
+        // - Tether: solid vertical line from drone down to ground
+        // - Ground circle: circle on terrain marking drone's ground projection
+        // All use line-z-offset + line-elevation-reference:'sea' (>= v3.8).
+        this.m_tetherSources = new Map();  // unitId -> sourceId (vertical line)
+        this.m_tetherLayers = new Map();   // unitId -> layerId
+        this.m_groundSources = new Map();  // unitId -> sourceId (ground circle)
+        this.m_groundLayers = new Map();   // unitId -> layerId
+        this.m_pathSources = new Map();    // unitId -> sourceId (path trail)
+        this.m_pathLayers = new Map();     // unitId -> layerId
+        this.m_pathData = new Map();       // unitId -> { coords, elevations }
+        this.m_tetherColors = ['#F5D29A', '#32CD32', '#FF1493', '#00CED1'];
     }
 
     /**
@@ -103,7 +117,7 @@ class CAndruavMap3D {
             const link = document.createElement('link');
             link.id = id;
             link.rel = 'stylesheet';
-            link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css';
+            link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.css';
             document.head.appendChild(link);
         };
 
@@ -119,7 +133,7 @@ class CAndruavMap3D {
 
             const script = document.createElement('script');
             script.id = id;
-            script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js';
+            script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.js';
             script.async = true;
             script.onload = () => resolve();
             script.onerror = () => reject(new Error('Failed to load Mapbox GL JS'));
@@ -195,7 +209,7 @@ class CAndruavMap3D {
                 });
             }
 
-            // Enable terrain (required for marker altitude to be visible)
+            // Enable terrain (required for marker altitude + path dots to be visible)
             this.m_map.setTerrain({
                 source: 'mapbox-dem',
                 exaggeration: 1.3  // Adjust for visual impact (1.0 = natural, 1.5+ = dramatic)
@@ -306,16 +320,22 @@ class CAndruavMap3D {
     }
 
     /**
-     * Syncs unit position, rotation (yaw), and icon.
-     * Note: Mapbox GL JS v3.9.4 LngLat.convert silently ignores the third
-     * array element (altitude). Markers are auto-draped on terrain by the
-     * map when setTerrain() is enabled, so [lng, lat] is sufficient.
+     * Syncs unit position, altitude, rotation (yaw), and icon.
+     * Altitude is applied via Marker#setAltitude (meters above the map surface
+     * when terrain is enabled) — LngLat itself only carries lng/lat, so the
+     * third array element is intentionally not used. With terrain on, the
+     * marker floats `alt_relative` meters above the ground, giving a true 3D
+     * "flying" representation.
      */
     fn_syncUnit(unit, markerIconUrl = null) {
         if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
 
         const { lat, lng } = unit.m_Nav_Info.p_Location;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        // Relative altitude (meters above launch/home) — used as the height
+        // above the terrain surface so the drone appears to fly in 3D.
+        const altRelative = unit.m_Nav_Info.p_Location.alt_relative;
 
         const id = unit.getPartyID();
         let marker = this.m_markers.get(id);
@@ -339,10 +359,9 @@ class CAndruavMap3D {
 
             marker = new window.mapboxgl.Marker({
                 element: el,
+                // Billboarded (always faces camera) for readability + click/hover.
+                // rotationAlignment:'map' keeps the icon spinning with map bearing.
                 rotationAlignment: 'map',
-                // 'viewport' keeps the icon billboarded toward the camera (like the 2D
-                // Leaflet map) instead of laid flat on the terrain, which at typical
-                // camera pitch angles foreshortens small icons into near-invisible slivers.
                 pitchAlignment: 'viewport',
                 anchor: 'center'
             })
@@ -354,6 +373,12 @@ class CAndruavMap3D {
             if (typeof marker.setPitchAlignment === 'function') marker.setPitchAlignment('viewport');
         } else {
             marker.setLngLat([lng, lat]);
+        }
+
+        // Apply altitude so the drone floats above the 3D terrain.
+        // setAltitude() is meters above the map surface when terrain is on.
+        if (Number.isFinite(altRelative) && typeof marker.setAltitude === 'function') {
+            marker.setAltitude(altRelative);
         }
 
         this.m_markers.set(id, marker);
@@ -382,7 +407,315 @@ class CAndruavMap3D {
             }
         }
 
+        // Update the 3D tether line (vertical line from drone down to ground).
+        this.fn_syncTether(unit, lat, lng, altRelative);
+
         return marker;
+    }
+
+    // ====================================================================
+    //  3D tether line (drone → ground)
+    //  A vertical line from the drone's 3D position straight down to the
+    //  terrain surface below it. Updated on every fn_syncUnit so it's always
+    //  visible — even when the drone is stationary on the ground.
+    //  Uses line-z-offset + line-elevation-reference:'sea' (>= v3.8).
+    // ====================================================================
+
+    /**
+     * Returns the tether color for a unit based on its index.
+     */
+    fn_getTetherColor(unit) {
+        const idx = unit?.m_index ?? 0;
+        return this.m_tetherColors[idx % this.m_tetherColors.length];
+    }
+
+    /**
+     * Ensures a GeoJSON source + elevated line layer exist for a unit's tether,
+     * plus a ground circle source + layer. Called on first fn_syncTether.
+     */
+    fn_ensureTetherLayer(unit) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_tetherSources.has(id)) return;
+
+        const sourceId = `de-tether-${id}`;
+        const layerId = `de-tether-layer-${id}`;
+        const groundSourceId = `de-ground-${id}`;
+        const groundLayerId = `de-ground-layer-${id}`;
+        const color = this.fn_getTetherColor(unit);
+
+        // --- Vertical tether line (drone → ground) ---
+        // lineMetrics:true is required for line-progress / line-z-offset.
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            lineMetrics: true,
+            data: {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[0, 0], [0, 0]]
+                },
+                properties: { elevation: [0, 0] }
+            }
+        });
+
+        // Solid elevated line: line-z-offset interpolates per-vertex elevation
+        // from the 'elevation' property array using line-progress (0..1).
+        // vertex 0 = ground (terrainElev), vertex 1 = drone (terrainElev + alt).
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': [
+                    'at-interpolated',
+                    ['line-progress'],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': 2,
+                'line-opacity': 0.8
+            }
+        });
+
+        this.m_tetherSources.set(id, sourceId);
+        this.m_tetherLayers.set(id, layerId);
+
+        // --- Ground circle (drone's ground projection) ---
+        // A circle layer at [lng, lat] with no elevation — drapes on the
+        // terrain surface, marking where the drone is directly above.
+        this.m_map.addSource(groundSourceId, {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {}
+            }
+        });
+
+        this.m_map.addLayer({
+            id: groundLayerId,
+            type: 'circle',
+            source: groundSourceId,
+            paint: {
+                'circle-radius': 8,
+                'circle-color': color,
+                'circle-opacity': 0.4,
+                'circle-stroke-width': 2,
+                'circle-stroke-color': color,
+                'circle-stroke-opacity': 0.9,
+                'circle-pitch-scale': 'map'
+            }
+        });
+
+        this.m_groundSources.set(id, groundSourceId);
+        this.m_groundLayers.set(id, groundLayerId);
+    }
+
+    /**
+     * Updates the tether line + ground circle for a unit.
+     * Called from fn_syncUnit on every telemetry update.
+     */
+    fn_syncTether(unit, lat, lng, altRelative) {
+        if (!this.m_map || !this.m_isReady) return;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const id = unit.getPartyID();
+        this.fn_ensureTetherLayer(unit);
+
+        // Terrain elevation at the drone's position (meters above sea level).
+        const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
+            ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
+            : 0;
+        const droneAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
+
+        // --- Update vertical tether line ---
+        const sourceId = this.m_tetherSources.get(id);
+        const source = this.m_map?.getSource(sourceId);
+        if (source) {
+            source.setData({
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[lng, lat], [lng, lat]]
+                },
+                properties: {
+                    elevation: [terrainElev, droneAlt]
+                }
+            });
+        }
+
+        // --- Update ground circle position ---
+        const groundSourceId = this.m_groundSources.get(id);
+        const groundSource = this.m_map?.getSource(groundSourceId);
+        if (groundSource) {
+            groundSource.setData({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [lng, lat]
+                },
+                properties: {}
+            });
+        }
+    }
+
+    // ====================================================================
+    //  3D path trail (elevated dotted line along the flight path)
+    // ====================================================================
+
+    /**
+     * Ensures a GeoJSON source + elevated line layer exist for a unit's path trail.
+     */
+    fn_ensurePathTrailLayer(unit) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_pathSources.has(id)) return;
+
+        const sourceId = `de-trail-${id}`;
+        const layerId = `de-trail-layer-${id}`;
+        const color = this.fn_getTetherColor(unit);
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            lineMetrics: true,
+            data: {
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                properties: { elevation: [0, 0] }
+            }
+        });
+
+        // Dotted elevated trail: line-z-offset lifts it to drone altitude,
+        // line-dasharray creates dot-like segments.
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': [
+                    'at-interpolated',
+                    ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': 5,
+                'line-opacity': 0.85,
+                'line-dasharray': [0.1, 3]
+            }
+        });
+
+        this.m_pathSources.set(id, sourceId);
+        this.m_pathLayers.set(id, layerId);
+        this.m_pathData.set(id, { coords: [], elevations: [] });
+    }
+
+    /**
+     * Adds a point to the unit's 3D flight path trail.
+     * Called from js_main.js when the drone has moved > 10m.
+     */
+    fn_DrawPath(unit, lat, lng, altRelative) {
+        if (!this.m_map || !this.m_isReady) return null;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+        const id = unit.getPartyID();
+        this.fn_ensurePathTrailLayer(unit);
+
+        const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
+            ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
+            : 0;
+        const absAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
+
+        const data = this.m_pathData.get(id);
+        if (!data) return null;
+
+        data.coords.push([lng, lat]);
+        data.elevations.push(absAlt);
+
+        const sourceId = this.m_pathSources.get(id);
+        const source = this.m_map.getSource(sourceId);
+        if (!source) return null;
+
+        source.setData({
+            type: 'Feature',
+            geometry: { type: 'LineString', coordinates: data.coords },
+            properties: { elevation: data.elevations }
+        });
+
+        return { sourceId, index: data.coords.length - 1 };
+    }
+
+    /**
+     * Flushes (clears) the tether + ground circle + path trail for a unit.
+     * Called when a unit is re-created.
+     */
+    fn_flushPath(unit) {
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        // Clear tether line
+        const sourceId = this.m_tetherSources.get(id);
+        if (sourceId) {
+            const source = this.m_map?.getSource(sourceId);
+            if (source) {
+                source.setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                    properties: { elevation: [0, 0] }
+                });
+            }
+        }
+
+        // Clear ground circle
+        const groundSourceId = this.m_groundSources.get(id);
+        if (groundSourceId) {
+            const groundSource = this.m_map?.getSource(groundSourceId);
+            if (groundSource) {
+                groundSource.setData({
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [0, 0] },
+                    properties: {}
+                });
+            }
+        }
+
+        // Clear path trail
+        const trailSourceId = this.m_pathSources.get(id);
+        if (trailSourceId) {
+            const trailSource = this.m_map?.getSource(trailSourceId);
+            if (trailSource) {
+                trailSource.setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                    properties: { elevation: [0, 0] }
+                });
+            }
+        }
+        const data = this.m_pathData.get(id);
+        if (data) {
+            data.coords = [];
+            data.elevations = [];
+        }
+    }
+
+    /**
+     * Compatibility stub for the circular buffer callback.
+     */
+    fn_hideItem(item) {
+        // No-op
     }
 
     /**

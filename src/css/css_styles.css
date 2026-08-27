@@ -1416,8 +1416,8 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
  }
 
 .css_map3d_marker {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1425,8 +1425,8 @@ button.btn-outline-theme-aware:not(.hidden):disabled,
 }
 
 .css_map3d_marker_icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

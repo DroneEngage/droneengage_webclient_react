@@ -2404,6 +2404,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 		if (marker === null || marker === undefined) {
 			// create a buffer for flight path
 			p_andruavUnit.m_gui.m_gui_flightPath.fn_flush();
+			js_map3d.fn_flushPath(p_andruavUnit);
 			p_andruavUnit.m_gui.m_flightPath_style = {
 				color: js_globals.flightPath_colors[p_andruavUnit.m_index % 4],
 				opacity: 0.8,
@@ -2490,6 +2491,14 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 
 					p_andruavUnit.m_Nav_Info.m_FlightPath.push(v_flightPath);
+					// 3D map: plot a dot at the drone's 3D position (lng, lat, alt)
+					// so the trajectory is visible as a 3D trail above the terrain.
+					js_map3d.fn_DrawPath(
+						p_andruavUnit,
+						p_andruavUnit.m_Nav_Info.p_Location.lat,
+						p_andruavUnit.m_Nav_Info.p_Location.lng,
+						p_andruavUnit.m_Nav_Info.p_Location.alt_relative);
+
 					p_andruavUnit.m_Nav_Info.p_Location.oldlat = p_andruavUnit.m_Nav_Info.p_Location.lat;
 					p_andruavUnit.m_Nav_Info.p_Location.oldlng = p_andruavUnit.m_Nav_Info.p_Location.lng;
 					p_andruavUnit.m_Nav_Info.p_Location.oldalt = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
