@@ -1,15 +1,24 @@
 /**
  * Remote Telnet/Terminal control for DroneEngage units.
  *
- * Provides a simple terminal interface that:
+ * Simple line-mode terminal interface that:
  *  - Opens a shell session on the unit's de_telnet module.
- *  - Sends keystrokes as TELNET_DATA messages.
- *  - Renders pty output received as TELNET_DATA (binary) events.
+ *  - Sends a whole command line as a single TELNET_DATA message
+ *    (text + CR) via the input box / Send button / Enter key.
+ *  - Provides toolbar buttons for Ctrl+C / Ctrl+Z / Backspace / Delete
+ *    that send the corresponding raw byte(s) directly to the pty
+ *    (useful to interrupt/suspend a running command or edit output
+ *    without typing a full line).
+ *  - Renders pty output received as TELNET_DATA (binary) events with
+ *    ANSI color support.
  *  - Handles session open/close/resize/status via TELNET_STATUS events.
  *
- * No external terminal library (xterm.js) is used — the output is
- * rendered in a scrollable <pre> and input is a text line + send button.
- * This keeps the webclient dependency-free and consistent with the
+ * The output <pre> is read-only display only — there is no character-
+ * mode keystroke forwarding or cursor emulation. This keeps the model
+ * simple and predictable, at the cost of not supporting raw-mode
+ * full-screen apps (vim, nano, top, ...).
+ *
+ * No external terminal library (xterm.js) is used, consistent with the
  * existing gadget components.
  *
  * @auth: Devin / DroneEngage
@@ -20,6 +29,7 @@ import { js_globals } from '../../../js/js_globals.js';
 import { EVENTS as js_event } from '../../../js/js_eventList.js'
 import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
+import { ansiToReact } from './js_ansi_parser.js'
 
 export class ClssCtrlTelnet extends React.Component {
 
@@ -38,8 +48,8 @@ export class ClssCtrlTelnet extends React.Component {
         this.m_outputBuffer = '';
         this.m_maxOutputLines = 500;
 
-        this.m_inputRef = React.createRef();
         this.m_outputRef = React.createRef();
+        this.m_inputRef = React.createRef();
 
         js_eventEmitter.fn_subscribe(js_event.EE_unitTelnetStatus, this, this.fn_onTelnetStatus);
         js_eventEmitter.fn_subscribe(js_event.EE_unitTelnetData, this, this.fn_onTelnetData);
@@ -161,37 +171,34 @@ export class ClssCtrlTelnet extends React.Component {
     }
 
     /**
-     * Send the text from the input line to the pty.
-     * Appends a newline so the shell executes the command.
+     * Send a raw string (one or more bytes) to the remote pty.
      */
-    fn_sendInput() {
+    fn_sendToPty(data) {
+        if (!this.state.m_connected || !this.state.m_session_id) return;
+        js_globals.v_andruavFacade.API_telnetData(this.props.p_unit, this.state.m_session_id, data);
+    }
+
+    /**
+     * Send the text from the input line to the pty as a single message
+     * (text + CR), so the shell executes it. One round-trip per command.
+     */
+    fn_sendCommand() {
         if (!this.state.m_connected || !this.state.m_session_id) return;
         const text = this.m_inputRef.current ? this.m_inputRef.current.value : '';
-        if (!text) return;
-        // Echo the command locally so the user sees what they typed.
-        this.fn_appendOutput(text + '\n');
-        // Send text + newline to the shell.
-        js_globals.v_andruavFacade.API_telnetData(this.props.p_unit, this.state.m_session_id, text + '\n');
+        this.fn_sendToPty(text + '\r');
         if (this.m_inputRef.current) {
             this.m_inputRef.current.value = '';
         }
     }
 
     /**
-     * Handle keydown in the input field — Enter sends, Ctrl+C sends interrupt.
+     * Toolbar control-button handlers — each sends the corresponding
+     * raw terminal byte sequence to the pty.
      */
-    fn_handleKeyDown(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            this.fn_sendInput();
-        } else if (e.key === 'c' && e.ctrlKey) {
-            e.preventDefault();
-            if (this.state.m_connected && this.state.m_session_id) {
-                js_globals.v_andruavFacade.API_telnetData(this.props.p_unit, this.state.m_session_id, '\x03');
-                this.fn_appendOutput('^C\n');
-            }
-        }
-    }
+    fn_btnCtrlC() { this.fn_sendToPty('\x03'); }       // ETX - interrupt
+    fn_btnCtrlZ() { this.fn_sendToPty('\x1a'); }       // SUB - suspend
+    fn_btnBackspace() { this.fn_sendToPty('\x7f'); }   // DEL - backspace
+    fn_btnDelete() { this.fn_sendToPty('\x1b[3~'); }   // Delete key sequence
 
     /**
      * Clear the terminal output.
@@ -199,6 +206,24 @@ export class ClssCtrlTelnet extends React.Component {
     fn_clearOutput() {
         this.m_outputBuffer = '';
         this.setState({ m_output: '' });
+    }
+
+    /**
+     * Export the terminal output buffer as a downloadable .txt file
+     * (raw text, ANSI escape codes included as-is).
+     */
+    fn_exportOutput() {
+        const v_andruavUnit = this.props.p_unit;
+        const blob = new Blob([this.m_outputBuffer], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        a.href = url;
+        a.download = `telnet_${v_andruavUnit.getPartyID()}_${stamp}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     render() {
@@ -209,8 +234,8 @@ export class ClssCtrlTelnet extends React.Component {
 
         return (
             <div id={id} key={id} className="ms-1">
-                {/* Toolbar: connect / disconnect / clear */}
-                <div className="d-flex align-items-center gap-2 mb-1">
+                {/* Toolbar: connect / disconnect / clear + control buttons */}
+                <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
                     {!isConnected ? (
                         <button className="btn btn-sm btn-success" onClick={() => this.fn_openSession()}>
                             <i className="bi bi-terminal" /> Connect
@@ -223,6 +248,38 @@ export class ClssCtrlTelnet extends React.Component {
                     <button className="btn btn-sm btn-secondary" onClick={() => this.fn_clearOutput()} title="Clear screen">
                         <i className="bi bi-eraser" /> Clear
                     </button>
+                    <button className="btn btn-sm btn-secondary" onClick={() => this.fn_exportOutput()} title="Export terminal output as text file">
+                        <i className="bi bi-download" /> Export
+                    </button>
+
+                    {isConnected && (
+                        <>
+                            <div className="vr" />
+                            <button className="btn btn-sm btn-outline-warning"
+                                onClick={() => this.fn_btnCtrlC()}
+                                title="Send Ctrl+C (interrupt)"
+                                style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                Ⓒ
+                            </button>
+                            <button className="btn btn-sm btn-outline-warning"
+                                onClick={() => this.fn_btnCtrlZ()}
+                                title="Send Ctrl+Z (suspend)"
+                                style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                Ⓩ
+                            </button>
+                            <button className="btn btn-sm btn-outline-secondary"
+                                onClick={() => this.fn_btnBackspace()}
+                                title="Send Backspace (DEL)">
+                                <i className="bi bi-backspace" />
+                            </button>
+                            <button className="btn btn-sm btn-outline-secondary"
+                                onClick={() => this.fn_btnDelete()}
+                                title="Send Delete key">
+                                <i className="bi bi-x-circle" />
+                            </button>
+                        </>
+                    )}
+
                     {isConnected && (
                         <span className="badge bg-success">Session: {this.state.m_session_id}</span>
                     )}
@@ -231,7 +288,7 @@ export class ClssCtrlTelnet extends React.Component {
                     )}
                 </div>
 
-                {/* Terminal output area */}
+                {/* Terminal output area — read-only display */}
                 <pre
                     ref={this.m_outputRef}
                     className="bg-black text-light rounded p-2 m-0"
@@ -242,12 +299,12 @@ export class ClssCtrlTelnet extends React.Component {
                         fontFamily: 'monospace',
                         whiteSpace: 'pre-wrap',
                         wordBreak: 'break-all',
-                        cursor: 'text',
                     }}
-                    onClick={() => { if (this.m_inputRef.current) this.m_inputRef.current.focus(); }}
-                >{this.state.m_output || (isConnected ? '' : 'Click "Connect" to open a remote shell session.')}</pre>
+                >{this.state.m_output
+                    ? ansiToReact(this.state.m_output)
+                    : (isConnected ? '' : 'Click "Connect" to open a remote shell session.')}</pre>
 
-                {/* Input line */}
+                {/* Input line — sends a whole command in one message */}
                 <div className="d-flex align-items-center gap-1 mt-1">
                     <span className="text-success fw-bold" style={{ fontFamily: 'monospace', fontSize: '13px' }}>$</span>
                     <input
@@ -257,7 +314,10 @@ export class ClssCtrlTelnet extends React.Component {
                         style={{ fontFamily: 'monospace', fontSize: '13px' }}
                         placeholder={isConnected ? "Type a command and press Enter..." : "Connect first"}
                         disabled={!isConnected}
-                        onKeyDown={(e) => { e.stopPropagation(); this.fn_handleKeyDown(e); }}
+                        onKeyDown={(e) => {
+                            e.stopPropagation();
+                            if (e.key === 'Enter') { e.preventDefault(); this.fn_sendCommand(); }
+                        }}
                         onKeyUp={(e) => e.stopPropagation()}
                         autoComplete="off"
                         spellCheck="false"
@@ -265,7 +325,7 @@ export class ClssCtrlTelnet extends React.Component {
                     <button
                         className="btn btn-sm btn-primary"
                         disabled={!isConnected}
-                        onClick={() => this.fn_sendInput()}
+                        onClick={() => this.fn_sendCommand()}
                     >Send</button>
                 </div>
             </div>

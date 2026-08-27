@@ -57,17 +57,19 @@ export const ThemeProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Initialize theme on mount only
+    // Initialize theme on mount only. Always call switchTheme (even for
+    // 'default') so that the theme system is the sole loader of bootstrap
+    // CSS — page-level `import '../css/bootstrap.min.css'` statements were
+    // removed to avoid a race where the page chunk's default bootstrap CSS
+    // is injected after the themed CSS and overrides it.
     const initializeTheme = async () => {
-      if (currentTheme !== 'default') {
-        try {
-          await themeUtils.switchTheme(currentTheme);
-        } catch (error) {
-          console.warn('Failed to initialize theme:', error);
-        }
+      try {
+        await themeUtils.switchTheme(currentTheme);
+      } catch (error) {
+        console.warn('Failed to initialize theme:', error);
       }
     };
-    
+
     initializeTheme();
   }, []); // Only run on mount
 
