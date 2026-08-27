@@ -1,6 +1,5 @@
 import React , { useEffect } from 'react';
 
-import '../css/bootstrap.min.css';  // my theme
 import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';

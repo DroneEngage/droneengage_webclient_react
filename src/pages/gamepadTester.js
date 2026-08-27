@@ -1,4 +1,3 @@
-import '../css/bootstrap.min.css'; 
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';

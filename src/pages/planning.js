@@ -1,4 +1,3 @@
-import '../css/bootstrap.min.css';  // my theme
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.pm/dist/leaflet.pm.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
