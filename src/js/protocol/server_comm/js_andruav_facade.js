@@ -273,6 +273,39 @@ class CAndruavClientFacade {
     }
 
 
+    // ---- TELNET ----
+
+    API_telnetOpen(p_andruavUnit, p_shell) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_telnetOpen(p_andruavUnit, p_shell);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_telnetClose(p_andruavUnit, p_session_id) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_telnetClose(p_andruavUnit, p_session_id);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_telnetList(p_andruavUnit) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_telnetList(p_andruavUnit);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_telnetResize(p_andruavUnit, p_session_id, p_cols, p_rows) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_telnetResize(p_andruavUnit, p_session_id, p_cols, p_rows);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+    API_telnetData(p_andruavUnit, p_session_id, p_text) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+        const cmd = CCommandAPI.API_telnetData(p_andruavUnit, p_session_id, p_text);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
+
     API_scanP2P(p_andruavUnit) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
 

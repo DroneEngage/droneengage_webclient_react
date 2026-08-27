@@ -957,6 +957,8 @@ class C_Modules {
     this.has_ai_recognition_alive = false;
     this.has_viewlink = false;
     this.has_viewlink_alive = false;
+    this.has_telnet = false;
+    this.has_telnet_alive = false;
 
     this.m_old_version = false;
 
@@ -1107,7 +1109,15 @@ class C_Modules {
           module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.vlk;
           old_module = old_module || (module.z == -1);
           break;
-          
+
+        case js_andruavMessages.TYPE_MODULE_CLASS_TELNET:
+          this.has_telnet = true;
+          this.has_telnet_alive = module.d === false;
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.tel ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.tel.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.tel;
+          old_module = old_module || (module.z == -1);
+          break;
+
         default:
           console.warn(`Unknown module class: ${module.c}`);
           break;

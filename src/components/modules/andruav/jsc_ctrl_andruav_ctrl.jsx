@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { js_globals } from '../../js/js_globals';
-import { EVENTS as js_event } from '../../js/js_eventList.js'
-import { js_eventEmitter } from '../../js/js_eventEmitter'
-import { js_localStorage } from '../../js/js_localStorage'
+import { js_globals } from '../../../js/js_globals.js';
+import { EVENTS as js_event } from '../../../js/js_eventList.js'
+import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
+import { js_localStorage } from '../../../js/js_localStorage.js'
 
 export class ClssCtrlAndruavCtrl extends React.Component {
 

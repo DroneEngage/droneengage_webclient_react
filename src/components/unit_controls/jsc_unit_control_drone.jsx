@@ -28,7 +28,8 @@ import { ClssCtrlExperimental } from '../modules/experimental/jsc_ctrl_experimen
 import { ClssCtrlArdupilotFlightController } from '../flight_controllers/jsc_ctrl_ardupilot_flightControl.jsx'
 import { ClssCtrlPx4FlightControl } from '../flight_controllers/jsc_ctrl_px4_flightControl.jsx'
 import { ClssCtrlAUDIO } from '../gadgets/jsc_ctrl_audio.jsx'
-import { ClssCtrlAndruavCtrl } from '../gadgets/jsc_ctrl_andruav_ctrl.jsx'
+import { ClssCtrlTelnet } from '../modules/telnet/jsc_ctrl_telnet.jsx'
+import { ClssCtrlAndruavCtrl } from '../modules/andruav/jsc_ctrl_andruav_ctrl.jsx'
 import ClssCtrlDroneIMU from './jsc_unit_control_imu.jsx'
 import { ClssAndruavUnitBase } from './jsc_unit_control_base.jsx'
 import ClssCtrlUnitMainBar from './jsc_ctrl_unit_main_bar.jsx'
@@ -285,6 +286,15 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             </li>);
         }
 
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_TELNET != null)
+            && (js_siteConfig.CONST_FEATURE.DISABLE_TELNET === false)
+            && (this.state.tab_module === true)
+            && (v_andruavUnit.m_modules.has_telnet === true)) {
+            container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li7tel'} className="nav-item">
+                <a className="nav-link user-select-none bi bi-terminal txt-theme-aware " data-bs-toggle="tab" href={"#telnet" + v_andruavUnit.getPartyID()} title='Telnet'></a>
+            </li>);
+        }
+
         if (v_andruavUnit.fn_isAndruav() === true) {
             container_tabs.push(<li key={v_andruavUnit.getPartyID() + 'li6ctrl'} className="nav-item">
                 <a className="nav-link user-select-none bi bi-sliders txt-theme-aware " data-bs-toggle="tab" href={"#andruavctrl" + v_andruavUnit.getPartyID()} title='Andruav Ctrl'></a>
@@ -362,6 +372,12 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         {
             container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlAUDIO'} className="tab-pane fade pt-2" id={"audio" + v_andruavUnit.getPartyID()}>
                 <ClssCtrlAUDIO p_unit={v_andruavUnit} />
+            </div>);
+        }
+
+        if ((js_siteConfig.CONST_FEATURE.DISABLE_TELNET === false) && (this.state.tab_module === true) && (v_andruavUnit.m_modules.has_telnet === true)) {
+            container_controls.push(<div key={v_andruavUnit.getPartyID() + 'myTabClssCtrlTELNET'} className="tab-pane fade pt-2" id={"telnet" + v_andruavUnit.getPartyID()}>
+                <ClssCtrlTelnet p_unit={v_andruavUnit} />
             </div>);
         }
 

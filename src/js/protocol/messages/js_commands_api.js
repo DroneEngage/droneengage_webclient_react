@@ -860,5 +860,85 @@ export class CCommandAPI {
         return msg;
     }
 
+
+    // ---- TELNET ----
+
+    static API_telnetOpen(p_andruavUnit, p_shell) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        let p_msg = {
+            a: js_andruavMessages.CONST_TELNET_ACTION_OPEN,
+        };
+        if (p_shell) p_msg.sh = p_shell;
+
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_ACTION,
+            'ms': p_msg
+        };
+        return msg;
+    }
+
+    static API_telnetClose(p_andruavUnit, p_session_id) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        const p_msg = {
+            a: js_andruavMessages.CONST_TELNET_ACTION_CLOSE,
+            i: p_session_id,
+        };
+
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_ACTION,
+            'ms': p_msg
+        };
+        return msg;
+    }
+
+    static API_telnetList(p_andruavUnit) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        const p_msg = {
+            a: js_andruavMessages.CONST_TELNET_ACTION_LIST,
+        };
+
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_ACTION,
+            'ms': p_msg
+        };
+        return msg;
+    }
+
+    static API_telnetResize(p_andruavUnit, p_session_id, p_cols, p_rows) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        const p_msg = {
+            a: js_andruavMessages.CONST_TELNET_ACTION_RESIZE,
+            i: p_session_id,
+            c: p_cols,
+            r: p_rows,
+        };
+
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_ACTION,
+            'ms': p_msg
+        };
+        return msg;
+    }
+
+    static API_telnetData(p_andruavUnit, p_session_id, p_text) {
+        if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
+
+        const p_msg = {
+            a: js_andruavMessages.CONST_TELNET_ACTION_DATA,
+            i: p_session_id,
+            d: p_text,
+        };
+
+        const msg = {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_DATA,
+            'ms': p_msg
+        };
+        return msg;
+    }
+
 }
 

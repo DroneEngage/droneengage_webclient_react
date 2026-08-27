@@ -111,7 +111,8 @@ export let CONST_FEATURE = {
     DISABLE_EXPERIMENTAL: true,
     DISABLE_DE_PILOT: true,
     DISABLE_3D_MAP: false,
-    DISABLE_VERSION_NOTIFICATION: false
+    DISABLE_VERSION_NOTIFICATION: false,
+    DISABLE_TELNET: false
 };
 
 /**

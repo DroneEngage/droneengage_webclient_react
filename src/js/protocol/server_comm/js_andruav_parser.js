@@ -925,6 +925,15 @@ class CAndruavClientParser {
             }
                 break;
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_STATUS: {
+                p_jmsg = msg.msgPayload;
+                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) {
+                    p_jmsg = JSON.parse(msg.msgPayload);
+                }
+                js_eventEmitter.fn_dispatch(js_event.EE_unitTelnetStatus, { unit: p_unit, msg: p_jmsg });
+            }
+                break;
+
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Signaling: {
 
@@ -1745,6 +1754,20 @@ class CAndruavClientParser {
 
 
         switch (andruavCMD.mt) {
+
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_DATA: {
+                // Binary pty output from the de_telnet module.
+                // andruavCMD.ms contains {a, i} where i is the session_id.
+                // The bytes after the JSON header are the raw terminal output.
+                const binaryPayload = data.buffer.slice(v_internalCommandIndexByteBased);
+                const textPayload = new TextDecoder().decode(binaryPayload);
+                js_eventEmitter.fn_dispatch(js_event.EE_unitTelnetData, {
+                    unit: v_unit,
+                    session_id: andruavCMD.ms ? andruavCMD.ms.i : '',
+                    data: textPayload
+                });
+            }
+                break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_SPECTRUM: {
                 // Extract the float data

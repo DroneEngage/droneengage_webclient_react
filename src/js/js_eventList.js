@@ -134,6 +134,8 @@ const EVENT_LIST = Object.freeze({
 			"EE_Opacity_Control",
 
 			"EE_WebConnector_Not_Running",
+		"EE_unitTelnetStatus",
+		"EE_unitTelnetData",
 		"EE_Mission_Loaded",
 		"EE_Mission_Saved",
 		"EE_Mission_Deleted",

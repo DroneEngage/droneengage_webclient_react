@@ -170,7 +170,6 @@ export const CONST_TYPE_AndruavMessage_Set_Communication_Line = 6509;
 export const CONST_TYPE_AndruavMessage_Communication_Line_Status = 6510;
 export const CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH = 6511;
 export const CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE = 6512;
-export const CONST_TYPE_AndruavMessage_SOUND_LIST = 6530;
 
 export const CONST_TYPE_AndruavMessage_SDR_TRIGGER = 6513;
 export const CONST_TYPE_AndruavMessage_SDR_ACTION = 6514;
@@ -198,6 +197,32 @@ export const CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE = 6524;
 
 export const CONST_TYPE_AndruavMessage_CONFIG_ACTION = 6525;
 export const CONST_TYPE_AndruavMessage_CONFIG_STATUS = 6526;
+
+export const CONST_TYPE_AndruavMessage_MAVLINK_EVENTS = 6527;
+export const CONST_TYPE_AndruavMessage_IR_CAMERA_MI48_ACTION = 6528;
+export const CONST_TYPE_AndruavMessage_IR_CAMERA_MI48_STATUS = 6529;
+export const CONST_TYPE_AndruavMessage_SOUND_LIST = 6530;
+
+// Remote Telnet/Terminal messages (de_telnet module)
+export const CONST_TYPE_AndruavMessage_TELNET_ACTION = 6531;
+export const CONST_TYPE_AndruavMessage_TELNET_STATUS = 6532;
+export const CONST_TYPE_AndruavMessage_TELNET_DATA = 6533;
+export const CONST_TYPE_AndruavMessage_TELNET_REMOTE_EXECUTE = 6534;
+
+// TELNET_ACTION sub-codes
+export const CONST_TELNET_ACTION_OPEN = 0;
+export const CONST_TELNET_ACTION_CLOSE = 1;
+export const CONST_TELNET_ACTION_LIST = 2;
+export const CONST_TELNET_ACTION_RESIZE = 3;
+export const CONST_TELNET_ACTION_DATA = 4;
+
+// TELNET_STATUS sub-codes
+export const CONST_TELNET_STATUS_OPENED = 0;
+export const CONST_TELNET_STATUS_CLOSED = 1;
+export const CONST_TELNET_STATUS_DATA = 2;
+export const CONST_TELNET_STATUS_LIST = 3;
+export const CONST_TELNET_STATUS_ERROR = 4;
+export const CONST_TELNET_STATUS_RESIZED = 5;
 
 
 // System Messages
@@ -599,8 +624,15 @@ export const message_names = {
   6510: "Comm Line Status - 6510",
   6511: "Text to Speech - 6511",
   6512: "Play Sound File - 6512",
-  6530: "Sound List - 6530",
   6520: "GPIO Status - 6520",
+  6527: "MAVLink Events - 6527",
+  6528: "IR Camera MI48 Action - 6528",
+  6529: "IR Camera MI48 Status - 6529",
+  6530: "Sound List - 6530",
+  6531: "Telnet Action - 6531",
+  6532: "Telnet Status - 6532",
+  6533: "Telnet Data - 6533",
+  6534: "Telnet Remote Execute - 6534",
 };
 
 export const swarm_formation_names = {
@@ -629,3 +661,4 @@ export const TYPE_MODULE_CLASS_TRACKING = "trk";
 export const TYPE_MODULE_CLASS_AI_RECOGNITION = "ai_rec";
 export const TYPE_MODULE_CLASS_VIEW_LINK = "vlk";
 export const TYPE_MODULE_CLASS_GENERIC = "gen";
+export const TYPE_MODULE_CLASS_TELNET = "tel";
