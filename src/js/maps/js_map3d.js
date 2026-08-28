@@ -538,6 +538,12 @@ class CAndruavMap3D {
         const droneAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
 
         // --- Update vertical tether line ---
+        // Mapbox line layers need non-zero horizontal length to render — a
+        // LineString with two identical [lng,lat] points is invisible. We
+        // offset the top point by a tiny amount (~1m north) so the line has
+        // horizontal extent to draw, while line-z-offset provides the vertical
+        // component. At any realistic zoom this looks perfectly vertical.
+        const TINY_OFFSET = 0.00001;  // ~1 meter in degrees
         const sourceId = this.m_tetherSources.get(id);
         const source = this.m_map?.getSource(sourceId);
         if (source) {
@@ -545,7 +551,7 @@ class CAndruavMap3D {
                 type: 'Feature',
                 geometry: {
                     type: 'LineString',
-                    coordinates: [[lng, lat], [lng, lat]]
+                    coordinates: [[lng, lat], [lng, lat + TINY_OFFSET]]
                 },
                 properties: {
                     elevation: [terrainElev, droneAlt]
