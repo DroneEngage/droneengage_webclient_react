@@ -1030,17 +1030,12 @@ class CAndruavMap3D {
         // with validSteps[] so fn_applyMissionElevation can re-run later.
         const validSteps = wayPointArray.filter(w => Number.isFinite(w.Latitude) && Number.isFinite(w.Longitude));
 
-        // Item #0 (home) reports an ABSOLUTE (MSL) altitude; every other item
-        // is relative to home's ground level (see fn_applyMissionElevation).
-        // Used here only as a same-ballpark initial placement — the real,
-        // terrain-corrected value lands moments later via fn_applyMissionElevation.
-        const homeAbsAlt = Number.isFinite(validSteps[0]?.Altitude) ? validSteps[0].Altitude : 0;
-
-        const markers = validSteps.map((wayPointStep, i) => {
+        // Create at altitude 0 (on the ground) as a safe placeholder — the
+        // real, home/terrain-corrected value lands moments later via
+        // fn_applyMissionElevation, called further below in this same function.
+        const markers = validSteps.map((wayPointStep) => {
             const label = `${unit.m_unitName || id} - ${wayPointStep.m_label || 'WP'} #${wayPointStep.m_Sequence ?? ''}`;
-            const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
-            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
-            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, absAlt, pathColor, label);
+            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, 0, pathColor, label);
         });
         this.m_missionMarkers.set(id, markers);
 
@@ -1130,19 +1125,18 @@ class CAndruavMap3D {
      * fn_scheduleMissionElevationRetry).
      *
      * Mission item #0 (home) is reported by the flight controller with an
-     * ABSOLUTE (MSL) altitude; every following waypoint uses
-     * MAV_FRAME_GLOBAL_RELATIVE_ALT — relative to HOME's ground level, not
-     * to the terrain directly beneath that individual waypoint. So each
-     * waypoint's true absolute (sea-level) height is:
-     *   - home item:       its own Altitude value (already MSL)
-     *   - every other item: homeAbsAlt + its own Altitude value
-     * This absolute height is what the connecting line (line-elevation-
-     * reference:'sea') needs directly — no per-point terrain query required,
-     * so the path's shape is correct immediately, without waiting on DEM tiles.
-     * Marker#setAltitude() is the only thing that's inherently *local*-terrain-
-     * relative, so converting absAlt -> marker altitude still needs this
-     * point's own terrain height, which is what fn_scheduleMissionElevationRetry
-     * polls for.
+     * ABSOLUTE (MSL) altitude, and every following waypoint uses
+     * MAV_FRAME_GLOBAL_RELATIVE_ALT — relative to HOME's ground level. But
+     * the FC's own home altitude doesn't necessarily match Mapbox's DEM
+     * reading at that same point (satellite-derived terrain data commonly
+     * differs from a GPS-surveyed value by several meters) — using the FC's
+     * number directly as the "ground" reference could put the home marker
+     * (and everything anchored to it) noticeably above or *below* the
+     * visible terrain. So instead we anchor everything to Mapbox's OWN
+     * terrain height at home: the home marker always sits exactly on the
+     * ground (relAlt = 0, by definition), and every other waypoint's
+     * absolute height is homeLocalTerrainElev + its own relative Altitude —
+     * consistent with Mapbox's own terrain model everywhere, not the FC's.
      * @returns {boolean} true if every marker's local terrain height was
      *          actually resolved (queryTerrainElevation didn't return null
      *          for any of them); false if some still need a retry.
@@ -1154,32 +1148,53 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         if (generation !== undefined && this.m_missionSyncGeneration.get(id) !== generation) return true;  // superseded
 
-        const homeAbsAlt = Number.isFinite(validSteps[0].Altitude) ? validSteps[0].Altitude : 0;
+        const queryElev = (typeof this.m_map.queryTerrainElevation === 'function')
+            ? (lng, lat) => this.m_map.queryTerrainElevation([lng, lat])
+            : () => 0;
+
+        const home = validSteps[0];
+        const homeLocalTerrainElev = queryElev(home.Longitude, home.Latitude);
 
         const lineCoords = [];
         const lineElevations = [];
-        let allResolved = true;
+        // Nothing further can be computed correctly until we know home's own
+        // ground height (everything else is anchored to it).
+        let allResolved = (homeLocalTerrainElev !== null && homeLocalTerrainElev !== undefined);
 
         validSteps.forEach((wayPointStep, i) => {
             const lat = wayPointStep.Latitude;
             const lng = wayPointStep.Longitude;
             const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
-            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
+            const marker = markers[i];
+
+            if (i === 0) {
+                // Home always sits exactly on the ground.
+                if (marker && typeof marker.setAltitude === 'function') marker.setAltitude(0);
+                lineCoords.push([lng, lat]);
+                lineElevations.push(homeLocalTerrainElev ?? rawAlt);  // best-effort if still unresolved
+                return;
+            }
+
+            if (!allResolved) {
+                // Can't anchor to home yet — leave this marker where it is
+                // (placeholder from creation) and retry everything shortly.
+                lineCoords.push([lng, lat]);
+                lineElevations.push(rawAlt);
+                return;
+            }
+
+            const absAlt = homeLocalTerrainElev + rawAlt;
 
             // queryTerrainElevation() returns null (not 0) when the DEM tile
             // for this point hasn't loaded yet — treat that as "unresolved"
             // so we know to retry, rather than silently placing the marker
             // at the wrong height.
-            let localTerrainElev = null;
-            if (typeof this.m_map.queryTerrainElevation === 'function') {
-                localTerrainElev = this.m_map.queryTerrainElevation([lng, lat]);
-            }
+            const localTerrainElev = queryElev(lng, lat);
 
-            const marker = markers[i];
             if (marker && typeof marker.setAltitude === 'function') {
                 if (localTerrainElev === null || localTerrainElev === undefined) {
                     allResolved = false;
-                    marker.setAltitude(absAlt);  // best-effort until the tile loads
+                    marker.setAltitude(rawAlt);  // best-effort until the tile loads
                 } else {
                     marker.setAltitude(absAlt - localTerrainElev);
                 }
