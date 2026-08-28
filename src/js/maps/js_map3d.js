@@ -2,6 +2,55 @@ import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 
+/**
+ * Custom Mapbox GL control: three buttons (x1, x2, x5) that switch the
+ * terrain exaggeration factor.  Mounted bottom-right of the 3D map.
+ */
+class TerrainExaggerationControl {
+    constructor(map3d) {
+        this._map3d = map3d;
+        this._container = null;
+        this._buttons = [];
+    }
+
+    onAdd() {
+        this._container = document.createElement('div');
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group css_map3d_exaggeration_ctrl';
+
+        const label = document.createElement('span');
+        label.className = 'css_map3d_exaggeration_label';
+        label.textContent = 'ALT';
+        this._container.appendChild(label);
+
+        const factors = [1, 2, 5];
+        factors.forEach((f) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = `x${f}`;
+            btn.title = `Terrain exaggeration x${f}`;
+            btn.addEventListener('click', () => {
+                this._map3d.fn_setTerrainExaggeration(f);
+                this._buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+            this._container.appendChild(btn);
+            this._buttons.push(btn);
+            // Highlight the current factor on init.
+            if (f === this._map3d.m_terrainExaggeration) btn.classList.add('active');
+        });
+
+        return this._container;
+    }
+
+    onRemove() {
+        if (this._container?.parentNode) {
+            this._container.parentNode.removeChild(this._container);
+        }
+        this._container = null;
+        this._buttons = [];
+    }
+}
+
 class CAndruavMap3D {
     constructor() {
         this.m_map = null;
@@ -42,6 +91,7 @@ class CAndruavMap3D {
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
+        this.m_terrainExaggeration = 1.3;        // current terrain exaggeration factor (adjustable via x1/x2/x5 buttons)
     }
 
     /**
@@ -231,7 +281,7 @@ class CAndruavMap3D {
             // Enable terrain (required for marker altitude + path dots to be visible)
             this.m_map.setTerrain({
                 source: 'mapbox-dem',
-                exaggeration: 1.3  // Adjust for visual impact (1.0 = natural, 1.5+ = dramatic)
+                exaggeration: this.m_terrainExaggeration
             });
         });
 
@@ -241,6 +291,41 @@ class CAndruavMap3D {
             // Draw any missions that arrived while the map was still loading.
             this.fn_replayMissions();
         });
+
+        // Add the terrain exaggeration control (x1 / x2 / x5 buttons).
+        this.m_map.addControl(new TerrainExaggerationControl(this), 'bottom-right');
+    }
+
+    /**
+     * Changes the terrain exaggeration factor and re-applies all line/marker
+     * elevations so they stay visually consistent with the exaggerated terrain.
+     * Called by the TerrainExaggerationControl buttons.
+     * @param {number} factor - new exaggeration (1.0 = natural, 2.0 = 2x, etc.)
+     */
+    fn_setTerrainExaggeration(factor) {
+        if (!this.m_map || !this.m_isReady) return;
+        this.m_terrainExaggeration = factor;
+        this.m_map.setTerrain({
+            source: 'mapbox-dem',
+            exaggeration: factor
+        });
+
+        // Re-apply all tether/path elevations — queryTerrainElevation() returns
+        // the un-exaggerated DEM value, but Mapbox renders terrain + line-z-offset
+        // (sea reference) in the same exaggerated world space, so the stored
+        // elevations are still correct.  We just need to force a re-paint by
+        // re-setting the same data.
+        this.m_markers.forEach((marker, id) => {
+            const unit = js_globals.m_andruavUnitList?.fn_getUnit(id);
+            if (unit?.m_Nav_Info?.p_Location) {
+                const { lat, lng } = unit.m_Nav_Info.p_Location;
+                const altRelative = unit.m_Nav_Info.p_Location.alt_relative;
+                this.fn_syncTether(unit, lat, lng, altRelative);
+            }
+        });
+
+        // Re-apply mission elevations.
+        this.fn_replayMissions();
     }
 
     fn_show() {
