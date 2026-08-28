@@ -297,9 +297,18 @@ class CAndruavMap3D {
     }
 
     /**
-     * Changes the terrain exaggeration factor and re-applies all line/marker
-     * elevations so they stay visually consistent with the exaggerated terrain.
-     * Called by the TerrainExaggerationControl buttons.
+     * Changes the terrain exaggeration factor.  Called by the
+     * TerrainExaggerationControl buttons.
+     *
+     * No need to re-apply line/marker elevations: Mapbox's
+     * line-elevation-reference:'sea' puts line-z-offset in the same MSL
+     * coordinate space as the terrain DEM, so when exaggeration changes
+     * Mapbox scales both the terrain surface AND the line visually together.
+     * Marker#setAltitude() is terrain-relative, so markers also scale
+     * automatically.  Re-applying would actually break things —
+     * queryTerrainElevation() returns null while the DEM re-renders after
+     * the exaggeration change, which would reset the line to near-sea-level
+     * (underground).
      * @param {number} factor - new exaggeration (1.0 = natural, 2.0 = 2x, etc.)
      */
     fn_setTerrainExaggeration(factor) {
@@ -309,23 +318,6 @@ class CAndruavMap3D {
             source: 'mapbox-dem',
             exaggeration: factor
         });
-
-        // Re-apply all tether/path elevations — queryTerrainElevation() returns
-        // the un-exaggerated DEM value, but Mapbox renders terrain + line-z-offset
-        // (sea reference) in the same exaggerated world space, so the stored
-        // elevations are still correct.  We just need to force a re-paint by
-        // re-setting the same data.
-        this.m_markers.forEach((marker, id) => {
-            const unit = js_globals.m_andruavUnitList?.fn_getUnit(id);
-            if (unit?.m_Nav_Info?.p_Location) {
-                const { lat, lng } = unit.m_Nav_Info.p_Location;
-                const altRelative = unit.m_Nav_Info.p_Location.alt_relative;
-                this.fn_syncTether(unit, lat, lng, altRelative);
-            }
-        });
-
-        // Re-apply mission elevations.
-        this.fn_replayMissions();
     }
 
     fn_show() {
