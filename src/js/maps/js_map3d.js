@@ -1,4 +1,5 @@
 import * as js_siteConfig from '../js_siteConfig';
+import { js_globals } from '../js_globals.js';
 
 class CAndruavMap3D {
     constructor() {
@@ -10,19 +11,24 @@ class CAndruavMap3D {
         this.m_mapDblClickCallbacks = [];
         this.m_isMapDblClickBound = false;
 
-        // ---- 3D tether line + ground circle + path trail ----
+        // ---- 3D tether line + ground circle + altitude circle + path trail ----
         // - Path trail: elevated dotted line along the drone's flight path
         // - Tether: solid vertical line from drone down to ground
         // - Ground circle: circle on terrain marking drone's ground projection
+        // - Altitude circle: ring at the drone's altitude (icon level) marking
+        //   its 3D position in the air. Circle layers can't be elevated, so this
+        //   is a line ring lifted with line-z-offset + line-elevation-reference:'sea'.
         // All use line-z-offset + line-elevation-reference:'sea' (>= v3.8).
         this.m_tetherSources = new Map();  // unitId -> sourceId (vertical line)
         this.m_tetherLayers = new Map();   // unitId -> layerId
         this.m_groundSources = new Map();  // unitId -> sourceId (ground circle)
         this.m_groundLayers = new Map();   // unitId -> layerId
+        this.m_altCircleSources = new Map();  // unitId -> sourceId (altitude ring)
+        this.m_altCircleLayers = new Map();   // unitId -> layerId
         this.m_pathSources = new Map();    // unitId -> sourceId (path trail)
         this.m_pathLayers = new Map();     // unitId -> layerId
         this.m_pathData = new Map();       // unitId -> { coords, elevations }
-        this.m_tetherColors = ['#F5D29A', '#32CD32', '#FF1493', '#00CED1'];
+        // Colors + line thickness live in js_globals (CONST_MAP3D_*).
     }
 
     /**
@@ -426,7 +432,8 @@ class CAndruavMap3D {
      */
     fn_getTetherColor(unit) {
         const idx = unit?.m_index ?? 0;
-        return this.m_tetherColors[idx % this.m_tetherColors.length];
+        const colors = js_globals.CONST_MAP3D_TETHER_COLORS;
+        return colors[idx % colors.length];
     }
 
     /**
@@ -478,7 +485,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': 2,
+                'line-width': js_globals.CONST_MAP3D_TETHER_WIDTH,
                 'line-opacity': 0.8
             }
         });
@@ -487,41 +494,77 @@ class CAndruavMap3D {
         this.m_tetherLayers.set(id, layerId);
 
         // --- Ground circle (drone's ground projection) ---
-        // A circle layer at [lng, lat] with no elevation — drapes on the
-        // terrain surface, marking where the drone is directly above.
+        // A line ring (outline only) at [lng, lat] with no z-offset, so it
+        // drapes flat on the terrain surface — same ring style + radius as the
+        // altitude circle, ensuring its diameter is not bigger than the upper one.
         this.m_map.addSource(groundSourceId, {
             type: 'geojson',
             data: {
                 type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [0, 0]
-                },
+                geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
                 properties: {}
             }
         });
 
         this.m_map.addLayer({
             id: groundLayerId,
-            type: 'circle',
+            type: 'line',
             source: groundSourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+                // No line-z-offset / line-elevation-reference => drapes on terrain.
+            },
             paint: {
-                'circle-radius': 8,
-                'circle-color': color,
-                'circle-opacity': 0.4,
-                'circle-stroke-width': 2,
-                'circle-stroke-color': color,
-                'circle-stroke-opacity': 0.9,
-                'circle-pitch-scale': 'map'
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
             }
         });
 
         this.m_groundSources.set(id, groundSourceId);
         this.m_groundLayers.set(id, groundLayerId);
+
+        // --- Altitude circle (ring at the drone's altitude / icon level) ---
+        // Circle layers have no z-offset, so this is a line ring lifted to the
+        // drone's absolute altitude via line-z-offset + line-elevation-reference:'sea'.
+        // It marks the drone's 3D position in the air, pairing with the ground
+        // circle below and the vertical tether line connecting them.
+        const altSourceId = `de-altcircle-${id}`;
+        const altLayerId = `de-altcircle-layer-${id}`;
+
+        this.m_map.addSource(altSourceId, {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                properties: {}
+            }
+        });
+
+        this.m_map.addLayer({
+            id: altLayerId,
+            type: 'line',
+            source: altSourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': 0,   // updated per fn_syncTether to droneAlt
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        this.m_altCircleSources.set(id, altSourceId);
+        this.m_altCircleLayers.set(id, altLayerId);
     }
 
     /**
-     * Updates the tether line + ground circle for a unit.
+     * Updates the tether line + ground circle + altitude circle for a unit.
      * Called from fn_syncUnit on every telemetry update.
      */
     fn_syncTether(unit, lat, lng, altRelative) {
@@ -559,19 +602,61 @@ class CAndruavMap3D {
             });
         }
 
-        // --- Update ground circle position ---
+        // --- Update ground circle (ring draping on terrain) ---
+        // Same ring geometry + radius as the altitude circle so the ground
+        // diameter is not bigger than the upper one. No z-offset => drapes
+        // flat on the terrain surface.
+        const CIRCLE_RADIUS = 5;  // meters — shared by ground + altitude rings
+        const ringCoordsUp = this.fn_generateCircleRing(lng, lat, CIRCLE_RADIUS * 2);
+        const ringCoordsDown = this.fn_generateCircleRing(lng, lat, CIRCLE_RADIUS);
+
         const groundSourceId = this.m_groundSources.get(id);
         const groundSource = this.m_map?.getSource(groundSourceId);
         if (groundSource) {
             groundSource.setData({
                 type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [lng, lat]
-                },
+                geometry: { type: 'LineString', coordinates: ringCoordsDown },
                 properties: {}
             });
         }
+
+        // --- Update altitude circle (ring at the drone's altitude / icon level) ---
+        // Same ring geometry, lifted to droneAlt via line-z-offset. Pairs with
+        // the ground circle below + the tether line connecting them.
+        const altSourceId = this.m_altCircleSources.get(id);
+        const altLayerId = this.m_altCircleLayers.get(id);
+        const altSource = this.m_map?.getSource(altSourceId);
+        if (altSource && altLayerId) {
+            altSource.setData({
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: ringCoordsUp },
+                properties: {}
+            });
+            // Elevate the whole ring to the drone's absolute altitude (above sea).
+            this.m_map.setLayoutProperty(altLayerId, 'line-z-offset', droneAlt);
+        }
+    }
+
+    /**
+     * Generates a closed circular ring (LineString coordinates) of the given
+     * radius (meters) around a [lng, lat] center. Used for the altitude circle.
+     * @returns {Array<[number, number]>} array of [lng, lat] points (closed)
+     */
+    fn_generateCircleRing(lng, lat, radiusMeters, numPoints = 32) {
+        const points = [];
+        const latRad = lat * Math.PI / 180;
+        const metersPerDegLat = 111320;
+        const metersPerDegLng = 111320 * Math.cos(latRad);
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = (i / numPoints) * 2 * Math.PI;
+            const dx = radiusMeters * Math.cos(angle);
+            const dy = radiusMeters * Math.sin(angle);
+            points.push([
+                lng + dx / metersPerDegLng,
+                lat + dy / metersPerDegLat
+            ]);
+        }
+        return points;
     }
 
     // ====================================================================
@@ -618,7 +703,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': 5,
+                'line-width': js_globals.CONST_MAP3D_TRAIL_WIDTH,
                 'line-opacity': 0.85,
                 'line-dasharray': [0.1, 3]
             }
@@ -665,8 +750,8 @@ class CAndruavMap3D {
     }
 
     /**
-     * Flushes (clears) the tether + ground circle + path trail for a unit.
-     * Called when a unit is re-created.
+     * Flushes (clears) the tether + ground circle + altitude circle + path trail
+     * for a unit. Called when a unit is re-created.
      */
     fn_flushPath(unit) {
         const id = unit?.getPartyID?.();
@@ -692,10 +777,27 @@ class CAndruavMap3D {
             if (groundSource) {
                 groundSource.setData({
                     type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
+                    geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
                     properties: {}
                 });
             }
+        }
+
+        // Clear altitude circle
+        const altSourceId = this.m_altCircleSources.get(id);
+        const altLayerId = this.m_altCircleLayers.get(id);
+        if (altSourceId) {
+            const altSource = this.m_map?.getSource(altSourceId);
+            if (altSource) {
+                altSource.setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                    properties: {}
+                });
+            }
+        }
+        if (altLayerId) {
+            this.m_map?.setLayoutProperty(altLayerId, 'line-z-offset', 0);
         }
 
         // Clear path trail

@@ -207,6 +207,14 @@ class GLOBALS {
 		// Debug: Show white dot at anchor point of icons
 		this.CONST_DEBUG_SHOW_ANCHOR_DOTS = false;
 
+		// ---- Map3D (Mapbox 3D) visual constants ----
+		// Tether/ground/altitude/trail colors per unit index (cycled).
+		this.CONST_MAP3D_TETHER_COLORS = ['#503508', '#094709', '#510c31', '#127577'];
+		// Line thickness (pixels) for the 3D overlay layers.
+		this.CONST_MAP3D_TETHER_WIDTH = 2;     // vertical tether line
+		this.CONST_MAP3D_CIRCLE_WIDTH = 2;     // ground + altitude rings
+		this.CONST_MAP3D_TRAIL_WIDTH = 5;      // flight path trail
+
 		this.CONST_DISABLE_ADSG = true;
 
 		// VIEW LINK Gimbal Zoom range constants
