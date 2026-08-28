@@ -40,6 +40,7 @@ class CAndruavMap3D {
         this.m_missionLineSources = new Map();  // unitId -> sourceId
         this.m_missionLineLayers = new Map();   // unitId -> layerId
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
+        this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
     }
 
     /**
@@ -1041,21 +1042,51 @@ class CAndruavMap3D {
             }
         });
 
-        // Apply elevation now, then again once the map/terrain settle.
-        this.fn_applyMissionElevation(unit, validSteps, markers);
+        // Guards against a slower, stale retry chain (below) overwriting a
+        // newer sync's line/markers if fn_syncMissionWaypoints is called
+        // again for this unit before the previous retries finish.
+        const generation = (this.m_missionSyncGeneration.get(id) || 0) + 1;
+        this.m_missionSyncGeneration.set(id, generation);
 
+        // Apply elevation now (best-effort paint), then keep retrying until
+        // every waypoint's terrain height actually resolves.
+        //
         // Mapbox's terrain-relative marker elevation (Marker#setAltitude) and
-        // queryTerrainElevation() only resolve real heights for DEM tiles that
-        // are actually loaded — which only happens for the current viewport.
-        // A mission can span waypoints far outside the current view (unlike
-        // the unit's own marker, which the camera is kept centered on), so
-        // those markers silently render un-elevated until their tile loads.
-        // Ensure the whole mission is in view (loading its DEM tiles) before
-        // the final re-application.
+        // queryTerrainElevation() only return real data for DEM tiles that are
+        // already loaded. A mission can span waypoints far outside the current
+        // view (unlike the unit's own marker, which the camera stays centered
+        // on), and even points already inside the current viewport can have
+        // their DEM tile arrive well after 'idle' fires for the base map. So
+        // rather than assuming a single re-apply is enough, poll until
+        // queryTerrainElevation stops returning null for every waypoint.
+        this.fn_applyMissionElevation(unit, validSteps, markers, generation);
         this.fn_ensureBoundsVisible(validSteps, () => {
-            this.fn_applyMissionElevation(unit, validSteps, markers);
-            this.m_map.once('idle', () => this.fn_applyMissionElevation(unit, validSteps, markers));
+            const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
+            if (!resolved) {
+                this.fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, 20);
+            }
         });
+    }
+
+    /**
+     * Repeatedly re-applies mission elevation until every waypoint's terrain
+     * height resolves (queryTerrainElevation stops returning null) or the
+     * retry budget runs out. Aborts silently if a newer sync has since
+     * started for this unit (generation mismatch).
+     */
+    fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, attemptsLeft) {
+        if (attemptsLeft <= 0 || !this.m_map) return;
+
+        const RETRY_DELAY_MS = 400;
+        setTimeout(() => {
+            const id = unit?.getPartyID?.();
+            if (!id || this.m_missionSyncGeneration.get(id) !== generation) return;  // superseded
+
+            const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
+            if (!resolved) {
+                this.fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, attemptsLeft - 1);
+            }
+        }, RETRY_DELAY_MS);
     }
 
     /**
@@ -1087,23 +1118,39 @@ class CAndruavMap3D {
     /**
      * (Re-)applies terrain-relative elevation to a unit's mission markers +
      * connecting line, using each waypoint's planned altitude. Safe to call
-     * multiple times (e.g. once terrain DEM tiles finish loading).
+     * multiple times (e.g. while polling for terrain DEM tiles to finish
+     * loading — see fn_scheduleMissionElevationRetry).
+     * @returns {boolean} true if every waypoint's terrain height was
+     *          actually resolved (queryTerrainElevation didn't return null
+     *          for any of them); false if some still need a retry.
      */
-    fn_applyMissionElevation(unit, validSteps, markers) {
-        if (!this.m_map || !this.m_isReady) return;
-        if (!validSteps || validSteps.length === 0) return;
+    fn_applyMissionElevation(unit, validSteps, markers, generation) {
+        if (!this.m_map || !this.m_isReady) return true;
+        if (!validSteps || validSteps.length === 0) return true;
 
         const id = unit.getPartyID();
+        if (generation !== undefined && this.m_missionSyncGeneration.get(id) !== generation) return true;  // superseded
+
         const lineCoords = [];
         const lineElevations = [];
+        let allResolved = true;
 
         validSteps.forEach((wayPointStep, i) => {
             const lat = wayPointStep.Latitude;
             const lng = wayPointStep.Longitude;
 
-            const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
-                ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
-                : 0;
+            // queryTerrainElevation() returns null (not 0) when the DEM tile
+            // for this point hasn't loaded yet — treat that as "unresolved"
+            // rather than silently defaulting to sea level, so we know to retry.
+            let terrainElev = 0;
+            if (typeof this.m_map.queryTerrainElevation === 'function') {
+                const queried = this.m_map.queryTerrainElevation([lng, lat]);
+                if (queried === null || queried === undefined) {
+                    allResolved = false;
+                } else {
+                    terrainElev = queried;
+                }
+            }
             const relAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
 
             const marker = markers[i];
@@ -1126,6 +1173,8 @@ class CAndruavMap3D {
                 });
             }
         }
+
+        return allResolved;
     }
 
     /**
