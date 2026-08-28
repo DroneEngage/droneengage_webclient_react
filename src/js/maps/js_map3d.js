@@ -888,7 +888,7 @@ class CAndruavMap3D {
                 'line-join': 'round',
                 'line-z-offset': [
                     'at-interpolated',
-                    ['line-progress'],
+                    ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
                     ['get', 'elevation']
                 ],
                 'line-elevation-reference': 'sea'
