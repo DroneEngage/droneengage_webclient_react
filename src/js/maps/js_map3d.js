@@ -1116,11 +1116,26 @@ class CAndruavMap3D {
     }
 
     /**
-     * (Re-)applies terrain-relative elevation to a unit's mission markers +
-     * connecting line, using each waypoint's planned altitude. Safe to call
-     * multiple times (e.g. while polling for terrain DEM tiles to finish
-     * loading — see fn_scheduleMissionElevationRetry).
-     * @returns {boolean} true if every waypoint's terrain height was
+     * (Re-)applies elevation to a unit's mission markers + connecting line,
+     * using each waypoint's planned altitude. Safe to call multiple times
+     * (e.g. while polling for terrain DEM tiles to finish loading — see
+     * fn_scheduleMissionElevationRetry).
+     *
+     * Mission item #0 (home) is reported by the flight controller with an
+     * ABSOLUTE (MSL) altitude; every following waypoint uses
+     * MAV_FRAME_GLOBAL_RELATIVE_ALT — relative to HOME's ground level, not
+     * to the terrain directly beneath that individual waypoint. So each
+     * waypoint's true absolute (sea-level) height is:
+     *   - home item:       its own Altitude value (already MSL)
+     *   - every other item: homeAbsAlt + its own Altitude value
+     * This absolute height is what the connecting line (line-elevation-
+     * reference:'sea') needs directly — no per-point terrain query required,
+     * so the path's shape is correct immediately, without waiting on DEM tiles.
+     * Marker#setAltitude() is the only thing that's inherently *local*-terrain-
+     * relative, so converting absAlt -> marker altitude still needs this
+     * point's own terrain height, which is what fn_scheduleMissionElevationRetry
+     * polls for.
+     * @returns {boolean} true if every marker's local terrain height was
      *          actually resolved (queryTerrainElevation didn't return null
      *          for any of them); false if some still need a retry.
      */
@@ -1131,6 +1146,8 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         if (generation !== undefined && this.m_missionSyncGeneration.get(id) !== generation) return true;  // superseded
 
+        const homeAbsAlt = Number.isFinite(validSteps[0].Altitude) ? validSteps[0].Altitude : 0;
+
         const lineCoords = [];
         const lineElevations = [];
         let allResolved = true;
@@ -1138,28 +1155,30 @@ class CAndruavMap3D {
         validSteps.forEach((wayPointStep, i) => {
             const lat = wayPointStep.Latitude;
             const lng = wayPointStep.Longitude;
+            const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
+            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
 
             // queryTerrainElevation() returns null (not 0) when the DEM tile
             // for this point hasn't loaded yet — treat that as "unresolved"
-            // rather than silently defaulting to sea level, so we know to retry.
-            let terrainElev = 0;
+            // so we know to retry, rather than silently placing the marker
+            // at the wrong height.
+            let localTerrainElev = null;
             if (typeof this.m_map.queryTerrainElevation === 'function') {
-                const queried = this.m_map.queryTerrainElevation([lng, lat]);
-                if (queried === null || queried === undefined) {
-                    allResolved = false;
-                } else {
-                    terrainElev = queried;
-                }
+                localTerrainElev = this.m_map.queryTerrainElevation([lng, lat]);
             }
-            const relAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
 
             const marker = markers[i];
             if (marker && typeof marker.setAltitude === 'function') {
-                marker.setAltitude(relAlt);
+                if (localTerrainElev === null || localTerrainElev === undefined) {
+                    allResolved = false;
+                    marker.setAltitude(absAlt);  // best-effort until the tile loads
+                } else {
+                    marker.setAltitude(absAlt - localTerrainElev);
+                }
             }
 
             lineCoords.push([lng, lat]);
-            lineElevations.push(terrainElev + relAlt);
+            lineElevations.push(absAlt);
         });
 
         if (lineCoords.length >= 2) {
