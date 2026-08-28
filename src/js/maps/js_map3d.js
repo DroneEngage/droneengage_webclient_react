@@ -1,5 +1,6 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
+import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 
 class CAndruavMap3D {
     constructor() {
@@ -29,6 +30,16 @@ class CAndruavMap3D {
         this.m_pathLayers = new Map();     // unitId -> layerId
         this.m_pathData = new Map();       // unitId -> { coords, elevations }
         // Colors + line thickness live in js_globals (CONST_MAP3D_*).
+
+        // ---- 3D mission waypoints (mirrors the leaflet mission drawing) ----
+        // - Markers: small colored dots at each waypoint, elevated to its
+        //   planned altitude above terrain.
+        // - Mission line: elevated line connecting waypoints in order.
+        // - Loiter rings: ground-draped circles for CIRCLE waypoints.
+        this.m_missionMarkers = new Map();      // unitId -> array of markers
+        this.m_missionLineSources = new Map();  // unitId -> sourceId
+        this.m_missionLineLayers = new Map();   // unitId -> layerId
+        this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
     }
 
     /**
@@ -816,6 +827,269 @@ class CAndruavMap3D {
         if (data) {
             data.coords = [];
             data.elevations = [];
+        }
+    }
+
+    // ====================================================================
+    //  3D mission waypoints (read from unit)
+    //  Mirrors the mission drawing done on the leaflet map in
+    //  js_main.js#EVT_msgFromUnit_WayPoints: small marker per waypoint,
+    //  an elevated line connecting them in sequence, and ground-draped
+    //  rings for CIRCLE/loiter waypoints.
+    // ====================================================================
+
+    /**
+     * Removes a Mapbox layer + its source, if present.
+     */
+    fn_removeLayerAndSource(layerId, sourceId) {
+        if (!this.m_map) return;
+        if (layerId && this.m_map.getLayer(layerId)) this.m_map.removeLayer(layerId);
+        if (sourceId && this.m_map.getSource(sourceId)) this.m_map.removeSource(sourceId);
+    }
+
+    /**
+     * Ensures the elevated mission-path line source + layer exist for a unit.
+     * Uses the same line-z-offset + at-interpolated mechanism as the flight
+     * path trail, but solid/dashed differently to distinguish plan vs flown path.
+     */
+    fn_ensureMissionLineLayer(unit, color) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_missionLineSources.has(id)) return;
+
+        const sourceId = `de-mission-line-${id}`;
+        const layerId = `de-mission-line-layer-${id}`;
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            lineMetrics: true,
+            data: {
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                properties: { elevation: [0, 0] }
+            }
+        });
+
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': [
+                    'at-interpolated',
+                    ['line-progress'],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_TRAIL_WIDTH,
+                'line-opacity': 0.7,
+                'line-dasharray': [2, 1]
+            }
+        });
+
+        this.m_missionLineSources.set(id, sourceId);
+        this.m_missionLineLayers.set(id, layerId);
+    }
+
+    /**
+     * Draws a ground-draped loiter ring for a CIRCLE waypoint. Each ring gets
+     * its own source/layer (count varies per mission) tracked in
+     * m_missionCircleIds so fn_clearMissionWaypoints can remove them all.
+     */
+    fn_drawMissionCircleRing(unit, lat, lng, radiusMeters, color, seq) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+
+        const sourceId = `de-mission-circle-${id}-${seq}`;
+        const layerId = `${sourceId}-layer`;
+        if (this.m_map.getSource(sourceId)) return;  // already drawn this pass
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            data: {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: this.fn_generateCircleRing(lng, lat, radiusMeters)
+                },
+                properties: {}
+            }
+        });
+
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.8
+            }
+        });
+
+        const circles = this.m_missionCircleIds.get(id) || [];
+        circles.push({ sourceId, layerId });
+        this.m_missionCircleIds.set(id, circles);
+    }
+
+    /**
+     * Creates a small DOM marker for a mission waypoint (colored dot),
+     * elevated to the waypoint's planned altitude above terrain.
+     */
+    fn_createMissionWaypointMarker(lng, lat, altRelative, color, label) {
+        const el = document.createElement('div');
+        el.className = 'css_map3d_mission_marker';
+        el.title = label || '';
+        el.style.width = '14px';
+        el.style.height = '14px';
+        el.style.borderRadius = '50%';
+        el.style.background = color;
+        el.style.border = '2px solid #fff';
+        el.style.boxShadow = '0 0 2px rgba(0,0,0,0.6)';
+
+        const marker = new window.mapboxgl.Marker({
+            element: el,
+            anchor: 'center',
+            pitchAlignment: 'viewport',
+            rotationAlignment: 'viewport'
+        })
+        .setLngLat([lng, lat])
+        .addTo(this.m_map);
+
+        if (Number.isFinite(altRelative) && typeof marker.setAltitude === 'function') {
+            marker.setAltitude(altRelative);
+        }
+
+        return marker;
+    }
+
+    /**
+     * Clears all mission waypoint graphics (markers, path line, loiter rings)
+     * for a unit. Called before re-drawing on every fresh WayPoints message,
+     * and when the mission is deleted.
+     */
+    fn_clearMissionWaypoints(unit) {
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        // Remove waypoint markers
+        const markers = this.m_missionMarkers.get(id);
+        if (markers) {
+            markers.forEach(marker => marker.remove());
+        }
+        this.m_missionMarkers.set(id, []);
+
+        // Reset mission path line (keep source/layer, just clear geometry)
+        const lineSourceId = this.m_missionLineSources.get(id);
+        const lineSource = this.m_map?.getSource(lineSourceId);
+        if (lineSource) {
+            lineSource.setData({
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] },
+                properties: { elevation: [0, 0] }
+            });
+        }
+
+        // Remove loiter circle rings (dynamic count per sync)
+        const circles = this.m_missionCircleIds.get(id);
+        if (circles) {
+            circles.forEach(({ sourceId, layerId }) => this.fn_removeLayerAndSource(layerId, sourceId));
+        }
+        this.m_missionCircleIds.set(id, []);
+    }
+
+    /**
+     * Syncs (redraws) a unit's mission waypoints on the 3D map: markers at
+     * each waypoint's planned altitude, an elevated connecting path, and
+     * ground rings for loiter/CIRCLE waypoints. Mirrors the leaflet drawing
+     * in js_main.js#EVT_msgFromUnit_WayPoints.
+     * @param {*} unit
+     * @param {Array} wayPointArray - array of wayPointStep objects (Latitude/
+     *        Longitude/Altitude/waypointType/m_Radius/m_Sequence/m_label)
+     * @param {string} [color] - path/marker color; defaults to the unit's tether color
+     */
+    fn_syncMissionWaypoints(unit, wayPointArray, color) {
+        if (!this.m_map || !this.m_isReady) return;
+
+        this.fn_clearMissionWaypoints(unit);
+
+        if (!Array.isArray(wayPointArray) || wayPointArray.length === 0) return;
+
+        const id = unit.getPartyID();
+        const pathColor = color || this.fn_getTetherColor(unit);
+        this.fn_ensureMissionLineLayer(unit, pathColor);
+
+        // Only keep steps with a valid position — markers[] stays index-aligned
+        // with validSteps[] so fn_applyMissionElevation can re-run later.
+        const validSteps = wayPointArray.filter(w => Number.isFinite(w.Latitude) && Number.isFinite(w.Longitude));
+
+        const markers = validSteps.map((wayPointStep) => {
+            const label = `${unit.m_unitName || id} - ${wayPointStep.m_label || 'WP'} #${wayPointStep.m_Sequence ?? ''}`;
+            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, 0, pathColor, label);
+        });
+        this.m_missionMarkers.set(id, markers);
+
+        validSteps.forEach((wayPointStep) => {
+            if (wayPointStep.waypointType === js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE) {
+                this.fn_drawMissionCircleRing(unit, wayPointStep.Latitude, wayPointStep.Longitude, wayPointStep.m_Radius, pathColor, wayPointStep.m_Sequence);
+            }
+        });
+
+        // Apply elevation now, then again once the map/terrain settle — DEM
+        // tiles for the mission area may not be loaded yet on the first pass
+        // (mission graphics are synced once per message, unlike the unit's
+        // own marker which re-syncs every telemetry tick and self-corrects).
+        this.fn_applyMissionElevation(unit, validSteps, markers);
+        this.m_map.once('idle', () => this.fn_applyMissionElevation(unit, validSteps, markers));
+    }
+
+    /**
+     * (Re-)applies terrain-relative elevation to a unit's mission markers +
+     * connecting line, using each waypoint's planned altitude. Safe to call
+     * multiple times (e.g. once terrain DEM tiles finish loading).
+     */
+    fn_applyMissionElevation(unit, validSteps, markers) {
+        if (!this.m_map || !this.m_isReady) return;
+        if (!validSteps || validSteps.length === 0) return;
+
+        const id = unit.getPartyID();
+        const lineCoords = [];
+        const lineElevations = [];
+
+        validSteps.forEach((wayPointStep, i) => {
+            const lat = wayPointStep.Latitude;
+            const lng = wayPointStep.Longitude;
+
+            const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
+                ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
+                : 0;
+            const relAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
+
+            const marker = markers[i];
+            if (marker && typeof marker.setAltitude === 'function') {
+                marker.setAltitude(relAlt);
+            }
+
+            lineCoords.push([lng, lat]);
+            lineElevations.push(terrainElev + relAlt);
+        });
+
+        if (lineCoords.length >= 2) {
+            const lineSourceId = this.m_missionLineSources.get(id);
+            const lineSource = this.m_map.getSource(lineSourceId);
+            if (lineSource) {
+                lineSource.setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: lineCoords },
+                    properties: { elevation: lineElevations }
+                });
+            }
         }
     }
 

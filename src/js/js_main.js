@@ -1499,6 +1499,9 @@ function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 		js_leafletmap.fn_hideItem(p_andruavUnit.m_wayPoint.polylines);
 		//p_andruavUnit.m_wayPoint.polylines.setMap(null);
 	}
+
+	// Mirror the clear on the 3D map (markers, elevated path, loiter rings).
+	js_map3d.fn_clearMissionWaypoints(p_andruavUnit);
 }
 function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
 	const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
@@ -2210,6 +2213,9 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 	if (LngLatPoints.length > 0) {
 		p_andruavUnit.m_wayPoint.polylines = js_leafletmap.fn_drawMissionPolyline(LngLatPoints, js_globals.flightPath_colors[p_andruavUnit.m_index % 4]);
 	}
+
+	// Mirror the mission on the 3D map (markers + elevated path + loiter rings).
+	js_map3d.fn_syncMissionWaypoints(p_andruavUnit, wayPointArray, js_globals.flightPath_colors[p_andruavUnit.m_index % 4]);
 }
 
 
