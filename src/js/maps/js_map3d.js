@@ -1175,15 +1175,63 @@ class CAndruavMap3D {
         const generation = (this.m_missionSyncGeneration.get(id) || 0) + 1;
         this.m_missionSyncGeneration.set(id, generation);
 
-        // Apply elevation now (best-effort paint), then keep retrying until
-        // every waypoint's terrain height actually resolves.
+        // Apply elevation now (best-effort paint), then keep re-applying
+        // whenever DEM source data loads until every waypoint's terrain
+        // height actually resolves.  Uses the 'sourcedata' event (fired
+        // when DEM tiles arrive) instead of blind polling — more reliable
+        // than setTimeout retries, which can miss the window where
+        // queryTerrainElevation() transitions from null to a real value.
         this.fn_applyMissionElevation(unit, validSteps, markers, generation);
         this.fn_ensureBoundsVisible(validSteps, () => {
-            const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
-            if (!resolved) {
-                this.fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, 20);
-            }
+            this.fn_watchTerrainForMission(unit, validSteps, markers, generation);
         });
+    }
+
+    /**
+     * Sets up a 'sourcedata' listener on the DEM source that re-applies
+     * mission elevations whenever terrain tiles load, until all waypoints
+     * resolve or a timeout fires.  Cleans up the listener once resolved.
+     * Aborts silently if a newer sync has started (generation mismatch).
+     */
+    fn_watchTerrainForMission(unit, validSteps, markers, generation) {
+        if (!this.m_map) return;
+        const id = unit.getPartyID();
+
+        // First try immediately — tiles may have loaded during fitBounds.
+        const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
+        if (resolved) return;
+
+        // Re-apply on every DEM sourcedata event until all resolved.
+        const onSourceData = (e) => {
+            if (e.sourceId !== 'mapbox-dem') return;
+            if (this.m_missionSyncGeneration.get(id) !== generation) {
+                this.m_map.off('sourcedata', onSourceData);
+                return;
+            }
+            const done = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
+            if (done) {
+                this.m_map.off('sourcedata', onSourceData);
+            }
+        };
+        this.m_map.on('sourcedata', onSourceData);
+
+        // Fallback: if no sourcedata event fires within 15s (e.g. all tiles
+        // already cached but queryTerrainElevation still returns null/0),
+        // do a few final attempts then give up and clean up the listener.
+        let attempts = 0;
+        const fallbackTimer = setInterval(() => {
+            attempts++;
+            if (!this.m_map || this.m_missionSyncGeneration.get(id) !== generation) {
+                clearInterval(fallbackTimer);
+                this.m_map?.off('sourcedata', onSourceData);
+                return;
+            }
+            const done = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
+            if (done || attempts >= 10) {
+                clearInterval(fallbackTimer);
+                this.m_map.off('sourcedata', onSourceData);
+            }
+        }, 1000);
     }
 
     /**
@@ -1203,27 +1251,6 @@ class CAndruavMap3D {
     }
 
     /**
-     * Repeatedly re-applies mission elevation until every waypoint's terrain
-     * height resolves (queryTerrainElevation stops returning null) or the
-     * retry budget runs out. Aborts silently if a newer sync has since
-     * started for this unit (generation mismatch).
-     */
-    fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, attemptsLeft) {
-        if (attemptsLeft <= 0 || !this.m_map) return;
-
-        const RETRY_DELAY_MS = 400;
-        setTimeout(() => {
-            const id = unit?.getPartyID?.();
-            if (!id || this.m_missionSyncGeneration.get(id) !== generation) return;  // superseded
-
-            const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
-            if (!resolved) {
-                this.fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, attemptsLeft - 1);
-            }
-        }, RETRY_DELAY_MS);
-    }
-
-    /**
      * Ensures the map camera covers all given waypoints' [lng,lat] positions
      * (so their terrain DEM tiles get requested/loaded), fitting the view if
      * any fall outside the current bounds. Calls p_onSettled once done (either
@@ -1238,7 +1265,9 @@ class CAndruavMap3D {
         const currentBounds = this.m_map.getBounds();
         const allVisible = validSteps.every(w => currentBounds.contains([w.Longitude, w.Latitude]));
         if (allVisible) {
-            p_onSettled();
+            // Even when all waypoints are visible, wait for 'idle' so DEM
+            // tiles have a chance to load before we query terrain elevation.
+            this.m_map.once('idle', p_onSettled);
             return;
         }
 
