@@ -1030,9 +1030,17 @@ class CAndruavMap3D {
         // with validSteps[] so fn_applyMissionElevation can re-run later.
         const validSteps = wayPointArray.filter(w => Number.isFinite(w.Latitude) && Number.isFinite(w.Longitude));
 
-        const markers = validSteps.map((wayPointStep) => {
+        // Item #0 (home) reports an ABSOLUTE (MSL) altitude; every other item
+        // is relative to home's ground level (see fn_applyMissionElevation).
+        // Used here only as a same-ballpark initial placement — the real,
+        // terrain-corrected value lands moments later via fn_applyMissionElevation.
+        const homeAbsAlt = Number.isFinite(validSteps[0]?.Altitude) ? validSteps[0].Altitude : 0;
+
+        const markers = validSteps.map((wayPointStep, i) => {
             const label = `${unit.m_unitName || id} - ${wayPointStep.m_label || 'WP'} #${wayPointStep.m_Sequence ?? ''}`;
-            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, 0, pathColor, label);
+            const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
+            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
+            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, absAlt, pathColor, label);
         });
         this.m_missionMarkers.set(id, markers);
 
