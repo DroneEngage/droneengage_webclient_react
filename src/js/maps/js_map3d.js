@@ -1041,12 +1041,47 @@ class CAndruavMap3D {
             }
         });
 
-        // Apply elevation now, then again once the map/terrain settle — DEM
-        // tiles for the mission area may not be loaded yet on the first pass
-        // (mission graphics are synced once per message, unlike the unit's
-        // own marker which re-syncs every telemetry tick and self-corrects).
+        // Apply elevation now, then again once the map/terrain settle.
         this.fn_applyMissionElevation(unit, validSteps, markers);
-        this.m_map.once('idle', () => this.fn_applyMissionElevation(unit, validSteps, markers));
+
+        // Mapbox's terrain-relative marker elevation (Marker#setAltitude) and
+        // queryTerrainElevation() only resolve real heights for DEM tiles that
+        // are actually loaded — which only happens for the current viewport.
+        // A mission can span waypoints far outside the current view (unlike
+        // the unit's own marker, which the camera is kept centered on), so
+        // those markers silently render un-elevated until their tile loads.
+        // Ensure the whole mission is in view (loading its DEM tiles) before
+        // the final re-application.
+        this.fn_ensureBoundsVisible(validSteps, () => {
+            this.fn_applyMissionElevation(unit, validSteps, markers);
+            this.m_map.once('idle', () => this.fn_applyMissionElevation(unit, validSteps, markers));
+        });
+    }
+
+    /**
+     * Ensures the map camera covers all given waypoints' [lng,lat] positions
+     * (so their terrain DEM tiles get requested/loaded), fitting the view if
+     * any fall outside the current bounds. Calls p_onSettled once done (either
+     * immediately, if nothing needed to change, or after the fit + idle).
+     */
+    fn_ensureBoundsVisible(validSteps, p_onSettled) {
+        if (!this.m_map || !window.mapboxgl || validSteps.length === 0) {
+            p_onSettled();
+            return;
+        }
+
+        const currentBounds = this.m_map.getBounds();
+        const allVisible = validSteps.every(w => currentBounds.contains([w.Longitude, w.Latitude]));
+        if (allVisible) {
+            p_onSettled();
+            return;
+        }
+
+        const bounds = new window.mapboxgl.LngLatBounds();
+        validSteps.forEach(w => bounds.extend([w.Longitude, w.Latitude]));
+
+        this.m_map.fitBounds(bounds, { padding: 60, duration: 600, maxZoom: 18 });
+        this.m_map.once('idle', p_onSettled);
     }
 
     /**
