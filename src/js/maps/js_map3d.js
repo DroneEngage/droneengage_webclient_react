@@ -41,6 +41,7 @@ class CAndruavMap3D {
         this.m_missionLineLayers = new Map();   // unitId -> layerId
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
+        this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
     }
 
     /**
@@ -237,6 +238,8 @@ class CAndruavMap3D {
         this.m_map.on('load', () => {
             this.m_isReady = true;
             if (this.m_isVisible) this.m_map.resize();
+            // Draw any missions that arrived while the map was still loading.
+            this.fn_replayMissions();
         });
     }
 
@@ -261,6 +264,11 @@ class CAndruavMap3D {
                     if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
                 }
             });
+
+            // Re-draw any missions that were stored while the 3D tab was
+            // hidden — markers created against a zero-size container don't
+            // project correctly, so we replay them now that it's visible.
+            this.fn_replayMissions();
         }
     }
 
@@ -979,6 +987,10 @@ class CAndruavMap3D {
         const id = unit?.getPartyID?.();
         if (!id) return;
 
+        // Note: we do NOT delete m_missionData here — this is called to clear
+        // the *graphics* before redrawing.  The store is cleared only by
+        // fn_syncMissionWaypoints when an empty array arrives (mission deleted).
+
         // Remove waypoint markers
         const markers = this.m_missionMarkers.get(id);
         if (markers) {
@@ -1016,31 +1028,61 @@ class CAndruavMap3D {
      * @param {string} [color] - path/marker color; defaults to the unit's tether color
      */
     fn_syncMissionWaypoints(unit, wayPointArray, color) {
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        // Always store the latest mission so it can be replayed when the map
+        // becomes ready or the 3D tab is shown.  Without this, a mission that
+        // arrives while the map is still loading (or while the 3D view is
+        // hidden) is lost forever — fn_syncMissionWaypoints would have early-
+        // returned and there'd be nothing to redraw later.
+        if (!Array.isArray(wayPointArray) || wayPointArray.length === 0) {
+            this.m_missionData.delete(id);
+            this.fn_clearMissionWaypoints(unit);
+            return;
+        }
+        this.m_missionData.set(id, { wayPointArray, color });
+
+        // If the map isn't ready yet (still loading, or 3D never opened),
+        // just store — fn_show() / the 'load' handler will replay it.
         if (!this.m_map || !this.m_isReady) return;
 
-        this.fn_clearMissionWaypoints(unit);
+        this.fn_drawMission(unit, wayPointArray, color);
+    }
 
-        if (!Array.isArray(wayPointArray) || wayPointArray.length === 0) return;
-
+    /**
+     * Internal: actually draws markers, line, and loiter rings for a mission.
+     * Called by fn_syncMissionWaypoints (live) and by fn_replayMissions
+     * (after map load / when 3D tab is shown).  Assumes map is ready.
+     *
+     * Altitude model (same as the drone's tether in fn_syncTether):
+     *   - Item #0 (home) is on the ground → relative alt = 0.
+     *   - Every other item's Altitude is relative-to-home → used directly as
+     *     the height above terrain for the marker (Marker#setAltitude is
+     *     terrain-relative, exactly like the drone marker).
+     *   - The connecting line uses line-elevation-reference:'sea', so each
+     *     vertex's absolute height = terrainElev(at that point) + relativeAlt,
+     *     matching the drone's `droneAlt = terrainElev + altRelative` pattern.
+     */
+    fn_drawMission(unit, wayPointArray, color) {
         const id = unit.getPartyID();
         const pathColor = color || this.fn_getTetherColor(unit);
+
+        this.fn_clearMissionWaypoints(unit);
         this.fn_ensureMissionLineLayer(unit, pathColor);
 
         // Only keep steps with a valid position — markers[] stays index-aligned
         // with validSteps[] so fn_applyMissionElevation can re-run later.
         const validSteps = wayPointArray.filter(w => Number.isFinite(w.Latitude) && Number.isFinite(w.Longitude));
-
-        // Item #0 (home) reports an ABSOLUTE (MSL) altitude; every other item
-        // is relative to home's ground level (see fn_applyMissionElevation).
-        // Used here only as a same-ballpark initial placement — the real,
-        // terrain-corrected value lands moments later via fn_applyMissionElevation.
-        const homeAbsAlt = Number.isFinite(validSteps[0]?.Altitude) ? validSteps[0].Altitude : 0;
+        if (validSteps.length === 0) return;
 
         const markers = validSteps.map((wayPointStep, i) => {
             const label = `${unit.m_unitName || id} - ${wayPointStep.m_label || 'WP'} #${wayPointStep.m_Sequence ?? ''}`;
-            const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
-            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
-            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, absAlt, pathColor, label);
+            // Home (i===0) sits on the ground (0m).  All other waypoints'
+            // Altitude is already relative-to-home → use directly as terrain-
+            // relative marker altitude, same as the drone's alt_relative.
+            const relAlt = (i === 0) ? 0 : (Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0);
+            return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, relAlt, pathColor, label);
         });
         this.m_missionMarkers.set(id, markers);
 
@@ -1058,20 +1100,27 @@ class CAndruavMap3D {
 
         // Apply elevation now (best-effort paint), then keep retrying until
         // every waypoint's terrain height actually resolves.
-        //
-        // Mapbox's terrain-relative marker elevation (Marker#setAltitude) and
-        // queryTerrainElevation() only return real data for DEM tiles that are
-        // already loaded. A mission can span waypoints far outside the current
-        // view (unlike the unit's own marker, which the camera stays centered
-        // on), and even points already inside the current viewport can have
-        // their DEM tile arrive well after 'idle' fires for the base map. So
-        // rather than assuming a single re-apply is enough, poll until
-        // queryTerrainElevation stops returning null for every waypoint.
         this.fn_applyMissionElevation(unit, validSteps, markers, generation);
         this.fn_ensureBoundsVisible(validSteps, () => {
             const resolved = this.fn_applyMissionElevation(unit, validSteps, markers, generation);
             if (!resolved) {
                 this.fn_scheduleMissionElevationRetry(unit, validSteps, markers, generation, 20);
+            }
+        });
+    }
+
+    /**
+     * Replays all stored missions onto the map.  Called after the map finishes
+     * loading and whenever the 3D tab is shown (fn_show), so missions that
+     * arrived while the map wasn't ready or was hidden get drawn.
+     */
+    fn_replayMissions() {
+        if (!this.m_map || !this.m_isReady) return;
+        this.m_missionData.forEach(({ wayPointArray, color }, id) => {
+            // Need the unit object — look it up from the global unit list.
+            const unit = js_globals.m_andruavUnitList?.fn_getUnit(id);
+            if (unit) {
+                this.fn_drawMission(unit, wayPointArray, color);
             }
         });
     }
@@ -1129,23 +1178,21 @@ class CAndruavMap3D {
      * (e.g. while polling for terrain DEM tiles to finish loading — see
      * fn_scheduleMissionElevationRetry).
      *
-     * Mission item #0 (home) is reported by the flight controller with an
-     * ABSOLUTE (MSL) altitude; every following waypoint uses
-     * MAV_FRAME_GLOBAL_RELATIVE_ALT — relative to HOME's ground level, not
-     * to the terrain directly beneath that individual waypoint. So each
-     * waypoint's true absolute (sea-level) height is:
-     *   - home item:       its own Altitude value (already MSL)
-     *   - every other item: homeAbsAlt + its own Altitude value
-     * This absolute height is what the connecting line (line-elevation-
-     * reference:'sea') needs directly — no per-point terrain query required,
-     * so the path's shape is correct immediately, without waiting on DEM tiles.
-     * Marker#setAltitude() is the only thing that's inherently *local*-terrain-
-     * relative, so converting absAlt -> marker altitude still needs this
-     * point's own terrain height, which is what fn_scheduleMissionElevationRetry
-     * polls for.
-     * @returns {boolean} true if every marker's local terrain height was
-     *          actually resolved (queryTerrainElevation didn't return null
-     *          for any of them); false if some still need a retry.
+     * Uses the same altitude model as the drone's tether (fn_syncTether):
+     *   - Marker#setAltitude(relAlt)  — terrain-relative, just like the drone.
+     *   - Line vertex elevation = terrainElev(at that point) + relAlt  — absolute
+     *     MSL for line-elevation-reference:'sea', matching droneAlt = terrainElev
+     *     + altRelative.
+     * Home (item #0) has relAlt = 0 (on the ground); every other item's relAlt
+     * is its own Altitude value (already relative-to-home from the FC).
+     *
+     * queryTerrainElevation() returns null while the DEM tile for a point
+     * hasn't loaded yet — we treat that as "unresolved" and keep the marker
+     * at its initial relAlt (best-effort) until the tile arrives, then the
+     * line elevation gets the correct terrainElev + relAlt value.
+     * @returns {boolean} true if every waypoint's terrain height was actually
+     *          resolved (queryTerrainElevation didn't return null for any);
+     *          false if some still need a retry.
      */
     fn_applyMissionElevation(unit, validSteps, markers, generation) {
         if (!this.m_map || !this.m_isReady) return true;
@@ -1154,8 +1201,6 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         if (generation !== undefined && this.m_missionSyncGeneration.get(id) !== generation) return true;  // superseded
 
-        const homeAbsAlt = Number.isFinite(validSteps[0].Altitude) ? validSteps[0].Altitude : 0;
-
         const lineCoords = [];
         const lineElevations = [];
         let allResolved = true;
@@ -1163,30 +1208,34 @@ class CAndruavMap3D {
         validSteps.forEach((wayPointStep, i) => {
             const lat = wayPointStep.Latitude;
             const lng = wayPointStep.Longitude;
-            const rawAlt = Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0;
-            const absAlt = (i === 0) ? rawAlt : (homeAbsAlt + rawAlt);
+            // Home (i===0) is on the ground; others are relative-to-home.
+            const relAlt = (i === 0) ? 0 : (Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0);
 
             // queryTerrainElevation() returns null (not 0) when the DEM tile
-            // for this point hasn't loaded yet — treat that as "unresolved"
-            // so we know to retry, rather than silently placing the marker
-            // at the wrong height.
+            // for this point hasn't loaded yet.
             let localTerrainElev = null;
             if (typeof this.m_map.queryTerrainElevation === 'function') {
                 localTerrainElev = this.m_map.queryTerrainElevation([lng, lat]);
             }
 
+            // Marker: terrain-relative altitude (same as drone marker).
             const marker = markers[i];
             if (marker && typeof marker.setAltitude === 'function') {
-                if (localTerrainElev === null || localTerrainElev === undefined) {
-                    allResolved = false;
-                    marker.setAltitude(absAlt);  // best-effort until the tile loads
-                } else {
-                    marker.setAltitude(absAlt - localTerrainElev);
-                }
+                marker.setAltitude(relAlt);
+            }
+
+            // Line: absolute MSL = terrainElev + relAlt (same as droneAlt).
+            // If terrain hasn't resolved yet, use relAlt alone as best-effort
+            // (marker is already at relAlt above terrain, so the line roughly
+            // tracks it) and mark for retry.
+            if (localTerrainElev === null || localTerrainElev === undefined) {
+                allResolved = false;
+                lineElevations.push(relAlt);
+            } else {
+                lineElevations.push(localTerrainElev + relAlt);
             }
 
             lineCoords.push([lng, lat]);
-            lineElevations.push(absAlt);
         });
 
         if (lineCoords.length >= 2) {
