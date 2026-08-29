@@ -82,6 +82,16 @@ export default class ClssModuleDetails extends React.Component {
         const { module, t } = this.props;
         if (!this.props.isExpanded) return null;
 
+        // Health data for this module (if any). de_comm sends with k="comm",
+        // modules send with their own module key stored in module.k.
+        // The main module (de_comm core) has no k, so use "comm".
+        const healthKey = module.k ? module.k : 'comm';
+        const health = this.props.p_unit.m_moduleHealth ? this.props.p_unit.m_moduleHealth[healthKey] : null;
+
+        const trendIcon = health ? (health.trend === 1 ? 'bi-arrow-up text-warning' : health.trend === 2 ? 'bi-arrow-down text-success' : 'bi-arrow-left-right text-muted') : null;
+        const statusColor = health ? (health.status === 2 ? 'text-danger' : health.status === 1 ? 'text-warning' : 'text-success') : null;
+        const statusText = health ? (health.status === 2 ? t('critical') : health.status === 1 ? t('warning') : t('ok')) : null;
+
         return (
             <div id={`MD${this.key}`} key={`MD${this.key}`} className="row css_margin_zero padding_zero mt-1 w-100 cursor_default">
                 <div className="col-12">
@@ -198,6 +208,53 @@ export default class ClssModuleDetails extends React.Component {
                                         )}
                                     </div>
                                 </div>
+                                {health && (
+                                    <>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('memory_colon')}</small>
+                                                <span className={`fw-bold ${statusColor}`}>
+                                                    {health.rss != null ? `${health.rss.toFixed(1)} MB` : '-'}
+                                                </span>
+                                                {trendIcon && <i className={`bi ${trendIcon} ms-1`} />}
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('health_colon')}</small>
+                                                <span className={`fw-bold ${statusColor}`}>{statusText}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('peak_colon')}</small>
+                                                <span className="fw-bold text-muted">{health.vmpeak != null ? `${health.vmpeak.toFixed(1)} MB` : '-'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('swap_colon')}</small>
+                                                <span className={`fw-bold ${health.vmswap > 0 ? 'text-warning' : 'text-muted'}`}>
+                                                    {health.vmswap != null ? `${health.vmswap.toFixed(1)} MB` : '-'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('threads_colon')}</small>
+                                                <span className="fw-bold text-muted">{health.threads ?? '-'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="d-flex align-items-center">
+                                                <small className="text-muted me-2 text-capitalize">{t('uptime_colon')}</small>
+                                                <span className="fw-bold text-muted">
+                                                    {health.uptime != null ? `${Math.floor(health.uptime / 60)}m ${health.uptime % 60}s` : '-'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -354,7 +354,7 @@ export class CCommandAPI {
         if (comm_local_on_off != null) {
             p_msg.w2 = comm_local_on_off;
             if (comm_local_on_off_duration != null) {
-                p_msg.w2d = comm_local_on_off_duration;
+                p_msg.wd2 = comm_local_on_off_duration;
             }
         }
 

@@ -1156,6 +1156,33 @@ class CAndruavClientParser {
                 break;
 
 
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS: {
+                p_jmsg = msg.msgPayload;
+                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) {
+                    p_jmsg = JSON.parse(msg.msgPayload);
+                }
+
+                // Store health data on the unit's module health map, keyed by
+                // module_key (field "k"). de_comm itself sends with k="comm".
+                // Modules send with their own module key.
+                if (p_jmsg && p_jmsg.k) {
+                    p_unit.m_moduleHealth[p_jmsg.k] = {
+                        rss: p_jmsg.rs,
+                        vmpeak: p_jmsg.pk,
+                        vmswap: p_jmsg.sw,
+                        threads: p_jmsg.th,
+                        slope: p_jmsg.sl,
+                        trend: p_jmsg.tr,
+                        status: p_jmsg.hs,
+                        uptime: p_jmsg.up,
+                        timestamp: Date.now()
+                    };
+                    js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
+                }
+            }
+                break;
+
+
         };
 
     };

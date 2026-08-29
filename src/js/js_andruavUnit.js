@@ -1370,6 +1370,8 @@ export class CAndruavUnitObject {
     this.m_lidar_info = new C_LidarInfo(this);
     this.m_Throttle = 0; //MAVLINK_MSG_ID_VFR_HUD.throttle uint16_t % Current throttle setting (0 to 100).
 
+    this.m_moduleHealth = {};
+
 
   }
 

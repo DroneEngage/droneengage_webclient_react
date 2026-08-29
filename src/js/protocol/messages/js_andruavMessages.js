@@ -153,6 +153,12 @@ export const CONST_TYPE_AndruavMessage_Viewlink_STATUS = 1080;
 
 export const CONST_TYPE_AndruavMessage_DEPilot_Control = 1081;
 export const CONST_TYPE_AndruavMessage_Chat = 1082;
+// Viewlink telemetry stream (gimbal angles, target/vehicle coords, LRF distance, AI targets)
+// from drone_engage_viewlink_module. Reassigned from 1081 to 1083 (was colliding
+// with DEPilot_Control) - see de_common/de_databus/messages.hpp for full field docs.
+// NOTE: no parser case for this id exists yet in js_andruav_parser.js, so this
+// telemetry is not currently consumed/displayed by the webclient.
+export const CONST_TYPE_AndruavMessage_Viewlink_Telemetry = 1083;
 
 // Binary Messages
 export const CONST_TYPE_AndruavMessage_LightTelemetry = 2022;
@@ -223,6 +229,23 @@ export const CONST_TELNET_STATUS_DATA = 2;
 export const CONST_TELNET_STATUS_LIST = 3;
 export const CONST_TELNET_STATUS_ERROR = 4;
 export const CONST_TELNET_STATUS_RESIZED = 5;
+
+
+// Module Health/Memory status (de_common CFacade_Base::sendMemoryStatus)
+export const CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS = 6535;
+
+// MODULE_HEALTH_ACTION sub-codes
+export const CONST_MODULE_HEALTH_ACTION_STATUS = 0;
+
+// MODULE_HEALTH_STATUS sub-codes (field [hs])
+export const CONST_MODULE_HEALTH_STATUS_OK = 0;
+export const CONST_MODULE_HEALTH_STATUS_WARNING = 1;
+export const CONST_MODULE_HEALTH_STATUS_CRITICAL = 2;
+
+// MODULE_HEALTH_TREND sub-codes (field [tr])
+export const CONST_MODULE_HEALTH_TREND_STABLE = 0;
+export const CONST_MODULE_HEALTH_TREND_UP = 1;
+export const CONST_MODULE_HEALTH_TREND_DOWN = 2;
 
 
 // System Messages
@@ -633,6 +656,7 @@ export const message_names = {
   6532: "Telnet Status - 6532",
   6533: "Telnet Data - 6533",
   6534: "Telnet Remote Execute - 6534",
+  6535: "Module Health Status - 6535",
 };
 
 export const swarm_formation_names = {

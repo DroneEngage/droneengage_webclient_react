@@ -101,6 +101,14 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
               const needsUpgrade = module.z === -1;
               const statusColor = isOffline ? 'text-danger' : (needsUpgrade ? 'text-warning' : 'text-success');
 
+              // Health data for this module
+              // The main module (de_comm core) has no k, so use "comm".
+              const healthKey = module.k ? module.k : 'comm';
+              const health = v_andruavUnit.m_moduleHealth ? v_andruavUnit.m_moduleHealth[healthKey] : null;
+              const healthTrendIcon = health ? (health.trend === 1 ? 'bi-arrow-up text-warning' : health.trend === 2 ? 'bi-arrow-down text-success' : 'bi-arrow-left-right text-muted') : null;
+              const healthStatusColor = health ? (health.status === 2 ? 'text-danger' : health.status === 1 ? 'text-warning' : 'text-success') : null;
+              const healthStatusText = health ? (health.status === 2 ? t('critical') : health.status === 1 ? t('warning') : t('ok')) : null;
+
               return (
                 <div key={rowId} className="mobile-module-row">
                   <div className="mobile-module-row-header" onClick={() => fn_toggleExpand(rowId)}>
@@ -144,6 +152,41 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
                             {module.version_info.help}
                           </a>
                         </div>
+                      )}
+                      {health && (
+                        <>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('memory_colon')}</span>
+                            <span className={`mobile-sheet-value ${healthStatusColor}`}>
+                              {health.rss != null ? `${health.rss.toFixed(1)} MB` : '-'}
+                              {healthTrendIcon && <i className={`bi ${healthTrendIcon} ms-1`} />}
+                            </span>
+                          </div>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('health_colon')}</span>
+                            <span className={`mobile-sheet-value ${healthStatusColor}`}>{healthStatusText}</span>
+                          </div>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('peak_colon')}</span>
+                            <span className="mobile-sheet-value text-muted">{health.vmpeak != null ? `${health.vmpeak.toFixed(1)} MB` : '-'}</span>
+                          </div>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('swap_colon')}</span>
+                            <span className={`mobile-sheet-value ${health.vmswap > 0 ? 'text-warning' : 'text-muted'}`}>
+                              {health.vmswap != null ? `${health.vmswap.toFixed(1)} MB` : '-'}
+                            </span>
+                          </div>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('threads_colon')}</span>
+                            <span className="mobile-sheet-value text-muted">{health.threads ?? '-'}</span>
+                          </div>
+                          <div className="mobile-module-detail-row">
+                            <span className="mobile-sheet-label">{t('uptime_colon')}</span>
+                            <span className="mobile-sheet-value text-muted">
+                              {health.uptime != null ? `${Math.floor(health.uptime / 60)}m ${health.uptime % 60}s` : '-'}
+                            </span>
+                          </div>
+                        </>
                       )}
                     </div>
                   )}
