@@ -312,20 +312,48 @@ class CAndruavMap3D {
      * Changes the terrain exaggeration factor.  Called by the
      * TerrainExaggerationControl buttons.
      *
-     * No need to re-apply line/marker elevations: all elevated line layers
-     * use line-elevation-ground-scale:1.0, so Mapbox scales their z-offset
-     * with the terrain exaggeration automatically (added in GL JS v3.19).
-     * Marker#setAltitude() is terrain-relative, so markers also scale
-     * automatically.
+     * Elevated line layers use line-elevation-ground-scale:1.0, so Mapbox
+     * scales their z-offset with terrain exaggeration automatically (GL JS
+     * v3.19+).  Marker#setAltitude() does NOT scale automatically — the
+     * altitude is raw meters above the (exaggerated) terrain surface — so we
+     * must re-apply all marker altitudes multiplied by the new factor.
      * @param {number} factor - new exaggeration (1.0 = natural, 2.0 = 2x, etc.)
      */
     fn_setTerrainExaggeration(factor) {
         if (!this.m_map || !this.m_isReady) return;
+        const prevFactor = this.m_terrainExaggeration;
         this.m_terrainExaggeration = factor;
         this.m_map.setTerrain({
             source: 'mapbox-dem',
             exaggeration: factor
         });
+
+        // Re-apply marker altitudes with the new exaggeration factor.
+        // Drone markers store their raw alt_relative on the marker instance
+        // (set in fn_syncUnit); waypoint markers store it too (set in
+        // fn_createMissionWaypointMarker / fn_applyMissionElevation).
+        const ratio = factor / prevFactor;
+        if (ratio !== 1) {
+            this.m_markers.forEach(marker => {
+                if (marker && typeof marker.getAltitude === 'function' && typeof marker.setAltitude === 'function') {
+                    const cur = marker.getAltitude();
+                    if (Number.isFinite(cur) && cur !== 0) {
+                        marker.setAltitude(cur * ratio);
+                    }
+                }
+            });
+            this.m_missionMarkers.forEach(markers => {
+                if (!Array.isArray(markers)) return;
+                markers.forEach(marker => {
+                    if (marker && typeof marker.getAltitude === 'function' && typeof marker.setAltitude === 'function') {
+                        const cur = marker.getAltitude();
+                        if (Number.isFinite(cur) && cur !== 0) {
+                            marker.setAltitude(cur * ratio);
+                        }
+                    }
+                });
+            });
+        }
     }
 
     fn_show() {
@@ -505,8 +533,12 @@ class CAndruavMap3D {
 
         // Apply altitude so the drone floats above the 3D terrain.
         // setAltitude() is meters above the map surface when terrain is on.
+        // Marker altitude does NOT scale with terrain exaggeration (unlike
+        // line-z-offset with line-elevation-ground-scale), so we multiply by
+        // the current exaggeration factor to keep the icon at the same visual
+        // height as the elevated lines.
         if (Number.isFinite(altRelative) && typeof marker.setAltitude === 'function') {
-            marker.setAltitude(altRelative);
+            marker.setAltitude(altRelative * this.m_terrainExaggeration);
         }
 
         this.m_markers.set(id, marker);
@@ -1317,7 +1349,9 @@ class CAndruavMap3D {
         .addTo(this.m_map);
 
         if (Number.isFinite(altRelative) && typeof marker.setAltitude === 'function') {
-            marker.setAltitude(altRelative);
+            // Scale by terrain exaggeration to match elevated lines (see
+            // fn_syncUnit for the same rationale).
+            marker.setAltitude(altRelative * this.m_terrainExaggeration);
         }
 
         return marker;
@@ -1634,9 +1668,10 @@ class CAndruavMap3D {
 
             // Marker: terrain-relative altitude (same as drone marker).
             // Only first/last have dot markers; interior are null.
+            // Scale by terrain exaggeration to match elevated lines.
             const marker = markers[i];
             if (marker && typeof marker.setAltitude === 'function') {
-                marker.setAltitude(relAlt);
+                marker.setAltitude(relAlt * this.m_terrainExaggeration);
             }
 
             // Line: absolute MSL = terrainElev + relAlt (same as droneAlt).
