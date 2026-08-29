@@ -312,15 +312,11 @@ class CAndruavMap3D {
      * Changes the terrain exaggeration factor.  Called by the
      * TerrainExaggerationControl buttons.
      *
-     * No need to re-apply line/marker elevations: Mapbox's
-     * line-elevation-reference:'sea' puts line-z-offset in the same MSL
-     * coordinate space as the terrain DEM, so when exaggeration changes
-     * Mapbox scales both the terrain surface AND the line visually together.
+     * No need to re-apply line/marker elevations: all elevated line layers
+     * use line-elevation-ground-scale:1.0, so Mapbox scales their z-offset
+     * with the terrain exaggeration automatically (added in GL JS v3.19).
      * Marker#setAltitude() is terrain-relative, so markers also scale
-     * automatically.  Re-applying would actually break things —
-     * queryTerrainElevation() returns null while the DEM re-renders after
-     * the exaggeration change, which would reset the line to near-sea-level
-     * (underground).
+     * automatically.
      * @param {number} factor - new exaggeration (1.0 = natural, 2.0 = 2x, etc.)
      */
     fn_setTerrainExaggeration(factor) {
@@ -607,7 +603,8 @@ class CAndruavMap3D {
                     ['line-progress'],
                     ['get', 'elevation']
                 ],
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
@@ -676,7 +673,8 @@ class CAndruavMap3D {
                 'line-cap': 'round',
                 'line-join': 'round',
                 'line-z-offset': 0,   // updated per fn_syncTether to droneAlt
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
@@ -880,7 +878,8 @@ class CAndruavMap3D {
                 'line-cap': 'round',
                 'line-join': 'round',
                 'line-z-offset': 0,  // updated per fn_DrawPath
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
@@ -1102,7 +1101,8 @@ class CAndruavMap3D {
                 'line-cap': 'round',
                 'line-join': 'round',
                 'line-z-offset': 0,  // updated per fn_applyMissionElevation
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
@@ -1149,7 +1149,8 @@ class CAndruavMap3D {
                     ['line-progress'],
                     ['get', 'elevation']
                 ],
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
@@ -1196,7 +1197,8 @@ class CAndruavMap3D {
                     ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
                     ['get', 'elevation']
                 ],
-                'line-elevation-reference': 'sea'
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0  // scale z-offset with terrain exaggeration
             },
             paint: {
                 'line-color': color,
