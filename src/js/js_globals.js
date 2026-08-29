@@ -215,6 +215,9 @@ class GLOBALS {
 		this.CONST_MAP3D_CIRCLE_WIDTH = 2;     // ground + altitude rings
 		this.CONST_MAP3D_TRAIL_WIDTH = 5;      // flight path trail
 		this.CONST_MAP3D_MISSION_DROP_WIDTH = 1;  // waypoint drop-to-ground line
+		this.CONST_MAP3D_GATE_RADIUS = 10;        // vertical gate ring radius (meters)
+		this.CONST_MAP3D_GATE_WIDTH = 3;          // vertical gate ring line width
+		this.CONST_MAP3D_WP_GROUND_RADIUS = 5;    // ground circle radius at waypoint drop base (meters)
 
 		this.CONST_DISABLE_ADSG = true;
 

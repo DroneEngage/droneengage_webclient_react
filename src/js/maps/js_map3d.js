@@ -81,17 +81,25 @@ class CAndruavMap3D {
         // Colors + line thickness live in js_globals (CONST_MAP3D_*).
 
         // ---- 3D mission waypoints (mirrors the leaflet mission drawing) ----
-        // - Markers: small colored dots at each waypoint, elevated to its
-        //   planned altitude above terrain.
+        // - Markers: small colored dots at first/last waypoints, elevated to
+        //   their planned altitude above terrain.
+        // - Gate rings: vertical rings at interior waypoints, facing the line
+        //   direction (like a race gate).
         // - Mission line: elevated line connecting waypoints in order.
         // - Drop lines: thin vertical line from each waypoint down to the
         //   ground, showing its altitude above terrain at a glance.
+        // - Ground circles: small ring on terrain at each drop line base
+        //   (same style as the drone's ground circle).
         // - Loiter rings: ground-draped circles for CIRCLE waypoints.
-        this.m_missionMarkers = new Map();      // unitId -> array of markers
+        this.m_missionMarkers = new Map();      // unitId -> array of markers (first/last only; null for interior)
         this.m_missionLineSources = new Map();  // unitId -> sourceId
         this.m_missionLineLayers = new Map();   // unitId -> layerId
         this.m_missionDropSources = new Map();  // unitId -> sourceId (waypoint→ground vertical lines)
         this.m_missionDropLayers = new Map();   // unitId -> layerId
+        this.m_missionGateSources = new Map();  // unitId -> sourceId (vertical gate rings, FeatureCollection)
+        this.m_missionGateLayers = new Map();   // unitId -> layerId
+        this.m_missionGroundSources = new Map(); // unitId -> sourceId (ground circles at drop bases, FeatureCollection)
+        this.m_missionGroundLayers = new Map();  // unitId -> layerId
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
@@ -777,6 +785,62 @@ class CAndruavMap3D {
         return points;
     }
 
+    /**
+     * Computes the initial bearing (forward azimuth) from point 1 to point 2.
+     * @returns {number} bearing in degrees (0 = north, 90 = east, -180..180)
+     */
+    fn_bearing(lat1, lng1, lat2, lng2) {
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δλ = (lng2 - lng1) * Math.PI / 180;
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        return Math.atan2(y, x) * 180 / Math.PI;
+    }
+
+    /**
+     * Generates a vertical ring (race-gate style) centered at [lng, lat] at
+     * centerElev MSL, lying in a vertical plane perpendicular to bearingDeg.
+     *
+     * Each point on the ring has a horizontal offset (perpendicular to the
+     * line direction) and a vertical offset (altitude), so the ring stands
+     * upright like a gate the drone would fly through.
+     *
+     * @param {number} lng - center longitude
+     * @param {number} lat - center latitude
+     * @param {number} centerElev - center absolute MSL elevation
+     * @param {number} bearingDeg - line direction at this waypoint (degrees)
+     * @param {number} radiusMeters - ring radius
+     * @returns {{ coords: Array<[number,number]>, elevations: Array<number> }}
+     */
+    fn_generateVerticalRing(lng, lat, centerElev, bearingDeg, radiusMeters, numPoints = 32) {
+        const coords = [];
+        const elevations = [];
+        const latRad = lat * Math.PI / 180;
+        const metersPerDegLat = 111320;
+        const metersPerDegLng = 111320 * Math.cos(latRad);
+        // Perpendicular to the line bearing → the ring plane faces along the line.
+        const perpRad = (bearingDeg + 90) * Math.PI / 180;
+
+        for (let i = 0; i <= numPoints; i++) {
+            const angle = (i / numPoints) * 2 * Math.PI;
+            // Horizontal offset: radius * cos(angle) in the perpendicular direction
+            const horizDist = radiusMeters * Math.cos(angle);
+            const dx = horizDist * Math.sin(perpRad);  // east component
+            const dy = horizDist * Math.cos(perpRad);  // north component
+            // Vertical offset: radius * sin(angle) in altitude
+            const vertDist = radiusMeters * Math.sin(angle);
+
+            coords.push([
+                lng + dx / metersPerDegLng,
+                lat + dy / metersPerDegLat
+            ]);
+            elevations.push(centerElev + vertDist);
+        }
+
+        return { coords, elevations };
+    }
+
     // ====================================================================
     //  3D path trail (elevated dotted line along the flight path)
     // ====================================================================
@@ -1100,6 +1164,91 @@ class CAndruavMap3D {
     }
 
     /**
+     * Ensures the vertical gate-ring source + layer exist for a unit.
+     * Holds a FeatureCollection of LineStrings (one closed ring per interior
+     * waypoint).  Ring points are uniformly spaced, so at-interpolated on
+     * line-progress maps correctly per-feature (each feature has its own
+     * 'elevation' array).
+     */
+    fn_ensureMissionGateLayer(unit, color) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_missionGateSources.has(id)) return;
+
+        const sourceId = `de-mission-gate-${id}`;
+        const layerId = `de-mission-gate-layer-${id}`;
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            lineMetrics: true,
+            data: { type: 'FeatureCollection', features: [] }
+        });
+
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': [
+                    'at-interpolated',
+                    ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_GATE_WIDTH,
+                'line-opacity': 0.8
+            }
+        });
+
+        this.m_missionGateSources.set(id, sourceId);
+        this.m_missionGateLayers.set(id, layerId);
+    }
+
+    /**
+     * Ensures the ground-circle source + layer exist for a unit.
+     * Holds a FeatureCollection of closed LineString rings (one per waypoint
+     * drop-line base).  No z-offset → drapes flat on the terrain surface,
+     * same style as the drone's ground circle.
+     */
+    fn_ensureMissionGroundCircleLayer(unit, color) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_missionGroundSources.has(id)) return;
+
+        const sourceId = `de-mission-ground-${id}`;
+        const layerId = `de-mission-ground-layer-${id}`;
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] }
+        });
+
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+                // No line-z-offset / line-elevation-reference => drapes on terrain.
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        this.m_missionGroundSources.set(id, sourceId);
+        this.m_missionGroundLayers.set(id, layerId);
+    }
+
+    /**
      * Draws a ground-draped loiter ring for a CIRCLE waypoint. Each ring gets
      * its own source/layer (count varies per mission) tracked in
      * m_missionCircleIds so fn_clearMissionWaypoints can remove them all.
@@ -1210,6 +1359,20 @@ class CAndruavMap3D {
             dropSource.setData({ type: 'FeatureCollection', features: [] });
         }
 
+        // Reset gate rings (keep source/layer, just clear geometry)
+        const gateSourceId = this.m_missionGateSources.get(id);
+        const gateSource = this.m_map?.getSource(gateSourceId);
+        if (gateSource) {
+            gateSource.setData({ type: 'FeatureCollection', features: [] });
+        }
+
+        // Reset ground circles (keep source/layer, just clear geometry)
+        const groundSourceId = this.m_missionGroundSources.get(id);
+        const groundSource = this.m_map?.getSource(groundSourceId);
+        if (groundSource) {
+            groundSource.setData({ type: 'FeatureCollection', features: [] });
+        }
+
         // Remove loiter circle rings (dynamic count per sync)
         const circles = this.m_missionCircleIds.get(id);
         if (circles) {
@@ -1272,17 +1435,22 @@ class CAndruavMap3D {
         this.fn_clearMissionWaypoints(unit);
         this.fn_ensureMissionLineLayer(unit, pathColor);
         this.fn_ensureMissionDropLayer(unit, pathColor);
+        this.fn_ensureMissionGateLayer(unit, pathColor);
+        this.fn_ensureMissionGroundCircleLayer(unit, pathColor);
 
         // Only keep steps with a valid position — markers[] stays index-aligned
         // with validSteps[] so fn_applyMissionElevation can re-run later.
         const validSteps = wayPointArray.filter(w => Number.isFinite(w.Latitude) && Number.isFinite(w.Longitude));
         if (validSteps.length === 0) return;
 
+        const lastIdx = validSteps.length - 1;
+        // Dot markers for first (home) and last waypoints only; interior
+        // waypoints are represented by vertical gate rings (built in
+        // fn_applyMissionElevation).  markers[i] is null for interior
+        // waypoints so fn_applyMissionElevation skips marker altitude updates.
         const markers = validSteps.map((wayPointStep, i) => {
+            if (i !== 0 && i !== lastIdx) return null;
             const label = `${unit.m_unitName || id} - ${wayPointStep.m_label || 'WP'} #${wayPointStep.m_Sequence ?? ''}`;
-            // Home (i===0) sits on the ground (0m).  All other waypoints'
-            // Altitude is already relative-to-home → use directly as terrain-
-            // relative marker altitude, same as the drone's alt_relative.
             const relAlt = (i === 0) ? 0 : (Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0);
             return this.fn_createMissionWaypointMarker(wayPointStep.Longitude, wayPointStep.Latitude, relAlt, pathColor, label);
         });
@@ -1432,9 +1600,12 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         if (generation !== undefined && this.m_missionSyncGeneration.get(id) !== generation) return true;  // superseded
 
+        const lastIdx = validSteps.length - 1;
         const lineCoords = [];
         const lineElevations = [];
         const dropFeatures = [];
+        const gateFeatures = [];
+        const groundCircleFeatures = [];
         // Mapbox line layers need non-zero horizontal length to render — a
         // LineString with two identical [lng,lat] points is invisible. We
         // offset the top point by a tiny amount (~1m north) so each drop line
@@ -1442,6 +1613,8 @@ class CAndruavMap3D {
         // vertical component. At any realistic zoom this looks perfectly
         // vertical. (Same trick as the drone tether line in fn_syncTether.)
         const DROP_TINY_OFFSET = 0.00001;  // ~1 meter in degrees
+        const GATE_RADIUS = js_globals.CONST_MAP3D_GATE_RADIUS;
+        const GROUND_RADIUS = js_globals.CONST_MAP3D_WP_GROUND_RADIUS;
         let allResolved = true;
 
         validSteps.forEach((wayPointStep, i) => {
@@ -1458,6 +1631,7 @@ class CAndruavMap3D {
             }
 
             // Marker: terrain-relative altitude (same as drone marker).
+            // Only first/last have dot markers; interior are null.
             const marker = markers[i];
             if (marker && typeof marker.setAltitude === 'function') {
                 marker.setAltitude(relAlt);
@@ -1482,9 +1656,7 @@ class CAndruavMap3D {
 
             lineCoords.push([lng, lat]);
 
-            // Drop line: vertical line from the waypoint down to the ground.
-            // Skipped for home (on the ground) and for any waypoint at/below
-            // ground level (degenerate zero-length line).
+            // Drop line + ground circle: for every waypoint above ground.
             if (i > 0 && relAlt > 0) {
                 dropFeatures.push({
                     type: 'Feature',
@@ -1493,6 +1665,43 @@ class CAndruavMap3D {
                         coordinates: [[lng, lat], [lng, lat + DROP_TINY_OFFSET]]
                     },
                     properties: { elevation: [groundElev, topElev] }
+                });
+
+                // Ground circle at the drop line base — same style as the
+                // drone's ground circle (horizontal ring draping on terrain).
+                groundCircleFeatures.push({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: this.fn_generateCircleRing(lng, lat, GROUND_RADIUS)
+                    },
+                    properties: {}
+                });
+            }
+
+            // Gate ring: vertical ring at interior waypoints, facing the line
+            // direction.  First and last keep their dot markers instead.
+            if (i > 0 && i < lastIdx) {
+                // Bearing at this waypoint: bisector of incoming and outgoing
+                // segments, computed via vector averaging to handle wrap-around.
+                const prev = validSteps[i - 1];
+                const next = validSteps[i + 1];
+                const bIn = this.fn_bearing(prev.Latitude, prev.Longitude, lat, lng);
+                const bOut = this.fn_bearing(lat, lng, next.Latitude, next.Longitude);
+                const avgRad = Math.atan2(
+                    Math.sin(bIn * Math.PI / 180) + Math.sin(bOut * Math.PI / 180),
+                    Math.cos(bIn * Math.PI / 180) + Math.cos(bOut * Math.PI / 180)
+                );
+                const bearingDeg = avgRad * 180 / Math.PI;
+
+                const ring = this.fn_generateVerticalRing(lng, lat, topElev, bearingDeg, GATE_RADIUS);
+                gateFeatures.push({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: ring.coords
+                    },
+                    properties: { elevation: ring.elevations }
                 });
             }
         });
@@ -1528,6 +1737,23 @@ class CAndruavMap3D {
         const dropSource = this.m_map.getSource(dropSourceId);
         if (dropSource) {
             dropSource.setData({ type: 'FeatureCollection', features: dropFeatures });
+        }
+
+        // Update gate rings (FeatureCollection of vertical ring LineStrings).
+        // Ring points are uniformly spaced, so at-interpolated on line-progress
+        // maps correctly per-feature (each feature has its own elevation array).
+        const gateSourceId = this.m_missionGateSources.get(id);
+        const gateSource = this.m_map.getSource(gateSourceId);
+        if (gateSource) {
+            gateSource.setData({ type: 'FeatureCollection', features: gateFeatures });
+        }
+
+        // Update ground circles (FeatureCollection of horizontal LineString
+        // rings).  No z-offset → drapes flat on the terrain surface.
+        const groundSourceId = this.m_missionGroundSources.get(id);
+        const groundSource = this.m_map.getSource(groundSourceId);
+        if (groundSource) {
+            groundSource.setData({ type: 'FeatureCollection', features: groundCircleFeatures });
         }
 
         return allResolved;
