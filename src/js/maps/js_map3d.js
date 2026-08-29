@@ -84,10 +84,14 @@ class CAndruavMap3D {
         // - Markers: small colored dots at each waypoint, elevated to its
         //   planned altitude above terrain.
         // - Mission line: elevated line connecting waypoints in order.
+        // - Drop lines: thin vertical line from each waypoint down to the
+        //   ground, showing its altitude above terrain at a glance.
         // - Loiter rings: ground-draped circles for CIRCLE waypoints.
         this.m_missionMarkers = new Map();      // unitId -> array of markers
         this.m_missionLineSources = new Map();  // unitId -> sourceId
         this.m_missionLineLayers = new Map();   // unitId -> layerId
+        this.m_missionDropSources = new Map();  // unitId -> sourceId (waypoint→ground vertical lines)
+        this.m_missionDropLayers = new Map();   // unitId -> layerId
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
@@ -322,31 +326,48 @@ class CAndruavMap3D {
 
     fn_show() {
         this.m_isVisible = true;
-        this.m_map?.resize();
 
-        // Re-sync all markers after resize. When the map container is hidden
-        // (zero size), marker.setLngLat() projects to wrong screen coordinates
-        // via requestAnimationFrame. resize() fires a 'resize' event but NOT
-        // a 'move' event, so markers are never repositioned automatically.
-        // Manually calling setLngLat forces a re-projection with the correct
-        // container dimensions.
-        if (this.m_map && this.m_isReady) {
-            this.m_markers.forEach(marker => {
-                const lngLat = marker.getLngLat?.();
-                if (lngLat) marker.setLngLat(lngLat);
+        // The map was initialized while the container was display:none (zero
+        // size).  jQuery .show() changes display synchronously, but the browser
+        // doesn't reflow until the current JS frame yields — so calling
+        // resize() immediately reads the stale 0×0 dimensions and the canvas
+        // stays pinned in the top-left corner.  Deferring to the next
+        // animation frame lets the browser lay out the now-visible container
+        // first, so resize() picks up the real dimensions.
+        const doResizeAndSync = () => {
+            if (!this.m_map) return;
+            this.m_map.resize();
 
-                // Re-apply the last icon URL (stored on the marker instance)
-                if (marker._lastIconUrl) {
-                    const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
-                    if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
-                }
-            });
+            // Re-sync all markers after resize. When the map container is hidden
+            // (zero size), marker.setLngLat() projects to wrong screen coordinates
+            // via requestAnimationFrame. resize() fires a 'resize' event but NOT
+            // a 'move' event, so markers are never repositioned automatically.
+            // Manually calling setLngLat forces a re-projection with the correct
+            // container dimensions.
+            if (this.m_isReady) {
+                this.m_markers.forEach(marker => {
+                    const lngLat = marker.getLngLat?.();
+                    if (lngLat) marker.setLngLat(lngLat);
 
-            // Re-draw any missions that were stored while the 3D tab was
-            // hidden — markers created against a zero-size container don't
-            // project correctly, so we replay them now that it's visible.
-            this.fn_replayMissions();
-        }
+                    // Re-apply the last icon URL (stored on the marker instance)
+                    if (marker._lastIconUrl) {
+                        const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
+                        if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
+                    }
+                });
+
+                // Re-draw any missions that were stored while the 3D tab was
+                // hidden — markers created against a zero-size container don't
+                // project correctly, so we replay them now that it's visible.
+                this.fn_replayMissions();
+            }
+        };
+
+        // Best-effort immediate resize (works if the browser already has
+        // cached dimensions), then a guaranteed one on the next frame after
+        // reflow.  The double-RAF covers browsers where a single frame
+        // isn't enough to commit the layout change from display:none→block.
+        requestAnimationFrame(() => requestAnimationFrame(doResizeAndSync));
     }
 
     fn_hide() {
@@ -783,7 +804,10 @@ class CAndruavMap3D {
         });
 
         // Dotted elevated trail: line-z-offset lifts it to drone altitude,
-        // line-dasharray creates dot-like segments.
+        // line-dasharray creates dot-like segments.  The line-z-offset
+        // expression is updated per fn_DrawPath call to map each vertex's
+        // actual distance-based progress to its elevation (see
+        // fn_buildLineZOffsetExpr).
         this.m_map.addLayer({
             id: layerId,
             type: 'line',
@@ -791,11 +815,7 @@ class CAndruavMap3D {
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
-                'line-z-offset': [
-                    'at-interpolated',
-                    ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
-                    ['get', 'elevation']
-                ],
+                'line-z-offset': 0,  // updated per fn_DrawPath
                 'line-elevation-reference': 'sea'
             },
             paint: {
@@ -834,6 +854,7 @@ class CAndruavMap3D {
         data.elevations.push(absAlt);
 
         const sourceId = this.m_pathSources.get(id);
+        const layerId = this.m_pathLayers.get(id);
         const source = this.m_map.getSource(sourceId);
         if (!source) return null;
 
@@ -842,6 +863,14 @@ class CAndruavMap3D {
             geometry: { type: 'LineString', coordinates: data.coords },
             properties: { elevation: data.elevations }
         });
+
+        // Update line-z-offset to map each vertex's actual distance-based
+        // progress to its elevation, so the trail passes through the correct
+        // altitude at every recorded point regardless of spacing.
+        if (layerId) {
+            const zOffsetExpr = this.fn_buildLineZOffsetExpr(data.coords, data.elevations);
+            this.m_map.setLayoutProperty(layerId, 'line-z-offset', zOffsetExpr);
+        }
 
         return { sourceId, index: data.coords.length - 1 };
     }
@@ -934,9 +963,54 @@ class CAndruavMap3D {
     }
 
     /**
+     * Builds a Mapbox 'interpolate' expression for line-z-offset that maps
+     * each vertex's actual cumulative-distance progress (line-progress) to
+     * its elevation, so the line passes through the correct elevation at
+     * every vertex — regardless of whether vertices are evenly spaced.
+     *
+     * The previous approach used at-interpolated(line-progress * (N-1),
+     * elevation), which assumes uniform spacing.  With unevenly spaced
+     * waypoints (the common case), line-progress at vertex i ≠ i/(N-1),
+     * so the line interpolated between the wrong elevation values and
+     * missed the markers at every interior vertex.
+     *
+     * @param {Array<[number,number]>} coords - GeoJSON [lng,lat] coordinates
+     * @param {Array<number>} elevations - absolute MSL elevation per vertex
+     * @returns {Array|number} Mapbox interpolate expression, or a constant
+     *          if the line has < 2 vertices or zero total length.
+     */
+    fn_buildLineZOffsetExpr(coords, elevations) {
+        if (!coords || coords.length < 2) return elevations?.[0] ?? 0;
+
+        // Cumulative distance along the line (equirectangular approximation —
+        // only relative proportions matter for the progress fractions).
+        const dists = [0];
+        let total = 0;
+        for (let i = 1; i < coords.length; i++) {
+            const lat = coords[i][1];
+            const lng2m = 111320 * Math.cos(lat * Math.PI / 180);
+            const dx = (coords[i][0] - coords[i - 1][0]) * lng2m;
+            const dy = (coords[i][1] - coords[i - 1][1]) * 111320;
+            total += Math.hypot(dx, dy);
+            dists.push(total);
+        }
+
+        if (total === 0) return elevations[0] ?? 0;
+
+        // ['interpolate', ['linear'], ['line-progress'], p0, e0, p1, e1, ...]
+        const expr = ['interpolate', ['linear'], ['line-progress']];
+        for (let i = 0; i < coords.length; i++) {
+            expr.push(dists[i] / total);
+            expr.push(elevations[i]);
+        }
+        return expr;
+    }
+
+    /**
      * Ensures the elevated mission-path line source + layer exist for a unit.
-     * Uses the same line-z-offset + at-interpolated mechanism as the flight
-     * path trail, but solid/dashed differently to distinguish plan vs flown path.
+     * Uses line-z-offset with an interpolate expression (updated per data set
+     * in fn_applyMissionElevation) so the line passes through each waypoint's
+     * correct elevation regardless of spacing.
      */
     fn_ensureMissionLineLayer(unit, color) {
         if (!this.m_map || !this.m_isReady) return;
@@ -963,11 +1037,7 @@ class CAndruavMap3D {
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
-                'line-z-offset': [
-                    'at-interpolated',
-                    ['*', ['line-progress'], ['-', ['length', ['get', 'elevation']], 1]],
-                    ['get', 'elevation']
-                ],
+                'line-z-offset': 0,  // updated per fn_applyMissionElevation
                 'line-elevation-reference': 'sea'
             },
             paint: {
@@ -980,6 +1050,53 @@ class CAndruavMap3D {
 
         this.m_missionLineSources.set(id, sourceId);
         this.m_missionLineLayers.set(id, layerId);
+    }
+
+    /**
+     * Ensures the waypoint drop-line source + layer exist for a unit.
+     * Holds a FeatureCollection of 2-vertex LineStrings (one per waypoint),
+     * each going from the ground up to the waypoint's planned altitude.
+     * Uses the same line-z-offset + at-interpolated mechanism as the tether
+     * line, evaluated per-feature so every drop line rises independently.
+     */
+    fn_ensureMissionDropLayer(unit, color) {
+        if (!this.m_map || !this.m_isReady) return;
+        const id = unit.getPartyID();
+        if (this.m_missionDropSources.has(id)) return;
+
+        const sourceId = `de-mission-drop-${id}`;
+        const layerId = `de-mission-drop-layer-${id}`;
+
+        this.m_map.addSource(sourceId, {
+            type: 'geojson',
+            lineMetrics: true,
+            data: { type: 'FeatureCollection', features: [] }
+        });
+
+        this.m_map.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': [
+                    'at-interpolated',
+                    ['line-progress'],
+                    ['get', 'elevation']
+                ],
+                'line-elevation-reference': 'sea'
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_MISSION_DROP_WIDTH,
+                'line-opacity': 0.5,
+                'line-dasharray': [1, 1]
+            }
+        });
+
+        this.m_missionDropSources.set(id, sourceId);
+        this.m_missionDropLayers.set(id, layerId);
     }
 
     /**
@@ -1086,6 +1203,13 @@ class CAndruavMap3D {
             });
         }
 
+        // Reset waypoint drop lines (keep source/layer, just clear geometry)
+        const dropSourceId = this.m_missionDropSources.get(id);
+        const dropSource = this.m_map?.getSource(dropSourceId);
+        if (dropSource) {
+            dropSource.setData({ type: 'FeatureCollection', features: [] });
+        }
+
         // Remove loiter circle rings (dynamic count per sync)
         const circles = this.m_missionCircleIds.get(id);
         if (circles) {
@@ -1147,6 +1271,7 @@ class CAndruavMap3D {
 
         this.fn_clearMissionWaypoints(unit);
         this.fn_ensureMissionLineLayer(unit, pathColor);
+        this.fn_ensureMissionDropLayer(unit, pathColor);
 
         // Only keep steps with a valid position — markers[] stays index-aligned
         // with validSteps[] so fn_applyMissionElevation can re-run later.
@@ -1309,6 +1434,14 @@ class CAndruavMap3D {
 
         const lineCoords = [];
         const lineElevations = [];
+        const dropFeatures = [];
+        // Mapbox line layers need non-zero horizontal length to render — a
+        // LineString with two identical [lng,lat] points is invisible. We
+        // offset the top point by a tiny amount (~1m north) so each drop line
+        // has horizontal extent to draw, while line-z-offset provides the
+        // vertical component. At any realistic zoom this looks perfectly
+        // vertical. (Same trick as the drone tether line in fn_syncTether.)
+        const DROP_TINY_OFFSET = 0.00001;  // ~1 meter in degrees
         let allResolved = true;
 
         validSteps.forEach((wayPointStep, i) => {
@@ -1334,18 +1467,39 @@ class CAndruavMap3D {
             // If terrain hasn't resolved yet, use relAlt alone as best-effort
             // (marker is already at relAlt above terrain, so the line roughly
             // tracks it) and mark for retry.
+            let topElev;
+            let groundElev;
             if (localTerrainElev === null || localTerrainElev === undefined) {
                 allResolved = false;
+                topElev = relAlt;
+                groundElev = 0;
                 lineElevations.push(relAlt);
             } else {
+                topElev = localTerrainElev + relAlt;
+                groundElev = localTerrainElev;
                 lineElevations.push(localTerrainElev + relAlt);
             }
 
             lineCoords.push([lng, lat]);
+
+            // Drop line: vertical line from the waypoint down to the ground.
+            // Skipped for home (on the ground) and for any waypoint at/below
+            // ground level (degenerate zero-length line).
+            if (i > 0 && relAlt > 0) {
+                dropFeatures.push({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: [[lng, lat], [lng, lat + DROP_TINY_OFFSET]]
+                    },
+                    properties: { elevation: [groundElev, topElev] }
+                });
+            }
         });
 
         if (lineCoords.length >= 2) {
             const lineSourceId = this.m_missionLineSources.get(id);
+            const lineLayerId = this.m_missionLineLayers.get(id);
             const lineSource = this.m_map.getSource(lineSourceId);
             if (lineSource) {
                 lineSource.setData({
@@ -1354,6 +1508,26 @@ class CAndruavMap3D {
                     properties: { elevation: lineElevations }
                 });
             }
+            // Update line-z-offset with an interpolate expression that maps
+            // each vertex's actual distance-based progress to its elevation.
+            // This ensures the line passes through the correct elevation at
+            // every waypoint, regardless of uneven spacing.  (The previous
+            // at-interpolated(line-progress * (N-1), elevation) assumed uniform
+            // spacing and missed every interior marker.)
+            if (lineLayerId) {
+                const zOffsetExpr = this.fn_buildLineZOffsetExpr(lineCoords, lineElevations);
+                this.m_map.setLayoutProperty(lineLayerId, 'line-z-offset', zOffsetExpr);
+            }
+        }
+
+        // Update waypoint drop lines (one FeatureCollection of 2-vertex
+        // LineStrings). Each feature's elevation array is evaluated
+        // independently by line-progress, so every drop line rises from
+        // the ground up to its own waypoint altitude.
+        const dropSourceId = this.m_missionDropSources.get(id);
+        const dropSource = this.m_map.getSource(dropSourceId);
+        if (dropSource) {
+            dropSource.setData({ type: 'FeatureCollection', features: dropFeatures });
         }
 
         return allResolved;

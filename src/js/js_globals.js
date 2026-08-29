@@ -214,6 +214,7 @@ class GLOBALS {
 		this.CONST_MAP3D_TETHER_WIDTH = 2;     // vertical tether line
 		this.CONST_MAP3D_CIRCLE_WIDTH = 2;     // ground + altitude rings
 		this.CONST_MAP3D_TRAIL_WIDTH = 5;      // flight path trail
+		this.CONST_MAP3D_MISSION_DROP_WIDTH = 1;  // waypoint drop-to-ground line
 
 		this.CONST_DISABLE_ADSG = true;
 
