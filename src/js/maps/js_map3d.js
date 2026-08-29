@@ -731,8 +731,13 @@ class CAndruavMap3D {
         this.fn_ensureTetherLayer(unit);
 
         // Terrain elevation at the drone's position (meters above sea level).
+        // queryTerrainElevation() returns the EXAGGERATED elevation (raw DEM ×
+        // exaggeration).  Our line layers use line-elevation-ground-scale:1.0
+        // which scales the z-offset by exaggeration, so we must pass the RAW
+        // (non-exaggerated) DEM value to avoid double-scaling.
+        const exag = this.m_terrainExaggeration || 1;
         const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
-            ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
+            ? ((this.m_map.queryTerrainElevation([lng, lat]) || 0) / exag)
             : 0;
         const droneAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
 
@@ -937,8 +942,11 @@ class CAndruavMap3D {
         const id = unit.getPartyID();
         this.fn_ensurePathTrailLayer(unit);
 
+        // queryTerrainElevation() returns exaggerated elevation; divide by
+        // exaggeration to get raw DEM value for line-elevation-ground-scale.
+        const exag = this.m_terrainExaggeration || 1;
         const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
-            ? (this.m_map.queryTerrainElevation([lng, lat]) || 0)
+            ? ((this.m_map.queryTerrainElevation([lng, lat]) || 0) / exag)
             : 0;
         const absAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
 
@@ -1660,10 +1668,16 @@ class CAndruavMap3D {
             const relAlt = (i === 0) ? 0 : (Number.isFinite(wayPointStep.Altitude) ? wayPointStep.Altitude : 0);
 
             // queryTerrainElevation() returns null (not 0) when the DEM tile
-            // for this point hasn't loaded yet.
+            // for this point hasn't loaded yet.  It also returns the
+            // EXAGGERATED elevation (raw DEM × exaggeration); we divide by
+            // exaggeration to get the raw value, since our line layers use
+            // line-elevation-ground-scale:1.0 which scales the z-offset by
+            // exaggeration (avoiding double-scaling).
+            const exag = this.m_terrainExaggeration || 1;
             let localTerrainElev = null;
             if (typeof this.m_map.queryTerrainElevation === 'function') {
-                localTerrainElev = this.m_map.queryTerrainElevation([lng, lat]);
+                const queried = this.m_map.queryTerrainElevation([lng, lat]);
+                localTerrainElev = (queried === null || queried === undefined) ? null : queried / exag;
             }
 
             // Marker: terrain-relative altitude (same as drone marker).
