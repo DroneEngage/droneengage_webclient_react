@@ -1378,10 +1378,11 @@ class CAndruavMap3D {
         // the *graphics* before redrawing.  The store is cleared only by
         // fn_syncMissionWaypoints when an empty array arrives (mission deleted).
 
-        // Remove waypoint markers
+        // Remove waypoint markers (interior entries are null — gate rings
+        // replace dot markers there — so guard before calling .remove()).
         const markers = this.m_missionMarkers.get(id);
         if (markers) {
-            markers.forEach(marker => marker.remove());
+            markers.forEach(marker => marker && marker.remove());
         }
         this.m_missionMarkers.set(id, []);
 
