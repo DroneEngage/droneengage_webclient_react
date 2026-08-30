@@ -77,30 +77,24 @@ class ClssMissionLoadDialog extends ClssModalDialogBase {
 
         const missionName = mission.name || mission.id;
 
-        // Use confirmation via event dispatch to avoid importing js_main circular dep
-        js_eventEmitter.fn_dispatch(js_event.EE_displayConfirmationDialog, {
-            p_title: 'Delete Mission',
-            p_message: 'Are you sure you want to delete "' + missionName + '" from cloud storage?',
-            p_callback: function (p_approved) {
-                if (p_approved === false) return;
+        // Use native browser confirm so the prompt always appears above this modal
+        // (custom confirmation dialog was hidden behind the mission load dialog due to z-index stacking)
+        const approved = window.confirm('Are you sure you want to delete "' + missionName + '" from cloud storage?');
+        if (!approved) return;
 
-                // Call delete API
-                js_globals.v_andruavFacade.API_deleteMission(missionId);
+        // Call delete API
+        js_globals.v_andruavFacade.API_deleteMission(missionId);
 
-                // Remove from local list immediately for responsive UI
-                const remaining = Me.state.missions.filter(m => m.id !== missionId);
-                Me.setState({
-                    missions: remaining,
-                    selectedMissionId: Me.state.selectedMissionId === missionId ? null : Me.state.selectedMissionId
-                });
-
-                if (Me.p_deleteCallback) {
-                    Me.p_deleteCallback(missionId);
-                }
-            },
-            p_yesCaption: 'Delete',
-            p_style: 'bg-danger txt-theme-aware'
+        // Remove from local list immediately for responsive UI
+        const remaining = Me.state.missions.filter(m => m.id !== missionId);
+        Me.setState({
+            missions: remaining,
+            selectedMissionId: Me.state.selectedMissionId === missionId ? null : Me.state.selectedMissionId
         });
+
+        if (Me.p_deleteCallback) {
+            Me.p_deleteCallback(missionId);
+        }
     }
 
     fn_formatDate(timestamp) {
