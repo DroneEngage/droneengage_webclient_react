@@ -212,6 +212,14 @@ export const CONST_TYPE_AndruavSystem_SaveMission = 9011;
 export const CONST_TYPE_AndruavSystem_DeleteMission = 9012;
 export const CONST_TYPE_AndruavSystem_QueryServer = 9013;
 export const CONST_TYPE_AndruavSystem_StateServer = 9014;
+export const CONST_TYPE_AndruavSystem_LoadNews = 9015;
+export const CONST_TYPE_AndruavSystem_SaveNews = 9016;
+export const CONST_TYPE_AndruavSystem_DeleteNews = 9017;
+export const CONST_TYPE_AndruavSystem_NewsPush = 9018;
+
+// News scopes
+export const CONST_NEWS_SCOPE_GLOBAL = 'global';
+export const CONST_NEWS_SCOPE_ACCOUNT = 'account';
 
 // Subcommands for QueryServer / StateServer
 export const CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected = 1;

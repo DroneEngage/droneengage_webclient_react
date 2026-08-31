@@ -1578,3 +1578,25 @@ body.theme-vapor .btn-close {
   color: #000;
 }
 
+.news-display-container {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 420px;
+  z-index: 1001;
+}
+
+.news-display-panel .card-body,
+.news-display-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.news-write-panel {
+  position: fixed;
+  bottom: 10px;
+  left: 450px;
+  width: 380px;
+  z-index: 1002;
+}
+

@@ -140,7 +140,13 @@ const EVENT_LIST = Object.freeze({
 		"EE_Mission_Saved",
 		"EE_Mission_Deleted",
 		"EE_displayMissionLoadDialog",
-		"EE_StorageServerState"
+		"EE_StorageServerState",
+		"EE_News_Loaded",
+		"EE_News_Saved",
+		"EE_News_Deleted",
+		"EE_News_Push",
+		"EE_onNewsToggle",
+		"EE_onNewsWriteToggle"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

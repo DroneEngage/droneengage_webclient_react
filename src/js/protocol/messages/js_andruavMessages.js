@@ -260,9 +260,22 @@ export const CONST_TYPE_AndruavSystem_SaveMission = 9011;
 export const CONST_TYPE_AndruavSystem_DeleteMission = 9012;
 export const CONST_TYPE_AndruavSystem_QueryServer = 9013;
 export const CONST_TYPE_AndruavSystem_StateServer = 9014;
+export const CONST_TYPE_AndruavSystem_LoadNews = 9015;
+export const CONST_TYPE_AndruavSystem_SaveNews = 9016;
+export const CONST_TYPE_AndruavSystem_DeleteNews = 9017;
+export const CONST_TYPE_AndruavSystem_NewsPush = 9018;
 
 // Subcommands for QueryServer / StateServer
 export const CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected = 1;
+
+// News scopes
+export const CONST_NEWS_SCOPE_GLOBAL = 'global';
+export const CONST_NEWS_SCOPE_ACCOUNT = 'account';
+
+// News priority levels
+export const CONST_NEWS_PRIORITY_INFO = 0;
+export const CONST_NEWS_PRIORITY_WARNING = 1;
+export const CONST_NEWS_PRIORITY_CRITICAL = 2;
 
 // Storage/DB connection state codes (short strings)
 export const CONST_STORAGE_STATE_DISCONNECTED = 'dc';
@@ -553,6 +566,7 @@ export const CONST_TELEMETRY_SOURCE_GCS = 2;
 export const CONST_checkStatus_Interverl0 = 15000;
 export const CONST_checkStatus_Interverl1 = 20000;
 export const CONST_sendID_Interverl = 13000;
+export const CONST_News_Resync_Interval = 300000; // 5 minutes - safety-net resync for missed NewsPush
 export const CONST_sendRXChannels_Interval = 250;
 export const CONST_GAMEPAD_LONG_PRESS = 1250;
 export const CONST_GAMEPAD_REPEATED = 3000;

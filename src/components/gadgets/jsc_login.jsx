@@ -26,6 +26,8 @@ class ClssLoginControl extends React.Component {
       use_plugin: false,
       is_chat_visible: true,
       chat_unread: 0,
+      is_news_visible: true,
+      news_unread: 0,
       errorMessage: '',
       successMessage: '',
     };
@@ -43,6 +45,9 @@ class ClssLoginControl extends React.Component {
     this.fn_onChatMessage = this.fn_onChatMessage.bind(this);
     this.fn_onChatToggle = this.fn_onChatToggle.bind(this);
     this.fn_toggleChat = this.fn_toggleChat.bind(this);
+    this.fn_onNewsPush = this.fn_onNewsPush.bind(this);
+    this.fn_onNewsToggle = this.fn_onNewsToggle.bind(this);
+    this.fn_toggleNews = this.fn_toggleNews.bind(this);
     this.fn_onWebConnectorNotRunning = this.fn_onWebConnectorNotRunning.bind(this);
 
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
@@ -50,6 +55,8 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
     js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
     js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
+    js_eventEmitter.fn_subscribe(js_event.EE_News_Push, this, this.fn_onNewsPush);
+    js_eventEmitter.fn_subscribe(js_event.EE_onNewsToggle, this, this.fn_onNewsToggle);
     js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
 
   }
@@ -110,6 +117,29 @@ class ClssLoginControl extends React.Component {
     const nextVisible = this.state.chat_unread > 0 ? true : !this.state.is_chat_visible;
     this.setState({ is_chat_visible: nextVisible, chat_unread: nextVisible ? 0 : this.state.chat_unread });
     js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: nextVisible });
+  }
+
+  fn_onNewsPush(me) {
+    if (me.m_flag_mounted === false) return;
+    if (me.state.is_news_visible === false) {
+      me.setState(prevState => ({ news_unread: prevState.news_unread + 1 }));
+    }
+  }
+
+  fn_onNewsToggle(me, p_data) {
+    if (me.m_flag_mounted === false) return;
+    const visible = p_data && p_data.visible === true;
+    me.setState({ is_news_visible: visible, news_unread: visible ? 0 : me.state.news_unread });
+  }
+
+  fn_toggleNews(p_event) {
+    if (p_event) {
+      p_event.preventDefault();
+      p_event.stopPropagation();
+    }
+    const nextVisible = this.state.news_unread > 0 ? true : !this.state.is_news_visible;
+    this.setState({ is_news_visible: nextVisible, news_unread: nextVisible ? 0 : this.state.news_unread });
+    js_eventEmitter.fn_dispatch(js_event.EE_onNewsToggle, { visible: nextVisible });
   }
 
   fn_onAuthBad(me, data) {
@@ -249,6 +279,8 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onChatMessage, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onChatToggle, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_News_Push, this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_onNewsToggle, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
   }
 
@@ -549,6 +581,22 @@ class ClssLoginControl extends React.Component {
         className={'btn btn-sm mt-1 ms-1 bi ' + v_chatIconClass + ' btn_bi_fixer me-1 ' + v_chatBtnClass}
         title={this.state.chat_unread > 0 ? 'GCS Chat (' + this.state.chat_unread + ')' : 'GCS Chat'}
         onClick={(e) => this.fn_toggleChat(e)}
+      >
+      </button>
+    );
+
+    const v_newsIconClass = this.state.news_unread > 0
+      ? 'bi-megaphone-fill text-danger'
+      : (this.state.is_news_visible ? 'bi-megaphone-fill' : 'bi-megaphone');
+    const v_newsBtnClass = this.state.is_news_visible ? 'btn-primary' : 'btn-secondary';
+
+    control.push(
+      <button
+        key={'btn_news' + this.key}
+        type="button"
+        className={'btn btn-sm mt-1 ms-1 bi ' + v_newsIconClass + ' btn_bi_fixer me-1 ' + v_newsBtnClass}
+        title={this.state.news_unread > 0 ? 'News (' + this.state.news_unread + ')' : 'News'}
+        onClick={(e) => this.fn_toggleNews(e)}
       >
       </button>
     );

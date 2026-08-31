@@ -42,6 +42,8 @@ import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_detail
 import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
+import ClssNewsDisplay from '../components/jsc_news_display.jsx';
+import ClssNewsWrite from '../components/jsc_news_write.jsx';
 import MobileLoginPanel from '../components/gadgets/mobile/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
 import ClssMobileModuleDetailsPanel from '../components/gadgets/mobile/jsc_mobile_module_details_panel.jsx';
@@ -449,6 +451,10 @@ const Mobile = () => {
         <div id="gcs_chat_container" className="gcs-chat-container">
           <ClssGCSChat />
         </div>
+        <div id="news_display_container" className="news-display-container">
+          <ClssNewsDisplay />
+        </div>
+        <ClssNewsWrite />
         <div id="div_cmp_hud" />
         <div className="monitorview" id="message_notification" style={{ display: 'none' }}>
           &nbsp;

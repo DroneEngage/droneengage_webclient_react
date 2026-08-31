@@ -941,6 +941,49 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_QueryServer, p_msg);
     }
 
+    /**
+     * Load news (global + this account's news) from storage server via comm server.
+     * Reply arrives as CONST_TYPE_AndruavSystem_LoadNews; live updates arrive
+     * unsolicited as CONST_TYPE_AndruavSystem_NewsPush.
+     */
+    API_loadNews() {
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_LoadNews, {});
+    }
+
+    /**
+     * Save (create) an account-scoped news item via comm server.
+     * Global-scope news can only be posted from the storage server admin dashboard.
+     * @param {string} p_title - optional title
+     * @param {string} p_body - news text
+     * @param {number} p_priority - 0=info, 1=warning, 2=critical
+     * @param {number} p_expiresAt - optional epoch seconds
+     */
+    API_saveNews(p_title, p_body, p_priority, p_expiresAt = null) {
+        let p_msg = {
+            title: p_title,
+            body: p_body,
+            priority: p_priority
+        };
+
+        if (p_expiresAt !== null && p_expiresAt !== undefined) {
+            p_msg.expiresAt = p_expiresAt;
+        }
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_SaveNews, p_msg);
+    }
+
+    /**
+     * Disable (soft-delete) a news item via comm server.
+     * @param {string} p_newsId
+     */
+    API_deleteNews(p_newsId) {
+        let p_msg = {
+            newsId: p_newsId
+        };
+
+        js_andruav_ws.AndruavClientWS._API_sendSYSCMD(js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteNews, p_msg);
+    }
+
 
     API_TXCtrl(p_andruavUnit, p_subAction) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;

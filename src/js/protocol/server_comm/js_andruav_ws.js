@@ -84,6 +84,7 @@ class CAndruavClientWS {
         this.m_andruavUnit = null;
 
         this.m_timer_id = null;
+        this.m_newsResyncTimer_id = null;
 
         // Auth-frame state (security item 2.1)
         this.m_authViaFrame = false;   // true when credentials are sent via a post-open frame
@@ -279,6 +280,26 @@ class CAndruavClientWS {
             js_eventEmitter.fn_dispatch(js_event.EE_StorageServerState, p_payload);
             return;
         }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_LoadNews) {
+            js_eventEmitter.fn_dispatch(js_event.EE_News_Loaded, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_SaveNews) {
+            js_eventEmitter.fn_dispatch(js_event.EE_News_Saved, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_DeleteNews) {
+            js_eventEmitter.fn_dispatch(js_event.EE_News_Deleted, msg.msgPayload);
+            return;
+        }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_NewsPush) {
+            js_eventEmitter.fn_dispatch(js_event.EE_News_Push, msg.msgPayload);
+            return;
+        }
     };
 
     setSocketStatus(status) {
@@ -301,8 +322,16 @@ class CAndruavClientWS {
             // request IDfrom all units
             js_andruav_facade.AndruavClientFacade.API_requestID();
 
+            // News: load immediately, then periodically resync as a safety-net for
+            // any push (NewsPush) missed while disconnected/reconnecting.
+            js_andruav_facade.AndruavClientFacade.API_loadNews();
+            this.m_newsResyncTimer_id = setInterval(function () {
+                js_andruav_facade.AndruavClientFacade.API_loadNews();
+            }, js_andruavMessages.CONST_News_Resync_Interval);
+
         } else {
             clearInterval(this.m_timer_id);
+            clearInterval(this.m_newsResyncTimer_id);
         }
         js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus2, { status: status, name: c_SOCKET_STATUS[status - 1] });
     };

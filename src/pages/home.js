@@ -34,6 +34,8 @@ import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList
 import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
 import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
+import ClssNewsDisplay from '../components/jsc_news_display.jsx';
+import ClssNewsWrite from '../components/jsc_news_write.jsx';
 import ClssAltitudeDialog from '../components/dialogs/jsc_altitudeDialog.jsx';
 import ClssSpeedDialog from '../components/dialogs/jsc_speedDialog.jsx';
 import ClssUnitInfoDialog from '../components/dialogs/jsc_unitInfoDialog.jsx';
@@ -147,6 +149,11 @@ const Home = () => {
             <div id="gcs_chat_container" className="gcs-chat-container">
               <ClssGCSChat />
             </div>
+
+            <div id="news_display_container" className="news-display-container">
+              <ClssNewsDisplay />
+            </div>
+            <ClssNewsWrite />
           </div>
 
           <ClssModuleDetails />
