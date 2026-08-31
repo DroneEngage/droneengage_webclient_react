@@ -5,6 +5,7 @@ import Draggable from 'react-draggable';
 import { EVENTS as js_event } from '../js/js_eventList.js';
 import { js_eventEmitter } from '../js/js_eventEmitter.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
+import { CONST_FEATURE as js_siteConfig_CONST_FEATURE } from '../js/js_siteConfig.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
 
 /**
@@ -123,7 +124,10 @@ class ClssNewsDisplay extends ClssDialogBase {
 
         const news = this.fn_getActiveNews();
 
-        const composeButton = (
+        const sendingDisabled = js_siteConfig_CONST_FEATURE
+            && js_siteConfig_CONST_FEATURE.DISABLE_SENDING_NEWS === true;
+
+        const composeButton = sendingDisabled ? null : (
             <button
                 type="button"
                 className="btn btn-sm btn-link text-dark float-end p-0 ms-2"

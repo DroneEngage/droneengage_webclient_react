@@ -105,5 +105,18 @@
     "target_all": "Tous les GCS",
     "send": "Envoyer",
     "input_placeholder": "Tapez @nom pour cibler ou un message ici"
+  },
+  "news": {
+    "title": "Actualités",
+    "compose": "Publier une actualité",
+    "no_news": "Aucune actualité",
+    "write_title": "Publier une actualité (compte)",
+    "title_placeholder": "Titre (facultatif)",
+    "body_placeholder": "Texte de l'actualité",
+    "priority_info": "Info",
+    "priority_warning": "Avertissement",
+    "priority_critical": "Critique",
+    "expires_title": "Expire (facultatif)",
+    "post": "Publier"
   }
 }

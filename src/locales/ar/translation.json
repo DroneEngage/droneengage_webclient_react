@@ -90,5 +90,18 @@
     "target_all": "كل GCS",
     "send": "إرسال",
     "input_placeholder": "اكتب @name للهدف أو رسالة هنا"
+  },
+  "news": {
+    "title": "الأخبار",
+    "compose": "نشر خبر",
+    "no_news": "لا توجد أخبار",
+    "write_title": "نشر خبر (الحساب)",
+    "title_placeholder": "العنوان (اختياري)",
+    "body_placeholder": "نص الخبر",
+    "priority_info": "معلومة",
+    "priority_warning": "تحذير",
+    "priority_critical": "حرج",
+    "expires_title": "ينتهي في (اختياري)",
+    "post": "نشر"
   }
 }

@@ -87,7 +87,7 @@ class ClssNewsWrite extends ClssDialogBase {
 
         return (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
-                <div className="card css_ontop news-write-panel" ref={this.m_panelRef}>
+                <div className="card css_ontop news-write-panel p-0" ref={this.m_panelRef}>
                     {this.fn_renderDialogHeader(title, false)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2">

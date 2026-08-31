@@ -105,5 +105,18 @@
     "target_all": "All GCS",
     "send": "Send",
     "input_placeholder": "Type @name to target or message here"
+  },
+  "news": {
+    "title": "News",
+    "compose": "Post news",
+    "no_news": "No news",
+    "write_title": "Post News (Account)",
+    "title_placeholder": "Title (optional)",
+    "body_placeholder": "News text",
+    "priority_info": "Info",
+    "priority_warning": "Warning",
+    "priority_critical": "Critical",
+    "expires_title": "Expires (optional)",
+    "post": "Post"
   }
 }

@@ -105,5 +105,18 @@
     "target_all": "Todos los GCS",
     "send": "Enviar",
     "input_placeholder": "Escribe @nombre para dirigir o un mensaje"
+  },
+  "news": {
+    "title": "Noticias",
+    "compose": "Publicar noticia",
+    "no_news": "Sin noticias",
+    "write_title": "Publicar noticia (cuenta)",
+    "title_placeholder": "Título (opcional)",
+    "body_placeholder": "Texto de la noticia",
+    "priority_info": "Info",
+    "priority_warning": "Aviso",
+    "priority_critical": "Crítico",
+    "expires_title": "Caduca (opcional)",
+    "post": "Publicar"
   }
 }

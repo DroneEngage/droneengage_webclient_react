@@ -105,5 +105,18 @@
     "target_all": "Все GCS",
     "send": "Отправить",
     "input_placeholder": "Введите @name для адресата или сообщение здесь"
+  },
+  "news": {
+    "title": "Новости",
+    "compose": "Опубликовать новость",
+    "no_news": "Нет новостей",
+    "write_title": "Опубликовать новость (аккаунт)",
+    "title_placeholder": "Заголовок (необязательно)",
+    "body_placeholder": "Текст новости",
+    "priority_info": "Инфо",
+    "priority_warning": "Предупреждение",
+    "priority_critical": "Критично",
+    "expires_title": "Срок действия (необязательно)",
+    "post": "Опубликовать"
   }
 }
