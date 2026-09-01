@@ -264,6 +264,8 @@ export const CONST_TYPE_AndruavSystem_LoadNews = 9015;
 export const CONST_TYPE_AndruavSystem_SaveNews = 9016;
 export const CONST_TYPE_AndruavSystem_DeleteNews = 9017;
 export const CONST_TYPE_AndruavSystem_NewsPush = 9018;
+export const CONST_TYPE_AndruavSystem_AisSub = 9019;
+export const CONST_TYPE_AndruavSystem_AisPush = 9020;
 
 // Subcommands for QueryServer / StateServer
 export const CONST_TYPE_AndruavSystem_QueryServer_SubCmd_Is_Storage_Server_Connected = 1;

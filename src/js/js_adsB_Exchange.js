@@ -1,199 +1,83 @@
-import { js_eventEmitter } from './js_eventEmitter'
-import { EVENTS as js_event } from './js_eventList.js'
-import * as js_common from './js_common.js'
-import { js_globals } from './js_globals.js'
-import * as js_helpers from './js_helpers'
-import $ from 'jquery';
+/**
+ * ADSB Exchange provider (revamped).
+ *
+ * Previously this file used jQuery JSONP against the public
+ * `public-api.adsbexchange.com/VirtualRadar` endpoint and had several bugs
+ * (wrong `this` in the AJAX callback, a broken getInstance, methods called on
+ * the wrong singleton). It has been rewritten as a concrete AdsbProvider that
+ * uses the fetch API and emits normalized AdsbAircraft objects.
+ *
+ * NOTE: The old public VirtualRadar endpoint may be deprecated by ADSB Exchange.
+ * It is kept here as a provider example; the active provider is selected via
+ * config in js_adsbManager.
+ *
+ * Auth: Mohammad Hefny
+ */
 
+import {
+    AdsbProvider,
+    AdsbAircraft,
+} from './adsb/js_adsbProvider.js';
+import {
+    CONST_FEET_TO_METER,
+} from './js_helpers.js';
 
-class v_adsbObject {
-    constructor() {
+const KNOT_TO_MPS = 0.514444;          // knots -> m/s
+const FPM_TO_MPS = CONST_FEET_TO_METER / 60; // feet/min -> m/s
 
+export class AdsbExchangeProvider extends AdsbProvider {
+    /**
+     * @param {object} [config]
+     * @param {string} [config.url]   base VirtualRadar URL
+     */
+    constructor(config = {}, options = {}) {
+        super(config, options);
+        this._url = config.url || 'https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json';
     }
 
-    static getInstance() {
-        if (!v_adsbObject.instance) {
-            v_adsbObject.instance = new v_adsbObject();
-        }
-        return v_adsbObject.instance;
+    get id() {
+        return 'adsbexchange';
     }
 
-    update(_obj) {
-        if (_obj.PosTime !== this.PosTime) {   // sometimes data is chached at the site itself.
-            // if so then dont update our timer monitor.
-            this.m_lastActiveTime = _obj.m_lastActiveTime;
-        }
-        else {
-            js_common.fn_console_log("Repeated");
-        }
-        this.Id = _obj.Id;
-        this.Icao = _obj.Icao;
-        //A description of the aircraft’s model
-        this.ModelDescription = _obj.Mdl;
-        //The manufacturer’s name. This is looked up via a database based on the ICAO code. 
-        this.Manufacturer = _obj.Man;
-        // https://en.wikipedia.org/wiki/Transponder_(aeronautics)
-        if (_obj.hasOwnProperty('Sqk')) {
-            this.Sqk = _obj.Sqk;
-        }
-        else {
-            this.Sqk = "";
-        }
-        if (_obj.hasOwnProperty('Spd')) {
-            this.Speed = _obj.Spd * js_helpers.CONST_KNOT_TO_KM_HOUR;
-        }
-        else {
-            this.Speed = 0;
-        }
-        if (_obj.hasOwnProperty('Gnd')) {
-            this.Ground = _obj.Gnd;
-        }
-        else {
-            this.Ground = false;
-        }
-        if (_obj.hasOwnProperty('Help')) {
-            // serious issue
-            this.Help = _obj.Help;
-        }
-        else {
-            this.Help = false;
-        }
-        this.Longitude = _obj.Long;
-        this.Latitude = _obj.Lat;
-        if (_obj.hasOwnProperty('Alt')) {
-            // The altitude in feet at standard pressure. (broadcast by the aircraft)
-            this.Altitude = _obj.Alt * js_helpers.CONST_FEET_TO_METER;
-        }
-        else {
-            this.Altitude = 0.0;
-        }
-
-        // Vertical speed in feet per minute. Broadcast by the aircraft.
-        if (_obj.hasOwnProperty('Vsi')) {
-            this.VerticalSpd = _obj.Vsi * js_helpers.CONST_FEET_TO_METER / 60;
-            // vertical speed is barometric, 1 = vertical speed is geometric. Default to barometric until told otherwise.
-            this.IsVerticalSpeedGeometric = _obj.VsiT;
-        }
-        else {
-            this.VerticalSpd = 0;
-        }
-
-        if (_obj.hasOwnProperty('Trak')) {
-            this.Heading = _obj.Trak;
-        }
-        else {
-            this.Heading = 0;
-        }
+    buildRequest(lat, lng, radiusKm) {
+        // VirtualRadar uses fDstL/fDstU in nautical miles (1 km ~= 0.539956 nm).
+        const radiusNm = (radiusKm * 0.539956).toFixed(4);
+        const url =
+            `${this._url}?lat=${lat}&lng=${lng}&fDstL=0&fDstU=${radiusNm}`;
+        return { url, init: { method: 'GET' } };
     }
 
+    parseResponse(json) {
+        if (!json || !Array.isArray(json.acList)) return [];
+        const now = Date.now();
+        const out = [];
+        for (const raw of json.acList) {
+            if (!raw) continue;
+            const icao = raw.Icao || (raw.Id != null ? raw.Id.toString() : null);
+            if (!icao) continue;
+
+            const ac = new AdsbAircraft(icao.toString());
+            ac.callsign = (raw.Call || '').trim();
+            ac.modelDescription = raw.Mdl || '';
+            ac.manufacturer = raw.Man || '';
+            ac.squawk = raw.Sqk != null ? raw.Sqk.toString() : '';
+            ac.latitude = raw.Lat ?? null;
+            ac.longitude = raw.Long ?? null;
+            ac.altitude = raw.Alt != null ? raw.Alt * CONST_FEET_TO_METER : 0;
+            ac.heading = raw.Trak ?? 0;
+            ac.velocity = raw.Spd != null ? raw.Spd * KNOT_TO_MPS : 0;
+            ac.verticalRate = raw.Vsi != null ? raw.Vsi * FPM_TO_MPS : 0;
+            ac.onGround = !!raw.Gnd;
+            ac.spi = !!raw.Help;
+            // VirtualRadar "Species" does not map cleanly to MAVLink emitter
+            // types, so we leave emitterType at NO_INFO (0).
+            ac.emitterType = 0;
+            ac.lastContact = raw.PosTime != null ? raw.PosTime : now;
+            ac.lastPosition = raw.PosTime != null ? raw.PosTime : null;
+            out.push(ac);
+        }
+        return out;
+    }
 }
 
-
-
-export class v_ADSB_Exchange {
-
-    constructor() {
-        this.ADSB_UpdateTimeOut = 10000;
-        this.ADSB_RefreshRate = 8000;
-        this.ADSB_DroneRefreshRate = 8000;
-        this.v_url = "https://public-api.adsbexchange.com/VirtualRadar/AircraftList.json?";
-        this.lng = 0;
-        this.lat = 0;
-        this.radius = 0;
-
-        this.__callsTimeTable = {};
-
-        this.adsbObjectList = {};
-
-        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
-
-        const Me = this;
-        setInterval(function () {
-            // dont call 
-            if ((Me.lat === null || Me.lat === undefined) || (Me.radius === 0)) return;
-
-            Me.fn_getADSBData(Me.lat, Me.lng, undefined, Me.radius);
-
-        }, Me.ADSB_RefreshRate);
-    }
-
-    static getInstance() {
-        if (!v_adsbObject.instance) {
-            v_adsbObject.instance = new v_adsbObject();
-        }
-        return v_adsbObject.instance;
-    }
-
-    parseData(_data, _droneAlt) {
-        const now = Date.now();
-
-        const len = _data.acList.length;
-        for (let i = 0; i < len; ++i) {
-            _data.acList[i].m_lastActiveTime = now;
-            if (this.adsbObjectList.hasOwnProperty(_data.acList[i].Id)) {
-                this.adsbObjectList[_data.acList[i].Id].update(_data.acList[i]);
-            }
-            else {
-                let _obj = new v_adsbObject();
-                _obj.update(_data.acList[i]);
-                this.adsbObjectList[_data.acList[i].Id] = _obj;
-            }
-        }
-    }
-
-
-
-    fn_changeDefaultLocation(lat, lng, radius) {
-        this.lng = lng;
-        this.lat = lat;
-        this.radius = radius;
-    }
-
-    fn_getADSBDataForUnit(p_andruavUnit) {
-        if (js_globals.v_EnableADSB === false) return;
-
-        const now = Date.now();
-        if (this.__callsTimeTable.hasOwnProperty(p_andruavUnit.getPartyID()) === false) {
-            this.__callsTimeTable[p_andruavUnit.getPartyID()] = now;
-        }
-
-        if ((now - this.__callsTimeTable[p_andruavUnit.getPartyID()]) > this.ADSB_DroneRefreshRate) {
-            this.fn_getADSBData(p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Location.alt_relative, 10);
-        }
-    }
-
-    fn_getADSBData(p_lat, p_lng, p_alt, p_radius) {
-
-        if (js_globals.v_EnableADSB === false) return;
-
-        const _v_url = this.v_url + 'lat=' + p_lat.toString() + '&lng=' + p_lng.toString() + '&fDstL=0&fDstU=' + p_radius.toString();
-        js_common.fn_console_log("ADSB URL: %s", _v_url);
-        let res = null;
-        const Me = this;
-        $.ajax({
-            url: _v_url,
-            type: 'GET',
-            crossDomain: true,
-            dataType: 'JSONP',
-
-            success: function (p_res) {
-                this.parseData(p_res, p_alt);
-                js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, v_adsbObject.getInstance());
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                Me.v_logined = false;
-            },
-            async: false
-        });
-
-    };
-
-    fn_onPreferenceChanged(p_caller, p_params) {
-        if (js_globals.v_EnableADSB === false) {
-            js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, js_eventEmitter.adsbObjectList);
-        }
-    }
-
-
-};
-
+export default AdsbExchangeProvider;

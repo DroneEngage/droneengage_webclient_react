@@ -65,7 +65,7 @@ These are defined in `js_globals.js` and typically adjusted in code.
 | `CONST_DEFAULT_ALTITUDE_STEP` | Step size for some altitude controls (where used). |
 | `CONST_DEFAULT_SPEED_MIN` / `CONST_DEFAULT_SPEED_STEP` | Limits/step used in some mission/planning speed controls (where used). |
 | `CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT` | Number of points for flight-path visualization (smoothness vs performance). |
-| `v_EnableADSB` | Enables ADS-B related UI/processing (where integrated/used). |
+| `CONST_FEATURE.DISABLE_ADSB` | Disables ADS-B when `true`. Single source of truth for the ADS-B subsystem (provider polling, map rendering, geolocation/drone-follow queries). Configured in `js_siteConfig.js` / `config.json` / `config.local.json`. |
 | `v_en_Drone` / `v_en_GCS` | Enables filtering of drone vs GCS categories in UI (where used). |
 | `v_gamePadMode` | Default gamepad “mode” concept (stick mapping preset). Final behavior depends on stored gamepad configs. |
 | `GP_EPSILON_CHANGE` | Gamepad RC send threshold: minimum axis delta to trigger a send (noise filtering). |

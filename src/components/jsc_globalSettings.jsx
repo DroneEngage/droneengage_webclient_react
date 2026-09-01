@@ -251,6 +251,7 @@ class ClssPreferences extends React.Component {
     this.m_ws2wsRef = React.createRef();
     this.m_gcsDisplayRef = React.createRef();
     this.m_gcsShowMeRef = React.createRef();
+    this.m_enableADSBRef = React.createRef();
   }
 
   componentDidMount() {
@@ -260,6 +261,9 @@ class ClssPreferences extends React.Component {
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
     this.m_ws2wsRef.current.checked = js_localStorage.fn_getWS2WSEnabled();
+    if (this.m_enableADSBRef.current) {
+      this.m_enableADSBRef.current.checked = js_localStorage.fn_getADSBEnabled();
+    }
   }
 
   componentWillUnmount() { }
@@ -323,6 +327,12 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
+  fn_enableADSB(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setADSBEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
   render() {
     const { t } = this.props;
     const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
@@ -330,6 +340,10 @@ class ClssPreferences extends React.Component {
     if (js_localStorage.fn_getSpeechEnabled() === false) {
       v_speech_disabled = 'true';
     }
+
+    // ADSB feature exists only when the site flag CONST_FEATURE.DISABLE_ADSB
+    // is not true. The row is hidden entirely when the feature is disabled.
+    const v_adsbFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true);
 
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
@@ -405,6 +419,20 @@ class ClssPreferences extends React.Component {
             onClick={(e) => this.fn_enableWS2WS(e)}
           />
         </div>
+        {v_adsbFeatureEnabled && (
+          <div className="row mb-12 align-items-center">
+            <label htmlFor="check_enable_adsb" className={`col-sm-4 col-form-label ${dir}`}>
+              {t('globalSettings:enableADSBLabel')}
+            </label>
+            <input
+              className="form-check-input col-sm-8"
+              type="checkbox"
+              id="check_enable_adsb"
+              ref={this.m_enableADSBRef}
+              onClick={(e) => this.fn_enableADSB(e)}
+            />
+          </div>
+        )}
       </fieldset>
     );
   }

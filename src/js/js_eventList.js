@@ -146,7 +146,8 @@ const EVENT_LIST = Object.freeze({
 		"EE_News_Deleted",
 		"EE_News_Push",
 		"EE_onNewsToggle",
-		"EE_onNewsWriteToggle"
+		"EE_onNewsWriteToggle",
+		"EE_AisStream_Push"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

@@ -98,6 +98,7 @@ export let CONST_MODULE_VERSIONS = {
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
  */
 export let CONST_FEATURE = {
+    DISABLE_ADSB: false,
     DISABLE_UNIT_NAMING: false,
     DISABLE_UDPPROXY_UPDATE: false,
     DISABLE_SWARM: false,
@@ -138,6 +139,45 @@ export let CONST_ICE_SERVERS = [
     { urls: "stun:stun1.l.google.com:19302" },
 ];
 
+/**
+ * ADSB provider configuration.
+ *
+ * The WebClient talks to a normalized ADSB layer (src/js/adsb/) so different
+ * providers can be selected here without code changes.
+ *
+ *   PROVIDER: 'opensky' | 'adsbexchange' | 'aisstream'
+ *   REFRESH_RATE_MS: polling interval (OpenSky anonymous tier is credit-limited,
+ *                    so the default is conservative; for aisstream this is the
+ *                    flush interval for buffered push messages)
+ *   OBJECT_TIMEOUT_MS: how long an aircraft is kept after its last update
+ *   OPENSKY: { CLIENT_ID, CLIENT_SECRET } enable OAuth2 for higher limits; leave
+ *            empty for anonymous (bounding-box) mode.
+ *   AISSTREAM: { URL, REFRESH_RATE_MS } AIS maritime data via the DroneEngage
+ *              server plugin (aisstream.io). The API key stays server-side.
+ *   DRONE_MARGIN_KM: extra margin added around the swarm bounding circle (default 200)
+ *   GEOLOCATION_RADIUS_KM: scan radius when no drones are online (default 250)
+ */
+export let CONST_ADSB_CONFIG = {
+    PROVIDER: 'opensky',
+    REFRESH_RATE_MS: 60000,
+    OBJECT_TIMEOUT_MS: 13000,
+    DRONE_MARGIN_KM: 2200,
+    GEOLOCATION_RADIUS_KM: 2250,
+    OPENSKY: {
+        URL: '',
+        TOKEN_URL: '',
+        CLIENT_ID: '',
+        CLIENT_SECRET: '',
+    },
+    ADSBEXCHANGE: {
+        URL: '',
+    },
+    AISSTREAM: {
+        URL: '',
+        REFRESH_RATE_MS: 5000,
+    },
+};
+
 
 
 /**
@@ -175,6 +215,7 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
         if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
         if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
+        if (data.CONST_ADSB_CONFIG !== undefined) CONST_ADSB_CONFIG = { ...CONST_ADSB_CONFIG, ...data.CONST_ADSB_CONFIG };
         if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS };
         if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE };
 

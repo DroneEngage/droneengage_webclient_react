@@ -1,6 +1,7 @@
 /*jshint esversion: 6 */
 import { js_globals } from './js_globals.js';
 import * as js_common from './js_common.js'
+import * as js_siteConfig from './js_siteConfig.js';
 
 class CLocalStorage {
     constructor() {
@@ -239,6 +240,20 @@ class CLocalStorage {
 
     fn_getSpeechEnabled() {
         return this._getValue(js_globals.LS_ENABLE_SPEECH, 'true') === 'true';
+    }
+
+    // ADSB Enabled (runtime preference). Always returns false when the
+    // site feature flag CONST_FEATURE.DISABLE_ADSB is true — the feature
+    // does not exist in that case, regardless of the stored preference.
+    fn_setADSBEnabled(value) {
+        this._setValue(js_globals.LS_ENABLE_ADSB, value.toString());
+    }
+
+    fn_getADSBEnabled() {
+        if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true) {
+            return false;
+        }
+        return this._getValue(js_globals.LS_ENABLE_ADSB, 'true') === 'true';
     }
 
     // Volume

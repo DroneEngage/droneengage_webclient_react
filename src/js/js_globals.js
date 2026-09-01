@@ -93,7 +93,6 @@ class GLOBALS {
 		this.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT = 40;
 
 
-		this.v_EnableADSB = false;
 		this.v_en_Drone = true;
 		this.v_en_GCS = true;
 		this.v_enable_tabs_display = false;
@@ -191,6 +190,7 @@ class GLOBALS {
 		this.LS_SELECTED_THEME = '_vSelectedTheme';
 		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
 		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
+		this.LS_ENABLE_ADSB = '_vADSBEnabled';
 
 
 

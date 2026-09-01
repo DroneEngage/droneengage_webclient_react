@@ -29,6 +29,7 @@ import { js_eventEmitter } from './js_eventEmitter'
 import { js_localStorage } from './js_localStorage'
 import { js_webrtcstream } from './js_webrtcthin2.js'
 import { js_adsbUnit } from './js_adsbUnit.js'
+import { js_adsbManager } from './adsb/js_adsbManager.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
@@ -836,50 +837,138 @@ function fn_adsbExpiredUpdate(me) {
 	}
 }
 
-function fn_adsbObjectUpdate(me, p_adsbObject) {
+function fn_adsbObjectUpdate(me, p_registry) {
+	// p_registry is the js_adsbUnit registry (CADSBObjectList). The ADSB manager
+	// dispatches EE_adsbExchangeReady once per fetch with the whole registry, so
+	// we render every known aircraft here.
+	const list = (p_registry && p_registry.List) ? p_registry.List : null;
+	if (!list) return;
+	const keys = Object.keys(list);
+	for (let i = 0; i < keys.length; ++i) {
+		const p_adsbObject = list[keys[i]];
+		if (!p_adsbObject) continue;
+		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
+		fn_renderSingleAdsb(p_adsbObject);
+	}
+}
+
+// Re-render all ADSB markers when the unit system (metric/imperial) changes
+// so tooltips switch between m/km/h and ft/mph immediately.
+function fn_adsbUnitSystemChanged() {
+	const list = (js_adsbUnit && js_adsbUnit.List) ? js_adsbUnit.List : null;
+	if (!list) return;
+	const keys = Object.keys(list);
+	for (let i = 0; i < keys.length; ++i) {
+		const p_adsbObject = list[keys[i]];
+		if (!p_adsbObject) continue;
+		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
+		fn_renderSingleAdsb(p_adsbObject);
+	}
+}
+
+function fn_renderSingleAdsb(p_adsbObject) {
 	var v_marker = p_adsbObject.p_marker;
 	if (v_marker === null || v_marker === undefined) {
 		var icon;
 		switch (parseInt(p_adsbObject.m_emitter_type)) {
 			case mavlink20.ADSB_EMITTER_TYPE_NO_INFO:
-				icon = '/images/ufo.png';
-				break;
-			case mavlink20.ADSB_EMITTER_TYPE_LIGHT:
-			case mavlink20.ADSB_EMITTER_TYPE_SMALL:
-			case mavlink20.ADSB_EMITTER_TYPE_LARGE:
-			case mavlink20.ADSB_EMITTER_TYPE_HIGH_VORTEX_LARGE:
-			case mavlink20.ADSB_EMITTER_TYPE_HEAVY:
-			case mavlink20.ADSB_EMITTER_TYPE_HIGHLY_MANUV:
-			case mavlink20.ADSB_EMITTER_TYPE_UNASSIGNED:
-			case mavlink20.ADSB_EMITTER_TYPE_GLIDER:
-			case mavlink20.ADSB_EMITTER_TYPE_LIGHTER_AIR:
-			case mavlink20.ADSB_EMITTER_TYPE_PARACHUTE:
-			case mavlink20.ADSB_EMITTER_TYPE_ULTRA_LIGHT:
-			case mavlink20.ADSB_EMITTER_TYPE_UNASSIGNED2:
-			case mavlink20.ADSB_EMITTER_TYPE_UAV:
-			case mavlink20.ADSB_EMITTER_TYPE_SPACE:
-			case mavlink20.ADSB_EMITTER_TYPE_UNASSGINED3:
-			case mavlink20.ADSB_EMITTER_TYPE_EMERGENCY_SURFACE:
-			case mavlink20.ADSB_EMITTER_TYPE_SERVICE_SURFACE:
-			case mavlink20.ADSB_EMITTER_TYPE_POINT_OBSTACLE:
+				// Most aircraft don't broadcast category — default to plane icon.
 				icon = '/images/Plane_Track.png';
 				break;
 			case mavlink20.ADSB_EMITTER_TYPE_ROTOCRAFT:
-				icon = '/images/Quad_Track.png';
+				// Helicopter / rotorcraft.
+				icon = '/images/heli_1_32x32.png';
 				break;
 			default:
-				// display nothing
-				return;
+				// All other types (light, small, large, glider, UAV, etc.)
+				// use the plane icon.
+				icon = '/images/Plane_Track.png';
+				break;
 		}
 
-		var v_htmladsb = "<p class='text-warning margin_zero'>" + p_adsbObject.m_icao_address + "</p>";
+		var v_label = p_adsbObject.m_callsign || p_adsbObject.m_icao_address;
+		var v_htmladsb = "<p class='text-warning margin_zero'>" + v_label + "</p>";
 
-		v_marker = js_leafletmap.fn_CreateMarker(icon, p_adsbObject.m_icao_address, null, false, false, v_htmladsb, [64, 64]);
+		v_marker = js_leafletmap.fn_CreateMarker(icon, v_label, null, false, false, v_htmladsb, [64, 64]);
 		p_adsbObject.p_marker = v_marker;
+		// Prevent click on ADSB markers from propagating to the map (which can
+		// trigger context menus or panning behavior).
+		if (v_marker && typeof v_marker.on === 'function') {
+			v_marker.on('click', function (e) {
+				if (e && e.originalEvent) e.originalEvent.stopPropagation();
+			});
+		}
 	}
 
 	js_leafletmap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
 	js_leafletmap.fn_showItem(p_adsbObject.p_marker);
+
+	// Update hover tooltip with live speed/altitude/callsign.
+	// Velocity is stored in m/s, altitude in meters. OpenSky may return null
+	// for any of these, so guard against null/undefined before formatting.
+	// Respect js_globals.v_useMetricSystem for unit display.
+	var v_speedMs = Number(p_adsbObject.m_velocity) || 0;
+	var v_altM = Number(p_adsbObject.m_altitude) || 0;
+	var v_geoAltM = Number(p_adsbObject.m_geo_altitude) || 0;
+	var v_vsiMs = Number(p_adsbObject.m_vertical_rate) || 0;
+	var v_headingDeg = Number(p_adsbObject.m_heading) * 180 / Math.PI || 0;
+	var v_callsign = p_adsbObject.m_callsign || p_adsbObject.m_icao_address;
+	var v_icao = p_adsbObject.m_icao_address || '';
+	var v_country = p_adsbObject.m_origin_country || '';
+	var v_squawk = p_adsbObject.m_squawk || '';
+	var v_onGround = p_adsbObject.m_on_ground;
+	var v_spi = p_adsbObject.m_spi;
+	var v_posSrc = p_adsbObject.m_position_source;
+	var v_lat = Number(p_adsbObject.m_lat) || 0;
+	var v_lon = Number(p_adsbObject.m_lon) || 0;
+
+	var v_speedStr, v_altStr, v_geoAltStr, v_vsiStr;
+	if (js_globals.v_useMetricSystem === true) {
+		v_speedStr = (v_speedMs * 3.6).toFixed(0) + " km/h";
+		v_altStr = v_altM.toFixed(0) + " m";
+		v_geoAltStr = v_geoAltM > 0 ? v_geoAltM.toFixed(0) + " m" : "—";
+		v_vsiStr = v_vsiMs.toFixed(1) + " m/s";
+	} else {
+		v_speedStr = (v_speedMs * js_helpers.CONST_METER_TO_MILE).toFixed(0) + " mph";
+		v_altStr = (v_altM * js_helpers.CONST_METER_TO_FEET).toFixed(0) + " ft";
+		v_geoAltStr = v_geoAltM > 0 ? (v_geoAltM * js_helpers.CONST_METER_TO_FEET).toFixed(0) + " ft" : "—";
+		v_vsiStr = (v_vsiMs * js_helpers.CONST_METER_TO_FEET * 60).toFixed(0) + " ft/min";
+	}
+
+	// Position source label
+	var v_posSrcStr = "—";
+	if (v_posSrc === 0) v_posSrcStr = "ADS-B";
+	else if (v_posSrc === 1) v_posSrcStr = "ASTERIX";
+	else if (v_posSrc === 2) v_posSrcStr = "MLAT";
+	else if (v_posSrc === 3) v_posSrcStr = "FLARM";
+
+	var v_popup =
+		"<div style='font-size:12px; line-height:1.5; min-width:140px'>" +
+		"<b style='font-size:13px'>" + v_callsign + "</b>" +
+		(v_onGround ? " <span style='color:#28a745'>(on ground)</span>" : "") +
+		(v_spi ? " <span style='color:#dc3545'>(SPI)</span>" : "") +
+		"<br/>" +
+		"ICAO: " + v_icao + "<br/>" +
+		(v_country ? "Country: " + v_country + "<br/>" : "") +
+		(v_squawk ? "Squawk: " + v_squawk + "<br/>" : "") +
+		"SPD: " + v_speedStr + "<br/>" +
+		"ALT: " + v_altStr + "<br/>" +
+		"Geo ALT: " + v_geoAltStr + "<br/>" +
+		"HDG: " + v_headingDeg.toFixed(0) + "°<br/>" +
+		"V/S: " + v_vsiStr + "<br/>" +
+		"Pos: " + v_lat.toFixed(4) + ", " + v_lon.toFixed(4) + "<br/>" +
+		"Src: " + v_posSrcStr +
+		"</div>";
+	// Remove any leftover tooltip from older code, then bind/update popup.
+	// The icon label (callsign) is always visible; popup shows on click.
+	if (typeof p_adsbObject.p_marker.unbindTooltip === 'function' && p_adsbObject.p_marker.getTooltip && p_adsbObject.p_marker.getTooltip()) {
+		p_adsbObject.p_marker.unbindTooltip();
+	}
+	if (p_adsbObject.p_marker.getPopup && p_adsbObject.p_marker.getPopup()) {
+		p_adsbObject.p_marker.setPopupContent(v_popup);
+	} else if (typeof p_adsbObject.p_marker.bindPopup === 'function') {
+		p_adsbObject.p_marker.bindPopup(v_popup, { closeButton: false });
+	}
 }
 
 function fn_adsbUpdated(p_caller, p_data) {
@@ -1005,10 +1094,10 @@ function fn_gps_getLocation() {
 	function setPosition(position) {
 
 		js_globals.myposition = position;
-		if (js_globals.CONST_DISABLE_ADSG === false) {
-			js_adsbUnit.fn_changeDefaultLocation(
+		if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
+			js_adsbManager.fn_changeDefaultLocation(
 				js_globals.myposition.coords.latitude,
-				js_globals.myposition.coords.longitude, 1000);
+				js_globals.myposition.coords.longitude);
 		}
 		js_leafletmap.fn_PanTo_latlng(
 			js_globals.myposition.coords.latitude,
@@ -1044,6 +1133,12 @@ function fn_gps_getLocation() {
 function gps_showError(p_error) {
 
 	js_globals.myposition = null;
+
+	// Notify the ADSB manager that geolocation is unavailable so it can
+	// fall back to the swarm area (or stop scanning if no drones are online).
+	if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
+		js_adsbManager.fn_geolocationDenied();
+	}
 
 	switch (p_error.code) {
 		case p_error.PERMISSION_DENIED:
@@ -2401,8 +2496,8 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 		let marker = p_andruavUnit.m_gui.m_marker;
 
-		if (js_globals.CONST_DISABLE_ADSG === false) {
-			js_adsbUnit.fn_getADSBDataForUnit(p_andruavUnit);
+		if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
+			js_adsbManager.fn_getADSBDataForUnit(p_andruavUnit);
 		}
 
 		let v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
@@ -3308,9 +3403,14 @@ export function fn_on_ready() {
 			initMap();
 		}
 
-	if (js_globals.v_EnableADSB === true) {
+	// ADSB is enabled when CONST_FEATURE.DISABLE_ADSB is not true.
+	// This is the single source of truth — no redundant runtime flags.
+	if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+		// Re-render all ADSB markers when the unit system (metric/imperial) changes
+		// so tooltips switch between m/km/h and ft/mph immediately.
+		js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, fn_adsbUnitSystemChanged);
 	}
 
 

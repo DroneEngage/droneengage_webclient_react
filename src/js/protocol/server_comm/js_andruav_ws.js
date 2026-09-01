@@ -300,6 +300,11 @@ class CAndruavClientWS {
             js_eventEmitter.fn_dispatch(js_event.EE_News_Push, msg.msgPayload);
             return;
         }
+
+        if (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavSystem_AisPush) {
+            js_eventEmitter.fn_dispatch(js_event.EE_AisStream_Push, msg.msgPayload);
+            return;
+        }
     };
 
     setSocketStatus(status) {

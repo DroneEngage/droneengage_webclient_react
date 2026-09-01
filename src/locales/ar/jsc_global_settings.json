@@ -29,5 +29,6 @@
   "gcsDisplayLabel": "إظهار GCS المتصلة",
   "gcsShowMeLabel": "أظهرني",
   "gcsShowMeTitle": "إظهاري في قائمة GCS",
-  "advancedOptionsLabel": "الخيارات المتقدمة"
+  "advancedOptionsLabel": "الخيارات المتقدمة",
+  "enableADSBLabel": "تفعيل ADSB"
 }

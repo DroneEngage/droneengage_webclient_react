@@ -29,5 +29,6 @@
     "gcsDisplayLabel": "Voir les GCS connectés",
     "gcsShowMeLabel": "Me montrer",
     "gcsShowMeTitle": "Me montrer dans la liste GCS",
-    "advancedOptionsLabel": "Options avancés"
+    "advancedOptionsLabel": "Options avancés",
+    "enableADSBLabel": "Activer ADSB"
 }

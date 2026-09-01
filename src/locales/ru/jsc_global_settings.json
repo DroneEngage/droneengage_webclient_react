@@ -29,5 +29,6 @@
   "gcsDisplayLabel": "Показать подключенные GCS",
   "gcsShowMeLabel": "Показать меня",
   "gcsShowMeTitle": "показать меня в списке GCS",
-  "advancedOptionsLabel": "Расширенные настройки"
+  "advancedOptionsLabel": "Расширенные настройки",
+  "enableADSBLabel": "Включить ADSB"
 }
