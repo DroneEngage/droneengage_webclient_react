@@ -1,11 +1,8 @@
-img.leaflet-marker-icon
-{
-	content:url('/public/images/marker-icon.png') !important;
-}
-
-.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
-	background-image: url(/public/images/marker-icon.png);
-}
+/* Leaflet default marker icon paths are now configured in js_leafletmap.js
+   via L.Icon.Default.mergeOptions(). The previous CSS `content: url(...)`
+   hack caused a white border on the right/bottom of marker icons.
+   The .leaflet-default-icon-path heuristic is no longer needed since
+   _getIconUrl was deleted and iconUrl is set explicitly. */
 
 .leaflet-div-icon {
 	background: unset !important;

@@ -243,7 +243,9 @@ export class ClssSingleMissionControlBar extends React.Component {
 
     /**
      * Save the current mission to cloud storage.
-     * If a drone is selected, uses the drone name. Otherwise prompts for a name.
+     * If a drone is selected and identified, uses the drone's unitID (m_unitName)
+     * as the storage key so the drone can later query for its own plan by name.
+     * Otherwise prompts for a name and saves to the general bucket.
      */
     fn_saveMissionToCloud() {
         if (this.props.p_mission == null) return;
@@ -251,16 +253,17 @@ export class ClssSingleMissionControlBar extends React.Component {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1(v_andruavUnit);
 
-        if (v_andruavUnit !== null) {
+        if (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown") {
+            const unitId = v_andruavUnit.m_unitName;
             fn_do_modal_confirmation("Save Mission to Cloud",
-                "Save mission for " + v_andruavUnit.m_unitName + " to cloud storage?", function (p_approved) {
+                "Save mission for " + unitId + " to cloud storage?", function (p_approved) {
                     if (p_approved === false) return;
 
-                    const missionId = v_andruavUnit.getPartyID() + '_' + Date.now();
-                    const missionName = v_andruavUnit.m_unitName + ' Mission ' + new Date().toISOString().slice(0, 10);
+                    const missionId = unitId + '_' + Date.now();
+                    const missionName = unitId + ' Mission ' + new Date().toISOString().slice(0, 10);
                     const missionData = JSON.parse(c_mission_text);
 
-                    js_globals.v_andruavFacade.API_saveMission(v_andruavUnit.getPartyID(), missionId, missionName, missionData);
+                    js_globals.v_andruavFacade.API_saveMission(unitId, missionId, missionName, missionData);
                 }, "YES", "bg-info txt-theme-aware");
         } else {
             const missionName = window.prompt("Enter mission name:", "Mission " + new Date().toISOString().slice(0, 10));
@@ -281,7 +284,9 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_loadMissionFromCloud() {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
-        const unitId = (v_andruavUnit !== null) ? v_andruavUnit.getPartyID() : '_general_';
+        const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
+            ? v_andruavUnit.m_unitName
+            : '_general_';
 
         fn_do_modal_confirmation("Load Mission from Cloud",
             "Are you sure you want to load mission from cloud storage? Current mission will be replaced.", function (p_approved) {
@@ -298,7 +303,9 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_listMissionsFromCloud() {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
-        const unitId = (v_andruavUnit !== null) ? v_andruavUnit.getPartyID() : '_general_';
+        const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
+            ? v_andruavUnit.m_unitName
+            : '_general_';
 
         js_globals.v_andruavFacade.API_loadMission(unitId);
     }

@@ -5,7 +5,7 @@
 *
 *********************************************************************************** */
 
-import $ from 'jquery'; 
+import $ from 'jquery';
 import L from 'leaflet';
 import 'leaflet-rotatedmarker';
 
@@ -16,6 +16,18 @@ import {EVENTS as js_event} from '../js_eventList.js'
 import {js_eventEmitter} from '../js_eventEmitter.js'
 
 import {fn_contextMenu} from '../js_main.js'
+
+// Fix Leaflet's default marker icon paths for CRA/webpack bundling.
+// This replaces the CSS `content: url(...)` hack which caused a white
+// border on the right/bottom of marker icons due to sub-pixel rendering.
+// Note: CRA serves the public folder at root, so use '/images/...' not '/public/images/...'
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: '/images/marker-icon.png',
+    iconRetinaUrl: '/images/marker-icon-2x.png',
+    shadowUrl: '/images/marker-shadow.png',
+});
+
 class CLeafLetAndruavMap {
 
     constructor() {
@@ -649,11 +661,13 @@ class CLeafLetAndruavMap {
         const iconSize = p_iconsize || [48, 48];
     
         // Create the icon with customizable size and color
+        // line-height: 1 and display: block ensure the glyph fills the full
+        // iconSize height so the iconAnchor at the bottom aligns with the pin tip.
         const v_image = L.divIcon({
-            html: `<i class="bi ${p_bootstrap_icon_name}" style="background: none; border: none; color: ${p_color}; font-size: ${iconSize[0]}px;"></i>`,
+            html: `<i class="bi ${p_bootstrap_icon_name}" style="background: none; border: none; color: ${p_color}; font-size: ${iconSize[0]}px; line-height: 1; display: block; text-align: center;"></i>`,
             className: "custom-location-icon",
             iconSize: iconSize,
-            iconAnchor: [iconSize[0] / 2 - 1, iconSize[1]], // Center the icon horizontally and anchor it at the bottom
+            iconAnchor: [iconSize[0] / 2, iconSize[1]], // Center horizontally, anchor at bottom (pin tip)
             popupAnchor: [0, -iconSize[1]] // Adjust popup anchor based on icon size
         });
     

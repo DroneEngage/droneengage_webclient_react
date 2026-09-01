@@ -143,6 +143,9 @@ class ClssMissionLoadDialog extends ClssModalDialogBase {
                                                             <strong>{mission.name || mission.id}</strong>
                                                             <small>{this.fn_formatDate(mission.created_at)}</small>
                                                         </div>
+                                                        {mission.unit_id && mission.unit_id !== '_general_' && (
+                                                            <small className="text-muted d-block">Drone: {mission.unit_id}</small>
+                                                        )}
                                                         {mission.version != null && (
                                                             <small className="text-muted">v{mission.version}</small>
                                                         )}
