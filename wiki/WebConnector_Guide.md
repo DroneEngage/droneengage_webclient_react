@@ -39,47 +39,47 @@ The WebConnector is a standalone local WebSocket hub that bridges the DroneEngag
 
 ## Installation Methods
 
-### Method 1: npm Global Install (Recommended)
+The WebConnector now lives in its own repo: [DroneEngage/webclient_connector](https://github.com/DroneEngage/webclient_connector).
+
+### Method 1: npm Global Install from Git (Recommended)
 
 ```bash
-npm install -g droneengage-webconnector
+npm install -g git+https://github.com/DroneEngage/webclient_connector.git#v0.2.3
 droneengage-webconnector
 ```
 
-### Method 2: npx (No Installation)
+### Method 2: Clone & Run
 
 ```bash
-npx droneengage-webconnector email@domain.com accessCode
+git clone https://github.com/DroneEngage/webclient_connector.git
+cd webclient_connector
+npm install
+node src/index.js email@domain.com accessCode
 ```
 
 ### Method 3: Quick Start Scripts
 
+```bash
+git clone https://github.com/DroneEngage/webclient_connector.git
+cd webclient_connector
+```
+
 **Windows:**
 ```cmd
-cd webconnector
 start.bat
 ```
 
 **macOS/Linux:**
 ```bash
-cd webconnector
 chmod +x start.sh
 ./start.sh
-```
-
-### Method 4: Local Development
-
-```bash
-cd webconnector
-npm install
-node src/index.js
 ```
 
 ## Configuration
 
 ### WebConnector Configuration
 
-**File:** `webconnector/config.json`
+**File:** `config.json` (inside the `webclient_connector` repo)
 
 ```json
 {
@@ -199,10 +199,10 @@ droneengage-webconnector your@email.com yourAccessCode
 droneengage-webconnector --host airgap.local --port 19408 your@email.com yourAccessCode
 
 # Using npx with credentials
-npx droneengage-webconnector your@email.com yourAccessCode
+node src/index.js your@email.com yourAccessCode
 
 # Using npx with cloud server override
-npx droneengage-webconnector --host airgap.local --port 19408 your@email.com yourAccessCode
+node src/index.js --host airgap.local --port 19408 your@email.com yourAccessCode
 ```
 
 **Available options:**
@@ -348,7 +348,7 @@ kill -9 <PID>
 
 ### npm/npx Issues
 
-1. **Permission denied:** Use `sudo npm install -g droneengage-webconnector`
+1. **Permission denied:** Use `sudo npm install -g git+https://github.com/DroneEngage/webclient_connector.git`
 2. **Command not found:** Check npm global path: `npm config get prefix`
 3. **npx fails:** Ensure Node.js >=18.0.0: `node --version`
 
