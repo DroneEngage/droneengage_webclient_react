@@ -27,8 +27,8 @@ import {
 } from './js_adsbProvider.js';
 import { js_eventEmitter } from '../js_eventEmitter.js';
 import { EVENTS as js_event } from '../js_eventList.js';
-import { js_andruav_ws } from '../protocol/server_comm/js_andruav_ws.js';
-import { js_andruavMessages } from '../protocol/messages/js_andruavMessages.js';
+import * as js_andruav_ws from '../protocol/server_comm/js_andruav_ws.js';
+import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 
 const KNOTS_TO_MS = 0.514444;
 

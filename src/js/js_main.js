@@ -820,8 +820,35 @@ function fn_handleADSBPopup(p_obj) {
 
 }
 
+// Persistent Leaflet circle showing the ADSB query coverage area.
+let v_adsbQueryCircle = null;
+
+/**
+ * Create / update / remove the dotted ADSB query-area circle on the map.
+ * Called on every ADSB exchange tick and when ADSB is disabled.
+ */
+function fn_updateAdsbQueryCircle() {
+	const area = js_adsbManager.fn_getQueryArea();
+	if (js_adsbManager.fn_isRunning() && area) {
+		if (v_adsbQueryCircle) {
+			// Update existing circle in place.
+			v_adsbQueryCircle.setLatLng([area.lat, area.lng]);
+			v_adsbQueryCircle.setRadius(Math.round(area.radiusKm * 1000));
+		} else {
+			v_adsbQueryCircle = js_leafletmap.fn_drawAdsbQueryCircle(
+				area.lat, area.lng, area.radiusKm);
+		}
+	} else if (v_adsbQueryCircle) {
+		js_leafletmap.fn_hideItem(v_adsbQueryCircle);
+		v_adsbQueryCircle = null;
+	}
+}
+
 function fn_adsbExpiredUpdate(me) {
-	const ADSB_OBJECT_TIMEOUT = 13000;
+	// Use the same timeout as the ADSB manager's purge window so markers
+	// stay visible between polls (manager default 130s > 60s refresh).
+	const ADSB_OBJECT_TIMEOUT =
+		(js_adsbManager && js_adsbManager.fn_getObjectTimeoutMs && js_adsbManager.fn_getObjectTimeoutMs()) || 130000;
 	const count = js_adsbUnit.count;
 	const now = new Date();
 	const p_keys = Object.keys(js_adsbUnit.List);
@@ -835,6 +862,8 @@ function fn_adsbExpiredUpdate(me) {
 			}
 		}
 	}
+
+	fn_updateAdsbQueryCircle();
 }
 
 function fn_adsbObjectUpdate(me, p_registry) {
@@ -850,6 +879,9 @@ function fn_adsbObjectUpdate(me, p_registry) {
 		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
 		fn_renderSingleAdsb(p_adsbObject);
 	}
+
+	// Keep the query-area circle in sync with the current coverage.
+	fn_updateAdsbQueryCircle();
 }
 
 // Re-render all ADSB markers when the unit system (metric/imperial) changes
@@ -889,7 +921,7 @@ function fn_renderSingleAdsb(p_adsbObject) {
 		var v_label = p_adsbObject.m_callsign || p_adsbObject.m_icao_address;
 		var v_htmladsb = "<p class='text-warning margin_zero'>" + v_label + "</p>";
 
-		v_marker = js_leafletmap.fn_CreateMarker(icon, v_label, null, false, false, v_htmladsb, [64, 64]);
+		v_marker = js_leafletmap.fn_CreateMarker(icon, v_label, null, false, false, v_htmladsb, [32, 32]);
 		p_adsbObject.p_marker = v_marker;
 		// Prevent click on ADSB markers from propagating to the map (which can
 		// trigger context menus or panning behavior).

@@ -30,5 +30,7 @@
   "gcsShowMeLabel": "أظهرني",
   "gcsShowMeTitle": "إظهاري في قائمة GCS",
   "advancedOptionsLabel": "الخيارات المتقدمة",
-  "enableADSBLabel": "تفعيل ADSB"
+  "enableADSBLabel": "تفعيل ADSB",
+    "adsbRadiusLabel": "ADSB Radius",
+  "enableAISStreamLabel": "تفعيل AIS"
 }

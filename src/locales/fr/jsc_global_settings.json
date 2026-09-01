@@ -30,5 +30,7 @@
     "gcsShowMeLabel": "Me montrer",
     "gcsShowMeTitle": "Me montrer dans la liste GCS",
     "advancedOptionsLabel": "Options avancés",
-    "enableADSBLabel": "Activer ADSB"
+    "enableADSBLabel": "Activer ADSB",
+    "adsbRadiusLabel": "ADSB Radius",
+    "enableAISStreamLabel": "Activer AIS"
 }

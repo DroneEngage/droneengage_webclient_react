@@ -30,14 +30,71 @@ app.use(express.static(path.join(__dirname, 'build')));
 const OPENSKY_API = 'https://opensky-network.org/api';
 const OPENSKY_TOKEN_URL = 'https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token';
 
-let openskyCreds = { clientId: '', clientSecret: '' };
+// ─── Config loading ──────────────────────────────────────────────────────────
+// Loads public/config.json and public/config.local.json (the latter overrides the
+// former). A *missing* file is fine (soft notice). A file that EXISTS but cannot
+// be parsed is a real error: we highlight it LOUDLY and abort startup so a broken
+// config is never silently ignored.
+function fn_loadConfigFile(fileRelPath) {
+  const absPath = path.join(__dirname, fileRelPath);
+  let raw;
+  try {
+    raw = fs.readFileSync(absPath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log(`[config] ${fileRelPath} not found (skipping)`);
+      return {};
+    }
+    // Any other read error (permissions, I/O...) is loud.
+    console.error('\n' + '='.repeat(79));
+    console.error(' CONFIG ERROR  ::  could not read ' + fileRelPath);
+    console.error(' path: ' + absPath);
+    console.error(' error: ' + e.message);
+    console.error('='.repeat(79) + '\n');
+    throw e;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    console.error('\n' + '#'.repeat(79));
+    console.error('########  CONFIG PARSE ERROR  ########################################################');
+    console.error('##');
+    console.error('##  file:   ' + fileRelPath);
+    console.error('##  path:   ' + absPath);
+    console.error('##  error:  ' + e.message);
+    console.error('##');
+    console.error('##  Fix the JSON syntax in this file and restart the server.');
+    console.error('##  The server will NOT start while a config file is malformed.');
+    console.error('#'.repeat(79) + '\n');
+    throw e;
+  }
+  console.log(`[config] loaded ${fileRelPath} OK (${Object.keys(parsed).length} top-level key(s))`);
+  return parsed;
+}
+
+let mergedConfig = {};
 try {
-  const localCfg = JSON.parse(fs.readFileSync(path.join(__dirname, 'public/config.local.json'), 'utf8'));
-  const osc = (localCfg.CONST_ADSB_CONFIG && localCfg.CONST_ADSB_CONFIG.OPENSKY) || {};
+  mergedConfig = Object.assign(
+    {},
+    fn_loadConfigFile('public/config.json'),
+    fn_loadConfigFile('public/config.local.json')   // local overrides base
+  );
+} catch (e) {
+  console.error('FATAL: aborting startup due to config error above.');
+  process.exit(1);
+}
+
+let openskyCreds = { clientId: '', clientSecret: '' };
+{
+  const osc = (mergedConfig.CONST_ADSB_CONFIG && mergedConfig.CONST_ADSB_CONFIG.OPENSKY) || {};
   openskyCreds.clientId = osc.CLIENT_ID || '';
   openskyCreds.clientSecret = osc.CLIENT_SECRET || '';
-} catch (e) {
-  console.log('No OpenSky credentials found in config.local.json (anonymous mode)');
+  if (!openskyCreds.clientId || !openskyCreds.clientSecret) {
+    console.log('[config] No OpenSky credentials found (anonymous mode)');
+  } else {
+    console.log('[config] OpenSky credentials loaded (authenticated mode)');
+  }
 }
 
 function fn_forwardJson(proxyRes, res) {

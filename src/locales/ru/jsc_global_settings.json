@@ -30,5 +30,7 @@
   "gcsShowMeLabel": "Показать меня",
   "gcsShowMeTitle": "показать меня в списке GCS",
   "advancedOptionsLabel": "Расширенные настройки",
-  "enableADSBLabel": "Включить ADSB"
+  "enableADSBLabel": "Включить ADSB",
+    "adsbRadiusLabel": "ADSB Radius",
+  "enableAISStreamLabel": "Включить AIS"
 }

@@ -18,16 +18,51 @@ const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 // Read OpenSky credentials from config.local.json (gitignored).
+// A *missing* file is fine (anonymous mode). A file that EXISTS but is malformed
+// is a real error: highlight it LOUDLY and abort so a broken config is never
+// silently ignored.
 let openskyCreds = { clientId: '', clientSecret: '' };
-try {
-  const localCfg = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '..', 'public', 'config.local.json'), 'utf8')
-  );
-  const osc = (localCfg.CONST_ADSB_CONFIG && localCfg.CONST_ADSB_CONFIG.OPENSKY) || {};
-  openskyCreds.clientId = osc.CLIENT_ID || '';
-  openskyCreds.clientSecret = osc.CLIENT_SECRET || '';
-} catch (e) {
-  console.log('[setupProxy] No OpenSky credentials found (anonymous mode)');
+{
+  const cfgPath = path.join(__dirname, '..', 'public', 'config.local.json');
+  let raw;
+  try {
+    raw = fs.readFileSync(cfgPath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log('[setupProxy] config.local.json not found (anonymous mode)');
+    } else {
+      console.error('\n' + '='.repeat(79));
+      console.error(' CONFIG ERROR  ::  could not read config.local.json');
+      console.error(' path: ' + cfgPath);
+      console.error(' error: ' + e.message);
+      console.error('='.repeat(79) + '\n');
+      console.error('FATAL: [setupProxy] aborting startup due to config error above.');
+      process.exit(1);
+    }
+  }
+  if (raw !== undefined) {
+    let localCfg;
+    try {
+      localCfg = JSON.parse(raw);
+    } catch (e) {
+      console.error('\n' + '#'.repeat(79));
+      console.error('########  CONFIG PARSE ERROR  ########################################################');
+      console.error('##');
+      console.error('##  file:  config.local.json');
+      console.error('##  path:  ' + cfgPath);
+      console.error('##  error: ' + e.message);
+      console.error('##');
+      console.error('##  Fix the JSON syntax in this file and restart the dev server.');
+      console.error('#'.repeat(79) + '\n');
+      console.error('FATAL: [setupProxy] aborting startup due to config error above.');
+      process.exit(1);
+    }
+    const osc = (localCfg.CONST_ADSB_CONFIG && localCfg.CONST_ADSB_CONFIG.OPENSKY) || {};
+    openskyCreds.clientId = osc.CLIENT_ID || '';
+    openskyCreds.clientSecret = osc.CLIENT_SECRET || '';
+    console.log('[setupProxy] config.local.json loaded OK' +
+      (openskyCreds.clientId ? ' (authenticated mode)' : ' (anonymous mode)'));
+  }
 }
 
 module.exports = function (app) {

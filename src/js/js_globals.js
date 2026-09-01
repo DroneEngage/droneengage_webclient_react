@@ -191,6 +191,8 @@ class GLOBALS {
 		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
 		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
 		this.LS_ENABLE_ADSB = '_vADSBEnabled';
+		this.LS_ENABLE_AISSTREAM = '_vAISStreamEnabled';
+		this.LS_ADSB_RADIUS_KM = '_vADSBRadiusKm';
 
 
 

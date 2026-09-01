@@ -256,6 +256,32 @@ class CLocalStorage {
         return this._getValue(js_globals.LS_ENABLE_ADSB, 'true') === 'true';
     }
 
+    // AISStream Enabled (runtime preference). Always returns false when the
+    // site feature flag CONST_FEATURE.DISABLE_AISStream is true — the feature
+    // does not exist in that case, regardless of the stored preference.
+    fn_setAISStreamEnabled(value) {
+        this._setValue(js_globals.LS_ENABLE_AISSTREAM, value.toString());
+    }
+
+    fn_getAISStreamEnabled() {
+        if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_AISStream === true) {
+            return false;
+        }
+        return this._getValue(js_globals.LS_ENABLE_AISSTREAM, 'true') === 'true';
+    }
+
+    // ADSB geolocation fallback radius in kilometers (used when no drones
+    // are online). Stored in km as the canonical unit.
+    fn_setAdsbRadiusKm(value) {
+        this._setValue(js_globals.LS_ADSB_RADIUS_KM, value.toString());
+    }
+
+    fn_getAdsbRadiusKm() {
+        const v = parseInt(this._getValue(js_globals.LS_ADSB_RADIUS_KM, ''));
+        if (isNaN(v) || v < 2 || v > 200) return null;
+        return v;
+    }
+
     // Volume
     fn_setVolume(value) {
         this._setValue(js_globals.LS_DEFAULT_VOLUME, value.toString());

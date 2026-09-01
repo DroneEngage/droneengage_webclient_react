@@ -98,6 +98,7 @@ export let CONST_MODULE_VERSIONS = {
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
  */
 export let CONST_FEATURE = {
+    DISABLE_AISStream: true,
     DISABLE_ADSB: false,
     DISABLE_UNIT_NAMING: false,
     DISABLE_UDPPROXY_UPDATE: false,
@@ -135,10 +136,7 @@ export let CONST_LANGUAGE = {
 /**
  * WEBRTC Video Streaming Settings
  */
-export let CONST_ICE_SERVERS = [
-    { urls: 'turn:cloud.ardupilot.org', credential: '1234', username: 'andruav_ap' },
-    { urls: "stun:stun1.l.google.com:19302" },
-];
+export let CONST_ICE_SERVERS = [];
 
 /**
  * ADSB provider configuration.
@@ -155,15 +153,15 @@ export let CONST_ICE_SERVERS = [
  *            empty for anonymous (bounding-box) mode.
  *   AISSTREAM: { URL, REFRESH_RATE_MS } AIS maritime data via the DroneEngage
  *              server plugin (aisstream.io). The API key stays server-side.
- *   DRONE_MARGIN_KM: extra margin added around the swarm bounding circle (default 200)
- *   GEOLOCATION_RADIUS_KM: scan radius when no drones are online (default 250)
+ *   RADIUS_KM: ADSB scan radius — used both as the margin added around the
+ *              swarm bounding circle when drones are online, and as the scan
+ *              radius when no drones are online (default 850)
  */
 export let CONST_ADSB_CONFIG = {
     PROVIDER: 'opensky',
     REFRESH_RATE_MS: 60000,
-    OBJECT_TIMEOUT_MS: 13000,
-    DRONE_MARGIN_KM: 2200,
-    GEOLOCATION_RADIUS_KM: 2250,
+    OBJECT_TIMEOUT_MS: 130000,
+    RADIUS_KM: 850,
     OPENSKY: {
         URL: '',
         TOKEN_URL: '',
@@ -240,30 +238,58 @@ export function fn_applyRuntimeConfig(data) {
 export async function fn_loadConfig() {
     try {
         const res = await fetch('/config.json', { cache: 'no-store' });
-        if (!res.ok) {
-            console.error('Error loading config:', res.status);
+        if (res.status === 404) {
+            // config.json is optional — soft notice.
+            console.log('[config] config.json not found (skipping)');
+        } else if (!res.ok) {
+            console.error('%c[config] ERROR loading config.json: HTTP ' + res.status,
+                'background:#b00;color:#fff;padding:2px 6px;border-radius:3px;');
             return;
+        } else {
+            const txt = await res.text();
+            let data;
+            try {
+                data = fn_parseConfigJsonText(txt);
+            } catch (parseErr) {
+                console.error('%c[config] CONFIG PARSE ERROR in config.json',
+                    'background:#b00;color:#fff;font-weight:bold;padding:4px 8px;border-radius:3px;');
+                console.error('%c' + parseErr.message,
+                    'color:#b00;font-weight:bold;font-size:14px;');
+                console.error('Fix the JSON syntax in public/config.json and reload.');
+                return;
+            }
+            fn_applyRuntimeConfig(data);
+            console.log('[config] config.json loaded OK');
         }
-
-        const txt = await res.text();
-        const data = fn_parseConfigJsonText(txt);
-        fn_applyRuntimeConfig(data);
 
         // Try to load local config (for sensitive data like tokens)
-        // Local config fields overwrite public config fields with the same name
-        try {
-            const localRes = await fetch('/config.local.json', { cache: 'no-store' });
-            if (localRes.ok) {
-                const localTxt = await localRes.text();
-                const localData = fn_parseConfigJsonText(localTxt);
-                fn_applyRuntimeConfig(localData);
-                console.log('Local config loaded successfully');
+        // Local config fields overwrite public config fields with the same name.
+        // A 404 is fine (file is optional). A parse error on an existing file is
+        // a real problem and must be highlighted LOUDLY.
+        const localRes = await fetch('/config.local.json', { cache: 'no-store' });
+        if (localRes.status === 404) {
+            console.log('[config] config.local.json not found (skipping)');
+        } else if (!localRes.ok) {
+            console.error('%c[config] ERROR loading config.local.json: HTTP ' + localRes.status,
+                'background:#b00;color:#fff;padding:2px 6px;border-radius:3px;');
+        } else {
+            const localTxt = await localRes.text();
+            let localData;
+            try {
+                localData = fn_parseConfigJsonText(localTxt);
+            } catch (parseErr) {
+                console.error('%c[config] CONFIG PARSE ERROR in config.local.json',
+                    'background:#b00;color:#fff;font-weight:bold;padding:4px 8px;border-radius:3px;');
+                console.error('%c' + parseErr.message,
+                    'color:#b00;font-weight:bold;font-size:14px;');
+                console.error('Fix the JSON syntax in public/config.local.json and reload.');
+                return;
             }
-        } catch (localError) {
-            // Local config is optional, ignore if not found
-            console.log('No local config found (this is normal)');
+            fn_applyRuntimeConfig(localData);
+            console.log('[config] config.local.json loaded OK');
         }
     } catch (error) {
-        console.error('Error loading config:', error);
+        console.error('%c[config] ERROR loading config: ' + error.message,
+            'background:#b00;color:#fff;padding:2px 6px;border-radius:3px;');
     }
 }

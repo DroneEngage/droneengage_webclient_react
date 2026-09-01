@@ -41,11 +41,27 @@ function isADSBEnabled() {
     return js_localStorage.fn_getADSBEnabled();
 }
 
+/**
+ * AISStream (maritime AIS) is enabled only when the user's runtime preference
+ * (localStorage) is enabled. The site feature flag
+ * CONST_FEATURE.DISABLE_AISStream is checked inside fn_getAISStreamEnabled() —
+ * when the feature is disabled at the site level, the getter always returns
+ * false and the aisstream provider is not created. AIS data comes from the
+ * DroneEngage server over WebSocket (not HTTP polling), and is maritime
+ * (ships) — there is no fallback to the aircraft providers.
+ */
+function isAISStreamEnabled() {
+    return js_localStorage.fn_getAISStreamEnabled();
+}
+
 // Defaults
-const DEFAULT_DRONE_MARGIN_KM = 2200;     // margin around the swarm bounding circle
-const DEFAULT_GEOLOCATION_RADIUS_KM = 250;
+const DEFAULT_RADIUS_KM = 850;            // ADSB scan radius (swarm margin & geolocation fallback)
 const DEFAULT_UNIT_FOLLOW_RADIUS_KM = 200;
 const SWARM_RECOMPUTE_MS = 8000;         // throttle swarm-area recompute
+const DEFAULT_REFRESH_RATE_MS = 60000;   // default polling interval
+// Aircraft expiry default is 2x the refresh rate so a single missed poll
+// doesn't drop targets. Computed dynamically from the resolved refresh rate.
+const OBJECT_TIMEOUT_REFRESH_MULTIPLIER = 2;
 
 class AdsbManager {
     constructor() {
@@ -70,12 +86,20 @@ class AdsbManager {
         this._callsTimeTable = {};
         this._lastSwarmCompute = 0;
 
+        // Object expiry: explicit config override, otherwise 2x the resolved
+        // refresh rate so a single missed poll doesn't drop targets.
+        const refreshMs = AdsbManager._resolveRefreshRateMs();
         this._objectTimeoutMs =
-            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.OBJECT_TIMEOUT_MS) || 13000;
+            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.OBJECT_TIMEOUT_MS)
+            || OBJECT_TIMEOUT_REFRESH_MULTIPLIER * refreshMs;
+        // Drone circle: fixed margin around the swarm bounding circle.
+        // Read once from config and never overridden by the slider.
         this._droneMarginKm =
-            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.DRONE_MARGIN_KM) || DEFAULT_DRONE_MARGIN_KM;
+            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || DEFAULT_RADIUS_KM;
+        // Home/geolocation circle: default from config, overridable at runtime
+        // by the user slider (see _effectiveGeolocationRadiusKm).
         this._geolocationRadiusKm =
-            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.GEOLOCATION_RADIUS_KM) || DEFAULT_GEOLOCATION_RADIUS_KM;
+            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || DEFAULT_RADIUS_KM;
 
         // React to enable/disable preference.
         // Bind handlers so `this` is preserved (the event emitter calls
@@ -90,11 +114,20 @@ class AdsbManager {
         js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated, this, this._boundOnUnitNavUpdated);
     }
 
+    /**
+     * Resolve the polling interval from config (with default fallback).
+     * Centralized so the constructor (object-timeout default) and
+     * _ensureProvider (provider refreshRateMs) stay in sync.
+     */
+    static _resolveRefreshRateMs(cfg = js_siteConfig.CONST_ADSB_CONFIG) {
+        return (cfg && cfg.REFRESH_RATE_MS) || DEFAULT_REFRESH_RATE_MS;
+    }
+
     /** Lazily build the provider selected in config. */
     _ensureProvider() {
         if (this._provider) return this._provider;
         const cfg = js_siteConfig.CONST_ADSB_CONFIG || {};
-        const refreshMs = cfg.REFRESH_RATE_MS || 60000;
+        const refreshMs = AdsbManager._resolveRefreshRateMs(cfg);
         switch ((cfg.PROVIDER || 'opensky').toLowerCase()) {
             case 'adsbexchange':
                 this._provider = new AdsbExchangeProvider(
@@ -103,6 +136,13 @@ class AdsbManager {
                 );
                 break;
             case 'aisstream':
+                if (!isAISStreamEnabled()) {
+                    // AIS disabled by site flag or user preference — do not
+                    // create a provider. AIS is maritime data over the
+                    // DroneEngage WebSocket; there is no meaningful fallback
+                    // to the aircraft (opensky/adsbexchange) providers.
+                    return null;
+                }
                 this._provider = new AisStreamProvider(
                     { url: (cfg.AISSTREAM && cfg.AISSTREAM.URL) || '' },
                     { refreshRateMs: (cfg.AISSTREAM && cfg.AISSTREAM.REFRESH_RATE_MS) || refreshMs }
@@ -137,6 +177,32 @@ class AdsbManager {
 
     hasQueryArea() {
         return (this._lat !== null && this._lat !== undefined) && this._radius > 0;
+    }
+
+    /**
+     * Whether the polling loop is currently running (ADSB enabled and an
+     * area is known). The map layer uses this to decide whether to show
+     * the query-area circle.
+     */
+    fn_isRunning() {
+        return this._running;
+    }
+
+    /**
+     * Current query area, or null if none.
+     * @returns {{lat:number, lng:number, radiusKm:number, source:string}|null}
+     */
+    fn_getQueryArea() {
+        if (!this.hasQueryArea()) return null;
+        return { lat: this._lat, lng: this._lng, radiusKm: this._radius, source: this._areaSource };
+    }
+
+    /**
+     * Object expiry window in ms — markers older than this are hidden.
+     * The map layer uses this so its hide logic matches the registry purge.
+     */
+    fn_getObjectTimeoutMs() {
+        return this._objectTimeoutMs;
     }
 
     /**
@@ -194,6 +260,16 @@ class AdsbManager {
     }
 
     /**
+     * Effective geolocation fallback radius: runtime localStorage override
+     * (user slider) takes priority, then config, then default.
+     */
+    _effectiveGeolocationRadiusKm() {
+        const stored = js_localStorage.fn_getAdsbRadiusKm();
+        if (stored !== null) return stored;
+        return this._geolocationRadiusKm;
+    }
+
+    /**
      * Recompute the query area based on the current state:
      *   - if online drones exist -> enclosing circle + margin
      *   - else if geolocation available -> circle around GCS
@@ -220,7 +296,7 @@ class AdsbManager {
             this._setArea(
                 js_globals.myposition.coords.latitude,
                 js_globals.myposition.coords.longitude,
-                this._geolocationRadiusKm,
+                this._effectiveGeolocationRadiusKm(),
                 'geolocation'
             );
             return;
@@ -268,8 +344,34 @@ class AdsbManager {
             // Drones online — geolocation is just a fallback; recompute swarm area.
             this._recomputeArea();
         } else {
-            this._setArea(lat, lng, radius || this._geolocationRadiusKm, 'geolocation');
+            this._setArea(lat, lng, radius || this._effectiveGeolocationRadiusKm(), 'geolocation');
         }
+    }
+
+    /**
+     * Called by the settings UI when the user drags the ADSB radius slider.
+     * Updates the geolocation fallback radius immediately and restarts the
+     * polling loop so the next fetch uses the new radius. Also dispatches an
+     * immediate event so the map circle updates without waiting for a poll.
+     * @param {number} km
+     */
+    fn_setGeolocationRadiusKm(km) {
+        if (!isADSBEnabled()) return;
+        // If currently scanning based on geolocation, update radius in place
+        // and restart the loop so the next fetch uses the new radius.
+        if (this._areaSource === 'geolocation' && this.hasQueryArea()) {
+            this._radius = km;
+            if (this._running) {
+                this._stop();
+            }
+            this._start();
+        } else {
+            // Swarm or no area — recompute (picks up new radius from localStorage
+            // if it falls back to geolocation).
+            this._recomputeArea();
+        }
+        // Dispatch immediately so the map circle updates without waiting for a poll.
+        js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, js_adsbUnit);
     }
 
     /**
@@ -322,6 +424,7 @@ class AdsbManager {
         if (this._running) return;
         if (!this.hasQueryArea()) return;
         const provider = this._ensureProvider();
+        if (!provider) return;   // e.g. aisstream selected but AIS disabled
         this._running = true;
         const me = this;
         // Run an immediate cycle, then poll.
@@ -343,6 +446,7 @@ class AdsbManager {
         if (!this.hasQueryArea()) return;
         if (this._inflight) return;
         const provider = this._ensureProvider();
+        if (!provider) return;   // no provider available (e.g. AIS disabled)
         provider.setQueryArea(this._lat, this._lng, this._radius);
         this._inflight = true;
         let aircraft = [];
@@ -372,6 +476,9 @@ class AdsbManager {
             this._stop();
             js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, js_adsbUnit);
         } else {
+            // AIS preference may have changed — rebuild the provider so the
+            // aisstream/opensky fallback is re-evaluated, then recompute.
+            this.fn_reloadProvider();
             this._recomputeArea();
         }
     }

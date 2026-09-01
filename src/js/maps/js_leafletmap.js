@@ -512,6 +512,23 @@ class CLeafLetAndruavMap {
 
     }
 
+    /**
+     * Draw a dotted outline circle showing the ADSB query coverage area.
+     * No fill so it does not obscure the map. p_radiusKm is in kilometers;
+     * Leaflet circle radius is in meters.
+     */
+    fn_drawAdsbQueryCircle(p_lat, p_lng, p_radiusKm) {
+        return L.circle([p_lat, p_lng], {
+            radius: Math.round(p_radiusKm * 1000),
+            fill: false,
+            color: '#FFA500',
+            opacity: 0.8,
+            weight: 1,
+            dashArray: '2, 6',
+            lineCap: 'round'
+        }).addTo(this.m_Map);
+    }
+
 
     /**
          * Set position of a marker.
