@@ -278,7 +278,8 @@ class CLocalStorage {
 
     fn_getAdsbRadiusKm() {
         const v = parseInt(this._getValue(js_globals.LS_ADSB_RADIUS_KM, ''));
-        if (isNaN(v) || v < 2 || v > 200) return null;
+        const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
+        if (isNaN(v) || v < 2 || v > max) return null;
         return v;
     }
 

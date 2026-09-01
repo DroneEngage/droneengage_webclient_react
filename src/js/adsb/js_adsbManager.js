@@ -92,12 +92,9 @@ class AdsbManager {
         this._objectTimeoutMs =
             (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.OBJECT_TIMEOUT_MS)
             || OBJECT_TIMEOUT_REFRESH_MULTIPLIER * refreshMs;
-        // Drone circle: fixed margin around the swarm bounding circle.
-        // Read once from config and never overridden by the slider.
-        this._droneMarginKm =
-            (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || DEFAULT_RADIUS_KM;
-        // Home/geolocation circle: default from config, overridable at runtime
-        // by the user slider (see _effectiveGeolocationRadiusKm).
+        // ADSB scan radius: default from config, overridable at runtime by the
+        // user slider (see _effectiveGeolocationRadiusKm). Used for both the
+        // drone (swarm) circle and the home/geolocation circle — same value.
         this._geolocationRadiusKm =
             (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || DEFAULT_RADIUS_KM;
 
@@ -284,7 +281,7 @@ class AdsbManager {
 
         const drones = this._collectOnlineDrones();
         if (drones.length > 0) {
-            const circle = this._computeEnclosingCircle(drones, this._droneMarginKm);
+            const circle = this._computeEnclosingCircle(drones, this._effectiveGeolocationRadiusKm());
             if (circle) {
                 this._setArea(circle.lat, circle.lng, circle.radiusKm, 'swarm');
                 return;
