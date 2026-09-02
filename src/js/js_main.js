@@ -603,6 +603,13 @@ export function fn_showMap3D() {
 
 	js_map3d.fn_show();
 
+	// Sync the 3D map's start location to the leaflet map's current center so
+	// it does not stay stuck at its hardcoded initial center.
+	const center = js_leafletmap.fn_getCenter();
+	if (center) {
+		js_map3d.fn_syncCenter(center.lat, center.lng);
+	}
+
 	$('#btn_showMap').show();
 	$('#btn_showMap3D').hide();
 	$('#btn_showVideo').show();

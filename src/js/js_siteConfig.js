@@ -98,7 +98,7 @@ export let CONST_MODULE_VERSIONS = {
  * If a feature is not explicitly mentioned or has a value of true, it is considered to be enabled.
  */
 export let CONST_FEATURE = {
-    DISABLE_AISStream: true,
+    DISABLE_AISStream: false,
     DISABLE_ADSB: false,
     DISABLE_UNIT_NAMING: false,
     DISABLE_UDPPROXY_UPDATE: false,
@@ -144,7 +144,7 @@ export let CONST_ICE_SERVERS = [];
  * The WebClient talks to a normalized ADSB layer (src/js/adsb/) so different
  * providers can be selected here without code changes.
  *
- *   PROVIDER: 'opensky' | 'adsbexchange' | 'aisstream'
+ *   PROVIDER: 'opensky' | 'aisstream'
  *   REFRESH_RATE_MS: polling interval (OpenSky anonymous tier is credit-limited,
  *                    so the default is conservative; for aisstream this is the
  *                    flush interval for buffered push messages)
@@ -167,9 +167,6 @@ export let CONST_ADSB_CONFIG = {
         TOKEN_URL: '',
         CLIENT_ID: '',
         CLIENT_SECRET: '',
-    },
-    ADSBEXCHANGE: {
-        URL: '',
     },
     AISSTREAM: {
         URL: '',

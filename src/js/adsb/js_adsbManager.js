@@ -28,7 +28,6 @@ import { js_localStorage } from '../js_localStorage.js';
 import { js_adsbUnit } from '../js_adsbUnit.js';
 import * as js_siteConfig from '../js_siteConfig.js';
 import { OpenSkyProvider } from './js_adsbProviderOpenSky.js';
-import { AdsbExchangeProvider } from '../js_adsB_Exchange.js';
 import { AisStreamProvider } from './js_adsbProviderAisStream.js';
 
 /**
@@ -126,18 +125,12 @@ class AdsbManager {
         const cfg = js_siteConfig.CONST_ADSB_CONFIG || {};
         const refreshMs = AdsbManager._resolveRefreshRateMs(cfg);
         switch ((cfg.PROVIDER || 'opensky').toLowerCase()) {
-            case 'adsbexchange':
-                this._provider = new AdsbExchangeProvider(
-                    { url: (cfg.ADSBEXCHANGE && cfg.ADSBEXCHANGE.URL) || '' },
-                    { refreshRateMs: refreshMs }
-                );
-                break;
             case 'aisstream':
                 if (!isAISStreamEnabled()) {
                     // AIS disabled by site flag or user preference — do not
                     // create a provider. AIS is maritime data over the
                     // DroneEngage WebSocket; there is no meaningful fallback
-                    // to the aircraft (opensky/adsbexchange) providers.
+                    // to the aircraft (opensky) providers.
                     return null;
                 }
                 this._provider = new AisStreamProvider(

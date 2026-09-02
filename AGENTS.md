@@ -20,7 +20,7 @@ be selected via config without touching consumers.
 ```
 js_main.js  ──► js_adsbManager (singleton)  ──► AdsbProvider (abstract)
                  │                              ├─ OpenSkyProvider
-                 │                              └─ AdsbExchangeProvider
+                 │                              └─ AisStreamProvider
                  ▼
             js_adsbUnit (registry)  ──► CADSBObject  ──► map markers
             EE_adsbExchangeReady / EE_adsbExpiredUpdate events
@@ -34,9 +34,6 @@ js_main.js  ──► js_adsbManager (singleton)  ──► AdsbProvider (abstra
   Anonymous by default; OAuth2 client-credentials (auto token refresh) when
   `CONST_ADSB_CONFIG.OPENSKY.CLIENT_ID/CLIENT_SECRET` are set. Maps OpenSky
   `category` → MAVLink emitter type (`max(0, category-1)`).
-- `src/js/js_adsB_Exchange.js` — revamped ADSB Exchange provider
-  (`AdsbExchangeProvider extends AdsbProvider`, fetch-based; replaces the old
-  broken jQuery JSONP implementation).
 - `src/js/adsb/js_adsbManager.js` — singleton owning the polling loop, provider
   selection, registry merge, and event dispatch. Entry points:
   `fn_changeDefaultLocation(lat,lng,radiusKm)`, `fn_getADSBDataForUnit(unit)`,
@@ -53,11 +50,11 @@ js_main.js  ──► js_adsbManager (singleton)  ──► AdsbProvider (abstra
 
 ```js
 CONST_ADSB_CONFIG = {
-  PROVIDER: 'opensky',        // 'opensky' | 'adsbexchange'
+  PROVIDER: 'opensky',        // 'opensky' | 'aisstream'
   REFRESH_RATE_MS: 60000,     // poll interval (OpenSky anonymous tier is credit-limited)
   OBJECT_TIMEOUT_MS: 13000,   // aircraft expiry
   OPENSKY:    { URL:'', TOKEN_URL:'', CLIENT_ID:'', CLIENT_SECRET:'' },
-  ADSBEXCHANGE: { URL:'' },
+  AISSTREAM:  { URL:'', REFRESH_RATE_MS: 5000 },
 };
 ```
 
@@ -66,5 +63,6 @@ ADSB is gated by `js_globals.v_EnableADSB` and `js_globals.CONST_DISABLE_ADSG`.
 ## Notes
 
 - `js_mavlink_v2.js` is eslint-ignored (generated).
-- The old `v_ADSB_Exchange`/`v_adsbObject` jQuery implementation was dead code
-  (nothing imported it) and is replaced by the revamped provider.
+- The old `v_ADSB_Exchange`/`v_adsbObject` jQuery implementation and the
+  `AdsbExchangeProvider` (VirtualRadar endpoint) have been removed; OpenSky
+  is the active aircraft provider.

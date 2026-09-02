@@ -2176,6 +2176,18 @@ class CAndruavMap3D {
         this.m_map.easeTo({ center: [lng, lat], duration: 500 });
     }
 
+    /**
+     * Instantly re-centers the 3D map (no animation). Used to sync the 3D
+     * map's start location with the leaflet map when switching to the 3D tab,
+     * so the 3D map does not stay stuck at its hardcoded initial center.
+     * @param {number} lat - Latitude coordinate
+     * @param {number} lng - Longitude coordinate
+     */
+    fn_syncCenter(lat, lng) {
+        if (!this.m_map || !this.m_isReady) return;
+        this.m_map.jumpTo({ center: [lng, lat] });
+    }
+
 }
 
 export const js_map3d = new CAndruavMap3D();

@@ -395,6 +395,12 @@ class CLeafLetAndruavMap {
         return this.m_Map.getZoom();
     };
 
+    fn_getCenter() {
+        if (!this.m_Map) return null;
+        const c = this.m_Map.getCenter();
+        return { lat: c.lat, lng: c.lng };
+    };
+
 
     /**
      * Hide a shape or a marker.
