@@ -220,6 +220,9 @@ class GLOBALS {
 		this.CONST_MAP3D_GATE_RADIUS = 10;        // vertical gate ring radius (meters)
 		this.CONST_MAP3D_GATE_WIDTH = 3;          // vertical gate ring line width
 		this.CONST_MAP3D_WP_GROUND_RADIUS = 5;    // ground circle radius at waypoint drop base (meters)
+		this.CONST_MAP3D_ADSB_TETHER_COLOR = '#ff0000'; // ADSB aircraft tether/ground/altitude ring color
+		this.CONST_MAP3D_ADSB_TETHER_RADIUS = 100;       // ADSB tether cylinder radius (meters)
+		this.CONST_MAP3D_ADSB_TETHER_OPACITY = 0.95;    // ADSB tether cylinder fill opacity
 
 		this.CONST_DISABLE_ADSG = true;
 

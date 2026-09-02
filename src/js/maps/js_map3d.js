@@ -104,6 +104,23 @@ class CAndruavMap3D {
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
         this.m_terrainExaggeration = 1.3;        // current terrain exaggeration factor (adjustable via x1/x2/x5 buttons)
+
+        // ---- ADSB traffic markers (mirrors js_leafletmap's fn_renderSingleAdsb) ----
+        // ADSB traffic can number in the hundreds, so unlike drones (which
+        // each get their own tether/ground/altitude-circle layer set — there
+        // are only ever a handful of units) all aircraft share a single
+        // tether source + layer, ground-circle source + layer, and
+        // altitude-circle source + layer (batched FeatureCollections).
+        // The tether/rings are only ever populated for the *selected*
+        // (clicked) aircraft — see m_selectedAdsbIcao — both to keep this
+        // cheap and to mirror the leaflet map's click-to-see-details UX.
+        this.m_adsbMarkers = new Map();          // icao_address -> mapboxgl.Marker
+        this.m_adsbTetherData = new Map();       // icao_address -> { lng, lat, terrainElev, altAboveGround }
+        this.m_adsbLayersReady = false;
+        this.m_selectedAdsbIcao = null;          // icao of the currently clicked/highlighted aircraft
+
+        this.m_mapClickCallbacks = [];
+        this.m_isMapClickBound = false;
     }
 
     /**
@@ -130,6 +147,32 @@ class CAndruavMap3D {
         if (typeof p_callback !== 'function') return;
         this.m_mapDblClickCallbacks.push(p_callback);
         this.fn_registerMapDblClickHandler();
+    }
+
+    /**
+     * Registers a single-click handler on the map background (only once).
+     * Used to deselect the currently highlighted ADSB aircraft when the user
+     * clicks anywhere that isn't a marker (marker click handlers call
+     * stopPropagation() so this only fires for background clicks).
+     */
+    fn_registerMapClickHandler() {
+        if (!this.m_map || this.m_isMapClickBound) return;
+
+        this.m_map.on('click', () => {
+            this.m_mapClickCallbacks.forEach(callback => callback());
+        });
+
+        this.m_isMapClickBound = true;
+    }
+
+    /**
+     * Adds a callback to be called when the map background is clicked.
+     * @param {Function} p_callback () => void
+     */
+    fn_addListenerOnMapClick(p_callback) {
+        if (typeof p_callback !== 'function') return;
+        this.m_mapClickCallbacks.push(p_callback);
+        this.fn_registerMapClickHandler();
     }
 
     /**
@@ -353,7 +396,21 @@ class CAndruavMap3D {
                     }
                 });
             });
+            this.m_adsbMarkers.forEach(marker => {
+                if (marker && typeof marker.getAltitude === 'function' && typeof marker.setAltitude === 'function') {
+                    const cur = marker.getAltitude();
+                    if (Number.isFinite(cur) && cur !== 0) {
+                        marker.setAltitude(cur * ratio);
+                    }
+                }
+            });
         }
+
+        // The ADSB tether/altitude-circle use 'line-elevation-reference':
+        // 'ground', which — unlike the drone tether's 'sea' reference +
+        // line-elevation-ground-scale:1.0 — is NOT auto-scaled by Mapbox, so
+        // it must be recomputed (fn_flushAdsbTethers scales it manually).
+        this.fn_flushAdsbTethers();
     }
 
     fn_show() {
@@ -382,6 +439,17 @@ class CAndruavMap3D {
                     if (lngLat) marker.setLngLat(lngLat);
 
                     // Re-apply the last icon URL (stored on the marker instance)
+                    if (marker._lastIconUrl) {
+                        const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
+                        if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
+                    }
+                });
+
+                // Same re-projection fix for ADSB traffic markers.
+                this.m_adsbMarkers.forEach(marker => {
+                    const lngLat = marker.getLngLat?.();
+                    if (lngLat) marker.setLngLat(lngLat);
+
                     if (marker._lastIconUrl) {
                         const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
                         if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
@@ -568,9 +636,290 @@ class CAndruavMap3D {
         }
 
         // Update the 3D tether line (vertical line from drone down to ground).
-        this.fn_syncTether(unit, lat, lng, altRelative);
+        this.fn_syncTether(id, this.fn_getTetherColor(unit), lat, lng, altRelative);
 
         return marker;
+    }
+
+    // ====================================================================
+    //  ADSB traffic markers (mirrors js_leafletmap's fn_renderSingleAdsb)
+    //  Each aircraft gets a billboarded icon floating at its real-world
+    //  altitude above terrain, plus the same tether/ground-circle/altitude-
+    //  circle visualization used for drones (fn_syncTether).
+    // ====================================================================
+
+    /**
+     * Terrain elevation (meters MSL, non-exaggerated) at a lat/lng, or 0 if
+     * terrain tiles aren't loaded yet. queryTerrainElevation() returns the
+     * EXAGGERATED value, so we divide it back out (see fn_syncTether).
+     */
+    fn_getRawTerrainElevation(lat, lng) {
+        if (!this.m_map || typeof this.m_map.queryTerrainElevation !== 'function') return 0;
+        const exag = this.m_terrainExaggeration || 1;
+        return (this.m_map.queryTerrainElevation([lng, lat]) || 0) / exag;
+    }
+
+    /**
+     * Creates the shared tether/ground-circle/altitude-circle sources +
+     * layers used for the currently selected ADSB aircraft (see
+     * m_selectedAdsbIcao). Only ever holds 0 or 1 feature per layer, so a
+     * single shared set (rather than one per aircraft) is plenty.
+     *
+     * The tether itself is a solid 3D cylinder (fill-extrusion over a small
+     * circular polygon) rather than a thin line — a 1-2px line is very hard
+     * to see against terrain/sky at typical zoom levels, especially for
+     * aircraft thousands of meters up. fill-extrusion's default
+     * 'fill-extrusion-base-alignment': 'terrain' plants the cylinder's base
+     * directly on the local terrain surface (no manual terrain-elevation
+     * query needed for placement, unlike the old line-based tether).
+     *
+     * The ground/altitude rings still use 'line-elevation-reference':
+     * 'ground' (height above local terrain, same convention as
+     * Marker#setAltitude) for the same reasons as before.
+     */
+    fn_ensureAdsbSharedLayers() {
+        if (!this.m_map || !this.m_isReady || this.m_adsbLayersReady) return;
+
+        const color = js_globals.CONST_MAP3D_ADSB_TETHER_COLOR;
+        const empty = { type: 'FeatureCollection', features: [] };
+
+        // --- Vertical tether cylinder (aircraft → ground) ---
+        this.m_map.addSource('de-adsb-tether', { type: 'geojson', data: empty });
+        this.m_map.addLayer({
+            id: 'de-adsb-tether-layer',
+            type: 'fill-extrusion',
+            source: 'de-adsb-tether',
+            paint: {
+                'fill-extrusion-color': color,
+                'fill-extrusion-opacity': js_globals.CONST_MAP3D_ADSB_TETHER_OPACITY,
+                'fill-extrusion-base': 0,
+                'fill-extrusion-height': ['get', 'height']
+            }
+        });
+
+        // --- Ground circle (aircraft ground projection, draped on terrain) ---
+        this.m_map.addSource('de-adsb-ground', { type: 'geojson', data: empty });
+        this.m_map.addLayer({
+            id: 'de-adsb-ground-layer',
+            type: 'line',
+            source: 'de-adsb-ground',
+            layout: { 'line-cap': 'round', 'line-join': 'round' },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        // --- Altitude circle (ring at the aircraft's altitude) ---
+        // 'zoffset' is a per-feature property (constant along the ring),
+        // unlike the tether line which varies elevation along its length.
+        this.m_map.addSource('de-adsb-altcircle', { type: 'geojson', data: empty });
+        this.m_map.addLayer({
+            id: 'de-adsb-altcircle-layer',
+            type: 'line',
+            source: 'de-adsb-altcircle',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': ['get', 'zoffset'],
+                'line-elevation-reference': 'ground',
+                'line-elevation-ground-scale': 1.0
+            },
+            paint: {
+                'line-color': color,
+                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        this.m_adsbLayersReady = true;
+    }
+
+    /**
+     * Marks `icao` (or none, if null) as the selected ADSB aircraft — the
+     * only one whose tether/ground-circle/altitude-circle gets drawn. Call
+     * fn_flushAdsbTethers() afterwards to apply the change.
+     */
+    fn_setSelectedAdsbAircraft(icao) {
+        this.m_selectedAdsbIcao = icao || null;
+    }
+
+    /**
+     * Creates/updates the 3D marker for an ADSB aircraft: position, altitude,
+     * heading and icon. Called on every ADSB update (mirrors js_main.js's
+     * fn_renderSingleAdsb for the leaflet map). Does NOT touch the shared
+     * tether/ground/altitude-circle layers directly — it just records this
+     * aircraft's tether data (used only if it's the selected one); call
+     * fn_flushAdsbTethers() once after syncing all aircraft in a batch.
+     *
+     * `p_adsbObject.m_altitude` is barometric altitude MSL (meters), not
+     * relative to any drone's home point, so it's converted to height above
+     * the local terrain surface before calling Marker#setAltitude (which
+     * expects meters above the terrain, like the drone markers in fn_syncUnit).
+     * @param {import('../js_adsbUnit.js').CADSBObject} p_adsbObject
+     * @param {string} markerIconUrl
+     * @param {Function} [onClickCallback] (p_adsbObject) => void, called when
+     *   the aircraft's icon is clicked (bound once per marker).
+     * @returns {mapboxgl.Marker|null}
+     */
+    fn_syncAdsbObject(p_adsbObject, markerIconUrl, onClickCallback) {
+        if (!this.m_map || !this.m_isReady || !p_adsbObject) return null;
+
+        const lat = p_adsbObject.m_lat;
+        const lng = p_adsbObject.m_lon;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+        const icao = p_adsbObject.m_icao_address;
+        if (!icao) return null;
+
+        let marker = this.m_adsbMarkers.get(icao);
+        if (!marker) {
+            const el = document.createElement('div');
+            el.className = 'css_map3d_marker css_map3d_adsb_marker';
+            el.style.transformOrigin = 'center center';
+
+            const iconEl = document.createElement('div');
+            iconEl.className = 'css_map3d_marker_icon';
+            iconEl.style.transformOrigin = 'center center';
+            el.appendChild(iconEl);
+
+            marker = new window.mapboxgl.Marker({
+                element: el,
+                // Billboarded like drone markers: icon rotates with map bearing,
+                // stays flat to the viewport otherwise.
+                rotationAlignment: 'map',
+                pitchAlignment: 'viewport',
+                anchor: 'center'
+            })
+            .setLngLat([lng, lat])
+            .addTo(this.m_map);
+
+            if (typeof marker.setRotationAlignment === 'function') marker.setRotationAlignment('map');
+            if (typeof marker.setPitchAlignment === 'function') marker.setPitchAlignment('viewport');
+
+            this.m_adsbMarkers.set(icao, marker);
+        } else {
+            marker.setLngLat([lng, lat]);
+        }
+
+        const markerEl = marker.getElement?.();
+        if (markerEl) markerEl.title = p_adsbObject.m_callsign || icao;
+
+        // Bind the click handler once (el is stable for the marker's lifetime).
+        // stopPropagation keeps the background map-click handler (which
+        // deselects) from also firing right after selecting an aircraft.
+        if (markerEl && typeof onClickCallback === 'function' && !marker._adsbClickBound) {
+            markerEl.addEventListener('click', (evt) => {
+                evt.stopPropagation();
+                onClickCallback(p_adsbObject);
+            });
+            marker._adsbClickBound = true;
+        }
+
+        // Raw (non-exaggerated) height above the local terrain surface —
+        // reused for both the marker's floating altitude and its tether.
+        const terrainElev = this.fn_getRawTerrainElevation(lat, lng);
+        const altAboveGround = Math.max((Number(p_adsbObject.m_altitude) || 0) - terrainElev, 0);
+
+        if (typeof marker.setAltitude === 'function') {
+            marker.setAltitude(altAboveGround * this.m_terrainExaggeration);
+        }
+
+        // Heading is stored in radians (see CADSBObject.updateFromNormalized).
+        const headingDeg = ((Number(p_adsbObject.m_heading) || 0) * 180 / Math.PI) % 360;
+        const normalizedHeading = (headingDeg + 360) % 360;
+        if (typeof marker.setRotation === 'function') {
+            marker.setRotation(normalizedHeading);
+        } else {
+            const iconEl = marker.getElement()?.querySelector('.css_map3d_marker_icon');
+            iconEl?.style.setProperty('transform', `rotate(${normalizedHeading}deg)`);
+        }
+
+        this.fn_setMarkerIcon(marker, markerIconUrl);
+
+        this.m_adsbTetherData.set(icao, { lng, lat, terrainElev, altAboveGround });
+
+        return marker;
+    }
+
+    /**
+     * Pushes the selected ADSB aircraft's tether/ground/altitude-circle data
+     * (if any) to the shared Mapbox sources. Call once after syncing every
+     * aircraft for the current update tick, and after selecting/deselecting
+     * an aircraft (fn_setSelectedAdsbAircraft).
+     */
+    fn_flushAdsbTethers() {
+        if (!this.m_map || !this.m_isReady) return;
+
+        const data = this.m_selectedAdsbIcao ? this.m_adsbTetherData.get(this.m_selectedAdsbIcao) : null;
+        if (!data) {
+            if (!this.m_adsbLayersReady) return;
+            const empty = { type: 'FeatureCollection', features: [] };
+            this.m_map.getSource('de-adsb-tether')?.setData(empty);
+            this.m_map.getSource('de-adsb-ground')?.setData(empty);
+            this.m_map.getSource('de-adsb-altcircle')?.setData(empty);
+            return;
+        }
+
+        this.fn_ensureAdsbSharedLayers();
+
+        const CIRCLE_RADIUS = 5;      // meters — shared by ground + altitude rings
+        const { lng, lat, altAboveGround } = data;
+
+        // fill-extrusion-height/Marker#setAltitude don't auto-scale with
+        // terrain exaggeration, so — same as the marker in fn_syncAdsbObject
+        // above — we scale it ourselves to keep the tether/rings visually
+        // matching the marker's floating height.
+        const scaledAlt = altAboveGround * (this.m_terrainExaggeration || 1);
+
+        this.m_map.getSource('de-adsb-tether')?.setData({
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [this.fn_generateCircleRing(lng, lat, js_globals.CONST_MAP3D_ADSB_TETHER_RADIUS)]
+                },
+                properties: { height: scaledAlt }
+            }]
+        });
+        this.m_map.getSource('de-adsb-ground')?.setData({
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: this.fn_generateCircleRing(lng, lat, CIRCLE_RADIUS) },
+                properties: {}
+            }]
+        });
+        this.m_map.getSource('de-adsb-altcircle')?.setData({
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: this.fn_generateCircleRing(lng, lat, CIRCLE_RADIUS * 2) },
+                properties: { zoffset: scaledAlt }
+            }]
+        });
+    }
+
+    /**
+     * Removes an ADSB aircraft's 3D marker and its tether data, e.g. once
+     * it's expired/out of range. If it was the selected aircraft, also
+     * clears the selection. Call fn_flushAdsbTethers() afterwards. Recreated
+     * on demand next time the aircraft is seen again.
+     */
+    fn_removeAdsbMarker(p_adsbObject) {
+        const icao = p_adsbObject?.m_icao_address;
+        if (!icao) return;
+
+        const marker = this.m_adsbMarkers.get(icao);
+        if (marker) {
+            marker.remove();
+            this.m_adsbMarkers.delete(icao);
+        }
+
+        this.m_adsbTetherData.delete(icao);
+        if (this.m_selectedAdsbIcao === icao) this.m_selectedAdsbIcao = null;
     }
 
     // ====================================================================
@@ -591,19 +940,18 @@ class CAndruavMap3D {
     }
 
     /**
-     * Ensures a GeoJSON source + elevated line layer exist for a unit's tether,
+     * Ensures a GeoJSON source + elevated line layer exist for the tether
+     * (identified by `id`, e.g. a unit's party ID or an ADSB icao address),
      * plus a ground circle source + layer. Called on first fn_syncTether.
      */
-    fn_ensureTetherLayer(unit) {
+    fn_ensureTetherLayer(id, color) {
         if (!this.m_map || !this.m_isReady) return;
-        const id = unit.getPartyID();
         if (this.m_tetherSources.has(id)) return;
 
         const sourceId = `de-tether-${id}`;
         const layerId = `de-tether-layer-${id}`;
         const groundSourceId = `de-ground-${id}`;
         const groundLayerId = `de-ground-layer-${id}`;
-        const color = this.fn_getTetherColor(unit);
 
         // --- Vertical tether line (drone → ground) ---
         // lineMetrics:true is required for line-progress / line-z-offset.
@@ -720,15 +1068,15 @@ class CAndruavMap3D {
     }
 
     /**
-     * Updates the tether line + ground circle + altitude circle for a unit.
-     * Called from fn_syncUnit on every telemetry update.
+     * Updates the tether line + ground circle + altitude circle for a unit
+     * or an ADSB aircraft (identified by `id`, with tether color `color`).
+     * Called from fn_syncUnit / fn_syncAdsbObject on every telemetry update.
      */
-    fn_syncTether(unit, lat, lng, altRelative) {
+    fn_syncTether(id, color, lat, lng, altRelative) {
         if (!this.m_map || !this.m_isReady) return;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-        const id = unit.getPartyID();
-        this.fn_ensureTetherLayer(unit);
+        this.fn_ensureTetherLayer(id, color);
 
         // Terrain elevation at the drone's position (meters above sea level).
         // queryTerrainElevation() returns the EXAGGERATED elevation (raw DEM ×

@@ -860,8 +860,16 @@ function fn_adsbExpiredUpdate(me) {
 			if (adsb_obj.p_marker !== null && adsb_obj.p_marker !== undefined) {
 				js_leafletmap.fn_hideItem(adsb_obj.p_marker);
 			}
+			js_map3d.fn_removeAdsbMarker(adsb_obj);
+			if (v_adsbMap3dSelectedIcao === adsb_obj.m_icao_address) {
+				fn_clearAdsbMap3dSelection();
+			}
 		}
 	}
+
+	// Push the (now shorter) 3D tether/ground/altitude-circle feature lists
+	// to Mapbox in a single batch rather than once per removed aircraft.
+	js_map3d.fn_flushAdsbTethers();
 
 	fn_updateAdsbQueryCircle();
 }
@@ -879,6 +887,10 @@ function fn_adsbObjectUpdate(me, p_registry) {
 		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
 		fn_renderSingleAdsb(p_adsbObject);
 	}
+
+	// Push all aircrafts' 3D tether/ground/altitude-circle data to Mapbox in
+	// a single batch (see js_map3d.fn_syncAdsbObject / fn_flushAdsbTethers).
+	js_map3d.fn_flushAdsbTethers();
 
 	// Keep the query-area circle in sync with the current coverage.
 	fn_updateAdsbQueryCircle();
@@ -899,25 +911,25 @@ function fn_adsbUnitSystemChanged() {
 }
 
 function fn_renderSingleAdsb(p_adsbObject) {
+	var icon;
+	switch (parseInt(p_adsbObject.m_emitter_type)) {
+		case mavlink20.ADSB_EMITTER_TYPE_NO_INFO:
+			// Most aircraft don't broadcast category — default to plane icon.
+			icon = '/images/Plane_Track.png';
+			break;
+		case mavlink20.ADSB_EMITTER_TYPE_ROTOCRAFT:
+			// Helicopter / rotorcraft.
+			icon = '/images/heli_1_32x32.png';
+			break;
+		default:
+			// All other types (light, small, large, glider, UAV, etc.)
+			// use the plane icon.
+			icon = '/images/Plane_Track.png';
+			break;
+	}
+
 	var v_marker = p_adsbObject.p_marker;
 	if (v_marker === null || v_marker === undefined) {
-		var icon;
-		switch (parseInt(p_adsbObject.m_emitter_type)) {
-			case mavlink20.ADSB_EMITTER_TYPE_NO_INFO:
-				// Most aircraft don't broadcast category — default to plane icon.
-				icon = '/images/Plane_Track.png';
-				break;
-			case mavlink20.ADSB_EMITTER_TYPE_ROTOCRAFT:
-				// Helicopter / rotorcraft.
-				icon = '/images/heli_1_32x32.png';
-				break;
-			default:
-				// All other types (light, small, large, glider, UAV, etc.)
-				// use the plane icon.
-				icon = '/images/Plane_Track.png';
-				break;
-		}
-
 		var v_label = p_adsbObject.m_callsign || p_adsbObject.m_icao_address;
 		var v_htmladsb = "<p class='text-warning margin_zero'>" + v_label + "</p>";
 
@@ -935,7 +947,35 @@ function fn_renderSingleAdsb(p_adsbObject) {
 	js_leafletmap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
 	js_leafletmap.fn_showItem(p_adsbObject.p_marker);
 
-	// Update hover tooltip with live speed/altitude/callsign.
+	// Mirror the same aircraft on the 3D map. Clicking it selects it (shows
+	// the tether/rings + a popup), same UX as clicking the leaflet marker.
+	js_map3d.fn_syncAdsbObject(p_adsbObject, icon, fn_onAdsbMap3dMarkerClick);
+
+	var v_popup = fn_buildAdsbPopupHtml(p_adsbObject);
+
+	// Remove any leftover tooltip from older code, then bind/update popup.
+	// The icon label (callsign) is always visible; popup shows on click.
+	if (typeof p_adsbObject.p_marker.unbindTooltip === 'function' && p_adsbObject.p_marker.getTooltip && p_adsbObject.p_marker.getTooltip()) {
+		p_adsbObject.p_marker.unbindTooltip();
+	}
+	if (p_adsbObject.p_marker.getPopup && p_adsbObject.p_marker.getPopup()) {
+		p_adsbObject.p_marker.setPopupContent(v_popup);
+	} else if (typeof p_adsbObject.p_marker.bindPopup === 'function') {
+		p_adsbObject.p_marker.bindPopup(v_popup, { closeButton: false });
+	}
+
+	// If this aircraft is the one currently selected on the 3D map, refresh
+	// its popup content/position too (it moves every update).
+	if (v_adsbMap3dSelectedIcao === p_adsbObject.m_icao_address && v_adsbMap3dPopup) {
+		js_map3d.fn_bindPopup(v_adsbMap3dPopup, v_popup, p_adsbObject.m_lat, p_adsbObject.m_lon);
+	}
+}
+
+/**
+ * Builds the HTML content for an ADSB aircraft's info popup (speed,
+ * altitude, heading, etc.), shared between the leaflet and 3D maps.
+ */
+function fn_buildAdsbPopupHtml(p_adsbObject) {
 	// Velocity is stored in m/s, altitude in meters. OpenSky may return null
 	// for any of these, so guard against null/undefined before formatting.
 	// Respect js_globals.v_useMetricSystem for unit display.
@@ -974,8 +1014,7 @@ function fn_renderSingleAdsb(p_adsbObject) {
 	else if (v_posSrc === 2) v_posSrcStr = "MLAT";
 	else if (v_posSrc === 3) v_posSrcStr = "FLARM";
 
-	var v_popup =
-		"<div style='font-size:12px; line-height:1.5; min-width:140px'>" +
+	return "<div style='font-size:12px; line-height:1.5; min-width:140px'>" +
 		"<b style='font-size:13px'>" + v_callsign + "</b>" +
 		(v_onGround ? " <span style='color:#28a745'>(on ground)</span>" : "") +
 		(v_spi ? " <span style='color:#dc3545'>(SPI)</span>" : "") +
@@ -991,15 +1030,36 @@ function fn_renderSingleAdsb(p_adsbObject) {
 		"Pos: " + v_lat.toFixed(4) + ", " + v_lon.toFixed(4) + "<br/>" +
 		"Src: " + v_posSrcStr +
 		"</div>";
-	// Remove any leftover tooltip from older code, then bind/update popup.
-	// The icon label (callsign) is always visible; popup shows on click.
-	if (typeof p_adsbObject.p_marker.unbindTooltip === 'function' && p_adsbObject.p_marker.getTooltip && p_adsbObject.p_marker.getTooltip()) {
-		p_adsbObject.p_marker.unbindTooltip();
+}
+
+// ---- 3D map ADSB selection (click aircraft -> show tether/rings + popup) ----
+let v_adsbMap3dSelectedIcao = null;
+let v_adsbMap3dPopup = null;
+
+function fn_onAdsbMap3dMarkerClick(p_adsbObject) {
+	const icao = p_adsbObject.m_icao_address;
+
+	// Clicking the already-selected aircraft toggles it off.
+	const wasSelected = (v_adsbMap3dSelectedIcao === icao);
+	fn_clearAdsbMap3dSelection();
+	if (wasSelected) return;
+
+	v_adsbMap3dSelectedIcao = icao;
+	js_map3d.fn_setSelectedAdsbAircraft(icao);
+	js_map3d.fn_flushAdsbTethers();
+	v_adsbMap3dPopup = js_map3d.fn_showInfoWindow(
+		null, fn_buildAdsbPopupHtml(p_adsbObject), p_adsbObject.m_lat, p_adsbObject.m_lon);
+}
+
+function fn_clearAdsbMap3dSelection() {
+	if (v_adsbMap3dPopup) {
+		js_map3d.fn_hideInfoWindow(v_adsbMap3dPopup);
+		v_adsbMap3dPopup = null;
 	}
-	if (p_adsbObject.p_marker.getPopup && p_adsbObject.p_marker.getPopup()) {
-		p_adsbObject.p_marker.setPopupContent(v_popup);
-	} else if (typeof p_adsbObject.p_marker.bindPopup === 'function') {
-		p_adsbObject.p_marker.bindPopup(v_popup, { closeButton: false });
+	if (v_adsbMap3dSelectedIcao !== null) {
+		v_adsbMap3dSelectedIcao = null;
+		js_map3d.fn_setSelectedAdsbAircraft(null);
+		js_map3d.fn_flushAdsbTethers();
 	}
 }
 
@@ -1971,6 +2031,8 @@ function initMap() {
 		if (document.getElementById('mapid3d')) {
 			js_map3d.fn_initMap('mapid3d');
 			js_map3d.fn_addListenerOnDblClickMap(fn_onMap3dDblClick);
+			// Clicking the map background deselects the highlighted ADSB aircraft.
+			js_map3d.fn_addListenerOnMapClick(fn_clearAdsbMap3dSelection);
 		}
 		fn_setLapout();
 		fn_gps_getLocation();
