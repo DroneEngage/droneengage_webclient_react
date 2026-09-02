@@ -60,8 +60,15 @@ class ClssNewsWrite extends ClssDialogBase {
     fn_handlePost() {
         const body = this.state.body.trim();
         if (body.length === 0) return;
+        if (!this.state.expiresAt) return;
 
-        const expiresAt = this.state.expiresAt ? Math.floor(new Date(this.state.expiresAt).getTime() / 1000) : null;
+        // datetime-local defaults time to 00:00 when only a date is picked;
+        // treat 00:00 as "no time set" and use end of day (23:59) instead.
+        let expiresStr = this.state.expiresAt;
+        if (expiresStr.endsWith('T00:00')) {
+            expiresStr = expiresStr.replace('T00:00', 'T23:59');
+        }
+        const expiresAt = Math.floor(new Date(expiresStr).getTime() / 1000);
 
         AndruavClientFacade.API_saveNews(this.state.title.trim(), body, parseInt(this.state.priority, 10), expiresAt);
 
@@ -87,7 +94,11 @@ class ClssNewsWrite extends ClssDialogBase {
 
         return (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
-                <div className="card css_ontop news-write-panel p-0" ref={this.m_panelRef}>
+                <div
+                    className="card css_ontop news-write-panel p-0"
+                    ref={this.m_panelRef}
+                    onKeyDown={(e) => e.stopPropagation()}
+                >
                     {this.fn_renderDialogHeader(title, false)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2">
@@ -122,7 +133,7 @@ class ClssNewsWrite extends ClssDialogBase {
                                 <input
                                     type="datetime-local"
                                     className="form-control form-control-sm"
-                                    title={t('news.expires_title') || 'Expires (optional)'}
+                                    title={t('news.expires_title') || 'Expires (time optional, defaults to 23:59)'}
                                     value={this.state.expiresAt}
                                     onChange={(e) => this.setState({ expiresAt: e.target.value })}
                                 />
