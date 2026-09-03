@@ -19,10 +19,10 @@ class ClssMapSettings extends React.Component {
     const localStorage3DToken = js_localStorage.fn_getMapbox3DAccessToken();
     const localStorageStyle = js_localStorage.fn_getMapboxStyle();
 
-    this.leafletAccessTokenRef.current.value = localStorageToken || js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN;
-    this.leafletUrlMapRef.current.value = localStorageUrl || js_siteConfig.CONST_MAP_LEAFLET_URL_MAP;
-    this.mapbox3DAccessTokenRef.current.value = localStorage3DToken || js_siteConfig.CONST_MAPBOX_3D_ACCESS_TOKEN;
-    this.mapboxStyleRef.current.value = localStorageStyle || js_siteConfig.CONST_MAPBOX_STYLE;
+    this.leafletAccessTokenRef.current.value = localStorageToken || '';
+    this.leafletUrlMapRef.current.value = localStorageUrl || '';
+    this.mapbox3DAccessTokenRef.current.value = localStorage3DToken || '';
+    this.mapboxStyleRef.current.value = localStorageStyle || '';
   }
 
   fn_saveMapSettings(e) {

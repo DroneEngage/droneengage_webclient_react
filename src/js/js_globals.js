@@ -193,6 +193,13 @@ class GLOBALS {
 		this.LS_ENABLE_ADSB = '_vADSBEnabled';
 		this.LS_ENABLE_AISSTREAM = '_vAISStreamEnabled';
 		this.LS_ADSB_RADIUS_KM = '_vADSBRadiusKm';
+		// ADSB provider config overrides (editable from the ADSB settings tab).
+		// localStorage has highest priority, then config.local/config.json,
+		// then the defaults in js_siteConfig.CONST_ADSB_CONFIG.
+		this.LS_ADSB_PROVIDER = '_vADSBProvider';
+		this.LS_ADSB_REFRESH_RATE_MS = '_vADSBRefreshRateMs';
+		this.LS_ADSB_OPENSKY_CLIENT_ID = '_vADSBOpenSkyClientId';
+		this.LS_ADSB_OPENSKY_CLIENT_SECRET = '_vADSBOpenSkyClientSecret';
 
 
 

@@ -58,9 +58,12 @@ const DEFAULT_RADIUS_KM = 850;            // ADSB scan radius (swarm margin & ge
 const DEFAULT_UNIT_FOLLOW_RADIUS_KM = 200;
 const SWARM_RECOMPUTE_MS = 8000;         // throttle swarm-area recompute
 const DEFAULT_REFRESH_RATE_MS = 60000;   // default polling interval
-// Aircraft expiry default is 2x the refresh rate so a single missed poll
-// doesn't drop targets. Computed dynamically from the resolved refresh rate.
-const OBJECT_TIMEOUT_REFRESH_MULTIPLIER = 2;
+// Aircraft expiry default is 4x the refresh rate so a plane survives ~4
+// consecutive missed polls. OpenSky intermittently drops aircraft from
+// responses (coverage gaps, receiver aggregation), so the window must cover
+// several polls — not just one. Computed dynamically from the resolved refresh
+// rate; an explicit OBJECT_TIMEOUT_MS in config still takes priority.
+const OBJECT_TIMEOUT_REFRESH_MULTIPLIER = 4;
 
 class AdsbManager {
     constructor() {
@@ -85,8 +88,8 @@ class AdsbManager {
         this._callsTimeTable = {};
         this._lastSwarmCompute = 0;
 
-        // Object expiry: explicit config override, otherwise 2x the resolved
-        // refresh rate so a single missed poll doesn't drop targets.
+        // Object expiry: explicit config override, otherwise 4x the resolved
+        // refresh rate so a plane survives ~4 consecutive missed polls.
         const refreshMs = AdsbManager._resolveRefreshRateMs();
         this._objectTimeoutMs =
             (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.OBJECT_TIMEOUT_MS)

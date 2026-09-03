@@ -74,10 +74,24 @@ div#displays {
 	flex-direction: column;
 }
 
-/* Non-video sections take content height only */
-#message_notification,
-#div_map_view {
+/* Notification bar takes content height only */
+#message_notification {
 	flex: 0 0 auto;
+}
+
+/* Map views fill the available height. The map and video blocks are
+   switchable (only one is display:block at a time via js_main.js), so the
+   visible one should stretch to fill #displays. This overrides the fixed
+   800px from div.monitorview so the map grows with the viewport (e.g. when
+   the browser enters F11 fullscreen). Scoped to desktop layout; mobile
+   keeps its 60vh rule below. */
+@media (min-width: 992px) {
+	#div_map_view,
+	#div_map3d_view {
+		flex: 1 1 auto;
+		min-height: 0;
+		height: auto;
+	}
 }
 
 /* Let the video block consume remaining height within displays */

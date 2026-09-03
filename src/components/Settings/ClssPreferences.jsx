@@ -7,7 +7,6 @@ import { js_eventEmitter } from '../../js/js_eventEmitter';
 import { js_speak } from '../../js/js_speak';
 import { js_localStorage } from '../../js/js_localStorage';
 import { js_websocket_bridge } from '../../js/CPC/js_websocket_bridge.js';
-import { js_adsbManager } from '../../js/adsb/js_adsbManager.js';
 
 class ClssPreferences extends React.Component {
   constructor() {
@@ -20,43 +19,19 @@ class ClssPreferences extends React.Component {
     this.m_ws2wsRef = React.createRef();
     this.m_gcsDisplayRef = React.createRef();
     this.m_gcsShowMeRef = React.createRef();
-    this.m_enableADSBRef = React.createRef();
     this.m_enableAISStreamRef = React.createRef();
-    this.m_adsbRadiusRef = React.createRef();
-    this.state = {
-      adsbRadiusKm: js_localStorage.fn_getAdsbRadiusKm() ||
-        (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850,
-      isMetric: js_globals.v_useMetricSystem,
-    };
-    this._boundOnUnitSystemChanged = this._onUnitSystemChanged.bind(this);
-  }
-
-  _onUnitSystemChanged() {
-    this.setState({ isMetric: js_globals.v_useMetricSystem });
   }
 
   componentDidMount() {
-    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, this._boundOnUnitSystemChanged);
     this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
     this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
     this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
     this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
     this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
     this.m_ws2wsRef.current.checked = js_localStorage.fn_getWS2WSEnabled();
-    if (this.m_enableADSBRef.current) {
-      this.m_enableADSBRef.current.checked = js_localStorage.fn_getADSBEnabled();
-    }
     if (this.m_enableAISStreamRef.current) {
       this.m_enableAISStreamRef.current.checked = js_localStorage.fn_getAISStreamEnabled();
     }
-    if (this.m_adsbRadiusRef.current) {
-      const stored = js_localStorage.fn_getAdsbRadiusKm();
-      this.m_adsbRadiusRef.current.value = stored !== null ? stored : (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
-    }
-  }
-
-  componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
   }
 
   fn_changeVolume(e) {
@@ -118,30 +93,6 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
-  fn_enableADSB(e) {
-    const enabled = e.currentTarget.checked;
-    js_localStorage.fn_setADSBEnabled(enabled);
-    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
-  }
-
-  // Live preview of the slider value (label only) while dragging.
-  fn_changeAdsbRadius(e) {
-    const km = parseInt(e.currentTarget.value);
-    const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
-    if (isNaN(km) || km < 2 || km > max) return;
-    this.setState({ adsbRadiusKm: km });
-  }
-
-  // On mouse-up / touch-end: persist, reset ADSB, and redraw the circle.
-  fn_applyAdsbRadius(e) {
-    const km = parseInt(e.currentTarget.value);
-    const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
-    if (isNaN(km) || km < 2 || km > max) return;
-    js_localStorage.fn_setAdsbRadiusKm(km);
-    this.setState({ adsbRadiusKm: km });
-    js_adsbManager.fn_setGeolocationRadiusKm(km);
-  }
-
   fn_enableAISStream(e) {
     const enabled = e.currentTarget.checked;
     js_localStorage.fn_setAISStreamEnabled(enabled);
@@ -155,10 +106,6 @@ class ClssPreferences extends React.Component {
     if (js_localStorage.fn_getSpeechEnabled() === false) {
       v_speech_disabled = 'true';
     }
-
-    // ADSB feature exists only when the site flag CONST_FEATURE.DISABLE_ADSB
-    // is not true. The row is hidden entirely when the feature is disabled.
-    const v_adsbFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true);
 
     // AISStream feature exists only when the site flag
     // CONST_FEATURE.DISABLE_AISStream is not true.
@@ -238,37 +185,6 @@ class ClssPreferences extends React.Component {
             onClick={(e) => this.fn_enableWS2WS(e)}
           />
         </div>
-        {v_adsbFeatureEnabled && (
-          <div className="row mb-12 align-items-center flex-nowrap">
-            <label htmlFor="check_enable_adsb" className={`col-sm-4 col-form-label${dir}`}>
-              {t('globalSettings:enableADSBLabel')}
-            </label>
-            <input
-              className="form-check-input col-sm-4"
-              type="checkbox"
-              id="check_enable_adsb"
-              ref={this.m_enableADSBRef}
-              onClick={(e) => this.fn_enableADSB(e)}
-            />
-            <input
-              type="range"
-              className="form-range col ms-2"
-              id="range_adsb_radius"
-              min="2"
-              max={(js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850}
-              step="1"
-              ref={this.m_adsbRadiusRef}
-              onChange={(e) => this.fn_changeAdsbRadius(e)}
-              onMouseUp={(e) => this.fn_applyAdsbRadius(e)}
-              onTouchEnd={(e) => this.fn_applyAdsbRadius(e)}
-            />
-            <label className="col-sm-2 col-form-label al_l">
-              {this.state.isMetric
-                ? `${this.state.adsbRadiusKm} km`
-                : `${(this.state.adsbRadiusKm * 0.621371).toFixed(0)} mi`}
-            </label>
-          </div>
-        )}
         {v_aisStreamFeatureEnabled && (
           <div className="row mb-12 align-items-center">
             <label htmlFor="check_enable_aisstream" className={`col-sm-4 col-form-label ${dir}`}>

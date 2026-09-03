@@ -59,7 +59,15 @@ export class CADSBObject {
         this.m_origin_country = aircraft.originCountry || '';
         this.m_spi = !!aircraft.spi;
         this.m_position_source = aircraft.positionSource ?? null;
-        this.m_last_access = new Date(aircraft.lastContact || Date.now());
+        // m_last_access drives the purge/hide window (fn_purgeOlderThan and
+        // fn_adsbExpiredUpdate). It MUST be the time we last RECEIVED this
+        // aircraft in a response, NOT the provider's last_contact — OpenSky's
+        // last_contact is when the transponder was last heard by any receiver
+        // and can lag the fetch by tens of seconds, which silently shrinks the
+        // effective OBJECT_TIMEOUT_MS and makes planes vanish after a single
+        // missed poll. Using receive time makes OBJECT_TIMEOUT_MS mean exactly
+        // "absence tolerance" (how long a plane can be missing from responses).
+        this.m_last_access = new Date();
     }
 }
 

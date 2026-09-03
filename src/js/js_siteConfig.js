@@ -160,7 +160,13 @@ export let CONST_ICE_SERVERS = [];
  *   REFRESH_RATE_MS: polling interval (OpenSky anonymous tier is credit-limited,
  *                    so the default is conservative; for aisstream this is the
  *                    flush interval for buffered push messages)
- *   OBJECT_TIMEOUT_MS: how long an aircraft is kept after its last update
+ *   OBJECT_TIMEOUT_MS: how long an aircraft is kept after it last appears in
+ *                      a response. Measured from receive time (not the
+ *                      provider's last_contact), so this is the exact absence
+ *                      tolerance. Should be a multiple of REFRESH_RATE_MS so a
+ *                      plane survives several missed polls (OpenSky
+ *                      intermittently drops aircraft from responses). Default
+ *                      4x the refresh rate (240000 at 60s refresh).
  *   OPENSKY: { CLIENT_ID, CLIENT_SECRET } enable OAuth2 for higher limits; leave
  *            empty for anonymous (bounding-box) mode.
  *   AISSTREAM: { URL, REFRESH_RATE_MS } AIS maritime data via the DroneEngage
@@ -225,6 +231,23 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
         if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
         if (data.CONST_ADSB_CONFIG !== undefined) CONST_ADSB_CONFIG = { ...CONST_ADSB_CONFIG, ...data.CONST_ADSB_CONFIG };
+
+        // Apply localStorage overrides for ADSB config (localStorage has
+        // highest priority, then config.local/config.json, then defaults
+        // above). Mirrors the map-settings override pattern. Only non-empty
+        // localStorage values win; an empty stored value is ignored so the
+        // config/default still applies.
+        const lsAdsbProvider = js_localStorage.fn_getAdsbProvider();
+        if (lsAdsbProvider) CONST_ADSB_CONFIG.PROVIDER = lsAdsbProvider;
+
+        const lsAdsbRefresh = js_localStorage.fn_getAdsbRefreshRateMs();
+        if (lsAdsbRefresh) CONST_ADSB_CONFIG.REFRESH_RATE_MS = lsAdsbRefresh;
+
+        const lsClientId = js_localStorage.fn_getAdsbOpenSkyClientId();
+        if (lsClientId) CONST_ADSB_CONFIG.OPENSKY = { ...CONST_ADSB_CONFIG.OPENSKY, CLIENT_ID: lsClientId };
+
+        const lsClientSecret = js_localStorage.fn_getAdsbOpenSkyClientSecret();
+        if (lsClientSecret) CONST_ADSB_CONFIG.OPENSKY = { ...CONST_ADSB_CONFIG.OPENSKY, CLIENT_SECRET: lsClientSecret };
         if (data.CONST_MODULE_VERSIONS !== undefined) CONST_MODULE_VERSIONS = { ...CONST_MODULE_VERSIONS, ...data.CONST_MODULE_VERSIONS };
         if (data.CONST_LANGUAGE !== undefined) CONST_LANGUAGE = { ...CONST_LANGUAGE, ...data.CONST_LANGUAGE };
 

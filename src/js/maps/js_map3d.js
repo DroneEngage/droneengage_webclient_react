@@ -718,6 +718,13 @@ class CAndruavMap3D {
         this.m_isVisible = false;
     }
 
+    // Refresh the map canvas after its container size changes (e.g. browser
+    // F11 fullscreen toggle). No-op when hidden or not yet initialised.
+    fn_resize() {
+        if (!this.m_isVisible || !this.m_map) return;
+        this.m_map.resize();
+    }
+
     fn_getUnitMarker(unit) {
         return unit ? this.m_markers.get(unit.getPartyID()) ?? null : null;
     }

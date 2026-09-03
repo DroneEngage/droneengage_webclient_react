@@ -11,6 +11,7 @@ import { setSelectedMissionFilePathToWrite } from '../../js/js_main.js';
 import ClssDefault from './ClssDefault.jsx';
 import ClssPreferences from './ClssPreferences.jsx';
 import ClssMapSettings from './ClssMapSettings.jsx';
+import ClssAdsbSettings from './ClssAdsbSettings.jsx';
 
 class ClssGlobalSettings extends React.Component {
   constructor() {
@@ -159,6 +160,11 @@ class ClssGlobalSettings extends React.Component {
                   Map
                 </a>
               </li>
+              <li className="nav-item">
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_adsb">
+                  ADSB
+                </a>
+              </li>
             </ul>
             <div id="main_settings_tab" className="tab-content">
               <div className="tab-pane fade active show pt-2" id="settings_home">
@@ -177,6 +183,9 @@ class ClssGlobalSettings extends React.Component {
               </div>
               <div className="tab-pane fade" id="settings_map">
                 <ClssMapSettings t={t} i18n={this.props.i18n} />
+              </div>
+              <div className="tab-pane fade" id="settings_adsb">
+                <ClssAdsbSettings t={t} i18n={this.props.i18n} />
               </div>
             </div>
           </div>

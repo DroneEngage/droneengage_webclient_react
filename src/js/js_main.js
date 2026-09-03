@@ -861,9 +861,10 @@ function fn_updateAdsbQueryCircle() {
 // eslint-disable-next-line no-unused-vars
 function fn_adsbExpiredUpdate(me) {
 	// Use the same timeout as the ADSB manager's purge window so markers
-	// stay visible between polls (manager default 130s > 60s refresh).
+	// stay hidden/purged in sync. Default is 4x the refresh rate (240s at
+	// 60s refresh) so a plane survives ~4 missed polls.
 	const ADSB_OBJECT_TIMEOUT =
-		(js_adsbManager && js_adsbManager.fn_getObjectTimeoutMs && js_adsbManager.fn_getObjectTimeoutMs()) || 130000;
+		(js_adsbManager && js_adsbManager.fn_getObjectTimeoutMs && js_adsbManager.fn_getObjectTimeoutMs()) || 240000;
 	const count = js_adsbUnit.count;
 	const now = new Date();
 	const p_keys = Object.keys(js_adsbUnit.List);
@@ -3645,6 +3646,23 @@ export function fn_on_ready() {
 	$("#alert").hide();
 
 	fn_handleKeyBoard();
+
+	// Refresh the visible map when the viewport size changes (window resize
+	// or F11 browser fullscreen toggle). Leaflet/Mapbox don't auto-detect
+	// container size changes, so without this the map canvas stays pinned
+	// to its old dimensions after the container grows.
+	const fn_handleViewportResize = () => {
+		// Best-effort immediate refresh, then a guaranteed one after the
+		// browser commits the new layout on the next frame.
+		js_leafletmap.fn_invalidateSize();
+		js_map3d.fn_resize();
+		requestAnimationFrame(() => {
+			js_leafletmap.fn_invalidateSize();
+			js_map3d.fn_resize();
+		});
+	};
+	window.addEventListener('resize', fn_handleViewportResize);
+	document.addEventListener('fullscreenchange', fn_handleViewportResize);
 
 	js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, fn_connectWebSocket);
 

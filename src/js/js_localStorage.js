@@ -283,6 +283,58 @@ class CLocalStorage {
         return v;
     }
 
+    // ADSB provider config overrides. localStorage has highest priority
+    // (then config.local/config.json, then js_siteConfig defaults). These
+    // back the editable fields in the ADSB settings tab.
+    fn_setAdsbProvider(value) {
+        this._setValue(js_globals.LS_ADSB_PROVIDER, value);
+    }
+
+    fn_getAdsbProvider() {
+        return this._getValue(js_globals.LS_ADSB_PROVIDER, '');
+    }
+
+    fn_removeAdsbProvider() {
+        this._removeValue(js_globals.LS_ADSB_PROVIDER);
+    }
+
+    fn_setAdsbRefreshRateMs(value) {
+        this._setValue(js_globals.LS_ADSB_REFRESH_RATE_MS, value);
+    }
+
+    fn_getAdsbRefreshRateMs() {
+        const v = parseInt(this._getValue(js_globals.LS_ADSB_REFRESH_RATE_MS, ''));
+        return isNaN(v) || v < 1000 ? null : v;
+    }
+
+    fn_removeAdsbRefreshRateMs() {
+        this._removeValue(js_globals.LS_ADSB_REFRESH_RATE_MS);
+    }
+
+    fn_setAdsbOpenSkyClientId(value) {
+        this._setValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID, value);
+    }
+
+    fn_getAdsbOpenSkyClientId() {
+        return this._getValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID, '');
+    }
+
+    fn_removeAdsbOpenSkyClientId() {
+        this._removeValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID);
+    }
+
+    fn_setAdsbOpenSkyClientSecret(value) {
+        this._setValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET, value);
+    }
+
+    fn_getAdsbOpenSkyClientSecret() {
+        return this._getValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET, '');
+    }
+
+    fn_removeAdsbOpenSkyClientSecret() {
+        this._removeValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET);
+    }
+
     // Volume
     fn_setVolume(value) {
         this._setValue(js_globals.LS_DEFAULT_VOLUME, value.toString());

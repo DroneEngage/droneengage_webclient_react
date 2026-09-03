@@ -52,11 +52,30 @@ js_main.js  ──► js_adsbManager (singleton)  ──► AdsbProvider (abstra
 CONST_ADSB_CONFIG = {
   PROVIDER: 'opensky',        // 'opensky' | 'aisstream'
   REFRESH_RATE_MS: 60000,     // poll interval (OpenSky anonymous tier is credit-limited)
-  OBJECT_TIMEOUT_MS: 13000,   // aircraft expiry
+  OBJECT_TIMEOUT_MS: 240000,  // aircraft expiry — absence tolerance from receive
+                               // time (NOT provider last_contact); should be a
+                               // multiple of REFRESH_RATE_MS so a plane survives
+                               // several missed polls (default 4x)
   OPENSKY:    { URL:'', TOKEN_URL:'', CLIENT_ID:'', CLIENT_SECRET:'' },
   AISSTREAM:  { URL:'', REFRESH_RATE_MS: 5000 },
 };
 ```
+
+`CONST_ADSB_CONFIG` override priority (highest → lowest):
+1. **localStorage** — edited from the ADSB settings tab
+   (`src/components/Settings/ClssAdsbSettings.jsx`). Helpers in
+   `js_localStorage.js`: `fn_getAdsbProvider`, `fn_getAdsbRefreshRateMs`,
+   `fn_getAdsbOpenSkyClientId`, `fn_getAdsbOpenSkyClientSecret`. Applied
+   in `fn_applyRuntimeConfig` after the config-file merge, so they win.
+2. **`/public/config.local.json`** then **`/public/config.json`** — merged
+   via `fn_applyRuntimeConfig`.
+3. **defaults** in `js_siteConfig.js` (`CONST_ADSB_CONFIG`).
+
+The ADSB tab edits persist to localStorage, mirror onto `CONST_ADSB_CONFIG`
+in place, and call `js_adsbManager.fn_reloadProvider()` so the next poll
+uses the new credentials/refresh rate without a page reload. The ADSB
+enable toggle + radius slider live in this tab (moved out of
+`ClssPreferences.jsx`); AISStream enable stays in Preferences.
 
 ADSB is gated by `js_globals.v_EnableADSB` and `js_globals.CONST_DISABLE_ADSG`.
 
