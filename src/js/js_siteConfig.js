@@ -83,6 +83,18 @@ export let CONST_MAPBOX_3D_ACCESS_TOKEN = '';
 export let CONST_MAPBOX_STYLE = 'mapbox://styles/mapbox/standard';
 
 /**
+ * IndexedDB-backed cache for Leaflet raster tiles (src/js/maps/js_tileCache.js).
+ * Cache-first: reduces repeated tile requests, keeps previously-seen tiles
+ * available offline, and speeds up reloads of the same area. Requires the
+ * tile server to allow CORS (falls back to an uncached <img src> otherwise).
+ * MAX_TILES caps the number of cached tiles (LRU eviction).
+ */
+export let CONST_MAP_TILE_CACHE = {
+    ENABLED: true,
+    MAX_TILES: 2000,
+};
+
+/**
  * Location of GCS are not sent over network. Only The existence of connected GCS are shared.
  */
 export let CONST_DONT_BROADCAST_TO_GCSs = false;
@@ -207,6 +219,7 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_MAP_LEAFLET_ACCESS_TOKEN !== undefined) CONST_MAP_LEAFLET_ACCESS_TOKEN = data.CONST_MAP_LEAFLET_ACCESS_TOKEN;
         if (data.CONST_MAPBOX_3D_ACCESS_TOKEN !== undefined) CONST_MAPBOX_3D_ACCESS_TOKEN = data.CONST_MAPBOX_3D_ACCESS_TOKEN;
         if (data.CONST_MAPBOX_STYLE !== undefined) CONST_MAPBOX_STYLE = data.CONST_MAPBOX_STYLE;
+        if (data.CONST_MAP_TILE_CACHE !== undefined) CONST_MAP_TILE_CACHE = { ...CONST_MAP_TILE_CACHE, ...data.CONST_MAP_TILE_CACHE };
         if (data.CONST_DONT_BROADCAST_TO_GCSs !== undefined) CONST_DONT_BROADCAST_TO_GCSs = data.CONST_DONT_BROADCAST_TO_GCSs;
         if (data.CONST_DONT_BROADCAST_GCS_LOCATION !== undefined) CONST_DONT_BROADCAST_GCS_LOCATION = data.CONST_DONT_BROADCAST_GCS_LOCATION;
         if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };

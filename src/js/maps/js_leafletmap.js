@@ -14,6 +14,7 @@ import * as js_siteConfig from '../js_siteConfig.js'
 import {js_globals} from '../js_globals.js';
 import {EVENTS as js_event} from '../js_eventList.js'
 import {js_eventEmitter} from '../js_eventEmitter.js'
+import {js_tileCache} from './js_tileCache.js'
 
 import {fn_contextMenu} from '../js_main.js'
 
@@ -26,6 +27,38 @@ L.Icon.Default.mergeOptions({
     iconUrl: '/images/marker-icon.png',
     iconRetinaUrl: '/images/marker-icon-2x.png',
     shadowUrl: '/images/marker-shadow.png',
+});
+
+// Leaflet tile layer that routes tiles through the IndexedDB cache
+// (js_tileCache.js) instead of always hitting the network. Mirrors
+// L.TileLayer's default createTile, but resolves the tile src via
+// js_tileCache.fn_getTile() (cache-first, falls back to the direct URL on a
+// cache miss/CORS failure). Object URLs are released on 'tileunload'.
+const CCachedTileLayer = L.TileLayer.extend({
+    createTile(coords, done) {
+        const tile = document.createElement('img');
+
+        L.DomEvent.on(tile, 'load', L.Util.bind(this._tileOnLoad, this, done, tile));
+        L.DomEvent.on(tile, 'error', L.Util.bind(this._tileOnError, this, done, tile));
+
+        if (this.options.crossOrigin || this.options.crossOrigin === '') {
+            tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+        }
+
+        tile.alt = '';
+        tile.setAttribute('role', 'presentation');
+
+        const url = this.getTileUrl(coords);
+        const providerId = this.options.cacheProviderId || 'default';
+
+        js_tileCache.fn_getTile(url, providerId, coords.z, coords.x, coords.y)
+            .then((objectUrl) => {
+                tile._cachedObjectUrl = objectUrl || null;
+                tile.src = objectUrl || url;
+            });
+
+        return tile;
+    }
 });
 
 class CLeafLetAndruavMap {
@@ -157,11 +190,20 @@ class CLeafLetAndruavMap {
             return;
         }
         
-        L.tileLayer(tileUrl, {
+        const tileLayer = new CCachedTileLayer(tileUrl, {
                 maxZoom: 22,
                 attribution: v_site_copyright,
-                id: 'mapbox.streets'
-            }).addTo(this.m_Map);
+                id: 'mapbox.streets',
+                cacheProviderId: 'leaflet-basemap'
+            });
+        tileLayer.on('tileunload', (event) => {
+            const tile = event.tile;
+            if (tile && tile._cachedObjectUrl) {
+                js_tileCache.fn_releaseTileUrl(tile._cachedObjectUrl);
+                tile._cachedObjectUrl = null;
+            }
+        });
+        tileLayer.addTo(this.m_Map);
         
 
         
