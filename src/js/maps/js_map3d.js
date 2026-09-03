@@ -559,6 +559,24 @@ class CAndruavMap3D {
     }
 
     /**
+     * Computes the tether width/radius for a given altitude above ground.
+     * Scales linearly from CONST_MAP3D_TETHER_MIN (at 0m AGL) to
+     * CONST_MAP3D_TETHER_MAX (at CONST_MAP3D_TETHER_MAX_ALT and above).
+     * Used for both DroneEngage unit tethers (line-width in pixels) and
+     * ADSB aircraft tethers (fill-extrusion cylinder radius in meters).
+     * @param {number} altAboveGround meters above ground (AGL)
+     * @returns {number} tether width
+     */
+    fn_computeTetherWidth(altAboveGround) {
+        const min = js_globals.CONST_MAP3D_TETHER_MIN;
+        const max = js_globals.CONST_MAP3D_TETHER_MAX;
+        const maxAlt = js_globals.CONST_MAP3D_TETHER_MAX_ALT;
+        const alt = Math.max(0, Number(altAboveGround) || 0);
+        if (alt >= maxAlt) return max;
+        return min + (max - min) * (alt / maxAlt);
+    }
+
+    /**
      * Re-applies the current zoom-compensated scale (fn_computeModelScale)
      * to every unit's and (when CONST_MAP3D_ADSB_RENDER_MODE === 'glb')
      * every ADSB aircraft's 3D-model feature. Called on every 'zoom' event;
@@ -1321,7 +1339,7 @@ class CAndruavMap3D {
                 type: 'Feature',
                 geometry: {
                     type: 'Polygon',
-                    coordinates: [this.fn_generateCircleRing(lng, lat, js_globals.CONST_MAP3D_ADSB_TETHER_RADIUS)]
+                    coordinates: [this.fn_generateCircleRing(lng, lat, this.fn_computeTetherWidth(altAboveGround))]
                 },
                 properties: { height: scaledAlt }
             }]
@@ -1432,7 +1450,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_TETHER_WIDTH,
+                'line-width': js_globals.CONST_MAP3D_TETHER_MIN,  // updated per fn_syncTether
                 'line-opacity': 0.8
             }
         });
@@ -1553,6 +1571,13 @@ class CAndruavMap3D {
                     elevation: [terrainElev, droneAlt]
                 }
             });
+        }
+
+        // --- Update tether line width (dynamic, altitude-based) ---
+        const tetherLayerId = this.m_tetherLayers.get(id);
+        if (tetherLayerId) {
+            const width = this.fn_computeTetherWidth(altRelative);
+            this.m_map.setPaintProperty(tetherLayerId, 'line-width', width);
         }
 
         // --- Update ground circle (ring draping on terrain) ---

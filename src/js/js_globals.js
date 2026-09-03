@@ -213,7 +213,6 @@ class GLOBALS {
 		// Tether/ground/altitude/trail colors per unit index (cycled).
 		this.CONST_MAP3D_TETHER_COLORS = ['#503508', '#094709', '#510c31', '#127577'];
 		// Line thickness (pixels) for the 3D overlay layers.
-		this.CONST_MAP3D_TETHER_WIDTH = 2;     // vertical tether line
 		this.CONST_MAP3D_CIRCLE_WIDTH = 2;     // ground + altitude rings
 		this.CONST_MAP3D_TRAIL_WIDTH = 5;      // flight path trail
 		this.CONST_MAP3D_MISSION_DROP_WIDTH = 1;  // waypoint drop-to-ground line
@@ -221,8 +220,16 @@ class GLOBALS {
 		this.CONST_MAP3D_GATE_WIDTH = 3;          // vertical gate ring line width
 		this.CONST_MAP3D_WP_GROUND_RADIUS = 5;    // ground circle radius at waypoint drop base (meters)
 		this.CONST_MAP3D_ADSB_TETHER_COLOR = '#ff0000'; // ADSB aircraft tether/ground/altitude ring color
-		this.CONST_MAP3D_ADSB_TETHER_RADIUS = 100;       // ADSB tether cylinder radius (meters)
 		this.CONST_MAP3D_ADSB_TETHER_OPACITY = 0.95;    // ADSB tether cylinder fill opacity
+
+		// ---- Map3D tether width (dynamic, altitude-based) ----
+		// The vertical tether width scales linearly from MIN to MAX as the
+		// object's altitude above ground goes from 0 to MAX_ALT, then stays
+		// at MAX for higher altitudes. Applies to both DroneEngage units
+		// (line width in pixels) and ADSB aircraft (cylinder radius in meters).
+		this.CONST_MAP3D_TETHER_MIN = 2;        // minimum tether width (at ground level)
+		this.CONST_MAP3D_TETHER_MAX = 100;       // maximum tether width (at MAX_ALT and above)
+		this.CONST_MAP3D_TETHER_MAX_ALT = 1000;  // altitude (meters AGL) at which MAX is reached
 
 		// ---- Map3D 3D-model (glTF) icon LOD ----
 		// Below this zoom the flat billboard <div> marker is shown (constant
