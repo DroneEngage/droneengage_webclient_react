@@ -1,0 +1,291 @@
+import React from 'react';
+import { withTranslation } from 'react-i18next';
+import * as js_siteConfig from '../../js/js_siteConfig.js';
+import { js_globals } from '../../js/js_globals.js';
+import { EVENTS as js_event } from '../../js/js_eventList.js';
+import { js_eventEmitter } from '../../js/js_eventEmitter';
+import { js_speak } from '../../js/js_speak';
+import { js_localStorage } from '../../js/js_localStorage';
+import { js_websocket_bridge } from '../../js/CPC/js_websocket_bridge.js';
+import { js_adsbManager } from '../../js/adsb/js_adsbManager.js';
+
+class ClssPreferences extends React.Component {
+  constructor() {
+    super();
+    this.key = Math.random().toString();
+    js_globals.v_enable_tabs_display = js_localStorage.fn_getTabsDisplayEnabled();
+    this.m_volumeRangeRef = React.createRef();
+    this.m_enableSpeechRef = React.createRef();
+    this.m_advancedRef = React.createRef();
+    this.m_ws2wsRef = React.createRef();
+    this.m_gcsDisplayRef = React.createRef();
+    this.m_gcsShowMeRef = React.createRef();
+    this.m_enableADSBRef = React.createRef();
+    this.m_enableAISStreamRef = React.createRef();
+    this.m_adsbRadiusRef = React.createRef();
+    this.state = {
+      adsbRadiusKm: js_localStorage.fn_getAdsbRadiusKm() ||
+        (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850,
+      isMetric: js_globals.v_useMetricSystem,
+    };
+    this._boundOnUnitSystemChanged = this._onUnitSystemChanged.bind(this);
+  }
+
+  _onUnitSystemChanged() {
+    this.setState({ isMetric: js_globals.v_useMetricSystem });
+  }
+
+  componentDidMount() {
+    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, this._boundOnUnitSystemChanged);
+    this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
+    this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
+    this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
+    this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
+    this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
+    this.m_ws2wsRef.current.checked = js_localStorage.fn_getWS2WSEnabled();
+    if (this.m_enableADSBRef.current) {
+      this.m_enableADSBRef.current.checked = js_localStorage.fn_getADSBEnabled();
+    }
+    if (this.m_enableAISStreamRef.current) {
+      this.m_enableAISStreamRef.current.checked = js_localStorage.fn_getAISStreamEnabled();
+    }
+    if (this.m_adsbRadiusRef.current) {
+      const stored = js_localStorage.fn_getAdsbRadiusKm();
+      this.m_adsbRadiusRef.current.value = stored !== null ? stored : (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
+    }
+  }
+
+  componentWillUnmount() {
+    js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
+  }
+
+  fn_changeVolume(e) {
+    js_localStorage.fn_setVolume(e.currentTarget.value);
+    js_speak.fn_updateSettings();
+  }
+
+  fn_handleMouseUp(e) {
+    js_localStorage.fn_setVolume(e.currentTarget.value);
+    js_speak.fn_updateSettings();
+    js_speak.fn_speakFirst(this.props.t('globalSettings:testVolume'));
+  }
+
+  fn_enableSpeech(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setSpeechEnabled(enabled);
+    js_speak.fn_updateSettings();
+    if (enabled === true) {
+      js_speak.fn_speak(this.props.t('globalSettings:speechEnabled'));
+      this.m_volumeRangeRef.current.removeAttribute('disabled');
+    } else {
+      js_speak.fn_stopSpeaking();
+      this.m_volumeRangeRef.current.setAttribute('disabled', 'disabled');
+    }
+  }
+
+  fn_enableAdvanced(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setAdvancedOptionsEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onAdvancedMode);
+  }
+
+  fn_enableWS2WS(e)
+  {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setWS2WSEnabled(enabled);
+    
+    if (enabled === true)
+    {
+      js_websocket_bridge.fn_init();
+    }
+    else
+    {
+      js_websocket_bridge.fn_uninit();
+    }
+  }
+
+  fn_GCSShowMe(e) {
+    const enabled = e.currentTarget.checked;
+    js_globals.v_enable_tabs_display = enabled;
+    js_localStorage.fn_setGCSShowMe(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
+  fn_enableGCS(e) {
+    const enabled = e.currentTarget.checked;
+    js_globals.v_enable_gcs_display = enabled;
+    js_localStorage.fn_setGCSDisplayEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
+  fn_enableADSB(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setADSBEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
+  // Live preview of the slider value (label only) while dragging.
+  fn_changeAdsbRadius(e) {
+    const km = parseInt(e.currentTarget.value);
+    const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
+    if (isNaN(km) || km < 2 || km > max) return;
+    this.setState({ adsbRadiusKm: km });
+  }
+
+  // On mouse-up / touch-end: persist, reset ADSB, and redraw the circle.
+  fn_applyAdsbRadius(e) {
+    const km = parseInt(e.currentTarget.value);
+    const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
+    if (isNaN(km) || km < 2 || km > max) return;
+    js_localStorage.fn_setAdsbRadiusKm(km);
+    this.setState({ adsbRadiusKm: km });
+    js_adsbManager.fn_setGeolocationRadiusKm(km);
+  }
+
+  fn_enableAISStream(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setAISStreamEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
+  render() {
+    const { t } = this.props;
+    const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
+    let v_speech_disabled = 'false';
+    if (js_localStorage.fn_getSpeechEnabled() === false) {
+      v_speech_disabled = 'true';
+    }
+
+    // ADSB feature exists only when the site flag CONST_FEATURE.DISABLE_ADSB
+    // is not true. The row is hidden entirely when the feature is disabled.
+    const v_adsbFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true);
+
+    // AISStream feature exists only when the site flag
+    // CONST_FEATURE.DISABLE_AISStream is not true.
+    const v_aisStreamFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_AISStream === true);
+
+    return (
+      <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+        <div id='preference_settings' className="row mb-12 align-items-center flex-nowrap">
+          <label htmlFor="check_enable_speech" className={`col-sm-4 col-form-label${dir}`}>
+            {t('globalSettings:enableSpeechLabel')}
+          </label>
+          <input
+            className="form-check-input col-sm-4"
+            ref={this.m_enableSpeechRef}
+            type="checkbox"
+            id="check_enable_speech"
+            onClick={(e) => this.fn_enableSpeech(e)}
+          />
+          <label htmlFor="volume_range" className="col-sm-4 col-form-label al_c">
+            {t('globalSettings:volumeLabel')}
+          </label>
+          <input
+            type="range"
+            className="form-range  col"
+            id="volume_range"
+            ref={this.m_volumeRangeRef}
+            disabled={v_speech_disabled === 'true' }
+            onChange={(e) => this.fn_changeVolume(e)}
+            onMouseUp={(e) => this.fn_handleMouseUp(e)}
+          />
+        </div>
+        <div className="row mb-12 align-items-center">
+          <label htmlFor="check_gcs_display" className={`col-sm-4 col-form-label ${dir}`}>
+            {t('globalSettings:gcsDisplayLabel')}
+          </label>
+          <input
+            className="form-check-input col-sm-8"
+            type="checkbox"
+            id="check_gcs_display"
+            ref={this.m_gcsDisplayRef}
+            onClick={(e) => this.fn_enableGCS(e)}
+          />
+          <label
+            htmlFor="check_gcs_show_me"
+            className="col-sm-4 col-form-label al_r"
+            title={t('globalSettings:gcsShowMeTitle')}
+          >
+            {t('globalSettings:gcsShowMeLabel')}
+          </label>
+          <input
+            className="form-check-input col-sm-4"
+            type="checkbox"
+            id="check_gcs_show_me"
+            ref={this.m_gcsShowMeRef}
+            onClick={(e) => this.fn_GCSShowMe(e)}
+          />
+        </div>
+        <div className="row mb-12 align-items-center">
+          <label htmlFor="check_advanced" className={`col-sm-4 col-form-label ${dir}`}>
+            {t('globalSettings:advancedOptionsLabel')}
+          </label>
+          <input
+            className="form-check-input col-sm-8"
+            type="checkbox"
+            id="check_advanced"
+            ref={this.m_advancedRef}
+            onClick={(e) => this.fn_enableAdvanced(e)}
+          />
+          <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_r">
+            Mavlink3D
+          </label>
+          <input
+            className="form-check-input col-sm-8"
+            type="checkbox"
+            id="enable_ws2ws_socket"
+            ref={this.m_ws2wsRef}
+            onClick={(e) => this.fn_enableWS2WS(e)}
+          />
+        </div>
+        {v_adsbFeatureEnabled && (
+          <div className="row mb-12 align-items-center flex-nowrap">
+            <label htmlFor="check_enable_adsb" className={`col-sm-4 col-form-label${dir}`}>
+              {t('globalSettings:enableADSBLabel')}
+            </label>
+            <input
+              className="form-check-input col-sm-4"
+              type="checkbox"
+              id="check_enable_adsb"
+              ref={this.m_enableADSBRef}
+              onClick={(e) => this.fn_enableADSB(e)}
+            />
+            <input
+              type="range"
+              className="form-range col ms-2"
+              id="range_adsb_radius"
+              min="2"
+              max={(js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850}
+              step="1"
+              ref={this.m_adsbRadiusRef}
+              onChange={(e) => this.fn_changeAdsbRadius(e)}
+              onMouseUp={(e) => this.fn_applyAdsbRadius(e)}
+              onTouchEnd={(e) => this.fn_applyAdsbRadius(e)}
+            />
+            <label className="col-sm-2 col-form-label al_l">
+              {this.state.isMetric
+                ? `${this.state.adsbRadiusKm} km`
+                : `${(this.state.adsbRadiusKm * 0.621371).toFixed(0)} mi`}
+            </label>
+          </div>
+        )}
+        {v_aisStreamFeatureEnabled && (
+          <div className="row mb-12 align-items-center">
+            <label htmlFor="check_enable_aisstream" className={`col-sm-4 col-form-label ${dir}`}>
+              {t('globalSettings:enableAISStreamLabel')}
+            </label>
+            <input
+              className="form-check-input col-sm-8"
+              type="checkbox"
+              id="check_enable_aisstream"
+              ref={this.m_enableAISStreamRef}
+              onClick={(e) => this.fn_enableAISStream(e)}
+            />
+          </div>
+        )}
+      </fieldset>
+    );
+  }
+}
+
+export default withTranslation(['', 'globalSettings'])(ClssPreferences);

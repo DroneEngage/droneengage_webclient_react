@@ -18,7 +18,7 @@ import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
 import { js_eventEmitter } from '../js/js_eventEmitter';
 import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';
-import ClssGlobalSettings from '../components/jsc_globalSettings';
+import ClssGlobalSettings from '../components/Settings';
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx';
 import ClssAndruavUnitGCSList from '../components/unit_controls/jsc_unitControlGCSList.jsx';
 import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
