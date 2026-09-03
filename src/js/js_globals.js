@@ -224,6 +224,52 @@ class GLOBALS {
 		this.CONST_MAP3D_ADSB_TETHER_RADIUS = 100;       // ADSB tether cylinder radius (meters)
 		this.CONST_MAP3D_ADSB_TETHER_OPACITY = 0.95;    // ADSB tether cylinder fill opacity
 
+		// ---- Map3D 3D-model (glTF) icon LOD ----
+		// Below this zoom the flat billboard <div> marker is shown (constant
+		// screen size, no 3D tilt); at/above it we swap to a real glTF model
+		// (arrow.glb / plane.glb) that tilts with roll/pitch in 3D. This
+		// avoids the "too small / too big" problem of scaling a real-world
+		// sized 3D model across the full zoom range (see js_map3d.js).
+		this.CONST_MAP3D_MODEL_ZOOM_THRESHOLD = 4;
+		// model-scale [x,y,z] applied to arrow.glb/plane.glb *at
+		// CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM*. Mapbox's model-scale paint
+		// property doesn't support zoom expressions on a GeoJSON source, so
+		// js_map3d.js recomputes this manually on every 'zoom' event: scale
+		// is multiplied by 2^(referenceZoom - currentZoom), the same
+		// meters-per-pixel relationship tiles use, so the model keeps a
+		// roughly constant on-screen (icon-like) size as you zoom in/out
+		// within the LOD band, instead of growing/shrinking with true
+		// real-world scale.
+		this.CONST_MAP3D_MODEL_SCALE = [5, 5, 5];
+		this.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM = 18;
+		// Growth aggressiveness: factor = 2^((referenceZoom - zoom) * exponent).
+		// 1.0 = "true" pixel-constant compensation (model looks the same
+		// size on screen at any zoom). >1.0 = overcompensates, so the model
+		// visibly keeps growing larger the further you zoom out (rather than
+		// just holding steady) — this is what gives the "grows with me as I
+		// zoom out" feel. <1.0 = grows more gently than pixel-constant.
+		this.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT = 1.3;
+		// Clamp the zoom-compensation factor so scale can't blow up/collapse
+		// to a degenerate size at extreme zoom. Widened from the original
+		// 0.25-8 range so growth is visible across the full LOD zoom band
+		// down to CONST_MAP3D_MODEL_ZOOM_THRESHOLD instead of plateauing
+		// almost immediately; raise CONST_MAP3D_MODEL_SCALE_MAX_FACTOR
+		// further if you want it to keep growing even at very low zoom.
+		this.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR = 0.1;
+		this.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 160;
+
+		// ---- Map3D ADSB traffic render mode ----
+		// Unlike drone units (which always use the icon/GLB LOD hybrid
+		// above), ADSB aircraft can number in the hundreds, so instead of an
+		// automatic zoom-based swap this is a single global switch:
+		//   'icon' — flat DOM billboard markers only (current default).
+		//   'glb'  — real glTF models only ('drone-plane'), with the same
+		//            dynamic zoom-scaling (CONST_MAP3D_MODEL_SCALE_*) applied.
+		// See js_map3d.js fn_syncAdsbObject.
+		this.CONST_MAP3D_ADSB_RENDER_MODE_ICON = 'icon';
+		this.CONST_MAP3D_ADSB_RENDER_MODE_GLB = 'glb';
+		this.CONST_MAP3D_ADSB_RENDER_MODE = this.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+
 		this.CONST_DISABLE_ADSG = true;
 
 		// VIEW LINK Gimbal Zoom range constants

@@ -1054,8 +1054,14 @@ function fn_onAdsbMap3dMarkerClick(p_adsbObject) {
 	v_adsbMap3dSelectedIcao = icao;
 	js_map3d.fn_setSelectedAdsbAircraft(icao);
 	js_map3d.fn_flushAdsbTethers();
+
+	// Place the popup at the aircraft's altitude above the terrain (same
+	// computation as fn_syncAdsbObject) so it points at the 3D model/icon
+	// rather than sitting on the ground.
+	const terrainElev = js_map3d.fn_getRawTerrainElevation(p_adsbObject.m_lat, p_adsbObject.m_lon);
+	const altAboveGround = Math.max((Number(p_adsbObject.m_altitude) || 0) - terrainElev, 0);
 	v_adsbMap3dPopup = js_map3d.fn_showInfoWindow(
-		null, fn_buildAdsbPopupHtml(p_adsbObject), p_adsbObject.m_lat, p_adsbObject.m_lon);
+		null, fn_buildAdsbPopupHtml(p_adsbObject), p_adsbObject.m_lat, p_adsbObject.m_lon, altAboveGround);
 }
 
 function fn_clearAdsbMap3dSelection() {

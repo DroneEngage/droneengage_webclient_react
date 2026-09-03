@@ -1,6 +1,19 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
+import * as js_andruavUnit from '../js_andruavUnit';
+import '../../css/css_map3d.css';
+
+/**
+ * 1x1 fully-transparent PNG (data URI) used as a placeholder icon when a
+ * marker's real icon should be invisible but the marker element must stay
+ * in the DOM hit-test tree to catch click/hover — i.e. when a DroneEngage
+ * unit or ADSB aircraft is rendered as a 3D glTF model instead of a flat
+ * DOM icon. Mapbox's model-layer hit-testing is broken for GeoJSON-backed
+ * model layers (mapbox-gl-js#13598), so we keep the DOM marker alive with
+ * a transparent icon on top of the model to handle interaction natively.
+ */
+const TRANSPARENT_ICON_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 /**
  * Custom Mapbox GL control: three buttons (x1, x2, x5) that switch the
@@ -121,6 +134,21 @@ class CAndruavMap3D {
 
         this.m_mapClickCallbacks = [];
         this.m_isMapClickBound = false;
+
+        // ---- 3D model (glTF) icon LOD ----
+        // Above CONST_MAP3D_MODEL_ZOOM_THRESHOLD, drone icons are rendered as
+        // real glTF models (arrow.glb / plane.glb) via a Mapbox 'model' layer
+        // so they tilt in true 3D with roll/pitch (unlike the flat DOM
+        // billboard marker, which only ever rotates in the screen plane).
+        // Below the threshold we keep the DOM marker, since a real-world
+        // scaled 3D model looks wrong (too tiny/huge) once zoomed far out.
+        this.m_modelLayerReady = false;
+        this.m_modelLodActive = false;          // true when models are currently shown instead of DOM markers
+        this.m_unitModelFeatures = new Map();   // unitId -> GeoJSON Feature (kept so we can setData() the whole collection)
+
+        // glTF-model twin of the ADSB DOM markers, used only when
+        // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
+        this.m_adsbModelFeatures = new Map();   // icao_address -> GeoJSON Feature
     }
 
     /**
@@ -152,8 +180,12 @@ class CAndruavMap3D {
     /**
      * Registers a single-click handler on the map background (only once).
      * Used to deselect the currently highlighted ADSB aircraft when the user
-     * clicks anywhere that isn't a marker (marker click handlers call
-     * stopPropagation() so this only fires for background clicks).
+     * clicks anywhere that isn't a marker — DOM marker click handlers call
+     * stopPropagation() so this only fires for actual background clicks.
+     * In GLB mode the DOM markers are kept alive but transparent (see
+     * fn_syncAdsbObject / fn_updateModelLod) precisely so they still catch
+     * clicks natively, avoiding the broken Mapbox model-layer hit-testing
+     * (mapbox-gl-js#13598).
      */
     fn_registerMapClickHandler() {
         if (!this.m_map || this.m_isMapClickBound) return;
@@ -177,15 +209,32 @@ class CAndruavMap3D {
 
     /**
      * Shows a popup at the given location.
+     * @param {object} [p_infoWindow] existing popup to reuse (or null to create)
+     * @param {string|HTMLElement} p_content
+     * @param {number} p_lat
+     * @param {number} p_lng
+     * @param {number} [p_alt] optional altitude in meters above the terrain
+     *   surface (same convention as Marker#setAltitude). When terrain is on,
+     *   Mapbox GL JS v3 places the popup at this height; without it the popup
+     *   sits on the ground.
      * @returns {mapboxgl.Popup | null}
      */
-    fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng) {
+    fn_showInfoWindow(p_infoWindow, p_content, p_lat, p_lng, p_alt) {
         if (!this.m_map) return null;
 
         this.fn_hideInfoWindow(p_infoWindow);
 
+        // When an altitude is given, pass it as the 3rd element of the
+        // LngLatLike array so the popup floats above the terrain (matching
+        // the marker/model altitude). Scale by terrain exaggeration the same
+        // way Marker#setAltitude does (see fn_syncUnit / fn_syncAdsbObject).
+        const alt = (typeof p_alt === 'number' && Number.isFinite(p_alt))
+            ? p_alt * this.m_terrainExaggeration
+            : undefined;
+        const lngLat = (alt != null) ? [p_lng, p_lat, alt] : [p_lng, p_lat];
+
         const popup = new window.mapboxgl.Popup({ closeOnClick: true })
-            .setLngLat([p_lng, p_lat]);
+            .setLngLat(lngLat);
 
         if (typeof p_content === 'string') {
             popup.setHTML(p_content);
@@ -207,13 +256,18 @@ class CAndruavMap3D {
 
     /**
      * Updates an existing popup's content and/or position.
+     * @param {number} [p_alt] optional altitude in meters above the terrain
+     *   (same convention as fn_showInfoWindow).
      * @returns {mapboxgl.Popup | null}
      */
-    fn_bindPopup(p_infoWindow, p_content, p_lat, p_lng) {
+    fn_bindPopup(p_infoWindow, p_content, p_lat, p_lng, p_alt) {
         if (!p_infoWindow) return null;
 
         if (typeof p_lat === 'number' && typeof p_lng === 'number') {
-            p_infoWindow.setLngLat([p_lng, p_lat]);
+            const alt = (typeof p_alt === 'number' && Number.isFinite(p_alt))
+                ? p_alt * this.m_terrainExaggeration
+                : undefined;
+            p_infoWindow.setLngLat(alt != null ? [p_lng, p_lat, alt] : [p_lng, p_lat]);
         }
 
         if (typeof p_content === 'string') {
@@ -338,6 +392,8 @@ class CAndruavMap3D {
                 source: 'mapbox-dem',
                 exaggeration: this.m_terrainExaggeration
             });
+
+            this.fn_setupModelLodLayer();
         });
 
         this.m_map.on('load', () => {
@@ -347,8 +403,182 @@ class CAndruavMap3D {
             this.fn_replayMissions();
         });
 
+        // Toggle DOM markers vs. 3D glTF models, and rescale the models to
+        // compensate for zoom, as the user zooms in/out.
+        this.m_map.on('zoom', () => {
+            this.fn_updateModelLod();
+            this.fn_updateModelScale();
+        });
+
         // Add the terrain exaggeration control (x1 / x2 / x5 buttons).
         this.m_map.addControl(new TerrainExaggerationControl(this), 'bottom-right');
+    }
+
+    /**
+     * Registers the glTF models (arrow.glb / plane.glb) + the GeoJSON source
+     * and 'model' layer used to render unit icons as real 3D objects once
+     * zoomed in past CONST_MAP3D_MODEL_ZOOM_THRESHOLD. See fn_syncUnit for
+     * how per-unit position/rotation is pushed into the source, and
+     * fn_updateModelLod for the DOM-marker/model swap.
+     */
+    fn_setupModelLodLayer() {
+        if (!this.m_map || this.m_modelLayerReady) return;
+
+        if (typeof this.m_map.addModel === 'function') {
+            this.m_map.addModel('drone-arrow', '/models/arrow.glb');
+            this.m_map.addModel('drone-plane', '/models/plane.glb');
+            this.m_map.addModel('ground-station', '/models/groundstation.glb');
+            this.m_map.addModel('drone-quad', '/models/quad.glb');
+        }
+
+        if (!this.m_map.getSource('unit-3d-models')) {
+            this.m_map.addSource('unit-3d-models', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+        }
+
+        if (!this.m_map.getLayer('unit-3d-models-layer')) {
+            this.m_map.addLayer({
+                id: 'unit-3d-models-layer',
+                type: 'model',
+                source: 'unit-3d-models',
+                minzoom: js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
+                layout: {
+                    'model-id': ['get', 'modelId']
+                },
+                paint: {
+                    'model-rotation': ['get', 'rotation'],
+                    'model-translation': ['get', 'translation'],
+                    // Data-driven (per-feature), not a zoom expression: Mapbox
+                    // doesn't support zoom-dependent model-scale on a GeoJSON
+                    // source, so fn_updateModelScale() recomputes this value
+                    // in JS on every 'zoom' event instead (see below).
+                    'model-scale': ['get', 'scale'],
+                    // Real-time whole-model color tint (see fn_setUnitModelTint):
+                    // Mapbox only supports independently recoloring sub-parts
+                    // (e.g. rotors vs body) via materialOverrideNames on a
+                    // 'model'-type source, NOT on this shared GeoJSON source
+                    // (confirmed gap: mapbox/mapbox-gl-js#13609) — so this
+                    // tints the entire model uniformly. Defaults to a no-op
+                    // (intensity 0) unless a feature sets 'tintColor'/'tintIntensity'.
+                    'model-color': ['get', 'tintColor'],
+                    'model-color-mix-intensity': ['get', 'tintIntensity'],
+                    'model-cast-shadows': false,
+                    'model-receive-shadows': false
+                }
+            });
+        }
+
+        // ADSB traffic's glTF twin — only populated/shown when
+        // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (fn_syncAdsbObject).
+        // No minzoom gating here: unlike drone units (icon/model LOD swap by
+        // zoom), ADSB is an explicit all-or-nothing icon-vs-glb switch.
+        if (!this.m_map.getSource('adsb-3d-models')) {
+            this.m_map.addSource('adsb-3d-models', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+        }
+
+        if (!this.m_map.getLayer('adsb-3d-models-layer')) {
+            this.m_map.addLayer({
+                id: 'adsb-3d-models-layer',
+                type: 'model',
+                source: 'adsb-3d-models',
+                layout: {
+                    'model-id': ['get', 'modelId']
+                },
+                paint: {
+                    'model-rotation': ['get', 'rotation'],
+                    'model-translation': ['get', 'translation'],
+                    'model-scale': ['get', 'scale'],
+                    // Same uniform whole-model tint mechanism as the unit
+                    // layer above (see fn_setAdsbModelTint).
+                    'model-color': ['get', 'tintColor'],
+                    'model-color-mix-intensity': ['get', 'tintIntensity'],
+                    'model-cast-shadows': false,
+                    'model-receive-shadows': false
+                }
+            });
+        }
+
+        this.m_modelLayerReady = true;
+        this.fn_updateModelLod();
+        this.fn_updateModelScale();
+    }
+
+    /**
+     * Swaps between the flat DOM billboard markers (m_markers) and the 3D
+     * glTF model layer based on the current zoom, so the two never visually
+     * overlap. DOM markers give a constant, readable screen size at any
+     * zoom; the glTF models give true 3D roll/pitch tilt but only look
+     * right within a narrow zoom band (see CONST_MAP3D_MODEL_SCALE), so
+     * they're gated by minzoom on the layer itself + this icon swap.
+     *
+     * When models are active the DOM markers' icons are swapped to a
+     * transparent placeholder (TRANSPARENT_ICON_URL) rather than hiding the
+     * element — this keeps them in the hit-test tree so they still catch
+     * click/hover natively, which is the only reliable way to interact
+     * with the corresponding 3D model given that Mapbox's model-layer
+     * hit-testing is broken for GeoJSON-backed model layers
+     * (mapbox-gl-js#13598).
+     */
+    fn_updateModelLod() {
+        if (!this.m_map || !this.m_modelLayerReady) return;
+
+        const showModels = this.m_map.getZoom() >= js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD;
+        if (showModels === this.m_modelLodActive) return;
+        this.m_modelLodActive = showModels;
+
+        this.m_markers.forEach(marker => {
+            this.fn_applyMarkerIconForMode(marker, showModels);
+        });
+    }
+
+    /**
+     * Computes the [x,y,z] model-scale for the current zoom, compensating
+     * for the fact that model-scale is real-world meters (not screen
+     * pixels): doubling zoom halves meters-per-pixel, so we must grow the
+     * model's real-world scale as you zoom out just to hold its on-screen
+     * size steady. CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT lets it
+     * overcompensate (>1) so it visibly keeps growing larger while zooming
+     * out, rather than merely holding steady (=1).
+     * factor = 2^((referenceZoom - zoom) * exponent), clamped to avoid
+     * degenerate sizes at extreme zoom.
+     */
+    fn_computeModelScale(zoom) {
+        const refZoom = js_globals.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM;
+        const base = js_globals.CONST_MAP3D_MODEL_SCALE;
+        const exponent = js_globals.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT;
+        const minFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR;
+        const maxFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR;
+
+        const factor = Math.min(maxFactor, Math.max(minFactor, Math.pow(2, (refZoom - zoom) * exponent)));
+        return base.map(v => v * factor);
+    }
+
+    /**
+     * Re-applies the current zoom-compensated scale (fn_computeModelScale)
+     * to every unit's and (when CONST_MAP3D_ADSB_RENDER_MODE === 'glb')
+     * every ADSB aircraft's 3D-model feature. Called on every 'zoom' event;
+     * cheap given the small number of units (mirrors the ADSB tether
+     * batching pattern used elsewhere in this file).
+     */
+    fn_updateModelScale() {
+        if (!this.m_map || !this.m_modelLayerReady) return;
+
+        const scale = this.fn_computeModelScale(this.m_map.getZoom());
+
+        if (this.m_unitModelFeatures.size > 0) {
+            this.m_unitModelFeatures.forEach(feature => { feature.properties.scale = scale; });
+            this.fn_flushUnitModels();
+        }
+
+        if (this.m_adsbModelFeatures.size > 0) {
+            this.m_adsbModelFeatures.forEach(feature => { feature.properties.scale = scale; });
+            this.fn_flushAdsbModels();
+        }
     }
 
     /**
@@ -438,22 +668,18 @@ class CAndruavMap3D {
                     const lngLat = marker.getLngLat?.();
                     if (lngLat) marker.setLngLat(lngLat);
 
-                    // Re-apply the last icon URL (stored on the marker instance)
-                    if (marker._lastIconUrl) {
-                        const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
-                        if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
-                    }
+                    // Re-apply the correct icon (real or transparent) for the
+                    // current LOD state — see fn_applyMarkerIconForMode.
+                    this.fn_applyMarkerIconForMode(marker, this.m_modelLodActive);
                 });
 
                 // Same re-projection fix for ADSB traffic markers.
+                const adsbGlb = js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
                 this.m_adsbMarkers.forEach(marker => {
                     const lngLat = marker.getLngLat?.();
                     if (lngLat) marker.setLngLat(lngLat);
 
-                    if (marker._lastIconUrl) {
-                        const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
-                        if (iconEl) iconEl.style.backgroundImage = `url('${marker._lastIconUrl}')`;
-                    }
+                    this.fn_applyMarkerIconForMode(marker, adsbGlb);
                 });
 
                 // Re-draw any missions that were stored while the 3D tab was
@@ -480,14 +706,40 @@ class CAndruavMap3D {
 
     /**
      * Sets/updates a marker's icon image and remembers it so fn_show() can re-apply it.
+     * Stores the real icon URL in _realIconUrl (separate from _lastIconUrl which
+     * may be the transparent placeholder when GLB models are active — see
+     * fn_applyMarkerIconForMode).
      */
     fn_setMarkerIcon(marker, markerIconUrl) {
         if (!marker || !markerIconUrl) return;
 
-        marker._lastIconUrl = markerIconUrl;
+        marker._realIconUrl = markerIconUrl;
+        // _lastIconUrl tracks what's currently displayed (real or transparent),
+        // updated by fn_applyMarkerIconForMode. Only set it here if we're not
+        // in a model-active state; otherwise fn_applyMarkerIconForMode owns it.
+        if (!marker._modelActive) {
+            marker._lastIconUrl = markerIconUrl;
+            const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
+            if (iconEl) {
+                iconEl.style.backgroundImage = `url('${markerIconUrl}')`;
+            }
+        }
+    }
+
+    /**
+     * Applies either the real icon or the transparent placeholder to a marker,
+     * depending on whether 3D models are currently active. Called by
+     * fn_updateModelLod (for all unit markers) and fn_syncAdsbObject (per
+     * ADSB marker) whenever the LOD state or ADSB render mode changes.
+     */
+    fn_applyMarkerIconForMode(marker, modelActive) {
+        if (!marker) return;
+        marker._modelActive = modelActive;
+        const url = modelActive ? TRANSPARENT_ICON_URL : (marker._realIconUrl || '');
+        marker._lastIconUrl = url;
         const iconEl = marker.getElement?.()?.querySelector('.css_map3d_marker_icon');
-        if (iconEl) {
-            iconEl.style.backgroundImage = `url('${markerIconUrl}')`;
+        if (iconEl && url) {
+            iconEl.style.backgroundImage = `url('${url}')`;
         }
     }
 
@@ -611,6 +863,11 @@ class CAndruavMap3D {
 
         this.m_markers.set(id, marker);
 
+        // Keep newly created markers in sync with the current DOM/model LOD state.
+        if (this.m_modelLodActive) {
+            this.fn_applyMarkerIconForMode(marker, true);
+        }
+
         // Update icon if provided — store last URL so fn_show can re-apply it
         this.fn_setMarkerIcon(marker, markerIconUrl);
 
@@ -622,9 +879,10 @@ class CAndruavMap3D {
 
         // Apply yaw rotation (in degrees)
         const yaw = unit?.m_Nav_Info?.p_Orientation?.yaw;
+        let normalizedYaw = 0;
         if (Number.isFinite(yaw)) {
             const deg = (yaw * 180 / Math.PI) % 360;
-            const normalizedYaw = (deg + 360) % 360;
+            normalizedYaw = (deg + 360) % 360;
 
             if (typeof marker.setRotation === 'function') {
                 marker.setRotation(normalizedYaw);
@@ -638,7 +896,107 @@ class CAndruavMap3D {
         // Update the 3D tether line (vertical line from drone down to ground).
         this.fn_syncTether(id, this.fn_getTetherColor(unit), lat, lng, altRelative);
 
+        // Update the glTF model twin used at close zoom (fn_updateModelLod).
+        this.fn_syncUnitModel(unit, id, lat, lng, altRelative, normalizedYaw);
+
         return marker;
+    }
+
+    /**
+     * Updates (or creates) the GeoJSON feature backing this unit's entry in
+     * the 3D 'model' layer (unit-3d-models-layer) — the real glTF twin of
+     * the DOM marker, shown instead of it once zoomed in past
+     * CONST_MAP3D_MODEL_ZOOM_THRESHOLD (see fn_updateModelLod).
+     *
+     * model-rotation is [x, y, z] euler degrees applied in the model's
+     * world/ENU frame: x tilts about the east-west axis (pitch), y tilts
+     * about the north-south axis (roll/bank), z rotates about the vertical
+     * axis (yaw/heading, clockwise from North) — see the comments in
+     * scripts/generate_arrow_glb.js / generate_plane_glb.js for the raw
+     * model convention (-Z forward/North, +Y up at [0,0,0]). Roll/pitch
+     * sign conventions here are a best-effort derivation from MAVLink
+     * angles and may need a visual sign flip once seen on screen.
+     */
+    fn_syncUnitModel(unit, id, lat, lng, altRelative, yawDeg) {
+        if (!this.m_map) return;
+
+        const roll = unit?.m_Nav_Info?.p_Orientation?.roll;
+        const pitch = unit?.m_Nav_Info?.p_Orientation?.pitch;
+        const rollDeg = Number.isFinite(roll) ? roll * 180 / Math.PI : 0;
+        const pitchDeg = Number.isFinite(pitch) ? pitch * 180 / Math.PI : 0;
+
+        let modelId;
+        if (unit.m_VehicleType === js_andruavUnit.CONTROL_UNIT) {
+            modelId = 'ground-station';
+        } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_PLANE || unit.m_VehicleType === js_andruavUnit.VEHICLE_VTOL) {
+            modelId = 'drone-plane';
+        } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_QUAD || unit.m_VehicleType === js_andruavUnit.VEHICLE_TRI) {
+            modelId = 'drone-quad';
+        } else {
+            modelId = 'drone-arrow';
+        }
+
+        const zOffset = Number.isFinite(altRelative) ? altRelative * this.m_terrainExaggeration : 0;
+
+        // Preserve the zoom-compensated scale and any active tint if this
+        // feature already exists (fn_updateModelScale/fn_setUnitModelTint
+        // keep them current independently); otherwise seed defaults.
+        const existing = this.m_unitModelFeatures.get(id);
+        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom());
+        const tintColor = existing?.properties?.tintColor || '#ffffff';
+        const tintIntensity = existing?.properties?.tintIntensity || 0;
+
+        this.m_unitModelFeatures.set(id, {
+            type: 'Feature',
+            id,
+            properties: {
+                modelId,
+                rotation: [pitchDeg, rollDeg, yawDeg],
+                translation: [0, 0, zOffset],
+                scale,
+                tintColor,
+                tintIntensity
+            },
+            geometry: { type: 'Point', coordinates: [lng, lat] }
+        });
+
+        this.fn_flushUnitModels();
+    }
+
+    /**
+     * Applies a real-time whole-model color tint to a unit's glTF model
+     * (see the 'model-color'/'model-color-mix-intensity' comment on
+     * unit-3d-models-layer for why this can't independently target rotors
+     * vs body). Pass intensity 0 (or omit color) to clear the tint back to
+     * the model's baked-in material colors.
+     * @param {string} unitId
+     * @param {string} [colorHex='#ffffff'] e.g. '#ff0000'
+     * @param {number} [intensity=1] 0 (no tint) .. 1 (fully replaced by colorHex)
+     */
+    fn_setUnitModelTint(unitId, colorHex = '#ffffff', intensity = 1) {
+        const feature = this.m_unitModelFeatures.get(unitId);
+        if (!feature) return;
+
+        feature.properties.tintColor = colorHex;
+        feature.properties.tintIntensity = intensity;
+        this.fn_flushUnitModels();
+    }
+
+    /**
+     * Pushes the accumulated m_unitModelFeatures into the 'unit-3d-models'
+     * source. Cheap enough to call on every telemetry tick given the small
+     * number of units (mirrors the ADSB tether batching pattern).
+     */
+    fn_flushUnitModels() {
+        if (!this.m_map || !this.m_modelLayerReady) return;
+
+        const source = this.m_map.getSource('unit-3d-models');
+        if (!source) return;
+
+        source.setData({
+            type: 'FeatureCollection',
+            features: Array.from(this.m_unitModelFeatures.values())
+        });
     }
 
     // ====================================================================
@@ -773,6 +1131,29 @@ class CAndruavMap3D {
         const icao = p_adsbObject.m_icao_address;
         if (!icao) return null;
 
+        // Raw (non-exaggerated) height above the local terrain surface —
+        // reused for both the marker's/model's floating altitude and its
+        // tether. Heading is stored in radians (see
+        // CADSBObject.updateFromNormalized).
+        const terrainElev = this.fn_getRawTerrainElevation(lat, lng);
+        const altAboveGround = Math.max((Number(p_adsbObject.m_altitude) || 0) - terrainElev, 0);
+        const headingDeg = ((Number(p_adsbObject.m_heading) || 0) * 180 / Math.PI) % 360;
+        const normalizedHeading = (headingDeg + 360) % 360;
+        this.m_adsbTetherData.set(icao, { lng, lat, terrainElev, altAboveGround });
+
+        const isGlbMode = js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+
+        // In GLB mode: sync the 3D model AND keep the DOM marker alive but
+        // transparent (opacity:0) so it still catches click/hover natively —
+        // the only reliable interaction path given Mapbox's broken model-
+        // layer hit-testing (mapbox-gl-js#13598).
+        // In icon mode: drop any stale GLB model feature.
+        if (isGlbMode) {
+            this.fn_syncAdsbModel(icao, lat, lng, altAboveGround, normalizedHeading);
+        } else {
+            if (this.m_adsbModelFeatures.delete(icao)) this.fn_flushAdsbModels();
+        }
+
         let marker = this.m_adsbMarkers.get(icao);
         if (!marker) {
             const el = document.createElement('div');
@@ -817,18 +1198,10 @@ class CAndruavMap3D {
             marker._adsbClickBound = true;
         }
 
-        // Raw (non-exaggerated) height above the local terrain surface —
-        // reused for both the marker's floating altitude and its tether.
-        const terrainElev = this.fn_getRawTerrainElevation(lat, lng);
-        const altAboveGround = Math.max((Number(p_adsbObject.m_altitude) || 0) - terrainElev, 0);
-
         if (typeof marker.setAltitude === 'function') {
             marker.setAltitude(altAboveGround * this.m_terrainExaggeration);
         }
 
-        // Heading is stored in radians (see CADSBObject.updateFromNormalized).
-        const headingDeg = ((Number(p_adsbObject.m_heading) || 0) * 180 / Math.PI) % 360;
-        const normalizedHeading = (headingDeg + 360) % 360;
         if (typeof marker.setRotation === 'function') {
             marker.setRotation(normalizedHeading);
         } else {
@@ -838,9 +1211,78 @@ class CAndruavMap3D {
 
         this.fn_setMarkerIcon(marker, markerIconUrl);
 
-        this.m_adsbTetherData.set(icao, { lng, lat, terrainElev, altAboveGround });
+        // In GLB mode, swap the icon to a transparent placeholder so the
+        // marker is visually invisible but still catches click/hover for
+        // the 3D model sitting on top of it.
+        this.fn_applyMarkerIconForMode(marker, isGlbMode);
 
         return marker;
+    }
+
+    /**
+     * Updates (or creates) the GeoJSON feature backing this aircraft's entry
+     * in the 'adsb-3d-models' source — the glTF twin of the ADSB DOM marker,
+     * used only when js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb'. See
+     * fn_syncUnitModel for the rotation/scale conventions (identical here,
+     * except ADSB only carries heading — no roll/pitch — so x/y stay 0).
+     */
+    fn_syncAdsbModel(icao, lat, lng, altAboveGround, headingDeg) {
+        if (!this.m_map) return;
+
+        const zOffset = altAboveGround * this.m_terrainExaggeration;
+        const existing = this.m_adsbModelFeatures.get(icao);
+        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom());
+        const tintColor = existing?.properties?.tintColor || '#ffffff';
+        const tintIntensity = existing?.properties?.tintIntensity || 0;
+
+        this.m_adsbModelFeatures.set(icao, {
+            type: 'Feature',
+            id: icao,
+            properties: {
+                modelId: 'drone-plane',
+                rotation: [0, 0, headingDeg],
+                translation: [0, 0, zOffset],
+                scale,
+                tintColor,
+                tintIntensity
+            },
+            geometry: { type: 'Point', coordinates: [lng, lat] }
+        });
+
+        this.fn_flushAdsbModels();
+    }
+
+    /**
+     * Same real-time whole-model tint as fn_setUnitModelTint, for an ADSB
+     * aircraft's glTF model (only has an effect while
+     * CONST_MAP3D_ADSB_RENDER_MODE === 'glb').
+     * @param {string} icao
+     * @param {string} [colorHex='#ffffff']
+     * @param {number} [intensity=1] 0 (no tint) .. 1 (fully replaced by colorHex)
+     */
+    fn_setAdsbModelTint(icao, colorHex = '#ffffff', intensity = 1) {
+        const feature = this.m_adsbModelFeatures.get(icao);
+        if (!feature) return;
+
+        feature.properties.tintColor = colorHex;
+        feature.properties.tintIntensity = intensity;
+        this.fn_flushAdsbModels();
+    }
+
+    /**
+     * Pushes the accumulated m_adsbModelFeatures into the 'adsb-3d-models'
+     * source. Cheap enough given the batching (mirrors fn_flushUnitModels).
+     */
+    fn_flushAdsbModels() {
+        if (!this.m_map || !this.m_modelLayerReady) return;
+
+        const source = this.m_map.getSource('adsb-3d-models');
+        if (!source) return;
+
+        source.setData({
+            type: 'FeatureCollection',
+            features: Array.from(this.m_adsbModelFeatures.values())
+        });
     }
 
     /**
@@ -917,6 +1359,8 @@ class CAndruavMap3D {
             marker.remove();
             this.m_adsbMarkers.delete(icao);
         }
+
+        if (this.m_adsbModelFeatures.delete(icao)) this.fn_flushAdsbModels();
 
         this.m_adsbTetherData.delete(icao);
         if (this.m_selectedAdsbIcao === icao) this.m_selectedAdsbIcao = null;
