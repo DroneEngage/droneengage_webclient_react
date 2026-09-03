@@ -185,6 +185,11 @@ glb.writeUInt32LE(0x004E4942, binOffset + 4);      // "BIN\0"
 binBuffer.copy(glb, binOffset + 8);
 
 // Write file
-const outPath = path.join(__dirname, '..', 'public', 'models', 'arrow.glb');
+// Usage: node generate_arrow_glb.js [outputPath]
+//   outputPath is resolved relative to CWD; defaults to
+//   <repo>/public/models/arrow.glb
+const outPath = process.argv[2]
+    ? path.resolve(process.argv[2])
+    : path.join(__dirname, '..', 'public', 'models', 'arrow.glb');
 fs.writeFileSync(outPath, glb);
 console.log(`Generated ${outPath} (${glbLength} bytes, ${numVertices} vertices, ${numIndices} indices)`);

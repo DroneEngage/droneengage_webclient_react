@@ -2631,6 +2631,7 @@ class CAndruavMap3D {
     /**
      * Compatibility stub for the circular buffer callback.
      */
+    // eslint-disable-next-line no-unused-vars
     fn_hideItem(item) {
         // No-op
     }

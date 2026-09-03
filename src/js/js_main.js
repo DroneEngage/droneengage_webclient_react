@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 
 
 import $ from 'jquery';
+// eslint-disable-next-line no-unused-vars
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
@@ -35,6 +36,7 @@ import { mavlink20 } from './js_mavlink_v2.js'
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
 import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
+// eslint-disable-next-line no-unused-vars
 import { js_websocket_bridge } from './CPC/js_websocket_bridge.js'
 import i18n from './i18n.js';
 
@@ -52,6 +54,7 @@ $.fn.append = function ($el) {
 var v_context_busy = false;
 
 var info_unit_context_popup = null;
+// eslint-disable-next-line no-unused-vars
 var v_lastHighlightedUnit = null;
 let selectedMissionFilesToRead = "";
 let selectedMissionFilesToWrite = "";
@@ -217,6 +220,7 @@ function fn_handleKeyBoard() {
 
 		if (p_event.type === "keydown") {
 			if (p_event.altKey === true) {
+				// no-op
 
 			}
 
@@ -351,6 +355,7 @@ function fn_doGimbalCtrlStep(unit, stepPitch, stepRoll, stepYaw) {
 		stepYaw, false);
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_doGimbalCtrl(unit, pitch, roll, yaw) {
 	js_globals.v_andruavFacade.API_do_GimbalCtrl(unit, pitch, roll, yaw, true);
 }
@@ -719,6 +724,7 @@ export function fn_doYAW(p_andruavUnit, targetAngle, turnRate, isClockwise, isRe
 	js_globals.v_andruavFacade.API_do_YAW(p_andruavUnit, targetAngle, turnRate, isClockwise, isRelative);
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_getadsbIcon(_obj, droneAltitude) {
 	if (_obj.Help) {
 		return '/images/station-in-action-icon.png';
@@ -823,6 +829,7 @@ function fn_getadsbIcon(_obj, droneAltitude) {
 	}
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_handleADSBPopup(p_obj) {
 
 }
@@ -851,6 +858,7 @@ function fn_updateAdsbQueryCircle() {
 	}
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_adsbExpiredUpdate(me) {
 	// Use the same timeout as the ADSB manager's purge window so markers
 	// stay visible between polls (manager default 130s > 60s refresh).
@@ -1076,11 +1084,13 @@ function fn_clearAdsbMap3dSelection() {
 	}
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_adsbUpdated(p_caller, p_data) {
 
 }
 
 
+// eslint-disable-next-line no-unused-vars
 function gui_alert(title, message, level) {
 	$('#alert #title').html(title);
 	$('#alert #title').html(title);
@@ -1090,6 +1100,7 @@ function gui_alert(title, message, level) {
 	$('#alert').show();
 };
 
+// eslint-disable-next-line no-unused-vars
 function gui_alert_hide() {
 	$('#alert').hide();
 };
@@ -1165,7 +1176,7 @@ function gui_initGlobalSection() {
 
 	// unsolved: https://stackoverflow.com/questions/39152877/consider-marking-event-handler-as-passive-to-make-the-page-more-responsive
 	$("#yaw_knob").knob({
-		'change': function (v) {
+		'change': function () {
 			// Your change event handler code
 		},
 		'mousewheel': function (event) {
@@ -1258,6 +1269,8 @@ function gps_showError(p_error) {
 		case p_error.UNKNOWN_ERROR:
 			//x.innerHTML = "An unknown p_error occurred."
 			break;
+		default:
+			break;
 	}
 }
 
@@ -1295,6 +1308,7 @@ export function fn_switchGPS(p_andruavUnit) {
 
 
 
+// eslint-disable-next-line no-unused-vars
 function gui_camCtrl(p_partyID) {
 	// var p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
 	// if (p_andruavUnit === null || p_andruavUnit === undefined) {
@@ -1703,6 +1717,7 @@ function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 	// Mirror the clear on the 3D map (markers, elevated path, loiter rings).
 	js_map3d.fn_clearMissionWaypoints(p_andruavUnit);
 }
+// eslint-disable-next-line no-unused-vars
 function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
 	const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
 	const size = keys.length;
@@ -1872,6 +1887,7 @@ export function hlp_getFlightMode(p_andruavUnit) {
 }
 
 
+// eslint-disable-next-line no-unused-vars
 function hlp_generateFlyHereMenu(lat, lng) {
 
 	return "<div id='context_menu_here' class='margin_zero padding_zero row'/>";
@@ -1892,7 +1908,7 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 		<ClssMainContextMenu
 			p_lat={v_lat}
 			p_lng={v_lng}
-			OnComplete={(e) => {
+			OnComplete={() => {
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
@@ -1907,7 +1923,7 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 
 				// now your ReactDom div is under the active popup
 
-				info_unit_context_popup.on('remove', function (e) {
+				info_unit_context_popup.on('remove', function () {
 					info_unit_context_popup = null;
 					tempContainer.remove();
 				});
@@ -1932,7 +1948,7 @@ function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_
 			p_unit={p_andruavUnit}
 			p_waypoint={p_wayPointStep}
 			p_lat={v_lat} p_lng={v_lng}
-			OnComplete={(e) => {
+			OnComplete={() => {
 
 				// Create a DIV in leaflet popup 
 				const htmlContent = tempContainer.innerHTML;
@@ -1947,7 +1963,7 @@ function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_
 
 				// now your ReactDom div is under the active popup
 
-				info_unit_context_popup.on('remove', function (e) {
+				info_unit_context_popup.on('remove', function () {
 					info_unit_context_popup = null;
 					tempContainer.remove();
 				});
@@ -1978,7 +1994,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 			p_lat={v_lat}
 			p_lng={v_lng}
 
-			OnComplete={(e) => {
+			OnComplete={() => {
 				// Step 3: Extract the HTML
 				const htmlContent = tempContainer.innerHTML;
 
@@ -2000,7 +2016,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 				if (v_ignore === true) {
 					info_unit_context_popup.m_ignoreMouseOut = true;
 				}
-				info_unit_context_popup.on('remove', function (e) {
+				info_unit_context_popup.on('remove', function () {
 					info_unit_context_popup = null;
 				});
 				v_context_busy = false;
@@ -2036,7 +2052,6 @@ export function fn_contextMenu(p_position) {
 };
 
 /////////////////////////////////////////////////////////////////////////////// MAP Functions
-var map = null;
 var infowindow = null;
 function initMap() {
 	try {
@@ -2057,6 +2072,7 @@ function initMap() {
 };
 
 
+// eslint-disable-next-line no-unused-vars
 function resetzoom() {
 	js_leafletmap.setZoom(2);
 }
@@ -2095,7 +2111,6 @@ var EVT_onClose = function () {
 
 
 function fn_onSocketStatus(me, event) {
-	const name = event.name;
 	const status = event.status;
 	js_eventEmitter.fn_dispatch(js_event.EE_onSocketStatus, event);
 
@@ -2107,7 +2122,7 @@ function fn_onSocketStatus(me, event) {
 		}
 	}
 	else {
-
+		// no-op
 	}
 };
 
@@ -2269,6 +2284,8 @@ var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
 					case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
 						js_leafletmap.fn_setVehicleIcon(v_marker, '/images/camera_bg_32x32.png', null, null, false, false, null, [16, 16]);
 						break;
+					default:
+						break;
 				}
 			}
 			else {
@@ -2283,7 +2300,8 @@ var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
 					case js_andruavMessages.CONST_Report_NAV_ItemExecuting:
 						js_leafletmap.fn_setVehicleIcon(v_marker, '/images/location_bg_32x32.png', null, [16, 24], false, false, null, [32, 32]);
 						break;
-
+					default:
+						break;
 				}
 			}
 		}
@@ -2454,6 +2472,7 @@ function EVT_andruavUnitFightModeUpdated(me, p_andruavUnit) {
 }
 
 
+// eslint-disable-next-line no-unused-vars
 function changedeg(element, degree) {
 	if (navigator.userAgent.match("Chrome")) {
 		element.style.WebkitTransform = "rotate(" + degree + "deg)";
@@ -2539,10 +2558,13 @@ function getDestinationPointIcon(p_andruavUnit) {
 						return js_globals.swarm_quad_location_icon[c_vehicle_index];
 				}
 			}
+		default:
+			break;
 	}
 }
 
 
+// eslint-disable-next-line no-unused-vars
 export function getVehicleIcon(p_andruavUnit, applyBearing) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) {
 		return '/images/drone_3_32x32.png';
@@ -2653,7 +2675,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 					// pointer is over then register in event mouseOut
 					js_leafletmap.fn_addListenerOnMouseOutMarker(p_andruavUnit.m_gui.m_marker,
-						function (p_lat, p_lng) {
+						function () {
 							// pointer is out then deregister in mouse-out event.
 							js_leafletmap.fn_removeListenerOnMouseOutClickMarker(p_andruavUnit.m_gui.m_marker);
 							clearTimeout(clickTimer);
@@ -2750,7 +2772,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 					// pointer is over then register in event mouseOut
 					js_map3d.fn_addListenerOnMouseOutMarker(marker3d,
-						function (p_lat, p_lng) {
+						function () {
 							// pointer is out then deregister in mouse-out event.
 							js_map3d.fn_removeListenerOnMouseOutClickMarker(marker3d);
 							clearTimeout(clickTimer);
@@ -2770,7 +2792,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 		js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_andruavUnit);
 	}
 	else {
-
+		// no-op
 	}
 }
 
@@ -2815,6 +2837,7 @@ function fn_showCameraIcon(latlng) {
 	js_leafletmap.fn_setPosition(v_marker, latlng);
 }
 
+// eslint-disable-next-line no-unused-vars
 function hlp_saveImage_html() {
 	const contents = $('#unitImg').data('binaryImage');
 	saveData(contents, 'image.jpg');
@@ -2822,6 +2845,7 @@ function hlp_saveImage_html() {
 }
 
 
+// eslint-disable-next-line no-unused-vars
 function hlp_gotoImage_Map() {
 	const location = $('#unitImg').data('imgLocation');
 	if (location !== null && location !== undefined) {
@@ -2990,6 +3014,8 @@ var EVT_andruavUnitError = function (me, data) {
 			v_notification_Type = 'debug';
 			v_cssclass = 'good';
 			break;
+		default:
+			break;
 	}
 	const c_msg = {};
 	c_msg.m_unit = p_andruavUnit;
@@ -3018,9 +3044,12 @@ var EVT_andruavUnitError = function (me, data) {
 	}
 };
 
+// eslint-disable-next-line no-unused-vars
 let infowindow2 = null
+// eslint-disable-next-line no-unused-vars
 let infowindowADSB = null;
 
+// eslint-disable-next-line no-unused-vars
 function fn_showAdSBInfo(event, _adsb) {
 }
 
@@ -3284,6 +3313,7 @@ function EVT_andruavUnitGeoFenceHit(me, data) {
 	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) return;   // will be updated later when GPS message is recieved from that drone.
 	var typeMsg = "info"; var msg = "OK";
 	if (geoFenceHitInfo.m_inZone && geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be Out fence " + geoFenceHitInfo.fenceName; }
+	// eslint-disable-next-line no-unused-vars
 	else if (!geoFenceHitInfo.m_inZone && !geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be In fence " + geoFenceHitInfo.fenceName; }
 	// TODO: Replace Messenger REACT2
 	// Messenger().post({
@@ -3291,7 +3321,7 @@ function EVT_andruavUnitGeoFenceHit(me, data) {
 	// 	message: p_andruavUnit.m_unitName + ":" + "GeoFenceHit: " + msg
 	// });
 	if (msg === "OK") {
-
+		// no-op
 	}
 	else {
 		js_speak.fn_speak("unit " + p_andruavUnit.m_unitName + " " + msg);
@@ -3326,13 +3356,14 @@ function fn_gui_init_fpvVtrl() {
 
 async function fn_login(p_email, p_access_code) {
 	js_andruavAuth.fn_retryLogin(true);
-	const loginResult = await js_andruavAuth.fn_do_loginAccount(p_email, p_access_code);
+	await js_andruavAuth.fn_do_loginAccount(p_email, p_access_code);
 	if (js_andruavAuth.fn_logined() !== true) {
 		// note that js_andruavAuth retries internally
 		return;
 	}
 }
 
+// eslint-disable-next-line no-unused-vars
 function fn_connectWebSocket(me) {
 	// create a group object
 	if (js_andruav_ws.AndruavClientWS.getSocketStatus() !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
@@ -3587,7 +3618,7 @@ export function fn_on_ready() {
 		fn_gui_init_unitList();
 	}
 	else {
-
+		// no-op
 	}
 
 	if ((QueryString.test !== undefined) && (QueryString.test !== null)) {
@@ -3607,7 +3638,7 @@ export function fn_on_ready() {
 
 	}
 
-	$("#alert .close").on('click', function (e) {
+	$("#alert .close").on('click', function () {
 		$("#alert").hide();
 	});
 

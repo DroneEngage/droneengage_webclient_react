@@ -9,7 +9,7 @@
  * materialOverrideNames on a 'model'-type source — NOT supported on the
  * batched GeoJSON source this project currently uses; see js_map3d.js):
  *   - "body"   material: central body box + 4 diagonal arms + 4 rotor hubs
- *   - "rotors" material: 2 crossed blades per rotor (8 blades total)
+ *   - "rotors" material: 1 thin cylinder per rotor (4 disks total)
  *
  * Y-up glTF convention. -Z = forward (North), +X = right (East), +Y = up —
  * same convention as arrow.glb/plane.glb, centered at y=0.
@@ -20,7 +20,12 @@
 const fs = require('fs');
 const path = require('path');
 
-// ---- Geometry parameters (model-space units) ----
+// ============================================================================
+// CONTROL PARAMETERS — edit these to change the model. Everything below this
+// block is geometry/build logic and should not normally need editing.
+// ============================================================================
+
+// ---- Geometry (model-space units) ----
 const BODY_SIZE   = 0.6;   // body box width/depth (X/Z)
 const BODY_HEIGHT = 0.25;  // body box height (Y)
 
@@ -32,11 +37,31 @@ const ARM_Y0 = -0.04, ARM_Y1 = 0.04;
 const HUB_HALF_SIZE = 0.09;
 const HUB_Y0 = -0.07, HUB_Y1 = 0.07;
 
-const PROP_LEN = 0.9;       // full blade length (tip to tip)
-const PROP_HALF_WIDTH = 0.03;
-const PROP_Y0 = 0.08, PROP_Y1 = 0.10;  // sits just above the hub
+const PROP_RADIUS    = 0.45;  // propeller disk radius
+const PROP_THICKNESS = 0.02;  // propeller disk thickness (along Y)
+const PROP_SEGMENTS  = 16;    // cylinder side count
+const PROP_GAP       = 0.01;  // gap between hub top and propeller disk
 
 const ARM_ANGLES_DEG = [45, 135, 225, 315];  // X configuration
+
+// ---- Materials (RGBA baseColorFactor + PBR metallic/roughness) ----
+const BODY_COLOR  = [0.15, 0.15, 0.17, 1.0]; // dark gray frame
+const BODY_METAL  = 0.3;
+const BODY_ROUGH  = 0.6;
+
+const ROTOR_COLOR = [0.85, 0.12, 0.08, 1.0]; // red accent props
+const ROTOR_METAL = 0.1;
+const ROTOR_ROUGH = 0.5;
+
+// ---- Output ----
+const DEFAULT_OUT = path.join(__dirname, '..', 'public', 'models', 'quad.glb');
+
+// ============================================================================
+// BUILD — no user-tunable constants below this line.
+// ============================================================================
+
+// Derived: propeller disk sits just above the hub
+const PROP_Y_CENTER = HUB_Y1 + PROP_THICKNESS / 2 + PROP_GAP;
 
 // ---- Two independent geometry buffers (one per material) ----
 
@@ -85,6 +110,51 @@ function rotateYFn(angleDeg) {
     return ([x, y, z]) => [x * c + z * s, y, -x * s + z * c];
 }
 
+// Single triangle with a flat face normal (CCW winding → outward).
+function pushTriangle(geom, a, b, c) {
+    const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2];
+    const vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2];
+    let nx = uy * vz - uz * vy;
+    let ny = uz * vx - ux * vz;
+    let nz = ux * vy - uy * vx;
+    const len = Math.hypot(nx, ny, nz) || 1;
+    nx /= len; ny /= len; nz /= len;
+
+    const base = geom.positions.length / 3;
+    geom.positions.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+    geom.normals.push(nx, ny, nz, nx, ny, nz, nx, ny, nz);
+    geom.indices.push(base, base + 1, base + 2);
+}
+
+// Cylinder centered at (cx, cy, cz) with its axis along Y, given radius
+// and height (thickness). Flat-shaded sides (one quad per segment) plus
+// triangle-fan end caps. Used for the propeller disks.
+function addCylinder(geom, cx, cy, cz, radius, height, segments) {
+    const y0 = cy - height / 2, y1 = cy + height / 2;
+    const ring = [];
+    for (let i = 0; i < segments; i++) {
+        const a = (i / segments) * 2 * Math.PI;
+        ring.push([cx + Math.cos(a) * radius, cz + Math.sin(a) * radius]);
+    }
+    // Side faces (outward normals)
+    for (let i = 0; i < segments; i++) {
+        const j = (i + 1) % segments;
+        pushQuad(geom,
+            [ring[i][0], y0, ring[i][1]],
+            [ring[j][0], y0, ring[j][1]],
+            [ring[j][0], y1, ring[j][1]],
+            [ring[i][0], y1, ring[i][1]]);
+    }
+    // End caps
+    for (let i = 0; i < segments; i++) {
+        const j = (i + 1) % segments;
+        // bottom (normal -Y)
+        pushTriangle(geom, [cx, y0, cz], [ring[j][0], y0, ring[j][1]], [ring[i][0], y0, ring[i][1]]);
+        // top (normal +Y)
+        pushTriangle(geom, [cx, y1, cz], [ring[i][0], y1, ring[i][1]], [ring[j][0], y1, ring[j][1]]);
+    }
+}
+
 // ---- Body: box centered at origin ----
 addBox(bodyGeom,
     -BODY_SIZE / 2, -BODY_HEIGHT / 2, -BODY_SIZE / 2,
@@ -107,15 +177,13 @@ for (const angleDeg of ARM_ANGLES_DEG) {
          HUB_HALF_SIZE, HUB_Y1, ARM_OUTER + HUB_HALF_SIZE,
         rot);
 
-    // Propeller: two crossed blades centered on the hub, sitting above it.
-    addBox(rotorGeom,
-        -PROP_LEN / 2, PROP_Y0, ARM_OUTER - PROP_HALF_WIDTH,
-         PROP_LEN / 2, PROP_Y1, ARM_OUTER + PROP_HALF_WIDTH,
-        rot);
-    addBox(rotorGeom,
-        -PROP_HALF_WIDTH, PROP_Y0, ARM_OUTER - PROP_LEN / 2,
-         PROP_HALF_WIDTH, PROP_Y1, ARM_OUTER + PROP_LEN / 2,
-        rot);
+    // Propeller: a thin cylinder (disk) centered on the hub, sitting above it.
+    // The cylinder's axis is Y and it is rotationally symmetric, so it does not
+    // need rotateYFn — just place it at the hub center after the arm rotation.
+    const rad = angleDeg * Math.PI / 180;
+    const hubCx = ARM_OUTER * Math.sin(rad);
+    const hubCz = ARM_OUTER * Math.cos(rad);
+    addCylinder(rotorGeom, hubCx, PROP_Y_CENTER, hubCz, PROP_RADIUS, PROP_THICKNESS, PROP_SEGMENTS);
 }
 
 // ---- Pack both geometries into one GLB (2 primitives, 2 materials) ----
@@ -169,18 +237,18 @@ const gltfJson = {
         {
             name: 'body',
             pbrMetallicRoughness: {
-                baseColorFactor: [0.15, 0.15, 0.17, 1.0],  // dark gray frame
-                metallicFactor: 0.3,
-                roughnessFactor: 0.6
+                baseColorFactor: BODY_COLOR,
+                metallicFactor: BODY_METAL,
+                roughnessFactor: BODY_ROUGH
             },
             doubleSided: true
         },
         {
             name: 'rotors',
             pbrMetallicRoughness: {
-                baseColorFactor: [0.85, 0.12, 0.08, 1.0],  // red accent props
-                metallicFactor: 0.1,
-                roughnessFactor: 0.5
+                baseColorFactor: ROTOR_COLOR,
+                metallicFactor: ROTOR_METAL,
+                roughnessFactor: ROTOR_ROUGH
             },
             doubleSided: true
         }
@@ -231,7 +299,11 @@ glb.writeUInt32LE(binBuffer.length, binOffset);
 glb.writeUInt32LE(0x004E4942, binOffset + 4);  // "BIN\0"
 binBuffer.copy(glb, binOffset + 8);
 
-const outPath = path.join(__dirname, '..', 'public', 'models', 'quad.glb');
+// Usage: node generate_quad_glb.js [outputPath]
+//   outputPath is resolved relative to CWD; defaults to DEFAULT_OUT above.
+const outPath = process.argv[2]
+    ? path.resolve(process.argv[2])
+    : DEFAULT_OUT;
 fs.writeFileSync(outPath, glb);
 console.log(`Generated ${outPath} (${glbLength} bytes)`);
 console.log(`Body:   ${bodyPacked.numVertices} vertices, ${bodyPacked.numIndices} indices`);
