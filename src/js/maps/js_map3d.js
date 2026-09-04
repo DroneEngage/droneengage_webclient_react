@@ -83,7 +83,9 @@ class ModelSizeControl {
         this._target = target;
         this._label = label;
         this._container = null;
-        this._buttons = [];
+        this._valueEl = null;
+        this._decBtn = null;
+        this._incBtn = null;
     }
 
     onAdd() {
@@ -132,27 +134,129 @@ class ModelSizeControl {
             this._container.appendChild(label);
         }
 
+        // Stepped +/- buttons that walk the user-facing model size multiplier
+        // between CONST_MAP3D_MODEL_SIZE_MIN and MAX. Single click steps by
+        // CONST_MAP3D_MODEL_SIZE_STEP (0.1); double-click steps by
+        // CONST_MAP3D_MODEL_SIZE_STEP_BIG (0.5). A short debounce is used so
+        // a double-click fires only the big step, not two small steps + a big
+        // one. The current value is shown between the two buttons.
         const current = this._target === 'adsb'
             ? this._map3d.m_modelSizeMultiplierAdsb
             : this._map3d.m_modelSizeMultiplierUnits;
 
-        const factors = [1, 2, 5];
-        factors.forEach((f) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.textContent = `x${f}`;
-            btn.title = `${this._label} size x${f}`;
-            btn.addEventListener('click', () => {
-                this._map3d.fn_setModelSizeMultiplier(f, this._target);
-                this._buttons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-            this._container.appendChild(btn);
-            this._buttons.push(btn);
-            if (f === current) btn.classList.add('active');
-        });
+        const decBtn = document.createElement('button');
+        decBtn.type = 'button';
+        decBtn.className = 'css_map3d_modelsize_step';
+        decBtn.textContent = '\u2212';   // minus sign
+        decBtn.title = `${this._label} size decrease (double-click for bigger step)`;
+
+        const valueEl = document.createElement('span');
+        valueEl.className = 'css_map3d_modelsize_value';
+        valueEl.textContent = this._formatValue(current);
+
+        const incBtn = document.createElement('button');
+        incBtn.type = 'button';
+        incBtn.className = 'css_map3d_modelsize_step';
+        incBtn.textContent = '+';
+        incBtn.title = `${this._label} size increase (double-click for bigger step)`;
+
+        // Wire click + dblclick with a debounce per button. On a single
+        // click we wait DBLCLICK_DELAY; if a dblclick arrives in that
+        // window we cancel the small step and apply the big step instead.
+        this._wireStepButton(decBtn, -1);
+        this._wireStepButton(incBtn, +1);
+
+        this._container.appendChild(decBtn);
+        this._container.appendChild(valueEl);
+        this._container.appendChild(incBtn);
+
+        this._decBtn = decBtn;
+        this._incBtn = incBtn;
+        this._valueEl = valueEl;
+        this._updateButtonStates();
 
         return this._container;
+    }
+
+    /**
+     * Wires click (small step) and dblclick (big step) on a +/- button with
+     * a debounce so a double-click produces exactly one big step, not two
+     * small steps followed by a big one.
+     * @param {HTMLButtonElement} btn
+     * @param {number} dir -1 or +1
+     */
+    _wireStepButton(btn, dir) {
+        const DBLCLICK_DELAY = 250;   // ms — must be <= the browser's dblclick threshold
+        let pendingTimer = null;
+
+        btn.addEventListener('click', () => {
+            if (btn.disabled) return;
+            if (pendingTimer) return;   // a click is already pending (waiting for a possible dblclick)
+            pendingTimer = setTimeout(() => {
+                pendingTimer = null;
+                this._step(dir, js_globals.CONST_MAP3D_MODEL_SIZE_STEP);
+            }, DBLCLICK_DELAY);
+        });
+
+        btn.addEventListener('dblclick', (ev) => {
+            ev.preventDefault();
+            if (btn.disabled) return;
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingTimer = null;
+            }
+            this._step(dir, js_globals.CONST_MAP3D_MODEL_SIZE_STEP_BIG);
+        });
+    }
+
+    /**
+     * Steps the multiplier by the given amount in the given direction,
+     * clamped to [CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX],
+     * and updates the displayed value + button disabled states.
+     * @param {number} dir -1 to decrease, +1 to increase
+     * @param {number} step amount to step (defaults to CONST_MAP3D_MODEL_SIZE_STEP)
+     */
+    _step(dir, step = js_globals.CONST_MAP3D_MODEL_SIZE_STEP) {
+        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+
+        const current = this._target === 'adsb'
+            ? this._map3d.m_modelSizeMultiplierAdsb
+            : this._map3d.m_modelSizeMultiplierUnits;
+
+        // Round to step granularity to avoid float drift (e.g. 0.30000000004).
+        let next = Math.round((current + dir * step) / step) * step;
+        next = Math.min(max, Math.max(min, next));
+
+        this._map3d.fn_setModelSizeMultiplier(next, this._target);
+        this._valueEl.textContent = this._formatValue(next);
+        this._updateButtonStates();
+    }
+
+    /**
+     * Disables the - button at MIN and the + button at MAX so the user
+     * gets a visual signal that the range edge has been reached.
+     */
+    _updateButtonStates() {
+        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+        const current = this._target === 'adsb'
+            ? this._map3d.m_modelSizeMultiplierAdsb
+            : this._map3d.m_modelSizeMultiplierUnits;
+
+        if (this._decBtn) this._decBtn.disabled = (current <= min);
+        if (this._incBtn) this._incBtn.disabled = (current >= max);
+    }
+
+    /**
+     * Formats the multiplier for display: integers without decimals (x1,
+     * x2, x5), fractions with one decimal (x0.1, x1.5, x2.3).
+     * @param {number} v
+     * @returns {string}
+     */
+    _formatValue(v) {
+        const rounded = Math.round(v * 10) / 10;
+        return `x${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}`;
     }
 
     // Reflect the current ADSB enabled state on the toggle button.
@@ -172,11 +276,72 @@ class ModelSizeControl {
             this._boundOnPreferenceChanged = null;
         }
         this._adsbToggleBtn = null;
+        this._decBtn = null;
+        this._incBtn = null;
+        this._valueEl = null;
         if (this._container?.parentNode) {
             this._container.parentNode.removeChild(this._container);
         }
         this._container = null;
-        this._buttons = [];
+    }
+}
+
+/**
+ * Custom Mapbox GL control: a single toggle button that enables/disables
+ * chase-cam (follow) mode on the 3D map.  When active the camera trails
+ * behind the followed unit's heading on every telemetry tick (see
+ * fn_syncUnit).  Mounted bottom-left of the 3D map.
+ */
+class ChaseCamControl {
+    constructor(map3d) {
+        this._map3d = map3d;
+        this._container = null;
+        this._btn = null;
+    }
+
+    onAdd() {
+        this._container = document.createElement('div');
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group css_map3d_follow_ctrl';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'css_map3d_follow_toggle';
+        btn.title = 'Toggle chase-cam (follow selected unit)';
+        btn.textContent = 'FOLLOW';
+        btn.addEventListener('click', () => {
+            const enabled = this._map3d.m_followEnabled;
+            this._map3d.fn_setFollowEnabled(!enabled);
+        });
+        this._container.appendChild(btn);
+        this._btn = btn;
+        this._updateState();
+
+        // Keep the button state in sync with external changes (e.g. follow
+        // auto-disabled by a user drag).
+        this._boundOnFollowChanged = () => this._updateState();
+        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnFollowChanged);
+        return this._container;
+    }
+
+    _updateState() {
+        if (!this._btn) return;
+        if (this._map3d.m_followEnabled) {
+            this._btn.classList.add('active');
+        } else {
+            this._btn.classList.remove('active');
+        }
+    }
+
+    onRemove() {
+        if (this._boundOnFollowChanged) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
+            this._boundOnFollowChanged = null;
+        }
+        this._btn = null;
+        if (this._container?.parentNode) {
+            this._container.parentNode.removeChild(this._container);
+        }
+        this._container = null;
     }
 }
 
@@ -189,6 +354,17 @@ class CAndruavMap3D {
         this.m_hasAutoFocusedUnit = false;
         this.m_mapDblClickCallbacks = [];
         this.m_isMapDblClickBound = false;
+
+        // ---- Chase-cam / follow mode ----
+        // m_followEnabled: master toggle (ChaseCamControl button).
+        // m_followUnitId: which unit the camera trails.  Set when the user
+        //   clicks a unit (fn_focusUnit) or auto-seeded with the first unit
+        //   to sync if none was highlighted.  Cleared by fn_clearFollowUnit.
+        // m_followBound: guards the one-shot dragstart/rotatestart listeners
+        //   that auto-disable follow when the user manually grabs the map.
+        this.m_followEnabled = false;
+        this.m_followUnitId = null;
+        this.m_followBound = false;
 
         // ---- 3D tether line + ground circle + altitude circle + path trail ----
         // - Path trail: elevated dotted line along the drone's flight path
@@ -535,6 +711,87 @@ class CAndruavMap3D {
         // independently on top of the zoom-compensated factor.
         this.m_map.addControl(new ModelSizeControl(this, 'unit', 'UNITS'), 'top-left');
         this.m_map.addControl(new ModelSizeControl(this, 'adsb', 'ADSB'), 'top-left');
+        // Chase-cam (follow) toggle button, bottom-left.
+        this.m_map.addControl(new ChaseCamControl(this), 'bottom-left');
+
+        // Auto-disable follow mode when the user manually drags or rotates the
+        // map — otherwise the per-tick easeTo fights the user's gesture.  Bound
+        // once here (the map instance lives for the session).
+        this.fn_bindFollowCancelHandlers();
+    }
+
+    /**
+     * Registers one-shot dragstart/rotatestart listeners that turn off
+     * chase-cam follow mode as soon as the user grabs the map manually.
+     * Called once from fn_initMap.
+     */
+    fn_bindFollowCancelHandlers() {
+        if (!this.m_map || this.m_followBound) return;
+        this.m_followBound = true;
+        const cancel = () => this.fn_setFollowEnabled(false);
+        this.m_map.on('dragstart', cancel);
+        this.m_map.on('rotatestart', cancel);
+    }
+
+    /**
+     * Enables or disables chase-cam (follow) mode.  When enabled, the camera
+     * trails behind the followed unit on every telemetry tick (see
+     * fn_syncUnit).  When disabled, the camera is left where it is.
+     * @param {boolean} enabled
+     */
+    fn_setFollowEnabled(enabled) {
+        this.m_followEnabled = !!enabled;
+        if (this.m_followEnabled) {
+            // Snap to the follow zoom/pitch immediately so the first per-tick
+            // easeTo only has to track center+bearing, not a big view change.
+            if (this.m_map && this.m_isReady) {
+                this.m_map.jumpTo({
+                    zoom: js_globals.CONST_MAP3D_FOLLOW_ZOOM,
+                    pitch: js_globals.CONST_MAP3D_FOLLOW_PITCH
+                });
+            }
+        }
+        js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+    }
+
+    /**
+     * Sets the unit the camera should follow.  Called from fn_focusUnit when
+     * the user clicks a unit; if follow mode is already on, the camera
+     * immediately starts trailing the new target.
+     * @param {string} unitId
+     */
+    fn_setFollowUnit(unitId) {
+        if (!unitId) return;
+        this.m_followUnitId = unitId;
+    }
+
+    /**
+     * Clears the followed unit (e.g. when the unit is removed).  Follow mode
+     * itself is left on — the next unit to sync will auto-seed the target.
+     */
+    fn_clearFollowUnit(unitId) {
+        if (this.m_followUnitId === unitId) {
+            this.m_followUnitId = null;
+        }
+    }
+
+    /**
+     * Computes the chase-cam zoom for a given altitude above ground so the
+     * drone stays at a comfortable on-screen size regardless of how high it
+     * is. Linearly interpolates from CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND (at
+     * 0 m AGL) to CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH (at/above
+     * CONST_MAP3D_FOLLOW_ALT_REF m AGL), clamped at both ends.
+     * @param {number} altAboveGround meters AGL
+     * @returns {number} zoom level
+     */
+    fn_computeFollowZoom(altAboveGround) {
+        const zGround = js_globals.CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND;
+        const zHigh = js_globals.CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH;
+        const altRef = js_globals.CONST_MAP3D_FOLLOW_ALT_REF;
+        const alt = Math.max(0, Number(altAboveGround) || 0);
+        if (alt >= altRef) return zHigh;
+        const t = alt / altRef;   // 0 at ground, 1 at altRef
+        return zGround + (zHigh - zGround) * t;
     }
 
     /**
@@ -771,21 +1028,25 @@ class CAndruavMap3D {
     }
 
     /**
-     * Sets the user-selected model size multiplier (x1 / x2 / x5) for the
-     * given target ('unit' or 'adsb') and re-applies it to that target's
-     * 3D model features immediately. Called by the ModelSizeControl buttons.
-     * The multiplier is applied on top of the zoom-compensated factor in
-     * fn_computeModelScale, so the final on-screen scale for a feature of
-     * the given target = base * zoomFactor * this multiplier.
-     * @param {number} factor - 1, 2, or 5
+     * Sets the user-selected model size multiplier for the given target
+     * ('unit' or 'adsb') and re-applies it to that target's 3D model
+     * features immediately. Called by the ModelSizeControl +/- buttons.
+     * The multiplier is clamped to [CONST_MAP3D_MODEL_SIZE_MIN, MAX] and
+     * applied on top of the zoom-compensated factor in fn_computeModelScale,
+     * so the final on-screen scale for a feature of the given target =
+     * base * zoomFactor * this multiplier.
+     * @param {number} factor
      * @param {'unit'|'adsb'} target
      */
     fn_setModelSizeMultiplier(factor, target) {
         if (!Number.isFinite(factor) || factor <= 0) return;
+        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+        const clamped = Math.min(max, Math.max(min, factor));
         if (target === 'adsb') {
-            this.m_modelSizeMultiplierAdsb = factor;
+            this.m_modelSizeMultiplierAdsb = clamped;
         } else {
-            this.m_modelSizeMultiplierUnits = factor;
+            this.m_modelSizeMultiplierUnits = clamped;
         }
         this.fn_updateModelScale();
     }
@@ -1008,6 +1269,11 @@ class CAndruavMap3D {
         const { lat, lng } = unit.m_Nav_Info.p_Location;
         if (lat == null || lng == null) return;
 
+        // Track the last-highlighted unit as the follow target so that, if
+        // chase-cam is enabled (or gets enabled later), the camera trails
+        // this unit.
+        this.fn_setFollowUnit(unit.getPartyID());
+
         this.m_map.easeTo({ center: [lng, lat], duration: 500, pitch: 53 });
     }
 
@@ -1114,6 +1380,30 @@ class CAndruavMap3D {
 
         // Update the glTF model twin used at close zoom (fn_updateModelLod).
         this.fn_syncUnitModel(unit, id, lat, lng, altRelative, normalizedYaw);
+
+        // Chase-cam: if follow mode is on and this is the followed unit (or
+        // no target has been picked yet — auto-seed with the first unit to
+        // sync), recenter on it and orient bearing to its yaw so the drone
+        // always flies "up" the screen. The zoom is altitude-aware
+        // (fn_computeFollowZoom) so a high drone pulls the camera back and a
+        // low one pushes it in. duration spans the typical gap between
+        // telemetry packets so easeTo interpolates smoothly instead of
+        // snapping tick-to-tick.
+        if (this.m_followEnabled) {
+            if (!this.m_followUnitId) {
+                this.m_followUnitId = id;
+            }
+            if (this.m_followUnitId === id) {
+                this.m_map.easeTo({
+                    center: [lng, lat],
+                    bearing: normalizedYaw,
+                    pitch: js_globals.CONST_MAP3D_FOLLOW_PITCH,
+                    zoom: this.fn_computeFollowZoom(altRelative),
+                    duration: js_globals.CONST_MAP3D_FOLLOW_DURATION_MS,
+                    essential: true
+                });
+            }
+        }
 
         return marker;
     }

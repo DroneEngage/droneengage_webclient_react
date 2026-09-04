@@ -62,7 +62,7 @@
   color: #fff;
 }
 
-/* Model size multiplier control (x1/x2/x5 buttons, top-left of the 3D map) */
+/* Model size multiplier control (+/- stepper, top-left of the 3D map) */
 .css_map3d_modelsize_ctrl {
   display: flex;
   align-items: center;
@@ -102,6 +102,35 @@
   color: #fff;
 }
 
+/* +/- step buttons for the model size multiplier. Disabled at the range
+   edges (see ModelSizeControl._updateButtonStates). */
+.css_map3d_modelsize_ctrl button.css_map3d_modelsize_step {
+  min-width: 18px;
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 6px;
+}
+
+.css_map3d_modelsize_ctrl button.css_map3d_modelsize_step:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.css_map3d_modelsize_ctrl button.css_map3d_modelsize_step:disabled:hover {
+  background: #fff;
+}
+
+/* Current multiplier value shown between the +/- buttons. */
+.css_map3d_modelsize_ctrl .css_map3d_modelsize_value {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+  min-width: 34px;
+  text-align: center;
+  padding: 0 2px;
+  user-select: none;
+}
+
 /* ADSB toggle button (replaces the 'ADSB' text label in the model-size
    control). active = ADSB enabled (highlighted), inactive = dimmed. */
 .css_map3d_modelsize_ctrl button.css_map3d_adsb_toggle {
@@ -116,4 +145,38 @@
   background: #fff3cd;
   border: 1px solid #ffc107;
   opacity: 1;
+}
+
+/* Chase-cam (follow) toggle control — single button, bottom-left of the 3D
+   map. active = follow mode on (camera trails the selected unit). */
+.css_map3d_follow_ctrl {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.css_map3d_follow_ctrl button.css_map3d_follow_toggle {
+  border: none;
+  background: #fff;
+  color: #333;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.css_map3d_follow_ctrl button.css_map3d_follow_toggle:hover {
+  background: #e0e0e0;
+}
+
+.css_map3d_follow_ctrl button.css_map3d_follow_toggle.active {
+  background: #8e44ad;
+  color: #fff;
 }

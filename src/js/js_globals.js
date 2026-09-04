@@ -278,6 +278,17 @@ class GLOBALS {
 		this.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR = 1;
 		this.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 200;
 
+		// ---- Map3D model size multiplier range (ModelSizeControl +/- buttons) ----
+		// The user-facing size multiplier (applied on top of the zoom-
+		// compensated factor in fn_computeModelScale) is stepped with +/-
+		// buttons between MIN and MAX. STEP is the increment per single
+		// click, STEP_BIG is the increment per double-click. Default start
+		// value is 1 (no extra magnification).
+		this.CONST_MAP3D_MODEL_SIZE_MIN = 0.1;
+		this.CONST_MAP3D_MODEL_SIZE_MAX = 5;
+		this.CONST_MAP3D_MODEL_SIZE_STEP = 0.1;
+		this.CONST_MAP3D_MODEL_SIZE_STEP_BIG = 0.5;
+
 		// ---- Map3D ADSB traffic render mode ----
 		// Unlike drone units (which always use the icon/GLB LOD hybrid
 		// above), ADSB aircraft can number in the hundreds, so instead of an
@@ -289,6 +300,22 @@ class GLOBALS {
 		this.CONST_MAP3D_ADSB_RENDER_MODE_ICON = 'icon';
 		this.CONST_MAP3D_ADSB_RENDER_MODE_GLB = 'glb';
 		this.CONST_MAP3D_ADSB_RENDER_MODE = this.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+
+		// ---- Chase-cam / follow mode (3D map) ----
+		// When enabled, the 3D map camera trails behind the followed unit on
+		// every telemetry tick: center on the unit, bearing = yaw so the drone
+		// always flies "up" the screen, and a raised pitch for a chase view.
+		// The follow zoom is altitude-aware: it interpolates linearly from
+		// ZOOM_AT_GROUND (drone at 0 m AGL) to ZOOM_AT_HIGH (drone at/above
+		// ALT_REF m AGL), so a high drone pulls the camera back and a low
+		// one pushes it in — keeping the drone at a comfortable on-screen
+		// size regardless of altitude. See fn_computeFollowZoom.
+		this.CONST_MAP3D_FOLLOW_PITCH = 60;          // camera pitch (deg) while following
+		this.CONST_MAP3D_FOLLOW_ZOOM = 16;           // initial zoom applied once when follow starts
+		this.CONST_MAP3D_FOLLOW_DURATION_MS = 1500;  // easeTo duration per tick (smooths between packets)
+		this.CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND = 17; // zoom when drone is at 0 m AGL (closer)
+		this.CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH = 14;   // zoom when drone is at/above ALT_REF m AGL (farther)
+		this.CONST_MAP3D_FOLLOW_ALT_REF = 200;       // altitude (m AGL) at which ZOOM_AT_HIGH is reached
 
 		// ---- Wind arrow (selected unit) visual constants ----
 		// A single wind arrow is drawn next to the currently selected
