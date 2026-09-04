@@ -15,6 +15,8 @@
  * same convention as arrow.glb/plane.glb, centered at y=0.
  *
  * Output: public/models/quad.glb
+ *
+ * CLI: node scripts/generate_quad_glb.js [outPath] [--body=#RRGGBB] [--rotor=#RRGGBB] [--chassis=#RRGGBB]
  */
 
 const fs = require('fs');
@@ -26,8 +28,8 @@ const path = require('path');
 // ============================================================================
 
 // ---- Geometry (model-space units) ----
-const BODY_SIZE   = 0.6;   // body box width/depth (X/Z)
-const BODY_HEIGHT = 0.25;  // body box height (Y)
+const BODY_SIZE   = 0.6;   // central body box width/depth (X/Z)
+const BODY_HEIGHT = 0.25;  // central body box height (Y)
 
 const ARM_INNER = 0.35;    // arm start distance from center (past body edge)
 const ARM_OUTER = 1.1;     // arm end distance from center (rotor hub position)
@@ -45,13 +47,25 @@ const PROP_GAP       = 0.01;  // gap between hub top and propeller disk
 const ARM_ANGLES_DEG = [45, 135, 225, 315];  // X configuration
 
 // ---- Materials (RGBA baseColorFactor + PBR metallic/roughness) ----
-const BODY_COLOR  = [0.15, 0.15, 0.17, 1.0]; // dark gray frame
+// Default palette: dark gray frame + red rotors.
+// Override via CLI: --body=#RRGGBB --rotor=#RRGGBB --chassis=#RRGGBB
+// (chassis defaults to body color if omitted).
+const DEFAULT_BODY_COLOR  = [0.15, 0.15, 0.17, 1.0]; // dark gray frame
 const BODY_METAL  = 0.3;
 const BODY_ROUGH  = 0.6;
 
-const ROTOR_COLOR = [0.85, 0.12, 0.08, 1.0]; // red accent props
+const DEFAULT_ROTOR_COLOR = [0.85, 0.12, 0.08, 1.0]; // red accent props
 const ROTOR_METAL = 0.1;
 const ROTOR_ROUGH = 0.5;
+
+const DEFAULT_CHASSIS_COLOR = [0.15, 0.15, 0.17, 1.0]; // defaults to body color
+const CHASSIS_METAL = 0.3;
+const CHASSIS_ROUGH = 0.6;
+
+// Runtime overrides (filled by parseCliColors below).
+let BODY_COLOR   = DEFAULT_BODY_COLOR.slice();
+let ROTOR_COLOR  = DEFAULT_ROTOR_COLOR.slice();
+let CHASSIS_COLOR = DEFAULT_CHASSIS_COLOR.slice();
 
 // ---- Output ----
 const DEFAULT_OUT = path.join(__dirname, '..', 'public', 'models', 'quad.glb');
@@ -66,6 +80,7 @@ const PROP_Y_CENTER = HUB_Y1 + PROP_THICKNESS / 2 + PROP_GAP;
 // ---- Two independent geometry buffers (one per material) ----
 
 function makeGeom() { return { positions: [], normals: [], indices: [] }; }
+const chassisGeom = makeGeom();
 const bodyGeom = makeGeom();
 const rotorGeom = makeGeom();
 
@@ -155,8 +170,8 @@ function addCylinder(geom, cx, cy, cz, radius, height, segments) {
     }
 }
 
-// ---- Body: box centered at origin ----
-addBox(bodyGeom,
+// ---- Central body (chassis material) ----
+addBox(chassisGeom,
     -BODY_SIZE / 2, -BODY_HEIGHT / 2, -BODY_SIZE / 2,
      BODY_SIZE / 2,  BODY_HEIGHT / 2,  BODY_SIZE / 2);
 
@@ -186,7 +201,49 @@ for (const angleDeg of ARM_ANGLES_DEG) {
     addCylinder(rotorGeom, hubCx, PROP_Y_CENTER, hubCz, PROP_RADIUS, PROP_THICKNESS, PROP_SEGMENTS);
 }
 
-// ---- Pack both geometries into one GLB (2 primitives, 2 materials) ----
+// ---- Parse CLI overrides ----
+// Supports:
+//   node scripts/generate_quad_glb.js [outPath] [--body=#RRGGBB] [--rotor=#RRGGBB] [--chassis=#RRGGBB]
+// If a color is omitted it keeps the default. Hex values are treated as sRGB
+// and converted to linear for glTF.
+function srgbToLinear(v) {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function parseColorArg(str) {
+    const hexMatch = str.match(/^#?([0-9a-fA-F]{6})$/);
+    if (hexMatch) {
+        const r = parseInt(hexMatch[1].substr(0, 2), 16);
+        const g = parseInt(hexMatch[1].substr(2, 2), 16);
+        const b = parseInt(hexMatch[1].substr(4, 2), 16);
+        return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b), 1.0];
+    }
+    const parts = str.split(',').map(x => parseFloat(x.trim()));
+    if (parts.length >= 3) {
+        return [parts[0], parts[1], parts[2], parts[3] !== undefined ? parts[3] : 1.0];
+    }
+    throw new Error(`Invalid color: ${str}`);
+}
+
+let outPath = null;
+for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    const m = arg.match(/^--(body|rotor|chassis)=(.*)$/);
+    if (m) {
+        const color = parseColorArg(m[2]);
+        if (m[1] === 'body') BODY_COLOR = color;
+        if (m[1] === 'rotor') ROTOR_COLOR = color;
+        if (m[1] === 'chassis') CHASSIS_COLOR = color;
+    } else if (!outPath) {
+        outPath = arg;
+    } else {
+        throw new Error(`Unexpected argument: ${arg}`);
+    }
+}
+if (!outPath) outPath = DEFAULT_OUT;
+
+// ---- Pack the three geometries into one GLB (3 primitives, 3 materials) ----
 
 function packGeom(geom) {
     const numVertices = geom.positions.length / 3;
@@ -217,10 +274,12 @@ function packGeom(geom) {
 
 const bodyPacked = packGeom(bodyGeom);
 const rotorPacked = packGeom(rotorGeom);
+const chassisPacked = packGeom(chassisGeom);
 
-const binBuffer = Buffer.concat([bodyPacked.buffer, rotorPacked.buffer]);
+const binBuffer = Buffer.concat([bodyPacked.buffer, rotorPacked.buffer, chassisPacked.buffer]);
 const bodyBase = 0;
 const rotorBase = bodyPacked.totalLength;
+const chassisBase = rotorBase + rotorPacked.totalLength;
 
 const gltfJson = {
     asset: { version: '2.0', generator: 'DroneEngage quad.glb generator' },
@@ -230,7 +289,8 @@ const gltfJson = {
     meshes: [{
         primitives: [
             { attributes: { POSITION: 0, NORMAL: 1 }, indices: 2, material: 0 },  // body
-            { attributes: { POSITION: 3, NORMAL: 4 }, indices: 5, material: 1 }   // rotors
+            { attributes: { POSITION: 3, NORMAL: 4 }, indices: 5, material: 1 },  // rotors
+            { attributes: { POSITION: 6, NORMAL: 7 }, indices: 8, material: 2 }   // chassis
         ]
     }],
     materials: [
@@ -251,6 +311,15 @@ const gltfJson = {
                 roughnessFactor: ROTOR_ROUGH
             },
             doubleSided: true
+        },
+        {
+            name: 'chassis',
+            pbrMetallicRoughness: {
+                baseColorFactor: CHASSIS_COLOR,
+                metallicFactor: CHASSIS_METAL,
+                roughnessFactor: CHASSIS_ROUGH
+            },
+            doubleSided: true
         }
     ],
     buffers: [{ byteLength: binBuffer.length }],
@@ -260,7 +329,10 @@ const gltfJson = {
         { buffer: 0, byteOffset: bodyBase + bodyPacked.posPadded + bodyPacked.norPadded, byteLength: bodyPacked.idxBytes, target: 34963 },
         { buffer: 0, byteOffset: rotorBase, byteLength: rotorPacked.posBytes, target: 34962 },
         { buffer: 0, byteOffset: rotorBase + rotorPacked.posPadded, byteLength: rotorPacked.norBytes, target: 34962 },
-        { buffer: 0, byteOffset: rotorBase + rotorPacked.posPadded + rotorPacked.norPadded, byteLength: rotorPacked.idxBytes, target: 34963 }
+        { buffer: 0, byteOffset: rotorBase + rotorPacked.posPadded + rotorPacked.norPadded, byteLength: rotorPacked.idxBytes, target: 34963 },
+        { buffer: 0, byteOffset: chassisBase, byteLength: chassisPacked.posBytes, target: 34962 },
+        { buffer: 0, byteOffset: chassisBase + chassisPacked.posPadded, byteLength: chassisPacked.norBytes, target: 34962 },
+        { buffer: 0, byteOffset: chassisBase + chassisPacked.posPadded + chassisPacked.norPadded, byteLength: chassisPacked.idxBytes, target: 34963 }
     ],
     accessors: [
         { bufferView: 0, componentType: 5126, count: bodyPacked.numVertices, type: 'VEC3',
@@ -272,7 +344,12 @@ const gltfJson = {
           min: [rotorPacked.bounds.minX, rotorPacked.bounds.minY, rotorPacked.bounds.minZ],
           max: [rotorPacked.bounds.maxX, rotorPacked.bounds.maxY, rotorPacked.bounds.maxZ] },
         { bufferView: 4, componentType: 5126, count: rotorPacked.numVertices, type: 'VEC3' },
-        { bufferView: 5, componentType: 5123, count: rotorPacked.numIndices, type: 'SCALAR' }
+        { bufferView: 5, componentType: 5123, count: rotorPacked.numIndices, type: 'SCALAR' },
+        { bufferView: 6, componentType: 5126, count: chassisPacked.numVertices, type: 'VEC3',
+          min: [chassisPacked.bounds.minX, chassisPacked.bounds.minY, chassisPacked.bounds.minZ],
+          max: [chassisPacked.bounds.maxX, chassisPacked.bounds.maxY, chassisPacked.bounds.maxZ] },
+        { bufferView: 7, componentType: 5126, count: chassisPacked.numVertices, type: 'VEC3' },
+        { bufferView: 8, componentType: 5123, count: chassisPacked.numIndices, type: 'SCALAR' }
     ]
 };
 
@@ -299,12 +376,9 @@ glb.writeUInt32LE(binBuffer.length, binOffset);
 glb.writeUInt32LE(0x004E4942, binOffset + 4);  // "BIN\0"
 binBuffer.copy(glb, binOffset + 8);
 
-// Usage: node generate_quad_glb.js [outputPath]
-//   outputPath is resolved relative to CWD; defaults to DEFAULT_OUT above.
-const outPath = process.argv[2]
-    ? path.resolve(process.argv[2])
-    : DEFAULT_OUT;
-fs.writeFileSync(outPath, glb);
-console.log(`Generated ${outPath} (${glbLength} bytes)`);
+const resolvedOutPath = path.resolve(outPath);
+fs.writeFileSync(resolvedOutPath, glb);
+console.log(`Generated ${resolvedOutPath} (${glbLength} bytes)`);
 console.log(`Body:   ${bodyPacked.numVertices} vertices, ${bodyPacked.numIndices} indices`);
 console.log(`Rotors: ${rotorPacked.numVertices} vertices, ${rotorPacked.numIndices} indices`);
+console.log(`Chassis:${chassisPacked.numVertices} vertices, ${chassisPacked.numIndices} indices`);

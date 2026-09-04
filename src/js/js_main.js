@@ -751,6 +751,10 @@ export function fn_showMap3D() {
 
 function fn_onMap3dDblClick(p_lat, p_lng) {
 	if (js_globals.CONST_MAP_EDITOR === true) return;
+	// Draw a ground-draped circle with a + crosshair at the clicked point
+	// (instead of a DOM marker pin), then immediately show the context
+	// popup — the 3D map's dblclick UX has always opened the popup directly.
+	js_map3d.fn_drawTargetMarker(p_lat, p_lng);
 	fn_generateContextMenuHTML(p_lat, p_lng);
 }
 
@@ -2191,7 +2195,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 
 export function fn_contextMenu(p_position) {
 	// use JS Dom methods to create the menu
-	// use event.pixel.x and event.pixel.y 
+	// use event.pixel.x and event.pixel.y
 	// to position menu at mouse position
 
 	if (js_globals.m_markGuided !== null && js_globals.m_markGuided !== undefined) {

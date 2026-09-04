@@ -19,6 +19,8 @@
  * clockwise — matching MAVLink yaw convention (see js_map3d.js).
  *
  * Output: public/models/boat.glb
+ *
+ * CLI: node scripts/generate_boat_glb.js [outPath] [--hull=#RRGGBB] [--cabin=#RRGGBB] [--metal=#RRGGBB]
  */
 
 const fs = require('fs');
@@ -51,17 +53,23 @@ const SHEET_WID   = 1.2;  // slightly overhangs the cabin in X
 const SHEET_THICK = 0.05; // thin plate
 
 // ---- Materials (RGBA baseColorFactor + PBR metallic/roughness) ----
-const HULL_COLOR  = [0.85, 0.75, 0.45, 1.0];  // warm wood/tan
+// Override via CLI: --hull=#RRGGBB --cabin=#RRGGBB --metal=#RRGGBB
+const DEFAULT_HULL_COLOR  = [0.85, 0.75, 0.45, 1.0];  // warm wood/tan
 const HULL_METAL  = 0.1;
 const HULL_ROUGH  = 0.7;
 
-const CABIN_COLOR = [0.90, 0.90, 0.92, 1.0];  // off-white
+const DEFAULT_CABIN_COLOR = [0.90, 0.90, 0.92, 1.0];  // off-white
 const CABIN_METAL = 0.2;
 const CABIN_ROUGH = 0.5;
 
-const METAL_COLOR = [0.70, 0.72, 0.75, 1.0];  // brushed metal gray
+const DEFAULT_METAL_COLOR = [0.70, 0.72, 0.75, 1.0];  // brushed metal gray
 const METAL_METAL = 0.9;
 const METAL_ROUGH = 0.3;
+
+// Runtime overrides (filled by parseCliColors below).
+let HULL_COLOR  = DEFAULT_HULL_COLOR.slice();
+let CABIN_COLOR = DEFAULT_CABIN_COLOR.slice();
+let METAL_COLOR = DEFAULT_METAL_COLOR.slice();
 
 // ---- Output ----
 const DEFAULT_OUT = path.join(__dirname, '..', 'public', 'models', 'boat.glb');
@@ -198,6 +206,48 @@ addBox(sheetGeom,
     -SHEET_WID / 2, sheetY0, CABIN_Z_CENTER - SHEET_LEN / 2,
      SHEET_WID / 2, sheetY1, CABIN_Z_CENTER + SHEET_LEN / 2);
 
+// ---- Parse CLI overrides ----
+// Supports:
+//   node scripts/generate_boat_glb.js [outPath] [--hull=#RRGGBB] [--cabin=#RRGGBB] [--metal=#RRGGBB]
+// If a color is omitted it keeps the default. Hex values are treated as sRGB
+// and converted to linear for glTF.
+function srgbToLinear(v) {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function parseColorArg(str) {
+    const hexMatch = str.match(/^#?([0-9a-fA-F]{6})$/);
+    if (hexMatch) {
+        const r = parseInt(hexMatch[1].substr(0, 2), 16);
+        const g = parseInt(hexMatch[1].substr(2, 2), 16);
+        const b = parseInt(hexMatch[1].substr(4, 2), 16);
+        return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b), 1.0];
+    }
+    const parts = str.split(',').map(x => parseFloat(x.trim()));
+    if (parts.length >= 3) {
+        return [parts[0], parts[1], parts[2], parts[3] !== undefined ? parts[3] : 1.0];
+    }
+    throw new Error(`Invalid color: ${str}`);
+}
+
+let outPath = null;
+for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    const m = arg.match(/^--(hull|cabin|metal)=(.*)$/);
+    if (m) {
+        const color = parseColorArg(m[2]);
+        if (m[1] === 'hull') HULL_COLOR = color;
+        if (m[1] === 'cabin') CABIN_COLOR = color;
+        if (m[1] === 'metal') METAL_COLOR = color;
+    } else if (!outPath) {
+        outPath = arg;
+    } else {
+        throw new Error(`Unexpected argument: ${arg}`);
+    }
+}
+if (!outPath) outPath = DEFAULT_OUT;
+
 // ---- Pack all three geometries into one GLB (3 primitives, 3 materials) ----
 
 function packGeom(geom) {
@@ -332,13 +382,9 @@ glb.writeUInt32LE(binBuffer.length, binOffset);
 glb.writeUInt32LE(0x004E4942, binOffset + 4);  // "BIN\0"
 binBuffer.copy(glb, binOffset + 8);
 
-// Usage: node generate_boat_glb.js [outputPath]
-//   outputPath is resolved relative to CWD; defaults to DEFAULT_OUT above.
-const outPath = process.argv[2]
-    ? path.resolve(process.argv[2])
-    : DEFAULT_OUT;
-fs.writeFileSync(outPath, glb);
-console.log(`Generated ${outPath} (${glbLength} bytes)`);
+const resolvedOutPath = path.resolve(outPath);
+fs.writeFileSync(resolvedOutPath, glb);
+console.log(`Generated ${resolvedOutPath} (${glbLength} bytes)`);
 console.log(`Hull:   ${hullPacked.numVertices} vertices, ${hullPacked.numIndices} indices`);
 console.log(`Cabin:  ${cabinPacked.numVertices} vertices, ${cabinPacked.numIndices} indices`);
 console.log(`Sheet:  ${sheetPacked.numVertices} vertices, ${sheetPacked.numIndices} indices`);

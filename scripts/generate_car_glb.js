@@ -17,6 +17,8 @@
  * clockwise — matching MAVLink yaw convention (see js_map3d.js).
  *
  * Output: public/models/car.glb
+ *
+ * CLI: node scripts/generate_car_glb.js [outPath] [--body=#RRGGBB] [--cabin=#RRGGBB] [--wheels=#RRGGBB]
  */
 
 const fs = require('fs');
@@ -44,17 +46,23 @@ const WHEEL_INSET_X = 0.05; // how far the wheel pokes out beyond the body side
 const WHEEL_INSET_Z = 0.4;  // distance from nose/tail to wheel center (along Z)
 
 // ---- Materials (RGBA baseColorFactor + PBR metallic/roughness) ----
-const BODY_COLOR = [0.85, 0.10, 0.08, 1.0];   // red
+// Override via CLI: --body=#RRGGBB --cabin=#RRGGBB --wheels=#RRGGBB
+const DEFAULT_BODY_COLOR = [0.85, 0.10, 0.08, 1.0];   // red
 const BODY_METAL = 0.3;
 const BODY_ROUGH = 0.5;
 
-const CABIN_COLOR = [0.10, 0.30, 0.55, 1.0];   // dark tinted blue
+const DEFAULT_CABIN_COLOR = [0.10, 0.30, 0.55, 1.0];   // dark tinted blue
 const CABIN_METAL = 0.4;
 const CABIN_ROUGH = 0.25;
 
-const WHEEL_COLOR = [0.05, 0.05, 0.05, 1.0];  // near-black
+const DEFAULT_WHEEL_COLOR = [0.05, 0.05, 0.05, 1.0];  // near-black
 const WHEEL_METAL = 0.1;
 const WHEEL_ROUGH = 0.8;
+
+// Runtime overrides (filled by parseCliColors below).
+let BODY_COLOR  = DEFAULT_BODY_COLOR.slice();
+let CABIN_COLOR = DEFAULT_CABIN_COLOR.slice();
+let WHEEL_COLOR = DEFAULT_WHEEL_COLOR.slice();
 
 // ---- Output ----
 const DEFAULT_OUT = path.join(__dirname, '..', 'public', 'models', 'car.glb');
@@ -135,6 +143,48 @@ addBox(wheelGeom,
 addBox(wheelGeom,
      wheelX0, 0, wheelZRear - WHEEL_RAD,
      wheelX1, 2 * WHEEL_RAD, wheelZRear + WHEEL_RAD);
+
+// ---- Parse CLI overrides ----
+// Supports:
+//   node scripts/generate_car_glb.js [outPath] [--body=#RRGGBB] [--cabin=#RRGGBB] [--wheels=#RRGGBB]
+// If a color is omitted it keeps the default. Hex values are treated as sRGB
+// and converted to linear for glTF.
+function srgbToLinear(v) {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function parseColorArg(str) {
+    const hexMatch = str.match(/^#?([0-9a-fA-F]{6})$/);
+    if (hexMatch) {
+        const r = parseInt(hexMatch[1].substr(0, 2), 16);
+        const g = parseInt(hexMatch[1].substr(2, 2), 16);
+        const b = parseInt(hexMatch[1].substr(4, 2), 16);
+        return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b), 1.0];
+    }
+    const parts = str.split(',').map(x => parseFloat(x.trim()));
+    if (parts.length >= 3) {
+        return [parts[0], parts[1], parts[2], parts[3] !== undefined ? parts[3] : 1.0];
+    }
+    throw new Error(`Invalid color: ${str}`);
+}
+
+let outPath = null;
+for (let i = 2; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    const m = arg.match(/^--(body|cabin|wheels)=(.*)$/);
+    if (m) {
+        const color = parseColorArg(m[2]);
+        if (m[1] === 'body') BODY_COLOR = color;
+        if (m[1] === 'cabin') CABIN_COLOR = color;
+        if (m[1] === 'wheels') WHEEL_COLOR = color;
+    } else if (!outPath) {
+        outPath = arg;
+    } else {
+        throw new Error(`Unexpected argument: ${arg}`);
+    }
+}
+if (!outPath) outPath = DEFAULT_OUT;
 
 // ---- Pack all three geometries into one GLB (3 primitives, 3 materials) ----
 
@@ -270,13 +320,9 @@ glb.writeUInt32LE(binBuffer.length, binOffset);
 glb.writeUInt32LE(0x004E4942, binOffset + 4);  // "BIN\0"
 binBuffer.copy(glb, binOffset + 8);
 
-// Usage: node generate_car_glb.js [outputPath]
-//   outputPath is resolved relative to CWD; defaults to DEFAULT_OUT above.
-const outPath = process.argv[2]
-    ? path.resolve(process.argv[2])
-    : DEFAULT_OUT;
-fs.writeFileSync(outPath, glb);
-console.log(`Generated ${outPath} (${glbLength} bytes)`);
+const resolvedOutPath = path.resolve(outPath);
+fs.writeFileSync(resolvedOutPath, glb);
+console.log(`Generated ${resolvedOutPath} (${glbLength} bytes)`);
 console.log(`Body:    ${bodyPacked.numVertices} vertices, ${bodyPacked.numIndices} indices`);
 console.log(`Cabin:   ${cabinPacked.numVertices} vertices, ${cabinPacked.numIndices} indices`);
 console.log(`Wheels:  ${wheelPacked.numVertices} vertices, ${wheelPacked.numIndices} indices`);

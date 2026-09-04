@@ -238,7 +238,7 @@ class GLOBALS {
 		// (line width in pixels) and ADSB aircraft (cylinder radius in meters).
 		this.CONST_MAP3D_TETHER_MIN = 2;        // minimum tether width (at ground level)
 		this.CONST_MAP3D_TETHER_MAX = 100;       // maximum tether width (at MAX_ALT and above)
-		this.CONST_MAP3D_TETHER_MAX_ALT = 1000;  // altitude (meters AGL) at which MAX is reached
+		this.CONST_MAP3D_TETHER_MAX_ALT = 2000;  // altitude (meters AGL) at which MAX is reached
 
 		// ---- Map3D 3D-model (glTF) icon LOD ----
 		// Below this zoom (i.e. more Zoom out) the flat billboard <div> marker is shown (constant

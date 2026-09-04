@@ -197,6 +197,80 @@ const CAdsbToggleControl = L.Control.extend({
     }
 });
 
+/**
+ * Custom Leaflet control: a wind-arrow toggle button placed under the ADSB
+ * toggle (topleft), directly below the +/- zoom controls. Uses the Bootstrap
+ * Icons `bi-wind` glyph. Clicking it toggles the "Enable Wind Arrow" runtime
+ * preference (js_localStorage.fn_setWindEnabled) and dispatches
+ * EE_onPreferenceChanged — exactly what the Preferences checkbox does — so
+ * js_main's wind-arrow refresh picks up the change.
+ *
+ * The button reflects the current enabled state (active = highlighted,
+ * inactive = dimmed) and updates itself on EE_onPreferenceChanged so it stays
+ * in sync with the Preferences checkbox.
+ */
+const CWindToggleControl = L.Control.extend({
+    options: {
+        position: 'topleft'
+    },
+
+    onAdd(map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-wind-toggle-control');
+        // Prevent map drag/click from bleeding through the button.
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        const link = L.DomUtil.create('a', 'leaflet-wind-toggle-btn', container);
+        link.href = '#';
+        link.title = 'Toggle Wind Arrow';
+        link.role = 'button';
+
+        const icon = L.DomUtil.create('i', 'bi bi-wind', link);
+        icon.style.fontSize = '16px';
+        icon.style.lineHeight = '1';
+
+        this._link = link;
+        this._updateActiveState();
+
+        L.DomEvent.on(link, 'click', (ev) => {
+            L.DomEvent.stop(ev);
+            const enabled = js_localStorage.fn_getWindEnabled();
+            js_localStorage.fn_setWindEnabled(!enabled);
+            js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+            // _updateActiveState is called from the EE_onPreferenceChanged
+            // listener, but dispatch is synchronous so it has already run
+            // by the time we get here — still, update once more to be safe.
+            this._updateActiveState();
+        });
+
+        // Keep the button state in sync with the Preferences checkbox.
+        this._boundOnPreferenceChanged = () => this._updateActiveState();
+        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
+
+        return container;
+    },
+
+    onRemove() {
+        if (this._boundOnPreferenceChanged) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
+            this._boundOnPreferenceChanged = null;
+        }
+        this._link = null;
+    },
+
+    _updateActiveState() {
+        if (!this._link) return;
+        const enabled = js_localStorage.fn_getWindEnabled();
+        if (enabled) {
+            this._link.classList.add('leaflet-wind-toggle-active');
+            this._link.classList.remove('leaflet-wind-toggle-inactive');
+        } else {
+            this._link.classList.add('leaflet-wind-toggle-inactive');
+            this._link.classList.remove('leaflet-wind-toggle-active');
+        }
+    }
+});
+
 class CLeafLetAndruavMap {
 
     constructor() {
@@ -401,6 +475,13 @@ class CLeafLetAndruavMap {
         if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
             this.m_adsbToggleControl = new CAdsbToggleControl();
             this.m_adsbToggleControl.addTo(this.m_Map);
+        }
+
+        // Wind-arrow toggle button under the ADSB toggle (topleft).
+        // Skipped when the site feature flag disables the wind feature entirely.
+        if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_WIND === true)) {
+            this.m_windToggleControl = new CWindToggleControl();
+            this.m_windToggleControl.addTo(this.m_Map);
         }
 
 

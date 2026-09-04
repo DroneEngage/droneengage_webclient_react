@@ -1074,11 +1074,40 @@ div#displays {
 
 .leaflet-adsb-toggle-control a.leaflet-adsb-toggle-active {
 	background-color: #fff3cd;
-	border: 1px solid #ffc107;
+	border: 1px solid #e9c250;
 }
 
 .leaflet-adsb-toggle-control a.leaflet-adsb-toggle-inactive {
 	opacity: 0.45;
+}
+
+.leaflet-adsb-toggle-control a.leaflet-adsb-toggle-btn:hover {
+	opacity: 1.0;
+}
+
+/* Wind-arrow toggle button (under the ADSB toggle, topleft).
+   active = wind arrow enabled (highlighted), inactive = disabled (dimmed).
+   Mirrors the ADSB toggle styling. */
+.leaflet-wind-toggle-control a.leaflet-wind-toggle-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	line-height: 1;
+}
+
+.leaflet-wind-toggle-control a.leaflet-wind-toggle-active {
+	background-color: #fff3cd;
+	border: 1px solid #e9c250;
+}
+
+.leaflet-wind-toggle-control a.leaflet-wind-toggle-inactive {
+	opacity: 0.45;
+}
+
+.leaflet-wind-toggle-control a.leaflet-wind-toggle-btn:hover {
+	opacity: 1.0;
 }
 
 

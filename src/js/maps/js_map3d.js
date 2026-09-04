@@ -175,7 +175,60 @@ class ModelSizeControl {
         this._valueEl = valueEl;
         this._updateButtonStates();
 
+        // Capture keyboard + / - / z / x so the user can step the model
+        // size without clicking the buttons. For the 'unit' control the
+        // listener is attached to window so the keys work no matter what
+        // has focus (the map canvas is not reliably focusable). It is
+        // ignored when the 3D map is hidden or when the user is typing in
+        // an input/textarea/contenteditable. The 'adsb' control keeps its
+        // listener scoped to its own container so z/x doesn't step both
+        // controls at once.
+        this._boundOnKeyDown = (ev) => this._onKeyDown(ev);
+        if (this._target === 'unit') {
+            this._keyTarget = window;
+        } else {
+            this._container.tabIndex = 0;
+            this._keyTarget = this._container;
+        }
+        this._keyTarget.addEventListener('keydown', this._boundOnKeyDown);
+
         return this._container;
+    }
+
+    /**
+     * Keyboard handler: '+' steps up, '-' steps down (small step), mirroring
+     * the on-screen +/- buttons. Shift+'+'/'-' applies the big step, mirroring
+     * a double-click. Numpad + / - are also matched.
+     */
+    _onKeyDown(ev) {
+        // Ignore when the 3D map is hidden (the control may still be mounted
+        // while the leaflet map is the active view).
+        if (!this._map3d.m_isVisible) return;
+        // Ignore when the user is typing in a form field so z/x/+/- don't
+        // steal characters from inputs, textareas, or contenteditable.
+        const el = document.activeElement;
+        if (el) {
+            const tag = el.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable) return;
+        }
+
+        const key = ev.key;
+        const isPlus  = key === '+' || key === 'Add' || key === 'x' || key === 'X';
+        const isMinus = key === '-' || key === 'Subtract' || key === '_' || key === 'z' || key === 'Z';
+        if (!isPlus && !isMinus) return;
+
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const dir = isPlus ? +1 : -1;
+        const step = ev.shiftKey
+            ? js_globals.CONST_MAP3D_MODEL_SIZE_STEP_BIG
+            : js_globals.CONST_MAP3D_MODEL_SIZE_STEP;
+
+        const btn = isPlus ? this._incBtn : this._decBtn;
+        if (btn && !btn.disabled) {
+            this._step(dir, step);
+        }
     }
 
     /**
@@ -275,6 +328,11 @@ class ModelSizeControl {
             js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
             this._boundOnPreferenceChanged = null;
         }
+        if (this._boundOnKeyDown && this._keyTarget) {
+            this._keyTarget.removeEventListener('keydown', this._boundOnKeyDown);
+        }
+        this._boundOnKeyDown = null;
+        this._keyTarget = null;
         this._adsbToggleBtn = null;
         this._decBtn = null;
         this._incBtn = null;
@@ -288,9 +346,9 @@ class ModelSizeControl {
 
 /**
  * Custom Mapbox GL control: a single toggle button that enables/disables
- * chase-cam (follow) mode on the 3D map.  When active the camera trails
- * behind the followed unit's heading on every telemetry tick (see
- * fn_syncUnit).  Mounted bottom-left of the 3D map.
+ * follow mode on the 3D map.  When active the camera freezes its current
+ * relative position to the followed unit and maintains it on every
+ * telemetry tick (see fn_syncUnit).  Mounted bottom-left of the 3D map.
  */
 class ChaseCamControl {
     constructor(map3d) {
@@ -306,8 +364,8 @@ class ChaseCamControl {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'css_map3d_follow_toggle';
-        btn.title = 'Toggle chase-cam (follow selected unit)';
-        btn.textContent = 'FOLLOW';
+        btn.title = 'Toggle follow (freeze camera relative to selected unit)';
+        btn.innerHTML = '<i class="bi bi-image"></i>';
         btn.addEventListener('click', () => {
             const enabled = this._map3d.m_followEnabled;
             this._map3d.fn_setFollowEnabled(!enabled);
@@ -355,15 +413,45 @@ class CAndruavMap3D {
         this.m_mapDblClickCallbacks = [];
         this.m_isMapDblClickBound = false;
 
-        // ---- Chase-cam / follow mode ----
+        // ---- Follow mode ("freeze relative to drone") ----
+        // When active, the camera maintains a fixed world-space offset from
+        // the followed unit.  The user positions the camera wherever they
+        // like (e.g. to the right of the drone, looking at it from the
+        // side), then the camera moves WITH the drone, preserving that
+        // relative viewing angle and bearing.  Unlike the old chase-cam,
+        // the camera does NOT rotate with the drone's yaw — bearing/pitch/
+        // zoom are frozen at capture time.
+        //
+        // The offset + camera params are captured when follow starts and
+        // RE-captured whenever the user manually drags/rotates/zooms/pitches
+        // while follow is on — so adjusting the view doesn't cancel follow,
+        // it just updates the frozen relative position.
+        //
         // m_followEnabled: master toggle (ChaseCamControl button).
-        // m_followUnitId: which unit the camera trails.  Set when the user
-        //   clicks a unit (fn_focusUnit) or auto-seeded with the first unit
-        //   to sync if none was highlighted.  Cleared by fn_clearFollowUnit.
-        // m_followBound: guards the one-shot dragstart/rotatestart listeners
-        //   that auto-disable follow when the user manually grabs the map.
+        // m_followUnitId: which unit the camera follows.  Set on unit click
+        //   (fn_focusUnit) or auto-seeded with the first unit to sync.
+        // m_followOffsetCaptured: false until we've recorded the initial
+        //   offset (needs a drone position + a map center, so it may happen
+        //   on the first fn_syncUnit after enable, not at enable time).
+        // m_followOffsetLng/Lat: world-space offset from drone to camera
+        //   center (center = drone + offset).
+        // m_followBearing/Pitch/Zoom: frozen camera params at capture time.
+        // m_followLastUnitLng/Lat: last known position of the followed unit,
+        //   used to re-capture the offset after a user gesture.
+        // m_followUserInteracting: true while a drag/rotate/zoom/pitch
+        //   gesture is in progress, so per-tick easeTo doesn't fight it.
+        // m_followBound: guards the one-shot gesture listeners.
         this.m_followEnabled = false;
         this.m_followUnitId = null;
+        this.m_followOffsetCaptured = false;
+        this.m_followOffsetLng = 0;
+        this.m_followOffsetLat = 0;
+        this.m_followBearing = 0;
+        this.m_followPitch = 60;
+        this.m_followZoom = 16;
+        this.m_followLastUnitLng = null;
+        this.m_followLastUnitLat = null;
+        this.m_followUserInteracting = false;
         this.m_followBound = false;
 
         // ---- 3D tether line + ground circle + altitude circle + path trail ----
@@ -714,42 +802,82 @@ class CAndruavMap3D {
         // Chase-cam (follow) toggle button, bottom-left.
         this.m_map.addControl(new ChaseCamControl(this), 'bottom-left');
 
-        // Auto-disable follow mode when the user manually drags or rotates the
-        // map — otherwise the per-tick easeTo fights the user's gesture.  Bound
+        // While follow mode is on, user drag/rotate/zoom/pitch gestures
+        // pause the per-tick camera tracking and re-capture the frozen
+        // offset when the gesture ends — so the user can reposition the
+        // camera relative to the drone without follow canceling.  Bound
         // once here (the map instance lives for the session).
-        this.fn_bindFollowCancelHandlers();
+        this.fn_bindFollowGestureHandlers();
     }
 
     /**
-     * Registers one-shot dragstart/rotatestart listeners that turn off
-     * chase-cam follow mode as soon as the user grabs the map manually.
-     * Called once from fn_initMap.
+     * Registers gesture listeners that pause follow-mode camera tracking
+     * while the user is dragging/rotating/zooming/pitching, and re-capture
+     * the frozen offset when the gesture ends — so the user can reposition
+     * the camera relative to the drone without follow canceling.  Called
+     * once from fn_initMap.
      */
-    fn_bindFollowCancelHandlers() {
+    fn_bindFollowGestureHandlers() {
         if (!this.m_map || this.m_followBound) return;
         this.m_followBound = true;
-        const cancel = () => this.fn_setFollowEnabled(false);
-        this.m_map.on('dragstart', cancel);
-        this.m_map.on('rotatestart', cancel);
+
+        // Pause per-tick easeTo while a gesture is in progress so it
+        // doesn't fight the user's input.
+        const onStart = () => { this.m_followUserInteracting = true; };
+        this.m_map.on('dragstart', onStart);
+        this.m_map.on('rotatestart', onStart);
+        this.m_map.on('zoomstart', onStart);
+        this.m_map.on('pitchstart', onStart);
+
+        // When the gesture ends, re-capture the offset + camera params
+        // from the new view so the camera maintains this new relative
+        // position as the drone keeps moving.
+        const onEnd = () => {
+            this.m_followUserInteracting = false;
+            this.fn_captureFollowOffset();
+        };
+        this.m_map.on('dragend', onEnd);
+        this.m_map.on('rotateend', onEnd);
+        this.m_map.on('zoomend', onEnd);
+        this.m_map.on('pitchend', onEnd);
     }
 
     /**
-     * Enables or disables chase-cam (follow) mode.  When enabled, the camera
-     * trails behind the followed unit on every telemetry tick (see
-     * fn_syncUnit).  When disabled, the camera is left where it is.
+     * Captures (or re-captures) the frozen camera offset and params from
+     * the current map view.  The offset is the world-space delta from the
+     * followed unit's last known position to the map's current center.
+     * Called when follow is enabled and after every user gesture while
+     * follow is on.  No-op if follow is off or the drone position is
+     * unknown yet (will be retried on the next fn_syncUnit).
+     */
+    fn_captureFollowOffset() {
+        if (!this.m_followEnabled || !this.m_map || !this.m_isReady) return;
+        if (this.m_followLastUnitLng == null || this.m_followLastUnitLat == null) return;
+
+        const center = this.m_map.getCenter();
+        this.m_followOffsetLng = center.lng - this.m_followLastUnitLng;
+        this.m_followOffsetLat = center.lat - this.m_followLastUnitLat;
+        this.m_followBearing = this.m_map.getBearing();
+        this.m_followPitch = this.m_map.getPitch();
+        this.m_followZoom = this.m_map.getZoom();
+        this.m_followOffsetCaptured = true;
+    }
+
+    /**
+     * Enables or disables follow mode.  When enabled, the camera freezes
+     * its current relative position to the drone and maintains it on every
+     * telemetry tick.  No preset zoom/pitch jump — the user's current view
+     * is what gets frozen.  When disabled, the camera is left where it is.
      * @param {boolean} enabled
      */
     fn_setFollowEnabled(enabled) {
         this.m_followEnabled = !!enabled;
         if (this.m_followEnabled) {
-            // Snap to the follow zoom/pitch immediately so the first per-tick
-            // easeTo only has to track center+bearing, not a big view change.
-            if (this.m_map && this.m_isReady) {
-                this.m_map.jumpTo({
-                    zoom: js_globals.CONST_MAP3D_FOLLOW_ZOOM,
-                    pitch: js_globals.CONST_MAP3D_FOLLOW_PITCH
-                });
-            }
+            // Try to capture the offset from the current view immediately.
+            // If the drone position isn't known yet, the offset will be
+            // captured on the first fn_syncUnit for the followed unit.
+            this.m_followOffsetCaptured = false;
+            this.fn_captureFollowOffset();
         }
         js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
     }
@@ -757,7 +885,7 @@ class CAndruavMap3D {
     /**
      * Sets the unit the camera should follow.  Called from fn_focusUnit when
      * the user clicks a unit; if follow mode is already on, the camera
-     * immediately starts trailing the new target.
+     * immediately starts tracking the new target.
      * @param {string} unitId
      */
     fn_setFollowUnit(unitId) {
@@ -772,6 +900,9 @@ class CAndruavMap3D {
     fn_clearFollowUnit(unitId) {
         if (this.m_followUnitId === unitId) {
             this.m_followUnitId = null;
+            this.m_followLastUnitLng = null;
+            this.m_followLastUnitLat = null;
+            this.m_followOffsetCaptured = false;
         }
     }
 
@@ -831,6 +962,20 @@ class CAndruavMap3D {
             this.m_map.addModel('drone-plane', '/models/plane.glb');
             this.m_map.addModel('ground-station', '/models/groundstation.glb');
             this.m_map.addModel('drone-quad', '/models/quad.glb');
+            this.m_map.addModel('drone-quad-1', '/models/quad_1.glb');
+            this.m_map.addModel('drone-quad-2', '/models/quad_2.glb');
+            this.m_map.addModel('drone-quad-3', '/models/quad_3.glb');
+            this.m_map.addModel('drone-quad-4', '/models/quad_4.glb');
+            this.m_map.addModel('drone-boat', '/models/boat.glb');
+            this.m_map.addModel('drone-boat-1', '/models/boat_1.glb');
+            this.m_map.addModel('drone-boat-2', '/models/boat_2.glb');
+            this.m_map.addModel('drone-boat-3', '/models/boat_3.glb');
+            this.m_map.addModel('drone-boat-4', '/models/boat_4.glb');
+            this.m_map.addModel('drone-car', '/models/car.glb');
+            this.m_map.addModel('drone-car-1', '/models/car_1.glb');
+            this.m_map.addModel('drone-car-2', '/models/car_2.glb');
+            this.m_map.addModel('drone-car-3', '/models/car_3.glb');
+            this.m_map.addModel('drone-car-4', '/models/car_4.glb');
         }
 
         if (!this.m_map.getSource('unit-3d-models')) {
@@ -1381,27 +1526,41 @@ class CAndruavMap3D {
         // Update the glTF model twin used at close zoom (fn_updateModelLod).
         this.fn_syncUnitModel(unit, id, lat, lng, altRelative, normalizedYaw);
 
-        // Chase-cam: if follow mode is on and this is the followed unit (or
-        // no target has been picked yet — auto-seed with the first unit to
-        // sync), recenter on it and orient bearing to its yaw so the drone
-        // always flies "up" the screen. The zoom is altitude-aware
-        // (fn_computeFollowZoom) so a high drone pulls the camera back and a
-        // low one pushes it in. duration spans the typical gap between
-        // telemetry packets so easeTo interpolates smoothly instead of
-        // snapping tick-to-tick.
+        // Follow mode ("freeze relative to drone"): if follow is on and
+        // this is the followed unit (or no target has been picked yet —
+        // auto-seed with the first unit to sync), move the camera by the
+        // same delta as the drone so the world-space offset captured at
+        // enable time (or after the last user gesture) is preserved.
+        // bearing/pitch/zoom are frozen — the camera does NOT rotate with
+        // the drone's yaw.  If the user is actively dragging/rotating/
+        // zooming, skip the easeTo so it doesn't fight the gesture; the
+        // gesture-end handler will re-capture the offset and resume.
         if (this.m_followEnabled) {
             if (!this.m_followUnitId) {
                 this.m_followUnitId = id;
             }
             if (this.m_followUnitId === id) {
-                this.m_map.easeTo({
-                    center: [lng, lat],
-                    bearing: normalizedYaw,
-                    pitch: js_globals.CONST_MAP3D_FOLLOW_PITCH,
-                    zoom: this.fn_computeFollowZoom(altRelative),
-                    duration: js_globals.CONST_MAP3D_FOLLOW_DURATION_MS,
-                    essential: true
-                });
+                // Remember the drone's current position for offset
+                // re-capture after a user gesture.
+                this.m_followLastUnitLng = lng;
+                this.m_followLastUnitLat = lat;
+
+                // Capture the offset on the first sync after follow was
+                // enabled (if it wasn't already captured at enable time).
+                if (!this.m_followOffsetCaptured) {
+                    this.fn_captureFollowOffset();
+                }
+
+                if (this.m_followOffsetCaptured && !this.m_followUserInteracting) {
+                    this.m_map.easeTo({
+                        center: [lng + this.m_followOffsetLng, lat + this.m_followOffsetLat],
+                        bearing: this.m_followBearing,
+                        pitch: this.m_followPitch,
+                        zoom: this.m_followZoom,
+                        duration: js_globals.CONST_MAP3D_FOLLOW_DURATION_MS,
+                        essential: true
+                    });
+                }
             }
         }
 
@@ -1438,7 +1597,14 @@ class CAndruavMap3D {
         } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_PLANE || unit.m_VehicleType === js_andruavUnit.VEHICLE_VTOL) {
             modelId = 'drone-plane';
         } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_QUAD || unit.m_VehicleType === js_andruavUnit.VEHICLE_TRI) {
-            modelId = 'drone-quad';
+            const idx = Number.isFinite(unit.m_index) ? ((unit.m_index % 4) + 1) : 1;
+            modelId = `drone-quad-${idx}`;
+        } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT) {
+            const idx = Number.isFinite(unit.m_index) ? ((unit.m_index % 4) + 1) : 1;
+            modelId = `drone-boat-${idx}`;
+        } else if (unit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER) {
+            const idx = Number.isFinite(unit.m_index) ? ((unit.m_index % 4) + 1) : 1;
+            modelId = `drone-car-${idx}`;
         } else {
             modelId = 'drone-arrow';
         }
@@ -3123,11 +3289,89 @@ class CAndruavMap3D {
     }
 
     /**
-     * Compatibility stub for the circular buffer callback.
+     * Removes a marker (or any object with a .remove() method) from the
+     * map.  Mirrors js_leafletmap.fn_hideItem.
      */
-    // eslint-disable-next-line no-unused-vars
     fn_hideItem(item) {
-        // No-op
+        if (item && typeof item.remove === 'function') {
+            item.remove();
+        }
+    }
+
+    // ---- Guided-target ground marker (circle + crosshair) ----
+    // Drawn on dblclick instead of a DOM marker pin.  Uses a single
+    // GeoJSON source + line layer, terrain-draped (no elevation), so the
+    // circle sits flat on the ground and the + cross marks the exact
+    // clicked point.
+    static TARGET_MARKER_SOURCE = 'de-target-marker-src';
+    static TARGET_MARKER_LAYER  = 'de-target-marker-layer';
+    static TARGET_MARKER_RADIUS = 10;   // circle radius + cross arm length (meters)
+    static TARGET_MARKER_COLOR  = '#ffcc00';
+    static TARGET_MARKER_WIDTH  = 3;
+
+    /**
+     * Draws (or replaces) the guided-target ground marker: a circle with
+     * a + crosshair at its center, draped on the terrain.
+     * @param {number} lat
+     * @param {number} lng
+     */
+    fn_drawTargetMarker(lat, lng) {
+        if (!this.m_map || !this.m_isReady) return;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        // Remove any previous target marker.
+        this.fn_clearTargetMarker();
+
+        const R = CAndruavMap3D.TARGET_MARKER_RADIUS;
+        const ringCoords = this.fn_generateCircleRing(lng, lat, R);
+
+        // Crosshair: two short line segments (N-S and E-W) through center.
+        const latRad = lat * Math.PI / 180;
+        const metersPerDegLat = 111320;
+        const metersPerDegLng = 111320 * Math.cos(latRad);
+        const dLng = R / metersPerDegLng;
+        const dLat = R / metersPerDegLat;
+        const crossH = [[lng - dLng, lat], [lng + dLng, lat]];   // horizontal (E-W)
+        const crossV = [[lng, lat - dLat], [lng, lat + dLat]];   // vertical (N-S)
+
+        this.m_map.addSource(CAndruavMap3D.TARGET_MARKER_SOURCE, {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [
+                    { type: 'Feature', geometry: { type: 'LineString', coordinates: ringCoords }, properties: {} },
+                    { type: 'Feature', geometry: { type: 'LineString', coordinates: crossH },    properties: {} },
+                    { type: 'Feature', geometry: { type: 'LineString', coordinates: crossV },    properties: {} }
+                ]
+            }
+        });
+
+        this.m_map.addLayer({
+            id: CAndruavMap3D.TARGET_MARKER_LAYER,
+            type: 'line',
+            source: CAndruavMap3D.TARGET_MARKER_SOURCE,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+                // No line-z-offset / line-elevation-reference => drapes on terrain.
+            },
+            paint: {
+                'line-color': CAndruavMap3D.TARGET_MARKER_COLOR,
+                'line-width': CAndruavMap3D.TARGET_MARKER_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+    }
+
+    /**
+     * Removes the guided-target ground marker if present.
+     */
+    fn_clearTargetMarker() {
+        if (!this.m_map) return;
+        this.fn_removeLayerAndSource(
+            CAndruavMap3D.TARGET_MARKER_LAYER,
+            CAndruavMap3D.TARGET_MARKER_SOURCE
+        );
     }
 
     /**
