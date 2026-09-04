@@ -244,33 +244,37 @@ class GLOBALS {
 		// (arrow.glb / plane.glb) that tilts with roll/pitch in 3D. This
 		// avoids the "too small / too big" problem of scaling a real-world
 		// sized 3D model across the full zoom range (see js_map3d.js).
-		this.CONST_MAP3D_MODEL_ZOOM_THRESHOLD = 4;
+		this.CONST_MAP3D_MODEL_ZOOM_THRESHOLD = 8;
 		// model-scale [x,y,z] applied to arrow.glb/plane.glb *at
 		// CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM*. Mapbox's model-scale paint
 		// property doesn't support zoom expressions on a GeoJSON source, so
 		// js_map3d.js recomputes this manually on every 'zoom' event: scale
-		// is multiplied by 2^(referenceZoom - currentZoom), the same
-		// meters-per-pixel relationship tiles use, so the model keeps a
-		// roughly constant on-screen (icon-like) size as you zoom in/out
-		// within the LOD band, instead of growing/shrinking with true
-		// real-world scale.
-		this.CONST_MAP3D_MODEL_SCALE = [5, 5, 5];
-		this.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM = 18;
-		// Growth aggressiveness: factor = 2^((referenceZoom - zoom) * exponent).
-		// 1.0 = "true" pixel-constant compensation (model looks the same
-		// size on screen at any zoom). >1.0 = overcompensates, so the model
-		// visibly keeps growing larger the further you zoom out (rather than
-		// just holding steady) — this is what gives the "grows with me as I
-		// zoom out" feel. <1.0 = grows more gently than pixel-constant.
-		this.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT = 1.3;
+		// is multiplied by 2^(referenceZoom - currentZoom) * exponent, the
+		// same meters-per-pixel relationship tiles use.
+		this.CONST_MAP3D_MODEL_SCALE = [2, 2, 2];
+		this.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM = 22;
+		// Pixel-constant compensation exponent. Mapbox model-scale is in
+		// real-world meters; each zoom level halves meters-per-pixel, so to
+		// hold a CONSTANT on-screen (icon-like) size the real-world scale
+		// must grow by 2× per zoom level you zoom out, and shrink by 2× per
+		// level you zoom in. That is exactly:
+		//   factor = 2^((refZoom - zoom) * exponent)
+		// exponent = 1.0 → true pixel-constant (model keeps the SAME screen
+		//   size at every zoom, just like a billboard/icon — this is the
+		//   desired "icon" behaviour).
+		// exponent > 1.0 → over-compensates, model visibly grows on screen
+		//   as you zoom out.
+		// exponent < 1.0 → under-compensates, model shrinks on screen as
+		//   you zoom out.
+		this.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT = 1;
 		// Clamp the zoom-compensation factor so scale can't blow up/collapse
-		// to a degenerate size at extreme zoom. Widened from the original
-		// 0.25-8 range so growth is visible across the full LOD zoom band
-		// down to CONST_MAP3D_MODEL_ZOOM_THRESHOLD instead of plateauing
-		// almost immediately; raise CONST_MAP3D_MODEL_SCALE_MAX_FACTOR
-		// further if you want it to keep growing even at very low zoom.
-		this.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR = 0.1;
-		this.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 160;
+		// to a degenerate size at extreme zoom. MIN_FACTOR is set low so the
+		// model CAN shrink (factor < 1) when you zoom in past the reference
+		// zoom — that shrinkage is what holds the on-screen size constant at
+		// high zoom (icon behaviour across the full range, not just below
+		// the reference). MAX_FACTOR caps the growth at extreme zoom-out.
+		this.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR = 1;
+		this.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 200;
 
 		// ---- Map3D ADSB traffic render mode ----
 		// Unlike drone units (which always use the icon/GLB LOD hybrid

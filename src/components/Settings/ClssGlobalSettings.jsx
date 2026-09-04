@@ -10,8 +10,7 @@ import { setSelectedMissionFilePathToWrite } from '../../js/js_main.js';
 
 import ClssDefault from './ClssDefault.jsx';
 import ClssPreferences from './ClssPreferences.jsx';
-import ClssMapSettings from './ClssMapSettings.jsx';
-import ClssAdsbSettings from './ClssAdsbSettings.jsx';
+import ClssMapAdsbSettings from './ClssMapAdsbSettings.jsx';
 
 class ClssGlobalSettings extends React.Component {
   constructor() {
@@ -156,13 +155,8 @@ class ClssGlobalSettings extends React.Component {
                 </a>
               </li>
               <li className="nav-item">
-                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_map">
-                  Map
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_adsb">
-                  ADSB
+                <a className="nav-link user-select-none txt-theme-aware" data-bs-toggle="tab" href="#settings_map_adsb">
+                  Map &amp; ADSB
                 </a>
               </li>
             </ul>
@@ -181,11 +175,8 @@ class ClssGlobalSettings extends React.Component {
               <div className="tab-pane fade" id="settings_preference">
                 <ClssPreferences t={t} i18n={this.props.i18n} />
               </div>
-              <div className="tab-pane fade" id="settings_map">
-                <ClssMapSettings t={t} i18n={this.props.i18n} />
-              </div>
-              <div className="tab-pane fade" id="settings_adsb">
-                <ClssAdsbSettings t={t} i18n={this.props.i18n} />
+              <div className="tab-pane fade" id="settings_map_adsb">
+                <ClssMapAdsbSettings t={t} i18n={this.props.i18n} />
               </div>
             </div>
           </div>

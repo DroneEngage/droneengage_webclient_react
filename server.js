@@ -6,14 +6,14 @@ const path = require('path');
 const app = express();
 
 const sslOptions = {
-  //cert: fs.readFileSync(process.env.WEB_SSL_CRT),
-  //key: fs.readFileSync(process.env.WEB_SSL_KEY),
-  cert: fs.readFileSync("./ssl/localssl.crt"),
-  key: fs.readFileSync("./ssl/localssl.key"),
+  cert: fs.readFileSync(process.env.WEB_SSL_CRT || "./ssl/localssl.crt"),
+  key: fs.readFileSync(process.env.WEB_SSL_KEY || "./ssl/localssl.key"),
 };
 
-https.createServer(sslOptions, app).listen(3000, () => {
-  console.log('HTTPS server running on port 3000');
+const PORT = process.env.WEB_PORT || process.env.PORT || 3000;
+
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`HTTPS server running on port ${PORT}`);
 });
 
 app.use(express.static(path.join(__dirname, 'build')));

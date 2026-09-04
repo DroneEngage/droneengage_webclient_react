@@ -1,6 +1,8 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
+import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
+
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
 import * as js_common from '../../js/js_common.js';
 import { EVENTS as js_event } from '../../js/js_eventList.js';
@@ -420,13 +422,11 @@ class ClssLoginControl extends React.Component {
               <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
-              <input
-                type="password"
+              <CPasswordReveal
                 id="txtAccessCode"
                 title={t('tooltip.accessCode')}
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
-                className="form-control"
                 onKeyDown={(e) => this.fn_onInputKeyDown(e)}
                 defaultValue={
                   QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
@@ -517,13 +517,11 @@ class ClssLoginControl extends React.Component {
               <label htmlFor="txtAccessCode" id="account" className="txt-theme-aware" title={t('tooltip.accessCode')}>
                 {t('label.password')}
               </label>
-              <input
-                type="password"
+              <CPasswordReveal
                 id="txtAccessCode"
                 title={t('tooltip.accessCode')}
                 name="txtAccessCode"
                 ref={this.txtAccessCodeRef}
-                className="form-control"
                 defaultValue={
                   QueryString.accesscode != null ? QueryString.accesscode : js_localStorage.fn_getAccessCode()
                 }

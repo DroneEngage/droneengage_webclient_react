@@ -6,6 +6,7 @@ import { EVENTS as js_event } from '../../js/js_eventList.js';
 import { js_eventEmitter } from '../../js/js_eventEmitter';
 import { js_localStorage } from '../../js/js_localStorage';
 import { js_adsbManager } from '../../js/adsb/js_adsbManager.js';
+import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
 
 /**
  * ADSB settings tab.
@@ -232,9 +233,8 @@ class ClssAdsbSettings extends React.Component {
           <label htmlFor="txt_adsb_client_secret" className={`col-sm-4 col-form-label ${dir}`}>
             OpenSky Client Secret
           </label>
-          <input
-            type="password"
-            className="form-control col-sm-8"
+          <CPasswordReveal
+            className="col-sm-8"
             id="txt_adsb_client_secret"
             ref={this.m_clientSecretRef}
             onChange={() => this.fn_changeClientSecret()}

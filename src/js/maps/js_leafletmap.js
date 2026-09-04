@@ -15,6 +15,7 @@ import {js_globals} from '../js_globals.js';
 import {EVENTS as js_event} from '../js_eventList.js'
 import {js_eventEmitter} from '../js_eventEmitter.js'
 import {js_tileCache} from './js_tileCache.js'
+import {js_localStorage} from '../js_localStorage.js'
 
 import {fn_contextMenu} from '../js_main.js'
 
@@ -60,6 +61,63 @@ const CCachedTileLayer = L.TileLayer.extend({
         return tile;
     }
 });
+
+// Cache key namespace for a tile layer, derived from its URL template
+// (query string stripped, since that's just the access token). Different
+// Leaflet map styles have different URL paths, so this keeps cached tiles
+// from one style/provider from being served under another style's z/x/y -
+// otherwise images from the previously selected style would mix in with
+// the newly selected one at matching coordinates.
+function fn_deriveTileCacheProviderId(p_tileUrl) {
+    return (p_tileUrl || '').split('?')[0] || 'default';
+}
+
+/**
+ * Resolve a tile URL template + access token into the final URL.
+ *
+ * Supports two template styles:
+ *  - New (preferred): the template carries its own auth query-param name
+ *    via a `{token}` placeholder, e.g.
+ *      `https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key={token}`
+ *      `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={token}`
+ *    This lets each provider use its own param name (key=, api_key=,
+ *    apikey=, apiKey=, access_token=, ...) without any extra config field.
+ *  - Legacy: the template ends with the param name and an empty value,
+ *    e.g. `...?access_token=` — the token is appended. Kept for backward
+ *    compatibility with existing config.json / config.local.json / stored
+ *    localStorage values that don't contain `{token}`.
+ *
+ * Templates with no auth param (e.g. ESRI World Imagery, OSM) simply have
+ * no `{token}` placeholder and no trailing `?param=`; the token is ignored.
+ */
+function fn_resolveTileUrl(p_urlTemplate, p_token) {
+    const template = p_urlTemplate || '';
+    if (template.indexOf('{token}') !== -1) {
+        return template.replace('{token}', encodeURIComponent(p_token || ''));
+    }
+    return template + (p_token || '');
+}
+
+/**
+ * Derive Leaflet tile-layer options (tileSize, zoomOffset, maxZoom) from
+ * the URL template by detecting HiDPI / @2x / 512px patterns.
+ *
+ * - URLs containing `@2x` or `/512/` (MapTiler, Stadia, Thunderforest,
+ *   HERE 512, Mapbox 512 @2x) are 512px HiDPI tiles: Leaflet needs
+ *   tileSize=512 and zoomOffset=-1 so labels and scale are correct.
+ * - Everything else (standard OSM 256px, ESRI 256px) uses Leaflet defaults.
+ *
+ * This works for any URL — including ones pasted directly into
+ * config.local.json — without needing a separate config field.
+ */
+function fn_deriveTileLayerOptions(p_urlTemplate) {
+    const url = p_urlTemplate || '';
+    const isHiDPI = url.indexOf('@2x') !== -1 || url.indexOf('/512/') !== -1 || url.indexOf('512/png8') !== -1;
+    if (isHiDPI) {
+        return { tileSize: 512, zoomOffset: -1, maxZoom: 22 };
+    }
+    return { tileSize: 256, zoomOffset: 0, maxZoom: 22 };
+}
 
 class CLeafLetAndruavMap {
 
@@ -170,6 +228,64 @@ class CLeafLetAndruavMap {
 
 
     /**
+     * Build (but don't attach) a cached tile layer for the given URL,
+     * wiring up the tileunload -> object URL release housekeeping.
+     * Tile size / zoom offset / max zoom are auto-detected from the URL
+     * (fn_deriveTileLayerOptions) so HiDPI @2x / 512px providers render
+     * correctly without extra config.
+     */
+    fn_createBasemapTileLayer(p_tileUrl, p_attribution) {
+        const opts = fn_deriveTileLayerOptions(p_tileUrl);
+        const tileLayer = new CCachedTileLayer(p_tileUrl, {
+                tileSize: opts.tileSize,
+                zoomOffset: opts.zoomOffset,
+                maxZoom: opts.maxZoom,
+                attribution: p_attribution,
+                id: 'mapbox.streets',
+                cacheProviderId: fn_deriveTileCacheProviderId(p_tileUrl)
+            });
+        tileLayer.on('tileunload', (event) => {
+            const tile = event.tile;
+            if (tile && tile._cachedObjectUrl) {
+                js_tileCache.fn_releaseTileUrl(tile._cachedObjectUrl);
+                tile._cachedObjectUrl = null;
+            }
+        });
+
+        return tileLayer;
+    }
+
+    /**
+     * Swap in a fresh basemap tile layer built from the current access
+     * token/style (localStorage first, falling back to js_siteConfig)
+     * without tearing down the rest of the map - used by the Settings
+     * "Refresh Map" button so it doesn't force a full page reload.
+     */
+    fn_refreshBasemap() {
+        if (this.m_Map == null) {
+            console.warn('Map not initialized');
+            return;
+        }
+
+        const token = js_localStorage.fn_getMapLeafletAccessToken() || js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN;
+        const urlTemplate = js_localStorage.fn_getMapLeafletUrlMap() || js_siteConfig.CONST_MAP_LEAFLET_URL_MAP;
+        if (!urlTemplate) {
+            console.error('Map tile URL not configured in js_siteConfig.CONST_MAP_LEAFLET_URL_MAP or CONST_MAP_LEAFLET_ACCESS_TOKEN');
+            return;
+        }
+        const tileUrl = fn_resolveTileUrl(urlTemplate, token);
+
+        const v_site_copyright = '&copy; <a href="' + (js_siteConfig.CONST_HOME_URL || '#') + '">' + (js_siteConfig.CONST_TITLE || 'Map') + '</a>';
+        const newTileLayer = this.fn_createBasemapTileLayer(tileUrl, v_site_copyright);
+        newTileLayer.addTo(this.m_Map);
+
+        if (this.m_tileLayer) {
+            this.m_Map.removeLayer(this.m_tileLayer);
+        }
+        this.m_tileLayer = newTileLayer;
+    }
+
+    /**
     * Handle map initialization onLoad.
     */
     fn_initMap(p_mapelement) {
@@ -182,29 +298,17 @@ class CLeafLetAndruavMap {
             zoom: 13,
             doubleClickZoom: false // Disable the default double-click zoom
         });
-        
+
         // Validate tile layer URL before using
-        const tileUrl = js_siteConfig.CONST_MAP_LEAFLET_URL_MAP + js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN;
+        const tileUrl = fn_resolveTileUrl(js_siteConfig.CONST_MAP_LEAFLET_URL_MAP, js_siteConfig.CONST_MAP_LEAFLET_ACCESS_TOKEN);
         if (!tileUrl) {
             console.error('Map tile URL not configured in js_siteConfig.CONST_MAP_LEAFLET_URL_MAP or CONST_MAP_LEAFLET_ACCESS_TOKEN');
             return;
         }
-        
-        const tileLayer = new CCachedTileLayer(tileUrl, {
-                maxZoom: 22,
-                attribution: v_site_copyright,
-                id: 'mapbox.streets',
-                cacheProviderId: 'leaflet-basemap'
-            });
-        tileLayer.on('tileunload', (event) => {
-            const tile = event.tile;
-            if (tile && tile._cachedObjectUrl) {
-                js_tileCache.fn_releaseTileUrl(tile._cachedObjectUrl);
-                tile._cachedObjectUrl = null;
-            }
-        });
-        tileLayer.addTo(this.m_Map);
-        
+
+        this.m_tileLayer = this.fn_createBasemapTileLayer(tileUrl, v_site_copyright);
+        this.m_tileLayer.addTo(this.m_Map);
+
 
         
         if (js_globals.CONST_MAP_EDITOR === true) {

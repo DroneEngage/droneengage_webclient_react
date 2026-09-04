@@ -70,10 +70,17 @@ export let CONST_WEBSOCKET_BRIDGE_PORT = 8812;
  */
 
 // CHOOSE YOUR MAP SOURCE
+// The URL template carries its own auth query-param name via a {token}
+// placeholder, so each provider can use its own param name (key=, api_key=,
+// apikey=, apiKey=, access_token=, ...) without any extra config field.
+// Legacy templates without {token} (e.g. "...?access_token=") still work -
+// the token is appended. See fn_resolveTileUrl in js_leafletmap.js.
 export let CONST_MAP_LEAFLET_ACCESS_TOKEN = "mapbox-YOUR-TOKEN-HERE";
-export let CONST_MAP_LEAFLET_URL_MAP = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=";
+export let CONST_MAP_LEAFLET_URL_MAP = "https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={token}";
 //export let CONST_MAP_LEAFLET_URL_MAP = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 //export let CONST_MAP_LEAFLET_URL_MAP = "https://airgap.local:88/sat_{x}_{y}_{z}.png"; // LOCAL MAP
+//export let CONST_MAP_LEAFLET_URL_MAP = "https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key={token}";
+//export let CONST_MAP_LEAFLET_URL_MAP = "https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}@2x.png?api_key={token}";
 
 
 

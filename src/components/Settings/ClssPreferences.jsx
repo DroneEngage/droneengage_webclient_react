@@ -23,15 +23,9 @@ class ClssPreferences extends React.Component {
   }
 
   componentDidMount() {
-    this.m_enableSpeechRef.current.checked = js_localStorage.fn_getSpeechEnabled();
-    this.m_volumeRangeRef.current.value = js_localStorage.fn_getVolume();
-    this.m_advancedRef.current.checked = js_localStorage.fn_getAdvancedOptionsEnabled();
-    this.m_gcsDisplayRef.current.checked = js_localStorage.fn_getGCSDisplayEnabled();
-    this.m_gcsShowMeRef.current.checked = js_localStorage.fn_getGCSShowMe();
-    this.m_ws2wsRef.current.checked = js_localStorage.fn_getWS2WSEnabled();
-    if (this.m_enableAISStreamRef.current) {
-      this.m_enableAISStreamRef.current.checked = js_localStorage.fn_getAISStreamEnabled();
-    }
+    // Initial values are set via defaultChecked / defaultValue in render
+    // so they survive parent re-renders (ClssGlobalSettings calls setState
+    // in its own componentDidMount which re-renders this component).
   }
 
   fn_changeVolume(e) {
@@ -122,6 +116,7 @@ class ClssPreferences extends React.Component {
             ref={this.m_enableSpeechRef}
             type="checkbox"
             id="check_enable_speech"
+            defaultChecked={js_localStorage.fn_getSpeechEnabled()}
             onClick={(e) => this.fn_enableSpeech(e)}
           />
           <label htmlFor="volume_range" className="col-sm-4 col-form-label al_c">
@@ -132,6 +127,7 @@ class ClssPreferences extends React.Component {
             className="form-range  col"
             id="volume_range"
             ref={this.m_volumeRangeRef}
+            defaultValue={js_localStorage.fn_getVolume()}
             disabled={v_speech_disabled === 'true' }
             onChange={(e) => this.fn_changeVolume(e)}
             onMouseUp={(e) => this.fn_handleMouseUp(e)}
@@ -146,6 +142,7 @@ class ClssPreferences extends React.Component {
             type="checkbox"
             id="check_gcs_display"
             ref={this.m_gcsDisplayRef}
+            defaultChecked={js_localStorage.fn_getGCSDisplayEnabled()}
             onClick={(e) => this.fn_enableGCS(e)}
           />
           <label
@@ -160,6 +157,7 @@ class ClssPreferences extends React.Component {
             type="checkbox"
             id="check_gcs_show_me"
             ref={this.m_gcsShowMeRef}
+            defaultChecked={js_localStorage.fn_getGCSShowMe()}
             onClick={(e) => this.fn_GCSShowMe(e)}
           />
         </div>
@@ -172,6 +170,7 @@ class ClssPreferences extends React.Component {
             type="checkbox"
             id="check_advanced"
             ref={this.m_advancedRef}
+            defaultChecked={js_localStorage.fn_getAdvancedOptionsEnabled()}
             onClick={(e) => this.fn_enableAdvanced(e)}
           />
           <label htmlFor="check_advanced" className="col-sm-4 col-form-label al_r">
@@ -182,6 +181,7 @@ class ClssPreferences extends React.Component {
             type="checkbox"
             id="enable_ws2ws_socket"
             ref={this.m_ws2wsRef}
+            defaultChecked={js_localStorage.fn_getWS2WSEnabled()}
             onClick={(e) => this.fn_enableWS2WS(e)}
           />
         </div>
@@ -195,6 +195,7 @@ class ClssPreferences extends React.Component {
               type="checkbox"
               id="check_enable_aisstream"
               ref={this.m_enableAISStreamRef}
+              defaultChecked={js_localStorage.fn_getAISStreamEnabled()}
               onClick={(e) => this.fn_enableAISStream(e)}
             />
           </div>

@@ -1,5 +1,6 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
+import { js_localStorage } from '../js_localStorage.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_andruavUnit from '../js_andruavUnit';
 import '../../css/css_map3d.css';
@@ -50,6 +51,66 @@ class TerrainExaggerationControl {
             this._buttons.push(btn);
             // Highlight the current factor on init.
             if (f === this._map3d.m_terrainExaggeration) btn.classList.add('active');
+        });
+
+        return this._container;
+    }
+
+    onRemove() {
+        if (this._container?.parentNode) {
+            this._container.parentNode.removeChild(this._container);
+        }
+        this._container = null;
+        this._buttons = [];
+    }
+}
+
+/**
+ * Custom Mapbox GL control: three buttons (x1, x2, x5) that multiply the
+ * on-screen size of every 3D model of the given target ('unit' or 'adsb')
+ * by the chosen factor, on top of the zoom-compensated scale from
+ * fn_computeModelScale.  Mounted top-left of the 3D map so the user can
+ * grow/shrink units and ADSB aircraft independently without changing zoom.
+ * @param {CAndruavMap3D} map3d
+ * @param {'unit'|'adsb'} target - which model set this control scales
+ * @param {string} label - short label shown before the buttons (e.g. 'UNITS')
+ */
+class ModelSizeControl {
+    constructor(map3d, target, label) {
+        this._map3d = map3d;
+        this._target = target;
+        this._label = label;
+        this._container = null;
+        this._buttons = [];
+    }
+
+    onAdd() {
+        this._container = document.createElement('div');
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group css_map3d_modelsize_ctrl';
+
+        const label = document.createElement('span');
+        label.className = 'css_map3d_modelsize_label';
+        label.textContent = this._label;
+        this._container.appendChild(label);
+
+        const current = this._target === 'adsb'
+            ? this._map3d.m_modelSizeMultiplierAdsb
+            : this._map3d.m_modelSizeMultiplierUnits;
+
+        const factors = [1, 2, 5];
+        factors.forEach((f) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = `x${f}`;
+            btn.title = `${this._label} size x${f}`;
+            btn.addEventListener('click', () => {
+                this._map3d.fn_setModelSizeMultiplier(f, this._target);
+                this._buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+            this._container.appendChild(btn);
+            this._buttons.push(btn);
+            if (f === current) btn.classList.add('active');
         });
 
         return this._container;
@@ -117,6 +178,8 @@ class CAndruavMap3D {
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
         this.m_terrainExaggeration = 1.3;        // current terrain exaggeration factor (adjustable via x1/x2/x5 buttons)
+        this.m_modelSizeMultiplierUnits = 1;     // user-selected size multiplier for drone units (x1/x2/x5, top-left)
+        this.m_modelSizeMultiplierAdsb = 1;      // user-selected size multiplier for ADSB aircraft (x1/x2/x5, top-left)
 
         // ---- ADSB traffic markers (mirrors js_leafletmap's fn_renderSingleAdsb) ----
         // ADSB traffic can number in the hundreds, so unlike drones (which
@@ -412,6 +475,33 @@ class CAndruavMap3D {
 
         // Add the terrain exaggeration control (x1 / x2 / x5 buttons).
         this.m_map.addControl(new TerrainExaggerationControl(this), 'bottom-right');
+        // Add the model size multiplier controls (x1 / x2 / x5 buttons, top-left):
+        // one for drone units, one for ADSB aircraft, each scaling its own set
+        // independently on top of the zoom-compensated factor.
+        this.m_map.addControl(new ModelSizeControl(this, 'unit', 'UNITS'), 'top-left');
+        this.m_map.addControl(new ModelSizeControl(this, 'adsb', 'ADSB'), 'top-left');
+    }
+
+    /**
+     * Swap in the current access token/style (localStorage first, falling
+     * back to js_siteConfig) without tearing down the map instance - used
+     * by the Settings "Refresh Map" button so it doesn't force a full page
+     * reload. mapboxgl re-fires 'style.load' after setStyle(), which the
+     * fn_initMap handler above already uses to re-add 3D buildings/terrain.
+     */
+    fn_refreshStyle() {
+        if (!this.m_map) {
+            console.warn('3D map not initialized');
+            return;
+        }
+
+        const token = js_localStorage.fn_getMapbox3DAccessToken() || js_siteConfig.CONST_MAPBOX_3D_ACCESS_TOKEN;
+        if (window.mapboxgl && token) {
+            window.mapboxgl.accessToken = token;
+        }
+
+        const style = js_localStorage.fn_getMapboxStyle() || js_siteConfig.CONST_MAPBOX_STYLE || 'mapbox://styles/mapbox/standard';
+        this.m_map.setStyle(style);
     }
 
     /**
@@ -472,8 +562,14 @@ class CAndruavMap3D {
 
         // ADSB traffic's glTF twin — only populated/shown when
         // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (fn_syncAdsbObject).
-        // No minzoom gating here: unlike drone units (icon/model LOD swap by
-        // zoom), ADSB is an explicit all-or-nothing icon-vs-glb switch.
+        // minzoom gates the 3D model the same way as the unit layer above:
+        // below CONST_MAP3D_MODEL_ZOOM_THRESHOLD the real-world scale needed
+        // for pixel-constant compensation becomes so enormous that Mapbox's
+        // model-layer rendering loses rotation precision (models default to
+        // north). Below the threshold the DOM markers (which handle rotation
+        // correctly at any size) take over; above it the 3D models render
+        // with correct heading + tilt. fn_updateModelLod swaps the ADSB
+        // DOM markers' icons between real and transparent accordingly.
         if (!this.m_map.getSource('adsb-3d-models')) {
             this.m_map.addSource('adsb-3d-models', {
                 type: 'geojson',
@@ -486,6 +582,7 @@ class CAndruavMap3D {
                 id: 'adsb-3d-models-layer',
                 type: 'model',
                 source: 'adsb-3d-models',
+                minzoom: js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
                 layout: {
                     'model-id': ['get', 'modelId']
                 },
@@ -534,27 +631,44 @@ class CAndruavMap3D {
         this.m_markers.forEach(marker => {
             this.fn_applyMarkerIconForMode(marker, showModels);
         });
+
+        // In GLB mode, ADSB DOM markers swap between their real icon (below
+        // threshold — the 3D model layer is hidden by minzoom, so the DOM
+        // marker must be visible with correct heading) and the transparent
+        // placeholder (at/above threshold — the 3D model renders instead).
+        // In icon mode ADSB markers always show their real icon, so skip.
+        if (js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB) {
+            this.m_adsbMarkers.forEach(marker => {
+                this.fn_applyMarkerIconForMode(marker, showModels);
+            });
+        }
     }
 
     /**
-     * Computes the [x,y,z] model-scale for the current zoom, compensating
-     * for the fact that model-scale is real-world meters (not screen
-     * pixels): doubling zoom halves meters-per-pixel, so we must grow the
-     * model's real-world scale as you zoom out just to hold its on-screen
-     * size steady. CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT lets it
-     * overcompensate (>1) so it visibly keeps growing larger while zooming
-     * out, rather than merely holding steady (=1).
-     * factor = 2^((referenceZoom - zoom) * exponent), clamped to avoid
-     * degenerate sizes at extreme zoom.
+     * Computes the [x,y,z] model-scale for the current zoom so the glTF
+     * model keeps a CONSTANT on-screen (icon-like) size regardless of zoom.
+     * model-scale is real-world meters (not screen pixels): each zoom level
+     * halves meters-per-pixel, so to hold the screen size steady the
+     * real-world scale must grow by 2× per zoom-out level (and shrink by
+     * 2× per zoom-in level). With exponent = 1.0 this is exact pixel-
+     * constant compensation:
+     *   zoomFactor = 2^((refZoom - zoom) * exponent), clamped to [min,max].
+     * The user-selected multiplier for the given target ('unit' or 'adsb')
+     * is then applied on top, so final scale = base * zoomFactor * multiplier.
+     * @param {number} zoom
+     * @param {'unit'|'adsb'} [target='unit'] - which multiplier to apply
      */
-    fn_computeModelScale(zoom) {
+    fn_computeModelScale(zoom, target = 'unit') {
         const refZoom = js_globals.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM;
         const base = js_globals.CONST_MAP3D_MODEL_SCALE;
         const exponent = js_globals.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT;
         const minFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR;
         const maxFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR;
+        const multiplier = (target === 'adsb' ? this.m_modelSizeMultiplierAdsb : this.m_modelSizeMultiplierUnits) || 1;
 
-        const factor = Math.min(maxFactor, Math.max(minFactor, Math.pow(2, (refZoom - zoom) * exponent)));
+        const zoomFactor = Math.min(maxFactor, Math.max(minFactor, Math.pow(2, (refZoom - zoom) * exponent)));
+        const factor = zoomFactor * multiplier;
+        console.log(`factor:${factor} (zoom:${zoomFactor} x${multiplier} ${target})`);
         return base.map(v => v * factor);
     }
 
@@ -586,17 +700,39 @@ class CAndruavMap3D {
     fn_updateModelScale() {
         if (!this.m_map || !this.m_modelLayerReady) return;
 
-        const scale = this.fn_computeModelScale(this.m_map.getZoom());
+        const zoom = this.m_map.getZoom();
 
         if (this.m_unitModelFeatures.size > 0) {
+            const scale = this.fn_computeModelScale(zoom, 'unit');
             this.m_unitModelFeatures.forEach(feature => { feature.properties.scale = scale; });
             this.fn_flushUnitModels();
         }
 
         if (this.m_adsbModelFeatures.size > 0) {
+            const scale = this.fn_computeModelScale(zoom, 'adsb');
             this.m_adsbModelFeatures.forEach(feature => { feature.properties.scale = scale; });
             this.fn_flushAdsbModels();
         }
+    }
+
+    /**
+     * Sets the user-selected model size multiplier (x1 / x2 / x5) for the
+     * given target ('unit' or 'adsb') and re-applies it to that target's
+     * 3D model features immediately. Called by the ModelSizeControl buttons.
+     * The multiplier is applied on top of the zoom-compensated factor in
+     * fn_computeModelScale, so the final on-screen scale for a feature of
+     * the given target = base * zoomFactor * this multiplier.
+     * @param {number} factor - 1, 2, or 5
+     * @param {'unit'|'adsb'} target
+     */
+    fn_setModelSizeMultiplier(factor, target) {
+        if (!Number.isFinite(factor) || factor <= 0) return;
+        if (target === 'adsb') {
+            this.m_modelSizeMultiplierAdsb = factor;
+        } else {
+            this.m_modelSizeMultiplierUnits = factor;
+        }
+        this.fn_updateModelScale();
     }
 
     /**
@@ -947,8 +1083,9 @@ class CAndruavMap3D {
 
         const roll = unit?.m_Nav_Info?.p_Orientation?.roll;
         const pitch = unit?.m_Nav_Info?.p_Orientation?.pitch;
+        // Negated: model-rotation y-axis sign is opposite to MAVLink roll.
         const rollDeg = Number.isFinite(roll) ? roll * 180 / Math.PI : 0;
-        const pitchDeg = Number.isFinite(pitch) ? pitch * 180 / Math.PI : 0;
+        const pitchDeg = Number.isFinite(pitch) ? -pitch * 180 / Math.PI : 0;
 
         let modelId;
         if (unit.m_VehicleType === js_andruavUnit.CONTROL_UNIT) {
@@ -967,7 +1104,7 @@ class CAndruavMap3D {
         // feature already exists (fn_updateModelScale/fn_setUnitModelTint
         // keep them current independently); otherwise seed defaults.
         const existing = this.m_unitModelFeatures.get(id);
-        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom());
+        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom(), 'unit');
         const tintColor = existing?.properties?.tintColor || '#ffffff';
         const tintIntensity = existing?.properties?.tintIntensity || 0;
 
@@ -1238,8 +1375,13 @@ class CAndruavMap3D {
 
         // In GLB mode, swap the icon to a transparent placeholder so the
         // marker is visually invisible but still catches click/hover for
-        // the 3D model sitting on top of it.
-        this.fn_applyMarkerIconForMode(marker, isGlbMode);
+        // the 3D model sitting on top of it — but ONLY when the 3D model
+        // layer is actually active (at/above CONST_MAP3D_MODEL_ZOOM_THRESHOLD).
+        // Below the threshold the model layer is hidden by minzoom (the
+        // enormous scale needed for pixel-constant compensation would lose
+        // rotation precision in Mapbox), so the DOM marker must show its
+        // real icon with correct heading instead.
+        this.fn_applyMarkerIconForMode(marker, isGlbMode && this.m_modelLodActive);
 
         return marker;
     }
@@ -1256,7 +1398,7 @@ class CAndruavMap3D {
 
         const zOffset = altAboveGround * this.m_terrainExaggeration;
         const existing = this.m_adsbModelFeatures.get(icao);
-        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom());
+        const scale = existing?.properties?.scale || this.fn_computeModelScale(this.m_map.getZoom(), 'adsb');
         const tintColor = existing?.properties?.tintColor || '#ffffff';
         const tintIntensity = existing?.properties?.tintIntensity || 0;
 
