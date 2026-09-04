@@ -1061,6 +1061,27 @@ div#displays {
 }
 
 
+/* ADSB toggle button (under the +/- zoom controls).
+   active = ADSB enabled (highlighted), inactive = disabled (dimmed). */
+.leaflet-adsb-toggle-control a.leaflet-adsb-toggle-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	line-height: 1;
+}
+
+.leaflet-adsb-toggle-control a.leaflet-adsb-toggle-active {
+	background-color: #fff3cd;
+	border: 1px solid #ffc107;
+}
+
+.leaflet-adsb-toggle-control a.leaflet-adsb-toggle-inactive {
+	opacity: 0.45;
+}
+
+
 #css_video_ctrl_panel {
 	display: flex;
 	flex-direction: row;

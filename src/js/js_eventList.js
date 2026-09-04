@@ -109,6 +109,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_onAdvancedMode",
 			"EE_ErrorMessage",
 			"EE_adsbExpiredUpdate",
+		"EE_adsbCleared",
 
 
 			"EE_Auth_Login_In_Progress",

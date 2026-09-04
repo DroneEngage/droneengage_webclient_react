@@ -101,3 +101,19 @@
   background: #27ae60;
   color: #fff;
 }
+
+/* ADSB toggle button (replaces the 'ADSB' text label in the model-size
+   control). active = ADSB enabled (highlighted), inactive = dimmed. */
+.css_map3d_modelsize_ctrl button.css_map3d_adsb_toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  opacity: 0.45;
+}
+
+.css_map3d_modelsize_ctrl button.css_map3d_adsb_toggle.active {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  opacity: 1;
+}

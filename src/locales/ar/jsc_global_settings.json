@@ -32,5 +32,6 @@
   "advancedOptionsLabel": "الخيارات المتقدمة",
   "enableADSBLabel": "تفعيل ADSB",
     "adsbRadiusLabel": "ADSB Radius",
-  "enableAISStreamLabel": "تفعيل AIS"
+  "enableAISStreamLabel": "تفعيل AIS",
+  "enableWindLabel": "تفعيل سهم الرياح"
 }

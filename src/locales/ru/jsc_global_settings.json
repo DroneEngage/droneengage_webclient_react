@@ -32,5 +32,6 @@
   "advancedOptionsLabel": "Расширенные настройки",
   "enableADSBLabel": "Включить ADSB",
     "adsbRadiusLabel": "ADSB Radius",
-  "enableAISStreamLabel": "Включить AIS"
+  "enableAISStreamLabel": "Включить AIS",
+  "enableWindLabel": "Включить стрелку ветра"
 }

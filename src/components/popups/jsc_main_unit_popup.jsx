@@ -1,6 +1,8 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
-import { hlp_getFlightMode } from '../../js/js_main.js';
+import { hlp_getFlightMode, fn_getWindData } from '../../js/js_main.js';
+import { js_globals } from '../../js/js_globals.js';
+import * as js_helpers from '../../js/js_helpers.js';
 
 class ClssMainUnitPopup extends React.Component {
   constructor() {
@@ -91,6 +93,37 @@ class ClssMainUnitPopup extends React.Component {
 
     markerContent.push(speedDisplay('groundSpeed', vSpeed));
     markerContent.push(speedDisplay('airSpeed', vAirSpeed));
+
+    // Wind info (from Open-Meteo via js_windProvider). Wind data is kept
+    // in a module-level Map keyed by partyID (see js_main.js) because unit
+    // objects are frozen and cannot carry a m_windData property.
+    // windData = { speedMs, directionDeg, gustsMs, level }
+    // Speed is converted to mph when v_useMetricSystem is false (mirrors
+    // fn_changeSpeed in js_main.js). Direction is shown in degrees.
+    const unitPartyId = c_unit.getPartyID ? c_unit.getPartyID() : null;
+    const wd = unitPartyId ? fn_getWindData(unitPartyId) : null;
+    if (wd) {
+      const isMetric = js_globals.v_useMetricSystem !== false;
+      const windSpeed = isMetric
+        ? (wd.speedMs || 0).toFixed(1)
+        : ((wd.speedMs || 0) * js_helpers.CONST_METER_TO_MILE).toFixed(1);
+      const windUnit = isMetric ? t('metersPerSecond') : 'mph';
+      const gusts = wd.gustsMs != null
+        ? (isMetric ? wd.gustsMs.toFixed(1) : (wd.gustsMs * js_helpers.CONST_METER_TO_MILE).toFixed(1))
+        : null;
+      markerContent.push(
+        <p key={`${this.key}-wind-${keyCounter++}`} className="m-0 p-0">
+          <span className="text-warning">{t('wind')}:</span>
+          <span className="text-success"> {windSpeed}</span>
+          <span className="text-primary"> {windUnit}</span>
+          <span className="text-warning"> {t('direction')}:</span>
+          <span className="text-success"> {(wd.directionDeg || 0).toFixed(0)}&deg;</span>
+          {gusts != null && (
+            <span className="text-secondary"> ({t('gusts')}: {gusts} {windUnit})</span>
+          )}
+        </p>
+      );
+    }
 
     markerContent.push(
       <p key={`${this.key}-location-${keyCounter++}`} className="m-0 p-0">

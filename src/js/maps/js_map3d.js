@@ -1,6 +1,8 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
 import { js_localStorage } from '../js_localStorage.js';
+import { js_eventEmitter } from '../js_eventEmitter.js';
+import { EVENTS as js_event } from '../js_eventList.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_andruavUnit from '../js_andruavUnit';
 import '../../css/css_map3d.css';
@@ -88,10 +90,47 @@ class ModelSizeControl {
         this._container = document.createElement('div');
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group css_map3d_modelsize_ctrl';
 
-        const label = document.createElement('span');
-        label.className = 'css_map3d_modelsize_label';
-        label.textContent = this._label;
-        this._container.appendChild(label);
+        // For the ADSB control, the label is a clickable toggle button
+        // (with the plane icon) that enables/disables ADSB — mirroring the
+        // leaflet map's ADSB toggle button. For other targets it stays a
+        // plain text label.
+        if (this._target === 'adsb') {
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'css_map3d_adsb_toggle';
+            toggle.title = 'Toggle ADSB';
+
+            const img = document.createElement('img');
+            img.src = '/images/Plane_Track.png';
+            img.alt = 'ADSB';
+            img.style.width = '16px';
+            img.style.height = '16px';
+            img.style.verticalAlign = 'middle';
+            toggle.appendChild(img);
+
+            this._adsbToggleBtn = toggle;
+            this._updateAdsbToggleState();
+
+            toggle.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                const enabled = js_localStorage.fn_getADSBEnabled();
+                js_localStorage.fn_setADSBEnabled(!enabled);
+                js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+                this._updateAdsbToggleState();
+            });
+
+            this._container.appendChild(toggle);
+
+            // Keep the toggle state in sync with external changes (e.g. the
+            // leaflet map button or the settings checkbox).
+            this._boundOnPreferenceChanged = () => this._updateAdsbToggleState();
+            js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
+        } else {
+            const label = document.createElement('span');
+            label.className = 'css_map3d_modelsize_label';
+            label.textContent = this._label;
+            this._container.appendChild(label);
+        }
 
         const current = this._target === 'adsb'
             ? this._map3d.m_modelSizeMultiplierAdsb
@@ -116,7 +155,23 @@ class ModelSizeControl {
         return this._container;
     }
 
+    // Reflect the current ADSB enabled state on the toggle button.
+    _updateAdsbToggleState() {
+        if (!this._adsbToggleBtn) return;
+        const enabled = js_localStorage.fn_getADSBEnabled();
+        if (enabled) {
+            this._adsbToggleBtn.classList.add('active');
+        } else {
+            this._adsbToggleBtn.classList.remove('active');
+        }
+    }
+
     onRemove() {
+        if (this._boundOnPreferenceChanged) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
+            this._boundOnPreferenceChanged = null;
+        }
+        this._adsbToggleBtn = null;
         if (this._container?.parentNode) {
             this._container.parentNode.removeChild(this._container);
         }

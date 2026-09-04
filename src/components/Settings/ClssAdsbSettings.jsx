@@ -41,14 +41,25 @@ class ClssAdsbSettings extends React.Component {
       isMetric: js_globals.v_useMetricSystem,
     };
     this._boundOnUnitSystemChanged = this._onUnitSystemChanged.bind(this);
+    this._boundOnPreferenceChanged = this._onPreferenceChanged.bind(this);
   }
 
   _onUnitSystemChanged() {
     this.setState({ isMetric: js_globals.v_useMetricSystem });
   }
 
+  // Re-sync the enable checkbox from localStorage when the ADSB preference
+  // changes from outside this tab (e.g. the map toggle button). The checkbox
+  // is uncontrolled (ref-based), so without this it stays stale.
+  _onPreferenceChanged() {
+    if (this.m_enableADSBRef.current) {
+      this.m_enableADSBRef.current.checked = js_localStorage.fn_getADSBEnabled();
+    }
+  }
+
   componentDidMount() {
     js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, this._boundOnUnitSystemChanged);
+    js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
     const cfg = js_siteConfig.CONST_ADSB_CONFIG || {};
 
     if (this.m_enableADSBRef.current) {
@@ -74,6 +85,7 @@ class ClssAdsbSettings extends React.Component {
 
   componentWillUnmount() {
     js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
+    js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
   }
 
   fn_enableADSB(e) {

@@ -270,6 +270,20 @@ class CLocalStorage {
         return this._getValue(js_globals.LS_ENABLE_AISSTREAM, 'true') === 'true';
     }
 
+    // Wind arrow Enabled (runtime preference). Always returns false when the
+    // site feature flag CONST_FEATURE.DISABLE_WIND is true — the feature
+    // does not exist in that case, regardless of the stored preference.
+    fn_setWindEnabled(value) {
+        this._setValue(js_globals.LS_ENABLE_WIND, value.toString());
+    }
+
+    fn_getWindEnabled() {
+        if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_WIND === true) {
+            return false;
+        }
+        return this._getValue(js_globals.LS_ENABLE_WIND, 'false') === 'true';
+    }
+
     // ADSB geolocation fallback radius in kilometers (used when no drones
     // are online). Stored in km as the canonical unit.
     fn_setAdsbRadiusKm(value) {

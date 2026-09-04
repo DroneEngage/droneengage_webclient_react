@@ -119,6 +119,7 @@ export let CONST_MODULE_VERSIONS = {
 export let CONST_FEATURE = {
     DISABLE_AISStream: false,
     DISABLE_ADSB: false,
+    DISABLE_WIND: false,
     DISABLE_UNIT_NAMING: false,
     DISABLE_UDPPROXY_UPDATE: false,
     DISABLE_SWARM: false,
@@ -199,6 +200,27 @@ export let CONST_ADSB_CONFIG = {
     },
 };
 
+/**
+ * Wind arrow configuration.
+ *
+ * The WebClient fetches wind data from Open-Meteo (free, no API key) via
+ * js_windProvider.js and draws a wind arrow next to the currently selected
+ * DroneEngage unit on the map. See js_globals.CONST_MAP_WIND_ARROW_* for
+ * the visual constants.
+ *
+ *   ENABLED:        default state (overridable from Preferences + localStorage)
+ *   CELL_ROUNDING:  decimal places to round lat/lng to for cache cell key
+ *                   (1 = ~11 km, the Open-Meteo grid resolution)
+ *   REFRESH_RATE_MS: minimum interval between re-fetches for the same cell
+ *                   (the cache is also keyed by UTC hour, so this is a
+ *                   safety cap on top of the hourly key change)
+ */
+export let CONST_WIND_CONFIG = {
+    ENABLED: false,
+    CELL_ROUNDING: 1,
+    REFRESH_RATE_MS: 3600000,
+};
+
 
 
 /**
@@ -238,6 +260,7 @@ export function fn_applyRuntimeConfig(data) {
         if (data.CONST_FEATURE !== undefined) CONST_FEATURE = { ...CONST_FEATURE, ...data.CONST_FEATURE };
         if (data.CONST_ICE_SERVERS !== undefined) CONST_ICE_SERVERS = data.CONST_ICE_SERVERS;
         if (data.CONST_ADSB_CONFIG !== undefined) CONST_ADSB_CONFIG = { ...CONST_ADSB_CONFIG, ...data.CONST_ADSB_CONFIG };
+        if (data.CONST_WIND_CONFIG !== undefined) CONST_WIND_CONFIG = { ...CONST_WIND_CONFIG, ...data.CONST_WIND_CONFIG };
 
         // Apply localStorage overrides for ADSB config (localStorage has
         // highest priority, then config.local/config.json, then defaults

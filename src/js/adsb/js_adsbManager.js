@@ -467,6 +467,10 @@ class AdsbManager {
     _onPreferenceChanged() {
         if (!isADSBEnabled()) {
             this._stop();
+            // Tell the map layer to drop every ADSB marker, hide the query
+            // circle, and clear the registry — stale aircraft must not linger
+            // after the polling loop stops.
+            js_eventEmitter.fn_dispatch(js_event.EE_adsbCleared);
             js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, js_adsbUnit);
         } else {
             // AIS preference may have changed — rebuild the provider so the

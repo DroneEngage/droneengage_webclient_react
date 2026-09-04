@@ -31,6 +31,7 @@ import { js_localStorage } from './js_localStorage'
 import { js_webrtcstream } from './js_webrtcthin2.js'
 import { js_adsbUnit } from './js_adsbUnit.js'
 import { js_adsbManager } from './adsb/js_adsbManager.js'
+import { js_windProvider } from './weather/js_windProvider.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
@@ -58,6 +59,134 @@ var info_unit_context_popup = null;
 var v_lastHighlightedUnit = null;
 let selectedMissionFilesToRead = "";
 let selectedMissionFilesToWrite = "";
+
+/**
+ * Module-level wind-data store, keyed by unit partyID.
+ *
+ * Unit objects (CAndruavUnit) are frozen / non-extensible, so wind data
+ * cannot be attached as `unit.m_windData`. This Map is the mutable side
+ * cache that the map-render code writes to and the popup reads from
+ * synchronously. Entries are pruned in fn_clearStaleWindArrows below.
+ *
+ * value shape: { speedMs, directionDeg, gustsMs, level }
+ */
+const m_windDataByUnitId = new Map();
+
+/**
+ * Store wind data for a unit (by partyID). Replaces any previous entry.
+ * @param {string} unitId partyID
+ * @param {object} wind   { speedMs, directionDeg, gustsMs, level }
+ */
+export function fn_setWindData(unitId, wind) {
+	if (!unitId) return;
+	m_windDataByUnitId.set(unitId, wind);
+}
+
+/**
+ * Synchronous lookup of the latest wind data for a unit.
+ * @param {string} unitId partyID
+ * @returns {object|null} { speedMs, directionDeg, gustsMs, level } or null
+ */
+export function fn_getWindData(unitId) {
+	if (!unitId) return null;
+	return m_windDataByUnitId.get(unitId) || null;
+}
+
+/**
+ * Remove wind data for one unit (on stale cleanup / removal).
+ * @param {string} unitId partyID
+ */
+export function fn_clearWindData(unitId) {
+	if (!unitId) return;
+	m_windDataByUnitId.delete(unitId);
+}
+
+/**
+ * Remove ALL wind data (on feature disable).
+ */
+export function fn_clearAllWindData() {
+	m_windDataByUnitId.clear();
+}
+
+/**
+ * Updates (or clears) the wind arrows on the leaflet map for ALL units.
+ * Called on EE_unitHighlighted (immediate refresh for the selected unit)
+ * and on EE_onPreferenceChanged (toggle on/off). Fetches wind from
+ * Open-Meteo via js_windProvider (cached per rounded cell + UTC hour).
+ * When the wind feature is disabled, all arrows are cleared.
+ */
+function fn_updateAllWindArrows() {
+	if (!js_localStorage.fn_getWindEnabled()) {
+		js_leafletmap.fn_clearAllWindArrows();
+		fn_clearAllWindData();
+		return;
+	}
+	const units = js_andruavUnit.AndruavUnitList.fn_getUnitsArray();
+	if (!units || units.length === 0) {
+		js_leafletmap.fn_clearAllWindArrows();
+		fn_clearAllWindData();
+		return;
+	}
+	const activeIds = new Set();
+	units.forEach(([partyId, unit]) => {
+		activeIds.add(partyId);
+		// Fire-and-forget: the provider caches per cell+hour, so this is
+		// cheap after the first fetch. Wind data is stored in the module
+		// map (not on the frozen unit) so the popup can read it
+		// synchronously (see jsc_main_unit_popup.jsx).
+		js_windProvider.fn_getWindForUnit(unit).then(wind => {
+			if (!wind) return;
+			fn_setWindData(partyId, wind);
+			// Unit may have gone offline between fetch and resolve.
+			if (js_andruavUnit.AndruavUnitList.fn_getUnit(partyId)) {
+				js_leafletmap.fn_setWindArrow(unit, wind);
+			}
+		});
+	});
+	// Remove arrows + wind data for units no longer online (self-cleaning).
+	js_leafletmap.fn_clearStaleWindArrows(activeIds);
+	for (const id of m_windDataByUnitId.keys()) {
+		if (!activeIds.has(id)) m_windDataByUnitId.delete(id);
+	}
+}
+
+/**
+ * Immediate single-unit wind arrow update (used on unit selection so the
+ * arrow appears instantly without waiting for the throttle). Also stores
+ * wind data in the module map for the popup.
+ */
+function fn_updateWindArrow(p_andruavUnit) {
+	if (!js_localStorage.fn_getWindEnabled()) {
+		js_leafletmap.fn_clearAllWindArrows();
+		fn_clearAllWindData();
+		return;
+	}
+	if (!p_andruavUnit) return;
+	const partyId = p_andruavUnit.getPartyID ? p_andruavUnit.getPartyID() : null;
+	js_windProvider.fn_getWindForUnit(p_andruavUnit).then(wind => {
+		if (!wind) return;
+		fn_setWindData(partyId, wind);
+		// Guard against the unit having been removed by the time the
+		// (cached) promise resolves.
+		if (js_andruavUnit.AndruavUnitList.fn_getUnit(partyId)) {
+			js_leafletmap.fn_setWindArrow(p_andruavUnit, wind);
+		}
+	});
+}
+
+/**
+ * Throttled refresh of ALL wind arrows on telemetry sync. Telemetry can
+ * arrive at 1-10 Hz per unit, but wind data is cached hourly + per ~11km
+ * cell, so refreshing faster than CONST_MAP_WIND_ARROW_REFRESH_MS just
+ * rebuilds SVG icons for nothing. The fetch is a cache hit (no network),
+ * but the throttle avoids the async plumbing + icon rebuild overhead on
+ * every packet.
+ */
+function fn_refreshWindArrowPosition() {
+	if (!js_localStorage.fn_getWindEnabled()) return;
+	if (Date.now() - js_leafletmap.m_windArrowLastRefresh < js_globals.CONST_MAP_WIND_ARROW_REFRESH_MS) return;
+	fn_updateAllWindArrows();
+}
 
 export const setSelectedMissionFilePathToRead = function (p_file_name) {
 	selectedMissionFilesToRead = p_file_name;
@@ -888,6 +1017,37 @@ function fn_adsbExpiredUpdate(me) {
 	js_map3d.fn_flushAdsbTethers();
 
 	fn_updateAdsbQueryCircle();
+}
+
+/**
+ * Remove every ADSB marker from both the 2D Leaflet map and the 3D
+ * Mapbox map, clear the registry, hide the query-area circle, and drop
+ * any 3D selection. Called when ADSB is disabled (EE_adsbCleared) so
+ * stale aircraft don't linger on the map after the polling loop stops.
+ */
+function fn_clearAdsbFromMap() {
+	const list = (js_adsbUnit && js_adsbUnit.List) ? js_adsbUnit.List : null;
+	if (list) {
+		const keys = Object.keys(list);
+		for (let i = 0; i < keys.length; ++i) {
+			const adsb_obj = list[keys[i]];
+			if (!adsb_obj) continue;
+			if (adsb_obj.p_marker) {
+				js_leafletmap.fn_hideItem(adsb_obj.p_marker);
+				adsb_obj.p_marker = null;
+			}
+			js_map3d.fn_removeAdsbMarker(adsb_obj);
+		}
+	}
+	fn_clearAdsbMap3dSelection();
+	js_map3d.fn_flushAdsbTethers();
+	js_adsbUnit.fn_clear();
+
+	// Hide the dotted ADSB query-area circle as well.
+	if (v_adsbQueryCircle) {
+		js_leafletmap.fn_hideItem(v_adsbQueryCircle);
+		v_adsbQueryCircle = null;
+	}
 }
 
 function fn_adsbObjectUpdate(me, p_registry) {
@@ -2745,6 +2905,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 		}
 
 		js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
+		fn_refreshWindArrowPosition();
 		const marker3d = js_map3d.fn_syncUnit(p_andruavUnit, v_image);
 
 		if (marker3d && p_andruavUnit.m_gui.m_marker3d_events_attached !== true) {
@@ -3443,6 +3604,13 @@ function fn_connectWebSocket(me) {
 
 		js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted, this, function (me, p_andruavUnit) {
 			js_map3d.fn_focusUnit(p_andruavUnit);
+			fn_updateWindArrow(p_andruavUnit);
+		});
+
+		// Refresh/clear the wind arrows when the Wind preference toggle
+		// changes (EE_onPreferenceChanged is dispatched by the checkbox).
+		js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, function () {
+			fn_updateAllWindArrows();
 		});
 
 
@@ -3547,6 +3715,8 @@ export function fn_on_ready() {
 	if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+		// Clear all ADSB markers from the map when ADSB is disabled.
+		js_eventEmitter.fn_subscribe(js_event.EE_adsbCleared, this, fn_clearAdsbFromMap);
 		// Re-render all ADSB markers when the unit system (metric/imperial) changes
 		// so tooltips switch between m/km/h and ft/mph immediately.
 		js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, fn_adsbUnitSystemChanged);
@@ -3574,6 +3744,7 @@ export function fn_on_ready() {
 
 		js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted, this, function (me, p_andruavUnit) {
 			js_map3d.fn_focusUnit(p_andruavUnit);
+			fn_updateWindArrow(p_andruavUnit);
 		});
 
 		$('#btn_showControl').click(

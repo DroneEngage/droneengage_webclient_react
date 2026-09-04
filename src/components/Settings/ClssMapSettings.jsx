@@ -16,35 +16,58 @@ import { js_map3d } from '../../js/maps/js_map3d.js';
 // and the token field is ignored for those.
 const LEAFLET_STYLE_OPTIONS = [
   // ---- Mapbox (512px @2x HiDPI, access_token=) ----
-  { id: 'mapbox:satellite-v9', label: 'Satellite — pure satellite imagery (no roads, boundaries, or text)', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:satellite-streets-v12', label: 'Satellite Streets — satellite imagery with vector road overlays, borders, and place labels', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:streets-v12', label: 'Streets — standard detailed vector street map', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:outdoors-v12', label: 'Outdoors — topographic map for hiking/outdoors (elevation contours, trails, parks)', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:light-v11', label: 'Light — minimalist light-gray basemap', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:dark-v11', label: 'Dark — minimalist dark-themed basemap', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:navigation-day-v1', label: 'Navigation Day — high-contrast turn-by-turn driving map (day mode)', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-day-v1/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
-  { id: 'mapbox:navigation-night-v1', label: 'Navigation Night — high-contrast turn-by-turn driving map (night mode)', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-night-v1/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:satellite-v9', label: 'Satellite — pure satellite imagery (no roads, boundaries, or text) [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:satellite-v9-256', label: 'Satellite — pure satellite imagery (no roads, boundaries, or text) [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:satellite-streets-v12', label: 'Satellite Streets — satellite imagery with vector road overlays, borders, and place labels [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:satellite-streets-v12-256', label: 'Satellite Streets — satellite imagery with vector road overlays, borders, and place labels [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:streets-v12', label: 'Streets — standard detailed vector street map [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:streets-v12-256', label: 'Streets — standard detailed vector street map [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:outdoors-v12', label: 'Outdoors — topographic map for hiking/outdoors (elevation contours, trails, parks) [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:outdoors-v12-256', label: 'Outdoors — topographic map for hiking/outdoors (elevation contours, trails, parks) [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:light-v11', label: 'Light — minimalist light-gray basemap [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:light-v11-256', label: 'Light — minimalist light-gray basemap [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:dark-v11', label: 'Dark — minimalist dark-themed basemap [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:dark-v11-256', label: 'Dark — minimalist dark-themed basemap [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:navigation-day-v1', label: 'Navigation Day — high-contrast turn-by-turn driving map (day mode) [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-day-v1/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:navigation-day-v1-256', label: 'Navigation Day — high-contrast turn-by-turn driving map (day mode) [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-day-v1/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
+  { id: 'mapbox:navigation-night-v1', label: 'Navigation Night — high-contrast turn-by-turn driving map (night mode) [HiDPI @2x]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-night-v1/tiles/512/{z}/{x}/{y}@2x?access_token={token}', color: 'text-primary' },
+  { id: 'mapbox:navigation-night-v1-256', label: 'Navigation Night — high-contrast turn-by-turn driving map (night mode) [Standard 256px]', urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/navigation-night-v1/tiles/256/{z}/{x}/{y}?access_token={token}', color: 'text-success' },
 
   // ---- MapTiler (512px @2x HiDPI, key=) ----
-  { id: 'maptiler:satellite', label: 'Satellite — pure satellite imagery', urlTemplate: 'https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key={token}', color: 'text-success' },
-  { id: 'maptiler:hybrid', label: 'Hybrid — satellite imagery with vector overlays and labels', urlTemplate: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}@2x.jpg?key={token}', color: 'text-success' },
-  { id: 'maptiler:streets', label: 'Streets — standard street map', urlTemplate: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-success' },
-  { id: 'maptiler:topo', label: 'Topo — topographic map with contours and trails', urlTemplate: 'https://api.maptiler.com/maps/topo-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-success' },
-  { id: 'maptiler:dark', label: 'Dark — dark-themed basemap', urlTemplate: 'https://api.maptiler.com/maps/dark-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-success' },
-  { id: 'maptiler:light', label: 'Light — light-themed basemap', urlTemplate: 'https://api.maptiler.com/maps/light-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-success' },
+  { id: 'maptiler:satellite', label: 'Satellite — pure satellite imagery [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key={token}', color: 'text-primary' },
+  { id: 'maptiler:satellite-256', label: 'Satellite — pure satellite imagery [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/satellite/{z}/{x}/{y}.jpg?key={token}', color: 'text-success' },
+  { id: 'maptiler:hybrid', label: 'Hybrid — satellite imagery with vector overlays and labels [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}@2x.jpg?key={token}', color: 'text-primary' },
+  { id: 'maptiler:hybrid-256', label: 'Hybrid — satellite imagery with vector overlays and labels [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key={token}', color: 'text-success' },
+  { id: 'maptiler:streets', label: 'Streets — standard street map [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-primary' },
+  { id: 'maptiler:streets-256', label: 'Streets — standard street map [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key={token}', color: 'text-success' },
+  { id: 'maptiler:topo', label: 'Topo — topographic map with contours and trails [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/topo-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-primary' },
+  { id: 'maptiler:topo-256', label: 'Topo — topographic map with contours and trails [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/topo-v2/{z}/{x}/{y}.png?key={token}', color: 'text-success' },
+  { id: 'maptiler:dark', label: 'Dark — dark-themed basemap [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/dark-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-primary' },
+  { id: 'maptiler:dark-256', label: 'Dark — dark-themed basemap [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/dark-v2/{z}/{x}/{y}.png?key={token}', color: 'text-success' },
+  { id: 'maptiler:light', label: 'Light — light-themed basemap [HiDPI @2x]', urlTemplate: 'https://api.maptiler.com/maps/light-v2/{z}/{x}/{y}@2x.png?key={token}', color: 'text-primary' },
+  { id: 'maptiler:light-256', label: 'Light — light-themed basemap [Standard 256px]', urlTemplate: 'https://api.maptiler.com/maps/light-v2/{z}/{x}/{y}.png?key={token}', color: 'text-success' },
 
   // ---- Stadia Maps (512px @2x HiDPI, api_key=) ----
-  { id: 'stadia:alidade_smooth', label: 'Alidade Smooth — smooth light basemap', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-success' },
-  { id: 'stadia:alidade_smooth_dark', label: 'Alidade Smooth Dark — smooth dark basemap', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-success' },
-  { id: 'stadia:stamen_terrain', label: 'Stamen Terrain — terrain with hill shading and contours', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-success' },
-  { id: 'stadia:stamen_watercolor', label: 'Stamen Watercolor — artistic watercolor basemap', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}@2x.jpg?api_key={token}', color: 'text-success' },
-  { id: 'stadia:osm_bright', label: 'OSM Bright — bright OSM-based street map', urlTemplate: 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-success' },
+  { id: 'stadia:alidade_smooth', label: 'Alidade Smooth — smooth light basemap [HiDPI @2x]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-primary' },
+  { id: 'stadia:alidade_smooth-256', label: 'Alidade Smooth — smooth light basemap [Standard 256px]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png?api_key={token}', color: 'text-success' },
+  { id: 'stadia:alidade_smooth_dark', label: 'Alidade Smooth Dark — smooth dark basemap [HiDPI @2x]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-primary' },
+  { id: 'stadia:alidade_smooth_dark-256', label: 'Alidade Smooth Dark — smooth dark basemap [Standard 256px]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png?api_key={token}', color: 'text-success' },
+  { id: 'stadia:stamen_terrain', label: 'Stamen Terrain — terrain with hill shading and contours [HiDPI @2x]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-primary' },
+  { id: 'stadia:stamen_terrain-256', label: 'Stamen Terrain — terrain with hill shading and contours [Standard 256px]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png?api_key={token}', color: 'text-success' },
+  { id: 'stadia:stamen_watercolor', label: 'Stamen Watercolor — artistic watercolor basemap [HiDPI @2x]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}@2x.jpg?api_key={token}', color: 'text-primary' },
+  { id: 'stadia:stamen_watercolor-256', label: 'Stamen Watercolor — artistic watercolor basemap [Standard 256px]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg?api_key={token}', color: 'text-success' },
+  { id: 'stadia:osm_bright', label: 'OSM Bright — bright OSM-based street map [HiDPI @2x]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}@2x.png?api_key={token}', color: 'text-primary' },
+  { id: 'stadia:osm_bright-256', label: 'OSM Bright — bright OSM-based street map [Standard 256px]', urlTemplate: 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}.png?api_key={token}', color: 'text-success' },
 
   // ---- Thunderforest (512px @2x HiDPI, apikey=) ----
-  { id: 'thunderforest:cycle', label: 'OpenCycleMap — cycling routes and trails', urlTemplate: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-success' },
-  { id: 'thunderforest:transport', label: 'Transport — public transport network map', urlTemplate: 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-success' },
-  { id: 'thunderforest:outdoors', label: 'Outdoors — outdoor recreation map', urlTemplate: 'https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-success' },
-  { id: 'thunderforest:landscape', label: 'Landscape — landscape features map', urlTemplate: 'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-success' },
+  { id: 'thunderforest:cycle', label: 'OpenCycleMap — cycling routes and trails [HiDPI @2x]', urlTemplate: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-primary' },
+  { id: 'thunderforest:cycle-256', label: 'OpenCycleMap — cycling routes and trails [Standard 256px]', urlTemplate: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey={token}', color: 'text-success' },
+  { id: 'thunderforest:transport', label: 'Transport — public transport network map [HiDPI @2x]', urlTemplate: 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-primary' },
+  { id: 'thunderforest:transport-256', label: 'Transport — public transport network map [Standard 256px]', urlTemplate: 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey={token}', color: 'text-success' },
+  { id: 'thunderforest:outdoors', label: 'Outdoors — outdoor recreation map [HiDPI @2x]', urlTemplate: 'https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-primary' },
+  { id: 'thunderforest:outdoors-256', label: 'Outdoors — outdoor recreation map [Standard 256px]', urlTemplate: 'https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey={token}', color: 'text-success' },
+  { id: 'thunderforest:landscape', label: 'Landscape — landscape features map [HiDPI @2x]', urlTemplate: 'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}@2x.png?apikey={token}', color: 'text-primary' },
+  { id: 'thunderforest:landscape-256', label: 'Landscape — landscape features map [Standard 256px]', urlTemplate: 'https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey={token}', color: 'text-success' },
 
   // ---- ESRI World Imagery (free, no token, 256px) ----
   { id: 'esri:world_imagery', label: 'World Imagery — ESRI satellite imagery (free, no token needed)', urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', color: 'text-success' },
@@ -54,16 +77,16 @@ const LEAFLET_STYLE_OPTIONS = [
 
   // ---- Local / Offline (no token, 256px) ----
   // airgap.local is the on-premise tile server (offline LAN). Marked
-  // text-warning to flag that it only works on the local network.
-  { id: 'local:airgap_sat', label: 'AirGap Satellite — local offline tile server (airgap.local:88, LAN only)', urlTemplate: 'https://airgap.local:88/sat_{x}_{y}_{z}.png', color: 'text-warning' },
+  // text-danger to flag that it only works on the local network.
+  { id: 'local:airgap_sat', label: 'AirGap Satellite — local offline tile server (airgap.local:88, LAN only)', urlTemplate: 'https://airgap.local:88/sat_{x}_{y}_{z}.png', color: 'text-danger' },
 ];
 
 // Group labels for the <optgroup> elements in the dropdown.
 const LEAFLET_PROVIDER_GROUPS = [
-  { prefix: 'mapbox:', label: 'Mapbox (HiDPI @2x, access_token=)' },
-  { prefix: 'maptiler:', label: 'MapTiler (HiDPI @2x, key=)' },
-  { prefix: 'stadia:', label: 'Stadia Maps (HiDPI @2x, api_key=)' },
-  { prefix: 'thunderforest:', label: 'Thunderforest (HiDPI @2x, apikey=)' },
+  { prefix: 'mapbox:', label: 'Mapbox (HiDPI @2x + Standard 256px, access_token=)' },
+  { prefix: 'maptiler:', label: 'MapTiler (HiDPI @2x + Standard 256px, key=)' },
+  { prefix: 'stadia:', label: 'Stadia Maps (HiDPI @2x + Standard 256px, api_key=)' },
+  { prefix: 'thunderforest:', label: 'Thunderforest (HiDPI @2x + Standard 256px, apikey=)' },
   { prefix: 'esri:', label: 'ESRI (free, no token)' },
   { prefix: 'osm:', label: 'OpenStreetMap (free, no token)' },
   { prefix: 'local:', label: 'Local / Offline (LAN only, no token)' },
@@ -203,7 +226,7 @@ class ClssMapSettings extends React.Component {
                   .filter((opt) => opt.id.startsWith(group.prefix))
                   .map((opt) => (
                     <option key={opt.id} value={opt.id} className={opt.color}>
-                      {opt.label}
+                      {opt.color === 'text-danger' ? '\u{1F534} ' : opt.color === 'text-success' ? '\u{1F7E2} ' : '\u{1F535} '}{opt.label}
                     </option>
                   ))}
               </optgroup>

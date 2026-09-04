@@ -32,5 +32,6 @@
   "advancedOptionsLabel": "Opciones avanzadas",
   "enableADSBLabel": "Habilitar ADSB",
     "adsbRadiusLabel": "ADSB Radius",
-  "enableAISStreamLabel": "Habilitar AIS"
+  "enableAISStreamLabel": "Habilitar AIS",
+  "enableWindLabel": "Habilitar flecha de viento"
 }

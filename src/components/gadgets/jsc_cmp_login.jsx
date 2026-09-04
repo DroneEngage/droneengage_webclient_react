@@ -170,7 +170,7 @@ export default class ClssLoginControl extends React.Component {
                 
                 {this.state.errorMessage && (
                     <div className="alert alert-danger text-center" role="alert">
-                        {this.state.errorMessage} dsdsssd
+                        {this.state.errorMessage}
                     </div>
                 )}
                 

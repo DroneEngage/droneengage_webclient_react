@@ -16,6 +16,7 @@ import {EVENTS as js_event} from '../js_eventList.js'
 import {js_eventEmitter} from '../js_eventEmitter.js'
 import {js_tileCache} from './js_tileCache.js'
 import {js_localStorage} from '../js_localStorage.js'
+import {js_windProvider} from '../weather/js_windProvider.js'
 
 import {fn_contextMenu} from '../js_main.js'
 
@@ -119,6 +120,83 @@ function fn_deriveTileLayerOptions(p_urlTemplate) {
     return { tileSize: 256, zoomOffset: 0, maxZoom: 22 };
 }
 
+/**
+ * Custom Leaflet control: an ADSB toggle button placed under the +/- zoom
+ * controls (topleft). Uses the same plane icon as the ADSB markers
+ * (/images/Plane_Track.png). Clicking it toggles the ADSB runtime preference
+ * (js_localStorage.fn_setADSBEnabled) and dispatches EE_onPreferenceChanged
+ * — exactly what the ADSB settings checkbox does — so the manager stops/starts
+ * polling and the map clears/repaints accordingly.
+ *
+ * The button reflects the current enabled state (active = highlighted,
+ * inactive = dimmed) and updates itself on EE_onPreferenceChanged so it stays
+ * in sync with the settings checkbox.
+ */
+const CAdsbToggleControl = L.Control.extend({
+    options: {
+        position: 'topleft'
+    },
+
+    onAdd(map) {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-adsb-toggle-control');
+        // Prevent map drag/click from bleeding through the button.
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        const link = L.DomUtil.create('a', 'leaflet-adsb-toggle-btn', container);
+        link.href = '#';
+        link.title = 'Toggle ADSB';
+        link.role = 'button';
+
+        const img = L.DomUtil.create('img', '', link);
+        img.src = '/images/Plane_Track.png';
+        img.alt = 'ADSB';
+        img.style.width = '20px';
+        img.style.height = '20px';
+        img.style.verticalAlign = 'middle';
+
+        this._link = link;
+        this._updateActiveState();
+
+        L.DomEvent.on(link, 'click', (ev) => {
+            L.DomEvent.stop(ev);
+            const enabled = js_localStorage.fn_getADSBEnabled();
+            js_localStorage.fn_setADSBEnabled(!enabled);
+            js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+            // _updateActiveState is called from the EE_onPreferenceChanged
+            // listener, but dispatch is synchronous so it has already run
+            // by the time we get here — still, update once more to be safe.
+            this._updateActiveState();
+        });
+
+        // Keep the button state in sync with the settings checkbox.
+        this._boundOnPreferenceChanged = () => this._updateActiveState();
+        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
+
+        return container;
+    },
+
+    onRemove() {
+        if (this._boundOnPreferenceChanged) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
+            this._boundOnPreferenceChanged = null;
+        }
+        this._link = null;
+    },
+
+    _updateActiveState() {
+        if (!this._link) return;
+        const enabled = js_localStorage.fn_getADSBEnabled();
+        if (enabled) {
+            this._link.classList.add('leaflet-adsb-toggle-active');
+            this._link.classList.remove('leaflet-adsb-toggle-inactive');
+        } else {
+            this._link.classList.add('leaflet-adsb-toggle-inactive');
+            this._link.classList.remove('leaflet-adsb-toggle-active');
+        }
+    }
+});
+
 class CLeafLetAndruavMap {
 
     constructor() {
@@ -129,6 +207,15 @@ class CLeafLetAndruavMap {
         this.m_markGuided = null;
         this.m_urlSyncEnabled = false;
         this.m_suppressHashUpdate = false;
+
+        // ---- Wind arrow (all units) ----
+        // One rotatedmarker per unit with an inline-SVG arrow divIcon, drawn
+        // at each unit's position. Points downwind (bearing =
+        // windDirection + 180). Length grows with wind speed. See
+        // js_windProvider.js for the data source (Open-Meteo, free, no key).
+        this.m_windArrowMarkers = new Map(); // unitId -> L.marker (leaflet-rotatedmarker)
+        this.m_windArrowLastRefresh = 0;     // ms epoch of last visual refresh (throttle)
+        this.m_windArrowLastSpeed = new Map(); // unitId -> last speed (skip icon rebuild)
 
     };
 
@@ -308,6 +395,13 @@ class CLeafLetAndruavMap {
 
         this.m_tileLayer = this.fn_createBasemapTileLayer(tileUrl, v_site_copyright);
         this.m_tileLayer.addTo(this.m_Map);
+
+        // ADSB toggle button under the +/- zoom controls (topleft).
+        // Skipped when the site feature flag disables ADSB entirely.
+        if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
+            this.m_adsbToggleControl = new CAdsbToggleControl();
+            this.m_adsbToggleControl.addTo(this.m_Map);
+        }
 
 
         
@@ -955,6 +1049,143 @@ class CLeafLetAndruavMap {
     fn_removeListenerOnMouseOutClickMarker(p_marker, p_callback) {
         p_marker.off('mouseout');
     };
+
+    // ---- Wind arrow (selected unit) ----
+
+    /**
+     * Builds a leaflet divIcon containing an inline-SVG wind arrow pointing
+     * UP (north) in its source orientation. The arrow length encodes wind
+     * speed (clamped to [MIN, MAX]). leaflet-rotatedmarker's rotationAngle
+     * orients it to the downwind bearing (see fn_setWindArrow).
+     * @param {number} speedMs wind speed in m/s
+     * @returns {L.DivIcon}
+     */
+    fn_buildWindArrowIcon(speedMs) {
+        const g = js_globals;
+        const len = Math.max(g.CONST_MAP_WIND_ARROW_MIN_LENGTH,
+                   Math.min(g.CONST_MAP_WIND_ARROW_MAX_LENGTH,
+                            g.CONST_MAP_WIND_ARROW_BASE_LENGTH_MS + (Number(speedMs) || 0) * g.CONST_MAP_WIND_ARROW_LENGTH_PER_MS));
+        const color = g.CONST_MAP_WIND_ARROW_COLOR;
+        const w = 14;                 // SVG width (pixels)
+        const headH = Math.min(14, len * 0.35);
+        const shaftTop = headH;
+        const shaftBot = len;
+        const halfW = w / 2;
+        // Arrow shape: tip at top, shaft below. Points UP (north) at 0°.
+        const points = [
+            `${halfW},0`,                              // tip
+            `${w},${headH}`,                           // head right
+            `${halfW + 2},${headH}`,                   // head right inner
+            `${halfW + 2},${shaftBot}`,                // shaft bottom right
+            `${halfW - 2},${shaftBot}`,                // shaft bottom left
+            `${halfW - 2},${headH}`,                   // head left inner
+            `0,${headH}`,                              // head left
+        ].join(' ');
+        const svg = `<svg width="${w}" height="${len}" viewBox="0 0 ${w} ${len}" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">` +
+                    `<polygon points="${points}" fill="${color}" stroke="#000" stroke-width="0.5" opacity="0.85"/>` +
+                    `</svg>`;
+        return L.divIcon({
+            html: svg,
+            className: 'leaflet-wind-arrow',
+            iconSize: [w, len],
+            iconAnchor: [halfW, len],   // anchor at tail (bottom-center) so the arrow emanates from the unit
+        });
+    }
+
+    /**
+     * Creates or updates the wind arrow marker at the unit's position,
+     * oriented to point downwind. Called on unit selection and on every
+     * telemetry sync of the selected unit.
+     * @param {object} unit CAndruavUnit
+     * @param {{speedMs:number, directionDeg:number}} windData from js_windProvider
+     */
+    fn_setWindArrow(unit, windData) {
+        if (!this.m_Map || !unit || !windData) return;
+        const loc = unit.m_Nav_Info && unit.m_Nav_Info.p_Location;
+        if (!loc) return;
+        const lat = Number(loc.lat);
+        const lng = Number(loc.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const unitId = unit.getPartyID ? unit.getPartyID() : (unit.partyID || null);
+        if (!unitId) return;
+
+        // Meteorological direction = where wind blows FROM.
+        // Arrow points DOWNWIND = where wind blows TO = direction + 180.
+        const downwindBearing = ((Number(windData.directionDeg) || 0) + 180) % 360;
+        const speed = Number(windData.speedMs) || 0;
+
+        const existing = this.m_windArrowMarkers.get(unitId);
+        if (existing) {
+            // Always update position + rotation (cheap).
+            existing.setLatLng([lat, lng]);
+            existing.setRotationAngle(downwindBearing);
+            // Only rebuild the SVG icon when speed changed enough to alter
+            // the arrow length — wind is cached hourly, so speed is usually
+            // identical across thousands of refreshes.
+            if (this.m_windArrowLastSpeed.get(unitId) !== speed) {
+                existing.setIcon(this.fn_buildWindArrowIcon(speed));
+                this.m_windArrowLastSpeed.set(unitId, speed);
+            }
+        } else {
+            const marker = L.marker([lat, lng], {
+                icon: this.fn_buildWindArrowIcon(speed),
+                rotationAngle: downwindBearing,
+                interactive: false,    // no click/hover — the unit marker handles interaction
+                keyboard: false,
+                zIndexOffset: 1000,
+            }).addTo(this.m_Map);
+            this.m_windArrowMarkers.set(unitId, marker);
+            this.m_windArrowLastSpeed.set(unitId, speed);
+        }
+        this.m_windArrowLastRefresh = Date.now();
+    }
+
+    /**
+     * Removes the wind arrow marker for a single unit from the map.
+     * @param {string} unitId
+     */
+    fn_clearWindArrow(unitId) {
+        if (!unitId) return;
+        const marker = this.m_windArrowMarkers.get(unitId);
+        if (marker) {
+            this.m_Map.removeLayer(marker);
+            this.m_windArrowMarkers.delete(unitId);
+        }
+        this.m_windArrowLastSpeed.delete(unitId);
+    }
+
+    /**
+     * Removes ALL wind arrow markers from the map (on disable).
+     */
+    fn_clearAllWindArrows() {
+        this.m_windArrowMarkers.forEach(marker => {
+            this.m_Map.removeLayer(marker);
+        });
+        this.m_windArrowMarkers.clear();
+        this.m_windArrowLastSpeed.clear();
+        this.m_windArrowLastRefresh = 0;
+    }
+
+    /**
+     * Removes wind arrows for units no longer in the given active-unit set.
+     * Self-cleaning — no explicit unit-removal event exists in the codebase.
+     * @param {Set<string>} activeUnitIds partyIDs of currently online units
+     */
+    fn_clearStaleWindArrows(activeUnitIds) {
+        for (const unitId of this.m_windArrowMarkers.keys()) {
+            if (!activeUnitIds.has(unitId)) {
+                this.fn_clearWindArrow(unitId);
+            }
+        }
+    }
+
+    /**
+     * @returns {number} count of active wind arrow markers
+     */
+    fn_getWindArrowCount() {
+        return this.m_windArrowMarkers.size;
+    }
 
 
 }

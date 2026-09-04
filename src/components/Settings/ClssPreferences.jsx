@@ -20,6 +20,7 @@ class ClssPreferences extends React.Component {
     this.m_gcsDisplayRef = React.createRef();
     this.m_gcsShowMeRef = React.createRef();
     this.m_enableAISStreamRef = React.createRef();
+    this.m_enableWindRef = React.createRef();
   }
 
   componentDidMount() {
@@ -93,6 +94,12 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
+  fn_enableWind(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setWindEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
   render() {
     const { t } = this.props;
     const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
@@ -104,6 +111,10 @@ class ClssPreferences extends React.Component {
     // AISStream feature exists only when the site flag
     // CONST_FEATURE.DISABLE_AISStream is not true.
     const v_aisStreamFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_AISStream === true);
+
+    // Wind arrow feature exists only when the site flag
+    // CONST_FEATURE.DISABLE_WIND is not true.
+    const v_windFeatureEnabled = !(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_WIND === true);
 
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
@@ -197,6 +208,21 @@ class ClssPreferences extends React.Component {
               ref={this.m_enableAISStreamRef}
               defaultChecked={js_localStorage.fn_getAISStreamEnabled()}
               onClick={(e) => this.fn_enableAISStream(e)}
+            />
+          </div>
+        )}
+        {v_windFeatureEnabled && (
+          <div className="row mb-12 align-items-center">
+            <label htmlFor="check_enable_wind" className={`col-sm-4 col-form-label ${dir}`}>
+              {t('globalSettings:enableWindLabel')}
+            </label>
+            <input
+              className="form-check-input col-sm-8"
+              type="checkbox"
+              id="check_enable_wind"
+              ref={this.m_enableWindRef}
+              defaultChecked={js_localStorage.fn_getWindEnabled()}
+              onClick={(e) => this.fn_enableWind(e)}
             />
           </div>
         )}

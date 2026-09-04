@@ -98,6 +98,7 @@ class GLOBALS {
 		this.v_enable_tabs_display = false;
 		this.v_enable_unit_sort = true;
 		this.v_enable_gcs_display = false;
+		this.v_enable_wind = false;          // wind arrow for selected unit (toggled in Preferences)
 		this.v_gamePadMode = 2;
 
 		// GamePad Functions Assignment
@@ -192,6 +193,7 @@ class GLOBALS {
 		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
 		this.LS_ENABLE_ADSB = '_vADSBEnabled';
 		this.LS_ENABLE_AISSTREAM = '_vAISStreamEnabled';
+		this.LS_ENABLE_WIND = '_vWindEnabled';
 		this.LS_ADSB_RADIUS_KM = '_vADSBRadiusKm';
 		// ADSB provider config overrides (editable from the ADSB settings tab).
 		// localStorage has highest priority, then config.local/config.json,
@@ -239,7 +241,7 @@ class GLOBALS {
 		this.CONST_MAP3D_TETHER_MAX_ALT = 1000;  // altitude (meters AGL) at which MAX is reached
 
 		// ---- Map3D 3D-model (glTF) icon LOD ----
-		// Below this zoom the flat billboard <div> marker is shown (constant
+		// Below this zoom (i.e. more Zoom out) the flat billboard <div> marker is shown (constant
 		// screen size, no 3D tilt); at/above it we swap to a real glTF model
 		// (arrow.glb / plane.glb) that tilts with roll/pitch in 3D. This
 		// avoids the "too small / too big" problem of scaling a real-world
@@ -287,6 +289,24 @@ class GLOBALS {
 		this.CONST_MAP3D_ADSB_RENDER_MODE_ICON = 'icon';
 		this.CONST_MAP3D_ADSB_RENDER_MODE_GLB = 'glb';
 		this.CONST_MAP3D_ADSB_RENDER_MODE = this.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+
+		// ---- Wind arrow (selected unit) visual constants ----
+		// A single wind arrow is drawn next to the currently selected
+		// DroneEngage unit on the map (leaflet 2D now, map3d later). It
+		// points DOWNWIND (the direction the wind blows TO), and its length
+		// grows with wind speed. See js_windProvider.js for the data source
+		// (Open-Meteo, free, no key).
+		this.CONST_MAP_WIND_ARROW_COLOR = '#ffff00';        // arrow color (yellow, visible on most basemaps)
+		this.CONST_MAP_WIND_ARROW_LENGTH_PER_MS = 8;       // SVG path length units per 1 m/s of wind speed
+		this.CONST_MAP_WIND_ARROW_MAX_LENGTH = 80;         // clamp max path length (units)
+		this.CONST_MAP_WIND_ARROW_MIN_LENGTH = 24;         // clamp min path length (so 0 m/s is still visible)
+		this.CONST_MAP_WIND_ARROW_BASE_LENGTH_MS = 0;      // base length added regardless of speed
+		// Minimum interval between wind-arrow visual refreshes. Telemetry can
+		// arrive at 1-10 Hz; refreshing the arrow on every packet rebuilds the
+		// SVG icon + fires async plumbing for nothing (wind data is cached
+		// hourly + per ~11km cell, so it barely changes). This throttle makes
+		// the arrow "follow" the drone at a smooth, human-perceptible rate.
+		this.CONST_MAP_WIND_ARROW_REFRESH_MS = 10000;
 
 		this.CONST_DISABLE_ADSG = true;
 
