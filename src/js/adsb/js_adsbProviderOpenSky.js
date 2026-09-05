@@ -222,14 +222,18 @@ export class OpenSkyProvider extends AdsbProvider {
 
     async fetch(lat, lng, radiusKm) {
         const { url, init } = this.buildRequest(lat, lng, radiusKm);
+        console.log('ADSB4 opensky.fetch: buildRequest done', { url });
         const token = await this._ensureToken();
+        console.log('ADSB5 opensky.fetch: token resolved', { hasToken: !!token });
         const headers = { ...(init.headers || {}) };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), this.timeoutMs);
         try {
+            console.log('ADSB6 opensky.fetch: sending HTTP request');
             const res = await fetch(url, { ...init, headers, signal: controller.signal });
+            console.log('ADSB7 opensky.fetch: HTTP response received', { status: res.status, statusText: res.statusText });
             // 429 Too Many Requests — enter backoff so the manager suspends
             // polling. Respect Retry-After (seconds) when present, otherwise
             // use the default backoff. The provider stays constructed; the
@@ -266,6 +270,7 @@ export class OpenSkyProvider extends AdsbProvider {
                 const json = await retryRes.json();
                 this.lastFetchAt = Date.now();
                 this.rateLimitedUntil = 0;   // success — clear any backoff
+                console.log('ADSB8 opensky.fetch: parsing (401-retry path)');
                 return this.parseResponse(json);
             }
             if (!res.ok) {
@@ -274,6 +279,7 @@ export class OpenSkyProvider extends AdsbProvider {
             const json = await res.json();
             this.lastFetchAt = Date.now();
             this.rateLimitedUntil = 0;   // success — clear any backoff
+            console.log('ADSB8 opensky.fetch: parsing (normal path)');
             return this.parseResponse(json);
         } finally {
             clearTimeout(timer);
@@ -284,6 +290,7 @@ export class OpenSkyProvider extends AdsbProvider {
         if (!json || !Array.isArray(json.states)) return [];
         const now = Date.now();
         const out = [];
+        const tParseStart = performance.now();
         for (const row of json.states) {
             if (!Array.isArray(row)) continue;
             const icao = row[STATE_ICAO24];
@@ -312,6 +319,7 @@ export class OpenSkyProvider extends AdsbProvider {
 
             out.push(ac);
         }
+        console.log('ADSB8b opensky.parseResponse: done', { rawRows: json.states.length, parsed: out.length, ms: Math.round(performance.now() - tParseStart) });
         return out;
     }
 }

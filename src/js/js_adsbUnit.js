@@ -116,6 +116,7 @@ class CADSBObjectList {
      */
     fn_mergeNormalized(aircraftList) {
         const seen = [];
+        const tMergeStart = performance.now();
         for (const ac of aircraftList) {
             if (!ac || !ac.icao) continue;
             const key = ac.icao.toString();
@@ -129,18 +130,22 @@ class CADSBObjectList {
             }
             seen.push(key);
         }
+        console.log('ADSB10b fn_mergeNormalized: done', { merged: seen.length, registryCount: this.count, ms: Math.round(performance.now() - tMergeStart) });
         return seen;
     }
 
     /** Remove aircraft not seen since `beforeMs` (ms epoch). */
     fn_purgeOlderThan(beforeMs) {
         const keys = Object.keys(this.List);
+        let purged = 0;
         for (const key of keys) {
             const obj = this.List[key];
             if (obj && obj.m_last_access && obj.m_last_access.getTime() < beforeMs) {
                 this.Del(key);
+                purged++;
             }
         }
+        console.log('ADSB17b fn_purgeOlderThan: done', { beforeCount: keys.length, purged, remaining: this.count });
     }
 
     /** Clear the entire registry (e.g. when ADSB is disabled). */

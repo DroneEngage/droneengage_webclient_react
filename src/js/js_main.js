@@ -1080,6 +1080,8 @@ function fn_onAdsbError(me, p_msg) {
 
 // eslint-disable-next-line no-unused-vars
 function fn_adsbExpiredUpdate(me) {
+	console.log('ADSB16 fn_adsbExpiredUpdate: EE_adsbExpiredUpdate handler enter', { registryCount: js_adsbUnit.count });
+	const tExpStart = performance.now();
 	// Use the same timeout as the ADSB manager's purge window so markers
 	// stay hidden/purged in sync. Default is 4x the refresh rate (240s at
 	// 60s refresh) so a plane survives ~4 missed polls.
@@ -1088,6 +1090,7 @@ function fn_adsbExpiredUpdate(me) {
 	const count = js_adsbUnit.count;
 	const now = new Date();
 	const p_keys = Object.keys(js_adsbUnit.List);
+	let hidden = 0;
 
 	for (let i = 0; i < count; ++i) {
 		let adsb_obj = js_adsbUnit.List[p_keys[i]];
@@ -1100,6 +1103,7 @@ function fn_adsbExpiredUpdate(me) {
 			if (v_adsbMap3dSelectedIcao === adsb_obj.m_icao_address) {
 				fn_clearAdsbMap3dSelection();
 			}
+			hidden++;
 		}
 	}
 
@@ -1108,6 +1112,7 @@ function fn_adsbExpiredUpdate(me) {
 	js_map3d.fn_flushAdsbTethers();
 
 	fn_updateAdsbQueryCircle();
+	console.log('ADSB16b fn_adsbExpiredUpdate: done', { hidden, ms: Math.round(performance.now() - tExpStart) });
 }
 
 /**
@@ -1228,6 +1233,7 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 		visible = visible.slice(0, CONST_ADSB_MAX_RENDERED_MARKERS);
 	}
 	const visibleSet = new Set(visible);
+	console.log('ADSB13 fn_renderAdsbMarkers', { isDataUpdate, total: all.length, visible: visible.length });
 
 	for (let i = 0; i < all.length; ++i) {
 		const p_adsbObject = all[i];
@@ -1254,6 +1260,8 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 }
 
 function fn_adsbObjectUpdate() {
+	console.log('ADSB12 fn_adsbObjectUpdate: EE_adsbExchangeReady handler enter', { registryCount: js_adsbUnit.count });
+	const tUpdateStart = performance.now();
 	// The ADSB manager dispatches EE_adsbExchangeReady once per fetch;
 	// fn_renderAdsbMarkers reads the current registry itself (see its doc
 	// comment) so no data needs to be threaded through here. Pass true so
@@ -1267,6 +1275,7 @@ function fn_adsbObjectUpdate() {
 
 	// Keep the query-area circle in sync with the current coverage.
 	fn_updateAdsbQueryCircle();
+	console.log('ADSB14 fn_adsbObjectUpdate: done', { ms: Math.round(performance.now() - tUpdateStart) });
 }
 
 // Re-render ADSB markers when the unit system (metric/imperial) changes so
@@ -1286,6 +1295,7 @@ function fn_adsbUnitSystemChanged() {
 }
 
 function fn_renderSingleAdsb(p_adsbObject) {
+	console.log('ADSB13b fn_renderSingleAdsb', { icao: p_adsbObject.m_icao_address, hasMarker: !!p_adsbObject.p_marker });
 	var icon;
 	switch (parseInt(p_adsbObject.m_emitter_type)) {
 		case mavlink20.ADSB_EMITTER_TYPE_NO_INFO:
