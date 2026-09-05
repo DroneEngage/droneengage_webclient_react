@@ -527,6 +527,12 @@ class CAndruavMap3D {
         this.m_modelLayerReady = false;
         this.m_modelLodActive = false;          // true when models are currently shown instead of DOM markers
         this.m_unitModelFeatures = new Map();   // unitId -> GeoJSON Feature (kept so we can setData() the whole collection)
+        // Guards the 'zoom' handler below: Mapbox fires 'zoom' continuously
+        // (many times per second) during a zoom gesture, but the LOD/scale
+        // update it triggers (including a source.setData() call) only needs
+        // to run once per rendered frame. Without this, a single zoom
+        // gesture could call setData() dozens of times.
+        this.m_modelUpdateScheduled = false;
 
         // glTF-model twin of the ADSB DOM markers, used only when
         // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
@@ -786,10 +792,12 @@ class CAndruavMap3D {
         });
 
         // Toggle DOM markers vs. 3D glTF models, and rescale the models to
-        // compensate for zoom, as the user zooms in/out.
+        // compensate for zoom, as the user zooms in/out. 'zoom' fires
+        // continuously during the gesture, so this is throttled to once per
+        // animation frame (see fn_scheduleModelUpdate) rather than running
+        // fn_updateModelScale's setData() call on every single tick.
         this.m_map.on('zoom', () => {
-            this.fn_updateModelLod();
-            this.fn_updateModelScale();
+            this.fn_scheduleModelUpdate();
         });
 
         // Add the terrain exaggeration control (x1 / x2 / x5 buttons).
@@ -1078,6 +1086,23 @@ class CAndruavMap3D {
      * hit-testing is broken for GeoJSON-backed model layers
      * (mapbox-gl-js#13598).
      */
+    /**
+     * Coalesces fn_updateModelLod + fn_updateModelScale to at most once per
+     * animation frame. Bound to the 'zoom' event, which fires continuously
+     * (many times per second) during a zoom gesture in Mapbox GL — without
+     * this, fn_updateModelScale's source.setData() call would run on every
+     * single tick of the gesture instead of once per rendered frame.
+     */
+    fn_scheduleModelUpdate() {
+        if (this.m_modelUpdateScheduled) return;
+        this.m_modelUpdateScheduled = true;
+        requestAnimationFrame(() => {
+            this.m_modelUpdateScheduled = false;
+            this.fn_updateModelLod();
+            this.fn_updateModelScale();
+        });
+    }
+
     fn_updateModelLod() {
         if (!this.m_map || !this.m_modelLayerReady) return;
 
@@ -1125,7 +1150,6 @@ class CAndruavMap3D {
 
         const zoomFactor = Math.min(maxFactor, Math.max(minFactor, Math.pow(2, (refZoom - zoom) * exponent)));
         const factor = zoomFactor * multiplier;
-        console.log(`factor:${factor} (zoom:${zoomFactor} x${multiplier} ${target})`);
         return base.map(v => v * factor);
     }
 
