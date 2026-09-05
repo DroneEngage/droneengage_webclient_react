@@ -1,8 +1,6 @@
 import React from 'react';
 
 import { js_globals } from '../../../js/js_globals.js';
-import { EVENTS as js_event } from '../../../js/js_eventList.js'
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
 import { js_localStorage } from '../../../js/js_localStorage.js'
 
 export class ClssCtrlAndruavCtrl extends React.Component {
@@ -19,7 +17,11 @@ export class ClssCtrlAndruavCtrl extends React.Component {
 
         this.m_smsNumberRef = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle, this, this.fn_toggle_global);
+        // NOTE: this component previously subscribed to EE_BattViewToggle
+        // with this.fn_toggle_global, but fn_toggle_global was never
+        // defined here (copy-paste from jsc_ctrl_battery.jsx), so the
+        // subscription was a no-op (fn_subscribe guards against a null
+        // callback). Removed rather than migrated to useEventSubscription.
     }
 
 
@@ -32,7 +34,6 @@ export class ClssCtrlAndruavCtrl extends React.Component {
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
-        js_eventEmitter.fn_unsubscribe(js_event.EE_BattViewToggle, this);
     }
 
     fn_makeFlash(p_andruavUnit) {

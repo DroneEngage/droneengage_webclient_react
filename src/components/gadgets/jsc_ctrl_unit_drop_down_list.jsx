@@ -5,9 +5,9 @@ import * as js_common from '../../js/js_common.js'
 
 import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 /**
  * List all units in combobox with icon next to it.
@@ -34,9 +34,11 @@ export class ClssAndruavUnitDropDownList extends React.Component {
         this.m_flag_mounted = false;
         
         this.key = Math.random().toString();
-            
-        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
+
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription. This replaces the manual constructor
+        // fn_subscribe / componentWillUnmount fn_unsubscribe pairing.
 
     }
 
@@ -73,9 +75,8 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
-		js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged,this);
-
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     
@@ -180,13 +181,15 @@ export class ClssAndruavUnitDropDownList extends React.Component {
 
         return (
                 <div className={`form-group${this.props.className ? " " + this.props.className : ""}`}>
+                    <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(this, p_andruavUnit)} />
+                    <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(this, p_andruavUnit)} />
                     <label htmlFor={this.key + 'combo_list'} className="col-3 txt-theme-aware al_r pe-2 "><small><b>{this.props.p_label}</b></small></label>
                     <select multiple="" className={'col-7 bg-dark ' + v_css_select} id={this.key + 'combo_list'} value={this.state.m_selected_party_id } onChange={(e) => this.fn_onSelectUnit(e)}>
                         {units_details}
                     </select>
                     <ClssCtrlUnitIcon className="ms-2 p-1" p_unit={v_andruavUnit}/>
                 </div>
-            
+
         );
     }
 }

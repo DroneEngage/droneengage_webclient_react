@@ -12,7 +12,7 @@
 
 import React from 'react';
 import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 import ClassBarChart from '../../gadgets/jsc_ctrl_bar_chart'
 
@@ -25,8 +25,8 @@ class ClassSDRSpectrumVisualizer extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitSDRSpectrum,this,this.fn_unitUpdated);
-    
+        // Event subscription is owned by the EventBridge sibling rendered
+        // below (useEventSubscription auto-unsubscribes on unmount).
     }
 
     componentDidMount() {
@@ -35,7 +35,8 @@ class ClassSDRSpectrumVisualizer extends React.Component {
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitSDRSpectrum,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // sibling (useEventSubscription) on unmount.
     }
 
     fn_unitUpdated (p_me, p_unit)
@@ -50,20 +51,28 @@ class ClassSDRSpectrumVisualizer extends React.Component {
         let data = [];
         let labels = [];
         let spectrum = this.props.p_unit.m_SDR.getLastSpectrum();
-        
+
         if (spectrum===null || spectrum === undefined)
         {
-            return (<div>No Spectrum Data</div>);
+            return (
+                <React.Fragment>
+                    <EventBridge eventName={js_event.EE_unitSDRSpectrum} onEvent={(p_unit) => this.fn_unitUpdated(this, p_unit)} />
+                    <div>No Spectrum Data</div>
+                </React.Fragment>
+            );
         }
-        
+
         data = spectrum.spectrum_data;
-        
+
         labels.push(spectrum.frequency_min);
         labels.push(spectrum.frequency_min + (spectrum.frequency_step * data.length/2));
         labels.push(spectrum.frequency_min + spectrum.frequency_step * data.length);
-        
+
         return (
-            <ClassBarChart data={data} labels={labels} />
+            <React.Fragment>
+                <EventBridge eventName={js_event.EE_unitSDRSpectrum} onEvent={(p_unit) => this.fn_unitUpdated(this, p_unit)} />
+                <ClassBarChart data={data} labels={labels} />
+            </React.Fragment>
         );
     }
 }

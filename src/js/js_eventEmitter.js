@@ -84,6 +84,23 @@ class CEventEmitter {
             // Optionally, notify that the listener is already subscribed, or update the callback.
             // console.warn(`Listener already subscribed to event "${p_event}".`);
         }
+
+        // Dev-mode leak guard: warn when an event accumulates an unusually
+        // high number of listeners. This usually means a component is
+        // subscribing without unsubscribing on unmount (missing
+        // componentWillUnmount or misuse of useEventSubscription). Kept
+        // dev-only so the console.warn string building never ships to
+        // production bundles. O(1) per subscribe.
+        if (process.env.NODE_ENV !== 'production') {
+            const WARN_THRESHOLD = 30; // tune after checking real listener counts per event in a live session
+            if (subscribers.size === WARN_THRESHOLD) {
+                console.warn(
+                    `[js_eventEmitter] event "${p_event}" has ${WARN_THRESHOLD}+ listeners. ` +
+                    `This usually means a component is subscribing without unsubscribing on unmount ` +
+                    `(check componentWillUnmount / useEventSubscription usage).`
+                );
+            }
+        }
     }
 
     /**
