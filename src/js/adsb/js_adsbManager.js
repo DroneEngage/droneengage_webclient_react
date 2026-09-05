@@ -492,7 +492,9 @@ class AdsbManager {
         if (!provider) return;   // no provider available (e.g. AIS disabled)
         // Respect provider rate-limit backoff (set when a 429 was received).
         // Skip this tick; the interval will fire again after refreshRateMs.
+        console.log ('jh1');
         if (provider.rateLimitedUntil && Date.now() < provider.rateLimitedUntil) {
+            console.log ('jh2');
             return;
         }
         provider.setQueryArea(this._lat, this._lng, this._radius);

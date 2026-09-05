@@ -1356,6 +1356,14 @@ class CAndruavMap3D {
                 // hidden — markers created against a zero-size container don't
                 // project correctly, so we replay them now that it's visible.
                 this.fn_replayMissions();
+
+                // fn_flushAdsbTethers() was skipped while hidden (see its
+                // m_isVisible guard) - if an aircraft is/was selected, its
+                // tether/ground/altitude-ring visuals would otherwise stay
+                // stale until the next ADSB poll (up to ~60s). Re-flush now
+                // that the view (and m_adsbTetherData, refreshed by the
+                // marker-sync loop above) is current again.
+                this.fn_flushAdsbTethers();
             }
         };
 
@@ -2040,7 +2048,15 @@ class CAndruavMap3D {
      * an aircraft (fn_setSelectedAdsbAircraft).
      */
     fn_flushAdsbTethers() {
-        if (!this.m_map || !this.m_isReady) return;
+        // Same gap as fn_syncAdsbObject/fn_syncUnit had: called unconditionally
+        // from js_main.js's fn_adsbObjectUpdate on every ADSB fetch regardless
+        // of whether the 3D view is visible. source.setData() below triggers a
+        // Mapbox repaint request even on a display:none canvas (Mapbox GL does
+        // not check container visibility itself), so this was still forcing
+        // background render work while the user was only looking at the 2D
+        // map. fn_show()'s doResizeAndSync path re-establishes the correct
+        // tether/ring state when the 3D view becomes visible again.
+        if (!this.m_map || !this.m_isReady || !this.m_isVisible) return;
 
         const data = this.m_selectedAdsbIcao ? this.m_adsbTetherData.get(this.m_selectedAdsbIcao) : null;
         if (!data) {

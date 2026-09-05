@@ -1152,7 +1152,7 @@ function fn_clearAdsbFromMap() {
 // main-thread cost during map pan/hover (unrelated to tile caching or
 // React rendering: HitTest against #mapid alone was taking 11-74ms per
 // mousemove).
-const CONST_ADSB_MAX_RENDERED_MARKERS = 150;
+const CONST_ADSB_MAX_RENDERED_MARKERS = 50;
 // Pad the viewport used for culling by this fraction of its own size (in
 // each direction) so a marker just past the visible edge doesn't pop its
 // DOM node in/out on every tiny pan.
@@ -1308,15 +1308,19 @@ function fn_renderSingleAdsb(p_adsbObject) {
 		var v_label = p_adsbObject.m_callsign || p_adsbObject.m_icao_address;
 		var v_htmladsb = "<p class='text-warning margin_zero'>" + v_label + "</p>";
 
-		v_marker = js_leafletmap.fn_CreateMarker(icon, v_label, null, false, false, v_htmladsb, [32, 32]);
+		// TEMP DEBUG: create ADSB markers as non-interactive to eliminate
+		// Chrome hit-test cost during pan/zoom (the dominant hang cause with
+		// many interactive markers). Click handling is via map-level delegation.
+		var v_image = js_leafletmap.fn_createIcon(icon, v_label, null, false, false, v_htmladsb, [32, 32]);
+		v_marker = window.L.marker([0, 0], {
+			icon: v_image,
+			title: v_label,
+			draggable: false,
+			interactive: false,
+			keyboard: false,
+			zIndexOffset: 0
+		}).addTo(js_leafletmap.m_Map);
 		p_adsbObject.p_marker = v_marker;
-		// Prevent click on ADSB markers from propagating to the map (which can
-		// trigger context menus or panning behavior).
-		if (v_marker && typeof v_marker.on === 'function') {
-			v_marker.on('click', function (e) {
-				if (e && e.originalEvent) e.originalEvent.stopPropagation();
-			});
-		}
 	}
 
 	js_leafletmap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
@@ -3914,6 +3918,26 @@ export function fn_on_ready() {
 	if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+		// TEMP DEBUG: delegated click handler for non-interactive ADSB markers.
+		// Finds the nearest ADSB marker within a pixel threshold and opens its
+		// popup, replacing per-marker click listeners (which made each marker
+		// interactive and thus hit-testable on every mousemove).
+		js_leafletmap.m_Map.on('click', function (e) {
+			const clickPt = e.containerPoint;
+			const list = (js_adsbUnit && js_adsbUnit.List) ? Object.values(js_adsbUnit.List) : [];
+			let best = null;
+			let bestDist = 20; // px threshold
+			for (let i = 0; i < list.length; i++) {
+				const o = list[i];
+				if (!o || !o.p_marker) continue;
+				const markerPt = js_leafletmap.m_Map.latLngToContainerPoint(o.p_marker.getLatLng());
+				const d = Math.hypot(markerPt.x - clickPt.x, markerPt.y - clickPt.y);
+				if (d < bestDist) { bestDist = d; best = o; }
+			}
+			if (best && best.p_marker.getPopup()) {
+				best.p_marker.openPopup();
+			}
+		});
 		// Re-evaluate which ADSB aircraft are visible whenever the map view
 		// changes (pan or zoom) - not just when fresh ADSB data arrives - so
 		// aircraft scrolling into view reappear immediately (rather than

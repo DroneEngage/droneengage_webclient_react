@@ -1190,11 +1190,13 @@ class CLeafLetAndruavMap {
 
 
     fn_addListenerOnMouseOverMarker(p_marker, p_callback) {
-        this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseover');
+        // TEMP DEBUG: hover disabled
+        // this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseover');
     };
 
     fn_addListenerOnMouseOutMarker(p_marker, p_callback) {
-        this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseout');
+        // TEMP DEBUG: hover disabled
+        // this.fn_addListenerOnMarker(p_marker, p_callback, 'mouseout');
     };
 
     fn_removeListenerOnMouseOverMarker(p_marker, p_callback) {
