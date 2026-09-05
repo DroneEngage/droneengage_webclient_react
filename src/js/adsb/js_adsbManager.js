@@ -58,6 +58,17 @@ const DEFAULT_RADIUS_KM = 850;            // ADSB scan radius (swarm margin & ge
 const DEFAULT_UNIT_FOLLOW_RADIUS_KM = 200;
 const SWARM_RECOMPUTE_MS = 8000;         // throttle swarm-area recompute
 const DEFAULT_REFRESH_RATE_MS = 60000;   // default polling interval
+// Area-change tolerance: the swarm enclosing circle is recomputed on every
+// unit-nav update (throttled to SWARM_RECOMPUTE_MS). Tiny drone movements
+// produce sub-meter drift in the centroid/bounding box. Without a tolerance,
+// _setArea() sees every float difference as a "change", stops the loop and
+// restarts it with an immediate fetch — effectively turning the 60s poll into
+// an 8s poll and burning through OpenSky's rate-limit credits. Only restart
+// the loop when the center moves more than this many km or the radius changes
+// by more than AREA_CHANGE_RADIUS_PCT. Below-tolerance updates still update
+// the stored area so the next scheduled tick uses the fresh coordinates.
+const AREA_CHANGE_CENTER_TOLERANCE_KM = 2;
+const AREA_CHANGE_RADIUS_PCT = 0.10;     // 10%
 // Aircraft expiry default is 4x the refresh rate so a plane survives ~4
 // consecutive missed polls. OpenSky intermittently drops aircraft from
 // responses (coverage gaps, receiver aggregation), so the window must cover
@@ -300,18 +311,38 @@ class AdsbManager {
     }
 
     /**
-     * Internal: set the query area and start/restart polling if it changed.
+     * Internal: set the query area and start/restart polling if it changed
+     * meaningfully.
+     *
+     * The swarm enclosing circle is recomputed frequently (every
+     * SWARM_RECOMPUTE_MS) as drones move, producing sub-meter float drift.
+     * Restarting the loop on every such drift would trigger an immediate
+     * fetch on each recompute — far faster than the configured poll interval
+     * — and exhaust OpenSky's rate-limit credits. So we only restart when
+     * the center moves beyond AREA_CHANGE_CENTER_TOLERANCE_KM or the radius
+     * changes by more than AREA_CHANGE_RADIUS_PCT. Below-tolerance updates
+     * still update the stored area; the next scheduled tick picks up the new
+     * coordinates via provider.setQueryArea() in _tick().
      */
     _setArea(lat, lng, radiusKm, source) {
-        const changed =
-            this._lat !== lat || this._lng !== lng || this._radius !== radiusKm || this._areaSource !== source;
+        const sourceChanged = this._areaSource !== source;
+        const centerMovedKm = (this._lat == null || this._lng == null)
+            ? Infinity
+            : haversineKm(this._lat, this._lng, lat, lng);
+        const radiusDelta = this._radius > 0
+            ? Math.abs(radiusKm - this._radius) / this._radius
+            : Infinity;
+        const meaningfulChange = sourceChanged
+            || centerMovedKm > AREA_CHANGE_CENTER_TOLERANCE_KM
+            || radiusDelta > AREA_CHANGE_RADIUS_PCT;
         this._lat = lat;
         this._lng = lng;
         this._radius = radiusKm;
         this._areaSource = source;
-        if (changed) {
-            // Area changed — restart the loop so the next fetch uses the new area
-            // immediately (and the provider's query area is updated).
+        if (meaningfulChange) {
+            // Area changed meaningfully — restart the loop so the next fetch
+            // uses the new area immediately (and the provider's query area is
+            // updated).
             if (this._running) {
                 this._stop();
             }
@@ -420,8 +451,12 @@ class AdsbManager {
         if (!provider) return;   // e.g. aisstream selected but AIS disabled
         this._running = true;
         const me = this;
-        // Run an immediate cycle, then poll.
-        this._tick().catch((e) => console.error('[adsb] tick error:', e));
+        // Run an immediate cycle, then poll — unless the provider is in
+        // rate-limit backoff (e.g. a recent 429), in which case skip the
+        // immediate fetch and let the interval pick up when backoff elapses.
+        if (!provider.rateLimitedUntil || Date.now() >= provider.rateLimitedUntil) {
+            this._tick().catch((e) => console.error('[adsb] tick error:', e));
+        }
         this._timer = setInterval(() => {
             me._tick().catch((e) => console.error('[adsb] tick error:', e));
         }, provider.refreshRateMs);
@@ -440,6 +475,11 @@ class AdsbManager {
         if (this._inflight) return;
         const provider = this._ensureProvider();
         if (!provider) return;   // no provider available (e.g. AIS disabled)
+        // Respect provider rate-limit backoff (set when a 429 was received).
+        // Skip this tick; the interval will fire again after refreshRateMs.
+        if (provider.rateLimitedUntil && Date.now() < provider.rateLimitedUntil) {
+            return;
+        }
         provider.setQueryArea(this._lat, this._lng, this._radius);
         this._inflight = true;
         let aircraft = [];

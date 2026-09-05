@@ -88,6 +88,12 @@ export class AdsbProvider {
         // Last fetch result, for diagnostics.
         this.lastError = null;
         this.lastFetchAt = 0;
+
+        // Rate-limit backoff: when the provider returns 429, polling is
+        // suspended until this ms-epoch timestamp. 0 means no backoff.
+        // Subclasses set this in fetch() when they receive a 429; the
+        // manager checks it before each tick.
+        this.rateLimitedUntil = 0;
     }
 
     /** Unique provider id, e.g. 'opensky' / 'adsbexchange'. */

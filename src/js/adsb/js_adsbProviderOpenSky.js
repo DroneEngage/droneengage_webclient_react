@@ -29,6 +29,10 @@ const OPENSKY_API = 'https://opensky-network.org/api/states/all';
 const OPENSKY_TOKEN_URL =
     'https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token';
 const TOKEN_REFRESH_MARGIN_S = 30;   // refresh this many seconds before expiry
+// Default backoff when OpenSky returns 429 without a Retry-After header.
+// OpenSky anonymous tier is credit-limited; once rate-limited, wait a full
+// poll cycle before retrying rather than hammering the endpoint.
+const DEFAULT_429_BACKOFF_MS = 60000;
 
 // OpenSky does not send CORS headers for third-party origins, so direct browser
 // fetch() is blocked. Route through the local proxy in server.js instead.
@@ -226,6 +230,18 @@ export class OpenSkyProvider extends AdsbProvider {
         const timer = setTimeout(() => controller.abort(), this.timeoutMs);
         try {
             const res = await fetch(url, { ...init, headers, signal: controller.signal });
+            // 429 Too Many Requests — enter backoff so the manager suspends
+            // polling. Respect Retry-After (seconds) when present, otherwise
+            // use the default backoff. The provider stays constructed; the
+            // manager skips ticks until rateLimitedUntil elapses.
+            if (res.status === 429) {
+                const retryAfterS = Number(res.headers.get('Retry-After'));
+                const backoffMs = (isFinite(retryAfterS) && retryAfterS > 0)
+                    ? retryAfterS * 1000
+                    : DEFAULT_429_BACKOFF_MS;
+                this.rateLimitedUntil = Date.now() + backoffMs;
+                throw new Error(`[opensky] HTTP 429 Too Many Requests (backoff ${Math.round(backoffMs / 1000)}s)`);
+            }
             // 401 -> token expired mid-flight; refresh once and retry.
             if (res.status === 401 && this.isAuthenticated) {
                 this._accessToken = null;
@@ -236,11 +252,20 @@ export class OpenSkyProvider extends AdsbProvider {
                     headers: { ...headers, Authorization: `Bearer ${fresh}` },
                     signal: controller.signal,
                 });
+                if (retryRes.status === 429) {
+                    const retryAfterS = Number(retryRes.headers.get('Retry-After'));
+                    const backoffMs = (isFinite(retryAfterS) && retryAfterS > 0)
+                        ? retryAfterS * 1000
+                        : DEFAULT_429_BACKOFF_MS;
+                    this.rateLimitedUntil = Date.now() + backoffMs;
+                    throw new Error(`[opensky] HTTP 429 Too Many Requests (backoff ${Math.round(backoffMs / 1000)}s)`);
+                }
                 if (!retryRes.ok) {
                     throw new Error(`[opensky] HTTP ${retryRes.status} ${retryRes.statusText}`);
                 }
                 const json = await retryRes.json();
                 this.lastFetchAt = Date.now();
+                this.rateLimitedUntil = 0;   // success — clear any backoff
                 return this.parseResponse(json);
             }
             if (!res.ok) {
@@ -248,6 +273,7 @@ export class OpenSkyProvider extends AdsbProvider {
             }
             const json = await res.json();
             this.lastFetchAt = Date.now();
+            this.rateLimitedUntil = 0;   // success — clear any backoff
             return this.parseResponse(json);
         } finally {
             clearTimeout(timer);
