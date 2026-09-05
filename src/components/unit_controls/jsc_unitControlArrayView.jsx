@@ -135,15 +135,15 @@ class ClssAndruavUnitDroneRow extends React.Component{
 		this.telemetry_level=["OFF","1","2","3"];
         js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_onPreferenceChanged);
     }
 
-     
+
     componentDidMount() {
         this.m_flag_mounted = true;
     }
 
-    childcomponentWillUnmount () {
+    componentWillUnmount () {
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
@@ -155,7 +155,17 @@ class ClssAndruavUnitDroneRow extends React.Component{
         if (p_andruavUnit.getPartyID() !== p_me.props.p_unit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
-        
+
+    }
+
+    fn_onPreferenceChanged(p_me)
+    {
+        // EE_onPreferenceChanged is dispatched with no payload (see
+        // ClssAndruavUnitListArray.fn_onPreferenceChanged below for the
+        // same pattern), so this cannot reuse fn_unitUpdated's
+        // partyID-matching signature.
+        if (p_me.m_flag_mounted === false)return ;
+        p_me.setState({'m_update': p_me.state.m_update +1});
     }
 
     
