@@ -384,6 +384,7 @@ class CLeafLetAndruavMap {
         const mapState = this.fn_parseMapHash();
         if (!mapState) return;
 
+        console.log('ADSB20b fn_applyHashToMap: applying hash', mapState);
         this.m_suppressHashUpdate = true;
         this.m_Map.setView([mapState.lat, mapState.lng], mapState.zoom, { animate: false });
         this.m_suppressHashUpdate = false;
@@ -399,6 +400,7 @@ class CLeafLetAndruavMap {
             // only fire once per completed gesture (not continuously during
             // the drag/zoom itself), so this is inherently low-frequency.
             console.log('ADSB20a leaflet moveend/zoomend: center=', this.m_Map.getCenter(), 'zoom=', this.m_Map.getZoom(), 'size=', this.m_Map.getSize());
+            console.trace('ADSB20a TRACE: what triggered moveend/zoomend?');
             js_eventEmitter.fn_dispatch(js_event.EE_mapViewChanged);
         });
 
@@ -719,7 +721,7 @@ class CLeafLetAndruavMap {
             return;
         }
         let v_latlng = new L.LatLng(p_lat, p_lng);
-
+        console.log('ADSB20c fn_PanTo_latlng called', { lat: p_lat, lng: p_lng });
         this.m_Map.panTo(v_latlng);
     };
 
@@ -729,6 +731,7 @@ class CLeafLetAndruavMap {
             console.warn('Map not initialized');
             return;
         }
+        console.log('ADSB20d fn_PanTo called', p_marker._latlng);
         this.m_Map.panTo(p_marker._latlng);
     };
 
@@ -782,6 +785,7 @@ class CLeafLetAndruavMap {
     }
 
     fn_setZoom(p_zoom) {
+        console.log('ADSB20e fn_setZoom called', { zoom: p_zoom });
         this.m_Map.setZoom(p_zoom);
     };
 
