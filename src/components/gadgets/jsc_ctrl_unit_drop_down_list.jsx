@@ -4,7 +4,7 @@ import React    from 'react';
 import * as js_common from '../../js/js_common.js'
 
 import {js_globals} from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/js_eventList.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'

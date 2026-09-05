@@ -15,8 +15,8 @@ import { useTranslation, withTranslation } from 'react-i18next';
 
 import { js_globals } from '../js/js_globals.js';
 import * as js_siteConfig from '../js/js_siteConfig.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
-import { EVENTS as js_event } from '../js/js_eventList.js';
+import { js_eventEmitter } from '../js/events/js_eventEmitter';
+import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
 import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_showMap, toggleVideo } from '../js/js_main';
 import { fn_stopVideo } from '../js/mobile/js_mobile_commands.js';

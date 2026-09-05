@@ -6,8 +6,8 @@
 
 import React    from 'react';
 import {js_globals} from '../../../js/js_globals.js';
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
 import {ClssCtrlGPIO_Port} from './jsc_ctrl_gpio_port.jsx'

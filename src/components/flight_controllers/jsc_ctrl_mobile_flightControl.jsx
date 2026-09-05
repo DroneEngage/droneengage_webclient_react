@@ -1,8 +1,8 @@
 import React    from 'react';
 import { withTranslation } from 'react-i18next';
 import {js_globals} from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import {mavlink20} from '../../js/js_mavlink_v2.js';
 import {js_andruavAuth} from '../../js/protocol/auth/js_andruav_auth.js';
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';

@@ -5,8 +5,8 @@ import * as js_common from '../../../js/js_common.js'
 
 
 import { js_globals } from '../../../js/js_globals.js';
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 
 import { ClssSingleMissionControlBar } from './jsc_ctrl_single_mission_control_bar.jsx'
 import { ClssAndruavUnitDropDownList } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'

@@ -1,7 +1,7 @@
 import React    from 'react';
 
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../js/js_eventList.js';
-import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../js/events/js_eventList.js';
+import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { js_globals } from '../../js/js_globals.js';
 import { CONST_METER_TO_FEET } from '../../js/js_helpers.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';

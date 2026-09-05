@@ -26,8 +26,8 @@ import { ClssAndruavFencePlan } from './js_plan_fence.js'
 import { js_andruavAuth } from './protocol/auth/js_andruav_auth'
 import { js_leafletmap } from './maps/js_leafletmap.js'
 import { js_map3d } from './maps/js_map3d.js'
-import { js_eventEmitter } from './js_eventEmitter'
-import './js_eventEmitterConfig' // side-effect: opts telemetry-frequency events into rAF batching
+import { js_eventEmitter } from './events/js_eventEmitter'
+import './events/js_eventEmitterConfig' // side-effect: opts telemetry-frequency events into rAF batching
 import { js_localStorage } from './js_localStorage'
 import { js_webrtcstream } from './js_webrtcthin2.js'
 import { js_adsbUnit } from './js_adsbUnit.js'

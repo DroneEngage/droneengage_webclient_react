@@ -3,8 +3,8 @@ import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
-import { EVENTS as js_event } from '../../js/js_eventList.js'
-import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {

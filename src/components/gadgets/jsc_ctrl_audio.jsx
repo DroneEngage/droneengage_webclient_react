@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { js_globals } from '../../js/js_globals';
-import { EVENTS as js_event } from '../../js/js_eventList.js'
-import { js_eventEmitter } from '../../js/js_eventEmitter'
+import { EVENTS as js_event } from '../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 
 export class ClssCtrlAUDIO extends React.Component {
 

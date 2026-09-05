@@ -2,8 +2,8 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 
-import { EVENTS as js_event } from '../js/js_eventList.js';
-import { js_eventEmitter } from '../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../js/events/js_eventList.js';
+import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';

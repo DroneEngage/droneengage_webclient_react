@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { js_eventEmitter } from '../js_eventEmitter.js';
+import { js_eventEmitter } from '../events/js_eventEmitter.js';
 
 /**
  * Subscribes `callback` to `eventName` for the lifetime of the calling

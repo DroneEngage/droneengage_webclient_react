@@ -1,5 +1,5 @@
 import { js_globals } from '../../js_globals.js';
-import { EVENTS as js_event } from '../../js_eventList.js'
+import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
 import * as js_andruavUnit from '../../js_andruavUnit.js';
@@ -7,7 +7,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../js_common.js'
 import { js_localStorage } from '../../js_localStorage.js'
-import { js_eventEmitter } from '../../js_eventEmitter.js'
+import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'

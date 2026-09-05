@@ -5,8 +5,8 @@ import React    from 'react';
 
 import {Class_Radar_Screen} from '../micro_gadgets/jsc_mctrl_radar_screen.jsx'
 
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 
 export class ClssCtrlLidarDevice extends React.Component {
     

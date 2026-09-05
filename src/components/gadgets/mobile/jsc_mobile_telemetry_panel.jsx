@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { js_globals } from '../../../js/js_globals.js';
-import { EVENTS as js_event } from '../../../js/js_eventList.js';
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 
 const TELEMETRY_LEVEL_LABEL = ['OFF', '1', '2', '3'];

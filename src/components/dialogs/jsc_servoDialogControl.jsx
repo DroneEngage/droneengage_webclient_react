@@ -3,8 +3,8 @@ import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 import { js_globals } from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import { js_eventEmitter } from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {fn_helpPage} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 

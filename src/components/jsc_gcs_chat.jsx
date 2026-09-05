@@ -3,8 +3,8 @@ import { withTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 
 import { js_globals } from '../js/js_globals.js';
-import { EVENTS as js_event } from '../js/js_eventList.js';
-import { js_eventEmitter } from '../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../js/events/js_eventList.js';
+import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import { CONST_TARGETS_GCS } from '../js/protocol/server_comm/js_andruav_ws.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';

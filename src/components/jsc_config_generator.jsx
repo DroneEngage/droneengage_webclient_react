@@ -12,8 +12,8 @@ import { withTranslation } from 'react-i18next';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages'
 import { js_globals } from '../js/js_globals.js';
-import { EVENTS as js_event } from '../js/js_eventList.js'
-import { js_eventEmitter } from '../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../js/events/js_eventList.js'
+import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { fn_do_modal_alert, fn_do_modal_confirmation } from '../js/js_main.js';
 import {
   buildInitialValues,

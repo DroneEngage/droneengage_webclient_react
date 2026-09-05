@@ -2,8 +2,8 @@ import $ from 'jquery';
 
 import React    from 'react';
 
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 

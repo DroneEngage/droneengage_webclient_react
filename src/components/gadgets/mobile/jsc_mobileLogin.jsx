@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { EVENTS as js_event } from '../../../js/js_eventList.js';
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 import { js_globals } from '../../../js/js_globals.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 import { js_localStorage } from '../../../js/js_localStorage.js';

@@ -2,8 +2,8 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
-import { EVENTS as js_event } from '../../js/js_eventList.js';
-import { js_eventEmitter } from '../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../js/events/js_eventList.js';
+import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 import { fn_changeUDPPort } from '../../js/js_main.js';
 import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_message_control.jsx';

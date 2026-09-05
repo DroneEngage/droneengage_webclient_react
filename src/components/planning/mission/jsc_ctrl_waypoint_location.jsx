@@ -1,8 +1,8 @@
 import React    from 'react';
 
 import { mavlink20 } from '../../../js/js_mavlink_v2.js'
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 
 /**
  * Editable lat/lng/alt form for the currently selected waypoint (p_shape).

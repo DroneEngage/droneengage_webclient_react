@@ -3,9 +3,9 @@ import React    from 'react';
 
 
 import {js_globals} from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/js_eventList.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import * as js_common from '../../js/js_common.js'
 
 import {js_andruav_gamepad} from '../../js/gamepad/js_andruav_gamepad.js'

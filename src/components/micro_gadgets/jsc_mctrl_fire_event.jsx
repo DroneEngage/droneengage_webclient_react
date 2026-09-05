@@ -1,8 +1,8 @@
 import React from 'react';
 
 
-import { EVENTS as js_event } from '../../js/js_eventList.js'
-import { js_eventEmitter } from '../../js/js_eventEmitter'
+import { EVENTS as js_event } from '../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 import { js_localStorage } from '../../js/js_localStorage'
 
 export class ClssFireEvent extends React.Component {

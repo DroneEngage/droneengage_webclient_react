@@ -5,8 +5,8 @@ import 'jquery-knob/dist/jquery.knob.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';

@@ -19,8 +19,8 @@ import * as js_siteConfig from './js_siteConfig.js';
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
 import { js_globals } from "./js_globals.js";
-import { EVENTS as js_event } from './js_eventList.js'
-import { js_eventEmitter } from './js_eventEmitter.js'
+import { EVENTS as js_event } from './events/js_eventList.js'
+import { js_eventEmitter } from './events/js_eventEmitter.js'
 import { mavlink20 } from "./js_mavlink_v2.js";
 
 // Vehicle Types

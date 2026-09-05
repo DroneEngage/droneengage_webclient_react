@@ -21,8 +21,8 @@
  * Auth: Mohammad Hefny
  */
 
-import { js_eventEmitter } from '../js_eventEmitter.js';
-import { EVENTS as js_event } from '../js_eventList.js';
+import { js_eventEmitter } from '../events/js_eventEmitter.js';
+import { EVENTS as js_event } from '../events/js_eventList.js';
 import { js_globals } from '../js_globals.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_adsbUnit } from '../js_adsbUnit.js';

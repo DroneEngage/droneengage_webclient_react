@@ -3,8 +3,8 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 
 import {ClssCtrlLidarDevice} from '../gadgets/jsc_ctrl_lidar_device.jsx'
 import ClssDialogBase from './jsc_dialog_base.jsx';

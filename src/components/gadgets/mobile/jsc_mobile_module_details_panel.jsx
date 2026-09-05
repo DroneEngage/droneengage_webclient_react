@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../../js/js_eventList.js';
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 
 /**
  * Compact mobile bottom-sheet that displays module version information for a

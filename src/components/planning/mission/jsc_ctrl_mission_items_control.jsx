@@ -2,8 +2,8 @@ import React from 'react';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages';
 import * as js_common from '../../../js/js_common.js';
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js';
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
-import { js_eventEmitter } from '../../../js/js_eventEmitter.js';
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
+import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 import { js_leafletmap } from '../../../js/maps/js_leafletmap.js';
 import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
 import { setSelectedMissionFilePathToRead } from '../../../js/js_main.js';

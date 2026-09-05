@@ -3,7 +3,7 @@ import React    from 'react';
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
 import {js_localStorage} from '../../../js/js_localStorage.js'
-import {js_eventEmitter} from '../../../js/js_eventEmitter.js'
+import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_mission_plan from '../../../js/js_plan_mission.js'
 import * as js_fence_plan from '../../../js/js_mission_fence.js'

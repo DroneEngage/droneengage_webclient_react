@@ -11,7 +11,7 @@
 
 
 import React from 'react';
-import {EVENTS as js_event} from '../../../js/js_eventList.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 import ClassBarChart from '../../gadgets/jsc_ctrl_bar_chart'

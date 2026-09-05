@@ -15,7 +15,7 @@ import { useTranslation, withTranslation } from 'react-i18next';
 import { js_globals } from '../js/js_globals.js';
 import { js_localStorage } from '../js/js_localStorage.js';
 import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
-import { js_eventEmitter } from '../js/js_eventEmitter';
+import { js_eventEmitter } from '../js/events/js_eventEmitter';
 import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';
 import ClssGlobalSettings from '../components/Settings';

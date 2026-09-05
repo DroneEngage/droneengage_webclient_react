@@ -1,6 +1,6 @@
 import { js_globals } from "./js_globals.js";
-import { EVENTS as js_event } from './js_eventList.js'
-import { js_eventEmitter } from './js_eventEmitter';
+import { EVENTS as js_event } from './events/js_eventList.js'
+import { js_eventEmitter } from './events/js_eventEmitter';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
 

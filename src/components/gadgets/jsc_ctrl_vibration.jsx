@@ -1,8 +1,8 @@
 import React    from 'react';
 
 
-import {EVENTS as js_event} from '../../js/js_eventList.js'
-import {js_eventEmitter} from '../../js/js_eventEmitter'
+import {EVENTS as js_event} from '../../js/events/js_eventList.js'
+import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 
 export class ClssCtrlVibration extends React.Component {
