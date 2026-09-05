@@ -23,17 +23,28 @@ import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
 
 
+/**
+ * Max number of unit panels kept mounted at once in tabbed-display mode
+ * (the active unit plus the most-recently-visited ones). Inactive units
+ * beyond this set are unmounted so they stop receiving telemetry-driven
+ * re-renders while hidden. Keeps per-unit UI state (e.g. log history in
+ * ClssCtrlUnitLog) alive for recently-viewed units without keeping every
+ * connected unit's full control tree live.
+ */
+const CONST_KEEP_ALIVE_UNITS = 3;
+
+
 
 
 /**
- * 
+ *
  * Properties:
  * tab_planning: display planning tab... true in planner.
  * tab_main: display main bar control.... true in mnormal operation
  * tab_log: log tab that lists messages.
  * tab_details: detailed tab that display version, attached modules, received messages ....etc.
  * tab_modules: true to display any other module such as SDR,P2P,Audio ...etc.
- * 
+ *
  */
 class ClssAndruavUnitList extends React.Component {
   
@@ -45,6 +56,10 @@ class ClssAndruavUnitList extends React.Component {
             rnd:Math.random(),
 		    'm_update': 0,
             isMinimized: false,
+            // LRU set of party IDs whose full ClssAndruavUnitDrone tree stays
+            // mounted in tabbed-display mode. Always contains the active unit
+            // (most-recently pushed). Capped at CONST_KEEP_ALIVE_UNITS.
+            m_keepAlive: [],
 		};
 
         this.m_flag_mounted = false;
@@ -64,7 +79,27 @@ class ClssAndruavUnitList extends React.Component {
     {
         if (p_me.m_flag_mounted === false) return ;
 
-        p_me.setState({m_active_partyID: p_andruavUnit.getPartyID()});
+        p_me.fn_setActiveUnit(p_andruavUnit.getPartyID());
+    }
+
+    /**
+     * Select the active unit tab and record it in the LRU keep-alive set so
+     * its full ClssAndruavUnitDrone tree stays mounted (preserving per-unit
+     * UI state such as log history) even after the user switches to another
+     * unit, up to CONST_KEEP_ALIVE_UNITS recently-visited units.
+     */
+    fn_setActiveUnit (p_partyID)
+    {
+        if (this.m_flag_mounted === false) return ;
+
+        this.setState((prevState) => {
+            let v_keepAlive = prevState.m_keepAlive.filter(id => id !== p_partyID);
+            v_keepAlive.push(p_partyID);
+            while (v_keepAlive.length > CONST_KEEP_ALIVE_UNITS) {
+                v_keepAlive.shift();
+            }
+            return { m_active_partyID: p_partyID, m_keepAlive: v_keepAlive };
+        });
     }
       
     fn_unitOnlineChanged(me,p_andruavUnit)
@@ -241,6 +276,20 @@ class ClssAndruavUnitList extends React.Component {
 
             const v_prop = this.props;
 
+            // Resolve the active party ID for tabbed-display mode.
+            // - If the stored active unit is no longer connected, drop it so a
+            //   fallback (first eligible unit) can take over below.
+            // - If no unit has been selected yet (initial load, no marker/tab
+            //   click), the first eligible unit is treated as active so its
+            //   panel mounts and is visible immediately.
+            let activePartyID = me.state.m_active_partyID;
+            if (activePartyID !== undefined
+                && !sortedPartyIDs.some(obj => obj && obj.m_defined === true && obj.m_IsGCS === false && obj.getPartyID() === activePartyID))
+            {
+                activePartyID = undefined;
+            }
+            let fallbackActiveAssigned = false;
+
             sortedPartyIDs.map(function (object)
             {
 
@@ -262,17 +311,31 @@ class ClssAndruavUnitList extends React.Component {
                     {
                         // Display in Tabs
                         const header_info = me.getHeaderInfo(v_andruavUnit);
-                        const c_active = me.state.m_active_partyID === v_andruavUnit.getPartyID();
+                        let c_active = activePartyID === v_andruavUnit.getPartyID();
+                        // No unit selected yet: make the first eligible unit the
+                        // visible one so the user sees a panel on initial load.
+                        if (c_active === false && activePartyID === undefined && fallbackActiveAssigned === false)
+                        {
+                            c_active = true;
+                            fallbackActiveAssigned = true;
+                        }
+                        // Only keep-alive units (active + recently visited) get
+                        // their full ClssAndruavUnitDrone tree mounted. Everyone
+                        // else gets null: no telemetry-driven re-renders and no
+                        // live listeners while hidden.
+                        const c_keepAlive = c_active === true || me.state.m_keepAlive.includes(v_andruavUnit.getPartyID());
                         units_header.push(
                             <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
                                 <a
-                                className={`nav-link user-select-none txt-theme-aware  ${c_active === true ? '' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()}><span className={header_info.classes}> {header_info.text}</span> </a>
+                                className={`nav-link user-select-none txt-theme-aware  ${c_active === true ? 'active' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()} onClick={() => me.fn_setActiveUnit(partyID)}><span className={header_info.classes}> {header_info.text}</span> </a>
                             </li>
                         );
 
                         units_details.push(
                             <div key={'aud' + partyID} className={`tab-pane fade ${c_active === true ? 'active show' : ''}`} id={"tab_"+v_andruavUnit.getPartyID()}>
-                                <ClssAndruavUnitDrone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                                {c_keepAlive === true
+                                    ? <ClssAndruavUnitDrone p_unit = {v_andruavUnit} tab_collapsed={false} tab_planning={v_prop.tab_planning} tab_main={v_prop.tab_main} tab_log={v_prop.tab_log} tab_details={v_prop.tab_details} tab_module={v_prop.tab_module} />
+                                    : null}
                             </div>
                         );
                     }
