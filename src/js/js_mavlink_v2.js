@@ -15629,7 +15629,9 @@ MAVLink20Processor.prototype.parsePrefix = function() {
 MAVLink20Processor.prototype.parseLength = function() {
     
     if( this.buf.length >= 2 ) {
-        const unpacked = jspack.Unpack('BB', this.buf.slice(0, 2));
+        // subarray safe: Unpack only reads; the 2-byte view is local and
+        // discarded immediately, so no backing-buffer retention concern.
+        const unpacked = jspack.Unpack('BB', this.buf.subarray(0, 2));
         this.expected_length = unpacked[1] + mavlink20.HEADER_LEN + 2 // length of message + header + CRC
     }
 
@@ -15729,7 +15731,9 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // decode the header
     try {
-        unpacked = jspack.Unpack('cBBBBBBHB', msgbuf.slice(0, 10));
+        // subarray is safe here: jspack.Unpack only reads its input (verified
+        // in node_modules/jspack/jspack.js — all _De* paths are read-only).
+        unpacked = jspack.Unpack('cBBBBBBHB', msgbuf.subarray(0, 10));
         magic = unpacked[0];
         mlen = unpacked[1];
         incompat_flags = unpacked[2];
@@ -15763,12 +15767,13 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
 
     // decode the checksum
     try {
-        var receivedChecksum = jspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2));
+        var receivedChecksum = jspack.Unpack('<H', msgbuf.subarray(msgbuf.length - 2));
     } catch (e) {
         throw new Error("Unable to unpack MAVLink CRC: " + e.message);
     }
 
-    let messageChecksum = mavlink20.x25Crc(msgbuf.slice(1, msgbuf.length - 2));
+    // subarray safe: x25Crc only reads bytes via _.each (no mutation).
+    let messageChecksum = mavlink20.x25Crc(msgbuf.subarray(1, msgbuf.length - 2));
 
     // Assuming using crc_extra = True.  See the message.prototype.pack() function.
     messageChecksum = mavlink20.x25Crc([decoder.crc_extra], messageChecksum);
@@ -15778,7 +15783,11 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     }
 
     let paylen = jspack.CalcLength(decoder.format);
-    let payload = msgbuf.slice(mavlink20.HEADER_LEN, msgbuf.length - 2);
+    // subarray safe: msgbuf is already a standalone copy (parsePayload slices
+    // it off this.buf), and payload is only read by jspack.Unpack below. When
+    // truncation padding is needed the branch below reassigns payload to a
+    // fresh copy, so the view never escapes mutated.
+    let payload = msgbuf.subarray(mavlink20.HEADER_LEN, msgbuf.length - 2);
 
     //put any truncated 0's back in
     if (paylen > payload.length) {
