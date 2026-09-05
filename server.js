@@ -108,9 +108,14 @@ function fn_forwardJson(proxyRes, res) {
 }
 
 // Proxy: OpenSky states API (GET)
+// Forwards the browser-supplied Authorization header (bearer token from
+// /opensky/token) so OpenSky sees an authenticated request and applies the
+// higher rate limit. Without this the request goes anonymous and hits 429.
 app.get('/opensky/api/*', (req, res) => {
   const targetUrl = OPENSKY_API + req.url.replace('/opensky/api', '');
-  const proxyReq = https.get(targetUrl, (proxyRes) => fn_forwardJson(proxyRes, res));
+  const fwdHeaders = {};
+  if (req.headers['authorization']) fwdHeaders['Authorization'] = req.headers['authorization'];
+  const proxyReq = https.get(targetUrl, { headers: fwdHeaders }, (proxyRes) => fn_forwardJson(proxyRes, res));
   proxyReq.on('error', (e) => res.status(502).json({ error: e.message }));
 });
 

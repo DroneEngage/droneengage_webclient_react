@@ -320,7 +320,7 @@ class ClssMapSettings extends React.Component {
               onChange={this.fn_handleTileCacheToggle}
             />
             <span className="form-text small text-muted me-3">
-              {mapTileCacheEnabled ? 'IndexedDB cache on (cache-first, falls back to network on miss/CORS)' : 'Uncached — every tile fetched from network'}
+              {mapTileCacheEnabled ? 'On — maps load faster and use less data' : 'Off — maps are always downloaded fresh'}
             </span>
             <button
               type="button"
