@@ -1080,8 +1080,6 @@ function fn_onAdsbError(me, p_msg) {
 
 // eslint-disable-next-line no-unused-vars
 function fn_adsbExpiredUpdate(me) {
-	console.log('ADSB16 fn_adsbExpiredUpdate: EE_adsbExpiredUpdate handler enter', { registryCount: js_adsbUnit.count });
-	const tExpStart = performance.now();
 	// Use the same timeout as the ADSB manager's purge window so markers
 	// stay hidden/purged in sync. Default is 4x the refresh rate (240s at
 	// 60s refresh) so a plane survives ~4 missed polls.
@@ -1090,36 +1088,26 @@ function fn_adsbExpiredUpdate(me) {
 	const count = js_adsbUnit.count;
 	const now = new Date();
 	const p_keys = Object.keys(js_adsbUnit.List);
-	let hidden = 0;
 
-	console.log('ADSB16c fn_adsbExpiredUpdate: starting loop', { count, timeoutMs: ADSB_OBJECT_TIMEOUT });
 	for (let i = 0; i < count; ++i) {
 		let adsb_obj = js_adsbUnit.List[p_keys[i]];
 
 		if ((now - adsb_obj.m_last_access) > ADSB_OBJECT_TIMEOUT) {
-			const tItemStart = performance.now();
 			if (adsb_obj.p_marker !== null && adsb_obj.p_marker !== undefined) {
-				console.log('ADSB16d fn_adsbExpiredUpdate: hiding leaflet marker', { icao: adsb_obj.m_icao_address });
 				js_leafletmap.fn_hideItem(adsb_obj.p_marker);
 			}
-			console.log('ADSB16e fn_adsbExpiredUpdate: calling fn_removeAdsbMarker', { icao: adsb_obj.m_icao_address });
 			js_map3d.fn_removeAdsbMarker(adsb_obj);
-			console.log('ADSB16f fn_adsbExpiredUpdate: fn_removeAdsbMarker done', { icao: adsb_obj.m_icao_address, ms: Math.round(performance.now() - tItemStart) });
 			if (v_adsbMap3dSelectedIcao === adsb_obj.m_icao_address) {
 				fn_clearAdsbMap3dSelection();
 			}
-			hidden++;
 		}
 	}
 
-	console.log('ADSB16g fn_adsbExpiredUpdate: loop done, calling fn_flushAdsbTethers', { hidden });
 	// Push the (now shorter) 3D tether/ground/altitude-circle feature lists
 	// to Mapbox in a single batch rather than once per removed aircraft.
 	js_map3d.fn_flushAdsbTethers();
-	console.log('ADSB16h fn_adsbExpiredUpdate: fn_flushAdsbTethers done');
 
 	fn_updateAdsbQueryCircle();
-	console.log('ADSB16b fn_adsbExpiredUpdate: done', { hidden, ms: Math.round(performance.now() - tExpStart) });
 }
 
 /**
@@ -1240,10 +1228,7 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 		visible = visible.slice(0, CONST_ADSB_MAX_RENDERED_MARKERS);
 	}
 	const visibleSet = new Set(visible);
-	console.log('ADSB13 fn_renderAdsbMarkers', { isDataUpdate, total: all.length, visible: visible.length });
 
-	let rendered = 0, hidden = 0;
-	const tRenderStart = performance.now();
 	for (let i = 0; i < all.length; ++i) {
 		const p_adsbObject = all[i];
 		if (visibleSet.has(p_adsbObject)) {
@@ -1256,7 +1241,6 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 				// setLatLng/setRotationAngle would just repeat that work
 				// as redundant DOM style mutations.
 				fn_renderSingleAdsb(p_adsbObject);
-				rendered++;
 			}
 		} else if (p_adsbObject.p_marker) {
 			// Off-screen or beyond the cap - drop the live marker so it
@@ -1265,15 +1249,11 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 			// visible set.
 			js_leafletmap.fn_hideItem(p_adsbObject.p_marker);
 			p_adsbObject.p_marker = null;
-			hidden++;
 		}
 	}
-	console.log('ADSB13b fn_renderAdsbMarkers: loop done', { isDataUpdate, rendered, hidden, ms: Math.round(performance.now() - tRenderStart) });
 }
 
 function fn_adsbObjectUpdate() {
-	console.log('ADSB12 fn_adsbObjectUpdate: EE_adsbExchangeReady handler enter', { registryCount: js_adsbUnit.count });
-	const tUpdateStart = performance.now();
 	// The ADSB manager dispatches EE_adsbExchangeReady once per fetch;
 	// fn_renderAdsbMarkers reads the current registry itself (see its doc
 	// comment) so no data needs to be threaded through here. Pass true so
@@ -1287,7 +1267,6 @@ function fn_adsbObjectUpdate() {
 
 	// Keep the query-area circle in sync with the current coverage.
 	fn_updateAdsbQueryCircle();
-	console.log('ADSB14 fn_adsbObjectUpdate: done', { ms: Math.round(performance.now() - tUpdateStart) });
 }
 
 // Re-render ADSB markers when the unit system (metric/imperial) changes so
@@ -3967,10 +3946,7 @@ export function fn_on_ready() {
 		// piling up at extreme offsets while zooming in get culled right away.
 		// Wrapped so isDataUpdate=false is passed (view change only: skip
 		// full re-render for markers that already exist, just cull/create).
-		js_eventEmitter.fn_subscribe(js_event.EE_mapViewChanged, this, () => {
-			console.log('ADSB20 EE_mapViewChanged fired → fn_renderAdsbMarkers(false)', { hasMarkers: Object.values(js_adsbUnit.List || {}).some(o => o && o.p_marker) });
-			fn_renderAdsbMarkers(false);
-		});
+		js_eventEmitter.fn_subscribe(js_event.EE_mapViewChanged, this, () => fn_renderAdsbMarkers(false));
 		// Clear all ADSB markers from the map when ADSB is disabled.
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbCleared, this, fn_clearAdsbFromMap);
 		// Turn the ADSB query circle red when the provider reports a fetch

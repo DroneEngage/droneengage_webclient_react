@@ -470,11 +470,9 @@ class AdsbManager {
         // rate-limit backoff (e.g. a recent 429), in which case skip the
         // immediate fetch and let the interval pick up when backoff elapses.
         if (!provider.rateLimitedUntil || Date.now() >= provider.rateLimitedUntil) {
-            console.log('ADSB1 timer: immediate tick firing');
             this._tick().catch((e) => console.error('[adsb] tick error:', e));
         }
         this._timer = setInterval(() => {
-            console.log('ADSB1 timer: interval tick firing');
             me._tick().catch((e) => console.error('[adsb] tick error:', e));
         }, provider.refreshRateMs);
     }
@@ -488,7 +486,6 @@ class AdsbManager {
     }
 
     async _tick() {
-        console.log('ADSB2 _tick: enter', { hasArea: this.hasQueryArea(), inflight: this._inflight });
         if (!this.hasQueryArea()) return;
         if (this._inflight) return;
         const provider = this._ensureProvider();
@@ -496,15 +493,12 @@ class AdsbManager {
         // Respect provider rate-limit backoff (set when a 429 was received).
         // Skip this tick; the interval will fire again after refreshRateMs.
         if (provider.rateLimitedUntil && Date.now() < provider.rateLimitedUntil) {
-            console.log('ADSB2 _tick: rate-limited, skipping');
             return;
         }
         provider.setQueryArea(this._lat, this._lng, this._radius);
         this._inflight = true;
         let aircraft = [];
-        const tFetchStart = performance.now();
         try {
-            console.log('ADSB3 _tick: calling provider.fetch', { lat: this._lat, lng: this._lng, radiusKm: this._radius, provider: provider.id });
             aircraft = await provider.fetch(this._lat, this._lng, this._radius);
         } catch (e) {
             console.error(`[adsb] ${provider.id} fetch failed:`, e);
@@ -521,8 +515,6 @@ class AdsbManager {
             this._inflight = false;
         }
 
-        console.log('ADSB9 _tick: fetch returned', { count: aircraft.length, ms: Math.round(performance.now() - tFetchStart) });
-
         // Clear any previous error state on success.
         if (this._lastError !== null) {
             this._lastError = null;
@@ -530,27 +522,15 @@ class AdsbManager {
         }
 
         // Merge into the shared registry.
-        console.log('ADSB10 _tick: merging into registry');
         js_adsbUnit.fn_mergeNormalized(aircraft);
 
         // Notify the map layer that fresh data is available.
-        console.log('ADSB11 _tick: dispatching EE_adsbExchangeReady');
         js_eventEmitter.fn_dispatch(js_event.EE_adsbExchangeReady, js_adsbUnit);
 
         // Let the map hide stale markers before we purge them from the registry.
-        console.log('ADSB15 _tick: dispatching EE_adsbExpiredUpdate');
         js_eventEmitter.fn_dispatch(js_event.EE_adsbExpiredUpdate, this);
         const cutoff = Date.now() - this._objectTimeoutMs;
-        console.log('ADSB17 _tick: purging registry older than cutoff');
         js_adsbUnit.fn_purgeOlderThan(cutoff);
-        console.log('ADSB18 _tick: COMPLETE — all JS done, browser will render now');
-
-        // Schedule a rAF marker to detect browser rendering stalls. If the
-        // gap between ADSB18 and ADSB19 is large, the browser is freezing
-        // during rendering (layout/paint/composite), not in JS.
-        requestAnimationFrame(() => {
-            console.log('ADSB19 rAF: browser rendered a frame after ADSB tick');
-        });
     }
 
     _onPreferenceChanged() {

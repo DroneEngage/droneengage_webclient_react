@@ -2125,10 +2125,7 @@ class CAndruavMap3D {
         }
 
         if (this.m_adsbModelFeatures.delete(icao)) {
-            console.log('ADSB16e1 fn_removeAdsbMarker: calling fn_flushAdsbModels (per-aircraft!)', { icao });
-            const tFlushStart = performance.now();
             this.fn_flushAdsbModels();
-            console.log('ADSB16e2 fn_removeAdsbMarker: fn_flushAdsbModels done', { icao, ms: Math.round(performance.now() - tFlushStart) });
         }
 
         this.m_adsbTetherData.delete(icao);

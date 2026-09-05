@@ -349,6 +349,13 @@ class CLeafLetAndruavMap {
         this.m_windArrowLastRefresh = 0;     // ms epoch of last visual refresh (throttle)
         this.m_windArrowLastSpeed = new Map(); // unitId -> last speed (skip icon rebuild)
 
+        // Canvas renderer for the ADSB query circle. Lazily created on first
+        // use (see fn_drawAdsbQueryCircle). Using Canvas instead of SVG for
+        // the query circle avoids browser freezes when zoomed in: the 850km
+        // circle would otherwise produce an SVG <path> with million-pixel
+        // coordinates that stalls layout/composite on every zoom frame.
+        this.m_adsbCircleRenderer = null;
+
     };
 
     fn_parseMapHash() {
@@ -384,7 +391,6 @@ class CLeafLetAndruavMap {
         const mapState = this.fn_parseMapHash();
         if (!mapState) return;
 
-        console.log('ADSB20b fn_applyHashToMap: applying hash', mapState);
         this.m_suppressHashUpdate = true;
         this.m_Map.setView([mapState.lat, mapState.lng], mapState.zoom, { animate: false });
         this.m_suppressHashUpdate = false;
@@ -399,8 +405,6 @@ class CLeafLetAndruavMap {
             // js_main.js) re-evaluate what's on/off screen. moveend/zoomend
             // only fire once per completed gesture (not continuously during
             // the drag/zoom itself), so this is inherently low-frequency.
-            console.log('ADSB20a leaflet moveend/zoomend: center=', this.m_Map.getCenter(), 'zoom=', this.m_Map.getZoom(), 'size=', this.m_Map.getSize());
-            console.trace('ADSB20a TRACE: what triggered moveend/zoomend?');
             js_eventEmitter.fn_dispatch(js_event.EE_mapViewChanged);
         });
 
@@ -721,7 +725,7 @@ class CLeafLetAndruavMap {
             return;
         }
         let v_latlng = new L.LatLng(p_lat, p_lng);
-        console.log('ADSB20c fn_PanTo_latlng called', { lat: p_lat, lng: p_lng });
+
         this.m_Map.panTo(v_latlng);
     };
 
@@ -731,7 +735,6 @@ class CLeafLetAndruavMap {
             console.warn('Map not initialized');
             return;
         }
-        console.log('ADSB20d fn_PanTo called', p_marker._latlng);
         this.m_Map.panTo(p_marker._latlng);
     };
 
@@ -785,7 +788,6 @@ class CLeafLetAndruavMap {
     }
 
     fn_setZoom(p_zoom) {
-        console.log('ADSB20e fn_setZoom called', { zoom: p_zoom });
         this.m_Map.setZoom(p_zoom);
     };
 
@@ -924,6 +926,16 @@ class CLeafLetAndruavMap {
      * orange outline (e.g. red when the ADSB provider is in an error state).
      */
     fn_drawAdsbQueryCircle(p_lat, p_lng, p_radiusKm, p_color) {
+        // Use a Canvas renderer instead of the default SVG renderer.
+        // The ADSB query circle can have a radius of 850+ km; when zoomed
+        // in, that translates to a pixel radius of millions, and Leaflet's
+        // SVG renderer creates a <path> with coordinates in the millions
+        // that freezes the browser during layout/composite on every zoom
+        // frame. Canvas clips to the viewport automatically, so only the
+        // visible arc is drawn regardless of the circle's true pixel size.
+        if (!this.m_adsbCircleRenderer) {
+            this.m_adsbCircleRenderer = L.canvas({ padding: 0.5 });
+        }
         return L.circle([p_lat, p_lng], {
             radius: Math.round(p_radiusKm * 1000),
             fill: false,
@@ -931,7 +943,9 @@ class CLeafLetAndruavMap {
             opacity: 0.8,
             weight: 1,
             dashArray: '2, 6',
-            lineCap: 'round'
+            lineCap: 'round',
+            renderer: this.m_adsbCircleRenderer,
+            interactive: false
         }).addTo(this.m_Map);
     }
 
