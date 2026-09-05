@@ -72,9 +72,9 @@ export class ClssAndruavUnitDropDownList extends React.Component {
     }
 
     componentWillUnmount () {
-        this._isMounted = false;
+        this.m_flag_mounted = false;
 		js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this);
+        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged,this);
 
     }
 

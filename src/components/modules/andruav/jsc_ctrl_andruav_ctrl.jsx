@@ -30,6 +30,11 @@ export class ClssCtrlAndruavCtrl extends React.Component {
         }
     }
 
+    componentWillUnmount () {
+        this.m_flag_mounted = false;
+        js_eventEmitter.fn_unsubscribe(js_event.EE_BattViewToggle, this);
+    }
+
     fn_makeFlash(p_andruavUnit) {
         js_globals.v_andruavFacade.API_makeFlash(p_andruavUnit);
         this.setState((s) => ({ m_flashActive: !s.m_flashActive }));

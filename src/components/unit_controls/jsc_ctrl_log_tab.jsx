@@ -84,6 +84,15 @@ export  class ClssCtrlUnitLog  extends React.Component {
             time: (new Date()).toLocaleTimeString()
         });
 
+        // Trim the backing array so it never grows beyond the display window.
+        // Render only ever shows the last CONST_MAX_MESSAGE_LOG entries; without
+        // this the array (and every message/unit reference inside it) grows
+        // unbounded over a long session.
+        const v_cap = js_globals.CONST_MAX_MESSAGE_LOG;
+        if (p_me.state.m_message.length > v_cap) {
+            p_me.state.m_message.splice(0, p_me.state.m_message.length - v_cap);
+        }
+
         
         if (p_me.m_flag_mounted === false)return ;
         p_me.setState({'m_update': p_me.state.m_update +1});
@@ -100,7 +109,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
     }
 
     componentWillUnmount () {
-        this._isMounted = false;
+        this.m_flag_mounted = false;
 		js_eventEmitter.fn_unsubscribe (js_event.EE_onMessage,this);
     }
 

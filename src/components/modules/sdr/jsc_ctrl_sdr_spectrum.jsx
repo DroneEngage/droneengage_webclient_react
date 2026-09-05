@@ -23,12 +23,24 @@ class ClassSDRSpectrumVisualizer extends React.Component {
             m_update : 0
         };
 
+        this.m_flag_mounted = false;
+
         js_eventEmitter.fn_subscribe (js_event.EE_unitSDRSpectrum,this,this.fn_unitUpdated);
     
     }
 
+    componentDidMount() {
+        this.m_flag_mounted = true;
+    }
+
+    componentWillUnmount () {
+        this.m_flag_mounted = false;
+        js_eventEmitter.fn_unsubscribe (js_event.EE_unitSDRSpectrum,this);
+    }
+
     fn_unitUpdated (p_me, p_unit)
     {
+        if (p_me.m_flag_mounted === false) return;
         //p_me.fn_copyData(p_me, p_unit);
         p_me.setState({m_update:p_me.state.m_update});
     }
