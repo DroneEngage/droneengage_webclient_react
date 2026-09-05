@@ -5,6 +5,7 @@ import { js_localStorage } from '../../js/js_localStorage';
 import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
 import { js_leafletmap } from '../../js/maps/js_leafletmap.js';
 import { js_map3d } from '../../js/maps/js_map3d.js';
+import { js_tileCache } from '../../js/maps/js_tileCache.js';
 
 // Each Leaflet 2D tile provider/style carries its own urlTemplate with a
 // {token} placeholder. fn_resolveTileUrl (js_leafletmap.js) substitutes the
@@ -137,6 +138,8 @@ class ClssMapSettings extends React.Component {
       mapboxAccessToken: '',
       leafletStyleId: LEAFLET_STYLE_OPTIONS[0].id,
       mapboxStyleUrl: MAPBOX_STYLE_OPTIONS[0].url,
+      mapTileCacheEnabled: true,
+      mapTileCacheStatus: '',
     };
   }
 
@@ -151,6 +154,7 @@ class ClssMapSettings extends React.Component {
       mapboxAccessToken: localStorageMapboxToken || '',
       leafletStyleId: fn_extractStyleIdFromLeafletUrl(localStorageUrl),
       mapboxStyleUrl: localStorageStyle || MAPBOX_STYLE_OPTIONS[0].url,
+      mapTileCacheEnabled: js_localStorage.fn_getMapTileCacheEnabled(),
     });
   }
 
@@ -193,6 +197,37 @@ class ClssMapSettings extends React.Component {
     this.setState({ mapboxStyleUrl: e.target.value }, this.fn_saveMapSettings);
   };
 
+  // Toggle the IndexedDB tile cache on/off. Persists to localStorage,
+  // mirrors onto js_siteConfig.CONST_MAP_TILE_CACHE.ENABLED in place (so
+  // js_tileCache.fn_isEnabled() picks it up immediately on the next tile
+  // request), and refreshes the basemap so the layer re-requests tiles
+  // under the new caching policy instead of waiting for a pan/zoom.
+  fn_handleTileCacheToggle = (e) => {
+    const enabled = e.target.checked;
+    js_localStorage.fn_setMapTileCacheEnabled(enabled);
+    if (js_siteConfig.CONST_MAP_TILE_CACHE) {
+      js_siteConfig.CONST_MAP_TILE_CACHE.ENABLED = enabled;
+    }
+    this.setState({ mapTileCacheEnabled: enabled, mapTileCacheStatus: '' }, () => {
+      js_leafletmap.fn_refreshBasemap();
+    });
+  };
+
+  // Wipe the IndexedDB tile store. Useful after switching providers or
+  // when cached tiles go stale. Best-effort: reports success/failure in
+  // the status line next to the button.
+  fn_handleClearTileCache = () => {
+    this.setState({ mapTileCacheStatus: 'clearing…' });
+    js_tileCache.clearCache()
+      .then(() => {
+        this.setState({ mapTileCacheStatus: 'cache cleared' });
+      })
+      .catch((err) => {
+        console.error('[ClssMapSettings] clearCache failed:', err);
+        this.setState({ mapTileCacheStatus: 'clear failed' });
+      });
+  };
+
   // Swap the live tile layer / Mapbox GL style in place instead of
   // reloading the whole site - a full page reload would also drop the
   // websocket session (login, connected units, telemetry) just to pick up
@@ -206,7 +241,7 @@ class ClssMapSettings extends React.Component {
   render() {
     const { t } = this.props;
     const dir = this.props.i18n.language === 'ar' ? 'rtl' : 'ltr';
-    const { leafletAccessToken, mapboxAccessToken, leafletStyleId, mapboxStyleUrl } = this.state;
+    const { leafletAccessToken, mapboxAccessToken, leafletStyleId, mapboxStyleUrl, mapTileCacheEnabled, mapTileCacheStatus } = this.state;
 
     return (
       <fieldset dir={dir}>
@@ -271,6 +306,34 @@ class ClssMapSettings extends React.Component {
             value={mapboxAccessToken}
             onChange={this.fn_handleMapboxAccessTokenChange}
           />
+        </div>
+        <div className="row mb-2 align-items-center">
+          <label htmlFor="check_enable_tile_cache" className="col-sm-4 col-form-label">
+            Enable Map Tile Cache
+          </label>
+          <div className="col-sm-8 d-flex align-items-center">
+            <input
+              className="form-check-input me-2"
+              type="checkbox"
+              id="check_enable_tile_cache"
+              checked={mapTileCacheEnabled}
+              onChange={this.fn_handleTileCacheToggle}
+            />
+            <span className="form-text small text-muted me-3">
+              {mapTileCacheEnabled ? 'IndexedDB cache on (cache-first, falls back to network on miss/CORS)' : 'Uncached — every tile fetched from network'}
+            </span>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={this.fn_handleClearTileCache}
+              disabled={!mapTileCacheEnabled}
+            >
+              Clear Cache
+            </button>
+            {mapTileCacheStatus && (
+              <span className="form-text small text-muted ms-2">{mapTileCacheStatus}</span>
+            )}
+          </div>
         </div>
         <div className="row mb-2">
           <div className="col-sm-8 offset-sm-4">

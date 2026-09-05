@@ -37,7 +37,10 @@ js_main.js  ──► js_adsbManager (singleton)  ──► AdsbProvider (abstra
 - `src/js/adsb/js_adsbManager.js` — singleton owning the polling loop, provider
   selection, registry merge, and event dispatch. Entry points:
   `fn_changeDefaultLocation(lat,lng,radiusKm)`, `fn_getADSBDataForUnit(unit)`,
-  `fn_reloadProvider()`, `fn_initAdsb()`.
+  `fn_reloadProvider()`, `fn_initAdsb()`, `fn_getLastError()`. Dispatches
+  `EE_adsbError` (with the error message string, or null to clear) when a
+  provider fetch fails/succeeds — the map toggle buttons turn red and the
+  query circle switches from orange to red while the error is active.
 - `src/js/js_adsbUnit.js` — `CADSBObjectList` registry + `CADSBObject`. The
   `m_*` field names are the **rendering contract** consumed by `js_main.js`
   (`fn_adsbObjectUpdate` / `fn_adsbExpiredUpdate`) — do not rename them.

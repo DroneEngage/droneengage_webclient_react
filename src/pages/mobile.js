@@ -1,10 +1,11 @@
-import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 import '../css/css_mobile.css';
+
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
@@ -52,6 +53,8 @@ import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { js_speak } from '../js/js_speak.js';
 import { js_localStorage } from '../js/js_localStorage';
 
+fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
+
 
 const Mobile = () => {
   useTranslation('home');
@@ -72,6 +75,36 @@ const Mobile = () => {
     tickRef.current++;
     forceUpdate(tickRef.current);
   }, []);
+
+  // Throttled refresh for high-frequency telemetry events (EE_unitNavUpdated,
+  // EE_unitPowUpdated, EE_msgFromUnit_GPS). These fire at 10-50Hz per unit
+  // (every MAVLink ATTITUDE/GPS/BATTERY packet). The mobile page reads
+  // nav/power fields in its telemetry grid, so it needs to re-render — but
+  // 5Hz (200ms) is fast enough for a mobile HUD and cuts the re-render rate
+  // 4-10x, preventing the main-thread flooding that makes the map hang.
+  // Low-frequency events (unitAdded, armed, flying, video, socket, etc.)
+  // use the immediate refresh above so discrete state changes appear instantly.
+  const throttleRef = useRef({ lastTs: 0, pending: false, handle: null });
+  const refreshThrottled = useCallback(() => {
+    const now = Date.now();
+    const state = throttleRef.current;
+    const elapsed = now - state.lastTs;
+    if (elapsed >= 200) {
+      state.lastTs = now;
+      state.pending = false;
+      if (state.handle) { clearTimeout(state.handle); state.handle = null; }
+      refresh();
+    } else if (!state.pending) {
+      state.pending = true;
+      const delay = 200 - elapsed;
+      state.handle = setTimeout(() => {
+        state.handle = null;
+        state.pending = false;
+        state.lastTs = Date.now();
+        refresh();
+      }, delay);
+    }
+  }, [refresh]);
 
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
@@ -95,12 +128,11 @@ const Mobile = () => {
     const unitSystemListener = unitSystemListenerRef.current;
     js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', unitSystemListener, handleUnitSystemChange);
 
-    const events = [
+    // Low-frequency events: re-render immediately so discrete state changes
+    // (armed, flying, online, video, socket, module) appear without delay.
+    const immediateEvents = [
       js_event.EE_unitAdded,
       js_event.EE_unitUpdated,
-      js_event.EE_unitNavUpdated,
-      js_event.EE_unitPowUpdated,
-      js_event.EE_msgFromUnit_GPS,
       js_event.EE_andruavUnitFlyingUpdated,
       js_event.EE_andruavUnitFightModeUpdated,
       js_event.EE_andruavUnitArmedUpdated,
@@ -112,9 +144,23 @@ const Mobile = () => {
       js_event.EE_OldModule,
     ];
 
+    // High-frequency telemetry events: throttled to 5Hz (200ms) to avoid
+    // main-thread flooding. The mobile telemetry grid reads nav/power/GPS
+    // fields from the unit object, so it needs periodic re-renders, but
+    // 50Hz is overkill for a mobile HUD and starves the map/gesture thread.
+    const throttledEvents = [
+      js_event.EE_unitNavUpdated,
+      js_event.EE_unitPowUpdated,
+      js_event.EE_msgFromUnit_GPS,
+    ];
+
     const listenerObj = {};
-    events.forEach((evt) => {
+    immediateEvents.forEach((evt) => {
       js_eventEmitter.fn_subscribe(evt, listenerObj, refresh);
+    });
+    const throttleListenerObj = {};
+    throttledEvents.forEach((evt) => {
+      js_eventEmitter.fn_subscribe(evt, throttleListenerObj, refreshThrottled);
     });
 
     // Track login state changes
@@ -135,14 +181,21 @@ const Mobile = () => {
 
     return () => {
       js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', unitSystemListener);
-      events.forEach((evt) => {
+      immediateEvents.forEach((evt) => {
         js_eventEmitter.fn_unsubscribe(evt, listenerObj);
       });
+      throttledEvents.forEach((evt) => {
+        js_eventEmitter.fn_unsubscribe(evt, throttleListenerObj);
+      });
+      if (throttleRef.current.handle) {
+        clearTimeout(throttleRef.current.handle);
+        throttleRef.current.handle = null;
+      }
       js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Logined, authObj);
       js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, authObj);
       js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, authObj);
     };
-  }, [refresh]);
+  }, [refresh, refreshThrottled]);
 
   const getDroneUnits = () => {
     // Use fn_getUnitsSorted() — same method ClssAndruavUnitList uses in home.js.

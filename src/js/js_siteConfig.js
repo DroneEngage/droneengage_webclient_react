@@ -293,6 +293,12 @@ export function fn_applyRuntimeConfig(data) {
 
         const localStorageStyle = js_localStorage.fn_getMapboxStyle();
         if (localStorageStyle) CONST_MAPBOX_STYLE = localStorageStyle;
+
+        // Apply localStorage override for the tile-cache enable flag.
+        // Unlike the token/url overrides above, this is a boolean, so it
+        // is applied unconditionally — a stored `false` is a valid,
+        // intentional override and must win over the config/default.
+        CONST_MAP_TILE_CACHE.ENABLED = js_localStorage.fn_getMapTileCacheEnabled();
     } catch (error) {
         console.error('Error applying config:', error);
     }

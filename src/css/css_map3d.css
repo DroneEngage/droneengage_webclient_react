@@ -147,6 +147,14 @@
   opacity: 1;
 }
 
+/* ADSB provider error state — red background to surface fetch failures
+   (HTTP 500, network error, rate limit, etc.) on the 3D map. */
+.css_map3d_modelsize_ctrl button.css_map3d_adsb_toggle.error {
+  background: #f8d7da;
+  border: 1px solid #dc3545;
+  opacity: 1;
+}
+
 /* Chase-cam (follow) toggle control — single button, bottom-left of the 3D
    map. active = follow mode on (camera trails the selected unit). */
 .css_map3d_follow_ctrl {

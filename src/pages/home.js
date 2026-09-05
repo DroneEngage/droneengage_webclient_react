@@ -1,4 +1,3 @@
-import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
@@ -7,6 +6,8 @@ import '../css/css_gamepad.css';
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
+
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
@@ -44,6 +45,8 @@ import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog
 import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
 import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx';
 import { fn_on_ready } from '../js/js_main';
+
+fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 
 const Home = () => {
   useTranslation('home'); // Use home namespace

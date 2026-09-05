@@ -10,7 +10,6 @@ import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import { js_globals } from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
-import {loadConfigurationFiles} from '../../../js/js_configuration_files.js'
 
 
 export class ClssCtrlExperimental extends React.Component {
@@ -21,8 +20,6 @@ export class ClssCtrlExperimental extends React.Component {
         };
 
         this.m_flag_mounted = false;
-
-        this.jsonData = loadConfigurationFiles('mavlink.json');
     }
 
     componentWillUnmount() {
@@ -65,13 +62,6 @@ export class ClssCtrlExperimental extends React.Component {
         if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
         if (p_me.m_flag_mounted === false) return;
         p_me.setState({ 'm_update': p_me.state.m_update + 1 });
-    }
-
-    fn_applyMavlinkConfiguration (p_contents)
-    {
-        const v_andruavUnit = this.props.p_unit;
-        console.log(p_contents);
-        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
     }
 
     render() {

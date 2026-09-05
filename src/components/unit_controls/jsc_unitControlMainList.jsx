@@ -21,6 +21,7 @@ import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 
 
 import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
+import ClssUnitTabHeaderItem from './jsc_unit_tab_header.jsx'
 
 
 /**
@@ -67,9 +68,13 @@ class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
+        // EE_unitOnlineChanged / EE_andruavUnitArmedUpdated / EE_andruavUnitFCBUpdated
+        // used to all funnel into fn_unitOnlineChanged, forcing this whole list
+        // (every connected unit's tab header) to re-render on any single unit's
+        // armed/FCB/online tick. Each tab header now reads those fields itself
+        // via useUnitField (see jsc_unit_tab_header.jsx), bridged from the same
+        // three events in js_main.js - so only the affected unit's header
+        // re-renders, not the whole list.
         js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
         js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted,this,this.fn_unitOnUnitHighlighted);
         
@@ -184,65 +189,11 @@ class ClssAndruavUnitList extends React.Component {
         js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonPreferenceChanged,this);
         js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonSocketStatus,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitArmedUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitFCBUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitHighlighted,this);
         
     }
 
-    /**
-     * determine text and style of tabs of each drone.
-     * @param {*} v_andruavUnit 
-     * @returns classes, text
-     */
-    getHeaderInfo(v_andruavUnit)
-    {
-        const bad_fcb = (
-            (v_andruavUnit.m_modules.has_fcb === true)
-            &&
-            ((v_andruavUnit.m_useFCBIMU === false)
-            ||((v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_DroneKit_Telemetry)
-            && (v_andruavUnit.m_telemetry_protocol !== js_andruavMessages.CONST_TelemetryProtocol_CONST_Mavlink_Telemetry)))
-            );
-
-        let classes = "";
-        let text = v_andruavUnit.m_unitName;
-        if (v_andruavUnit.m_FCBParameters.m_systemID !== 0)
-        {
-            text += ":" + v_andruavUnit.m_FCBParameters.m_systemID;
-        }
-        if ((v_andruavUnit.m_IsDisconnectedFromGCS === true) || (v_andruavUnit.m_IsShutdown === true))
-        {
-            classes = " blink_offline ";
-        }
-        else
-        {
-            if (bad_fcb === true) 
-            {
-                    classes = "blink_warning animate_iteration_5s bi bi-exclamation-diamond ";
-                    text = " " + text;
-                    
-            }
-            else 
-            if (v_andruavUnit.m_isArmed === true) 
-            {
-                classes = " blink_alert animate_iteration_3s";
-            }
-            else
-            {
-                classes += " blink_success animate_iteration_3s ";
-            }
-
-            
-        }
-        return {
-            'classes': classes,
-            'text': text
-        };
-    }
-    
     render() {
         const { t } = this.props; // Access t function
 
@@ -310,7 +261,6 @@ class ClssAndruavUnitList extends React.Component {
                     if (js_localStorage.fn_getTabsDisplayEnabled() === true)
                     {
                         // Display in Tabs
-                        const header_info = me.getHeaderInfo(v_andruavUnit);
                         let c_active = activePartyID === v_andruavUnit.getPartyID();
                         // No unit selected yet: make the first eligible unit the
                         // visible one so the user sees a panel on initial load.
@@ -325,10 +275,12 @@ class ClssAndruavUnitList extends React.Component {
                         // live listeners while hidden.
                         const c_keepAlive = c_active === true || me.state.m_keepAlive.includes(v_andruavUnit.getPartyID());
                         units_header.push(
-                            <li id={'h' + partyID} key={'h' + partyID} className="nav-item nav-units">
-                                <a
-                                className={`nav-link user-select-none txt-theme-aware  ${c_active === true ? 'active' : ''}`} data-bs-toggle="tab" href={"#tab_" + v_andruavUnit.getPartyID()} onClick={() => me.fn_setActiveUnit(partyID)}><span className={header_info.classes}> {header_info.text}</span> </a>
-                            </li>
+                            <ClssUnitTabHeaderItem
+                                key={'h' + partyID}
+                                p_unit={v_andruavUnit}
+                                active={c_active}
+                                onSelect={() => me.fn_setActiveUnit(partyID)}
+                            />
                         );
 
                         units_details.push(

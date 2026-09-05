@@ -1,12 +1,12 @@
 import React , { useEffect } from 'react';
 
-import 'leaflet/dist/leaflet.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
@@ -19,6 +19,9 @@ import {js_globals} from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssLoginControl from '../components/gadgets/jsc_cmp_login.jsx'
+
+fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
+
 const Accounts = () => {
 
     useEffect(() => {

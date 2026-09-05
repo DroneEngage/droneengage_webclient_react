@@ -15,7 +15,7 @@ import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';
-import { EVENTS as js_event } from './js_eventList.js'
+import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_speak } from './js_speak'
 import * as js_common from './js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
@@ -34,6 +34,7 @@ import { js_adsbUnit } from './js_adsbUnit.js'
 import { js_adsbManager } from './adsb/js_adsbManager.js'
 import { js_windProvider } from './weather/js_windProvider.js'
 import { mavlink20 } from './js_mavlink_v2.js'
+import { notifyUnitFieldChanged } from './store/unitStore.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
@@ -51,6 +52,74 @@ $.fn.append = function ($el) {
 		return this
 	}
 	return oldAppend.apply(this, arguments)
+}
+
+// ---------------------------------------------------------------------------
+// Event -> unitStore bridge (Plan 4)
+//
+// Translates coarse event-emitter announcements (EE_onTrackingStatusChanged,
+// etc.) into field-level notifications consumed by useUnitField. This is an
+// additive reactive layer on top of the existing mutation/dispatch flow —
+// the parser/facade layer is NOT modified. One bridge line per (event,
+// field) pair, added incrementally as components are migrated to useUnitField.
+// These are permanent app-lifetime subscriptions (js_main.js is the entry
+// module and is imported once before the app renders).
+// ---------------------------------------------------------------------------
+{
+	const bridgeKey = { __unitStoreBridge: true };
+	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingStatusChanged, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_tracker.m_enable_gui_tracker');
+		notifyUnitFieldChanged(pid, 'm_tracker.m_active');
+		notifyUnitFieldChanged(pid, 'm_tracker.m_ai_driven');
+	});
+	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIStatusChanged, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_active');
+		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_detected');
+	});
+	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIObjectListUpdate, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_object_list');
+	});
+	// EE_onAndruavUnitSwarmUpdated is dispatched with the specific unit as
+	// payload (see js_andruav_parser.js's eventMap), so it can be bridged
+	// exactly like the tracker events above.
+	js_eventEmitter.fn_subscribe(js_event.EE_onAndruavUnitSwarmUpdated, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_Swarm.m_following');
+		notifyUnitFieldChanged(pid, 'm_Swarm.m_isLeader');
+		notifyUnitFieldChanged(pid, 'm_Swarm.m_formation_as_leader');
+		notifyUnitFieldChanged(pid, 'm_Swarm.m_formation_as_follower');
+	});
+	// Unit tab header (jsc_unitControlMainList.jsx / jsc_unit_tab_header.jsx).
+	// EE_andruavUnitArmedUpdated and EE_unitOnlineChanged are safety-critical
+	// and deliberately excluded from Plan 3's rAF batching (see
+	// js_eventEmitterConfig.js) - this bridge does NOT change that; it still
+	// fires synchronously, it just scopes the resulting re-render to the one
+	// affected unit's header instead of the whole unit list.
+	js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		notifyUnitFieldChanged(p_unit.getPartyID(), 'm_isArmed');
+	});
+	js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_IsDisconnectedFromGCS');
+		notifyUnitFieldChanged(pid, 'm_IsShutdown');
+	});
+	js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated, bridgeKey, (_me, p_unit) => {
+		if (!p_unit) return;
+		const pid = p_unit.getPartyID();
+		notifyUnitFieldChanged(pid, 'm_useFCBIMU');
+		notifyUnitFieldChanged(pid, 'm_telemetry_protocol');
+		notifyUnitFieldChanged(pid, 'm_modules.has_fcb');
+		notifyUnitFieldChanged(pid, 'm_FCBParameters.m_systemID');
+	});
 }
 
 var v_context_busy = false;
@@ -970,26 +1039,43 @@ function fn_handleADSBPopup(p_obj) {
 
 // Persistent Leaflet circle showing the ADSB query coverage area.
 let v_adsbQueryCircle = null;
+// Non-null when the ADSB provider is in an error state (e.g. HTTP 500 from
+// OpenSky). The query circle turns red to surface the problem on the map.
+let v_adsbError = null;
 
 /**
  * Create / update / remove the dotted ADSB query-area circle on the map.
  * Called on every ADSB exchange tick and when ADSB is disabled.
+ * The circle turns red when v_adsbError is set (provider fetch failure).
  */
 function fn_updateAdsbQueryCircle() {
 	const area = js_adsbManager.fn_getQueryArea();
 	if (js_adsbManager.fn_isRunning() && area) {
+		const color = v_adsbError ? '#FF0000' : '#FFA500';
 		if (v_adsbQueryCircle) {
 			// Update existing circle in place.
 			v_adsbQueryCircle.setLatLng([area.lat, area.lng]);
 			v_adsbQueryCircle.setRadius(Math.round(area.radiusKm * 1000));
+			v_adsbQueryCircle.setStyle({ color });
 		} else {
 			v_adsbQueryCircle = js_leafletmap.fn_drawAdsbQueryCircle(
-				area.lat, area.lng, area.radiusKm);
+				area.lat, area.lng, area.radiusKm, color);
 		}
 	} else if (v_adsbQueryCircle) {
 		js_leafletmap.fn_hideItem(v_adsbQueryCircle);
 		v_adsbQueryCircle = null;
 	}
+}
+
+/**
+ * EE_adsbError handler — sets/clears the ADSB error state and recolors
+ * the query circle red when the provider reports a fetch failure.
+ * @param {*} me - listener (this)
+ * @param {string|null} p_msg - error message (truthy = error, null = cleared)
+ */
+function fn_onAdsbError(me, p_msg) {
+	v_adsbError = p_msg || null;
+	fn_updateAdsbQueryCircle();
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -1053,21 +1139,127 @@ function fn_clearAdsbFromMap() {
 		js_leafletmap.fn_hideItem(v_adsbQueryCircle);
 		v_adsbQueryCircle = null;
 	}
+	v_adsbError = null;
 }
 
-function fn_adsbObjectUpdate(me, p_registry) {
-	// p_registry is the js_adsbUnit registry (CADSBObjectList). The ADSB manager
-	// dispatches EE_adsbExchangeReady once per fetch with the whole registry, so
-	// we render every known aircraft here.
-	const list = (p_registry && p_registry.List) ? p_registry.List : null;
+// Cap on live ADSB Leaflet markers, as a last-resort safety net for a
+// single view that's genuinely dense with traffic (see fn_renderAdsbMarkers
+// - viewport culling handles the common case). Each rendered aircraft is an
+// individually hit-testable interactive marker; the default 850km query
+// radius (js_adsbManager.js) can return hundreds of aircraft over busy
+// airspace, and an unbounded marker count makes every mouse move over the
+// map pay for hit-testing all of them - measured as the dominant
+// main-thread cost during map pan/hover (unrelated to tile caching or
+// React rendering: HitTest against #mapid alone was taking 11-74ms per
+// mousemove).
+const CONST_ADSB_MAX_RENDERED_MARKERS = 150;
+// Pad the viewport used for culling by this fraction of its own size (in
+// each direction) so a marker just past the visible edge doesn't pop its
+// DOM node in/out on every tiny pan.
+const CONST_ADSB_VIEWPORT_PAD_RATIO = 0.25;
+
+function fn_haversineKm(lat1, lng1, lat2, lng2) {
+	const R = 6371;
+	const toRad = (d) => (d * Math.PI) / 180;
+	const dLat = toRad(lat2 - lat1);
+	const dLng = toRad(lng2 - lng1);
+	const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+	return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Render/cull live ADSB markers against js_adsbUnit's registry directly
+ * (not a passed-in snapshot), so the same pass can run both on a fresh
+ * ADSB fetch (fn_adsbObjectUpdate) and on every map pan/zoom
+ * (EE_mapViewChanged) with no data of its own.
+ *
+ * Two layers of defense against unbounded marker count, both aimed at the
+ * same measured problem (Chrome's HitTest cost against #mapid scales with
+ * the number of interactive DOM markers, not just the ones under the
+ * cursor):
+ *  1. Viewport culling: only aircraft within the current map bounds
+ *     (padded) are candidates for a live marker at all. This is what
+ *     fixes the "the more I zoom in, the more it hangs" symptom - without
+ *     it, aircraft scattered across the full 850km query radius sit at
+ *     increasingly extreme pixel offsets as you zoom in tight on one
+ *     spot, since a fixed real-world distance maps to more screen pixels
+ *     at every zoom level, while remaining live (off-screen) DOM nodes.
+ *  2. Distance cap: if a single view is still dense with traffic (e.g. a
+ *     busy airport at low zoom), only the nearest CONST_ADSB_MAX_RENDERED_MARKERS
+ *     to the query center get a marker.
+ * Aircraft that lose their marker keep updating silently in the registry
+ * and reappear immediately once they're back in view/among the nearest.
+ *
+ * @param {boolean} [isDataUpdate=false] - true when called from a fresh
+ *        ADSB fetch (EE_adsbExchangeReady): every visible aircraft gets a
+ *        full re-render (position, heading, popup content updated).
+ *        false when called from a view change (EE_mapViewChanged): only
+ *        newly-visible aircraft that don't have a marker yet get one
+ *        created; aircraft that already have a live marker are left alone
+ *        (Leaflet repositions them automatically via its pane transform,
+ *        so calling setLatLng again is redundant DOM work — and with 150
+ *        markers that's 450 style/innerHTML mutations per zoom end, the
+ *        remaining dominant cost during pan/zoom after the m_isVisible
+ *        guard on the 3D map).
+ */
+function fn_renderAdsbMarkers(isDataUpdate) {
+	const list = (js_adsbUnit && js_adsbUnit.List) ? js_adsbUnit.List : null;
 	if (!list) return;
-	const keys = Object.keys(list);
-	for (let i = 0; i < keys.length; ++i) {
-		const p_adsbObject = list[keys[i]];
-		if (!p_adsbObject) continue;
-		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
-		fn_renderSingleAdsb(p_adsbObject);
+
+	const all = Object.values(list).filter(
+		(o) => o && o.m_lat !== null && o.m_lat !== undefined
+	);
+
+	const bounds = js_leafletmap.fn_getBounds();
+	const padded = bounds ? bounds.pad(CONST_ADSB_VIEWPORT_PAD_RATIO) : null;
+
+	let visible = padded
+		? all.filter((o) => padded.contains([o.m_lat, o.m_lon]))
+		: all;
+
+	if (visible.length > CONST_ADSB_MAX_RENDERED_MARKERS) {
+		const area = js_adsbManager.fn_getQueryArea();
+		if (area) {
+			visible = visible.slice().sort((a, b) =>
+				fn_haversineKm(area.lat, area.lng, a.m_lat, a.m_lon) -
+				fn_haversineKm(area.lat, area.lng, b.m_lat, b.m_lon)
+			);
+		}
+		visible = visible.slice(0, CONST_ADSB_MAX_RENDERED_MARKERS);
 	}
+	const visibleSet = new Set(visible);
+
+	for (let i = 0; i < all.length; ++i) {
+		const p_adsbObject = all[i];
+		if (visibleSet.has(p_adsbObject)) {
+			if (isDataUpdate || !p_adsbObject.p_marker) {
+				// Fresh data, or this aircraft just scrolled into view and
+				// needs a marker created — do the full render (position,
+				// heading, popup). On a pure view change, aircraft that
+				// already have a live marker are skipped: Leaflet moves
+				// them automatically when the map pans/zooms, so
+				// setLatLng/setRotationAngle would just repeat that work
+				// as redundant DOM style mutations.
+				fn_renderSingleAdsb(p_adsbObject);
+			}
+		} else if (p_adsbObject.p_marker) {
+			// Off-screen or beyond the cap - drop the live marker so it
+			// stops costing hit-test/layout time. fn_renderSingleAdsb
+			// re-creates it the moment this aircraft is back in the
+			// visible set.
+			js_leafletmap.fn_hideItem(p_adsbObject.p_marker);
+			p_adsbObject.p_marker = null;
+		}
+	}
+}
+
+function fn_adsbObjectUpdate() {
+	// The ADSB manager dispatches EE_adsbExchangeReady once per fetch;
+	// fn_renderAdsbMarkers reads the current registry itself (see its doc
+	// comment) so no data needs to be threaded through here. Pass true so
+	// every visible aircraft gets a full re-render (position/heading/popup
+	// updated from the fresh data).
+	fn_renderAdsbMarkers(true);
 
 	// Push all aircrafts' 3D tether/ground/altitude-circle data to Mapbox in
 	// a single batch (see js_map3d.fn_syncAdsbObject / fn_flushAdsbTethers).
@@ -1077,16 +1269,18 @@ function fn_adsbObjectUpdate(me, p_registry) {
 	fn_updateAdsbQueryCircle();
 }
 
-// Re-render all ADSB markers when the unit system (metric/imperial) changes
-// so tooltips switch between m/km/h and ft/mph immediately.
+// Re-render ADSB markers when the unit system (metric/imperial) changes so
+// tooltips switch between m/km/h and ft/mph immediately. Only refreshes
+// aircraft that already have a live marker - culled/off-screen aircraft
+// (see fn_renderAdsbMarkers) must NOT be force-rendered here, or every unit
+// toggle would undo the viewport/distance culling.
 function fn_adsbUnitSystemChanged() {
 	const list = (js_adsbUnit && js_adsbUnit.List) ? js_adsbUnit.List : null;
 	if (!list) return;
 	const keys = Object.keys(list);
 	for (let i = 0; i < keys.length; ++i) {
 		const p_adsbObject = list[keys[i]];
-		if (!p_adsbObject) continue;
-		if (p_adsbObject.m_lat === null || p_adsbObject.m_lat === undefined) continue;
+		if (!p_adsbObject || !p_adsbObject.p_marker) continue;
 		fn_renderSingleAdsb(p_adsbObject);
 	}
 }
@@ -3720,8 +3914,19 @@ export function fn_on_ready() {
 	if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExchangeReady, this, fn_adsbObjectUpdate);
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbExpiredUpdate, this, fn_adsbExpiredUpdate);
+		// Re-evaluate which ADSB aircraft are visible whenever the map view
+		// changes (pan or zoom) - not just when fresh ADSB data arrives - so
+		// aircraft scrolling into view reappear immediately (rather than
+		// waiting up to the next ~60s poll) and aircraft scrolling out /
+		// piling up at extreme offsets while zooming in get culled right away.
+		// Wrapped so isDataUpdate=false is passed (view change only: skip
+		// full re-render for markers that already exist, just cull/create).
+		js_eventEmitter.fn_subscribe(js_event.EE_mapViewChanged, this, () => fn_renderAdsbMarkers(false));
 		// Clear all ADSB markers from the map when ADSB is disabled.
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbCleared, this, fn_clearAdsbFromMap);
+		// Turn the ADSB query circle red when the provider reports a fetch
+		// error, and restore the normal orange color when the error clears.
+		js_eventEmitter.fn_subscribe(js_event.EE_adsbError, this, fn_onAdsbError);
 		// Re-render all ADSB markers when the unit system (metric/imperial) changes
 		// so tooltips switch between m/km/h and ft/mph immediately.
 		js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, fn_adsbUnitSystemChanged);

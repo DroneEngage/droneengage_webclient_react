@@ -1,107 +1,71 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter'
+import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 
+function fn_isGPIOFlashAllON(gpio_flash) {
+    let count = 0;
 
-export default class ClssCtrlGPIO_Flash extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            m_update: 0,
-            m_gpio_flashes_OnOff: false,
-            m_gpio_flashes_enabled: false,
-        };
-
-        this.key = Math.random().toString();
-        
-        js_eventEmitter.fn_subscribe(js_event.EE_unitGPIOUpdated, this, this.fnl_gpioFlashChanged);
-    }
-
-
-    // --- Core Change: Preventing re-renders from parent props ---
-    shouldComponentUpdate(nextProps, nextState) {
-        // Only re-render if the internal m_update state has changed.
-        // This effectively ignores prop changes from the parent.
-        return (nextState.m_update !== this.state.m_update);
-    }
-        
-    componentDidMount() {
-        this.setState({ m_update: 1 });
-
-    }
-
-    componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitGPIOUpdated, this);
-    }
-
-    fnl_gpioFlashChanged(p_me, p_unit) {
-        const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
-        p_me.state.m_gpio_flashes_OnOff = p_me.fn_isGPIOFlashAllON(gpio_flash);
-        p_me.setState({ 'm_update': p_me.state.m_update + 1 });
-    }
-
-    fn_isGPIOFlashAllON(gpio_flash) {
-        let count = 0;
-
-        gpio_flash.forEach(element => {
-            if (element.pin_value === 1) {
-                count++;
-
-            }
-        });
-        return (count === gpio_flash.length);
-    }
-
-    fnl_gpioFlashOnOff(e) {
-
-        if (!this.state.m_gpio_flashes_enabled) return ;
-
-        const gpio_flash = this.props.p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
-        const target_status = this.state.m_gpio_flashes_OnOff? 0 : 1;
-        gpio_flash.forEach(element => {
-            if (element.pin_value) {
-
-            } else {
-
-            }
-            js_globals.v_andruavFacade.API_writeGPIO(this.props.p_unit, element.pin_module_key, element.pin_number, target_status);
-        });
-    }
-
-    render() {
-
-        if (this.props.p_unit.fn_getIsDE() === false) {
-            return ("");
+    gpio_flash.forEach(element => {
+        if (element.pin_value === 1) {
+            count++;
         }
+    });
+    return (count === gpio_flash.length);
+}
 
-        let css_flashGPIO = ' bi bi-sun ';
-     
-        const gpio_flash = this.props.p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
+/**
+ * GPIO-flash state (on/off/enabled) is derived via a method call
+ * (m_GPIOs.getGPIOByName(...)) rather than a plain dot-path field, so it
+ * is read fresh at render time (same as the original) rather than routed
+ * through useUnitField. The event subscription only needs to force a
+ * re-render when this unit's GPIO state changes.
+ */
+export default function ClssCtrlGPIO_Flash({ id, className, title, p_unit }) {
+    const [, setTick] = useState(0);
+    const key = useState(() => Math.random().toString())[0];
 
-        if (gpio_flash.length > 0) {
-            this.state.m_gpio_flashes_enabled = true;
-            this.state.m_gpio_flashes_OnOff = this.fn_isGPIOFlashAllON(gpio_flash);
-            
-            if (this.state.m_gpio_flashes_OnOff === true) {
-                css_flashGPIO = " bi bi-sun-fill text-danger cursor_hand ";
-            }
-            else {
-                css_flashGPIO = " bi bi-sun text-success cursor_hand ";
-            }
-            
+    const fnl_gpioFlashChanged = useCallback((p_unit_updated) => {
+        if (p_unit_updated.getPartyID() !== p_unit.getPartyID()) return;
+        setTick((t) => t + 1);
+    }, [p_unit]);
+
+    useEventSubscription(js_event.EE_unitGPIOUpdated, fnl_gpioFlashChanged);
+
+    const fnl_gpioFlashOnOff = (e) => {
+        const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
+        if (gpio_flash.length === 0) return; // matches original: only enabled once at least one GPIO exists
+
+        const target_status = fn_isGPIOFlashAllON(gpio_flash) ? 0 : 1;
+        gpio_flash.forEach(element => {
+            js_globals.v_andruavFacade.API_writeGPIO(p_unit, element.pin_module_key, element.pin_number, target_status);
+        });
+    };
+
+    if (p_unit.fn_getIsDE() === false) {
+        return ("");
+    }
+
+    let css_flashGPIO = ' bi bi-sun ';
+
+    const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);
+
+    if (gpio_flash.length > 0) {
+        if (fn_isGPIOFlashAllON(gpio_flash) === true) {
+            css_flashGPIO = " bi bi-sun-fill text-danger cursor_hand ";
         }
         else {
-            css_flashGPIO = " bi bi-sun txt-theme-aware ";
-            this.state.m_gpio_flashes_enabled = false;
+            css_flashGPIO = " bi bi-sun text-success cursor_hand ";
         }
-
-        return (
-            <i id={this.props.id?this.props.id:this.key} key={this.key} className={css_flashGPIO + " css_large_icon"} title={this.props.title?this.props.title:'flash light'} onClick={(e) => this.fnl_gpioFlashOnOff(e)}></i>
-        );
+    }
+    else {
+        css_flashGPIO = " bi bi-sun txt-theme-aware ";
     }
 
+    return (
+        <i id={id ? id : key} key={key} className={css_flashGPIO + " css_large_icon"} title={title ? title : 'flash light'} onClick={fnl_gpioFlashOnOff}></i>
+    );
 }

@@ -3,7 +3,8 @@
  *
  * Owns the active ADSB provider and the polling loop, merges normalized
  * aircraft into the shared registry (js_adsbUnit) and dispatches the events
- * the map layer listens to (EE_adsbExchangeReady / EE_adsbExpiredUpdate).
+ * the map layer listens to (EE_adsbExchangeReady / EE_adsbExpiredUpdate /
+ * EE_adsbCleared / EE_adsbError).
  *
  * Query-area strategy (in priority order):
  *   1. If online drone units exist, compute a bounding circle that encloses
@@ -111,6 +112,11 @@ class AdsbManager {
         this._geolocationRadiusKm =
             (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || DEFAULT_RADIUS_KM;
 
+        // Last fetch error state. When non-null, the map layer shows a red
+        // ADSB error indicator (toggle buttons + query circle). Cleared on
+        // the next successful fetch. Dispatched via EE_adsbError.
+        this._lastError = null;
+
         // React to enable/disable preference.
         // Bind handlers so `this` is preserved (the event emitter calls
         // callback(listener, data) without a this-binding).
@@ -190,6 +196,15 @@ class AdsbManager {
      */
     fn_isRunning() {
         return this._running;
+    }
+
+    /**
+     * Last fetch error message, or null if the last fetch succeeded.
+     * The map layer uses this to show/clear the red ADSB error indicator.
+     * @returns {string|null}
+     */
+    fn_getLastError() {
+        return this._lastError;
     }
 
     /**
@@ -487,9 +502,23 @@ class AdsbManager {
             aircraft = await provider.fetch(this._lat, this._lng, this._radius);
         } catch (e) {
             console.error(`[adsb] ${provider.id} fetch failed:`, e);
+            // Surface the error to the map layer so it can show a red ADSB
+            // indicator (toggle buttons + query circle). Only dispatch when
+            // the error message changes to avoid spamming on every tick.
+            const msg = (e && e.message) ? e.message : String(e);
+            if (this._lastError !== msg) {
+                this._lastError = msg;
+                js_eventEmitter.fn_dispatch(js_event.EE_adsbError, msg);
+            }
             return;
         } finally {
             this._inflight = false;
+        }
+
+        // Clear any previous error state on success.
+        if (this._lastError !== null) {
+            this._lastError = null;
+            js_eventEmitter.fn_dispatch(js_event.EE_adsbError, null);
         }
 
         // Merge into the shared registry.
@@ -507,6 +536,12 @@ class AdsbManager {
     _onPreferenceChanged() {
         if (!isADSBEnabled()) {
             this._stop();
+            // Clear any lingering error state so the red indicator doesn't
+            // persist after ADSB is turned off.
+            if (this._lastError !== null) {
+                this._lastError = null;
+                js_eventEmitter.fn_dispatch(js_event.EE_adsbError, null);
+            }
             // Tell the map layer to drop every ADSB marker, hide the query
             // circle, and clear the registry — stale aircraft must not linger
             // after the polling loop stops.

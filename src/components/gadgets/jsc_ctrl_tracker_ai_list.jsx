@@ -1,12 +1,11 @@
-import $ from 'jquery';
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter'
-
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 
 
 /**
@@ -16,111 +15,59 @@ import { js_eventEmitter } from '../../js/events/js_eventEmitter'
  * events:
  * onMakeSwarm
  * onRequestToFollow
+ *
+ * Migrated from the class + shouldComponentUpdate(m_update counter) +
+ * manual fn_subscribe/fn_unsubscribe pattern to useUnitField, which
+ * re-renders only when the specific tracker-AI fields change — not on
+ * every coarse EE_onTrackingAIStatusChanged / EE_onTrackingAIObjectListUpdate
+ * for unrelated units/fields.
+ *
+ * Local UI state (m_selectedUnits) stays as ordinary useState — it is
+ * genuinely local to this component and is not shared unit telemetry.
  */
-class ClssCtrlObjectTrackerAIList extends React.Component {
+function ClssCtrlObjectTrackerAIList({ p_unit, title, className, t }) {
+    const partyId = p_unit && p_unit.getPartyID ? p_unit.getPartyID() : undefined;
+    const trackerAiActive = useUnitField(partyId, 'm_tracker_ai.m_active');
+    const trackerAiDetected = useUnitField(partyId, 'm_tracker_ai.m_detected');
+    const objectList = useUnitField(partyId, 'm_tracker_ai.m_object_list');
 
-    constructor(props) {
-        super(props);
+    // Local UI state: which detected-object indices are selected.
+    const [selectedUnits, setSelectedUnits] = useState([]);
 
-        this.state = {
-                m_update: 0,
-                m_tracker_ai_gui_enabled: false,
-                m_selectedUnits: [],
-                m_selected_units_updated: false
-        };
+    const key = useState(() => Math.random().toString())[0];
 
-        this.key = Math.random().toString();
+    // Request the AI class list once on mount (was in the constructor).
+    useEffect(() => {
+        js_globals.v_andruavFacade.API_GetTrackingAIClassList(p_unit);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-        js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIStatusChanged, this, this.fn_onTrackingAIStatusChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIObjectListUpdate, this, this.fn_onTrackingAIObjectListUpdate);
+    const fnl_trackerAIOff = useCallback(() => {
+        js_globals.v_andruavFacade.API_DisableTrackingAI(p_unit);
+    }, [p_unit]);
 
-        js_globals.v_andruavFacade.API_GetTrackingAIClassList(this.props.p_unit);
-
-    }
-
-    // --- Core Change: Preventing re-renders from parent props ---
-    shouldComponentUpdate(nextProps, nextState) {
-        // Only re-render if the internal m_update state has changed.
-        // This effectively ignores prop changes from the parent.
-        return (nextState.m_update !== this.state.m_update) || (nextState.m_selectedUnits.length != this.state.m_selectedUnits.length);
-    }
-
-    componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onTrackingAIStatusChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onTrackingAIObjectListUpdate,this);
-    }
-
-
-
-
-    componentDidMount() {
-        this.m_flag_mounted = true;
-        this.setState({ m_update: 1 });
-    }
-
-
-    componentDidUpdate(prevProps, prevState) {
-        // If the component re-rendered because m_selectedUnits_changed was true,
-        // reset it back to false to allow future changes to trigger re-renders.
-        if (this.state.m_selectedUnits_changed === true && prevState.m_selectedUnits_changed === false) {
-            this.setState({ m_selectedUnits_changed: false });
-        }
-    }
-
-    fn_onTrackingAIStatusChanged(p_me, p_unit) {
-
-        if (p_me.props.p_unit.getPartyID() !== p_unit.getPartyID()) return ;
-        if (p_me.m_flag_mounted === false)return;
-
-        p_me.setState({ 'm_update': p_me.state.m_update + 1 });
-    }
-
-    fn_onTrackingAIObjectListUpdate(p_me, p_unit) {
-        
-        if (p_me.props.p_unit.getPartyID() !== p_unit.getPartyID()) return ;
-        if (p_me.m_flag_mounted === false)return;
-
-        p_me.setState({ 'm_update': p_me.state.m_update + 1 });
-    }
-
-
-    fnl_trackerAIOff() {
-        js_globals.v_andruavFacade.API_DisableTrackingAI(this.props.p_unit);
-    }
-
-    fnl_trackerAIOnOff(e) {
-        if (this.props.p_unit.m_tracker_ai.m_active===true)
+    const fnl_trackerAIOnOff = useCallback((e) => {
+        if (p_unit.m_tracker_ai.m_active === true)
         {
-            this.fnl_trackerAIOff();
+            fnl_trackerAIOff();
         }
         else
         {
-            js_globals.v_andruavFacade.API_EnableTrackingAI(this.props.p_unit);
-            if (this.state.m_selectedUnits.length == 0) return ; // nothing to select
-            js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
+            js_globals.v_andruavFacade.API_EnableTrackingAI(p_unit);
+            if (selectedUnits.length == 0) return ; // nothing to select
+            js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, selectedUnits);
         }
 
-        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, this.props.p_unit);
+        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, p_unit);
+    }, [p_unit, selectedUnits, fnl_trackerAIOff]);
 
-    }
+    const fnl_unSelectAll = useCallback((e) => {
+        setSelectedUnits([]);
+        fnl_trackerAIOff();
+    }, [fnl_trackerAIOff]);
 
-    fnl_unSelectAll(e)
-    {
-        const newSelectedUnits = [];
-
-        this.setState({
-            m_selectedUnits: newSelectedUnits,
-            m_update: this.state.m_update + 1
-        });
-
-        this.fnl_trackerAIOff();
-    }
-
-    fnl_selectAll(e) {
-        const { m_selectedUnits } = this.state;
-
-
-        const v_units = this.props.p_unit.m_tracker_ai.m_object_list;
+    const fnl_selectAll = useCallback((e) => {
+        const v_units = p_unit.m_tracker_ai.m_object_list;
         const len = v_units.length;
 
         const newSelectedUnits = [];
@@ -130,137 +77,124 @@ class ClssCtrlObjectTrackerAIList extends React.Component {
 
         if (newSelectedUnits.length === 0) return; // nothing to select
 
-        js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, newSelectedUnits);
+        js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, newSelectedUnits);
 
+        setSelectedUnits(newSelectedUnits);
+    }, [p_unit]);
 
-        this.setState({
-            m_selectedUnits: newSelectedUnits,
-            m_update: this.state.m_update + 1
-        });
-    }
-
-
-    fnl_handleCheckboxChange = (event, unitIndex) => {
-        const { m_selectedUnits } = this.state;
+    const fnl_handleCheckboxChange = useCallback((event, unitIndex) => {
         let newSelectedUnits;
 
         if (event.target.checked) {
-            newSelectedUnits = [...m_selectedUnits, unitIndex];
+            newSelectedUnits = [...selectedUnits, unitIndex];
         } else {
-            newSelectedUnits = m_selectedUnits.filter(index => index !== unitIndex);
+            newSelectedUnits = selectedUnits.filter(index => index !== unitIndex);
         }
 
-        // Update the state and then immediately trigger the search
-        this.setState({
-            m_selectedUnits: newSelectedUnits,
-            m_selected_units_updated: true
-        }, () => { // Callback function executed after state update
-            if (newSelectedUnits.length > 0) { // Only send if there are selected units
-                js_globals.v_andruavFacade.API_SendTrackAISelect(this.props.p_unit, this.state.m_selectedUnits);
-            } else {
-                // Optionally, if no items are selected, you might want to pause tracking
-                this.fnl_trackerAIOff();
-            }
-            js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, this.props.p_unit);
-        });
-    };
+        // Update the selection and then immediately trigger the search.
+        // (Mirrors the original setState callback behavior: the API receives
+        // the newly computed list.)
+        setSelectedUnits(newSelectedUnits);
+        if (newSelectedUnits.length > 0) { // Only send if there are selected units
+            js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, newSelectedUnits);
+        } else {
+            // Optionally, if no items are selected, you might want to pause tracking
+            fnl_trackerAIOff();
+        }
+        js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, p_unit);
+    }, [p_unit, selectedUnits, fnl_trackerAIOff]);
 
 
-    render() {
-        if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING_AI === false)
-               && (!this.props.p_unit.m_modules.has_ai_recognition))
+    if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING_AI === false)
+           && (!p_unit.m_modules.has_ai_recognition))
+    {
+        return (
+                    <div className="disabled hidden"/>
+                );
+    }
+    if (p_unit === null || p_unit === undefined) return;
+
+    //CODEBLOCK_START
+    const v_units = objectList || [];
+    const len = v_units.length;
+    const c_items = [];
+
+    let v_follower_class = "bg-secondry";
+
+    let css_Track = '';
+    let css_Track_title = title ? title : 'object tracker';
+    if (trackerAiActive === true)
+    {
+        if (trackerAiDetected)
         {
-            return (
-                        <div className="disabled hidden"/>
-                    );
+            css_Track = ' text-danger ';
+            css_Track_title += ' disable tracking ';
         }
-        if (this.props.p_unit === null || this.props.p_unit === undefined) return;
-
-        //CODEBLOCK_START
-        const v_units = this.props.p_unit.m_tracker_ai.m_object_list;
-        const len = v_units.length;
-        const c_items = [];
-
-        let v_follower_class = "bg-secondry";
-
-        let css_Track = '';
-        let css_Track_title = this.props.title?this.props.title :'object tracker';
-        if (this.props.p_unit.m_tracker_ai.m_active === true)
+        else
         {
-            if (this.props.p_unit.m_tracker_ai.m_detected)
-            {
-                css_Track = ' text-danger ';
-                css_Track_title += ' disable tracking ';
-                this.state.m_tracker_ai_gui_enabled = true;
-            }
-            else
-            {
-                css_Track = ' text-warning ';
-                css_Track_title += ' disable tracking ';
-                this.state.m_tracker_ai_gui_enabled = true;
-            }
-            
+            css_Track = ' text-warning ';
+            css_Track_title += ' disable tracking ';
         }
-        else 
-        {
-            css_Track = ' txt-theme-aware ';
-            css_Track_title += ' enable tracking ';
-            this.state.m_tracker_ai_gui_enabled = false;
-        }
-
-
-        for (let i = 0; i < len; ++i) {
-            const v_unit = v_units[i];
-            const unitIndex = i; // Get the index of the current unit
-            c_items.push(
-                        <div key={v_unit + this.key} className="dropdown-item">
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    value={v_unit}
-                                    id={`checkbox-${v_unit}`}
-                                    checked={this.state.m_selectedUnits.includes(unitIndex)} // Check if index is in m_selectedUnits
-                                    onChange={(e) => this.fnl_handleCheckboxChange(e, unitIndex)}
-                                />
-                                <label className="form-check-label" htmlFor={`checkbox-${v_unit}`}>
-                                    {v_unit}
-                                </label>
-                            </div>
-                        </div>
-                    );
-            }
-            
-            return (
-                    <div id={'aiq_1' + this.key} key={'aiq_1' + this.key} className={"btn-group flgtctrlbtn_icon_w " + this.props.className} role="group" aria-label="Button group with nested dropdown">
-                        <button
-                            type="button"
-                            className={"btn btn-sm  bi bi-eye-fill " + css_Track}
-                            title={css_Track_title}
-                            onClick={(e) => this.fnl_trackerAIOnOff(e)}></button>
-                        <div key={'aiq_12' + this.key} className="btn-group" role="group">
-                            <button
-                                id={"btnGroupDrop2"+ this.key}
-                                type="button"
-                                className={"btn  btn-sm dropdown-toggle " + v_follower_class}
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                            <div
-                                key={'aiq_121' + this.key}
-                                className="dropdown-menu"
-                                aria-labelledby={"btnGroupDrop2"+ this.key}
-                                style={{ maxHeight: '200px', overflowY: 'auto' }}
-                            >
-                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_unSelectAll(e)}>{this.props.t('unselectAll')}</a>
-                                <a className="dropdown-item " href="#" onClick={(e) => this.fnl_selectAll(e)}>{this.props.t('selectAll')}</a>
-                                {c_items}
-                                
-                            </div>
-                        </div>
-                    </div>
-            );
-
 
     }
+    else
+    {
+        css_Track = ' txt-theme-aware ';
+        css_Track_title += ' enable tracking ';
+    }
+
+
+    for (let i = 0; i < len; ++i) {
+        const v_unit = v_units[i];
+        const unitIndex = i; // Get the index of the current unit
+        c_items.push(
+                    <div key={v_unit + key} className="dropdown-item">
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                value={v_unit}
+                                id={`checkbox-${v_unit}`}
+                                checked={selectedUnits.includes(unitIndex)} // Check if index is in selectedUnits
+                                onChange={(e) => fnl_handleCheckboxChange(e, unitIndex)}
+                            />
+                            <label className="form-check-label" htmlFor={`checkbox-${v_unit}`}>
+                                {v_unit}
+                            </label>
+                        </div>
+                    </div>
+                );
+        }
+
+        return (
+                <div id={'aiq_1' + key} key={'aiq_1' + key} className={"btn-group flgtctrlbtn_icon_w " + className} role="group" aria-label="Button group with nested dropdown">
+                    <button
+                        type="button"
+                        className={"btn btn-sm  bi bi-eye-fill " + css_Track}
+                        title={css_Track_title}
+                        onClick={(e) => fnl_trackerAIOnOff(e)}></button>
+                    <div key={'aiq_12' + key} className="btn-group" role="group">
+                        <button
+                            id={"btnGroupDrop2"+ key}
+                            type="button"
+                            className={"btn  btn-sm dropdown-toggle " + v_follower_class}
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div
+                            key={'aiq_121' + key}
+                            className="dropdown-menu"
+                            aria-labelledby={"btnGroupDrop2"+ key}
+                            style={{ maxHeight: '200px', overflowY: 'auto' }}
+                        >
+                            <a className="dropdown-item " href="#" onClick={(e) => fnl_unSelectAll(e)}>{t('unselectAll')}</a>
+                            <a className="dropdown-item " href="#" onClick={(e) => fnl_selectAll(e)}>{t('selectAll')}</a>
+                            {c_items}
+
+                        </div>
+                    </div>
+                </div>
+        );
+
+
 }
 
 export default withTranslation('trackerAIList')(ClssCtrlObjectTrackerAIList);

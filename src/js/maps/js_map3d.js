@@ -1,8 +1,8 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
 import { js_localStorage } from '../js_localStorage.js';
-import { js_eventEmitter } from '../js_eventEmitter.js';
-import { EVENTS as js_event } from '../js_eventList.js';
+import { js_eventEmitter } from '../events/js_eventEmitter.js';
+import { EVENTS as js_event } from '../events/js_eventList.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_andruavUnit from '../js_andruavUnit';
 import '../../css/css_map3d.css';
@@ -127,6 +127,11 @@ class ModelSizeControl {
             // leaflet map button or the settings checkbox).
             this._boundOnPreferenceChanged = () => this._updateAdsbToggleState();
             js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
+
+            // Turn the button red when the ADSB provider reports a fetch
+            // error, and clear it when the error is resolved (null payload).
+            this._boundOnAdsbError = (listener, p_msg) => this._updateAdsbErrorState(p_msg);
+            js_eventEmitter.fn_subscribe(js_event.EE_adsbError, this, this._boundOnAdsbError);
         } else {
             const label = document.createElement('span');
             label.className = 'css_map3d_modelsize_label';
@@ -323,10 +328,28 @@ class ModelSizeControl {
         }
     }
 
+    // Show/clear the red error indicator on the ADSB toggle button.
+    // p_msg is the error string (truthy) when an error is active, or null
+    // when the error has been cleared by a successful fetch.
+    _updateAdsbErrorState(p_msg) {
+        if (!this._adsbToggleBtn) return;
+        if (p_msg) {
+            this._adsbToggleBtn.classList.add('error');
+            this._adsbToggleBtn.title = `ADSB Error: ${p_msg}`;
+        } else {
+            this._adsbToggleBtn.classList.remove('error');
+            this._adsbToggleBtn.title = 'Toggle ADSB';
+        }
+    }
+
     onRemove() {
         if (this._boundOnPreferenceChanged) {
             js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
             this._boundOnPreferenceChanged = null;
+        }
+        if (this._boundOnAdsbError) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_adsbError, this);
+            this._boundOnAdsbError = null;
         }
         if (this._boundOnKeyDown && this._keyTarget) {
             this._keyTarget.removeEventListener('keydown', this._boundOnKeyDown);
@@ -782,6 +805,14 @@ class CAndruavMap3D {
             });
 
             this.fn_setupModelLodLayer();
+
+            // setStyle() wipes ALL user-added layers/sources but leaves our
+            // in-memory tracking Maps intact, so fn_ensure*Layer would think
+            // the layers still exist and skip re-adding them — causing
+            // "layer does not exist" errors on the next setPaintProperty.
+            // Clear every dynamic-layer tracking Map here so the next
+            // fn_sync* call re-creates the layers from scratch.
+            this.fn_clearDynamicLayerTracking();
         });
 
         this.m_map.on('load', () => {
@@ -1455,7 +1486,14 @@ class CAndruavMap3D {
      * "flying" representation.
      */
     fn_syncUnit(unit, markerIconUrl = null) {
-        if (!this.m_map || !this.m_isReady || !unit?.m_Nav_Info?.p_Location) return;
+        // Skip while the 3D view is hidden (e.g. user is on the 2D map):
+        // this does real work per call (Mapbox marker create/update, terrain
+        // queries downstream) that's wasted on an invisible map, and was
+        // measured firing on every 2D map pan/zoom via fn_syncAdsbObject's
+        // identical gap. fn_show() re-syncs every tracked marker's position
+        // from cache when the 3D view becomes visible again, and the next
+        // natural telemetry tick repopulates anything missed while hidden.
+        if (!this.m_map || !this.m_isReady || !this.m_isVisible || !unit?.m_Nav_Info?.p_Location) return;
 
         const { lat, lng } = unit.m_Nav_Info.p_Location;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
@@ -1819,7 +1857,15 @@ class CAndruavMap3D {
      * @returns {mapboxgl.Marker|null}
      */
     fn_syncAdsbObject(p_adsbObject, markerIconUrl, onClickCallback) {
-        if (!this.m_map || !this.m_isReady || !p_adsbObject) return null;
+        // Skip while the 3D view is hidden. Confirmed via trace + code
+        // inspection as the actual dominant cost during 2D-map pan/zoom:
+        // this runs a synchronous Mapbox terrain-elevation query
+        // (queryTerrainElevation, see fn_getRawTerrainElevation) plus a real
+        // Mapbox GL marker create/update, per aircraft, on every render pass
+        // - including every 2D pan/zoom (fn_renderAdsbMarkers) - even though
+        // none of it is visible. fn_show() re-syncs every tracked marker's
+        // position from cache when the 3D view becomes visible again.
+        if (!this.m_map || !this.m_isReady || !this.m_isVisible || !p_adsbObject) return null;
 
         const lat = p_adsbObject.m_lat;
         const lng = p_adsbObject.m_lon;
@@ -2077,6 +2123,48 @@ class CAndruavMap3D {
     // ====================================================================
 
     /**
+     * Clears every per-unit/per-id dynamic-layer tracking Map and resets the
+     * shared-layer "ready" flags.  Called from the 'style.load' handler so
+     * that fn_ensure*Layer re-creates layers from scratch after setStyle()
+     * wipes them.  The Mapbox markers themselves (m_markers, m_adsbMarkers)
+     * are DOM elements independent of the style and survive a style reload,
+     * so they are NOT cleared here.
+     */
+    fn_clearDynamicLayerTracking() {
+        // Tether / ground circle / altitude circle (per unit)
+        this.m_tetherSources.clear();
+        this.m_tetherLayers.clear();
+        this.m_groundSources.clear();
+        this.m_groundLayers.clear();
+        this.m_altCircleSources.clear();
+        this.m_altCircleLayers.clear();
+
+        // Path trail (per unit) — data is preserved so fn_DrawPath can re-add
+        this.m_pathLayers.clear();
+        this.m_pathSources.clear();
+        // m_pathData is intentionally kept: it holds the actual coordinates
+        // so the trail can be replayed without losing history.
+
+        // Mission waypoints (per unit) — m_missionData is kept for replay
+        this.m_missionLineSources.clear();
+        this.m_missionLineLayers.clear();
+        this.m_missionDropSources.clear();
+        this.m_missionDropLayers.clear();
+        this.m_missionGateSources.clear();
+        this.m_missionGateLayers.clear();
+        this.m_missionGroundSources.clear();
+        this.m_missionGroundLayers.clear();
+        this.m_missionCircleIds.clear();
+        this.m_missionSyncGeneration.clear();
+
+        // ADSB shared layers (single set, flagged)
+        this.m_adsbLayersReady = false;
+
+        // glTF model LOD layer (single set, flagged)
+        this.m_modelLayerReady = false;
+    }
+
+    /**
      * Returns the tether color for a unit based on its index.
      */
     fn_getTetherColor(unit) {
@@ -2259,7 +2347,7 @@ class CAndruavMap3D {
 
         // --- Update tether line width (dynamic, altitude-based) ---
         const tetherLayerId = this.m_tetherLayers.get(id);
-        if (tetherLayerId) {
+        if (tetherLayerId && this.m_map.getLayer(tetherLayerId)) {
             const width = this.fn_computeTetherWidth(altRelative);
             this.m_map.setPaintProperty(tetherLayerId, 'line-width', width);
         }
@@ -2288,7 +2376,7 @@ class CAndruavMap3D {
         const altSourceId = this.m_altCircleSources.get(id);
         const altLayerId = this.m_altCircleLayers.get(id);
         const altSource = this.m_map?.getSource(altSourceId);
-        if (altSource && altLayerId) {
+        if (altSource && altLayerId && this.m_map.getLayer(altLayerId)) {
             altSource.setData({
                 type: 'Feature',
                 geometry: { type: 'LineString', coordinates: ringCoordsUp },
@@ -2471,7 +2559,7 @@ class CAndruavMap3D {
         // Update line-z-offset to map each vertex's actual distance-based
         // progress to its elevation, so the trail passes through the correct
         // altitude at every recorded point regardless of spacing.
-        if (layerId) {
+        if (layerId && this.m_map.getLayer(layerId)) {
             const zOffsetExpr = this.fn_buildLineZOffsetExpr(data.coords, data.elevations);
             this.m_map.setLayoutProperty(layerId, 'line-z-offset', zOffsetExpr);
         }
@@ -2526,7 +2614,7 @@ class CAndruavMap3D {
                 });
             }
         }
-        if (altLayerId) {
+        if (altLayerId && this.m_map?.getLayer(altLayerId)) {
             this.m_map?.setLayoutProperty(altLayerId, 'line-z-offset', 0);
         }
 
@@ -3276,7 +3364,7 @@ class CAndruavMap3D {
             // every waypoint, regardless of uneven spacing.  (The previous
             // at-interpolated(line-progress * (N-1), elevation) assumed uniform
             // spacing and missed every interior marker.)
-            if (lineLayerId) {
+            if (lineLayerId && this.m_map.getLayer(lineLayerId)) {
                 const zOffsetExpr = this.fn_buildLineZOffsetExpr(lineCoords, lineElevations);
                 this.m_map.setLayoutProperty(lineLayerId, 'line-z-offset', zOffsetExpr);
             }

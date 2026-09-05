@@ -133,6 +133,19 @@ class ClssAndruavUnitDroneRow extends React.Component{
         this.props.p_unit.m_gui.speed_link = false;
 
 		this.telemetry_level=["OFF","1","2","3"];
+        // Throttle telemetry-driven re-renders to at most one every
+        // CONST_ROW_THROTTLE_MS. EE_unitNavUpdated can fire at 10-50Hz per
+        // unit (every MAVLink HEARTBEAT/ATTITUDE/GPS packet), and each
+        // re-render of this row cascades to ~20-30 child DOM elements
+        // (battery, EKF, vibration, speed, altitude, GPS, HUD angles).
+        // A Chrome DevTools trace showed 19 re-renders/sec here creating
+        // 11,926 <div> async tasks in 7 seconds — the dominant main-thread
+        // cost that makes the map hang during pan/zoom, especially when
+        // ADSB loading adds its own DOM work on top. 200ms (5Hz) is fast
+        // enough for a HUD readout and cuts the re-render rate by 4-10x.
+        this.m_lastRenderTs = 0;
+        this.m_pendingRender = false;
+        this.m_throttleHandle = null;
         js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this,this.fn_unitUpdated);
         js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_onPreferenceChanged);
@@ -147,6 +160,10 @@ class ClssAndruavUnitDroneRow extends React.Component{
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
+        if (this.m_throttleHandle) {
+            clearTimeout(this.m_throttleHandle);
+            this.m_throttleHandle = null;
+        }
     }
 
 
@@ -154,8 +171,31 @@ class ClssAndruavUnitDroneRow extends React.Component{
     {
         if (p_andruavUnit.getPartyID() !== p_me.props.p_unit.getPartyID()) return ;
         if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
-
+        // Throttle: skip the re-render if the last one was less than
+        // CONST_ROW_THROTTLE_MS ago, but schedule a trailing update so
+        // the latest telemetry is eventually displayed (not dropped).
+        const now = Date.now();
+        const elapsed = now - p_me.m_lastRenderTs;
+        if (elapsed >= 200) {
+            p_me.m_lastRenderTs = now;
+            p_me.m_pendingRender = false;
+            if (p_me.m_throttleHandle) {
+                clearTimeout(p_me.m_throttleHandle);
+                p_me.m_throttleHandle = null;
+            }
+            p_me.setState({'m_update': p_me.state.m_update +1});
+        } else if (!p_me.m_pendingRender) {
+            p_me.m_pendingRender = true;
+            const delay = 200 - elapsed;
+            p_me.m_throttleHandle = setTimeout(() => {
+                p_me.m_throttleHandle = null;
+                p_me.m_pendingRender = false;
+                p_me.m_lastRenderTs = Date.now();
+                if (p_me.m_flag_mounted) {
+                    p_me.setState({'m_update': p_me.state.m_update +1});
+                }
+            }, delay);
+        }
     }
 
     fn_onPreferenceChanged(p_me)
@@ -766,8 +806,8 @@ class ClssAndruavUnitDroneRow extends React.Component{
                         </ul>
                 </div>
                 <div key={this.key+'6'} className = {'col-4  col-lg-2   d-grid css_margin_zero  si-07x  css_dotted_border  ' + css_battery_enabled}>
-                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat1"} id={v_andruavUnit.getPartyID() + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery}/>
-                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat2"} id={v_andruavUnit.getPartyID() + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2}/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat1"} id={v_andruavUnit.getPartyID() + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery} p_unit={v_andruavUnit}/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat2"} id={v_andruavUnit.getPartyID() + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2} p_unit={v_andruavUnit}/>
                 </div>
                 <div key={this.key+'7'} className = 'col-4  col-lg-2   d-none d-lg-grid css_margin_zero css_padding_zero css_dotted_border  '>
                     <div className = 'row  css_margin_zero css_padding_zero'>
@@ -839,7 +879,13 @@ class ClssAndruavUnitListArray extends React.Component {
         js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
         js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
         js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
+        // EE_unitUpdated removed: it re-rendered the ENTIRE list on every
+        // unit update from ANY unit (no party ID filter). With N units, one
+        // telemetry tick re-rendered all N rows + their children. The rows
+        // already subscribe to EE_unitNavUpdated/EE_unitUpdated themselves
+        // and re-render independently, so the parent only needs to re-render
+        // when the unit list changes (add/remove), handled by EE_unitAdded
+        // + EE_onSocketStatus above.
 	}
 
 
@@ -853,18 +899,11 @@ class ClssAndruavUnitListArray extends React.Component {
         js_eventEmitter.fn_unsubscribe (js_event.EE_onPreferenceChanged,this);
         js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
     }
 
     
 
 
-    fn_unitUpdated(me,p_andruavUnit)
-    {
-        if (me.m_flag_mounted === false)return ;
-        
-        me.setState({'m_update': me.state.m_update +1});
-    }
 
     fn_unitAdded (me,p_andruavUnit)
     {

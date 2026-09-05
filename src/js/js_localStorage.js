@@ -477,6 +477,22 @@ class CLocalStorage {
         this._removeValue('_vMapboxStyle');
     }
 
+    // Map Tile Cache Enabled (IndexedDB tile cache for Leaflet raster
+    // tiles). Default true matches CONST_MAP_TILE_CACHE.ENABLED in
+    // js_siteConfig. localStorage has highest priority, then
+    // config.local/config.json, then the js_siteConfig default.
+    fn_setMapTileCacheEnabled(value) {
+        this._setValue('_vMapTileCacheEnabled', value ? 'true' : 'false');
+    }
+
+    fn_getMapTileCacheEnabled() {
+        return this._getValue('_vMapTileCacheEnabled', 'true') === 'true';
+    }
+
+    fn_removeMapTileCacheEnabled() {
+        this._removeValue('_vMapTileCacheEnabled');
+    }
+
     // SMS Phone Number (used by Andruav SMS-with-location control)
     fn_setSMSPhoneNumber(value) {
         this._setValue(js_globals.LS_SMS_PHONE_NUMBER, value);

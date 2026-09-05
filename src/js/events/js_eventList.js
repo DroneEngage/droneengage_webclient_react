@@ -110,6 +110,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_ErrorMessage",
 			"EE_adsbExpiredUpdate",
 		"EE_adsbCleared",
+		"EE_adsbError",
 
 
 			"EE_Auth_Login_In_Progress",
@@ -148,7 +149,8 @@ const EVENT_LIST = Object.freeze({
 		"EE_News_Push",
 		"EE_onNewsToggle",
 		"EE_onNewsWriteToggle",
-		"EE_AisStream_Push"
+		"EE_AisStream_Push",
+		"EE_mapViewChanged"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

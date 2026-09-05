@@ -1,4 +1,3 @@
-import 'leaflet/dist/leaflet.css';
 import 'leaflet.pm/dist/leaflet.pm.css';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
@@ -6,6 +5,8 @@ import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
 import '../css/css_planning.css';
 import '../css/css_gamepad.css';
+
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
 
 import 'leaflet';              // side-effect: sets window.L. Must load before
                                // leaflet.pm — the plugin extends leaflet's
@@ -28,6 +29,8 @@ import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx'
 import ClssApplyAllDialog from '../components/dialogs/jsc_applyAllDialog.jsx'
 import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx'
 import { fn_on_ready } from '../js/js_main'
+
+fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 
 
 

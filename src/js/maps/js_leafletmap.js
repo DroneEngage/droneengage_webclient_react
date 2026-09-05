@@ -36,6 +36,16 @@ L.Icon.Default.mergeOptions({
 // L.TileLayer's default createTile, but resolves the tile src via
 // js_tileCache.fn_getTile() (cache-first, falls back to the direct URL on a
 // cache miss/CORS failure). Object URLs are released on 'tileunload'.
+//
+// IMPORTANT: tile.src MUST be set synchronously here (not in a .then()
+// callback). Leaflet calls done() when the tile's load/error event fires.
+// If src is set asynchronously (after an IndexedDB read), a rapid zoom
+// can remove the tile before src is ever set — load never fires, done()
+// is never called, and Leaflet's tile-loading queue backs up, freezing
+// the map. Setting src = url synchronously and swapping to the cached
+// blob only on a cache hit avoids this: the tile always starts loading
+// immediately, done() always fires, and cache hits still benefit from
+// the local blob (which loads faster than the network).
 const CCachedTileLayer = L.TileLayer.extend({
     createTile(coords, done) {
         const tile = document.createElement('img');
@@ -53,10 +63,36 @@ const CCachedTileLayer = L.TileLayer.extend({
         const url = this.getTileUrl(coords);
         const providerId = this.options.cacheProviderId || 'default';
 
+        // Set src synchronously so the tile starts loading immediately and
+        // done() is guaranteed to fire (load or error). This is critical:
+        // the previous async approach caused Leaflet's tile queue to back
+        // up during rapid zoom, freezing the map — especially when zooming
+        // in (more tiles needed, more tiles removed before their async
+        // IndexedDB read completed, more missed done() callbacks).
+        tile.src = url;
+
+        // If the cache has this tile, swap to the object URL. The browser
+        // cancels the network request if it hasn't completed yet, so this
+        // is not a double-download — it's a race where the faster source
+        // wins. On a cache miss, the async lookup returns null and the
+        // tile keeps loading from the network URL already set above.
+        //
+        // Guard against two races:
+        //  1. Tile already loaded from the network — swapping src would
+        //     cause a visual flash (reload from blob) and a spurious second
+        //     'load' event (done() was already called, so it's harmless to
+        //     Leaflet but wasteful).
+        //  2. Tile was unloaded (rapid zoom removed it before the IndexedDB
+        //     read completed) — tile.parentNode is null, and setting
+        //     _cachedObjectUrl would leak the object URL since tileunload
+        //     already fired and won't fire again.
         js_tileCache.fn_getTile(url, providerId, coords.z, coords.x, coords.y)
             .then((objectUrl) => {
-                tile._cachedObjectUrl = objectUrl || null;
-                tile.src = objectUrl || url;
+                if (!objectUrl) return;
+                if (tile.complete || !tile.parentNode) return;
+                if (tile.src === objectUrl) return;
+                tile._cachedObjectUrl = objectUrl;
+                tile.src = objectUrl;
             });
 
         return tile;
@@ -173,6 +209,11 @@ const CAdsbToggleControl = L.Control.extend({
         this._boundOnPreferenceChanged = () => this._updateActiveState();
         js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
 
+        // Turn the button red when the ADSB provider reports a fetch error,
+        // and clear the red state when the error is resolved (null payload).
+        this._boundOnAdsbError = (listener, p_msg) => this._updateErrorState(p_msg);
+        js_eventEmitter.fn_subscribe(js_event.EE_adsbError, this, this._boundOnAdsbError);
+
         return container;
     },
 
@@ -180,6 +221,10 @@ const CAdsbToggleControl = L.Control.extend({
         if (this._boundOnPreferenceChanged) {
             js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
             this._boundOnPreferenceChanged = null;
+        }
+        if (this._boundOnAdsbError) {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_adsbError, this);
+            this._boundOnAdsbError = null;
         }
         this._link = null;
     },
@@ -193,6 +238,19 @@ const CAdsbToggleControl = L.Control.extend({
         } else {
             this._link.classList.add('leaflet-adsb-toggle-inactive');
             this._link.classList.remove('leaflet-adsb-toggle-active');
+        }
+    },
+
+    // Show/clear the red error indicator. p_msg is the error string (truthy)
+    // when an error is active, or null when the error has been cleared.
+    _updateErrorState(p_msg) {
+        if (!this._link) return;
+        if (p_msg) {
+            this._link.classList.add('leaflet-adsb-toggle-error');
+            this._link.title = `ADSB Error: ${p_msg}`;
+        } else {
+            this._link.classList.remove('leaflet-adsb-toggle-error');
+            this._link.title = 'Toggle ADSB';
         }
     }
 });
@@ -336,6 +394,11 @@ class CLeafLetAndruavMap {
 
         this.m_Map.on('moveend zoomend', () => {
             this.fn_updateUrlHashFromMap();
+            // Lets viewport-dependent overlays (e.g. ADSB marker culling in
+            // js_main.js) re-evaluate what's on/off screen. moveend/zoomend
+            // only fire once per completed gesture (not continuously during
+            // the drag/zoom itself), so this is inherently low-frequency.
+            js_eventEmitter.fn_dispatch(js_event.EE_mapViewChanged);
         });
 
         window.addEventListener('hashchange', () => {
@@ -370,6 +433,16 @@ class CLeafLetAndruavMap {
     */
     fn_getLocationObjectBy_latlng(p_lat, p_lng) {
         return new L.LatLng(p_lat, p_lng);
+    };
+
+    /**
+     * Current visible map bounds (LatLngBounds), or null before the map is
+     * initialized. Used by viewport-dependent overlays (e.g. ADSB marker
+     * culling in js_main.js) to decide what's currently on-screen.
+     */
+    fn_getBounds() {
+        if (this.m_Map == null) return null;
+        return this.m_Map.getBounds();
     };
 
 
@@ -842,13 +915,14 @@ class CLeafLetAndruavMap {
     /**
      * Draw a dotted outline circle showing the ADSB query coverage area.
      * No fill so it does not obscure the map. p_radiusKm is in kilometers;
-     * Leaflet circle radius is in meters.
+     * Leaflet circle radius is in meters. p_color overrides the default
+     * orange outline (e.g. red when the ADSB provider is in an error state).
      */
-    fn_drawAdsbQueryCircle(p_lat, p_lng, p_radiusKm) {
+    fn_drawAdsbQueryCircle(p_lat, p_lng, p_radiusKm, p_color) {
         return L.circle([p_lat, p_lng], {
             radius: Math.round(p_radiusKm * 1000),
             fill: false,
-            color: '#FFA500',
+            color: p_color || '#FFA500',
             opacity: 0.8,
             weight: 1,
             dashArray: '2, 6',

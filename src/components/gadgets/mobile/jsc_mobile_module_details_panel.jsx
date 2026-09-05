@@ -26,17 +26,24 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
     forceUpdate(tickRef.current);
   }, []);
 
+  // Filter EE_unitUpdated by party ID so a telemetry tick from unit A
+  // doesn't re-render unit B's module details panel. EE_OldModule is not
+  // unit-filtered in the original (it's a global module-list change event),
+  // so it stays unfiltered here.
+  const refreshIfUnit = useCallback((p_andruavUnit) => {
+    if (p_unit && p_andruavUnit && p_andruavUnit.getPartyID
+        && p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+    refresh();
+  }, [p_unit, refresh]);
+
   useEffect(() => {
-    const events = [js_event.EE_OldModule, js_event.EE_unitUpdated];
-    events.forEach((evt) => {
-      js_eventEmitter.fn_subscribe(evt, listenerObj, refresh);
-    });
+    js_eventEmitter.fn_subscribe(js_event.EE_OldModule, listenerObj, refresh);
+    js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, listenerObj, refreshIfUnit);
     return () => {
-      events.forEach((evt) => {
-        js_eventEmitter.fn_unsubscribe(evt, listenerObj);
-      });
+      js_eventEmitter.fn_unsubscribe(js_event.EE_OldModule, listenerObj);
+      js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated, listenerObj);
     };
-  }, [refresh, listenerObj]);
+  }, [refresh, refreshIfUnit, listenerObj]);
 
   if (!p_isOpen) return null;
 
