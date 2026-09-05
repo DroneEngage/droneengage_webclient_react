@@ -543,6 +543,14 @@ class AdsbManager {
         const cutoff = Date.now() - this._objectTimeoutMs;
         console.log('ADSB17 _tick: purging registry older than cutoff');
         js_adsbUnit.fn_purgeOlderThan(cutoff);
+        console.log('ADSB18 _tick: COMPLETE — all JS done, browser will render now');
+
+        // Schedule a rAF marker to detect browser rendering stalls. If the
+        // gap between ADSB18 and ADSB19 is large, the browser is freezing
+        // during rendering (layout/paint/composite), not in JS.
+        requestAnimationFrame(() => {
+            console.log('ADSB19 rAF: browser rendered a frame after ADSB tick');
+        });
     }
 
     _onPreferenceChanged() {

@@ -1242,6 +1242,8 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 	const visibleSet = new Set(visible);
 	console.log('ADSB13 fn_renderAdsbMarkers', { isDataUpdate, total: all.length, visible: visible.length });
 
+	let rendered = 0, hidden = 0;
+	const tRenderStart = performance.now();
 	for (let i = 0; i < all.length; ++i) {
 		const p_adsbObject = all[i];
 		if (visibleSet.has(p_adsbObject)) {
@@ -1254,6 +1256,7 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 				// setLatLng/setRotationAngle would just repeat that work
 				// as redundant DOM style mutations.
 				fn_renderSingleAdsb(p_adsbObject);
+				rendered++;
 			}
 		} else if (p_adsbObject.p_marker) {
 			// Off-screen or beyond the cap - drop the live marker so it
@@ -1262,8 +1265,10 @@ function fn_renderAdsbMarkers(isDataUpdate) {
 			// visible set.
 			js_leafletmap.fn_hideItem(p_adsbObject.p_marker);
 			p_adsbObject.p_marker = null;
+			hidden++;
 		}
 	}
+	console.log('ADSB13b fn_renderAdsbMarkers: loop done', { isDataUpdate, rendered, hidden, ms: Math.round(performance.now() - tRenderStart) });
 }
 
 function fn_adsbObjectUpdate() {
@@ -3962,7 +3967,10 @@ export function fn_on_ready() {
 		// piling up at extreme offsets while zooming in get culled right away.
 		// Wrapped so isDataUpdate=false is passed (view change only: skip
 		// full re-render for markers that already exist, just cull/create).
-		js_eventEmitter.fn_subscribe(js_event.EE_mapViewChanged, this, () => fn_renderAdsbMarkers(false));
+		js_eventEmitter.fn_subscribe(js_event.EE_mapViewChanged, this, () => {
+			console.log('ADSB20 EE_mapViewChanged fired → fn_renderAdsbMarkers(false)', { hasMarkers: Object.values(js_adsbUnit.List || {}).some(o => o && o.p_marker) });
+			fn_renderAdsbMarkers(false);
+		});
 		// Clear all ADSB markers from the map when ADSB is disabled.
 		js_eventEmitter.fn_subscribe(js_event.EE_adsbCleared, this, fn_clearAdsbFromMap);
 		// Turn the ADSB query circle red when the provider reports a fetch
