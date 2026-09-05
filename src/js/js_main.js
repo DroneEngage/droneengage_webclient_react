@@ -1092,14 +1092,19 @@ function fn_adsbExpiredUpdate(me) {
 	const p_keys = Object.keys(js_adsbUnit.List);
 	let hidden = 0;
 
+	console.log('ADSB16c fn_adsbExpiredUpdate: starting loop', { count, timeoutMs: ADSB_OBJECT_TIMEOUT });
 	for (let i = 0; i < count; ++i) {
 		let adsb_obj = js_adsbUnit.List[p_keys[i]];
 
 		if ((now - adsb_obj.m_last_access) > ADSB_OBJECT_TIMEOUT) {
+			const tItemStart = performance.now();
 			if (adsb_obj.p_marker !== null && adsb_obj.p_marker !== undefined) {
+				console.log('ADSB16d fn_adsbExpiredUpdate: hiding leaflet marker', { icao: adsb_obj.m_icao_address });
 				js_leafletmap.fn_hideItem(adsb_obj.p_marker);
 			}
+			console.log('ADSB16e fn_adsbExpiredUpdate: calling fn_removeAdsbMarker', { icao: adsb_obj.m_icao_address });
 			js_map3d.fn_removeAdsbMarker(adsb_obj);
+			console.log('ADSB16f fn_adsbExpiredUpdate: fn_removeAdsbMarker done', { icao: adsb_obj.m_icao_address, ms: Math.round(performance.now() - tItemStart) });
 			if (v_adsbMap3dSelectedIcao === adsb_obj.m_icao_address) {
 				fn_clearAdsbMap3dSelection();
 			}
@@ -1107,9 +1112,11 @@ function fn_adsbExpiredUpdate(me) {
 		}
 	}
 
+	console.log('ADSB16g fn_adsbExpiredUpdate: loop done, calling fn_flushAdsbTethers', { hidden });
 	// Push the (now shorter) 3D tether/ground/altitude-circle feature lists
 	// to Mapbox in a single batch rather than once per removed aircraft.
 	js_map3d.fn_flushAdsbTethers();
+	console.log('ADSB16h fn_adsbExpiredUpdate: fn_flushAdsbTethers done');
 
 	fn_updateAdsbQueryCircle();
 	console.log('ADSB16b fn_adsbExpiredUpdate: done', { hidden, ms: Math.round(performance.now() - tExpStart) });
