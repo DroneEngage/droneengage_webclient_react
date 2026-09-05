@@ -398,6 +398,7 @@ class CLeafLetAndruavMap {
             // js_main.js) re-evaluate what's on/off screen. moveend/zoomend
             // only fire once per completed gesture (not continuously during
             // the drag/zoom itself), so this is inherently low-frequency.
+            console.log('ADSB20a leaflet moveend/zoomend: center=', this.m_Map.getCenter(), 'zoom=', this.m_Map.getZoom(), 'size=', this.m_Map.getSize());
             js_eventEmitter.fn_dispatch(js_event.EE_mapViewChanged);
         });
 
