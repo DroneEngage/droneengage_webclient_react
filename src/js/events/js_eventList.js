@@ -150,7 +150,8 @@ const EVENT_LIST = Object.freeze({
 		"EE_onNewsToggle",
 		"EE_onNewsWriteToggle",
 		"EE_AisStream_Push",
-		"EE_mapViewChanged"
+		"EE_mapViewChanged",
+		"EE_map3dShown"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;

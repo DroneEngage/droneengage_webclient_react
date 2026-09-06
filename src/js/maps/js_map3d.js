@@ -760,6 +760,16 @@ class CAndruavMap3D {
             doubleClickZoom: false
         });
 
+        // Mapbox GL JS v3.x can throw uncaught DOMExceptions in its web
+        // worker when a sprite/image in the style can't be decoded (e.g.
+        // the Standard style's sprites on some browsers). The map 'error'
+        // event catches style/source/layer errors so they don't surface as
+        // uncaught exceptions — the map typically still loads with missing
+        // icons rather than failing entirely.
+        this.m_map.on('error', (e) => {
+            console.warn('[map3d] Mapbox error event:', e?.error?.message || e?.type || e);
+        });
+
         this.fn_registerMapDblClickHandler();
 
         this.m_map.on('style.load', () => {
@@ -1370,6 +1380,16 @@ class CAndruavMap3D {
                 // marker-sync loop above) is current again.
                 this.fn_flushAdsbTethers();
             }
+
+            // Notify consumers that the 3D view is now visible and resized.
+            // fn_syncAdsbObject early-returns while the 3D view is hidden, so
+            // while the user was on the 2D map no ADSB markers were created in
+            // m_adsbMarkers. js_main.js listens for this event and mirrors the
+            // existing ADSB registry onto the 3D map immediately (otherwise
+            // aircraft would never appear: the per-poll path culls against the
+            // hidden 2D map's degenerate bounds, so fn_renderSingleAdsb —
+            // the only caller of fn_syncAdsbObject — never runs).
+            js_eventEmitter.fn_dispatch(js_event.EE_map3dShown);
         };
 
         // Best-effort immediate resize (works if the browser already has

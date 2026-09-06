@@ -1269,6 +1269,52 @@ function fn_adsbObjectUpdate() {
 	fn_updateAdsbQueryCircle();
 }
 
+// Sync all ADSB aircraft from the registry onto the 3D map, bypassing the
+// 2D viewport culling in fn_renderAdsbMarkers. Called when the 3D map
+// becomes visible (EE_map3dShown): fn_syncAdsbObject early-returns while
+// the 3D view is hidden, so m_adsbMarkers is empty until this runs. The 2D
+// leaflet map is display:none at this point, so fn_getBounds() returns
+// degenerate bounds and fn_renderAdsbMarkers would cull everything — hence
+// this dedicated path that iterates the whole registry and pushes each
+// aircraft straight to the 3D map (the 3D map does its own LOD/zoom
+// culling via minzoom on the model layer).
+function fn_syncAdsbToMap3D() {
+	const list = (js_adsbUnit && js_adsbUnit.List) ? js_adsbUnit.List : null;
+	if (!list) return;
+	let all = Object.values(list).filter(
+		(o) => o && Number.isFinite(o.m_lat) && Number.isFinite(o.m_lon)
+	);
+	if (all.length === 0) return;
+	// Cap to the same limit as the 2D path (fn_renderAdsbMarkers) so we don't
+	// create hundreds of Mapbox markers + terrain-elevation queries at once.
+	// Sort by distance from the query-area center (same heuristic as the 2D
+	// path's cap) so the closest aircraft are kept when the registry is large.
+	if (all.length > CONST_ADSB_MAX_RENDERED_MARKERS) {
+		const area = js_adsbManager.fn_getQueryArea();
+		if (area) {
+			all = all.slice().sort((a, b) =>
+				fn_haversineKm(area.lat, area.lng, a.m_lat, a.m_lon) -
+				fn_haversineKm(area.lat, area.lng, b.m_lat, b.m_lon)
+			);
+		}
+		all = all.slice(0, CONST_ADSB_MAX_RENDERED_MARKERS);
+	}
+	for (let i = 0; i < all.length; ++i) {
+		const o = all[i];
+		let icon;
+		switch (parseInt(o.m_emitter_type)) {
+			case mavlink20.ADSB_EMITTER_TYPE_ROTOCRAFT:
+				icon = '/images/heli_1_32x32.png';
+				break;
+			default:
+				icon = '/images/Plane_Track.png';
+				break;
+		}
+		js_map3d.fn_syncAdsbObject(o, icon, fn_onAdsbMap3dMarkerClick);
+	}
+	js_map3d.fn_flushAdsbTethers();
+}
+
 // Re-render ADSB markers when the unit system (metric/imperial) changes so
 // tooltips switch between m/km/h and ft/mph immediately. Only refreshes
 // aircraft that already have a live marker - culled/off-screen aircraft
@@ -2422,7 +2468,14 @@ function initMap() {
 	try {
 		js_leafletmap.fn_initMap('mapid');
 		if (document.getElementById('mapid3d')) {
-			js_map3d.fn_initMap('mapid3d');
+			// fn_initMap is async (loads Mapbox SDK from CDN, then creates the
+			// Map). Don't await it — fn_setLapout/fn_gps_getLocation below must
+			// run immediately so the 2D map and ADSB geolocation aren't blocked
+			// by the 3D map's CDN load. Catch async rejections so they don't
+			// surface as unhandled Promise rejections.
+			js_map3d.fn_initMap('mapid3d').catch((e) => {
+				console.warn('[map3d] fn_initMap failed:', e);
+			});
 			js_map3d.fn_addListenerOnDblClickMap(fn_onMap3dDblClick);
 			// Clicking the map background deselects the highlighted ADSB aircraft.
 			js_map3d.fn_addListenerOnMapClick(fn_clearAdsbMap3dSelection);
@@ -3955,6 +4008,15 @@ export function fn_on_ready() {
 		// Re-render all ADSB markers when the unit system (metric/imperial) changes
 		// so tooltips switch between m/km/h and ft/mph immediately.
 		js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, fn_adsbUnitSystemChanged);
+		// When the 3D map becomes visible, mirror the existing ADSB registry
+		// onto it. fn_syncAdsbObject skips while the 3D view is hidden, so
+		// while the user was on the 2D map no 3D ADSB markers were created;
+		// without this re-render aircraft would only appear on the next
+		// ~60s poll after switching to 3D. Uses fn_syncAdsbToMap3D (not
+		// fn_renderAdsbMarkers) because the 2D leaflet map is display:none
+		// at this point, so its bounds are degenerate and the 2D viewport
+		// culling in fn_renderAdsbMarkers would drop every aircraft.
+		js_eventEmitter.fn_subscribe(js_event.EE_map3dShown, this, fn_syncAdsbToMap3D);
 	}
 
 
