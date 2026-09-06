@@ -804,15 +804,20 @@ class CAndruavMap3D {
                 exaggeration: this.m_terrainExaggeration
             });
 
-            this.fn_setupModelLodLayer();
-
             // setStyle() wipes ALL user-added layers/sources but leaves our
             // in-memory tracking Maps intact, so fn_ensure*Layer would think
             // the layers still exist and skip re-adding them — causing
             // "layer does not exist" errors on the next setPaintProperty.
             // Clear every dynamic-layer tracking Map here so the next
             // fn_sync* call re-creates the layers from scratch.
+            // This MUST run before fn_setupModelLodLayer: it resets
+            // m_modelLayerReady, so running it after setup would leave the
+            // model layer permanently dead (fn_flush*Models early-returns)
+            // while m_modelLodActive stays stuck on — hiding the DOM icons
+            // too (transparent placeholder, never swapped back).
             this.fn_clearDynamicLayerTracking();
+
+            this.fn_setupModelLodLayer();
         });
 
         this.m_map.on('load', () => {
