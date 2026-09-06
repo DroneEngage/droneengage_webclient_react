@@ -39,6 +39,11 @@
  * @property {string} [method]     - optional dot-path to a unit method to call BEFORE
  *                                   dispatching (e.g. "m_tracker.fn_updateTrackerStatus").
  * @property {*}      [methodArg]  - single argument passed to the method.
+ * @property {string[]} [notifyFields] - optional field paths to notify via
+ *                                   notifyUnitFieldChanged after the method runs.
+ *                                   Used when a method mutates fields opaquely
+ *                                   (e.g. tracker methods) so the bridge in
+ *                                   js_main.js is not needed.
  */
 
 /**

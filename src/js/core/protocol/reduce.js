@@ -309,6 +309,7 @@ function reduceTrackingStatus(unit, msg) {
             payload: unit,
             method: 'm_tracker.fn_updateTrackerStatus',
             methodArg: msg.payload,
+            notifyFields: ['m_tracker.m_enable_gui_tracker', 'm_tracker.m_active', 'm_tracker.m_ai_driven'],
         }],
     };
 }
@@ -328,6 +329,7 @@ function reduceAIRecognition(unit, msg) {
                 payload: unit,
                 method: 'm_tracker_ai.fn_addObjectClass',
                 methodArg: p.c,
+                notifyFields: ['m_tracker_ai.m_object_list'],
             }],
         };
     }
@@ -338,6 +340,7 @@ function reduceAIRecognition(unit, msg) {
             payload: unit,
             method: 'm_tracker_ai.fn_updateTrackerStatus',
             methodArg: p.a,
+            notifyFields: ['m_tracker_ai.m_active', 'm_tracker_ai.m_detected'],
         }],
     };
 }
@@ -398,14 +401,15 @@ export function reduceID(unit, msg) {
             // match the original exactly.
             ops.push({ op: 'method', method: 'fn_resetOnBoardConnection', arg: {
                 FI: p.FI ?? false, TP: p.TP ?? CONST_Unknown_Telemetry,
-                T: p.T, AP: p.AP, VT: p.VT, GS: p.GS, UD: p.UD, DS: p.DS, p: p.p } });
+                T: p.T, AP: p.AP, VT: p.VT, GS: p.GS, UD: p.UD, DS: p.DS, p: p.p },
+                notifyFields: ['m_useFCBIMU', 'm_telemetry_protocol', 'm_VehicleType', 'm_autoPilot'] });
         }
     }
 
     // Phase 3: modules.
     if (p.m1) {
         triggers.onModuleChanged = p.m1.length !== unit.m_modules.m_list.length;
-        ops.push({ op: 'method', method: 'm_modules.addModules', arg: p.m1 });
+        ops.push({ op: 'method', method: 'm_modules.addModules', arg: p.m1, notifyFields: ['m_modules.has_fcb', 'm_modules.has_viewlink', 'm_modules.has_ai_recognition', 'm_modules.has_p2p', 'm_modules.has_sdr'] });
     }
 
     // Phase 4: home location sub-message.

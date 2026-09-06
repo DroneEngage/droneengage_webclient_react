@@ -65,70 +65,18 @@ $.fn.append = function ($el) {
 fn_initFacadeSubscriptions();
 
 // ---------------------------------------------------------------------------
-// Event -> unitStore bridge (Plan 4)
-//
-// Translates coarse event-emitter announcements (EE_onTrackingStatusChanged,
-// etc.) into field-level notifications consumed by useUnitField. This is an
-// additive reactive layer on top of the existing mutation/dispatch flow —
-// the parser/facade layer is NOT modified. One bridge line per (event,
-// field) pair, added incrementally as components are migrated to useUnitField.
-// These are permanent app-lifetime subscriptions (js_main.js is the entry
-// module and is imported once before the app renders).
+// MAVLink FCB field notification (temporary — until #prv_parseUnitMavlinkMessage
+// is migrated to core/protocol). The MAVLink path in the old parser mutates
+// m_FCBParameters.m_systemID opaquely and dispatches EE_andruavUnitFCBUpdated.
+// The reducer's ID ops already notify m_useFCBIMU, m_telemetry_protocol, and
+// m_modules.has_fcb via notifyFields, so this subscription only covers the
+// MAVLink-only field.
 // ---------------------------------------------------------------------------
 {
-	const bridgeKey = { __unitStoreBridge: true };
-	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingStatusChanged, bridgeKey, (_me, p_unit) => {
+	const mavlinkFcbKey = { __mavlinkFcbBridge: true };
+	js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated, mavlinkFcbKey, (_me, p_unit) => {
 		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_tracker.m_enable_gui_tracker');
-		notifyUnitFieldChanged(pid, 'm_tracker.m_active');
-		notifyUnitFieldChanged(pid, 'm_tracker.m_ai_driven');
-	});
-	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIStatusChanged, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_active');
-		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_detected');
-	});
-	js_eventEmitter.fn_subscribe(js_event.EE_onTrackingAIObjectListUpdate, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_tracker_ai.m_object_list');
-	});
-	// EE_onAndruavUnitSwarmUpdated is dispatched with the specific unit as
-	// payload (see js_andruav_parser.js's eventMap), so it can be bridged
-	// exactly like the tracker events above.
-	js_eventEmitter.fn_subscribe(js_event.EE_onAndruavUnitSwarmUpdated, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_Swarm.m_following');
-		notifyUnitFieldChanged(pid, 'm_Swarm.m_isLeader');
-		notifyUnitFieldChanged(pid, 'm_Swarm.m_formation_as_leader');
-		notifyUnitFieldChanged(pid, 'm_Swarm.m_formation_as_follower');
-	});
-	// Unit tab header (jsc_unitControlMainList.jsx / jsc_unit_tab_header.jsx).
-	// EE_andruavUnitArmedUpdated and EE_unitOnlineChanged are safety-critical
-	// and deliberately excluded from Plan 3's rAF batching (see
-	// js_eventEmitterConfig.js) - this bridge does NOT change that; it still
-	// fires synchronously, it just scopes the resulting re-render to the one
-	// affected unit's header instead of the whole unit list.
-	js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		notifyUnitFieldChanged(p_unit.getPartyID(), 'm_isArmed');
-	});
-	js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_IsDisconnectedFromGCS');
-		notifyUnitFieldChanged(pid, 'm_IsShutdown');
-	});
-	js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated, bridgeKey, (_me, p_unit) => {
-		if (!p_unit) return;
-		const pid = p_unit.getPartyID();
-		notifyUnitFieldChanged(pid, 'm_useFCBIMU');
-		notifyUnitFieldChanged(pid, 'm_telemetry_protocol');
-		notifyUnitFieldChanged(pid, 'm_modules.has_fcb');
-		notifyUnitFieldChanged(pid, 'm_FCBParameters.m_systemID');
+		notifyUnitFieldChanged(p_unit.getPartyID(), 'm_FCBParameters.m_systemID');
 	});
 }
 

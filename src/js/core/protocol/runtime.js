@@ -79,10 +79,18 @@ export function fn_handleFrame(p_frame, evt) {
         }
 
         // Dispatch coarse events. If an event carries a `method`, call it on
-        // the unit (or sub-object) before dispatching.
+        // the unit (or sub-object) before dispatching. If it carries
+        // notifyFields, notify the store for each field after the method runs
+        // (replaces the js_main.js __unitStoreBridge).
         for (const ev of result.events) {
             if (ev.method) {
                 callUnitMethod(unit, ev.method, ev.methodArg);
+            }
+            if (ev.notifyFields) {
+                const pid = unit.getPartyID();
+                for (const fp of ev.notifyFields) {
+                    notifyUnitFieldChanged(pid, fp);
+                }
             }
             js_eventEmitter.fn_dispatch(ev.name, ev.payload);
         }
@@ -142,6 +150,12 @@ function fn_executeOps(unit, ops) {
                 break;
             case 'method':
                 callUnitMethod(unit, op.method, op.arg);
+                if (op.notifyFields) {
+                    const pid = unit.getPartyID();
+                    for (const fp of op.notifyFields) {
+                        notifyUnitFieldChanged(pid, fp);
+                    }
+                }
                 break;
             case 'dispatch':
                 // Internal pseudo-events (prefixed __) are runtime concerns
