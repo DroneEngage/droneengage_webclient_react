@@ -2854,7 +2854,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 		if (marker === null || marker === undefined) {
 			// create a buffer for flight path
-			p_andruavUnit.m_gui.m_gui_flightPath.fn_flush();
+			p_andruavUnit.m_flightPathHistory.fn_flush();
 			js_map3d.fn_flushPath(p_andruavUnit);
 			p_andruavUnit.m_gui.m_flightPath_style = {
 				color: js_globals.flightPath_colors[p_andruavUnit.m_index % 4],
@@ -2935,7 +2935,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 						p_andruavUnit.m_gui.m_flightPath_style);
 
 					// Add flight path step
-					p_andruavUnit.m_gui.m_gui_flightPath.fn_add(v_flightPath, true,
+					p_andruavUnit.m_flightPathHistory.fn_add(v_flightPath, true,
 						function (oldstep) {
 							js_leafletmap.fn_hideItem(oldstep);
 						});
