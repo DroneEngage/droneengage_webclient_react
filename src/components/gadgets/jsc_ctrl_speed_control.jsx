@@ -5,6 +5,7 @@ import * as js_helpers from '../../js/js_helpers.js'
 import { js_globals } from '../../js/js_globals.js';
 import { js_speak } from '../../js/js_speak'
 import { fn_changeSpeed as fn_changeSpeed_main } from '../../js/js_main.js'
+import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 
@@ -86,7 +87,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
 
     if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== null && v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== undefined) {
         let speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
-        v_andruavUnit.m_gui.speed_link = true;
+        js_unitUiPrefs.fn_setUnitPref(v_andruavUnit.getPartyID(), 'speed_link', true);
         if (js_globals.v_useMetricSystem === true) {
             v_speed_val = speed.toFixed(0);
         }
@@ -131,7 +132,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                 </svg>
             </span>
-            <span id='speed' title={"target speed: " + v_targetspeed} onClick={(e) => fn_changeSpeed(e, v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : v_andruavUnit.m_gui.speed_link)}>
+            <span id='speed' title={"target speed: " + v_targetspeed} onClick={(e) => fn_changeSpeed(e, v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : js_unitUiPrefs.fn_getUnitPrefs(v_andruavUnit.getPartyID()).speed_link)}>
                 <small><b>&nbsp;
                     {'GS: ' + v_speed_text}
                     &nbsp;</b></small>

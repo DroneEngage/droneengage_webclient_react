@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "webclient",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-lc", "unset HTTPS SSL_CRT_FILE SSL_KEY_FILE; export NODE_OPTIONS=--openssl-legacy-provider; export BROWSER=none; npx react-scripts start"],
+      "port": 3000
+    }
+  ]
+}

@@ -13,6 +13,7 @@ import {
     fn_requestWayPoints,
     fn_clearWayPoints, fn_putWayPoints
 } from '../../js/js_main.js'
+import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
@@ -60,7 +61,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         };
 
         
-        this.props.p_unit.m_gui.speed_link = false;
+        js_unitUiPrefs.fn_setUnitPref(this.props.p_unit.getPartyID(), 'speed_link', false);
         this.key = Math.random().toString();
 
         js_eventEmitter.fn_subscribe (js_event.EE_OldModule,this,this.fn_update);

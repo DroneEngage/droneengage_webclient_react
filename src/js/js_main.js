@@ -36,6 +36,8 @@ import { js_windProvider } from './weather/js_windProvider.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 import { notifyUnitFieldChanged } from './store/unitStore.js'
 import { js_layout } from './state/layoutStore.js'
+import { js_unitUiPrefs } from './state/unitUiPrefs.js'
+import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
@@ -3084,8 +3086,8 @@ function hlp_gotoImage_Map() {
 */
 var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
 	// if (p_andruavUnit.m_IsGCS === false) {
-	// 	p_andruavUnit.m_gui.defaultHieght = js_globals.CONST_DEFAULT_ALTITUDE;
-	// 	p_andruavUnit.m_gui.defaultCircleRadius = js_globals.CONST_DEFAULT_RADIUS;
+	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultHieght', js_globals.CONST_DEFAULT_ALTITUDE);
+	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultCircleRadius', js_globals.CONST_DEFAULT_RADIUS);
 	// }
 
 	js_speak.fn_speak(p_andruavUnit.m_unitName + " unit added");

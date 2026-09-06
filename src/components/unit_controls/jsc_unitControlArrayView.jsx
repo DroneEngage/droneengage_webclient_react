@@ -12,6 +12,7 @@ import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
+import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
 
 
@@ -130,7 +131,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
         this.key = Math.random().toString();
 
-        this.props.p_unit.m_gui.speed_link = false;
+        js_unitUiPrefs.fn_setUnitPref(this.props.p_unit.getPartyID(), 'speed_link', false);
 
 		this.telemetry_level=["OFF","1","2","3"];
         // Throttle telemetry-driven re-renders to at most one every

@@ -12,6 +12,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
 import { ClssCtrlDEPilot } from '../de_pilot/jsc_ctrl_depilot.jsx'
+import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
 export class ClssCtrlArdupilotFlightController extends React.Component {
     constructor(props)
@@ -802,7 +803,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     }
 
     fn_changeSpeedWrapper(v_andruavUnit) {
-        const initSpeed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : v_andruavUnit.m_gui.speed_link;
+        const initSpeed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : js_unitUiPrefs.fn_getUnitPrefs(v_andruavUnit.getPartyID()).speed_link;
 
         if (this.state.m_applyOnAllSameType === true) {
             const me = this;
@@ -887,7 +888,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 
                 ctrl.push(<div key={this.props.id+"rc3"}   id={this.props.id+"rc3"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
                     <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-16 me-1 btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-16 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-16 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-16 btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class}>
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
@@ -971,7 +972,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
                     <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:this.props.v_andruavUnit.m_gui.speed_link)}>GS</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
                     <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     </div></div>);
                     }
