@@ -13,6 +13,7 @@ import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
+import { fn_handleFrame } from '../../core/protocol/runtime.js'
 
 
 export const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
@@ -603,7 +604,14 @@ class CAndruavClientWS {
 
                             case CMD_COMM_GROUP:
                             case CMD_COMM_INDIVIDUAL:
-                                js_andruav_parser.AndruavClientParser.parseCommunicationMessage(Me, p_jmsg, evt);
+                                // TASK-02: try the new pure decode/reduce/effects path
+                                // first. If the message type is migrated, fn_handleFrame
+                                // does everything and returns true; otherwise fall through
+                                // to the old switch. Both paths must not run for the same
+                                // frame.
+                                if (!fn_handleFrame(p_jmsg, evt)) {
+                                    js_andruav_parser.AndruavClientParser.parseCommunicationMessage(Me, p_jmsg, evt);
+                                }
                                 break;
                         }
                         // js_common.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // Disable in production for perf

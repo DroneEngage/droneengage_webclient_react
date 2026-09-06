@@ -12,7 +12,7 @@
  */
 
 import { fn_decode } from './decode.js';
-import { fn_reduce } from './reduce.js';
+import { fn_reduce, fn_isMigrated } from './reduce.js';
 import { fn_effects } from './effects.js';
 import { fn_setByPath } from './path.js';
 import { COMMANDS } from './types.js';
@@ -36,6 +36,12 @@ export function fn_handleFrame(p_frame, evt) {
     const receivedAt = Date.now();
     const msg = fn_decode(p_frame, receivedAt);
 
+    // Bail out BEFORE any side effects for unmigrated types, so the old switch
+    // runs cleanly with no double getOrCreateUnit / message accounting.
+    if (!fn_isMigrated(msg.type)) {
+        return false;
+    }
+
     const isIDMessage = (msg.type === 1004 /* CONST_TYPE_AndruavMessage_ID */);
     const { unit, shouldRequestID } = fn_getOrCreateUnit(msg.senderID, !isIDMessage);
     if (shouldRequestID) {
@@ -50,7 +56,7 @@ export function fn_handleFrame(p_frame, evt) {
 
     const result = fn_reduce(unit, msg);
     if (result === null) {
-        // Not yet migrated — caller falls through to the old switch.
+        // Should not happen (fn_isMigrated passed) but guard anyway.
         return false;
     }
 

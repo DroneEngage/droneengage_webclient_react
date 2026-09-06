@@ -27,6 +27,10 @@ import { EVENTS as js_event } from '../../events/js_eventList.js';
  * @returns {{patches: import('./types.js').FieldPatch[], events: import('./types.js').Dispatch[]} | null}
  */
 export function fn_reduce(unit, msg) {
+    if (!fn_isMigrated(msg.type)) {
+        // Not yet migrated — runtime falls through to the old switch.
+        return null;
+    }
     switch (msg.type) {
         case CONST_TYPE_AndruavMessage_GPS:
             return reduceGPS(unit, msg);
@@ -39,9 +43,23 @@ export function fn_reduce(unit, msg) {
         case CONST_TYPE_AndruavMessage_Communication_Line_Status:
             return reduceCommLineStatus(unit, msg);
         default:
-            // Not yet migrated — runtime falls through to the old switch.
             return null;
     }
+}
+
+/**
+ * Whether a message type is handled by the new reduce path. Runtime checks
+ * this BEFORE doing getOrCreateUnit / message accounting so unmigrated types
+ * fall through to the old switch with zero side effects (no double accounting).
+ * @param {number} type
+ * @returns {boolean}
+ */
+export function fn_isMigrated(type) {
+    return type === CONST_TYPE_AndruavMessage_GPS
+        || type === CONST_TYPE_AndruavMessage_POW
+        || type === CONST_TYPE_AndruavMessage_NAV_INFO
+        || type === CONST_TYPE_AndruavMessage_CommSignalsStatus
+        || type === CONST_TYPE_AndruavMessage_Communication_Line_Status;
 }
 
 // ---------------------------------------------------------------------------
