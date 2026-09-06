@@ -35,6 +35,7 @@ import { js_adsbManager } from './adsb/js_adsbManager.js'
 import { js_windProvider } from './weather/js_windProvider.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 import { notifyUnitFieldChanged } from './store/unitStore.js'
+import { fn_initFacadeSubscriptions } from './core/protocol/runtime.js'
 import { js_layout } from './state/layoutStore.js'
 import { js_unitUiPrefs } from './state/unitUiPrefs.js'
 import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
@@ -56,6 +57,12 @@ $.fn.append = function ($el) {
 	}
 	return oldAppend.apply(this, arguments)
 }
+
+// ---------------------------------------------------------------------------
+// Initialize the runtime's facade event subscriptions (the parser no longer
+// imports the facade — its remaining facade calls are event dispatches that
+// runtime handles here).
+fn_initFacadeSubscriptions();
 
 // ---------------------------------------------------------------------------
 // Event -> unitStore bridge (Plan 4)

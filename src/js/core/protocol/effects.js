@@ -8,7 +8,8 @@
  * breaks the parser<->facade cycle.
  */
 
-import { CONST_TYPE_AndruavMessage_ID } from '../../protocol/messages/js_andruavMessages.js';
+import { CONST_TYPE_AndruavMessage_ID,
+         CONST_TYPE_AndruavMessage_RemoteExecute } from '../../protocol/messages/js_andruavMessages.js';
 import { reduceIDEffects } from './reduce.js';
 
 /**
@@ -21,10 +22,13 @@ export function fn_effects(unit, msg, reduceResult) {
     switch (msg.type) {
         case CONST_TYPE_AndruavMessage_ID:
             return reduceIDEffects(unit, reduceResult);
+        case CONST_TYPE_AndruavMessage_RemoteExecute:
+            // The old sub-switch calls API_sendID when p_jmsg.C === CONST_TYPE_AndruavMessage_ID.
+            if (reduceResult && reduceResult.remoteExecuteC === CONST_TYPE_AndruavMessage_ID) {
+                return [{ kind: 'SEND_ID' }];
+            }
+            return [];
         default:
-            // No migrated message type produces outbound commands yet.
-            // When SDR/P2P/RemoteExecute/GeoFenceAttachStatus are migrated,
-            // their API_request* calls become Command objects returned here.
             return [];
     }
 }

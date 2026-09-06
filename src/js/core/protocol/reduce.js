@@ -24,6 +24,28 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
          CONST_TYPE_AndruavMessage_ID,
          CONST_TYPE_AndruavMessage_HomeLocation,
+         CONST_TYPE_AndruavMessage_CameraFlash,
+         CONST_TYPE_AndruavMessage_CameraZoom,
+         CONST_TYPE_AndruavMessage_DroneReport,
+         CONST_TYPE_AndruavMessage_GPIO_STATUS,
+         CONST_TYPE_AndruavMessage_TELNET_STATUS,
+         CONST_TYPE_AndruavMessage_Error,
+         CONST_TYPE_AndruavMessage_GEOFenceHit,
+         CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS,
+         CONST_TYPE_AndruavMessage_P2P_InRange_Node,
+         CONST_TYPE_AndruavMessage_P2P_InRange_BSSID,
+         CONST_TYPE_AndruavMessage_P2P_INFO,
+         CONST_TYPE_AndruavMessage_SDR_ACTION,
+         CONST_TYPE_AndruavMessage_RemoteExecute,
+         CONST_TYPE_AndruavMessage_DistinationLocation,
+         CONST_TYPE_AndruavMessage_Viewlink_STATUS,
+         CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
+         CONST_TYPE_AndruavMessage_SearchTargetList,
+         CONST_SDR_ACTION_SDR_INFO,
+         CONST_SDR_ACTION_LIST_SDR_DEVICES,
+         CONST_SDR_ACTION_TRIGGER,
+         VIEWLINK_STATUS_GIMBAL_ATTITUDE,
+         VIEWLINK_STATUS_ALL,
          CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST,
          CONST_TASHKEEL_SERB_NO_SWARM,
          CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
@@ -61,6 +83,38 @@ export function fn_reduce(unit, msg) {
             return reduceAIRecognition(unit, msg);
         case CONST_TYPE_AndruavMessage_ID:
             return reduceID(unit, msg);
+        case CONST_TYPE_AndruavMessage_CameraFlash:
+            return reduceCameraFlash(unit, msg);
+        case CONST_TYPE_AndruavMessage_CameraZoom:
+            return reduceCameraZoom(unit, msg);
+        case CONST_TYPE_AndruavMessage_HomeLocation:
+            return reduceHomeLocation(unit, msg);
+        case CONST_TYPE_AndruavMessage_DistinationLocation:
+            return reduceDistinationLocation(unit, msg);
+        case CONST_TYPE_AndruavMessage_DroneReport:
+            return reduceDroneReport(unit, msg);
+        case CONST_TYPE_AndruavMessage_GPIO_STATUS:
+            return reduceGPIOStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_TELNET_STATUS:
+            return reduceTelnetStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_Error:
+            return reduceError(unit, msg);
+        case CONST_TYPE_AndruavMessage_GEOFenceHit:
+            return reduceGeoFenceHit(unit, msg);
+        case CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS:
+            return reduceModuleHealthStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_P2P_InRange_Node:
+            return reduceP2PInRangeNode(unit, msg);
+        case CONST_TYPE_AndruavMessage_P2P_InRange_BSSID:
+            return reduceP2PInRangeBSSID(unit, msg);
+        case CONST_TYPE_AndruavMessage_P2P_INFO:
+            return reduceP2PInfo(unit, msg);
+        case CONST_TYPE_AndruavMessage_SDR_ACTION:
+            return reduceSDRAction(unit, msg);
+        case CONST_TYPE_AndruavMessage_RemoteExecute:
+            return reduceRemoteExecute(unit, msg);
+        case CONST_TYPE_AndruavMessage_Viewlink_STATUS:
+            return reduceViewlinkStatus(unit, msg);
         default:
             return null;
     }
@@ -83,7 +137,23 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_UdpProxy_Info
         || type === CONST_TYPE_AndruavMessage_TargetTracking_STATUS
         || type === CONST_TYPE_AndruavMessage_AI_Recognition_STATUS
-        || type === CONST_TYPE_AndruavMessage_ID;
+        || type === CONST_TYPE_AndruavMessage_ID
+        || type === CONST_TYPE_AndruavMessage_CameraFlash
+        || type === CONST_TYPE_AndruavMessage_CameraZoom
+        || type === CONST_TYPE_AndruavMessage_HomeLocation
+        || type === CONST_TYPE_AndruavMessage_DistinationLocation
+        || type === CONST_TYPE_AndruavMessage_DroneReport
+        || type === CONST_TYPE_AndruavMessage_GPIO_STATUS
+        || type === CONST_TYPE_AndruavMessage_TELNET_STATUS
+        || type === CONST_TYPE_AndruavMessage_Error
+        || type === CONST_TYPE_AndruavMessage_GEOFenceHit
+        || type === CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS
+        || type === CONST_TYPE_AndruavMessage_P2P_InRange_Node
+        || type === CONST_TYPE_AndruavMessage_P2P_InRange_BSSID
+        || type === CONST_TYPE_AndruavMessage_P2P_INFO
+        || type === CONST_TYPE_AndruavMessage_SDR_ACTION
+        || type === CONST_TYPE_AndruavMessage_RemoteExecute
+        || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS;
 }
 
 // ---------------------------------------------------------------------------
@@ -461,6 +531,275 @@ export function reduceID(unit, msg) {
     });
 
     return { patches: [], events: [], ops, triggers, isNewUnit };
+}
+
+// ---------------------------------------------------------------------------
+// CameraFlash / CameraZoom — dispatch only with {p_unit, p_jmsg} payload.
+// ---------------------------------------------------------------------------
+function reduceCameraFlash(unit, msg) {
+    return { patches: [], events: [{ name: js_event.EE_cameraFlashChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
+}
+function reduceCameraZoom(unit, msg) {
+    return { patches: [], events: [{ name: js_event.EE_cameraZoomChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
+}
+
+// ---------------------------------------------------------------------------
+// HomeLocation — field writes + EE_HomePointChanged.
+// ---------------------------------------------------------------------------
+function reduceHomeLocation(unit, msg) {
+    const p = msg.payload;
+    return {
+        patches: [
+            { path: 'm_Geo_Tags.p_HomePoint.m_isValid', value: true },
+            { path: 'm_Geo_Tags.p_HomePoint.lat', value: p.T },
+            { path: 'm_Geo_Tags.p_HomePoint.lng', value: p.O },
+            { path: 'm_Geo_Tags.p_HomePoint.alt', value: p.A },
+        ],
+        events: [{ name: js_event.EE_HomePointChanged, payload: unit }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// DistinationLocation — method call fn_addDestinationPoint + dispatch.
+// ---------------------------------------------------------------------------
+function reduceDistinationLocation(unit, msg) {
+    const p = msg.payload;
+    let destination_type = 0; // CONST_DESTINATION_GUIDED_POINT
+    if (p.P !== null && p.P !== undefined) destination_type = p.P;
+    return {
+        patches: [{ path: 'm_Geo_Tags.p_DestinationPoint.m_isValid', value: true }],
+        events: [{
+            name: js_event.EE_DistinationPointChanged,
+            payload: unit,
+            method: 'm_Geo_Tags.fn_addDestinationPoint',
+            methodArg: [p.T, p.O, p.A, destination_type],
+        }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// DroneReport — dispatch EE_msgFromUnit_WayPointsUpdated.
+// ---------------------------------------------------------------------------
+function reduceDroneReport(unit, msg) {
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_msgFromUnit_WayPointsUpdated, payload: { unit, mir: msg.payload.P, status: msg.payload.R } }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// GPIO_STATUS — method call m_GPIOs.addGPIO + dispatch.
+// ---------------------------------------------------------------------------
+function reduceGPIOStatus(unit, msg) {
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_unitGPIOUpdated,
+            payload: unit,
+            method: 'm_GPIOs.addGPIO',
+            methodArg: msg.payload.s,
+        }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// TELNET_STATUS — dispatch only.
+// ---------------------------------------------------------------------------
+function reduceTelnetStatus(unit, msg) {
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_unitTelnetStatus, payload: { unit, msg: msg.payload } }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// Error — dispatch EE_andruavUnitError.
+// ---------------------------------------------------------------------------
+function reduceError(unit, msg) {
+    const p = msg.payload;
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_andruavUnitError,
+            payload: { unit, err: { errorNo: p.EN, infoType: p.IT, notification_Type: p.NT, Description: p.DS } },
+        }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// GEOFenceHit — dispatch EE_andruavUnitGeoFenceHit.
+// ---------------------------------------------------------------------------
+function reduceGeoFenceHit(unit, msg) {
+    const p = msg.payload;
+    let m_shouldKeepOutside = false;
+    if (typeof p.o === 'number') m_shouldKeepOutside = (p.o === 1);
+    else if (typeof p.o === 'boolean') m_shouldKeepOutside = p.o;
+    const geoFenceHitInfo = {
+        hasValue: true, fenceName: p.n, m_inZone: p.z, m_shouldKeepOutside,
+        distance: p.hasOwnProperty('d') ? p.d : Number.NaN,
+    };
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_andruavUnitGeoFenceHit, payload: { unit, fenceHit: geoFenceHitInfo } }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// MODULE_HEALTH_STATUS — field writes + EE_unitUpdated.
+// ---------------------------------------------------------------------------
+function reduceModuleHealthStatus(unit, msg) {
+    const p = msg.payload;
+    if (!p || !p.k) return { patches: [], events: [] };
+    return {
+        patches: [{
+            path: `m_moduleHealth.${p.k}`,
+            value: { rss: p.rs, vmpeak: p.pk, vmswap: p.sw, threads: p.th, slope: p.sl, trend: p.tr, status: p.hs, uptime: p.up, timestamp: msg.receivedAt },
+        }],
+        events: [{ name: js_event.EE_unitUpdated, payload: unit }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// P2P_InRange_Node — merge detected nodes into m_P2P.m_detected_node.
+// ---------------------------------------------------------------------------
+function reduceP2PInRangeNode(unit, msg) {
+    const p = msg.payload;
+    if (!p || typeof p !== 'object') return { patches: [], events: [] };
+    const node = {};
+    try {
+        Object.entries(p).forEach(([partyID, n]) => {
+            n.t = n.t ?? 0;
+            node[partyID] = { mac: n.m, partyID: n.p, connected: n.c, last_time: n.t };
+        });
+    } catch (e) { /* ignore */ }
+    return {
+        patches: [{ path: 'm_P2P.m_detected_node', value: { ...(unit.m_P2P.m_detected_node || {}), ...node } }],
+        events: [{ name: js_event.EE_unitP2PUpdated, payload: unit }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// P2P_InRange_BSSID — merge detected BSSIDs into m_P2P.m_detected_bssid.
+// ---------------------------------------------------------------------------
+function reduceP2PInRangeBSSID(unit, msg) {
+    const p = msg.payload;
+    if (!p) return { patches: [], events: [] };
+    const bssid = {};
+    try {
+        Object.entries(p).forEach(([partyID, b]) => {
+            bssid[partyID] = { partyID: b.p, bssid: b.b, ssid: b.s, channel: b.c, rssi: b.r, last_time: b.t };
+        });
+    } catch (e) { /* ignore */ }
+    return {
+        patches: [{ path: 'm_P2P.m_detected_bssid', value: { ...(unit.m_P2P.m_detected_bssid || {}), ...bssid } }],
+        events: [{ name: js_event.EE_unitP2PUpdated, payload: unit }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// P2P_INFO — field writes + EE_unitP2PUpdated.
+// ---------------------------------------------------------------------------
+function reduceP2PInfo(unit, msg) {
+    const p = msg.payload;
+    const patches = [
+        { path: 'm_P2P.m_initialized', value: true },
+        { path: 'm_P2P.m_connection_type', value: p.c },
+        { path: 'm_P2P.m_address_1', value: p.a1 },
+        { path: 'm_P2P.m_address_2', value: p.a2 },
+        { path: 'm_P2P.m_wifi_channel', value: p.wc },
+        { path: 'm_P2P.m_wifi_password', value: p.wp },
+        { path: 'm_P2P.m_parent_address', value: p.pa },
+        { path: 'm_P2P.m_parent_connected', value: p.pc },
+        { path: 'm_P2P.m_logical_parent_address', value: p.lp },
+        { path: 'm_P2P.m_firmware', value: p.f },
+        { path: 'm_P2P.m_driver_connected', value: p.a },
+        { path: 'm_P2P.m_p2p_connected', value: p.o },
+        { path: 'm_P2P.m_p2p_disabled', value: (p.d !== null && p.d !== undefined) ? p.d : false },
+    ];
+    return { patches, events: [{ name: js_event.EE_unitP2PUpdated, payload: unit }] };
+}
+
+// ---------------------------------------------------------------------------
+// SDR_ACTION — sub-switch with 3 cases. No facade call (the old null-unit
+// requestID is dead code — fn_getOrCreateUnit always returns a unit).
+// ---------------------------------------------------------------------------
+function reduceSDRAction(unit, msg) {
+    const p = msg.payload;
+    switch (p.a) {
+        case CONST_SDR_ACTION_SDR_INFO: {
+            const patches = [
+                { path: 'm_SDR.m_initialized', value: true },
+                { path: 'm_SDR.m_center_frequency', value: p.fc },
+                { path: 'm_SDR.m_display_bars', value: p.r },
+                { path: 'm_SDR.m_gain', value: p.g },
+                { path: 'm_SDR.m_sample_rate', value: p.s },
+                { path: 'm_SDR.m_driver', value: p.n },
+                { path: 'm_SDR.m_status', value: p.c },
+                { path: 'm_SDR.m_interval', value: p.t },
+                { path: 'm_SDR.m_trigger_level', value: p.l },
+            ];
+            return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
+        }
+        case CONST_SDR_ACTION_LIST_SDR_DEVICES: {
+            const patches = [{ path: 'm_SDR.m_available_drivers', value: p.dr === null ? [] : p.dr }];
+            return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
+        }
+        case CONST_SDR_ACTION_TRIGGER: {
+            // addDetectedSignal is an impure unit method — use method dispatch.
+            return {
+                patches: [],
+                events: [{
+                    name: js_event.EE_unitSDRTrigger,
+                    payload: unit,
+                    method: 'm_SDR.addDetectedSignal',
+                    methodArg: [p.f, p.v, p.ln, p.la, p.A, p.r, p.d],
+                }],
+            };
+        }
+        default:
+            return { patches: [], events: [] };
+    }
+}
+
+// ---------------------------------------------------------------------------
+// RemoteExecute — sub-switch. The ID case calls API_sendID (facade) -> Command.
+// ---------------------------------------------------------------------------
+function reduceRemoteExecute(unit, msg) {
+    const p = msg.payload;
+    // The only live case in the sub-switch is CONST_TYPE_AndruavMessage_ID ->
+    // API_sendID. That becomes a Command returned by effects.
+    return { patches: [], events: [], remoteExecuteC: p.C };
+}
+
+// ---------------------------------------------------------------------------
+// Viewlink_STATUS — gimbal attitude + LRF, method calls + dispatch.
+// ---------------------------------------------------------------------------
+function reduceViewlinkStatus(unit, msg) {
+    const p = msg.payload;
+    switch (p.a) {
+        case VIEWLINK_STATUS_GIMBAL_ATTITUDE: {
+            return {
+                patches: [],
+                events: [{
+                    name: js_event.EE_viewLinkGimbalAttitude,
+                    payload: { gm: { y: p.y ?? 0, p: p.p ?? 0, r: p.r ?? 0 } },
+                    method: 'm_Gimbal.setOrientation',
+                    methodArg: [p.y ?? 0, p.p ?? 0, p.r ?? 0],
+                }],
+            };
+        }
+        case VIEWLINK_STATUS_ALL: {
+            const gmSrc = p.gm || {};
+            const lrt = p.lrf || {};
+            const events = [
+                { name: js_event.EE_viewLinkGimbalAttitude, payload: { gm: { y: gmSrc.y ?? 0, p: gmSrc.p ?? 0, r: gmSrc.r ?? 0 }, tr: p.tr || p.tracking || {}, lrf: p.lrf || {}, ai: p.ai || {}, g: p.g || {} }, method: 'm_Gimbal.setOrientation', methodArg: [gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0] },
+                { name: '__viewlinkLRF', payload: unit, method: 'm_Gimbal.setLRF', methodArg: [lrt.d, lrt.a] },
+            ];
+            return { patches: [], events };
+        }
+        default:
+            return { patches: [], events: [] };
+    }
 }
 
 /**

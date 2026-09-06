@@ -23,7 +23,6 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
-import * as js_andruav_facade from './js_andruav_facade.js'
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
 import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
 
@@ -75,10 +74,10 @@ class CAndruavClientParser {
 
             if (!unit.m_IsShutdown) {
                 if (!unit.m_Geo_Tags.p_HomePoint.m_isValid) {
-                    js_andruav_facade.AndruavClientFacade.API_do_GetHomeLocation(unit);
+                    js_eventEmitter.fn_dispatch('__facadeGetHomeLocation', unit);
                 }
                 if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl0) {
-                    js_andruav_facade.AndruavClientFacade.API_requestID(unit.getPartyID());
+                    js_eventEmitter.fn_dispatch('__facadeRequestID', unit.getPartyID());
                 }
             }
 
@@ -222,12 +221,8 @@ class CAndruavClientParser {
 
 
 
-    #prv_onNewUnitAdded(target) {
-        js_andruav_facade.AndruavClientFacade.API_requestGeoFencesAttachStatus(target);
-        js_andruav_facade.AndruavClientFacade.API_requestUdpProxyStatus(target);
-        js_andruav_facade.AndruavClientFacade.API_requestWayPoints(target);
-        //js_andruav_facade.AndruavClientFacade.API_requestIMU (target,true);  // NOT USED
-    };
+    // #prv_onNewUnitAdded removed — the 3 facade calls moved to
+    // reduceIDEffects (effects.js) as Command objects, dispatched by runtime.
 
 
     parseCommunicationMessage(Me, msg, evt) {
@@ -236,7 +231,7 @@ class CAndruavClientParser {
         const isIDMessage = (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavMessage_ID);
         const { unit: p_unit, shouldRequestID } = fn_getOrCreateUnit(p_jmsg.senderName, !isIDMessage);
         if (shouldRequestID) {
-            js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
+            js_eventEmitter.fn_dispatch('__facadeRequestID', msg.senderName);
         }
 
         p_unit.m_Messages.fn_addMsg(msg.messageType);
@@ -525,137 +520,16 @@ class CAndruavClientParser {
                 break;
 
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_ID: {
-                p_jmsg = msg.msgPayload;
-                this._handleUnitIDMessage(p_unit, { ...p_jmsg, senderName: msg.senderName }, !p_unit.m_defined);
-                break;
-            }
-
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION: {
-                if (p_unit === null || p_unit === undefined) { // p_unit not defined here ... send a request for ID
-                    js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
-                    return;
-                }
-
-                p_jmsg = msg.msgPayload;
-                switch (p_jmsg.a) {
-                    case js_andruavMessages.CONST_SDR_ACTION_SDR_INFO:
-                        p_jmsg = msg.msgPayload;
-                        p_unit.m_SDR.m_initialized = true;
-                        p_unit.m_SDR.m_center_frequency = p_jmsg.fc;
-                        p_unit.m_SDR.m_display_bars = p_jmsg.r;
-                        p_unit.m_SDR.m_gain = p_jmsg.g;
-                        p_unit.m_SDR.m_sample_rate = p_jmsg.s;
-                        p_unit.m_SDR.m_driver = p_jmsg.n;
-                        p_unit.m_SDR.m_status = p_jmsg.c;
-                        p_unit.m_SDR.m_interval = p_jmsg.t;
-                        p_unit.m_SDR.m_trigger_level = p_jmsg.l;
-
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRUpdated, p_unit);
-                        break;
-
-                    case js_andruavMessages.CONST_SDR_ACTION_LIST_SDR_DEVICES:
-                        if (p_jmsg.dr === null) {
-                            p_unit.m_SDR.m_available_drivers = [];
-                        }
-                        else {
-                            p_unit.m_SDR.m_available_drivers = p_jmsg.dr;
-                        }
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRUpdated, p_unit);
-                        break;
-
-                    case js_andruavMessages.CONST_SDR_ACTION_TRIGGER:
-                        console.log(p_jmsg);
-                        p_unit.m_SDR.addDetectedSignal(
-                            p_jmsg.f, p_jmsg.v,
-                            p_jmsg.ln, p_jmsg.la,
-                            p_jmsg.A,
-                            p_jmsg.r,
-                            p_jmsg.d
-                        )
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitSDRTrigger, p_unit);
-                        break;
-                }
-
-            }
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_ID:
+                // Migrated to core/protocol/reduce.js — handled by fn_handleFrame
+                // before this switch is reached. Dead code fallthrough marker.
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO: {
-                if (p_unit === null || p_unit === undefined) { // p_unit not defined here ... send a request for ID
-                    js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
-                    return;
-                }
-                p_jmsg = msg.msgPayload;
-                // p2p communication is available.
-                p_unit.m_P2P.m_initialized = true;
-                p_unit.m_P2P.m_connection_type = p_jmsg.c;
-                p_unit.m_P2P.m_address_1 = p_jmsg.a1;
-                p_unit.m_P2P.m_address_2 = p_jmsg.a2;
-                p_unit.m_P2P.m_wifi_channel = p_jmsg.wc;
-                p_unit.m_P2P.m_wifi_password = p_jmsg.wp;
-                p_unit.m_P2P.m_parent_address = p_jmsg.pa;
-                p_unit.m_P2P.m_parent_connected = p_jmsg.pc;
-                p_unit.m_P2P.m_logical_parent_address = p_jmsg.lp;
-                p_unit.m_P2P.m_firmware = p_jmsg.f;
-                p_unit.m_P2P.m_driver_connected = p_jmsg.a;
-                p_unit.m_P2P.m_p2p_connected = p_jmsg.o;
-                if (p_jmsg.d !== null && p_jmsg.d !== undefined) { // remove the if in release and keep the m_p2p_disabled field.
-                    p_unit.m_P2P.m_p2p_disabled = p_jmsg.d;
-                }
-                else {   // backward compatibility
-                    p_unit.m_P2P.m_p2p_disabled = false;
-                }
-
-                js_eventEmitter.fn_dispatch(js_event.EE_unitP2PUpdated, p_unit);
-
-            }
-                break;
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION:
+            case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO:
             case js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute:
-                {
-                    if (p_unit === null || p_unit === undefined) { // p_unit not defined here ... send a request for ID
-                        js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
-                        return;
-                    }
-
-                    p_jmsg = msg.msgPayload;
-                    if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                        p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                    }
-                    switch (p_jmsg.C) {
-                        case js_andruavMessages.CONST_TYPE_AndruavMessage_ID:
-                            // request send ID
-                            js_andruav_facade.AndruavClientFacade.API_sendID();
-                            break;
-
-
-                        // case js_andruavMessages.CONST_RemoteCommand_CLEAR_FENCE_DATA:
-                        //     if (p_jmsg.hasOwnProperty('fn')) { // fence name
-                        //         var fenceName = p_jmsg.n;
-                        //         Me.m_andruavGeoFences[fenceName];
-
-
-                        //         var keys = Object.keys(GeoLinearFences); //TODO: BUG HERE .. VARIABLE IS NOT USED ELSEWHERE.
-                        //         var size = Object.keys(GeoLinearFences).length;
-
-
-                        //         for (var i = 0; i < size; ++ i) {
-                        //             if (keys[i] === fenceName) {
-                        //                 js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitGeoFenceBeforeDelete, Me.m_andruavGeoFences[keys[i]]);
-
-                        //                 Me.m_andruavGeoFences.splice(i, 1);
-                        //                 break;
-                        //             }
-                        //         }
-                        //     } else { /*
-                        // 				* if you need to keep the original array because you have other references to it that should be updated too, you can clear it without creating a new array by setting its length to zero:
-                        // 				*/
-                        //         Me.EVT_andruavUnitGeoFenceBeforeDelete();
-                        //         Me.m_andruavGeoFences = [];
-                        //         Me.m_andruavGeoFences.length = 0;
-                        //     }
-                        //     break;
-                    }
-                }
+                // Migrated to core/protocol/reduce.js — handled by fn_handleFrame
+                // before this switch is reached. Dead code fallthrough markers.
                 break;
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_POW:
@@ -769,7 +643,7 @@ class CAndruavClientParser {
 							// 2- Add this Drone to the fence
 						*/
                     if (fence === null || fence === undefined) {
-                        js_andruav_facade.AndruavClientFacade.API_requestGeoFences(p_unit, geoFenceAttachStatus.fenceName);
+                        js_eventEmitter.fn_dispatch('__facadeRequestGeoFences', { unit: p_unit, fenceName: geoFenceAttachStatus.fenceName });
                         return;
                     } else {
                         if (fence.Units[p_unit.getPartyID()] === null || fence.Units[p_unit.getPartyID()] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
@@ -1178,231 +1052,10 @@ class CAndruavClientParser {
 
 
 
-    _handleUnitIDMessage(p_unit, p_jmsg, isNewUnit) {
-        const triggers = {
-            onVehicleBlocked: false,
-            onFlying: false,
-            onArmed: false,
-            onFCB: false,
-            onFlightMode: false,
-            onModuleChanged: false,
-            onHomePointChanged: false,
-            onVehicleChanged: false,
-            onSwarmStatus: false,
-            onSwarmStatus2: false,
-            onBackOnline: false,
-            onDEPilotChanged: false
-        };
 
-        p_unit.m_IsMe = false;
-        p_unit.m_IsGCS = p_jmsg.GS;
-        p_unit.m_unitName = p_jmsg.UD;
-        p_unit.Description = p_jmsg.DS;
-        const oldVehicleType = p_unit.m_VehicleType;
-        p_unit.m_VehicleType = p_jmsg.VT;
-        p_unit.m_Video.VideoRecording = p_jmsg.VR;
-        p_unit.m_GPS_Info1.gpsMode = p_jmsg.GM;
-        p_unit.m_Permissions = p_jmsg.p;
-        p_unit.m_IsDisconnectedFromGCS = false;
-        const oldUseFCBIMU = p_unit.m_useFCBIMU;
-        p_unit.m_useFCBIMU = p_jmsg.FI ?? false;
-        p_unit.m_telemetry_protocol = p_jmsg.TP ?? js_andruavMessages.CONST_Unknown_Telemetry;
-        p_unit.m_time_sync = p_jmsg.T ?? p_unit.m_time_sync;
-        p_unit.m_autoPilot = p_jmsg.AP ?? p_unit.m_autoPilot;
-
-        if (isNewUnit) {
-            p_unit.m_defined = true;
-            p_unit.setPartyID(p_jmsg.senderName);
-            js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
-            this.#prv_onNewUnitAdded(p_unit);
-        } else {
-            triggers.onVehicleChanged = oldVehicleType !== p_jmsg.VT;
-            triggers.onFCB = p_unit.m_useFCBIMU !== p_jmsg.FI || p_unit.m_telemetry_protocol !== p_jmsg.TP;
-            
-            // If board just connected (FI changed from false to true), reset unit object
-            // to clear any stale data from previous sessions
-            if (!oldUseFCBIMU && p_unit.m_useFCBIMU) {
-                p_unit.fn_resetOnBoardConnection({
-                    FI: p_jmsg.FI ?? false,
-                    TP: p_jmsg.TP ?? js_andruavMessages.CONST_Unknown_Telemetry,
-                    T: p_jmsg.T,
-                    AP: p_jmsg.AP,
-                    VT: p_jmsg.VT,
-                    GS: p_jmsg.GS,
-                    UD: p_jmsg.UD,
-                    DS: p_jmsg.DS,
-                    p: p_jmsg.p
-                });
-            }
-        }
-
-        if (p_jmsg.m1) {
-            triggers.onModuleChanged = p_jmsg.m1.length !== p_unit.m_modules.m_list.length;
-            p_unit.m_modules.addModules(p_jmsg.m1);
-        }
-
-        if (p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation]) {
-            const sub_jmsg = p_jmsg[js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation];
-            p_unit.m_Geo_Tags.fn_addHomePoint(sub_jmsg.T, sub_jmsg.O, sub_jmsg.A, sub_jmsg.R, sub_jmsg.H);
-            triggers.onHomePointChanged = true;
-        }
-
-        const oldIsDE = p_unit.fn_getIsDE();
-        if (p_jmsg.dv) {
-            // .dv meanse DRONEENGAGE-VERSION
-            p_unit.fn_setIsDE(true);
-            if (p_unit.fn_getVersion() !== p_jmsg.dv) {
-                p_unit.fn_setVersion(p_jmsg.dv);
-                setTimeout(() => {
-                    js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
-                        unit: p_unit,
-                        err: { notification_Type: 5, Description: `DE SW ver: ${p_jmsg.dv}` }
-                    });
-                }, 1000);
-            }
-        } else {
-
-            p_unit.fn_setIsDE(false);  // backward compatibility
-
-            if (p_jmsg.av) {
-                // .av means ANDRUAV-VERSION
-                if (p_unit.fn_getVersion() !== p_jmsg.av) {
-                    p_unit.fn_setVersion(p_jmsg.av);
-                    setTimeout(() => {
-                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
-                            unit: p_unit,
-                            err: { notification_Type: 5, Description: `Andruav version: ${p_jmsg.av}` }
-                        });
-                    }, 1000);
-                }
-            }
-        }
-        // If DE status changed (DE <-> Andruav), force marker icon refresh
-        if (oldIsDE !== p_unit.fn_getIsDE()) {
-            triggers.onVehicleChanged = true;
-        }
-
-        if (p_jmsg.hasOwnProperty('B')) {
-            triggers.onVehicleBlocked = p_unit.m_Telemetry.m_isGCSBlocked !== p_jmsg.B;
-            p_unit.m_Telemetry.m_isGCSBlocked = p_jmsg.B;
-        }
-
-        if (p_jmsg.hasOwnProperty('C')) {
-            p_unit.m_Telemetry.fn_updateTelemetry(p_jmsg.C);
-        }
-        else
-        {
-            p_unit.m_Telemetry.fn_updateTelemetry(0);
-        }
-
-        if (p_jmsg.hasOwnProperty('SD')) {
-            triggers.onBackOnline = p_unit.m_IsShutdown !== p_jmsg.SD;
-            p_unit.m_IsShutdown = p_jmsg.SD;
-        }
-
-        if (p_jmsg.hasOwnProperty('FM')) {
-            triggers.onFlightMode = p_unit.m_flightMode !== p_jmsg.FM;
-            p_unit.m_flightMode = p_jmsg.FM;
-        }
-
-        let is_armed = false;
-        let is_ready_to_arm = false;
-        if (typeof p_jmsg.AR === 'boolean') {
-            is_armed = p_jmsg.AR;
-            is_ready_to_arm = p_jmsg.AR;
-        } else if (typeof p_jmsg.AR === 'number') {
-            is_armed = (p_jmsg.AR & 0b0010) === 0b10;
-            is_ready_to_arm = (p_jmsg.AR & 0b0001) === 0b1;
-        }
-        triggers.onArmed = p_unit.m_isArmed !== is_armed || p_unit.m_is_ready_to_arm !== is_ready_to_arm;
-        p_unit.m_isArmed = is_armed;
-        p_unit.m_is_ready_to_arm = is_ready_to_arm;
-
-        if (p_jmsg.hasOwnProperty('FL')) {
-            triggers.onFlying = p_unit.m_isFlying !== p_jmsg.FL;
-            p_unit.m_isFlying = p_jmsg.FL;
-        }
-
-        if (p_jmsg.z) p_unit.m_FlyingLastStartTime = p_jmsg.z / 1000;
-        if (p_jmsg.a) p_unit.m_FlyingTotalDuration = p_jmsg.a / 1000;
-
-        // Handle DroneEngage Pilot fields
-        if (p_jmsg.hasOwnProperty('DE') || p_jmsg.hasOwnProperty('DO')) {
-            const old_de_pilot_enabled = p_unit.m_de_pilot_enabled;
-            const old_m_de_pilot_operation = p_unit.m_de_pilot_operation;
-            
-            if (p_jmsg.hasOwnProperty('DE')) {
-                p_unit.m_de_pilot_enabled = p_jmsg.DE;
-            }
-            if (p_jmsg.hasOwnProperty('DO')) {
-                p_unit.m_de_pilot_operation = p_jmsg.DO;
-            }
-            
-            triggers.onDEPilotChanged = old_de_pilot_enabled !== p_unit.m_de_pilot_enabled || old_m_de_pilot_operation !== p_unit.m_de_pilot_operation;
-        }
-
-        if (p_jmsg.n && p_jmsg.n !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
-            triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== p_jmsg.n;
-            p_unit.m_Swarm.m_formation_as_follower = p_jmsg.n;
-        } else {
-            triggers.onSwarmStatus = p_unit.m_Swarm.m_formation_as_follower !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-            p_unit.m_Swarm.m_formation_as_follower = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-        }
-
-        if (p_jmsg.o && p_jmsg.o !== js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM) {
-            triggers.onSwarmStatus = p_unit.m_Swarm.m_isLeader !== true;
-            p_unit.m_Swarm.m_isLeader = true;
-            p_unit.m_Swarm.m_formation_as_leader = p_jmsg.o;
-        } else {
-            triggers.onSwarmStatus = p_unit.m_Swarm.m_isLeader !== false;
-            p_unit.m_Swarm.m_isLeader = false;
-            p_unit.m_Swarm.m_formation_as_leader = js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM;
-        }
-
-        if (p_jmsg.q && p_jmsg.q !== '') {
-            triggers.onSwarmStatus2 = p_unit.m_Swarm.m_following !== p_jmsg.q;
-            p_unit.m_Swarm.m_following = p_jmsg.q;
-        } else {
-            triggers.onSwarmStatus2 = p_unit.m_Swarm.m_following != null;
-            p_unit.m_Swarm.m_following = null;
-        }
-
-        if (!isNewUnit) {
-            js_globals.m_andruavUnitList.putUnit(p_unit.getPartyID(), p_unit);
-            js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
-        } else {
-            js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitAdded, p_unit);
-        }
-
-        if (p_unit.m_modules.has_p2p && !p_unit.m_P2P.m_initialized) {
-            if (p_unit.m_delayedTimeout) clearTimeout(p_unit.m_delayedTimeout);
-            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestP2P(p_unit), 1000);
-        }
-
-        if (p_unit.m_modules.has_sdr && !p_unit.m_SDR.m_initialized) {
-            if (p_unit.m_delayedTimeout) clearTimeout(p_unit.m_delayedTimeout);
-            p_unit.m_delayedTimeout = setTimeout(() => js_andruav_facade.AndruavClientFacade.API_requestSDR(p_unit.getPartyID()), 1000);
-        }
-
-        const eventMap = {
-            onSwarmStatus: js_event.EE_onAndruavUnitSwarmUpdated,
-            onSwarmStatus2: js_event.EE_onAndruavUnitSwarmUpdated,
-            onFCB: js_event.EE_andruavUnitFCBUpdated,
-            onArmed: js_event.EE_andruavUnitArmedUpdated,
-            onFlying: js_event.EE_andruavUnitFlyingUpdated,
-            onFlightMode: js_event.EE_andruavUnitFightModeUpdated,
-            onVehicleChanged: js_event.EE_andruavUnitVehicleTypeUpdated,
-            onBackOnline: js_event.EE_unitOnlineChanged,
-            onModuleChanged: js_event.EE_onModuleUpdated,
-            onHomePointChanged: js_event.EE_HomePointChanged,
-            onDEPilotChanged: js_event.EE_onDroneEngagePilotChanged
-        };
-        Object.keys(triggers).forEach(key => {
-            if (triggers[key] && eventMap[key]) {
-                js_eventEmitter.fn_dispatch(eventMap[key], p_unit);
-            }
-        });
-    }
+    // _handleUnitIDMessage removed — ID message migrated to core/protocol/reduce.js
+    // (reduceID). The facade calls (3 new-unit requests, delayed P2P/SDR) are now
+    // Command objects returned by reduceIDEffects and dispatched by runtime.js.
 
 
     /**

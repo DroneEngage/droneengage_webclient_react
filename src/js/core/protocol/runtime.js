@@ -98,13 +98,38 @@ export function fn_handleFrame(p_frame, evt) {
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// One-time subscriptions for facade calls that were moved out of the parser
+// as event dispatches (the parser no longer imports the facade). These are
+// permanent app-lifetime subscriptions.
+// ---------------------------------------------------------------------------
+let _facadeSubscriptionsInitialized = false;
+export function fn_initFacadeSubscriptions() {
+    if (_facadeSubscriptionsInitialized) return;
+    _facadeSubscriptionsInitialized = true;
+
+    // From _fn_checkStatus in the parser.
+    js_eventEmitter.fn_subscribe('__facadeGetHomeLocation', { __runtimeFacade: true }, (_me, unit) => {
+        js_andruav_facade.AndruavClientFacade.API_do_GetHomeLocation(unit);
+    });
+    js_eventEmitter.fn_subscribe('__facadeRequestID', { __runtimeFacade: true }, (_me, partyId) => {
+        js_andruav_facade.AndruavClientFacade.API_requestID(partyId);
+    });
+
+    // From GeoFenceAttachStatus in the parser (parser-instance fence registry).
+    js_eventEmitter.fn_subscribe('__facadeRequestGeoFences', { __runtimeFacade: true }, (_me, data) => {
+        js_andruav_facade.AndruavClientFacade.API_requestGeoFences(data.unit, data.fenceName);
+    });
+}
+
 function callUnitMethod(unit, methodPath, arg) {
     const lastDot = methodPath.lastIndexOf('.');
     const parentPath = lastDot >= 0 ? methodPath.slice(0, lastDot) : '';
     const methodName = methodPath.slice(lastDot + 1);
     const parent = parentPath ? fn_getByPath(unit, parentPath) : unit;
     if (parent && typeof parent[methodName] === 'function') {
-        parent[methodName](arg);
+        if (Array.isArray(arg)) parent[methodName](...arg);
+        else parent[methodName](arg);
     }
 }
 
