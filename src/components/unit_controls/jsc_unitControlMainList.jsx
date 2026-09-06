@@ -14,6 +14,7 @@ import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
+import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js'
 
 
 
@@ -178,7 +179,7 @@ class ClssAndruavUnitList extends React.Component {
              && ((js_globals.v_en_Drone !== true ) || (p_andruavUnit.m_IsGCS !== false))
             )
         {
-            js_leafletmap.fn_hideItem(p_andruavUnit.m_gui.m_marker);
+            js_leafletmap.fn_hideItem(js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker);
         }
 
         return ;

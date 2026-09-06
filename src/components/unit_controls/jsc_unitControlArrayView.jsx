@@ -13,6 +13,7 @@ import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
+import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js'
 
 
 
@@ -932,15 +933,16 @@ class ClssAndruavUnitListArray extends React.Component {
              || ((js_globals.v_en_Drone === true ) && (p_andruavUnit.m_IsGCS ===false))
             )
         {
-            // if (p_andruavUnit.m_gui !== null && p_andruavUnit.m_gui !== undefined)
+            // const layers = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
+            // if (layers !== null && layers !== undefined)
             // {
-            //     //p_andruavUnit.m_gui.m_marker.setMap(p_andruavUnit.m_gui.m_mapObj);
-            //     js_leafletmap.setMap(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_gui.m_mapObj);
-            // }   
+            //     //layers.m_marker.setMap(layers.m_mapObj);
+            //     js_leafletmap.setMap(layers.m_marker, layers.m_mapObj);
+            // }
         }
         else
         {
-            js_leafletmap.fn_hideItem(p_andruavUnit.m_gui.m_marker);
+            js_leafletmap.fn_hideItem(js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker);
         }
 
         return ;

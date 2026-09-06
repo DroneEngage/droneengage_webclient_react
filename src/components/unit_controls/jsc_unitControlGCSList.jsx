@@ -8,6 +8,7 @@ import {js_localStorage} from '../../js/js_localStorage.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
+import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js'
 
 
 /**
@@ -84,7 +85,7 @@ class ClssAndruavUnitGCSList extends React.Component {
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         // only navigate if the unit has a marker (i.e. a known location)
-        const marker = p_andruavUnit.m_gui && p_andruavUnit.m_gui.m_marker;
+        const marker = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker;
         if (marker === null || marker === undefined) return;
         fn_gotoUnit_byPartyID(p_andruavUnit.getPartyID());
     }
