@@ -841,21 +841,6 @@ class C_LidarInfo {
   }
 }
 
-class C_GUIHelper {
-  constructor(p_parent) {
-    this.m_parent = p_parent;
-    // actual lines on map
-    this.m_gui_flightPath = new js_circularBuffer.ClssCustomCircularBuffer(
-      js_globals.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT
-    );
-    this.m_wayPoint_markers = [];
-    this.m_wayPoint_polygons = [];
-    this.m_marker = null;
-    this.m_marker_destination = null;
-    this.speed_link = false;
-  }
-}
-
 class C_GPIO {
   constructor(p_parent) {
     this.m_parent = p_parent;

@@ -2,17 +2,18 @@
 /**
  * unitLayerRegistry — the single owner of per-unit map layer objects.
  *
- * Replaces CAndruavUnitObject.m_gui (the C_GUIHelper bag of Leaflet/Mapbox
- * markers) and the parallel js_globals.v_vehicle_gui registry.
+ * Replaces the old C_GUIHelper bag of Leaflet/Mapbox markers that lived
+ * on CAndruavUnitObject, and the parallel partyID-keyed registry in
+ * js_globals that duplicated the same state.
  *
  * Lifetime is the MAP's, not the unit's: entries survive a unit object
- * being recreated (which is why v_vehicle_gui existed as a second copy),
- * and are removed only by fn_disposeUnitLayers. The old code leaked
- * markers when a unit disappeared because no removal path existed.
+ * being recreated (which is why the second registry existed), and are
+ * removed only by fn_disposeUnitLayers. The old code leaked markers
+ * when a unit disappeared because no removal path existed.
  *
  * Field names inside UnitLayers are intentionally identical to the old
- * C_GUIHelper field names so that call-site migration is a path change
- * only (p_andruavUnit.m_gui.m_marker -> layers.m_marker).
+ * field names so that call-site migration is a path change only
+ * (from the old per-unit GUI helper to layers.m_marker).
  */
 import { js_leafletmap } from '../../maps/js_leafletmap.js';
 

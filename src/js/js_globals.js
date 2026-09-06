@@ -10,7 +10,6 @@ class GLOBALS {
 
 		this.v_map_shapes = [];
 
-		this.v_vehicle_gui = {};
 		this.m_markGuided = null;
 
 		this.v_waypointsCache = {};
