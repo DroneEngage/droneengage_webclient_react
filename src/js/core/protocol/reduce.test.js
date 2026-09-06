@@ -23,7 +23,11 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_UdpProxy_Info,
          CONST_TYPE_AndruavMessage_TargetTracking_STATUS,
          CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
-         CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST } from '../../protocol/messages/js_andruavMessages.js';
+         CONST_TYPE_AndruavMessage_ID,
+         CONST_TYPE_AndruavMessage_HomeLocation,
+         CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST,
+         CONST_TASHKEEL_SERB_NO_SWARM,
+         CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
 
 function makeUnit() {
@@ -256,6 +260,106 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         expect(result.events[0].name).toBe(js_event.EE_onTrackingAIStatusChanged);
         expect(result.events[0].method).toBe('m_tracker_ai.fn_updateTrackerStatus');
         expect(result.events[0].methodArg).toBe(2);
+    });
+
+    test('ID: new unit produces ordered ops with field writes + EE_andruavUnitAdded', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_ID, 'party-new', {
+            GS: false, UD: 'Drone1', DS: 'desc', VT: 1, VR: false, GM: 0,
+            p: 7, FI: true, TP: 0, T: 123, AP: 0,
+            AR: true, FM: 4, FL: false,
+            m1: [{ k: 'mav', n: 'de_mavlink' }],
+        });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit(); // m_defined = false -> isNewUnit
+        const result = fn_reduce(unit, msg);
+
+        expect(result.ops).toBeDefined();
+        expect(result.isNewUnit).toBe(true);
+
+        // First ops are field writes
+        const sets = result.ops.filter(o => o.op === 'set');
+        const setPaths = sets.map(o => o.path);
+        expect(setPaths).toContain('m_unitName');
+        expect(setPaths).toContain('m_VehicleType');
+        expect(setPaths).toContain('m_isArmed');
+        expect(setPaths).toContain('m_defined');
+
+        // setPartyID method call
+        const methods = result.ops.filter(o => o.op === 'method');
+        expect(methods.some(o => o.method === 'setPartyID')).toBe(true);
+        expect(methods.some(o => o.method === 'm_modules.addModules')).toBe(true);
+
+        // EE_andruavUnitAdded for new unit (not EE_unitUpdated)
+        const dispatches = result.ops.filter(o => o.op === 'dispatch');
+        expect(dispatches.some(o => o.name === js_event.EE_andruavUnitAdded)).toBe(true);
+        expect(dispatches.some(o => o.name === js_event.EE_andruavUnitArmedUpdated)).toBe(true);
+    });
+
+    test('ID: existing unit with arming change triggers EE_andruavUnitArmedUpdated', () => {
+        const unit = makeUnit();
+        unit.m_defined = true;
+        unit.m_isArmed = false;
+        unit.m_is_ready_to_arm = false;
+        unit.m_useFCBIMU = true; // no reset triggered
+        unit.m_telemetry_protocol = CONST_Unknown_Telemetry;
+
+        const raw = frame(CONST_TYPE_AndruavMessage_ID, 'party-test', {
+            GS: false, UD: 'Drone1', DS: 'd', VT: 1, VR: false, GM: 0,
+            p: 7, FI: true, TP: CONST_Unknown_Telemetry,
+            AR: true, FM: 4,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(unit, msg);
+
+        expect(result.isNewUnit).toBe(false);
+        const dispatches = result.ops.filter(o => o.op === 'dispatch');
+        // AR changed from false to true -> onArmed trigger
+        expect(dispatches.some(o => o.name === js_event.EE_andruavUnitArmedUpdated)).toBe(true);
+        // existing unit -> EE_unitUpdated, not EE_andruavUnitAdded
+        expect(dispatches.some(o => o.name === js_event.EE_unitUpdated)).toBe(true);
+        expect(dispatches.some(o => o.name === js_event.EE_andruavUnitAdded)).toBe(false);
+    });
+
+    test('ID: FCB board connection triggers fn_resetOnBoardConnection method', () => {
+        const unit = makeUnit();
+        unit.m_defined = true;
+        unit.m_isArmed = false;
+        unit.m_useFCBIMU = false; // board NOT connected
+        unit.m_telemetry_protocol = CONST_Unknown_Telemetry;
+
+        const raw = frame(CONST_TYPE_AndruavMessage_ID, 'party-test', {
+            GS: false, UD: 'D', DS: 'd', VT: 1, VR: false, GM: 0,
+            p: 7, FI: true, TP: 0, // FI changes false->true -> reset
+            AR: false, FM: 0,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(unit, msg);
+
+        const methods = result.ops.filter(o => o.op === 'method');
+        expect(methods.some(o => o.method === 'fn_resetOnBoardConnection')).toBe(true);
+        // onFCB trigger should fire
+        const dispatches = result.ops.filter(o => o.op === 'dispatch');
+        expect(dispatches.some(o => o.name === js_event.EE_andruavUnitFCBUpdated)).toBe(true);
+    });
+
+    test('ID: swarm fields produce EE_onAndruavUnitSwarmUpdated', () => {
+        const unit = makeUnit();
+        unit.m_defined = true;
+        unit.m_isArmed = false;
+        unit.m_useFCBIMU = true;
+        unit.m_telemetry_protocol = CONST_Unknown_Telemetry;
+        unit.m_Swarm.m_formation_as_follower = CONST_TASHKEEL_SERB_NO_SWARM;
+        unit.m_Swarm.m_isLeader = false;
+
+        const raw = frame(CONST_TYPE_AndruavMessage_ID, 'u', {
+            GS: false, UD: 'D', DS: 'd', VT: 1, VR: false, GM: 0,
+            p: 7, FI: true, TP: CONST_Unknown_Telemetry,
+            AR: false, FM: 0, n: 1, o: 2, q: 'leader-id',
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(unit, msg);
+        const dispatches = result.ops.filter(o => o.op === 'dispatch');
+        expect(dispatches.some(o => o.name === js_event.EE_onAndruavUnitSwarmUpdated)).toBe(true);
     });
 });
 

@@ -52,6 +52,23 @@
  */
 
 /**
+ * An ordered operation for messages that interleave field writes, unit-method
+ * calls, and event dispatches (notably the ID message, where
+ * fn_resetOnBoardConnection must run between specific field writes).
+ * Runtime executes ops in array order. For 'set' it writes + notifies; for
+ * 'method' it calls the unit method; for 'dispatch' it fires the event.
+ *
+ * @typedef {Object} Op
+ * @property {'set'|'method'|'dispatch'} op
+ * @property {string} [path]      - for 'set': dot-path into the unit.
+ * @property {*}      [value]     - for 'set': the new value.
+ * @property {string} [method]    - for 'method': dot-path to a unit method.
+ * @property {*}      [arg]       - for 'method': single argument.
+ * @property {string} [name]      - for 'dispatch': event name.
+ * @property {*}      [payload]   - for 'dispatch': event payload.
+ */
+
+/**
  * Frozen map of command kind -> identifier. effects.js returns these names;
  * runtime.js maps them to the single facade call site. This is the ONLY place
  * the set of allowed commands is defined, so the cycle-breaking invariant is

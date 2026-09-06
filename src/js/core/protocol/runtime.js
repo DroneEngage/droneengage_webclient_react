@@ -20,6 +20,8 @@ import { COMMANDS } from './types.js';
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js';
 import { notifyUnitFieldChanged } from '../../store/unitStore.js';
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
+import { EVENTS as js_event } from '../../events/js_eventList.js';
+import { js_globals } from '../../js_globals.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus } from '../../protocol/messages/js_andruavMessages.js';
@@ -60,38 +62,82 @@ export function fn_handleFrame(p_frame, evt) {
         return false;
     }
 
-    const cmds = fn_effects(unit, msg);
+    // If the reduce result uses ordered ops (ID message), execute them in
+    // order — this preserves the exact interleaving of field writes, unit
+    // method calls (e.g. fn_resetOnBoardConnection), and event dispatches.
+    // Otherwise apply patches + events as before.
+    if (result.ops) {
+        fn_executeOps(unit, result.ops);
+    } else {
+        fn_applyPatches(unit, result.patches);
 
-    // Apply patches + field-level notifications.
-    fn_applyPatches(unit, result.patches);
-
-    // CommSignalsStatus: compute the network-type rank (needs js_helpers).
-    if (msg.type === CONST_TYPE_AndruavMessage_CommSignalsStatus) {
-        const rank = js_helpers.fn_getNetworkType(msg.payload.s);
-        fn_setByPath(unit, 'm_SignalStatus.m_mobileNetworkTypeRank', rank);
-        notifyUnitFieldChanged(unit.getPartyID(), 'm_SignalStatus.m_mobileNetworkTypeRank');
-    }
-
-    // Dispatch coarse events. If an event carries a `method`, call it on the
-    // unit (or sub-object) before dispatching — this handles unit methods like
-    // m_tracker.fn_updateTrackerStatus that reduce declares as data.
-    for (const ev of result.events) {
-        if (ev.method) {
-            const lastDot = ev.method.lastIndexOf('.');
-            const parentPath = lastDot >= 0 ? ev.method.slice(0, lastDot) : '';
-            const methodName = ev.method.slice(lastDot + 1);
-            const parent = parentPath ? fn_getByPath(unit, parentPath) : unit;
-            if (parent && typeof parent[methodName] === 'function') {
-                parent[methodName](ev.methodArg);
-            }
+        // CommSignalsStatus: compute the network-type rank (needs js_helpers).
+        if (msg.type === CONST_TYPE_AndruavMessage_CommSignalsStatus) {
+            const rank = js_helpers.fn_getNetworkType(msg.payload.s);
+            fn_setByPath(unit, 'm_SignalStatus.m_mobileNetworkTypeRank', rank);
+            notifyUnitFieldChanged(unit.getPartyID(), 'm_SignalStatus.m_mobileNetworkTypeRank');
         }
-        js_eventEmitter.fn_dispatch(ev.name, ev.payload);
+
+        // Dispatch coarse events. If an event carries a `method`, call it on
+        // the unit (or sub-object) before dispatching.
+        for (const ev of result.events) {
+            if (ev.method) {
+                callUnitMethod(unit, ev.method, ev.methodArg);
+            }
+            js_eventEmitter.fn_dispatch(ev.name, ev.payload);
+        }
     }
+
+    // Effects run AFTER ops/patches so unit state (module flags etc.) is
+    // current. The reduce result is passed for ID (isNewUnit).
+    const cmds = fn_effects(unit, msg, result);
 
     // Dispatch outbound commands (the ONLY place the facade is called).
     fn_dispatchCommands(unit, cmds);
 
     return true;
+}
+
+function callUnitMethod(unit, methodPath, arg) {
+    const lastDot = methodPath.lastIndexOf('.');
+    const parentPath = lastDot >= 0 ? methodPath.slice(0, lastDot) : '';
+    const methodName = methodPath.slice(lastDot + 1);
+    const parent = parentPath ? fn_getByPath(unit, parentPath) : unit;
+    if (parent && typeof parent[methodName] === 'function') {
+        parent[methodName](arg);
+    }
+}
+
+function fn_executeOps(unit, ops) {
+    for (const op of ops) {
+        switch (op.op) {
+            case 'set':
+                fn_setByPath(unit, op.path, op.value);
+                notifyUnitFieldChanged(unit.getPartyID(), op.path);
+                break;
+            case 'method':
+                callUnitMethod(unit, op.method, op.arg);
+                break;
+            case 'dispatch':
+                // Internal pseudo-events (prefixed __) are runtime concerns
+                // that don't go through the event emitter.
+                if (op.name === '__listAdd') {
+                    js_globals.m_andruavUnitList.Add(unit.getPartyID(), unit);
+                } else if (op.name === '__listPutUnit') {
+                    js_globals.m_andruavUnitList.putUnit(unit.getPartyID(), unit);
+                } else if (op.name === '__delayedVersionNotice') {
+                    const payload = op.payload;
+                    setTimeout(() => {
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
+                            unit: payload.unit,
+                            err: { notification_Type: 5, Description: payload.label } });
+                    }, 1000);
+                } else {
+                    js_eventEmitter.fn_dispatch(op.name, op.payload);
+                }
+                break;
+        }
+    }
 }
 
 function fn_applyPatches(unit, patches) {
