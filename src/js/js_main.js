@@ -646,6 +646,7 @@ export function fn_showSettings() {
 
 function onWEBRTCSessionStarted(c_talk) {
 	let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
+	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
 	js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
 	js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
@@ -653,6 +654,7 @@ function onWEBRTCSessionStarted(c_talk) {
 
 function onWEBRTCSessionEnded(c_talk) {
 	let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_talk.number);
+	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
 	js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
@@ -662,6 +664,7 @@ function onWEBRTCSessionEnded(c_talk) {
 
 function onWEBRTCSessionOrphanEnded(c_number) {
 	let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(c_number);
+	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
 	js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 }
@@ -1936,7 +1939,9 @@ function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 }
 // eslint-disable-next-line no-unused-vars
 function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
-	const keys = js_globals.m_andruavUnitList.fn_getUnitKeys();
+	// fn_getUnitKeys() returns undefined once v_andruavClient is cleared
+	// (e.g. on logout); guard so the loop does not crash.
+	const keys = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitKeys()) || [];
 	const size = keys.length;
 
 	for (let i = 0; i < size; ++i) {
@@ -3083,7 +3088,7 @@ function hlp_gotoImage_Map() {
 */
 var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
 	// if (p_andruavUnit.m_IsGCS === false) {
-	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultHieght', js_globals.CONST_DEFAULT_ALTITUDE);
+	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultHeight', js_globals.CONST_DEFAULT_ALTITUDE);
 	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultCircleRadius', js_globals.CONST_DEFAULT_RADIUS);
 	// }
 

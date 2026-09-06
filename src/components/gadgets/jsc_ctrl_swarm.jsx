@@ -96,7 +96,9 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
     }
 
     const key = partyId;
-    const v_units = js_globals.m_andruavUnitList.fn_getUnitValues();
+    // fn_getUnitValues() returns undefined once v_andruavClient is cleared
+    // (e.g. on logout); guard so the dropdown render does not crash.
+    const v_units = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitValues()) || [];
     const len = v_units.length;
     const c_items = [];
 
