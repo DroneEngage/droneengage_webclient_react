@@ -35,6 +35,7 @@ import { js_adsbManager } from './adsb/js_adsbManager.js'
 import { js_windProvider } from './weather/js_windProvider.js'
 import { mavlink20 } from './js_mavlink_v2.js'
 import { notifyUnitFieldChanged } from './store/unitStore.js'
+import { js_layout } from './state/layoutStore.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
@@ -561,221 +562,36 @@ function fn_doGimbalCtrl(unit, pitch, roll, yaw) {
 
 
 export function fn_showVideoMainTab() {
-	$('#div_map_view').hide();
-	$('#div_map3d_view').hide();
-	$('#div_video_control').show();
-
+	js_layout.fn_showVideo();
 	js_map3d.fn_hide();
-
-	$('#btn_showMap').show();
-	$('#btn_showMap3D').show();
-	$('#btn_showVideo').hide();
 }
 
-
-function fn_activateClassicalView() {
-	$('#row_2').show();
-	$('#row_1').show();
-	$('#row_1').removeClass();
-	$('#row_2').removeClass();
-	$('#row_1').addClass('col-lg-8 col-xl-8 col-xxl-8 col-12');
-	$('#row_2').addClass('col-lg-4 col-xl-4 col-xxl-4 col-12');
-
-	$('#div_map_view').show();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').hide();
-	$('#andruav_unit_list_array_float').hide();
-
-	$('#btn_showSettings').show();
-
-	$('#btn_showVideo').show();
-	$('#btn_showMap').show();
-	$('#btn_showMap3D').show();
-
-	$([document.documentElement, document.body]).animate({
-		scrollTop: $("#row_2").offset().top
-	}, 100);
-}
-
-function fn_activateMapCameraSectionOnly() {
-	$('#row_2').hide();
-	$('#row_1').show();
-	$('#row_1').removeClass();
-	$('#row_1').addClass('col-12');
-
-	$('#div_map_view').show();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').hide();
-	$('#andruav_unit_list_array_float').hide();
-
-	$('#btn_showSettings').hide();
-	$('#btn_showVideo').show();
-	$('#btn_showMap').hide();
-	$('#btn_showMap3D').show();
-}
-
-
-function fn_activateFixedVehicleListOnly() {
-	$('#row_2').hide();
-	$('#row_1').show();
-	$('#row_1').removeClass();
-	$('#row_1').addClass('col-12');
-
-	$('#div_map_view').hide();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').show();
-	$('#andruav_unit_list_array_float').hide();
-
-	$('#btn_showSettings').hide();
-	$('#btn_showVideo').hide();
-	$('#btn_showMap').hide();
-	$('#btn_showMap3D').hide();
-}
-
-function fn_activateMapCameraSectionAndFloatingList() {
-	$('#row_2').hide();
-	$('#row_1').show();
-	$('#row_1').removeClass();
-	$('#row_1').addClass('col-12');
-
-	$('#div_map_view').show();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').hide();
-	$('#andruav_unit_list_array_float').show();
-	$('#andruav_unit_list_array_float').css({ top: 400, left: 10, position: 'absolute' });
-
-	$('#btn_showSettings').hide();
-	$('#btn_showVideo').show();
-	$('#btn_showMap').hide();
-	$('#btn_showMap3D').show();
-}
-
-function fn_activateAllViews() {
-	$('#row_2').show();
-	$('#row_1').show();
-	$('#row_1').removeClass();
-	$('#row_2').removeClass();
-	$('#row_1').addClass('col-lg-8 col-xl-8 col-xxl-8 col-12');
-	$('#row_2').addClass('col-lg-4 col-xl-4 col-xxl-4 col-12');
-
-
-	$('#div_map_view').show();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').hide();
-	$('#andruav_unit_list_array_float').show();
-	$('#andruav_unit_list_array_float').css({ top: 400, left: 10, position: 'absolute' });
-
-	$('#btn_showSettings').show();
-	$('#btn_showVideo').show();
-	$('#btn_showMap').show();
-	$('#btn_showMap3D').show();
-
-	$([document.documentElement, document.body]).animate({
-		scrollTop: $("#row_2").offset().top
-	}, 100);
-}
-
-function fn_activateVehicleCardOnly() {
-	$('#row_2').show();
-	$('#row_1').hide();
-	$('#row_2').removeClass();
-	$('#row_2').addClass('col-12');
-
-	$('#div_map_view').hide();
-	$('#div_map3d_view').hide();
-	js_map3d.fn_hide();
-	$('#andruav_unit_list_array_fixed').hide();
-	$('#andruav_unit_list_array_float').hide();
-
-	$('#btn_showSettings').show();
-	$('#btn_showVideo').hide();
-	$('#btn_showMap').hide();
-	$('#btn_showMap3D').hide();
-}
 
 export function fn_applyControl(v_small_mode) {
 	let v_display_mode = js_localStorage.fn_getDisplayMode();
 
 	if (v_display_mode == null) v_display_mode = 0;
 
-	if (v_small_mode === true) {
-		switch (v_display_mode % 4) {
-			case 0:
-				// Classic View
-				fn_activateClassicalView();
-				$('#btn_showControl').html("<strong>DISPLAY-1</strong>");
+	// The store is the single source of truth for layout. It computes the
+	// profile (row visibility, column classes, pane visibility, button
+	// visibility) from displayMode + smallMode, persists the mode, and
+	// dispatches EE_LayoutChanged so React re-renders the layout.
+	js_layout.fn_setDisplayMode(v_display_mode, v_small_mode === true);
 
-				break;
+	// Map lifecycle: every old fn_activate* hid the 3D map and invalidated
+	// the 2D map's size after the column layout changed.
+	js_map3d.fn_hide();
 
-			case 1:
-				// Map or Camera Only
-				fn_activateMapCameraSectionOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-2</strong>");
-				break;
-
-
-			case 2:
-				// Vehicle List
-				fn_activateFixedVehicleListOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-3</strong>");
-				break;
-
-			case 3:
-				// Vehicle Control Cards
-				fn_activateVehicleCardOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-4</strong>");
-				break;
-
-			default:
-				break;
-		}
-	}
-	else {
-		switch (v_display_mode % 6) {
-			case 0:
-				// Classic View
-				fn_activateClassicalView();
-				$('#btn_showControl').html("<strong>DISPLAY-1</strong>");
-				break;
-
-			case 1:
-				fn_activateMapCameraSectionOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-2</strong>");
-				break;
-
-
-			case 2:
-				fn_activateMapCameraSectionAndFloatingList();
-				$('#btn_showControl').html("<strong>DISPLAY-3</strong>");
-				break;
-
-			case 3:
-				fn_activateFixedVehicleListOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-4</strong>");
-				break;
-
-			case 4:
-				fn_activateVehicleCardOnly();
-				$('#btn_showControl').html("<strong>DISPLAY-5</strong>");
-				break;
-
-			case 5:
-				fn_activateAllViews();
-				$('#btn_showControl').html("<strong>DISPLAY-6</strong>");
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	js_localStorage.fn_setDisplayMode(v_display_mode);
-	js_leafletmap.fn_invalidateSize();
+	// js_layout.fn_setDisplayMode() only dispatches EE_LayoutChanged; the
+	// column-width classes it drives are applied by React on its next
+	// commit, not synchronously here. Calling invalidateSize() immediately
+	// makes Leaflet measure the pre-resize container and lock in a
+	// half-width tile grid (visible as a white/map split down the middle).
+	// Same fix as js_map3d.fn_show()'s doResizeAndSync: defer past the
+	// commit + reflow with a double rAF.
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		js_leafletmap.fn_invalidateSize();
+	}));
 }
 
 export function fn_showControl(v_small_mode) {
@@ -787,24 +603,18 @@ export function fn_showControl(v_small_mode) {
 
 
 export function fn_showMap() {
-	$('#div_video_control').hide();
-	$('#div_map3d_view').hide();
-	$('#div_map_view').show();
-
+	js_layout.fn_showMap();
 	js_map3d.fn_hide();
 
-	$('#btn_showMap').hide();
-	$('#btn_showMap3D').show();
-	$('#btn_showVideo').show();
-
-	js_leafletmap.fn_invalidateSize();
+	// Same React-commit-timing issue as fn_applyControl() above: the
+	// container isn't resized until React re-renders, so defer.
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		js_leafletmap.fn_invalidateSize();
+	}));
 }
 
 export function fn_showMap3D() {
-	$('#div_video_control').hide();
-	$('#div_map_view').hide();
-	$('#div_map3d_view').show();
-
+	js_layout.fn_showMap3D();
 	js_map3d.fn_show();
 
 	// Sync the 3D map's start location to the leaflet map's current center so
@@ -813,10 +623,6 @@ export function fn_showMap3D() {
 	if (center) {
 		js_map3d.fn_syncCenter(center.lat, center.lng);
 	}
-
-	$('#btn_showMap').show();
-	$('#btn_showMap3D').hide();
-	$('#btn_showVideo').show();
 }
 
 function fn_onMap3dDblClick(p_lat, p_lng) {
@@ -1501,21 +1307,6 @@ function fn_adsbUpdated(p_caller, p_data) {
 }
 
 
-// eslint-disable-next-line no-unused-vars
-function gui_alert(title, message, level) {
-	$('#alert #title').html(title);
-	$('#alert #title').html(title);
-	$('#alert #msg').html(message);
-	$('#alert').removeClass();
-	$('#alert').addClass('alert alert-' + level);
-	$('#alert').show();
-};
-
-// eslint-disable-next-line no-unused-vars
-function gui_alert_hide() {
-	$('#alert').hide();
-};
-
 export function gui_toggleUnits(dontflip) {
 
 	// use current metric as other browser could change it and you will lose the SYNC
@@ -1847,7 +1638,7 @@ export function fn_gotoUnit(p_andruavUnit) {
 
 	let marker = p_andruavUnit.m_gui.m_marker;
 	if (marker !== null && marker !== undefined) {
-		const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+		const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 		const v_loc = p_andruavUnit.m_gui.m_marker.getLatLng()
 		mapAdapter.fn_PanTo_latlng(v_loc.lat, v_loc.lng);
 		// commented because zoom need to be after pan is completed otherwise map pans to wrong location.
@@ -2308,7 +2099,7 @@ function hlp_generateFlyHereMenu(lat, lng) {
 function fn_generateContextMenuHTML(v_lat, v_lng) {
 	if (v_context_busy === true) return;
 
-	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 
 	v_context_busy = true;
 	// Create a temporary container for the popup content
@@ -2347,7 +2138,7 @@ function fn_generateContextMenuHTML(v_lat, v_lng) {
 function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit) {
 	if (v_context_busy === true) return;
 
-	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 
 	v_context_busy = true;
 	// Create a temporary container for the popup content
@@ -2391,7 +2182,7 @@ function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v
 
 	if (v_context_busy === true) return;
 
-	const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 
 	v_context_busy = true;
 	// Create a temporary container for the popup content
@@ -3099,7 +2890,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 							clearTimeout(clickTimer);
 							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
 								// hide me if marked hide.
-								const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+								const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
 								info_unit_context_popup = null;
 							}
@@ -3197,7 +2988,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 							clearTimeout(clickTimer);
 							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
 								// hide me if marked hide.
-								const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+								const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
 								info_unit_context_popup = null;
 							}
@@ -3272,7 +3063,7 @@ function hlp_gotoImage_Map() {
 		// 	js_leafletmap.fn_setZoom(14);
 		// }
 
-		const mapAdapter = ($('#div_map3d_view').is(':visible') === true) ? js_map3d : js_leafletmap;
+		const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
 		mapAdapter.fn_PanTo_latlng(location.lat, location.lng);
 	}
 }
@@ -4030,24 +3821,10 @@ export function fn_on_ready() {
 		gui_hidesubmenus();
 		gui_initGlobalSection();
 
-
-		$('#btn_showMap').click(
-			fn_showMap
-		);
-
-		$('#btn_showVideo').click(
-			fn_showVideoMainTab
-		);
-
 		js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted, this, function (me, p_andruavUnit) {
 			js_map3d.fn_focusUnit(p_andruavUnit);
 			fn_updateWindArrow(p_andruavUnit);
 		});
-
-		$('#btn_showControl').click(
-			fn_showControl
-		);
-
 
 		$('#gimbaldiv').find('#btnpitchm').on('click', function () {
 			const p = $('#div_video_view').attr('partyID');
@@ -4106,12 +3883,6 @@ export function fn_on_ready() {
 		//http://127.0.0.1:9980/globalarclight.html?accesscode=myown&email=myown@myown.com&m_groupName=1&m_unitName=GCSWeb1
 
 	}
-
-	$("#alert .close").on('click', function () {
-		$("#alert").hide();
-	});
-
-	$("#alert").hide();
 
 	fn_handleKeyBoard();
 

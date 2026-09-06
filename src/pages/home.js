@@ -45,13 +45,34 @@ import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog
 import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
 import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx';
 import { fn_on_ready } from '../js/js_main';
+import { js_layout } from '../js/state/layoutStore.js';
+import { useLayout } from '../js/hooks/useLayout.js';
 
 fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 
 const Home = () => {
   useTranslation('home'); // Use home namespace
+  const layout = useLayout();
   const [isRow2Collapsed, setIsRow2Collapsed] = useState(false);
   const [isMetricSystem, setIsMetricSystem] = useState(js_globals.v_useMetricSystem);
+
+  // Layout profile derived from the store's displayMode + smallMode.
+  // This replaces the seven fn_activate* jQuery functions: the same
+  // row visibility, column classes, and list visibility they imposed
+  // are now expressed as React-driven CSS.
+  const profile = js_layout.fn_getProfile();
+
+  // Scroll to row_2 for display modes that had scroll behaviour
+  // (classical and allViews in the old fn_activate* functions).
+  useEffect(() => {
+    if (profile.scroll === true) {
+      const row2 = document.getElementById('row_2');
+      if (row2) {
+        window.scrollTo({ top: row2.offsetTop, behavior: 'smooth' });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layout.displayMode]);
 
   useEffect(() => {
     js_globals.CONST_MAP_EDITOR = false;
@@ -110,23 +131,23 @@ const Home = () => {
       <ClssHeaderControl />
 
       <div id="mainBody" className="row css_mainbody">
-        <div id="row_1" className="col-lg-8 col-xl-8 col-xxl-8 col-12">
+        <div id="row_1" className={profile.row1.visible ? profile.row1.col : 'd-none'}>
           <div id="row_1_1" className="row margin_zero">
             <div id="displays" className="container-fluid text-center">
               <div className="monitorview" id="message_notification" style={{ display: 'none' }}>
                 &nbsp;
               </div>
               <div id="div_cmp_hud"></div>
-              <div className="monitorview" id="div_map_view">
+              <div className="monitorview" id="div_map_view" style={{ display: layout.showMap2d ? 'block' : 'none' }}>
                 <div id="mapid" className="org_border fullscreen"></div>
               </div>
-              <div className="monitorview" id="div_map3d_view" style={{ display: 'none' }}>
+              <div className="monitorview" id="div_map3d_view" style={{ display: layout.showMap3d ? 'block' : 'none' }}>
                 <div id="mapid3d" className="org_border fullscreen"></div>
               </div>
-              <div className="cameraview" id="div_video_control">
+              <div className="cameraview" id="div_video_control" style={{ display: layout.showVideo ? 'block' : 'none' }}>
                 <ClssCVideoControl />
               </div>
-              <div id="andruav_unit_list_array_fixed" className="css_ontop andruav_unit_list_array">
+              <div id="andruav_unit_list_array_fixed" className="css_ontop andruav_unit_list_array" style={{ display: profile.fixed ? 'block' : 'none' }}>
                 <ClssAndruavUnitListArray
                   prop_speed={true}
                   prop_battery={true}
@@ -138,7 +159,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div id="andruav_unit_list_array_float" className="css_ontop andruav_unit_list_array_float">
+            <div id="andruav_unit_list_array_float" className="css_ontop andruav_unit_list_array_float" style={{ display: profile.float ? 'block' : 'none', ...(profile.float ? { top: 400, left: 10, position: 'absolute' } : {}) }}>
               <ClssAndruavUnitListArray
                 prop_speed={true}
                 prop_battery={true}
@@ -178,7 +199,7 @@ const Home = () => {
           <ClssMissionLoadDialog />
         </div>
 
-        <div id="row_2" className={`col-lg-4 col-xl-4 col-xxl-4 col-12 ${isRow2Collapsed ? 'collapsed-right' : ''}`}> 
+        <div id="row_2" className={profile.row2.visible ? `${profile.row2.col} ${isRow2Collapsed ? 'collapsed-right' : ''}` : 'd-none'}>
           <div id="andruavUnits" className="col-sm-12 padding_zero" style={{ display: isRow2Collapsed ? 'none' : 'block' }}>
             <div id="andruavUnits_in" className="">
               <ClssGlobalSettings />
