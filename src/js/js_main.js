@@ -1648,10 +1648,11 @@ export function fn_gotoUnit_byPartyID(p_partyID) {
 export function fn_gotoUnit(p_andruavUnit) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-	let marker = p_andruavUnit.m_gui.m_marker;
+	const layers = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
+	let marker = layers?.m_marker;
 	if (marker !== null && marker !== undefined) {
 		const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-		const v_loc = p_andruavUnit.m_gui.m_marker.getLatLng()
+		const v_loc = marker.getLatLng()
 		mapAdapter.fn_PanTo_latlng(v_loc.lat, v_loc.lng);
 		// commented because zoom need to be after pan is completed otherwise map pans to wrong location.
 		// if (js_leafletmap.fn_getZoom() < 16) {
@@ -1895,8 +1896,9 @@ function deleteWayPointsofDrone(p_andruavUnit, p_wayPointArray) {
 	gui_hideOldWayPointOfDrone(p_andruavUnit);
 	p_andruavUnit.m_wayPoint = {};
 	p_andruavUnit.m_wayPoint.wayPointPath = p_wayPointArray;
-	p_andruavUnit.m_gui.m_wayPoint_markers = [];
-	p_andruavUnit.m_gui.m_wayPoint_polygons = [];
+	const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
+	layers.m_wayPoint_markers = [];
+	layers.m_wayPoint_polygons = [];
 }
 
 /***
@@ -1904,7 +1906,8 @@ function deleteWayPointsofDrone(p_andruavUnit, p_wayPointArray) {
 ***/
 function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 	if (p_andruavUnit.m_wayPoint === null || p_andruavUnit.m_wayPoint === undefined) return;
-	const markers = p_andruavUnit.m_gui.m_wayPoint_markers;
+	const layers = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
+	const markers = layers?.m_wayPoint_markers;
 	if (markers === null || markers === undefined) return;
 
 	let count = markers.length;
@@ -1913,7 +1916,7 @@ function gui_hideOldWayPointOfDrone(p_andruavUnit) {
 		js_leafletmap.fn_hideItem(marker);
 	}
 
-	const polygons = p_andruavUnit.m_gui.m_wayPoint_polygons;
+	const polygons = layers?.m_wayPoint_polygons;
 	if (polygons !== null && polygons !== undefined) {
 		count = polygons.length;
 		for (let i = 0; i < count; i++) {
@@ -1941,7 +1944,7 @@ function gui_setVisibleMarkersByVehicleType(vehicleType, visible) {
 		let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(keys[i]);
 		if (p_andruavUnit !== null && p_andruavUnit !== undefined) {
 			if (p_andruavUnit.m_VehicleType === vehicleType) {
-				const marker = p_andruavUnit.m_gui.m_marker;
+				const marker = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker;
 				if (marker !== null && marker !== undefined) {
 					marker.setVisible(visible);
 				}
@@ -2488,9 +2491,10 @@ var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
 		return;
 	}
 
-	if (p_andruavUnit.m_gui.m_wayPoint_markers !== null && p_andruavUnit.m_gui.m_wayPoint_markers !== undefined) {
+	const layers_wp = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
+	if (layers_wp?.m_wayPoint_markers !== null && layers_wp?.m_wayPoint_markers !== undefined) {
 		const c_mission_index = missionIndexReached;
-		var v_marker = p_andruavUnit.m_gui.m_wayPoint_markers[c_mission_index];
+		var v_marker = layers_wp.m_wayPoint_markers[c_mission_index];
 		if (v_marker !== null && v_marker !== undefined) {
 			v_marker.waypoint_status = status;
 			if ((p_andruavUnit.m_wayPoint.wayPointPath[c_mission_index] === js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_TRIGGER)
@@ -2542,6 +2546,7 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 	var LngLatPoints = [];
 
 	deleteWayPointsofDrone(p_andruavUnit, wayPointArray);
+	const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
 
 	if (wayPointArray.length === 0) return;
 	let latlng = null;
@@ -2599,7 +2604,7 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 				// 	radius: parseInt(wayPointStep.m_Radius)
 				// });
 				// circleMission.setMap(map);
-				p_andruavUnit.m_gui.m_wayPoint_polygons.push(v_circleMission);
+				layers.m_wayPoint_polygons.push(v_circleMission);
 				break;
 			default:
 				continue;
@@ -2614,7 +2619,7 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 			}
 			let v_mark = js_leafletmap.fn_CreateMarker(icon_img, p_andruavUnit.m_unitName + "  step: " + wayPointStep.m_Sequence, [16, 24], false, false, null, v_iconsize);
 			js_leafletmap.fn_setPosition(v_mark, latlng);
-			p_andruavUnit.m_gui.m_wayPoint_markers.push(v_mark);
+			layers.m_wayPoint_markers.push(v_mark);
 			v_mark.wayPointStep = wayPointStep;
 
 			if (js_globals.CONST_MAP_EDITOR) {
@@ -2713,21 +2718,17 @@ function changedeg(element, degree) {
 }
 
 function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
-	// After fn_resetOnBoardConnection, m_gui is recreated and m_marker is lost.
-	// Restore the previous m_gui (with marker) from v_vehicle_gui if available.
-	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
-		if (js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== null && js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== undefined) {
-			p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()];
-		}
-	}
-	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
+	// The layer registry is keyed by partyID and survives unit recreation,
+	// so the marker is no longer lost when fn_resetOnBoardConnection recreates the unit.
+	const layers = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
+	if (layers?.m_marker === null || layers?.m_marker === undefined) {
 		console.warn(`Marker not found for unit ${p_andruavUnit.getPartyID()}, skipping icon update`);
 		return;
 	}
 
 	const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 	const v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
-	js_leafletmap.fn_setVehicleIcon(p_andruavUnit.m_gui.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
+	js_leafletmap.fn_setVehicleIcon(layers.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
 
 	const marker3d = js_map3d.fn_getUnitMarker(p_andruavUnit);
 	if (marker3d) {
@@ -2838,13 +2839,10 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 	if ((p_andruavUnit.m_defined === true) && (p_andruavUnit.m_Nav_Info.p_Location.lat !== null && p_andruavUnit.m_Nav_Info.p_Location.lat !== undefined)) {
 
-		if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) {
-			if (js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== null && js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] !== undefined) {
-				p_andruavUnit.m_gui = js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()];
-			}
-		}
-
-		let marker = p_andruavUnit.m_gui.m_marker;
+		// The layer registry is keyed by partyID and survives unit recreation,
+		// so no repair-block sync is needed here.
+		const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
+		let marker = layers.m_marker;
 
 		if (!(js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true)) {
 			js_adsbManager.fn_getADSBDataForUnit(p_andruavUnit);
@@ -2856,7 +2854,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			// create a buffer for flight path
 			p_andruavUnit.m_flightPathHistory.fn_flush();
 			js_map3d.fn_flushPath(p_andruavUnit);
-			p_andruavUnit.m_gui.m_flightPath_style = {
+			layers.m_flightPath_style = {
 				color: js_globals.flightPath_colors[p_andruavUnit.m_index % 4],
 				opacity: 0.8,
 				weight: 5,
@@ -2870,10 +2868,9 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			*/
 			const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 			// Add new Vehicle
-			p_andruavUnit.m_gui.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(), [32, 32], false, false, v_htmlTitle, [64, 64]);
-			js_globals.v_vehicle_gui[p_andruavUnit.getPartyID()] = p_andruavUnit.m_gui;
+			layers.m_marker = js_leafletmap.fn_CreateMarker(v_image, getLabel(), [32, 32], false, false, v_htmlTitle, [64, 64]);
 
-			js_leafletmap.fn_addListenerOnClickMarker(p_andruavUnit.m_gui.m_marker,
+			js_leafletmap.fn_addListenerOnClickMarker(layers.m_marker,
 				function (p_lat, p_lng) {
 					v_lastHighlightedUnit = p_andruavUnit;
 
@@ -2884,7 +2881,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 				});
 
-			js_leafletmap.fn_addListenerOnMouseOverMarker(p_andruavUnit.m_gui.m_marker,
+			js_leafletmap.fn_addListenerOnMouseOverMarker(layers.m_marker,
 				function (p_lat, p_lng) {
 
 					if (info_unit_context_popup !== null) return;
@@ -2895,10 +2892,10 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 					}, 200);
 
 					// pointer is over then register in event mouseOut
-					js_leafletmap.fn_addListenerOnMouseOutMarker(p_andruavUnit.m_gui.m_marker,
+					js_leafletmap.fn_addListenerOnMouseOutMarker(layers.m_marker,
 						function () {
 							// pointer is out then deregister in mouse-out event.
-							js_leafletmap.fn_removeListenerOnMouseOutClickMarker(p_andruavUnit.m_gui.m_marker);
+							js_leafletmap.fn_removeListenerOnMouseOutClickMarker(layers.m_marker);
 							clearTimeout(clickTimer);
 							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
 								// hide me if marked hide.
@@ -2932,7 +2929,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 						p_andruavUnit.m_Nav_Info.p_Location.oldlng,
 						p_andruavUnit.m_Nav_Info.p_Location.lat,
 						p_andruavUnit.m_Nav_Info.p_Location.lng,
-						p_andruavUnit.m_gui.m_flightPath_style);
+						layers.m_flightPath_style);
 
 					// Add flight path step
 					p_andruavUnit.m_flightPathHistory.fn_add(v_flightPath, true,
@@ -2964,12 +2961,12 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 		}
 
-		js_leafletmap.fn_setPosition_bylatlng(p_andruavUnit.m_gui.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
+		js_leafletmap.fn_setPosition_bylatlng(layers.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
 		fn_refreshWindArrowPosition();
 		const marker3d = js_map3d.fn_syncUnit(p_andruavUnit, v_image);
 
-		if (marker3d && p_andruavUnit.m_gui.m_marker3d_events_attached !== true) {
-			p_andruavUnit.m_gui.m_marker3d_events_attached = true;
+		if (marker3d && layers.m_marker3d_events_attached !== true) {
+			layers.m_marker3d_events_attached = true;
 
 			js_map3d.fn_addListenerOnClickMarker(marker3d,
 				function (p_lat, p_lng) {
@@ -3099,7 +3096,8 @@ var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
 var EVT_HomePointChanged = function (me, p_andruavUnit) {
 	let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_HomePoint.lat, p_andruavUnit.m_Geo_Tags.p_HomePoint.lng);
 
-	if (p_andruavUnit.m_gui.m_marker_home === null || p_andruavUnit.m_gui.m_marker_home === undefined) {
+	const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
+	if (layers.m_marker_home === null || layers.m_marker_home === undefined) {
 		const v_html = "<p class='text-light margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
 		let v_home = js_leafletmap.fn_CreateMarker('/images/home_b_24x24.png', p_andruavUnit.m_unitName, [12, 24], false, false, v_html, [24, 24]);
 
@@ -3117,7 +3115,7 @@ var EVT_HomePointChanged = function (me, p_andruavUnit) {
 		}
 
 
-		p_andruavUnit.m_gui.m_marker_home =
+		layers.m_marker_home =
 		{
 			'home_marker': v_home,
 			'radius_marker': v_circleMission
@@ -3132,7 +3130,7 @@ var EVT_HomePointChanged = function (me, p_andruavUnit) {
 			});
 	}
 
-	js_leafletmap.fn_setPosition(p_andruavUnit.m_gui.m_marker_home.home_marker, v_latlng);
+	js_leafletmap.fn_setPosition(layers.m_marker_home.home_marker, v_latlng);
 
 
 
@@ -3141,7 +3139,7 @@ var EVT_HomePointChanged = function (me, p_andruavUnit) {
 
 var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
-	const gui = p_andruavUnit.m_gui;
+	const gui = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
 
 	if (((js_siteConfig.CONST_FEATURE.DISABLE_SWARM_DESTINATION_PONTS === true) || (js_localStorage.fn_getAdvancedOptionsEnabled() !== true))
 		&& (p_andruavUnit.m_Geo_Tags.p_DestinationPoint.type === js_andruavMessages.CONST_DESTINATION_SWARM_MY_LOCATION)) {
@@ -3532,7 +3530,7 @@ function EVT_andruavUnitGeoFenceHit(me, data) {
 	}
 	if (fence.Units[p_andruavUnit.getPartyID()] === undefined) fence.Units[p_andruavUnit.getPartyID()] = {};
 	fence.Units[p_andruavUnit.getPartyID()].geoFenceHitInfo = geoFenceHitInfo;
-	if (p_andruavUnit.m_gui.m_marker === null || p_andruavUnit.m_gui.m_marker === undefined) return;   // will be updated later when GPS message is recieved from that drone.
+	if (js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker === null || js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker === undefined) return;   // will be updated later when GPS message is recieved from that drone.
 	var typeMsg = "info"; var msg = "OK";
 	if (geoFenceHitInfo.m_inZone && geoFenceHitInfo.m_shouldKeepOutside) { typeMsg = 'p_error'; msg = "should be Out fence " + geoFenceHitInfo.fenceName; }
 	// eslint-disable-next-line no-unused-vars
