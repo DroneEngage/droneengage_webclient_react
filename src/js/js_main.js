@@ -1065,11 +1065,21 @@ function fn_adsbObjectUpdate() {
 	// comment) so no data needs to be threaded through here. Pass true so
 	// every visible aircraft gets a full re-render (position/heading/popup
 	// updated from the fresh data).
-	fn_renderAdsbMarkers(true);
-
-	// Push all aircrafts' 3D tether/ground/altitude-circle data to Mapbox in
-	// a single batch (see js_map3d.fn_syncAdsbObject / fn_flushAdsbTethers).
-	js_map3d.fn_flushAdsbTethers();
+	//
+	// When the 3D map is the active view the 2D leaflet map is hidden
+	// (display:none), so fn_getBounds() returns degenerate zero-size bounds
+	// and fn_renderAdsbMarkers culls every aircraft — including the
+	// fn_syncAdsbObject mirror inside fn_renderSingleAdsb, so no 3D markers
+	// are ever created. Use the dedicated fn_syncAdsbToMap3D path (which
+	// iterates the whole registry without 2D culling) instead. This fixes
+	// the case where the user starts on the 3D map and enables ADSB
+	// afterwards: EE_map3dShown already fired on an empty registry, so the
+	// per-poll path is the only chance to create 3D markers.
+	if (js_layout.fn_getMapMode() === '3d') {
+		fn_syncAdsbToMap3D();
+	} else {
+		fn_renderAdsbMarkers(true);
+	}
 
 	// Keep the query-area circle in sync with the current coverage.
 	fn_updateAdsbQueryCircle();
