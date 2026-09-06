@@ -17,7 +17,7 @@ import { js_globals } from '../js_globals.js';
  * @typedef {Object} UnitUiPrefs
  * @property {boolean} speed_link          - UI toggle (8 sites)
  * @property {number} defaultCircleRadius  - UI default radius
- * @property {number} defaultHieght        - UI default altitude (note: existing typo kept)
+ * @property {number} defaultHeight        - UI default altitude (note: existing typo kept)
  */
 
 class CUnitUiPrefs {
@@ -37,7 +37,7 @@ class CUnitUiPrefs {
             prefs = {
                 speed_link: false,
                 defaultCircleRadius: js_globals.CONST_DEFAULT_RADIUS,
-                defaultHieght: js_globals.CONST_DEFAULT_ALTITUDE,
+                defaultHeight: js_globals.CONST_DEFAULT_ALTITUDE,
             };
             this.m_prefs[p_partyID] = prefs;
         }
@@ -47,7 +47,7 @@ class CUnitUiPrefs {
     /**
      * Set a single UI preference for a unit.
      * @param {string} p_partyID
-     * @param {string} p_key   - 'speed_link' | 'defaultCircleRadius' | 'defaultHieght'
+     * @param {string} p_key   - 'speed_link' | 'defaultCircleRadius' | 'defaultHeight'
      * @param {*} p_value
      */
     fn_setUnitPref(p_partyID, p_key, p_value) {

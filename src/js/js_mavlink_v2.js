@@ -15563,12 +15563,6 @@ export var MAVLink20Processor = function(logger, srcSystem, srcComponent) {
 
 // If the logger exists, this function will add a message to it.
 // Assumes the logger is a winston object.
-MAVLink20Processor.prototype.log = function(message) {
-    if(this.logger) {
-        this.logger.info(message);
-    }
-}
-
 MAVLink20Processor.prototype.log = function(level, message) {
     if(this.logger) {
         this.logger.log(level, message);
@@ -15680,7 +15674,7 @@ MAVLink20Processor.prototype.parsePayload = function() {
         // - if a message we find a well formed message, cut-off the expected_length
         // - if the message is not well formed (correct prefix by accident), cut-off 1 char only
         this.buf = this.buf.slice(this.expected_length);
-        this.expected_length = 6;
+        this.expected_length = mavlink20.HEADER_LEN;
 
         // w.info("Attempting to parse packet, message candidate buffer is ["+mbuf.toByteArray()+"]");
 
@@ -15808,7 +15802,7 @@ MAVLink20Processor.prototype.decode = function(msgbuf) {
     // Need to check if the message contains arrays
     let args = {};
     const elementsInMsg = decoder.order_map.length;
-    const actualElementsInMsg = JSON.parse(JSON.stringify(t)).length;
+    const actualElementsInMsg = t.length;
 
     if (elementsInMsg === actualElementsInMsg) {
         // Reorder the fields to match the order map
