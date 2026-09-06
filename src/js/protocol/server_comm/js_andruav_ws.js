@@ -12,6 +12,7 @@ import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
+import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
 
 
 export const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
@@ -398,28 +399,9 @@ class CAndruavClientWS {
             const p_jmsg = Me.#prv_parseJSONMessage(out.text);
 
             // Find or create the unit
-            const unitName = js_andruavUnit.fn_getFullName(p_jmsg.groupID, p_jmsg.senderName);
-            let v_unit = js_globals.m_andruavUnitList.fn_getUnit(unitName);
-
-            if (!v_unit) {
-                v_unit = new js_andruavUnit.CAndruavUnitObject();
-                v_unit.m_IsMe = false;
-                v_unit.m_defined = false;
-                v_unit.setPartyID(p_jmsg.senderName);
-                v_unit.m_index = js_globals.m_andruavUnitList.count;
-                js_globals.m_andruavUnitList.Add(v_unit.getPartyID(), v_unit);
-
-                // Request unit ID if allowed
-                if (v_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
-                    js_andruav_facade.AndruavClientFacade.API_requestID(p_jmsg.senderName);
-                    v_unit.m_Messages.fn_doNotRepeatMessageBefore(
-                        js_andruavMessages.CONST_TYPE_AndruavMessage_ID,
-                        1000,
-                        new Date()
-                    );
-                } else {
-                    // console.log("Skipping ID request (rate-limited)"); // Disable in production for perf
-                }
+            const { unit: v_unit, shouldRequestID } = fn_getOrCreateUnit(p_jmsg.senderName, true);
+            if (shouldRequestID) {
+                js_andruav_facade.AndruavClientFacade.API_requestID(p_jmsg.senderName);
             }
 
             // Update message statistics

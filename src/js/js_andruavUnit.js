@@ -1583,14 +1583,6 @@ class CAndruavUnitList {
     this.List.set(unitFullName, andruavUnit);
   }
 
-  attachGamePadToUnit(p_andruavUnit) {
-    if ((!this.m_currentEngagedUnitRX) && (this.m_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
-      this.API_disengageRX(this.m_currentEngagedUnitRX);
-    }
-
-    this.API_engageGamePad(p_andruavUnit);
-  }
-
   getEngagedUnitRX() {
     return this.m_currentEngagedUnitRX;
   }

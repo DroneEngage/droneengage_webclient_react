@@ -24,6 +24,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import * as js_common from '../../js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import * as js_andruav_facade from './js_andruav_facade.js'
+import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
 import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
 
 
@@ -232,23 +233,10 @@ class CAndruavClientParser {
     parseCommunicationMessage(Me, msg, evt) {
 
         let p_jmsg = msg;
-        let p_unit = js_globals.m_andruavUnitList.fn_getUnit(p_jmsg.senderName);
-
-        if (!p_unit) {
-            p_unit = new js_andruavUnit.CAndruavUnitObject();
-            p_unit.m_IsMe = false;
-            p_unit.m_defined = false;
-            p_unit.setPartyID(p_jmsg.senderName);
-            p_unit.m_index = js_globals.m_andruavUnitList.count;
-            js_globals.m_andruavUnitList.Add(p_unit.getPartyID(), p_unit);
-            if (msg.messageType !== js_andruavMessages.CONST_TYPE_AndruavMessage_ID) {
-                if (p_unit.m_Messages.fn_sendMessageAllowed(js_andruavMessages.CONST_TYPE_AndruavMessage_ID)) {
-                    js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
-                    p_unit.m_Messages.fn_doNotRepeatMessageBefore(js_andruavMessages.CONST_TYPE_AndruavMessage_ID, 1000, new Date());
-                } else {
-                    js_common.fn_console_log("skip");
-                }
-            }
+        const isIDMessage = (msg.messageType === js_andruavMessages.CONST_TYPE_AndruavMessage_ID);
+        const { unit: p_unit, shouldRequestID } = fn_getOrCreateUnit(p_jmsg.senderName, !isIDMessage);
+        if (shouldRequestID) {
+            js_andruav_facade.AndruavClientFacade.API_requestID(msg.senderName);
         }
 
         p_unit.m_Messages.fn_addMsg(msg.messageType);
