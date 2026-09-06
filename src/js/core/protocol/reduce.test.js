@@ -18,7 +18,12 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_POW,
          CONST_TYPE_AndruavMessage_NAV_INFO,
          CONST_TYPE_AndruavMessage_CommSignalsStatus,
-         CONST_TYPE_AndruavMessage_Communication_Line_Status } from '../../protocol/messages/js_andruavMessages.js';
+         CONST_TYPE_AndruavMessage_Communication_Line_Status,
+         CONST_TYPE_AndruavMessage_Chat,
+         CONST_TYPE_AndruavMessage_UdpProxy_Info,
+         CONST_TYPE_AndruavMessage_TargetTracking_STATUS,
+         CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
+         CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST } from '../../protocol/messages/js_andruavMessages.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
 
 function makeUnit() {
@@ -182,6 +187,75 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const msg = fn_decode(raw, 1);
         const result = fn_reduce(makeUnit(), msg);
         expect(result).toBeNull();
+    });
+
+    test('Chat: dispatch only, no patches', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_Chat, 'u', { text: 'hello' });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_onChatMessage);
+        expect(result.events[0].payload.unit).toBe(unit);
+        expect(result.events[0].payload.message).toEqual({ text: 'hello' });
+    });
+
+    test('UdpProxy_Info: fields + EE_onProxyInfoUpdated', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_UdpProxy_Info, 'u', {
+            a: '192.168.1.1', p: 14550, o: 2, en: true, z: true,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const byPath = {};
+        result.patches.forEach(p => { byPath[p.path] = p.value; });
+        expect(byPath['m_Telemetry.m_udpProxy_ip']).toBe('192.168.1.1');
+        expect(byPath['m_Telemetry.m_udpProxy_port']).toBe(14550);
+        expect(byPath['m_Telemetry.m_telemetry_level']).toBe(2);
+        expect(byPath['m_Telemetry.m_udpProxy_active']).toBe(true);
+        expect(byPath['m_Telemetry.m_udpProxy_paused']).toBe(true);
+        expect(result.events[0].name).toBe(js_event.EE_onProxyInfoUpdated);
+    });
+
+    test('UdpProxy_Info: missing z -> paused false', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_UdpProxy_Info, 'u', {
+            a: '1.1.1.1', p: 1, o: 0, en: false,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const byPath = {};
+        result.patches.forEach(p => { byPath[p.path] = p.value; });
+        expect(byPath['m_Telemetry.m_udpProxy_paused']).toBe(false);
+    });
+
+    test('TargetTracking_STATUS: method dispatch + event', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_TargetTracking_STATUS, 'u', { active: true });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events[0].name).toBe(js_event.EE_onTrackingStatusChanged);
+        expect(result.events[0].method).toBe('m_tracker.fn_updateTrackerStatus');
+        expect(result.events[0].methodArg).toEqual({ active: true });
+    });
+
+    test('AI_Recognition_STATUS: class list sub-case', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_AI_Recognition_STATUS, 'u', {
+            a: CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST, c: ['car', 'person'],
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events[0].name).toBe(js_event.EE_onTrackingAIObjectListUpdate);
+        expect(result.events[0].method).toBe('m_tracker_ai.fn_addObjectClass');
+        expect(result.events[0].methodArg).toEqual(['car', 'person']);
+    });
+
+    test('AI_Recognition_STATUS: status sub-case', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_AI_Recognition_STATUS, 'u', { a: 2 });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events[0].name).toBe(js_event.EE_onTrackingAIStatusChanged);
+        expect(result.events[0].method).toBe('m_tracker_ai.fn_updateTrackerStatus');
+        expect(result.events[0].methodArg).toBe(2);
     });
 });
 

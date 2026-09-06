@@ -14,7 +14,7 @@
 import { fn_decode } from './decode.js';
 import { fn_reduce, fn_isMigrated } from './reduce.js';
 import { fn_effects } from './effects.js';
-import { fn_setByPath } from './path.js';
+import { fn_setByPath, fn_getByPath } from './path.js';
 import { COMMANDS } from './types.js';
 
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js';
@@ -72,8 +72,19 @@ export function fn_handleFrame(p_frame, evt) {
         notifyUnitFieldChanged(unit.getPartyID(), 'm_SignalStatus.m_mobileNetworkTypeRank');
     }
 
-    // Dispatch coarse events.
+    // Dispatch coarse events. If an event carries a `method`, call it on the
+    // unit (or sub-object) before dispatching — this handles unit methods like
+    // m_tracker.fn_updateTrackerStatus that reduce declares as data.
     for (const ev of result.events) {
+        if (ev.method) {
+            const lastDot = ev.method.lastIndexOf('.');
+            const parentPath = lastDot >= 0 ? ev.method.slice(0, lastDot) : '';
+            const methodName = ev.method.slice(lastDot + 1);
+            const parent = parentPath ? fn_getByPath(unit, parentPath) : unit;
+            if (parent && typeof parent[methodName] === 'function') {
+                parent[methodName](ev.methodArg);
+            }
+        }
         js_eventEmitter.fn_dispatch(ev.name, ev.payload);
     }
 

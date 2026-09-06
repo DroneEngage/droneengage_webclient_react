@@ -17,7 +17,12 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_POW,
          CONST_TYPE_AndruavMessage_NAV_INFO,
          CONST_TYPE_AndruavMessage_CommSignalsStatus,
-         CONST_TYPE_AndruavMessage_Communication_Line_Status } from '../../protocol/messages/js_andruavMessages.js';
+         CONST_TYPE_AndruavMessage_Communication_Line_Status,
+         CONST_TYPE_AndruavMessage_Chat,
+         CONST_TYPE_AndruavMessage_UdpProxy_Info,
+         CONST_TYPE_AndruavMessage_TargetTracking_STATUS,
+         CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
+         CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST } from '../../protocol/messages/js_andruavMessages.js';
 
 import { EVENTS as js_event } from '../../events/js_eventList.js';
 
@@ -42,6 +47,14 @@ export function fn_reduce(unit, msg) {
             return reduceCommSignalsStatus(unit, msg);
         case CONST_TYPE_AndruavMessage_Communication_Line_Status:
             return reduceCommLineStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_Chat:
+            return reduceChat(unit, msg);
+        case CONST_TYPE_AndruavMessage_UdpProxy_Info:
+            return reduceUdpProxyInfo(unit, msg);
+        case CONST_TYPE_AndruavMessage_TargetTracking_STATUS:
+            return reduceTrackingStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_AI_Recognition_STATUS:
+            return reduceAIRecognition(unit, msg);
         default:
             return null;
     }
@@ -59,7 +72,11 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_POW
         || type === CONST_TYPE_AndruavMessage_NAV_INFO
         || type === CONST_TYPE_AndruavMessage_CommSignalsStatus
-        || type === CONST_TYPE_AndruavMessage_Communication_Line_Status;
+        || type === CONST_TYPE_AndruavMessage_Communication_Line_Status
+        || type === CONST_TYPE_AndruavMessage_Chat
+        || type === CONST_TYPE_AndruavMessage_UdpProxy_Info
+        || type === CONST_TYPE_AndruavMessage_TargetTracking_STATUS
+        || type === CONST_TYPE_AndruavMessage_AI_Recognition_STATUS;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,4 +190,77 @@ function reduceCommLineStatus(unit, msg) {
     if (p.p2p != null) patches.push({ path: 'm_P2P.m_p2p_disabled', value: !p.p2p });
 
     return { patches, events: [] };
+}
+
+// ---------------------------------------------------------------------------
+// Chat — dispatch only, no field writes. Payload may be stringified (decode
+// handles that). Original dispatches { unit, message: p_jmsg }.
+// ---------------------------------------------------------------------------
+function reduceChat(unit, msg) {
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_onChatMessage, payload: { unit, message: msg.payload } }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// UdpProxy_Info — telemetry proxy fields + one dispatch.
+// ---------------------------------------------------------------------------
+function reduceUdpProxyInfo(unit, msg) {
+    const p = msg.payload;
+    const patches = [];
+
+    patches.push({ path: 'm_Telemetry.m_udpProxy_ip', value: p.a });
+    patches.push({ path: 'm_Telemetry.m_udpProxy_port', value: p.p });
+    patches.push({ path: 'm_Telemetry.m_telemetry_level', value: p.o });
+    patches.push({ path: 'm_Telemetry.m_udpProxy_active', value: p.en });
+    patches.push({ path: 'm_Telemetry.m_udpProxy_paused', value: p.hasOwnProperty('z') ? p.z : false });
+
+    return { patches, events: [{ name: js_event.EE_onProxyInfoUpdated, payload: unit }] };
+}
+
+// ---------------------------------------------------------------------------
+// TargetTracking_STATUS — calls unit.m_tracker.fn_updateTrackerStatus(payload)
+// then dispatches EE_onTrackingStatusChanged. The method call is declared as
+// a Dispatch with a `method` field; runtime calls it before dispatching.
+// ---------------------------------------------------------------------------
+function reduceTrackingStatus(unit, msg) {
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_onTrackingStatusChanged,
+            payload: unit,
+            method: 'm_tracker.fn_updateTrackerStatus',
+            methodArg: msg.payload,
+        }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// AI_Recognition_STATUS — two sub-cases:
+//  CLASS_LIST: calls m_tracker_ai.fn_addObjectClass(p_jmsg.c) + EE_onTrackingAIObjectListUpdate
+//  default:    calls m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a) + EE_onTrackingAIStatusChanged
+// ---------------------------------------------------------------------------
+function reduceAIRecognition(unit, msg) {
+    const p = msg.payload;
+    if (p.a === CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST) {
+        return {
+            patches: [],
+            events: [{
+                name: js_event.EE_onTrackingAIObjectListUpdate,
+                payload: unit,
+                method: 'm_tracker_ai.fn_addObjectClass',
+                methodArg: p.c,
+            }],
+        };
+    }
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_onTrackingAIStatusChanged,
+            payload: unit,
+            method: 'm_tracker_ai.fn_updateTrackerStatus',
+            methodArg: p.a,
+        }],
+    };
 }

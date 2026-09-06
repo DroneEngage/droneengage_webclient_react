@@ -36,6 +36,9 @@
  * @typedef {Object} Dispatch
  * @property {string} name    - event name from js_eventList (e.g. "EE_msgFromUnit_GPS").
  * @property {*}      payload - payload to pass to fn_dispatch (usually the unit).
+ * @property {string} [method]     - optional dot-path to a unit method to call BEFORE
+ *                                   dispatching (e.g. "m_tracker.fn_updateTrackerStatus").
+ * @property {*}      [methodArg]  - single argument passed to the method.
  */
 
 /**
