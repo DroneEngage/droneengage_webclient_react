@@ -15,7 +15,6 @@
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_preferences from '../state/preferences.js';
 import * as js_helpers from '../js_helpers.js';
-import { js_globals } from '../js_globals.js';
 import { v_gamepad_button_types, v_total_gampad_buttons, STICK_LEFT_HORIZONTAL, STICK_LEFT_VERTICAL, STICK_RIGHT_HORIZONTAL, STICK_RIGHT_VERTICAL, STICK_MODE_MAPPING } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import { js_localStorage } from '../js_localStorage.js';
@@ -117,7 +116,7 @@ class CAndruavGamePad {
      * @returns 
      */
     fn_updatePadConfig(padStatus) {
-        if (!js_globals?.STICK_MODE_MAPPING) {
+        if (!STICK_MODE_MAPPING) {
             console.error("STICK_MODE_MAPPING is not defined");
             return false;
         }

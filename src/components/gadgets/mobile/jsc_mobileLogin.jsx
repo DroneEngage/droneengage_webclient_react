@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';

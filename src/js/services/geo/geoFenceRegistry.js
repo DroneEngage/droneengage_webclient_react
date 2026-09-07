@@ -1,4 +1,3 @@
-import * as js_session from '../../state/session.js';
 /**
  * TASK-02.1 — Single owner of geofence definitions.
  *

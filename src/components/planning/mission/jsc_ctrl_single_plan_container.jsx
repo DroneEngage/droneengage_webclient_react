@@ -1,6 +1,6 @@
 
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 import * as js_common from '../../../js/js_common.js'
 

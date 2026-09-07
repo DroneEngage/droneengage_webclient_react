@@ -1,5 +1,5 @@
 import React    from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_localStorage} from '../../../js/js_localStorage.js'

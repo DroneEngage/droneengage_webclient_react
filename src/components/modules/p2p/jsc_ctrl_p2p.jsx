@@ -5,7 +5,7 @@
  */
 
 import React    from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'

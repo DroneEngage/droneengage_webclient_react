@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 export class ClssCtrlGPIO_Port extends React.Component {
     constructor(props) {

@@ -1,4 +1,3 @@
-import * as js_session from '../state/session.js';
 // Thin reactive wrapper around the existing js_session.fn_getAndruavUnitList().
 // Does NOT replace the unit model — CAndruavUnit instances stay exactly
 // as they are today. This only adds a subscribe/getSnapshot surface so

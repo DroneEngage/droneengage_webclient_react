@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'

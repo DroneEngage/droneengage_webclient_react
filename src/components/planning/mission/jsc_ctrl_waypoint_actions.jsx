@@ -1,6 +1,6 @@
 
 import React    from 'react';
-import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../../js/config/constants.js';
 import L from 'leaflet';
 
 import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'

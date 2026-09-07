@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../../../js/state/session.js';
 import { useTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';

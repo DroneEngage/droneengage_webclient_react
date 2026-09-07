@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 

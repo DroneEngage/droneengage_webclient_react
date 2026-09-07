@@ -17,7 +17,7 @@
 
 import * as js_siteConfig from './js_siteConfig.js';
 import * as js_session from './state/session.js';
-import { CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT, CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH, CONST_MAX_SDR_SPECTRUM_LENGTH } from '../config/constants.js';
+import { CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT, CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH, CONST_MAX_SDR_SPECTRUM_LENGTH } from './config/constants.js';
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
 import { EVENTS as js_event } from './events/js_eventList.js'

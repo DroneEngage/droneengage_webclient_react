@@ -9,12 +9,12 @@ import $ from 'jquery';
 import * as js_session from '../state/session.js';
 import * as js_preferences from '../state/preferences.js';
 import { CONST_DEBUG_SHOW_ANCHOR_DOTS } from '../config/constants.js';
+import { CONST_MAP_WIND_ARROW_MIN_LENGTH, CONST_MAP_WIND_ARROW_MAX_LENGTH, CONST_MAP_WIND_ARROW_BASE_LENGTH_MS, CONST_MAP_WIND_ARROW_LENGTH_PER_MS, CONST_MAP_WIND_ARROW_COLOR } from '../config/mapStyle.js';
 import L from 'leaflet';
 import 'leaflet-rotatedmarker';
 
 
 import * as js_siteConfig from '../js_siteConfig.js'
-import {js_globals} from '../js_globals.js';
 import {EVENTS as js_event} from '../events/js_eventList.js'
 import {js_eventEmitter} from '../events/js_eventEmitter.js'
 import {js_tileCache} from './js_tileCache.js'
@@ -1254,11 +1254,10 @@ class CLeafLetAndruavMap {
      * @returns {L.DivIcon}
      */
     fn_buildWindArrowIcon(speedMs) {
-        const g = js_globals;
-        const len = Math.max(g.CONST_MAP_WIND_ARROW_MIN_LENGTH,
-                   Math.min(g.CONST_MAP_WIND_ARROW_MAX_LENGTH,
-                            g.CONST_MAP_WIND_ARROW_BASE_LENGTH_MS + (Number(speedMs) || 0) * g.CONST_MAP_WIND_ARROW_LENGTH_PER_MS));
-        const color = g.CONST_MAP_WIND_ARROW_COLOR;
+        const len = Math.max(CONST_MAP_WIND_ARROW_MIN_LENGTH,
+                   Math.min(CONST_MAP_WIND_ARROW_MAX_LENGTH,
+                            CONST_MAP_WIND_ARROW_BASE_LENGTH_MS + (Number(speedMs) || 0) * CONST_MAP_WIND_ARROW_LENGTH_PER_MS));
+        const color = CONST_MAP_WIND_ARROW_COLOR;
         const w = 14;                 // SVG width (pixels)
         const headH = Math.min(14, len * 0.35);
         const shaftTop = headH;

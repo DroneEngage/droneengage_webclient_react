@@ -11,7 +11,6 @@
  * js_globals fields are written at runtime by several call sites — they
  * are preferences, not constants. Do not try to freeze them here.
  */
-import { js_globals } from '../js_globals.js';
 import * as js_preferences from './preferences.js';
 
 /**

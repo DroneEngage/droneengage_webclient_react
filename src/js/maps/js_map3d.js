@@ -1,6 +1,5 @@
 import * as js_siteConfig from '../js_siteConfig';
 import * as js_session from '../state/session.js';
-import { js_globals } from '../js_globals.js';
 import { CONST_MAP3D_TETHER_COLORS, CONST_MAP3D_CIRCLE_WIDTH, CONST_MAP3D_TRAIL_WIDTH, CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH, CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY, CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT, CONST_MAP3D_MODEL_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM, CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR, CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE, CONST_MAP3D_FOLLOW_ZOOM, CONST_MAP3D_FOLLOW_DURATION_MS, CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND, CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH, CONST_MAP3D_FOLLOW_ALT_REF } from '../config/mapStyle.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
@@ -496,7 +495,7 @@ class CAndruavMap3D {
         this.m_pathSources = new Map();    // unitId -> sourceId (path trail)
         this.m_pathLayers = new Map();     // unitId -> layerId
         this.m_pathData = new Map();       // unitId -> { coords, elevations }
-        // Colors + line thickness live in js_globals (CONST_MAP3D_*).
+        // Colors + line thickness live in config/mapStyle.js (CONST_MAP3D_*).
 
         // ---- 3D mission waypoints (mirrors the leaflet mission drawing) ----
         // - Markers: small colored dots at first/last waypoints, elevated to

@@ -6,7 +6,7 @@
  * loaded from a file determined by the module class, producing JSON output based on user input.
  */
 import React from 'react';
-import * as js_session from '../../js/state/session.js';
+import * as js_session from '../js/state/session.js';
 import Draggable from "react-draggable";
 import { withTranslation } from 'react-i18next';
 

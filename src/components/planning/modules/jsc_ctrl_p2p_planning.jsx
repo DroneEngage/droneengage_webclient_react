@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_preferences from '../../js/state/preferences.js';
+import * as js_preferences from '../../../js/state/preferences.js';
 import ClssModulePlanningBase from './jsc_ctrl_dynamic_base.jsx';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages';
