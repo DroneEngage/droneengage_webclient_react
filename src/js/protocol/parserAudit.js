@@ -16,7 +16,7 @@
  * Called once from fn_initFacadeSubscriptions in runtime.js.
  */
 import * as js_andruavMessages from './messages/js_andruavMessages.js';
-import { fn_isMigrated } from '../core/protocol/reduce.js';
+import { fn_isMigrated } from '../core/protocol/reduce';
 
 // Binary-path types handled by parseBinaryAndruavMessage, not the JSON switch.
 const BINARY_TYPES = new Set([

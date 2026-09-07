@@ -1,5 +1,5 @@
 /**
- * TASK-02 — fn_reduce: pure model mutation as data.
+ * TASK-02 / TASK-06 — fn_reduce: pure model mutation as data.
  *
  * Takes a unit and a decoded Message, returns the field-level patches and
  * coarse events that the old switch would have produced. Does NOT mutate the
@@ -72,7 +72,16 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TASHKEEL_SERB_NO_SWARM,
          CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
 
-import { EVENTS as js_event } from '../../events/js_eventList.js';
+import { EVENTS as _js_event } from '../../events/js_eventList.js';
+import type { Message, FieldPatch, Dispatch, Op, ReduceResult, WayPointStep } from './types';
+
+// EVENTS is built dynamically via Array.reduce() in js_eventList.js, so its
+// keys are not statically inferable from the .js module (TS sees Readonly<{}>).
+// The values are `EVT_N` strings; treat the export as a string->string map.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const js_event: any = _js_event;
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // Chunked waypoint assembly constants (shared with runtime.js).
 // WAYPOINT_NO_CHUNK: full message (no chunking). WAYPOINT_LAST_CHUNK: final
@@ -81,11 +90,10 @@ export const WAYPOINT_NO_CHUNK = 0;
 export const WAYPOINT_LAST_CHUNK = 999;
 
 /**
- * @param {object} unit
- * @param {import('./types.js').Message} msg
- * @returns {{patches: import('./types.js').FieldPatch[], events: import('./types.js').Dispatch[]} | null}
+ * @param unit - the unit the message was received for.
+ * @param msg - the decoded inbound message.
  */
-export function fn_reduce(unit, msg) {
+export function fn_reduce(unit: any, msg: Message): ReduceResult | null {
     if (!fn_isMigrated(msg.type)) {
         // Not yet migrated — runtime falls through to the old switch.
         return null;
@@ -172,10 +180,8 @@ export function fn_reduce(unit, msg) {
  * Whether a message type is handled by the new reduce path. Runtime checks
  * this BEFORE doing getOrCreateUnit / message accounting so unmigrated types
  * fall through to the old switch with zero side effects (no double accounting).
- * @param {number} type
- * @returns {boolean}
  */
-export function fn_isMigrated(type) {
+export function fn_isMigrated(type: number): boolean {
     return type === CONST_TYPE_AndruavMessage_GPS
         || type === CONST_TYPE_AndruavMessage_POW
         || type === CONST_TYPE_AndruavMessage_NAV_INFO
@@ -218,9 +224,9 @@ export function fn_isMigrated(type) {
 // GPS — highest frequency, simplest. Pure field writes + one dispatch.
 // Matches js_andruav_parser.js CONST_TYPE_AndruavMessage_GPS exactly.
 // ---------------------------------------------------------------------------
-function reduceGPS(unit, msg) {
+function reduceGPS(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     const isValid = (p.la !== null && p.la !== undefined);
     patches.push({ path: 'm_GPS_Info1.m_isValid', value: isValid });
@@ -248,9 +254,9 @@ function reduceGPS(unit, msg) {
 // ---------------------------------------------------------------------------
 // POW — power/battery. Mobile + optional FCB battery block.
 // ---------------------------------------------------------------------------
-function reducePOW(unit, msg) {
+function reducePOW(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     patches.push({ path: 'm_Power._Mobile.p_Battery.BatteryLevel', value: p.BL });
     patches.push({ path: 'm_Power._Mobile.p_Battery.Voltage', value: p.V });
@@ -280,9 +286,9 @@ function reducePOW(unit, msg) {
 // ---------------------------------------------------------------------------
 // NAV_INFO — orientation + target nav data.
 // ---------------------------------------------------------------------------
-function reduceNavInfo(unit, msg) {
+function reduceNavInfo(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     patches.push({ path: 'm_Nav_Info._Target.target_bearing', value: parseFloat(p.d) });
     patches.push({ path: 'm_Nav_Info._Target.wp_dist', value: parseFloat(p.e) });
@@ -300,9 +306,9 @@ function reduceNavInfo(unit, msg) {
 // is imported by runtime (not reduce) to keep reduce free of globals. The rank
 // patch is added by runtime after reduce returns.
 // ---------------------------------------------------------------------------
-function reduceCommSignalsStatus(unit, msg) {
+function reduceCommSignalsStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     patches.push({ path: 'm_SignalStatus.m_mobile', value: true });
     patches.push({ path: 'm_SignalStatus.m_mobileSignalLevel', value: p.r });
@@ -317,9 +323,9 @@ function reduceCommSignalsStatus(unit, msg) {
 // ---------------------------------------------------------------------------
 // Communication_Line_Status — websocket + p2p line status. No event dispatch.
 // ---------------------------------------------------------------------------
-function reduceCommLineStatus(unit, msg) {
+function reduceCommLineStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     if (p.ws != null) patches.push({ path: 'm_SignalStatus.m_websocket', value: p.ws });
     if (p.p2p != null) patches.push({ path: 'm_P2P.m_p2p_disabled', value: !p.p2p });
@@ -331,7 +337,7 @@ function reduceCommLineStatus(unit, msg) {
 // Chat — dispatch only, no field writes. Payload may be stringified (decode
 // handles that). Original dispatches { unit, message: p_jmsg }.
 // ---------------------------------------------------------------------------
-function reduceChat(unit, msg) {
+function reduceChat(unit: any, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{ name: js_event.EE_onChatMessage, payload: { unit, message: msg.payload } }],
@@ -341,9 +347,9 @@ function reduceChat(unit, msg) {
 // ---------------------------------------------------------------------------
 // UdpProxy_Info — telemetry proxy fields + one dispatch.
 // ---------------------------------------------------------------------------
-function reduceUdpProxyInfo(unit, msg) {
+function reduceUdpProxyInfo(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [];
+    const patches: FieldPatch[] = [];
 
     patches.push({ path: 'm_Telemetry.m_udpProxy_ip', value: p.a });
     patches.push({ path: 'm_Telemetry.m_udpProxy_port', value: p.p });
@@ -359,7 +365,7 @@ function reduceUdpProxyInfo(unit, msg) {
 // then dispatches EE_onTrackingStatusChanged. The method call is declared as
 // a Dispatch with a `method` field; runtime calls it before dispatching.
 // ---------------------------------------------------------------------------
-function reduceTrackingStatus(unit, msg) {
+function reduceTrackingStatus(unit: any, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{
@@ -377,7 +383,7 @@ function reduceTrackingStatus(unit, msg) {
 //  CLASS_LIST: calls m_tracker_ai.fn_addObjectClass(p_jmsg.c) + EE_onTrackingAIObjectListUpdate
 //  default:    calls m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a) + EE_onTrackingAIStatusChanged
 // ---------------------------------------------------------------------------
-function reduceAIRecognition(unit, msg) {
+function reduceAIRecognition(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (p.a === CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST) {
         return {
@@ -414,10 +420,10 @@ function reduceAIRecognition(unit, msg) {
 // delayed REQUEST_SDR) are returned as effects Commands — see reduceIDEffects
 // which effects.js delegates to.
 // ---------------------------------------------------------------------------
-export function reduceID(unit, msg) {
+export function reduceID(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const ops = [];
-    const triggers = {
+    const ops: Op[] = [];
+    const triggers: Record<string, boolean> = {
         onVehicleBlocked: false, onFlying: false, onArmed: false,
         onFCB: false, onFlightMode: false, onModuleChanged: false,
         onHomePointChanged: false, onVehicleChanged: false,
@@ -579,7 +585,7 @@ export function reduceID(unit, msg) {
     }
 
     // Phase 12: trigger events (mirrors the old eventMap).
-    const eventMap = {
+    const eventMap: Record<string, any> = {
         onSwarmStatus: js_event.EE_onAndruavUnitSwarmUpdated,
         onSwarmStatus2: js_event.EE_onAndruavUnitSwarmUpdated,
         onFCB: js_event.EE_andruavUnitFCBUpdated,
@@ -604,17 +610,17 @@ export function reduceID(unit, msg) {
 // ---------------------------------------------------------------------------
 // CameraFlash / CameraZoom — dispatch only with {p_unit, p_jmsg} payload.
 // ---------------------------------------------------------------------------
-function reduceCameraFlash(unit, msg) {
+function reduceCameraFlash(unit: any, msg: Message): ReduceResult {
     return { patches: [], events: [{ name: js_event.EE_cameraFlashChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
 }
-function reduceCameraZoom(unit, msg) {
+function reduceCameraZoom(unit: any, msg: Message): ReduceResult {
     return { patches: [], events: [{ name: js_event.EE_cameraZoomChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
 }
 
 // ---------------------------------------------------------------------------
 // HomeLocation — field writes + EE_HomePointChanged.
 // ---------------------------------------------------------------------------
-function reduceHomeLocation(unit, msg) {
+function reduceHomeLocation(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     return {
         patches: [
@@ -630,7 +636,7 @@ function reduceHomeLocation(unit, msg) {
 // ---------------------------------------------------------------------------
 // DistinationLocation — method call fn_addDestinationPoint + dispatch.
 // ---------------------------------------------------------------------------
-function reduceDistinationLocation(unit, msg) {
+function reduceDistinationLocation(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     let destination_type = 0; // CONST_DESTINATION_GUIDED_POINT
     if (p.P !== null && p.P !== undefined) destination_type = p.P;
@@ -648,7 +654,7 @@ function reduceDistinationLocation(unit, msg) {
 // ---------------------------------------------------------------------------
 // DroneReport — dispatch EE_msgFromUnit_WayPointsUpdated.
 // ---------------------------------------------------------------------------
-function reduceDroneReport(unit, msg) {
+function reduceDroneReport(unit: any, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{ name: js_event.EE_msgFromUnit_WayPointsUpdated, payload: { unit, mir: msg.payload.P, status: msg.payload.R } }],
@@ -658,7 +664,7 @@ function reduceDroneReport(unit, msg) {
 // ---------------------------------------------------------------------------
 // GPIO_STATUS — method call m_GPIOs.addGPIO + dispatch.
 // ---------------------------------------------------------------------------
-function reduceGPIOStatus(unit, msg) {
+function reduceGPIOStatus(unit: any, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{
@@ -675,7 +681,7 @@ function reduceGPIOStatus(unit, msg) {
 // ---------------------------------------------------------------------------
 // TELNET_STATUS — dispatch only.
 // ---------------------------------------------------------------------------
-function reduceTelnetStatus(unit, msg) {
+function reduceTelnetStatus(unit: any, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{ name: js_event.EE_unitTelnetStatus, payload: { unit, msg: msg.payload } }],
@@ -685,7 +691,7 @@ function reduceTelnetStatus(unit, msg) {
 // ---------------------------------------------------------------------------
 // Error — dispatch EE_andruavUnitError.
 // ---------------------------------------------------------------------------
-function reduceError(unit, msg) {
+function reduceError(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     return {
         patches: [],
@@ -699,12 +705,12 @@ function reduceError(unit, msg) {
 // ---------------------------------------------------------------------------
 // GEOFenceHit — dispatch EE_andruavUnitGeoFenceHit.
 // ---------------------------------------------------------------------------
-function reduceGeoFenceHit(unit, msg) {
+function reduceGeoFenceHit(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     let m_shouldKeepOutside = false;
     if (typeof p.o === 'number') m_shouldKeepOutside = (p.o === 1);
     else if (typeof p.o === 'boolean') m_shouldKeepOutside = p.o;
-    const geoFenceHitInfo = {
+    const geoFenceHitInfo: Record<string, any> = {
         hasValue: true, fenceName: p.n, m_inZone: p.z, m_shouldKeepOutside,
         distance: p.hasOwnProperty('d') ? p.d : Number.NaN,
     };
@@ -717,7 +723,7 @@ function reduceGeoFenceHit(unit, msg) {
 // ---------------------------------------------------------------------------
 // MODULE_HEALTH_STATUS — field writes + EE_unitUpdated.
 // ---------------------------------------------------------------------------
-function reduceModuleHealthStatus(unit, msg) {
+function reduceModuleHealthStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (!p || !p.k) return { patches: [], events: [] };
     return {
@@ -732,12 +738,12 @@ function reduceModuleHealthStatus(unit, msg) {
 // ---------------------------------------------------------------------------
 // P2P_InRange_Node — merge detected nodes into m_P2P.m_detected_node.
 // ---------------------------------------------------------------------------
-function reduceP2PInRangeNode(unit, msg) {
+function reduceP2PInRangeNode(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (!p || typeof p !== 'object') return { patches: [], events: [] };
-    const node = {};
+    const node: Record<string, any> = {};
     try {
-        Object.entries(p).forEach(([partyID, n]) => {
+        Object.entries(p).forEach(([partyID, n]: [string, any]) => {
             n.t = n.t ?? 0;
             node[partyID] = { mac: n.m, partyID: n.p, connected: n.c, last_time: n.t };
         });
@@ -751,12 +757,12 @@ function reduceP2PInRangeNode(unit, msg) {
 // ---------------------------------------------------------------------------
 // P2P_InRange_BSSID — merge detected BSSIDs into m_P2P.m_detected_bssid.
 // ---------------------------------------------------------------------------
-function reduceP2PInRangeBSSID(unit, msg) {
+function reduceP2PInRangeBSSID(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (!p) return { patches: [], events: [] };
-    const bssid = {};
+    const bssid: Record<string, any> = {};
     try {
-        Object.entries(p).forEach(([partyID, b]) => {
+        Object.entries(p).forEach(([partyID, b]: [string, any]) => {
             bssid[partyID] = { partyID: b.p, bssid: b.b, ssid: b.s, channel: b.c, rssi: b.r, last_time: b.t };
         });
     } catch (e) { /* ignore */ }
@@ -769,9 +775,9 @@ function reduceP2PInRangeBSSID(unit, msg) {
 // ---------------------------------------------------------------------------
 // P2P_INFO — field writes + EE_unitP2PUpdated.
 // ---------------------------------------------------------------------------
-function reduceP2PInfo(unit, msg) {
+function reduceP2PInfo(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [
+    const patches: FieldPatch[] = [
         { path: 'm_P2P.m_initialized', value: true },
         { path: 'm_P2P.m_connection_type', value: p.c },
         { path: 'm_P2P.m_address_1', value: p.a1 },
@@ -793,11 +799,11 @@ function reduceP2PInfo(unit, msg) {
 // SDR_ACTION — sub-switch with 3 cases. No facade call (the old null-unit
 // requestID is dead code — fn_getOrCreateUnit always returns a unit).
 // ---------------------------------------------------------------------------
-function reduceSDRAction(unit, msg) {
+function reduceSDRAction(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     switch (p.a) {
         case CONST_SDR_ACTION_SDR_INFO: {
-            const patches = [
+            const patches: FieldPatch[] = [
                 { path: 'm_SDR.m_initialized', value: true },
                 { path: 'm_SDR.m_center_frequency', value: p.fc },
                 { path: 'm_SDR.m_display_bars', value: p.r },
@@ -811,7 +817,7 @@ function reduceSDRAction(unit, msg) {
             return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
         }
         case CONST_SDR_ACTION_LIST_SDR_DEVICES: {
-            const patches = [{ path: 'm_SDR.m_available_drivers', value: p.dr === null ? [] : p.dr }];
+            const patches: FieldPatch[] = [{ path: 'm_SDR.m_available_drivers', value: p.dr === null ? [] : p.dr }];
             return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
         }
         case CONST_SDR_ACTION_TRIGGER: {
@@ -834,7 +840,7 @@ function reduceSDRAction(unit, msg) {
 // ---------------------------------------------------------------------------
 // RemoteExecute — sub-switch. The ID case calls API_sendID (facade) -> Command.
 // ---------------------------------------------------------------------------
-function reduceRemoteExecute(unit, msg) {
+function reduceRemoteExecute(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     // The only live case in the sub-switch is CONST_TYPE_AndruavMessage_ID ->
     // API_sendID. That becomes a Command returned by effects.
@@ -844,7 +850,7 @@ function reduceRemoteExecute(unit, msg) {
 // ---------------------------------------------------------------------------
 // Viewlink_STATUS — gimbal attitude + LRF, method calls + dispatch.
 // ---------------------------------------------------------------------------
-function reduceViewlinkStatus(unit, msg) {
+function reduceViewlinkStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     switch (p.a) {
         case VIEWLINK_STATUS_GIMBAL_ATTITUDE: {
@@ -861,7 +867,7 @@ function reduceViewlinkStatus(unit, msg) {
         case VIEWLINK_STATUS_ALL: {
             const gmSrc = p.gm || {};
             const lrt = p.lrf || {};
-            const events = [
+            const events: Dispatch[] = [
                 { name: js_event.EE_viewLinkGimbalAttitude, payload: { gm: { y: gmSrc.y ?? 0, p: gmSrc.p ?? 0, r: gmSrc.r ?? 0 }, tr: p.tr || p.tracking || {}, lrf: p.lrf || {}, ai: p.ai || {}, g: p.g || {} }, method: 'm_Gimbal.setOrientation', methodArg: [gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0] },
                 { name: '__viewlinkLRF', payload: unit, method: 'm_Gimbal.setLRF', methodArg: [lrt.d, lrt.a] },
             ];
@@ -879,7 +885,7 @@ function reduceViewlinkStatus(unit, msg) {
 // a geoFenceInfo object from the payload. It does NOT dispatch — the reducer
 // wraps its output in an EE_andruavUnitGeoFenceUpdated event.
 // ---------------------------------------------------------------------------
-function fn_parseFenceInfo(p_jmsg, p_andruavUnit) {
+function fn_parseFenceInfo(p_jmsg: any, p_andruavUnit: any): Record<string, any> {
     let fencetype;
     let m_shouldKeepOutside = false;
 
@@ -900,11 +906,11 @@ function fn_parseFenceInfo(p_jmsg, p_andruavUnit) {
         }
     }
 
-    let geoFenceInfo = {};
-    let LngLatPoints = [];
+    let geoFenceInfo: Record<string, any> = {};
+    let LngLatPoints: { lat: number; lng: number; alt: number }[] = [];
     let count = (fencetype === CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
     for (let i = 0; i < count; ++i) {
-        let lnglat = {};
+        let lnglat: { lat: number; lng: number; alt: number } = { lat: 0, lng: 0, alt: 0 };
         lnglat.lat = parseFloat(p_jmsg[i].a);
         lnglat.lng = parseFloat(p_jmsg[i].g);
         if (p_jmsg[i].hasOwnProperty('l')) lnglat.alt = parseFloat(p_jmsg[i].l);
@@ -920,7 +926,7 @@ function fn_parseFenceInfo(p_jmsg, p_andruavUnit) {
     return geoFenceInfo;
 }
 
-function reduceGeoFence(unit, msg) {
+function reduceGeoFence(unit: any, msg: Message): ReduceResult {
     const fence = fn_parseFenceInfo(msg.payload, unit);
     return {
         patches: [],
@@ -928,7 +934,7 @@ function reduceGeoFence(unit, msg) {
     };
 }
 
-function reduceExternalGeoFence(unit, msg) {
+function reduceExternalGeoFence(unit: any, msg: Message): ReduceResult {
     // senderName === '_sys_' guard is a transport-level concern checked by
     // runtime before calling reduce. unit is null -> isEditable = true.
     const fence = fn_parseFenceInfo(msg.payload, null);
@@ -943,7 +949,7 @@ function reduceExternalGeoFence(unit, msg) {
 // intent as a runtime-only pseudo-event; runtime applies it to
 // js_geoFenceRegistry and dispatches __facadeRequestGeoFences when a fence
 // is missing.
-function reduceGeoFenceAttachStatus(unit, msg) {
+function reduceGeoFenceAttachStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     return {
         patches: [],
@@ -963,8 +969,8 @@ function reduceGeoFenceAttachStatus(unit, msg) {
 // and the dispatch decision (full message dispatches immediately, chunked
 // dispatches only on the last chunk).
 // ---------------------------------------------------------------------------
-function fn_decodeWaypointStep(item) {
-    const wayPointStep = {};
+function fn_decodeWaypointStep(item: any): WayPointStep {
+    const wayPointStep = {} as WayPointStep;
     wayPointStep.waypointType = item.t;
     switch (wayPointStep.waypointType) {
         case CONST_WayPoint_TYPE_WAYPOINTSTEP:
@@ -1034,11 +1040,11 @@ function fn_decodeWaypointStep(item) {
     return wayPointStep;
 }
 
-function reduceWayPoints(unit, msg) {
+function reduceWayPoints(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     const isChunk = p.hasOwnProperty('i') ? p.i : WAYPOINT_NO_CHUNK;
     const count = p.n;
-    const wps = [];
+    const wps: WayPointStep[] = [];
     for (let i = 0; i < count; ++i) {
         if (p[i] != null) {
             wps.push(fn_decodeWaypointStep(p[i]));
@@ -1056,12 +1062,12 @@ function reduceWayPoints(unit, msg) {
 // lives in runtime.js, not here. reduce stays pure: it uses msg.receivedAt
 // instead of the wall clock for lastUpdate.
 // ---------------------------------------------------------------------------
-function reduceSearchTargetList(unit, msg) {
+function reduceSearchTargetList(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (!p.hasOwnProperty('t')) return { patches: [], events: [] };
-    const targets = {};
+    const targets: Record<string, any> = {};
     for (const item of p.t) {
-        const c_search_target = {};
+        const c_search_target: Record<string, any> = {};
         c_search_target.m_name = item.n;
         c_search_target.m_type = item.hasOwnProperty('t') ? item.t : 'na';
         targets[c_search_target.m_name] = c_search_target;
@@ -1072,11 +1078,11 @@ function reduceSearchTargetList(unit, msg) {
     };
 }
 
-function reduceTargetTrackingLocation(unit, msg) {
+function reduceTargetTrackingLocation(unit: any, msg: Message): ReduceResult {
     const items = msg.payload.t;
-    const list = [];
+    const list: any[] = [];
     for (const item of items) {
-        const c_target = {};
+        const c_target: Record<string, any> = {};
         c_target.x1 = item.a;
         c_target.y1 = item.b;
         if (item.hasOwnProperty('r')) {
@@ -1105,12 +1111,12 @@ function reduceTargetTrackingLocation(unit, msg) {
 // signals it as a __callbackReply pseudo-event; runtime calls
 // js_callbackRegistry.fn_fireOnce. This keeps reduce pure.
 // ---------------------------------------------------------------------------
-function reduceCameraList(unit, msg) {
+function reduceCameraList(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     // The old case skips everything when T is empty (no available camera).
     if (!p.T || p.T.length === 0) return { patches: [], events: [] };
-    const patches = [{ path: 'm_Video.m_videoTracks', value: p.T }];
-    const events = [{ name: js_event.EE_unitUpdated, payload: unit }];
+    const patches: FieldPatch[] = [{ path: 'm_Video.m_videoTracks', value: p.T }];
+    const events: Dispatch[] = [{ name: js_event.EE_unitUpdated, payload: unit }];
     if (p.R === true) {
         events.push({ name: '__callbackReply', payload: {
             messageType: CONST_TYPE_AndruavMessage_CameraList,
@@ -1119,10 +1125,10 @@ function reduceCameraList(unit, msg) {
     return { patches, events };
 }
 
-function reduceSoundList(unit, msg) {
+function reduceSoundList(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
-    const patches = [{ path: 'm_Sound.m_files', value: Array.isArray(p.T) ? p.T : [] }];
-    const events = [{ name: js_event.EE_onSoundListUpdated, payload: unit }];
+    const patches: FieldPatch[] = [{ path: 'm_Sound.m_files', value: Array.isArray(p.T) ? p.T : [] }];
+    const events: Dispatch[] = [{ name: js_event.EE_onSoundListUpdated, payload: unit }];
     if (p.R === true) {
         events.push({ name: '__callbackReply', payload: {
             messageType: CONST_TYPE_AndruavMessage_SOUND_LIST,
@@ -1139,7 +1145,7 @@ function reduceSoundList(unit, msg) {
 // pseudo-event; runtime resolves the module, sets the template, and fires
 // the callback once via js_callbackRegistry.
 // ---------------------------------------------------------------------------
-function reduceConfigStatus(unit, msg) {
+function reduceConfigStatus(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     if (p.R !== true) return { patches: [], events: [] };
     return {
@@ -1153,7 +1159,7 @@ function reduceConfigStatus(unit, msg) {
 // present (wrapped form), otherwise the bare payload. Dispatch
 // EE_andruavSignalling with { unit, signal }; js_webrtcthin2 subscribes and
 // invokes the existing handler.
-function reduceSignaling(unit, msg) {
+function reduceSignaling(unit: any, msg: Message): ReduceResult {
     const p = msg.payload;
     const signal = (p && p.hasOwnProperty('w')) ? p.w : p;
     return {
@@ -1168,9 +1174,9 @@ function reduceSignaling(unit, msg) {
  * Takes the reduce result (for isNewUnit) and the post-ops unit (for module
  * flags set by addModules). Called by effects.js (which stays pure).
  */
-export function reduceIDEffects(unit, reduceResult) {
-    const cmds = [];
-    if (reduceResult.isNewUnit) {
+export function reduceIDEffects(unit: any, reduceResult?: ReduceResult): import('./types').Command[] {
+    const cmds: import('./types').Command[] = [];
+    if (reduceResult && reduceResult.isNewUnit) {
         // #prv_onNewUnitAdded: 3 requests.
         cmds.push({ kind: 'REQUEST_GEOFENCE_STATUS' });
         cmds.push({ kind: 'REQUEST_UDP_PROXY_STATUS' });

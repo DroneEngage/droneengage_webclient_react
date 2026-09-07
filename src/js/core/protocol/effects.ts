@@ -1,5 +1,5 @@
 /**
- * TASK-02 — fn_effects: pure outbound-command declaration.
+ * TASK-02 / TASK-06 — fn_effects: pure outbound-command declaration.
  *
  * Takes a unit, a decoded Message, and the reduce result. Returns the
  * Commands the runtime should send (via the facade) after applying patches.
@@ -10,15 +10,17 @@
 
 import { CONST_TYPE_AndruavMessage_ID,
          CONST_TYPE_AndruavMessage_RemoteExecute } from '../../protocol/messages/js_andruavMessages.js';
-import { reduceIDEffects } from './reduce.js';
+import { reduceIDEffects } from './reduce';
+import type { Message, Command, ReduceResult } from './types';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * @param {object} unit
- * @param {import('./types.js').Message} msg
- * @param {object} [reduceResult] - the result from fn_reduce (for ID effects)
- * @returns {import('./types.js').Command[]}
+ * @param unit - the unit the message was received for.
+ * @param msg - the decoded inbound message.
+ * @param reduceResult - the result from fn_reduce (for ID effects).
  */
-export function fn_effects(unit, msg, reduceResult) {
+export function fn_effects(unit: any, msg: Message, reduceResult?: ReduceResult): Command[] {
     switch (msg.type) {
         case CONST_TYPE_AndruavMessage_ID:
             return reduceIDEffects(unit, reduceResult);

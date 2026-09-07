@@ -11,13 +11,13 @@
  * event emitter, and the unit registry. reduce/effects/decode stay pure.
  */
 
-import { fn_decode } from './decode.js';
+import { fn_decode } from './decode';
 import * as js_session from '../../state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
-import { fn_reduce, fn_isMigrated, WAYPOINT_NO_CHUNK, WAYPOINT_LAST_CHUNK } from './reduce.js';
-import { fn_effects } from './effects.js';
+import { fn_reduce, fn_isMigrated, WAYPOINT_NO_CHUNK, WAYPOINT_LAST_CHUNK } from './reduce';
+import { fn_effects } from './effects';
 import { fn_setByPath, fn_getByPath } from './path.js';
-import { COMMANDS } from './types.js';
+import { COMMANDS } from './types';
 
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js';
 import { notifyUnitFieldChanged } from '../../store/unitStore.js';

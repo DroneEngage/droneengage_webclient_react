@@ -9,8 +9,8 @@
  * js_andruav_parser.js (the field keys `la`, `ln`, `a`, `r`, `3D`, `SC`, ...)
  * — the shared protocol with de_comm and Android clients, unchanged.
  */
-import { fn_decode } from './decode.js';
-import { fn_reduce } from './reduce.js';
+import { fn_decode } from './decode';
+import { fn_reduce } from './reduce';
 import { fn_setByPath, fn_getByPath } from './path.js';
 
 import { CAndruavUnitObject } from '../../js_andruavUnit.js';
