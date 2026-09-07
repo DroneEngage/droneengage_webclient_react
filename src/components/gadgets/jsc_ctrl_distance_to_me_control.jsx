@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import { js_globals } from '../../js/js_globals.js';
@@ -95,7 +96,7 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
         const v_lng2 = p_unit.m_Nav_Info.p_Location.lng;
         const distance = js_helpers.fn_calcDistance(js_globals.myposition.coords.latitude, js_globals.myposition.coords.longitude, v_lat2, v_lng2);
 
-        if (js_globals.v_useMetricSystem === true) {
+        if (js_preferences.fn_getUseMetricSystem() === true) {
             const KM_1 = 1000;
             if (distance >= KM_1) {
                 const val = (distance / 1000).toFixed(1);

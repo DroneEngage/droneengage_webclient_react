@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
@@ -38,14 +39,14 @@ class ClssAdsbSettings extends React.Component {
     this.state = {
       adsbRadiusKm: js_localStorage.fn_getAdsbRadiusKm() ||
         (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850,
-      isMetric: js_globals.v_useMetricSystem,
+      isMetric: js_preferences.fn_getUseMetricSystem(),
     };
     this._boundOnUnitSystemChanged = this._onUnitSystemChanged.bind(this);
     this._boundOnPreferenceChanged = this._onPreferenceChanged.bind(this);
   }
 
   _onUnitSystemChanged() {
-    this.setState({ isMetric: js_globals.v_useMetricSystem });
+    this.setState({ isMetric: js_preferences.fn_getUseMetricSystem() });
   }
 
   // Re-sync the enable checkbox from localStorage when the ADSB preference

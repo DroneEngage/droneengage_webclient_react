@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import * as js_preferences from '../../js/state/preferences.js';
 
 import React    from 'react';
 import { withTranslation } from 'react-i18next';
@@ -161,7 +162,7 @@ class ClssAndruavUnitList extends React.Component {
 
     fn_toggleTabsDisplay() {
         const enabled = !js_localStorage.fn_getTabsDisplayEnabled();
-        js_globals.v_enable_tabs_display = enabled;
+        js_preferences.fn_setEnableTabsDisplay(enabled);
         js_localStorage.fn_setTabsDisplayEnabled(enabled);
         js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
     }
@@ -176,8 +177,8 @@ class ClssAndruavUnitList extends React.Component {
     {
         if (p_andruavUnit.hasOwnProperty("p_marker") === false) return;
         if (
-                ((js_globals.v_en_GCS !== true ) || (p_andruavUnit.m_IsGCS !== true))
-             && ((js_globals.v_en_Drone !== true ) || (p_andruavUnit.m_IsGCS !== false))
+                ((js_preferences.fn_getEnGCS() !== true ) || (p_andruavUnit.m_IsGCS !== true))
+             && ((js_preferences.fn_getEnDrone() !== true ) || (p_andruavUnit.m_IsGCS !== false))
             )
         {
             js_leafletmap.fn_hideItem(js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID())?.m_marker);

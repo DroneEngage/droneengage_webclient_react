@@ -1,4 +1,5 @@
 import React , { useEffect } from 'react';
+import * as js_preferences from '../js/state/preferences.js';
 
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
@@ -25,7 +26,7 @@ fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 const Accounts = () => {
 
     useEffect(() => {
-		js_globals.CONST_MAP_EDITOR = false;
+		js_preferences.fn_setMapEditor(false);
 		fn_on_account_ready();
 	}
 	);

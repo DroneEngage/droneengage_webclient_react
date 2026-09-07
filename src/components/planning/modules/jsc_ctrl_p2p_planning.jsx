@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import ClssModulePlanningBase from './jsc_ctrl_dynamic_base.jsx';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages';
@@ -30,8 +31,8 @@ export class ClssP2P_Planning extends ClssModulePlanningBase {
         cmd = CCommandAPI.API_makeSwarm(
           this.props.p_unit,
           formation,
-          js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE,
-          js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE
+          js_preferences.fn_getDefaultSwarmHorizontalDistance(),
+          js_preferences.fn_getDefaultSwarmVerticalDistance()
         );
       }
       else {
@@ -39,8 +40,8 @@ export class ClssP2P_Planning extends ClssModulePlanningBase {
         cmd = CCommandAPI.API_makeSwarm(
           this.props.p_unit,
           js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM,
-          js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE,
-          js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE
+          js_preferences.fn_getDefaultSwarmHorizontalDistance(),
+          js_preferences.fn_getDefaultSwarmVerticalDistance()
         );
       }
       cmd_msgs.push(cmd);

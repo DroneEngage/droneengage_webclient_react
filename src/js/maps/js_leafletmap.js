@@ -6,6 +6,7 @@
 *********************************************************************************** */
 
 import $ from 'jquery';
+import * as js_preferences from '../state/preferences.js';
 import { CONST_DEBUG_SHOW_ANCHOR_DOTS } from '../config/constants.js';
 import L from 'leaflet';
 import 'leaflet-rotatedmarker';
@@ -581,7 +582,7 @@ class CLeafLetAndruavMap {
 
 
         
-        if (js_globals.CONST_MAP_EDITOR === true) {
+        if (js_preferences.fn_getMapEditor() === true) {
             // Check if Geoman plugin is available
             if (this.m_Map.pm == null) {
                 console.error('Geoman plugin not loaded. Map editor features will not be available.');
@@ -668,7 +669,7 @@ class CLeafLetAndruavMap {
         
         let update_timeout = null;
         this.m_Map.on('click', function (event) {
-            if (js_globals.CONST_MAP_EDITOR !== true)
+            if (js_preferences.fn_getMapEditor() !== true)
 			{
                 update_timeout = setTimeout(function () { // if (dontexecute) return ;
                     $('.contextmenu').remove();
@@ -677,7 +678,7 @@ class CLeafLetAndruavMap {
         });
 
         this.m_Map.on('dblclick', function (event) {
-            if (js_globals.CONST_MAP_EDITOR !== true)
+            if (js_preferences.fn_getMapEditor() !== true)
 			{
                 clearTimeout(update_timeout);
                 fn_contextMenu(event.latlng)

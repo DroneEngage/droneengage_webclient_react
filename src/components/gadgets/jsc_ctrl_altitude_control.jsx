@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import * as js_helpers from '../../js/js_helpers.js'
@@ -37,11 +38,11 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
         js_common.fn_console_log ("fn_doChangeAltitudeByStep:" + p_AltitudeInMeter);
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
 
-        if ((p_AltitudeInMeter === null || p_AltitudeInMeter === undefined) || (p_AltitudeInMeter < js_globals.CONST_DEFAULT_ALTITUDE_min)) return ;
+        if ((p_AltitudeInMeter === null || p_AltitudeInMeter === undefined) || (p_AltitudeInMeter < js_preferences.fn_getDefaultAltitudeMin())) return ;
 
         let v_speak;
 
-        if (js_globals.v_useMetricSystem === true) {
+        if (js_preferences.fn_getUseMetricSystem() === true) {
             v_speak = p_AltitudeInMeter.toFixed(1) + "meters";
         }
         else {
@@ -69,7 +70,7 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
     if (!v_andruavUnit) return null;
 
     let v_alt_title, v_alt_remark;
-    let v_unit_text = js_globals.v_useMetricSystem ? 'm' : 'ft';
+    let v_unit_text = js_preferences.fn_getUseMetricSystem() ? 'm' : 'ft';
 
     if (v_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_SUBMARINE) {
         v_alt_title = 'depth:';
@@ -80,7 +81,7 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
     }
 
     v_alt_remark += 'display: relative/absolute ... step: ' + js_localStorage.fn_getDefaultAltitude();
-    v_alt_remark += js_globals.v_useMetricSystem ? " m" : " feet";
+    v_alt_remark += js_preferences.fn_getUseMetricSystem() ? " m" : " feet";
 
     let v_alt_rel_val = v_andruavUnit.m_Nav_Info.p_Location.alt_relative;
     let v_alt_abs_val = v_andruavUnit.m_Nav_Info.p_Location.alt_abs;
@@ -89,7 +90,7 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
     let v_alt_abs_str = 'NA';
 
     if (v_alt_rel_val !== null && v_alt_rel_val !== undefined) {
-         if (js_globals.v_useMetricSystem) {
+         if (js_preferences.fn_getUseMetricSystem()) {
              v_alt_rel_str = v_alt_rel_val.toFixed(0);
          } else {
              v_alt_rel_str = (v_alt_rel_val * js_helpers.CONST_METER_TO_FEET).toFixed(0);
@@ -97,7 +98,7 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
     }
 
     if (v_alt_abs_val !== null && v_alt_abs_val !== undefined) {
-         if (js_globals.v_useMetricSystem) {
+         if (js_preferences.fn_getUseMetricSystem()) {
              v_alt_abs_str = v_alt_abs_val.toFixed(0);
          } else {
              v_alt_abs_str = (v_alt_abs_val * js_helpers.CONST_METER_TO_FEET).toFixed(0);

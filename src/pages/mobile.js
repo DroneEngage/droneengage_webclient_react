@@ -1,4 +1,5 @@
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
+import * as js_preferences from '../js/state/preferences.js';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
@@ -46,7 +47,7 @@ fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 const Mobile = () => {
   useTranslation('home');
   const [, forceUpdate] = useState(0);
-  const [isMetricSystem, setIsMetricSystem] = useState(js_globals.v_useMetricSystem);
+  const [isMetricSystem, setIsMetricSystem] = useState(js_preferences.fn_getUseMetricSystem());
   const [viewMode, setViewMode] = useState('map'); // 'map' | 'video'
   const [showUnitList, setShowUnitList] = useState(false);
   const [selectedPartyId, setSelectedPartyId] = useState(null);
@@ -94,7 +95,7 @@ const Mobile = () => {
   }, [refresh]);
 
   useEffect(() => {
-    js_globals.CONST_MAP_EDITOR = false;
+    js_preferences.fn_setMapEditor(false);
     fn_on_ready();
 
     document.body.classList.add('mobile-mode');
@@ -164,7 +165,7 @@ const Mobile = () => {
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, authObj, handleAuthBadLogined);
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, authObj, handleSocketStatus);
 
-    setIsMetricSystem(js_globals.v_useMetricSystem);
+    setIsMetricSystem(js_preferences.fn_getUseMetricSystem());
 
     return () => {
       js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', unitSystemListener);
@@ -518,7 +519,7 @@ const Mobile = () => {
       {ReactDOM.createPortal(
         <>
           <ClssModuleDetails />
-          <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+          <ClssGamePadControl p_index={js_preferences.fn_getActiveGamepadIndex()} />
           <DialogHost />
         </>,
         document.body

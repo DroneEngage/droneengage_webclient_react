@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import { hlp_getFlightMode, fn_getWindData } from '../../js/js_main.js';
 import { js_globals } from '../../js/js_globals.js';
@@ -103,7 +104,7 @@ class ClssMainUnitPopup extends React.Component {
     const unitPartyId = c_unit.getPartyID ? c_unit.getPartyID() : null;
     const wd = unitPartyId ? fn_getWindData(unitPartyId) : null;
     if (wd) {
-      const isMetric = js_globals.v_useMetricSystem !== false;
+      const isMetric = js_preferences.fn_getUseMetricSystem() !== false;
       const windSpeed = isMetric
         ? (wd.speedMs || 0).toFixed(1)
         : ((wd.speedMs || 0) * js_helpers.CONST_METER_TO_MILE).toFixed(1);

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DEFAULT_SPEED_STEP } from '../../js/config/constants.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
@@ -60,7 +61,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
         p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = parseFloat(p_speed);
 
 
-        if (js_globals.v_useMetricSystem === true) {
+        if (js_preferences.fn_getUseMetricSystem() === true) {
             v_speak = v_speak + p_speed.toFixed(1) + " meter per second";
         }
         else {
@@ -76,10 +77,10 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
     const v_andruavUnit = p_unit;
     if (!v_andruavUnit) return null;
 
-    let v_unit_text = js_globals.v_useMetricSystem ? 'm/s' : 'mph';
+    let v_unit_text = js_preferences.fn_getUseMetricSystem() ? 'm/s' : 'mph';
 
     let v_targetspeed = parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed).toFixed(2) + " " + v_unit_text;
-    if (js_globals.v_useMetricSystem === false) {
+    if (js_preferences.fn_getUseMetricSystem() === false) {
         // value stored in meters per seconds so convert it to miles per hour
         v_targetspeed = (parseFloat(v_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed) * js_helpers.CONST_METER_TO_MILE).toFixed(2) + " " + v_unit_text;
     }
@@ -89,7 +90,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
     if (v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== null && v_andruavUnit.m_Nav_Info.p_Location.ground_speed !== undefined) {
         let speed = v_andruavUnit.m_Nav_Info.p_Location.ground_speed;
         js_unitUiPrefs.fn_setUnitPref(v_andruavUnit.getPartyID(), 'speed_link', true);
-        if (js_globals.v_useMetricSystem === true) {
+        if (js_preferences.fn_getUseMetricSystem() === true) {
             v_speed_val = speed.toFixed(0);
         }
         else {

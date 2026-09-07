@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-import { js_globals } from './js_globals.js';
+import * as js_preferences from './state/preferences.js';
 import { CONST_DEFAULT_VOLUME } from '../config/constants.js';
 import * as js_common from './js_common.js'
 import * as js_siteConfig from './js_siteConfig.js';
@@ -18,9 +18,9 @@ class CLocalStorage {
     constructor() {
         if (this.isSupported()) {
             // Initialize global settings with saved values if they exist
-            js_globals.v_useMetricSystem = this.fn_getMetricSystem();
-            js_globals.CONST_DEFAULT_ALTITUDE = this.fn_getDefaultAltitude();
-            js_globals.CONST_DEFAULT_RADIUS = this.fn_getDefaultRadius();
+            js_preferences.fn_setUseMetricSystem(this.fn_getMetricSystem());
+            js_preferences.fn_setDefaultAltitude(this.fn_getDefaultAltitude());
+            js_preferences.fn_setDefaultRadius(this.fn_getDefaultRadius());
         }
     }
 
@@ -161,7 +161,7 @@ class CLocalStorage {
     }
 
     fn_getMetricSystem() {
-        return this._getValue(LS_METRIC_SYS, js_globals.v_useMetricSystem.toString()) === 'true';
+        return this._getValue(LS_METRIC_SYS, js_preferences.fn_getUseMetricSystem().toString()) === 'true';
     }
 
     fn_setGamePadConfig(config_index, value) {
@@ -216,7 +216,7 @@ class CLocalStorage {
     }
 
     fn_getDefaultAltitude() {
-        return parseInt(this._getValue(LS_DEFAULT_ALT, js_globals.CONST_DEFAULT_ALTITUDE.toString()));
+        return parseInt(this._getValue(LS_DEFAULT_ALT, js_preferences.fn_getDefaultAltitude().toString()));
     }
 
     // Default Radius
@@ -225,7 +225,7 @@ class CLocalStorage {
     }
 
     fn_getDefaultRadius() {
-        return parseInt(this._getValue('_vDefaultRadius', js_globals.CONST_DEFAULT_RADIUS.toString()));
+        return parseInt(this._getValue('_vDefaultRadius', js_preferences.fn_getDefaultRadius().toString()));
     }
 
     fn_setDefaultSwarmHorizontalDistance(value) {
@@ -233,7 +233,7 @@ class CLocalStorage {
     }
 
     fn_getDefaultSwarmHorizontalDistance() {
-        return parseInt(this._getValue('_vDefaultSHD', js_globals.CONST_DEFAULT_ALTITUDE.toString()));
+        return parseInt(this._getValue('_vDefaultSHD', js_preferences.fn_getDefaultAltitude().toString()));
     }
 
     fn_setDefaultSwarmVerticalDistance(value) {
@@ -241,7 +241,7 @@ class CLocalStorage {
     }
 
     fn_getDefaultSwarmVerticalDistance() {
-        return parseInt(this._getValue('_vDefaultSVD', js_globals.CONST_DEFAULT_RADIUS.toString()));
+        return parseInt(this._getValue('_vDefaultSVD', js_preferences.fn_getDefaultRadius().toString()));
     }
 
     // Speech Enabled

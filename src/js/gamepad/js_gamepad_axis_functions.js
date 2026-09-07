@@ -1,4 +1,5 @@
 import * as js_andruavUnit from '../js_andruavUnit'
+import * as js_preferences from '../state/preferences.js';
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_common from '../js_common.js'
@@ -75,7 +76,7 @@ class CGamePadAxisFunctions {
             return;
         }
 
-        const c_controller = js_andruav_gamepad.fn_getGamePad(js_globals.active_gamepad_index);
+        const c_controller = js_andruav_gamepad.fn_getGamePad(js_preferences.fn_getActiveGamepadIndex());
         // Exit if no valid controller
         if (!c_controller) {
             js_common.fn_console_log("No valid gamepad controller found.");

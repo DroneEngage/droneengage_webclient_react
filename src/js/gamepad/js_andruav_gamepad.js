@@ -13,6 +13,7 @@
 
 
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
+import * as js_preferences from '../state/preferences.js';
 import * as js_helpers from '../js_helpers.js';
 import { js_globals } from '../js_globals.js';
 import { v_gamepad_button_types, v_total_gampad_buttons, STICK_LEFT_HORIZONTAL, STICK_LEFT_VERTICAL, STICK_RIGHT_HORIZONTAL, STICK_RIGHT_VERTICAL, STICK_MODE_MAPPING } from '../config/gamepadMap.js';
@@ -269,7 +270,7 @@ class CAndruavGamePad {
             if (gamepad) {
                 if (!(gamepad.index in this.v_controllers)) {
                     this.fn_addGamePad(this, gamepad);
-                } else if (i === js_globals.active_gamepad_index && gamepad) {
+                } else if (i === js_preferences.fn_getActiveGamepadIndex() && gamepad) {
                     this.fn_universalPad(gamepad);
                 }
             }
@@ -277,12 +278,12 @@ class CAndruavGamePad {
     }
 
     fn_AxesChanged() {
-        const padStatus = this.v_controllers[js_globals.active_gamepad_index];
+        const padStatus = this.v_controllers[js_preferences.fn_getActiveGamepadIndex()];
         return padStatus ? padStatus.p_axesChanged : false;
     }
 
     fn_AxesOthersChanged() {
-        const padStatus = this.v_controllers[js_globals.active_gamepad_index];
+        const padStatus = this.v_controllers[js_preferences.fn_getActiveGamepadIndex()];
         return padStatus ? padStatus.p_axesOtherChanged : false;
     }
 

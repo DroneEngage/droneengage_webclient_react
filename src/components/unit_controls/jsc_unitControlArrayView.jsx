@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import React    from 'react';
 import { withTranslation } from 'react-i18next';
@@ -338,7 +339,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.abs.value = p_andruavUnit.m_Nav_Info.p_Location.alt_abs;
                 res.abs.unit = ' m';
@@ -368,7 +369,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.rel.value = p_andruavUnit.m_Nav_Info.p_Location.alt_relative;
                 res.rel.unit = ' m';
@@ -399,7 +400,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.terC.value = p_andruavUnit.m_Terrain_Info.last_terrain_entry.m_current_height;
                 res.terC.unit = ' m';
@@ -429,7 +430,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         }
         else
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.terH.value = p_andruavUnit.m_Terrain_Info.last_terrain_entry.m_terrain_height;
                 res.terH.unit = ' m';
@@ -469,7 +470,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             else
             {
             
-                if (js_globals.v_useMetricSystem === true)
+                if (js_preferences.fn_getUseMetricSystem() === true)
                 {
                     res.lidar.value = lidar.m_current_distance;
                     res.lidar.unit = ' m';
@@ -507,7 +508,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const ground_speed = p_andruavUnit.m_Nav_Info.p_Location.ground_speed;
         if ( ground_speed !== null && ground_speed !== undefined)
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.GS.value = ground_speed.toFixed(0);
                 res.GS.unit = ' m/s';
@@ -521,7 +522,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
         const air_speed = p_andruavUnit.m_Nav_Info.p_Location.air_speed;
         if (air_speed !== null && air_speed !== undefined)
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.AS.value = air_speed.toFixed(0);
                 res.AS.unit = ' m/s';
@@ -548,7 +549,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
         if (p_andruavUnit.m_WindSpeed !== null && p_andruavUnit.m_WindSpeed !== undefined)
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.WS.value = p_andruavUnit.m_WindSpeed.toFixed(0);
                 res.WS.unit = ' m/s';
@@ -569,7 +570,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
         if (p_andruavUnit.m_WindSpeed_z !== null && p_andruavUnit.m_WindSpeed_z !== undefined)
         {
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.WZ.value = p_andruavUnit.m_WindSpeed_z.toFixed(0);
                 res.WZ.unit = ' m/s';
@@ -644,7 +645,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
             
 
 
-            if (js_globals.v_useMetricSystem === true)
+            if (js_preferences.fn_getUseMetricSystem() === true)
             {
                 res.wp_dist.value = target.wp_dist.toFixed(0);
                 res.wp_dist.unit = ' m';
@@ -930,8 +931,8 @@ class ClssAndruavUnitListArray extends React.Component {
     {
         if (p_andruavUnit.hasOwnProperty("p_marker") === false) return;
         if (
-                ((js_globals.v_en_GCS === true ) && (p_andruavUnit.m_IsGCS === true))
-             || ((js_globals.v_en_Drone === true ) && (p_andruavUnit.m_IsGCS ===false))
+                ((js_preferences.fn_getEnGCS() === true ) && (p_andruavUnit.m_IsGCS === true))
+             || ((js_preferences.fn_getEnDrone() === true ) && (p_andruavUnit.m_IsGCS ===false))
             )
         {
             // const layers = js_unitLayerRegistry.fn_get(p_andruavUnit.getPartyID());
@@ -1022,7 +1023,7 @@ class ClssAndruavUnitListArray extends React.Component {
 
                     if (v_andruavUnit.m_IsGCS === true)
                     {
-                        //units_gcs.push (<ClssAndruavUnitGCS key={partyID} js_globals.v_en_GCS= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
+                        //units_gcs.push (<ClssAndruavUnitGCS key={partyID} js_preferences.fn_getEnGCS()= {js_localStorage.fn_getGCSDisplayEnabled()} p_unit = {v_andruavUnit}/>);
                     }
                     else 
                     if (v_andruavUnit.m_IsGCS===false)

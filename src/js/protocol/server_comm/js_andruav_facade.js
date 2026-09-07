@@ -16,6 +16,7 @@
 
 /*jshint esversion: 6 */
 import { js_globals } from '../../js_globals.js';
+import * as js_preferences from '../../state/preferences.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
@@ -1583,7 +1584,7 @@ class CAndruavClientFacade {
             return;
 
 
-        const c_controller = js_andruav_gamepad.fn_getGamePad(js_globals.active_gamepad_index);
+        const c_controller = js_andruav_gamepad.fn_getGamePad(js_preferences.fn_getActiveGamepadIndex());
         if (c_controller === null || c_controller === undefined)
             return;
 

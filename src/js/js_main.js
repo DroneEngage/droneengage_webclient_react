@@ -1,5 +1,6 @@
 
 import React from 'react';
+import * as js_preferences from './state/preferences.js';
 import { CONST_MAP_GOOLE, v_mission_file_extension } from './config/constants.js';
 import ReactDOM from "react-dom/client";
 
@@ -371,7 +372,7 @@ function enableDragging() {
  */
 function fn_handleKeyBoard() {
 
-	if (js_globals.CONST_MAP_EDITOR === true) {
+	if (js_preferences.fn_getMapEditor() === true) {
 		return;
 	}
 
@@ -588,7 +589,7 @@ export function fn_showMap3D() {
 }
 
 function fn_onMap3dDblClick(p_lat, p_lng) {
-	if (js_globals.CONST_MAP_EDITOR === true) return;
+	if (js_preferences.fn_getMapEditor() === true) return;
 	// Draw a ground-draped circle with a + crosshair at the clicked point
 	// (instead of a DOM marker pin), then immediately show the context
 	// popup — the 3D map's dblclick UX has always opened the popup directly.
@@ -1185,7 +1186,7 @@ function fn_renderSingleAdsb(p_adsbObject) {
 function fn_buildAdsbPopupHtml(p_adsbObject) {
 	// Velocity is stored in m/s, altitude in meters. OpenSky may return null
 	// for any of these, so guard against null/undefined before formatting.
-	// Respect js_globals.v_useMetricSystem for unit display.
+	// Respect js_preferences.fn_getUseMetricSystem() for unit display.
 	var v_speedMs = Number(p_adsbObject.m_velocity) || 0;
 	var v_altM = Number(p_adsbObject.m_altitude) || 0;
 	var v_geoAltM = Number(p_adsbObject.m_geo_altitude) || 0;
@@ -1202,7 +1203,7 @@ function fn_buildAdsbPopupHtml(p_adsbObject) {
 	var v_lon = Number(p_adsbObject.m_lon) || 0;
 
 	var v_speedStr, v_altStr, v_geoAltStr, v_vsiStr;
-	if (js_globals.v_useMetricSystem === true) {
+	if (js_preferences.fn_getUseMetricSystem() === true) {
 		v_speedStr = (v_speedMs * 3.6).toFixed(0) + " km/h";
 		v_altStr = v_altM.toFixed(0) + " m";
 		v_geoAltStr = v_geoAltM > 0 ? v_geoAltM.toFixed(0) + " m" : "—";
@@ -1289,45 +1290,45 @@ export function gui_toggleUnits(dontflip) {
 	// will record the value and ubunts in the storage. if you changed from other browser then 
 	// the values and unit of the latest browser will overwrite the saved one... but if you refresh
 	// the browser instead of changing the units the latter will take the values of the first one.
-	js_localStorage.fn_setMetricSystem(js_globals.v_useMetricSystem);
+	js_localStorage.fn_setMetricSystem(js_preferences.fn_getUseMetricSystem());
 
 	if (js_localStorage.fn_getMetricSystem() === true) {
-		if (dontflip !== true) js_globals.v_useMetricSystem = false;
+		if (dontflip !== true) js_preferences.fn_setUseMetricSystem(false);
 
 		js_localStorage.fn_setMetricSystem(false);
-		js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(0);
-		js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_RADIUS).toFixed(0);
+		js_preferences.fn_setDefaultAltitude((js_helpers.CONST_METER_TO_FEET * js_preferences.fn_getDefaultAltitude()).toFixed(0));
+		js_preferences.fn_setDefaultRadius((js_helpers.CONST_METER_TO_FEET * js_preferences.fn_getDefaultRadius()).toFixed(0));
 
-		js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_METER_TO_FEET;
-		js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_METER_TO_FEET;
+		js_preferences.fn_setDefaultAltitudeMin(js_preferences.fn_getDefaultAltitudeMin() * js_helpers.CONST_METER_TO_FEET);
+		js_preferences.fn_setDefaultRadiusMin(js_preferences.fn_getDefaultRadiusMin() * js_helpers.CONST_METER_TO_FEET);
 
-		js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE).toFixed(0);
-		js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = (js_helpers.CONST_METER_TO_FEET * js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE).toFixed(0);
+		js_preferences.fn_setDefaultSwarmHorizontalDistance((js_helpers.CONST_METER_TO_FEET * js_preferences.fn_getDefaultSwarmHorizontalDistance()).toFixed(0));
+		js_preferences.fn_setDefaultSwarmVerticalDistance((js_helpers.CONST_METER_TO_FEET * js_preferences.fn_getDefaultSwarmVerticalDistance()).toFixed(0));
 
-		js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN * js_helpers.CONST_METER_TO_FEET;
-		js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN * js_helpers.CONST_METER_TO_FEET;
+		js_preferences.fn_setDefaultSwarmHorizontalDistanceMin(js_preferences.fn_getDefaultSwarmHorizontalDistanceMin() * js_helpers.CONST_METER_TO_FEET);
+		js_preferences.fn_setDefaultSwarmVerticalDistanceMin(js_preferences.fn_getDefaultSwarmVerticalDistanceMin() * js_helpers.CONST_METER_TO_FEET);
 	}
 	else {
-		if (dontflip !== true) js_globals.v_useMetricSystem = true;
+		if (dontflip !== true) js_preferences.fn_setUseMetricSystem(true);
 
 		js_localStorage.fn_setMetricSystem(true);
-		js_globals.CONST_DEFAULT_ALTITUDE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_ALTITUDE).toFixed(1);
-		js_globals.CONST_DEFAULT_RADIUS = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_RADIUS).toFixed(1);
+		js_preferences.fn_setDefaultAltitude((js_helpers.CONST_FEET_TO_METER * js_preferences.fn_getDefaultAltitude()).toFixed(1));
+		js_preferences.fn_setDefaultRadius((js_helpers.CONST_FEET_TO_METER * js_preferences.fn_getDefaultRadius()).toFixed(1));
 
-		js_globals.CONST_DEFAULT_ALTITUDE_min = js_globals.CONST_DEFAULT_ALTITUDE_min * js_helpers.CONST_FEET_TO_METER;
-		js_globals.CONST_DEFAULT_RADIUS_min = js_globals.CONST_DEFAULT_RADIUS_min * js_helpers.CONST_FEET_TO_METER;
+		js_preferences.fn_setDefaultAltitudeMin(js_preferences.fn_getDefaultAltitudeMin() * js_helpers.CONST_FEET_TO_METER);
+		js_preferences.fn_setDefaultRadiusMin(js_preferences.fn_getDefaultRadiusMin() * js_helpers.CONST_FEET_TO_METER);
 
-		js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE).toFixed(1);
-		js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = (js_helpers.CONST_FEET_TO_METER * js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE).toFixed(1);
+		js_preferences.fn_setDefaultSwarmHorizontalDistance((js_helpers.CONST_FEET_TO_METER * js_preferences.fn_getDefaultSwarmHorizontalDistance()).toFixed(1));
+		js_preferences.fn_setDefaultSwarmVerticalDistance((js_helpers.CONST_FEET_TO_METER * js_preferences.fn_getDefaultSwarmVerticalDistance()).toFixed(1));
 
-		js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE_MIN * js_helpers.CONST_FEET_TO_METER;
-		js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN = js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE_MIN * js_helpers.CONST_FEET_TO_METER;
+		js_preferences.fn_setDefaultSwarmHorizontalDistanceMin(js_preferences.fn_getDefaultSwarmHorizontalDistanceMin() * js_helpers.CONST_FEET_TO_METER);
+		js_preferences.fn_setDefaultSwarmVerticalDistanceMin(js_preferences.fn_getDefaultSwarmVerticalDistanceMin() * js_helpers.CONST_FEET_TO_METER);
 	}
-	js_localStorage.fn_setDefaultAltitude(js_globals.CONST_DEFAULT_ALTITUDE);
-	js_localStorage.fn_setDefaultRadius(js_globals.CONST_DEFAULT_RADIUS);
+	js_localStorage.fn_setDefaultAltitude(js_preferences.fn_getDefaultAltitude());
+	js_localStorage.fn_setDefaultRadius(js_preferences.fn_getDefaultRadius());
 	
 	// Dispatch event to notify components of unit system change
-	js_eventEmitter.fn_dispatch('EE_UnitSystemChanged', { isMetric: js_globals.v_useMetricSystem });
+	js_eventEmitter.fn_dispatch('EE_UnitSystemChanged', { isMetric: js_preferences.fn_getUseMetricSystem() });
 };
 
 export function fn_convertToMeter(value) {
@@ -1603,18 +1604,18 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
 	let v_altitude_val = p_andruavUnit.m_Nav_Info.p_Location.alt_relative != null ? (p_andruavUnit.m_Nav_Info.p_Location.alt_relative).toFixed(1) : 0;
-	if (v_altitude_val < js_globals.CONST_DEFAULT_ALTITUDE_min) {
+	if (v_altitude_val < js_preferences.fn_getDefaultAltitudeMin()) {
 		v_altitude_val = fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()).toFixed(1);
 	}
 
-	if (js_globals.v_useMetricSystem === false) {
+	if (js_preferences.fn_getUseMetricSystem() === false) {
 		v_altitude_val = (v_altitude_val * js_helpers.CONST_METER_TO_FEET).toFixed(1);
 	}
 
 	const applyCallback = (p_unit, p_value) => {
 		let v_alt = p_value;
 		if (v_alt === '' || v_alt === undefined || isNaN(v_alt)) return;
-		if (js_globals.v_useMetricSystem === false) {
+		if (js_preferences.fn_getUseMetricSystem() === false) {
 			v_alt = (parseFloat(v_alt) * js_helpers.CONST_FEET_TO_METER).toFixed(1);
 		}
 		let v_alt_cmd;
@@ -1659,7 +1660,7 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 		return;
 	}
 
-	if (js_globals.v_useMetricSystem === true) {
+	if (js_preferences.fn_getUseMetricSystem() === true) {
 		v_speed_val = v_speed_val.toFixed(1);
 	}
 	else {
@@ -1669,7 +1670,7 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 	const applyCallback = (p_unit, p_value) => {
 		let v_speed = p_value;
 		if (v_speed === '' || v_speed === undefined || isNaN(v_speed)) return;
-		if (js_globals.v_useMetricSystem === false) {
+		if (js_preferences.fn_getUseMetricSystem() === false) {
 			v_speed = parseFloat(v_speed) * js_helpers.CONST_MILE_TO_METER;
 		}
 		const v_speed_cmd = parseFloat(v_speed);
@@ -2269,7 +2270,7 @@ function fn_onSocketStatus(me, event) {
 	if (status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
 		js_speak.fn_speak('Connected');
 
-		if (js_globals.CONST_MAP_EDITOR === true) {
+		if (js_preferences.fn_getMapEditor() === true) {
 			js_globals.v_andruavFacade.API_loadGeoFence(js_andruavAuth.m_username, js_globals.v_andruavWS.m_groupName, null, '_drone_', 1);
 		}
 	}
@@ -2406,7 +2407,7 @@ var EVT_onDeleted = function () {
 var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
 
 	// Live update is not allowed in Map Editor
-	if (js_globals.CONST_MAP_EDITOR === true) return;
+	if (js_preferences.fn_getMapEditor() === true) return;
 
 	const p_andruavUnit = data.unit;
 	const missionIndexReached = data.mir;
@@ -2464,7 +2465,7 @@ var EVT_msgFromUnit_WayPointsUpdated = function (me, data) {
 var EVT_msgFromUnit_WayPoints = function (me, data) {
 
 	// dont upload waypoints in map editor mode. -- for now TEMP
-	if (js_globals.CONST_MAP_EDITOR) return;
+	if (js_preferences.fn_getMapEditor()) return;
 
 	const p_andruavUnit = data.unit;
 	const wayPointArray = data.wps;
@@ -2550,7 +2551,7 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 			layers.m_wayPoint_markers.push(v_mark);
 			v_mark.wayPointStep = wayPointStep;
 
-			if (js_globals.CONST_MAP_EDITOR) {
+			if (js_preferences.fn_getMapEditor()) {
 				// add to shapes list.
 				v_mark.pm.m_shape_type = 'Marker';
 				v_mark.on('click', function (p_event) {
@@ -3011,8 +3012,8 @@ function hlp_gotoImage_Map() {
 */
 var EVT_andruavUnitAdded = function (me, p_andruavUnit) {
 	// if (p_andruavUnit.m_IsGCS === false) {
-	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultHeight', js_globals.CONST_DEFAULT_ALTITUDE);
-	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultCircleRadius', js_globals.CONST_DEFAULT_RADIUS);
+	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultHeight', js_preferences.fn_getDefaultAltitude());
+	// 	js_unitUiPrefs.fn_setUnitPref(p_andruavUnit.getPartyID(), 'defaultCircleRadius', js_preferences.fn_getDefaultRadius());
 	// }
 
 	js_speak.fn_speak(p_andruavUnit.m_unitName + " unit added");
@@ -3313,7 +3314,7 @@ function showGeoFenceInfo(p_lat, p_lng, geoFenceInfo) {
 	}
 
 	let v_contentString = "<p class='img-rounded " + _style + "'><strong>" + geoFenceInfo.m_geoFenceName + _icon + "</strong></p><span class='help-block'>" + p_lat.toFixed(7) + " " + p_lng.toFixed(7) + "</span>";
-	v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_globals.CONST_DEFAULT_ALTITUDE + "," + js_globals.CONST_DEFAULT_RADIUS + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
+	v_contentString += "<div class='row'><div class= 'col-sm-12'><p class='cursor_hand bg-success link-white si-07x' onclick=\"window.open('./mapeditor?zoom=" + js_leafletmap.fn_getZoom() + "&lat=" + p_lat + "&lng=" + p_lng + "', '_blank')\"," + js_preferences.fn_getDefaultAltitude() + "," + js_preferences.fn_getDefaultRadius() + "," + 10 + " )\">Open Geo Fence Here</p></div></div>";
 
 	infowindow = js_leafletmap.fn_showInfoWindow(infowindow, v_contentString, p_lat, p_lng);
 
@@ -3759,7 +3760,7 @@ export function fn_on_ready() {
 
 	fn_showMap();
 
-	if (js_globals.CONST_MAP_EDITOR !== true) {
+	if (js_preferences.fn_getMapEditor() !== true) {
 		gui_hidesubmenus();
 		gui_initGlobalSection();
 

@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import * as js_preferences from '../../js/state/preferences.js';
 import React    from 'react';
 
 
@@ -193,10 +194,10 @@ export default class ClssGamePadControl extends React.Component {
                 <div key={this.key} className='gp_input'>
                     <div className="row  margin_2px css_padding_zero">
                         <div className='col-12'>
-                            <ClssGamePadAxesControl p_index={js_globals.active_gamepad_index}></ClssGamePadAxesControl>
+                            <ClssGamePadAxesControl p_index={js_preferences.fn_getActiveGamepadIndex()}></ClssGamePadAxesControl>
                         </div>
                         <div className='col-12'>
-                            <ClssGamePadButtonControl p_index={js_globals.active_gamepad_index}></ClssGamePadButtonControl>
+                            <ClssGamePadButtonControl p_index={js_preferences.fn_getActiveGamepadIndex()}></ClssGamePadButtonControl>
                         </div>
                     </div>
                 </div>
@@ -245,7 +246,7 @@ export default class ClssGamePadControl extends React.Component {
     {
         if ((p_index==null || p_index === undefined) || ((p_index<0) || (p_index>=4))) return ;
         
-        js_globals.active_gamepad_index = p_index;
+        js_preferences.fn_setActiveGamepadIndex(p_index);
         
         if (this.m_flag_mounted === false)return ;
         this.setState({'m_update': this.state.m_update +1});
@@ -361,7 +362,7 @@ export default class ClssGamePadControl extends React.Component {
             }
         }
         let gamepad_title = "Select an active Game Pad"; 
-        const v_controller = js_andruav_gamepad.v_controllers[js_globals.active_gamepad_index];
+        const v_controller = js_andruav_gamepad.v_controllers[js_preferences.fn_getActiveGamepadIndex()];
         if (v_controller !== null && v_controller !== undefined)
         {
             gamepad_title = v_controller.id.toString();
@@ -415,7 +416,7 @@ export default class ClssGamePadControl extends React.Component {
       <div role="group">
         <button
           id="btnGamePadDrop"
-          key={js_globals.active_gamepad_index}
+          key={js_preferences.fn_getActiveGamepadIndex()}
           type="button"
           className="btn btn-sm btn-danger dropdown-toggle"
           title={gamepad_title}
@@ -423,7 +424,7 @@ export default class ClssGamePadControl extends React.Component {
           aria-haspopup="true"
           aria-expanded="false"
         >
-          G-Pad {js_globals.active_gamepad_index}
+          G-Pad {js_preferences.fn_getActiveGamepadIndex()}
         </button>
         <div className="dropdown-menu" aria-labelledby="btnGamePadDrop">{gamepads}</div>
       </div>

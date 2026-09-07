@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import * as js_helpers from '../../js/js_helpers.js';
@@ -187,7 +188,7 @@ class ClssCtrlDroneIMU extends React.Component {
             wpdst_text = t('unit_control_imu:waypoint.na');
             distanceToWP_class = 'bg-secondary text-white cursor_hand bi bi-geo-alt-fill';
         } else {
-            if (js_globals.v_useMetricSystem === true) {
+            if (js_preferences.fn_getUseMetricSystem() === true) {
                 wpdst_text = Number(target.wp_dist.toFixed(1)).toLocaleString() + t('unit_control_imu:waypoint.m');
             } else {
                 wpdst_text = Number(target.wp_dist * js_helpers.CONST_METER_TO_FEET).toFixed(1).toLocaleString() + t('unit_control_imu:waypoint.ft');

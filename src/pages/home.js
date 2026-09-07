@@ -1,4 +1,5 @@
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
+import * as js_preferences from '../js/state/preferences.js';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
@@ -40,7 +41,7 @@ const Home = () => {
   useTranslation('home'); // Use home namespace
   const layout = useLayout();
   const [isRow2Collapsed, setIsRow2Collapsed] = useState(false);
-  const [isMetricSystem, setIsMetricSystem] = useState(js_globals.v_useMetricSystem);
+  const [isMetricSystem, setIsMetricSystem] = useState(js_preferences.fn_getUseMetricSystem());
 
   // Layout profile derived from the store's displayMode + smallMode.
   // This replaces the seven fn_activate* jQuery functions: the same
@@ -61,7 +62,7 @@ const Home = () => {
   }, [layout.displayMode]);
 
   useEffect(() => {
-    js_globals.CONST_MAP_EDITOR = false;
+    js_preferences.fn_setMapEditor(false);
     fn_on_ready();
   }, []);
 
@@ -75,7 +76,7 @@ const Home = () => {
     js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, handleUnitSystemChange);
     
     // Set initial state
-    setIsMetricSystem(js_globals.v_useMetricSystem);
+    setIsMetricSystem(js_preferences.fn_getUseMetricSystem());
     
     // Cleanup on unmount
     return () => {
@@ -167,7 +168,7 @@ const Home = () => {
           </div>
 
           <ClssModuleDetails />
-          <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+          <ClssGamePadControl p_index={js_preferences.fn_getActiveGamepadIndex()} />
           <DialogHost />
         </div>
 

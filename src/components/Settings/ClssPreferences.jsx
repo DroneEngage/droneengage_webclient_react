@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
@@ -12,7 +13,7 @@ class ClssPreferences extends React.Component {
   constructor() {
     super();
     this.key = Math.random().toString();
-    js_globals.v_enable_tabs_display = js_localStorage.fn_getTabsDisplayEnabled();
+    js_preferences.fn_setEnableTabsDisplay(js_localStorage.fn_getTabsDisplayEnabled());
     this.m_volumeRangeRef = React.createRef();
     this.m_enableSpeechRef = React.createRef();
     this.m_advancedRef = React.createRef();
@@ -76,14 +77,14 @@ class ClssPreferences extends React.Component {
 
   fn_GCSShowMe(e) {
     const enabled = e.currentTarget.checked;
-    js_globals.v_enable_tabs_display = enabled;
+    js_preferences.fn_setEnableTabsDisplay(enabled);
     js_localStorage.fn_setGCSShowMe(enabled);
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
   fn_enableGCS(e) {
     const enabled = e.currentTarget.checked;
-    js_globals.v_enable_gcs_display = enabled;
+    js_preferences.fn_setEnableGcsDisplay(enabled);
     js_localStorage.fn_setGCSDisplayEnabled(enabled);
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }

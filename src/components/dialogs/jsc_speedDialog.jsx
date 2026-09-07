@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 
 import { js_globals } from '../../js/js_globals.js';
@@ -101,7 +102,7 @@ class ClssSpeedDialog extends ClssModalDialogBase {
     }
 
     fn_getSpeedPresets() {
-        const isMetric = js_globals.v_useMetricSystem;
+        const isMetric = js_preferences.fn_getUseMetricSystem();
         if (isMetric) {
             return [
                 { value: '5', label: '5m/s' },
@@ -139,7 +140,7 @@ class ClssSpeedDialog extends ClssModalDialogBase {
             placeholder = 'Enter port';
             showPresets = false;
         } else {
-            const isMetric = js_globals.v_useMetricSystem;
+            const isMetric = js_preferences.fn_getUseMetricSystem();
             unitLabel = isMetric ? 'm/s' : 'ft/s';
             placeholder = 'Enter speed';
             showPresets = true;

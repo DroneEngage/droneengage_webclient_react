@@ -6,12 +6,13 @@
  * React components and js_main dialogs read and write. Previously these
  * lived as ad-hoc fields on CAndruavUnitObject.m_gui (C_GUIHelper).
  *
- * Defaults come from js_globals.CONST_DEFAULT_RADIUS /
+ * Defaults come from js_preferences.fn_getDefaultRadius() /
  * CONST_DEFAULT_ALTITUDE. Note: despite the CONST_ prefix, those two
  * js_globals fields are written at runtime by several call sites — they
  * are preferences, not constants. Do not try to freeze them here.
  */
 import { js_globals } from '../js_globals.js';
+import * as js_preferences from './preferences.js';
 
 /**
  * @typedef {Object} UnitUiPrefs
@@ -36,8 +37,8 @@ class CUnitUiPrefs {
         if (prefs === undefined || prefs === null) {
             prefs = {
                 speed_link: false,
-                defaultCircleRadius: js_globals.CONST_DEFAULT_RADIUS,
-                defaultHeight: js_globals.CONST_DEFAULT_ALTITUDE,
+                defaultCircleRadius: js_preferences.fn_getDefaultRadius(),
+                defaultHeight: js_preferences.fn_getDefaultAltitude(),
             };
             this.m_prefs[p_partyID] = prefs;
         }

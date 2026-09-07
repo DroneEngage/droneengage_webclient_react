@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages';
@@ -52,15 +53,15 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
             js_globals.v_andruavFacade.API_makeSwarm(
                 p_unit,
                 js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM,
-                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE,
-                js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE
+                js_preferences.fn_getDefaultSwarmHorizontalDistance(),
+                js_preferences.fn_getDefaultSwarmVerticalDistance()
             );
         } else {
             js_globals.v_andruavFacade.API_makeSwarm(
                 p_unit,
                 p_formationID,
-                js_globals.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE,
-                js_globals.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE
+                js_preferences.fn_getDefaultSwarmHorizontalDistance(),
+                js_preferences.fn_getDefaultSwarmVerticalDistance()
             );
         }
     };

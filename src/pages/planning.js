@@ -1,4 +1,5 @@
 import 'leaflet.pm/dist/leaflet.pm.css';
+import * as js_preferences from '../js/state/preferences.js';
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
@@ -35,7 +36,7 @@ const Planning = () => {
 	const { t } = useTranslation('home'); // Use home namespace
 
 
-	js_globals.CONST_MAP_EDITOR = true;
+	js_preferences.fn_setMapEditor(true);
 
 	useEffect(() => {
 		fn_on_ready();

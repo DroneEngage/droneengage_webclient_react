@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 
 import { js_globals } from '../../js/js_globals.js';
@@ -95,7 +96,7 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
     }
 
     fn_onPresetAltitude(p_meters) {
-        const isMetric = js_globals.v_useMetricSystem;
+        const isMetric = js_preferences.fn_getUseMetricSystem();
         const value = isMetric ? p_meters : Math.round(p_meters * CONST_METER_TO_FEET);
         if (this.altitudeInputRef.current) {
             this.altitudeInputRef.current.value = value.toString();
@@ -111,7 +112,7 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
             unitName = this.state.p_andruavUnit.m_unitName;
         }
 
-        const isMetric = js_globals.v_useMetricSystem;
+        const isMetric = js_preferences.fn_getUseMetricSystem();
         const unitLabel = isMetric ? 'm' : 'ft';
         const isCompact = this.fn_isCompact();
 
