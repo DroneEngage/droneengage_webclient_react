@@ -18,7 +18,7 @@
 import './js_eventEmitterConfig'; // side-effect: opts telemetry events into batching
 import { js_eventEmitter } from './js_eventEmitter';
 import { EVENTS as js_event } from './js_eventList';
-import { fn_videoStatsEvent } from '../core/events/eventPayloads';
+import { fn_videoStatsEvent } from './eventPayloads';
 
 // Minimal stand-in for a js_andruavUnit payload: the batched events all
 // dispatch the unit object, whose per-unit identity comes from getPartyID().

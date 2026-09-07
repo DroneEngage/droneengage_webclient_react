@@ -23,7 +23,7 @@ import { fn_getOrCreateUnit } from '../../model/unitRegistry.js';
 import { notifyUnitFieldChanged } from '../../store/unitStore.js';
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
-import { fn_unitError, fn_waypointsEvent } from '../events/eventPayloads';
+import { fn_unitError, fn_waypointsEvent } from '../../events/eventPayloads.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
