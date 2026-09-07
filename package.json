@@ -1,7 +1,7 @@
 {
   "name": "droneengage_webclient",
   "version": "3.1.0",
-  "build_number": "20260906-01",
+  "build_number": "20260907-01",
   "description": "DroneEngage WebClient GCS Control Station.",
   "author": {
     "email": "mohammad.hefny@gmail.com",
@@ -56,7 +56,8 @@
     "build": "react-scripts build --mode production --config-overrides ./webpack.config.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
