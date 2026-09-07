@@ -28,9 +28,13 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_GeoFence,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
+         CONST_TYPE_AndruavMessage_WayPoints,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
+         CONST_WayPoint_TYPE_WAYPOINTSTEP,
+         CONST_WayPoint_TYPE_TAKEOFF,
+         CONST_WayPoint_TYPE_CIRCLE,
          CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST,
          CONST_TASHKEEL_SERB_NO_SWARM,
          CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
@@ -456,6 +460,65 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const msg = fn_decode(raw, 1);
         const result = fn_reduce(makeUnit(), msg);
         expect(result.events[0].payload.isAttached).toBe(false);
+    });
+
+    // --- TASK-02.2: WayPoints message ---
+
+    test('WayPoints: full (non-chunked) frame with 3 waypoint types', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_WayPoints, 'party-uav-1', {
+            n: 3,
+            0: { t: CONST_WayPoint_TYPE_WAYPOINTSTEP, s: 1, g: 31.0, a: 30.0, l: 100, h: 45, y: 5 },
+            1: { t: CONST_WayPoint_TYPE_TAKEOFF, s: 2, l: 50, p: 10 },
+            2: { t: CONST_WayPoint_TYPE_CIRCLE, s: 3, g: 31.1, a: 30.1, l: 80, r: 50, n: 2, q: true, x: 1 },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+
+        expect(result.waypoints).toBeDefined();
+        expect(result.waypoints.isChunk).toBe(0); // WAYPOINT_NO_CHUNK
+        const wps = result.waypoints.wps;
+        expect(wps).toHaveLength(3);
+
+        expect(wps[0].waypointType).toBe(CONST_WayPoint_TYPE_WAYPOINTSTEP);
+        expect(wps[0].m_Sequence).toBe(1);
+        expect(wps[0].Longitude).toBe(31.0);
+        expect(wps[0].Latitude).toBe(30.0);
+        expect(wps[0].Altitude).toBe(100);
+        expect(wps[0].Heading).toBe(45);
+        expect(wps[0].TimeToStay).toBe(5);
+
+        expect(wps[1].waypointType).toBe(CONST_WayPoint_TYPE_TAKEOFF);
+        expect(wps[1].Altitude).toBe(50);
+        expect(wps[1].Pitch).toBe(10);
+
+        expect(wps[2].waypointType).toBe(CONST_WayPoint_TYPE_CIRCLE);
+        expect(wps[2].m_Radius).toBe(50);
+        expect(wps[2].m_Turns).toBe(2);
+        expect(wps[2].m_Header_Required).toBe(true);
+        expect(wps[2].m_Xtrack_Location).toBe(1);
+    });
+
+    test('WayPoints: chunked frame returns isChunk from payload.i', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_WayPoints, 'u', {
+            i: 1, n: 1,
+            0: { t: CONST_WayPoint_TYPE_WAYPOINTSTEP, s: 1, g: 1, a: 2, l: 3, h: 4, y: 5 },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.waypoints.isChunk).toBe(1);
+        expect(result.waypoints.wps).toHaveLength(1);
+    });
+
+    test('WayPoints: CIRCLE without q/x uses defaults', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_WayPoints, 'u', {
+            n: 1,
+            0: { t: CONST_WayPoint_TYPE_CIRCLE, s: 1, g: 1, a: 2, l: 3, r: 25, n: 1 },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const wp = result.waypoints.wps[0];
+        expect(wp.m_Header_Required).toBe(false);
+        expect(wp.m_Xtrack_Location).toBe(0);
     });
 });
 

@@ -44,9 +44,21 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_GeoFence,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
+         CONST_TYPE_AndruavMessage_WayPoints,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
+         CONST_WayPoint_TYPE_WAYPOINTSTEP,
+         CONST_WayPoint_TYPE_SPLINE,
+         CONST_WayPoint_TYPE_TAKEOFF,
+         CONST_WayPoint_TYPE_LANDING,
+         CONST_WayPoint_TYPE_RTL,
+         CONST_WayPoint_TYPE_CAMERA_TRIGGER,
+         CONST_WayPoint_TYPE_CAMERA_CONTROL,
+         CONST_WayPoint_TYPE_GUIDED,
+         CONST_WayPoint_TYPE_ChangeAlt,
+         CONST_WayPoint_TYPE_CMissionAction_CONTINUE_AND_CHANGE_ALT,
+         CONST_WayPoint_TYPE_CIRCLE,
          CONST_SDR_ACTION_SDR_INFO,
          CONST_SDR_ACTION_LIST_SDR_DEVICES,
          CONST_SDR_ACTION_TRIGGER,
@@ -57,6 +69,12 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
 
 import { EVENTS as js_event } from '../../events/js_eventList.js';
+
+// Chunked waypoint assembly constants (shared with runtime.js).
+// WAYPOINT_NO_CHUNK: full message (no chunking). WAYPOINT_LAST_CHUNK: final
+// chunk index that triggers the merged dispatch.
+export const WAYPOINT_NO_CHUNK = 0;
+export const WAYPOINT_LAST_CHUNK = 999;
 
 /**
  * @param {object} unit
@@ -127,6 +145,8 @@ export function fn_reduce(unit, msg) {
             return reduceExternalGeoFence(unit, msg);
         case CONST_TYPE_AndruavMessage_GeoFenceAttachStatus:
             return reduceGeoFenceAttachStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_WayPoints:
+            return reduceWayPoints(unit, msg);
         default:
             return null;
     }
@@ -168,7 +188,8 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS
         || type === CONST_TYPE_AndruavMessage_GeoFence
         || type === CONST_TYPE_AndruavMessage_ExternalGeoFence
-        || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus;
+        || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
+        || type === CONST_TYPE_AndruavMessage_WayPoints;
 }
 
 // ---------------------------------------------------------------------------
@@ -901,6 +922,100 @@ function reduceGeoFenceAttachStatus(unit, msg) {
             payload: { unit, fenceName: p.n, isAttached: p.a },
         }],
     };
+}
+
+// ---------------------------------------------------------------------------
+// WayPoints — chunked waypoint download.
+//
+// fn_decodeWaypointStep is the pure 10-case sub-switch over waypointType.
+// fn_decodeWaypoints decodes the full payload into { wps, isChunk }.
+// reduceWayPoints returns the decoded waypoints; runtime owns the cache
+// and the dispatch decision (full message dispatches immediately, chunked
+// dispatches only on the last chunk).
+// ---------------------------------------------------------------------------
+function fn_decodeWaypointStep(item) {
+    const wayPointStep = {};
+    wayPointStep.waypointType = item.t;
+    switch (wayPointStep.waypointType) {
+        case CONST_WayPoint_TYPE_WAYPOINTSTEP:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.Longitude = item.g;
+            wayPointStep.Latitude = item.a;
+            wayPointStep.Altitude = item.l;
+            wayPointStep.Heading = item.h;
+            wayPointStep.TimeToStay = item.y;
+            break;
+        case CONST_WayPoint_TYPE_SPLINE:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.Longitude = item.g;
+            wayPointStep.Latitude = item.a;
+            wayPointStep.Altitude = item.l;
+            wayPointStep.TimeToStay = item.y;
+            break;
+        case CONST_WayPoint_TYPE_TAKEOFF:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.Altitude = item.l;
+            wayPointStep.Pitch = item.p;
+            break;
+        case CONST_WayPoint_TYPE_LANDING:
+            wayPointStep.m_Sequence = item.s;
+            break;
+        case CONST_WayPoint_TYPE_RTL:
+            wayPointStep.m_Sequence = item.s;
+            break;
+        case CONST_WayPoint_TYPE_CAMERA_TRIGGER:
+            wayPointStep.m_Sequence = item.s;
+            break;
+        case CONST_WayPoint_TYPE_CAMERA_CONTROL:
+            wayPointStep.m_Sequence = item.s;
+            break;
+        case CONST_WayPoint_TYPE_GUIDED:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.Enable = item.e;
+            break;
+        case CONST_WayPoint_TYPE_ChangeAlt:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.AscentDescentRate = item.r;
+            break;
+        case CONST_WayPoint_TYPE_CMissionAction_CONTINUE_AND_CHANGE_ALT:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.AscentorDescent = item.c;
+            wayPointStep.DesiredAltitude = item.a;
+            break;
+        case CONST_WayPoint_TYPE_CIRCLE:
+            wayPointStep.m_Sequence = item.s;
+            wayPointStep.Longitude = item.g;
+            wayPointStep.Latitude = item.a;
+            wayPointStep.Altitude = item.l;
+            if (item.hasOwnProperty('q')) {
+                wayPointStep.m_Header_Required = item.q;
+            } else {
+                wayPointStep.m_Header_Required = false;
+            }
+            if (item.hasOwnProperty('x')) {
+                wayPointStep.m_Xtrack_Location = item.x;
+            } else {
+                wayPointStep.m_Xtrack_Location = 0;
+            }
+            wayPointStep.m_Radius = item.r;
+            wayPointStep.m_Turns = item.n;
+            break;
+    }
+    return wayPointStep;
+}
+
+function reduceWayPoints(unit, msg) {
+    const p = msg.payload;
+    const isChunk = p.hasOwnProperty('i') ? p.i : WAYPOINT_NO_CHUNK;
+    const count = p.n;
+    const wps = [];
+    for (let i = 0; i < count; ++i) {
+        if (p[i] != null) {
+            wps.push(fn_decodeWaypointStep(p[i]));
+        }
+    }
+    // Return the decoded waypoints; runtime owns the cache + dispatch.
+    return { patches: [], events: [], waypoints: { wps, isChunk } };
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * TASK-02.2 — Per-unit chunked waypoint assembly cache.
  *
- * Replaces js_globals.v_waypointsCache. A waypoint download arrives as
+ * Replaces the global waypoint cache on js_globals. A waypoint download arrives as
  * 1..N chunks. This cache holds the in-progress array keyed by partyID,
  * and is cleared on last chunk, on a new download request, or on unit
  * removal.

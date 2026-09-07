@@ -28,9 +28,7 @@ import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
 
 
 import { mavlink20, MAVLink20Processor } from '../../js_mavlink_v2.js'
-const WAYPOINT_NO_CHUNK = 0;
-const WAYPOINT_CHUNK = 1;
-const WAYPOINT_LAST_CHUNK = 999;
+// WAYPOINT_NO_CHUNK/WAYPOINT_LAST_CHUNK moved to core/protocol/reduce.js.
 
 
 // Tasks Scope
@@ -44,7 +42,7 @@ const CONST_TASK_SCOPE_PARTYID = 3;
 
 class CAndruavClientParser {
     constructor() {
-        js_globals.v_waypointsCache = {};
+        // waypoint cache moved to js_waypointCache (services/waypoint/waypointCache.js).
         this.v_callbackListeners = {};
         this.fn_init();
         //this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
@@ -698,125 +696,8 @@ class CAndruavClientParser {
             }
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_WayPoints: {
-
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-
-                let v_isChunck = WAYPOINT_NO_CHUNK;
-                if (p_jmsg.hasOwnProperty("i")) { // message is INCOMPLETE
-                    v_isChunck = p_jmsg.i;
-                }
-                let numberOfRecords = p_jmsg.n;
-                let wayPoint = [];
-
-                if (v_isChunck !== WAYPOINT_NO_CHUNK) {
-                    if (js_globals.v_waypointsCache.hasOwnProperty(p_unit.getPartyID()) === false) {
-                        // ! due to disconnection or repeated request this array could be filled of an incomplete previous request.
-                        // ! this value will be reset each time load wp is called.
-                        js_globals.v_waypointsCache[p_unit.getPartyID()] = [];
-                    }
-
-                    wayPoint = js_globals.v_waypointsCache[p_unit.getPartyID()];
-                } else { // if this is a full message of the same unit then delete any possible old partial messages -cleaning up-.
-                    delete js_globals.v_waypointsCache[p_unit.getPartyID()];
-                }
-
-                for (let i = 0; i < numberOfRecords; ++i) {
-                    if (p_jmsg[i] !== null && p_jmsg[i] !== undefined) {
-                        let wayPointStep = {};
-                        wayPointStep.waypointType = p_jmsg[i].t;
-
-                        switch (wayPointStep.waypointType) {
-                            case js_andruavMessages.CONST_WayPoint_TYPE_WAYPOINTSTEP:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.Longitude = p_jmsg[i].g;
-                                wayPointStep.Latitude = p_jmsg[i].a;
-                                wayPointStep.Altitude = p_jmsg[i].l;
-                                wayPointStep.Heading = p_jmsg[i].h;
-                                wayPointStep.TimeToStay = p_jmsg[i].y;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_SPLINE:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.Longitude = p_jmsg[i].g;
-                                wayPointStep.Latitude = p_jmsg[i].a;
-                                wayPointStep.Altitude = p_jmsg[i].l;
-                                wayPointStep.TimeToStay = p_jmsg[i].y;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_TAKEOFF:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.Altitude = p_jmsg[i].l;
-                                wayPointStep.Pitch = p_jmsg[i].p;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_LANDING:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_RTL:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_TRIGGER:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                break;
-                            case js_andruavMessages.CONST_WayPoint_TYPE_CAMERA_CONTROL:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                break;
-                            case js_andruavMessages.CONST_WayPoint_TYPE_GUIDED:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.Enable = p_jmsg[i].e;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_ChangeAlt:
-                                wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.AscentDescentRate = p_jmsg[i].r;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_CMissionAction_CONTINUE_AND_CHANGE_ALT: wayPointStep.m_Sequence = p_jmsg[i].s;
-                                /**
-                                     * 0 = Neutral, command completes when within 5m of this command's altitude, 
-                                     * 1 = Climbing, command completes when at or above this command's altitude,
-                                     * 2 = Descending, command completes when at or below this command's altitude.
-                                     */
-                                wayPointStep.AscentorDescent = p_jmsg[i].c;
-                                wayPointStep.DesiredAltitude = p_jmsg[i].a;
-                                break;
-
-                            case js_andruavMessages.CONST_WayPoint_TYPE_CIRCLE: wayPointStep.m_Sequence = p_jmsg[i].s;
-                                wayPointStep.Longitude = p_jmsg[i].g;
-                                wayPointStep.Latitude = p_jmsg[i].a;
-                                wayPointStep.Altitude = p_jmsg[i].l;
-                                if (p_jmsg[i].hasOwnProperty("q")) {
-                                    wayPointStep.m_Header_Required = p_jmsg[i].q;
-                                } else {
-                                    wayPointStep.m_Header_Required = false;
-                                }
-                                if (p_jmsg[i].hasOwnProperty("x")) {
-                                    wayPointStep.m_Xtrack_Location = p_jmsg[i].x;
-                                } else {
-                                    wayPointStep.m_Xtrack_Location = 0;
-                                } wayPointStep.m_Radius = p_jmsg[i].r;
-                                wayPointStep.m_Turns = p_jmsg[i].n;
-                                break;
-
-                        }
-
-                        wayPoint.push(wayPointStep);
-                    }
-                }
-                if (v_isChunck === WAYPOINT_NO_CHUNK) { // old format message is not a chunk
-                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit: p_unit, wps: wayPoint });
-                } else if (v_isChunck === WAYPOINT_LAST_CHUNK) { // end of chunks
-                    js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit: p_unit, wps: wayPoint });
-                    delete js_globals.v_waypointsCache[p_unit.getPartyID()];
-                }
-            }
-                break;
+            // WayPoints message removed — migrated to core/protocol/reduce.js
+            // (reduceWayPoints) + runtime.js (chunk assembly via js_waypointCache).
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_NAV_INFO: {
                 p_jmsg = msg.msgPayload;

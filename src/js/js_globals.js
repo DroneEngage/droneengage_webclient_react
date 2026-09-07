@@ -12,7 +12,7 @@ class GLOBALS {
 
 		this.m_markGuided = null;
 
-		this.v_waypointsCache = {};
+		// waypoint cache moved to js_waypointCache (services/waypoint/waypointCache.js).
 
 		this.m_current_tab_status = 'unknown';
 		

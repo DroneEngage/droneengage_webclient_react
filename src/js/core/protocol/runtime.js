@@ -12,7 +12,7 @@
  */
 
 import { fn_decode } from './decode.js';
-import { fn_reduce, fn_isMigrated } from './reduce.js';
+import { fn_reduce, fn_isMigrated, WAYPOINT_NO_CHUNK, WAYPOINT_LAST_CHUNK } from './reduce.js';
 import { fn_effects } from './effects.js';
 import { fn_setByPath, fn_getByPath } from './path.js';
 import { COMMANDS } from './types.js';
@@ -25,6 +25,7 @@ import { js_globals } from '../../js_globals.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
+import { js_waypointCache } from '../../services/waypoint/waypointCache.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
          CONST_TYPE_AndruavMessage_ExternalGeoFence } from '../../protocol/messages/js_andruavMessages.js';
 
@@ -108,6 +109,25 @@ export function fn_handleFrame(p_frame, evt) {
                 continue;
             }
             js_eventEmitter.fn_dispatch(ev.name, ev.payload);
+        }
+    }
+
+    // WayPoints: chunked waypoint assembly. reduce returns the decoded
+    // { wps, isChunk }; runtime owns the cache and the dispatch decision.
+    // Full message dispatches immediately; chunked dispatches only on the
+    // last chunk; a new full message clears any stale partial cache.
+    if (result.waypoints) {
+        const { wps, isChunk } = result.waypoints;
+        if (isChunk === WAYPOINT_NO_CHUNK) {
+            js_waypointCache.fn_clear(unit.getPartyID());
+            js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit, wps });
+        } else {
+            const cached = js_waypointCache.fn_get(unit.getPartyID());
+            for (const wp of wps) cached.push(wp);
+            if (isChunk === WAYPOINT_LAST_CHUNK) {
+                js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit, wps: cached });
+                js_waypointCache.fn_clear(unit.getPartyID());
+            }
         }
     }
 

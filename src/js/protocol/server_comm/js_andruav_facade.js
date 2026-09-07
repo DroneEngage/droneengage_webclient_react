@@ -33,6 +33,7 @@ import * as js_andruav_parser from './js_andruav_parser.js'
 
 
 import { mavlink20 } from '../../js_mavlink_v2.js'
+import { js_waypointCache } from '../../services/waypoint/waypointCache.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
@@ -811,11 +812,9 @@ class CAndruavClientFacade {
             msg.C = js_andruavMessages.CONST_RemoteCommand_GET_WAY_POINTS;
         }
 
-        if (js_globals.v_waypointsCache.hasOwnProperty(p_andruavUnit.getPartyID()) === true) {
-            // ! due to disconnection or repeated request this array could be filled of an incomplete previous request.
-            // ! this value will be reset each time load wp is called.
-            delete js_globals.v_waypointsCache[p_andruavUnit.getPartyID()];
-        }
+        // ! due to disconnection or repeated request this array could be filled of an incomplete previous request.
+        // ! this value will be reset each time load wp is called.
+        js_waypointCache.fn_clear(p_andruavUnit.getPartyID());
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute, msg);
     };
 
