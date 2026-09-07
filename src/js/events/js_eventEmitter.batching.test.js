@@ -18,6 +18,7 @@
 import './js_eventEmitterConfig'; // side-effect: opts telemetry events into batching
 import { js_eventEmitter } from './js_eventEmitter';
 import { EVENTS as js_event } from './js_eventList';
+import { fn_videoStatsEvent } from './eventPayloads';
 
 // Minimal stand-in for a js_andruavUnit payload: the batched events all
 // dispatch the unit object, whose per-unit identity comes from getPartyID().
@@ -136,6 +137,42 @@ describe('js_eventEmitter per-event rAF batching', () => {
             consoleErr.mockRestore();
             js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated, listenerBad);
             js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated, listenerOk);
+        }
+    });
+
+    test('factory payload with partyID field coalesces per-unit (no track_id branch)', async () => {
+        // After TASK-03, fn_videoStatsEvent produces { partyID, unit, fps, rx,
+        // track_id }. _fn_extractUnitKey no longer has a track_id branch — it
+        // keys on partyID. Two different units' stats in the same frame must
+        // both survive.
+        const unitA = makeUnit('stats-A');
+        const unitB = makeUnit('stats-B');
+        const calls = [];
+        const listener = { id: 'listener-stats' };
+
+        js_eventEmitter.fn_subscribe(
+            js_event.EE_onWebRTC_Video_Statistics,
+            listener,
+            (_l, data) => calls.push(data.partyID)
+        );
+
+        try {
+            js_eventEmitter.fn_dispatch(
+                js_event.EE_onWebRTC_Video_Statistics,
+                fn_videoStatsEvent(unitA, 'track-1', { fps: 30, rx: 1000 })
+            );
+            js_eventEmitter.fn_dispatch(
+                js_event.EE_onWebRTC_Video_Statistics,
+                fn_videoStatsEvent(unitB, 'track-2', { fps: 24, rx: 2000 })
+            );
+
+            expect(calls).toEqual([]);
+            await nextFrame();
+
+            // Both units survive, keyed by partyID (not track_id).
+            expect(calls).toEqual(['stats-A', 'stats-B']);
+        } finally {
+            js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, listener);
         }
     });
 });

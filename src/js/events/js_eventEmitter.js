@@ -92,14 +92,14 @@ class CEventEmitter {
      * multiple units emitting the same event in one animation frame each
      * keep their latest payload instead of one overwriting the other.
      *
-     * Observed payload shapes (verified across js_main.js /
-     * js_andruav_parser.js / js_webrtcthin2.js / js_andruav_gamepad.js):
+     * Payload shapes after TASK-03 factory migration:
      *   - a unit object with getPartyID()           -> partyID
-     *   - a plain { unit, fps, rx, track_id } stats -> per-track key
-     *   - a plain object with a partyID field        -> partyID
+     *   - a factory payload with a partyID field    -> partyID
      *   - no payload (e.g. EE_GamePad_Axes_Updated)  -> '__default__'
+     * The old track_id / unit.getPartyID() branches were removed once
+     * fn_videoStatsEvent started carrying a top-level partyID.
      * @param {*} p_data - The payload passed to fn_dispatch.
-     * @returns {string} A stable key identifying the emitting unit/track.
+     * @returns {string} A stable key identifying the emitting unit.
      */
     _fn_extractUnitKey(p_data) {
         if (p_data == null) {
@@ -108,19 +108,8 @@ class CEventEmitter {
         if (typeof p_data.getPartyID === 'function') {
             return p_data.getPartyID();
         }
-        if (typeof p_data === 'object') {
-            // WebRTC video statistics: { unit, fps, rx, track_id }. A single
-            // unit can have several video tracks, so key by track_id to keep
-            // each track's latest stats in the same frame.
-            if (p_data.track_id != null) {
-                return `track:${p_data.track_id}`;
-            }
-            if (p_data.unit && typeof p_data.unit.getPartyID === 'function') {
-                return p_data.unit.getPartyID();
-            }
-            if (p_data.partyID != null) {
-                return String(p_data.partyID);
-            }
+        if (typeof p_data === 'object' && p_data.partyID != null) {
+            return String(p_data.partyID);
         }
         return '__default__';
     }

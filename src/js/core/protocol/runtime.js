@@ -21,6 +21,7 @@ import { fn_getOrCreateUnit } from '../../model/unitRegistry.js';
 import { notifyUnitFieldChanged } from '../../store/unitStore.js';
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
+import { fn_unitError, fn_waypointsEvent } from '../../events/eventPayloads.js';
 import { js_globals } from '../../js_globals.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
@@ -149,12 +150,12 @@ export function fn_handleFrame(p_frame, evt) {
         const { wps, isChunk } = result.waypoints;
         if (isChunk === WAYPOINT_NO_CHUNK) {
             js_waypointCache.fn_clear(unit.getPartyID());
-            js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit, wps });
+            js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, fn_waypointsEvent(unit, wps));
         } else {
             const cached = js_waypointCache.fn_get(unit.getPartyID());
             for (const wp of wps) cached.push(wp);
             if (isChunk === WAYPOINT_LAST_CHUNK) {
-                js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, { unit, wps: cached });
+                js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_WayPoints, fn_waypointsEvent(unit, cached));
                 js_waypointCache.fn_clear(unit.getPartyID());
             }
         }
@@ -272,9 +273,7 @@ function fn_executeOps(unit, ops) {
                 } else if (op.name === '__delayedVersionNotice') {
                     const payload = op.payload;
                     setTimeout(() => {
-                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, {
-                            unit: payload.unit,
-                            err: { notification_Type: 5, Description: payload.label } });
+                        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitError, fn_unitError(payload.unit, { notification_Type: 5, Description: payload.label }));
                     }, 1000);
                 } else {
                     js_eventEmitter.fn_dispatch(op.name, op.payload);
