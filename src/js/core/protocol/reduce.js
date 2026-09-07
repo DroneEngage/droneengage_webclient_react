@@ -386,7 +386,9 @@ function reduceAIRecognition(unit, msg) {
                 name: js_event.EE_onTrackingAIObjectListUpdate,
                 payload: unit,
                 method: 'm_tracker_ai.fn_addObjectClass',
-                methodArg: p.c,
+                // callUnitMethod spreads array args; fn_addObjectClass takes
+                // a single array (the class list), so wrap it.
+                methodArg: [p.c],
                 notifyFields: ['m_tracker_ai.m_object_list'],
             }],
         };
@@ -663,7 +665,9 @@ function reduceGPIOStatus(unit, msg) {
             name: js_event.EE_unitGPIOUpdated,
             payload: unit,
             method: 'm_GPIOs.addGPIO',
-            methodArg: msg.payload.s,
+            // callUnitMethod spreads array args; addGPIO takes a single
+            // array (the gpio list), so wrap it.
+            methodArg: [msg.payload.s],
         }],
     };
 }

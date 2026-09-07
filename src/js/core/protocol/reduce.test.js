@@ -266,7 +266,7 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const result = fn_reduce(makeUnit(), msg);
         expect(result.events[0].name).toBe(js_event.EE_onTrackingAIObjectListUpdate);
         expect(result.events[0].method).toBe('m_tracker_ai.fn_addObjectClass');
-        expect(result.events[0].methodArg).toEqual(['car', 'person']);
+        expect(result.events[0].methodArg).toEqual([['car', 'person']]);
     });
 
     test('AI_Recognition_STATUS: status sub-case', () => {
