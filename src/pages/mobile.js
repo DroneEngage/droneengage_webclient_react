@@ -18,35 +18,22 @@ import { js_globals } from '../js/js_globals.js';
 import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
+import { js_dialogs } from '../js/app/dialogService.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/js_andruavUnit.js';
 import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_showMap, toggleVideo } from '../js/js_main';
 import { fn_stopVideo } from '../js/mobile/js_mobile_commands.js';
 import { ClssCtrlMobileFlightControl } from '../components/flight_controllers/jsc_ctrl_mobile_flightControl.jsx';
 
-import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
-import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
 import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx';
-import ClssFpvDialog from '../components/dialogs/jsc_fpvDialog.jsx';
-import ClssAltitudeDialog from '../components/dialogs/jsc_altitudeDialog.jsx';
-import ClssSpeedDialog from '../components/dialogs/jsc_speedDialog.jsx';
-import ClssUnitInfoDialog from '../components/dialogs/jsc_unitInfoDialog.jsx';
-import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx';
-import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
-import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx';
-import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
-import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx';
-import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
-import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
-import ClssViewLinkGimbal from '../components/dialogs/jsc_viewLinkGimbalControl.jsx';
 import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_details.jsx';
 import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
-import ClssConfigGenerator from '../components/jsc_config_generator.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import ClssNewsDisplay from '../components/jsc_news_display.jsx';
 import ClssNewsWrite from '../components/jsc_news_write.jsx';
 import MobileLoginPanel from '../components/gadgets/mobile/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
+import DialogHost from '../components/DialogHost.jsx';
 import ClssMobileModuleDetailsPanel from '../components/gadgets/mobile/jsc_mobile_module_details_panel.jsx';
 import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
@@ -242,7 +229,7 @@ const Mobile = () => {
     if (!selectedUnit) return;
     js_globals.v_andruavFacade.API_requestCameraList(selectedUnit, (p_session) => {
       if (p_session && p_session.status === 'connected') {
-        js_eventEmitter.fn_dispatch(js_event.EE_displayCameraDlgForm, p_session);
+        js_dialogs.fn_showCamera(p_session);
       }
     });
   };
@@ -530,23 +517,9 @@ const Mobile = () => {
           and are not clipped on mobile screens. */}
       {ReactDOM.createPortal(
         <>
-          <ClssConfirmationDialog />
-          <ClssAlertDialog />
-          <ClssFpvDialog p_compact={true} />
-          <ClssAltitudeDialog p_compact={true} />
-          <ClssSpeedDialog p_compact={true} />
-          <ClssUnitInfoDialog />
-          <ClssMissionLoadDialog />
-          <ClssCameraDialog p_compact={true} />
-          <ClssStreamDialog p_compact={true} />
-          <ClssYawDialog />
-          <ClssLidarInfoDialog />
-          <ClssServoControl />
-          <ClssUnitParametersList />
-          <ClssViewLinkGimbal />
           <ClssModuleDetails />
-          <ClssConfigGenerator />
           <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
+          <DialogHost />
         </>,
         document.body
       )}

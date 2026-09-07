@@ -24,10 +24,7 @@ import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
-import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx'
-import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx'
-import ClssApplyAllDialog from '../components/dialogs/jsc_applyAllDialog.jsx'
-import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx'
+import DialogHost from '../components/DialogHost.jsx'
 import { fn_on_ready } from '../js/js_main'
 
 fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
@@ -70,10 +67,7 @@ const Planning = () => {
 						<ClssMain_Control_Buttons />
 					</div>
 
-					<ClssConfirmationDialog />
-					<ClssAlertDialog />
-					<ClssApplyAllDialog />
-					<ClssMissionLoadDialog />
+					<DialogHost />
 				</div>
 			</div>
 

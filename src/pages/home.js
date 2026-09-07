@@ -22,28 +22,14 @@ import ClssFooterControl from '../components/jsc_footer';
 import ClssGlobalSettings from '../components/Settings';
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx';
 import ClssAndruavUnitGCSList from '../components/unit_controls/jsc_unitControlGCSList.jsx';
-import ClssYawDialog from '../components/dialogs/jsc_yawDialogControl.jsx';
-import ClssLidarInfoDialog from '../components/dialogs/jsc_lidarInfoDialogControl.jsx';
-import ClssCameraDialog from '../components/dialogs/jsc_cameraDialogControl.jsx';
-import ClssStreamDialog from '../components/dialogs/jsc_streamDialogControl.jsx';
-import ClssViewLinkGimbal from '../components/dialogs/jsc_viewLinkGimbalControl.jsx';
 import ClssModuleDetails from '../components/gadgets/jsc_ctrl_unit_module_details.jsx';
 import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
-import ClssServoControl from '../components/dialogs/jsc_servoDialogControl.jsx';
 import ClssAndruavUnitListArray from '../components/unit_controls/jsc_unitControlArrayView.jsx';
-import ClssUnitParametersList from '../components/dialogs/jsc_unitParametersList.jsx';
-import ClssConfigGenerator from '../components/jsc_config_generator.jsx'
 import { ClssCVideoControl } from '../components/video/jsc_videoDisplayComponent.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import ClssNewsDisplay from '../components/jsc_news_display.jsx';
 import ClssNewsWrite from '../components/jsc_news_write.jsx';
-import ClssAltitudeDialog from '../components/dialogs/jsc_altitudeDialog.jsx';
-import ClssSpeedDialog from '../components/dialogs/jsc_speedDialog.jsx';
-import ClssUnitInfoDialog from '../components/dialogs/jsc_unitInfoDialog.jsx';
-import ClssFpvDialog from '../components/dialogs/jsc_fpvDialog.jsx';
-import ClssConfirmationDialog from '../components/dialogs/jsc_confirmationDialog.jsx';
-import ClssAlertDialog from '../components/dialogs/jsc_alertDialog.jsx';
-import ClssMissionLoadDialog from '../components/dialogs/jsc_missionLoadDialog.jsx';
+import DialogHost from '../components/DialogHost.jsx';
 import { fn_on_ready } from '../js/js_main';
 import { js_layout } from '../js/state/layoutStore.js';
 import { useLayout } from '../js/hooks/useLayout.js';
@@ -181,22 +167,8 @@ const Home = () => {
           </div>
 
           <ClssModuleDetails />
-          <ClssLidarInfoDialog />
-          <ClssYawDialog />
-          <ClssCameraDialog />
-          <ClssServoControl />
-          <ClssUnitParametersList />
-          <ClssConfigGenerator />
           <ClssGamePadControl p_index={js_globals.active_gamepad_index} />
-          <ClssStreamDialog />
-          <ClssViewLinkGimbal />
-          <ClssAltitudeDialog />
-          <ClssSpeedDialog />
-          <ClssUnitInfoDialog />
-          <ClssFpvDialog />
-          <ClssConfirmationDialog />
-          <ClssAlertDialog />
-          <ClssMissionLoadDialog />
+          <DialogHost />
         </div>
 
         <div id="row_2" className={profile.row2.visible ? `${profile.row2.col} ${isRow2Collapsed ? 'collapsed-right' : ''}` : 'd-none'}>

@@ -55,15 +55,12 @@ const EVENT_LIST = Object.freeze({
 			"EE_BattViewToggle",
 			"EE_EKFViewToggle",
 			"EE_adsbExchangeReady",
-			"EE_displayGeoForm",
 			"EE_onShapeCreated",
 			"EE_onShapeSelected",
 			"EE_onMissionReset",
 			"EE_onShapeEdited",
 			"EE_onShapeDeleted",
 			"EE_mapMissionUpdate",
-			"EE_displayServoForm",
-			"EE_displayConfigGenerator",
 			"EE_servoOutputUpdate",
 			"EE_DetectedTarget",
 			"EE_SearchableTarget",
@@ -71,7 +68,6 @@ const EVENT_LIST = Object.freeze({
 			"EE_cameraZoomChanged",
 			"EE_cameraFlashChanged",
 
-			"EE_displayParameters",
 			"EE_updateParameters",
 
 			"EE_requestGamePad",
@@ -86,24 +82,7 @@ const EVENT_LIST = Object.freeze({
 			"EE_GamePad_Control_Update",
 
 
-			"EE_displayStreamDlgForm",
-			"EE_hideStreamDlgForm",
-
-			"EE_displayViewLinkGimbal",
-			"EE_hideViewLinkGimbal",
 			"EE_viewLinkGimbalAttitude",
-
-			"EE_displayYawDlgForm",
-			"EE_displayCameraDlgForm",
-			"EE_hideCameraDlgForm",
-
-			"EE_displayAltitudeDialog",
-			"EE_displaySpeedDialog",
-			"EE_displayUnitInfoDialog",
-			"EE_displayFpvDialog",
-			"EE_displayConfirmationDialog",
-			"EE_displayAlertDialog",
-			"EE_displayApplyAllDialog",
 
 			"EE_onPlanToggle",
 			"EE_onAdvancedMode",
@@ -143,7 +122,6 @@ const EVENT_LIST = Object.freeze({
 		"EE_Mission_Loaded",
 		"EE_Mission_Saved",
 		"EE_Mission_Deleted",
-		"EE_displayMissionLoadDialog",
 		"EE_StorageServerState",
 		"EE_News_Loaded",
 		"EE_News_Saved",
