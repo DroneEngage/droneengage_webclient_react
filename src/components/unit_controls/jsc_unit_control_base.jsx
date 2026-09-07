@@ -3,6 +3,7 @@ import React from 'react';
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import { js_dialogs } from '../../js/app/dialogService.js'
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
@@ -101,12 +102,12 @@ export class ClssAndruavUnitBase extends React.Component {
     fn_displayParamsDialog(p_andruavUnit) {
         if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
 
-        js_eventEmitter.fn_dispatch(js_event.EE_displayParameters, p_andruavUnit);
+        js_dialogs.fn_showParameters(p_andruavUnit);
     }
 
     fn_displayLidarDialog(p_andruavUnit) {
         if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
 
-        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitLidarShow, p_andruavUnit);
+        js_dialogs.fn_showLidarInfo(p_andruavUnit);
     }
 }

@@ -40,6 +40,7 @@ import { js_layout } from './state/layoutStore.js'
 import { js_unitUiPrefs } from './state/unitUiPrefs.js'
 import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
 import { js_geoFenceRegistry } from './services/geo/geoFenceRegistry.js'
+import { js_dialogs } from './app/dialogService.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
@@ -421,7 +422,7 @@ function fn_handleKeyBoard() {
 
 
 export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCaption, p_style, p_noCaption) {
-	js_eventEmitter.fn_dispatch(js_event.EE_displayConfirmationDialog, {
+	js_dialogs.fn_showConfirmationDialog({
 		p_title: p_title,
 		p_message: p_message,
 		p_callback: p_callback,
@@ -432,7 +433,7 @@ export function fn_do_modal_confirmation(p_title, p_message, p_callback, p_yesCa
 }
 
 export function fn_do_modal_alert(p_title, p_message, p_callback, p_okCaption, p_style) {
-	js_eventEmitter.fn_dispatch(js_event.EE_displayAlertDialog, {
+	js_dialogs.fn_showAlertDialog({
 		p_title: p_title,
 		p_message: p_message,
 		p_callback: p_callback,
@@ -445,14 +446,14 @@ export function fn_do_modal_alert(p_title, p_message, p_callback, p_okCaption, p
 export function fn_do_modal_apply_all(p_mission) {
 	if (p_mission === null || p_mission === undefined) return;
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displayApplyAllDialog, {
+	js_dialogs.fn_showApplyAllDialog({
 		p_mission: p_mission
 	});
 }
 
 
 export function fn_do_modal_mission_load(p_missions, p_callback) {
-	js_eventEmitter.fn_dispatch(js_event.EE_displayMissionLoadDialog, {
+	js_dialogs.fn_showMissionLoadDialog({
 		p_missions: p_missions,
 		p_callback: p_callback
 	});
@@ -1503,44 +1504,7 @@ export function gui_doYAW(p_partyID, p_onApply) {
 		return;
 	}
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displayYawDlgForm, p_andruavUnit);
-
-	let ctrl_yaw = $('#modal_ctrl_yaw').find('#btnYaw');
-	ctrl_yaw.off("click");
-	ctrl_yaw.on('click', function () {
-		const target_angle = $('#yaw_knob').val();
-		if (typeof p_onApply === 'function') {
-			// In callback mode, pass only the target angle; direction will be computed per-unit by the caller
-			p_onApply(p_andruavUnit, target_angle);
-		}
-		else {
-			const target_angle_deg = target_angle;
-			const current_angle_deg = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-			let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
-			fn_doYAW(p_andruavUnit, target_angle, 0, !direction, false);
-		}
-	});
-
-	ctrl_yaw = $('#modal_ctrl_yaw').find('#btnResetYaw');
-	ctrl_yaw.off("click");
-	ctrl_yaw.on('click', function () {
-		$('#yaw_knob').val(0);
-		$('#yaw_knob').trigger('change');
-		if (typeof p_onApply === 'function') {
-			// -1 indicates reset-to-heading; caller will handle direction per-unit
-			p_onApply(p_andruavUnit, -1);
-		}
-		else {
-			fn_doYAW(p_andruavUnit, -1, 0, true, false);
-		}
-	});
-
-
-	$('#yaw_knob').val((js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1));
-	$('#yaw_knob').trigger('change');
-	$('#modal_ctrl_yaw').attr('data-original-title', 'YAW Control - ' + p_andruavUnit.m_unitName);
-	$('#modal_ctrl_yaw').attr('partyID', p_partyID);
-	js_common.showDialog("modal_ctrl_yaw", true);
+	js_dialogs.fn_showYaw(p_andruavUnit, p_onApply);
 }
 
 
@@ -1629,7 +1593,7 @@ export function fn_changeUnitInfo(p_andruavUnit) {
 
 	if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displayUnitInfoDialog, p_andruavUnit);
+	js_dialogs.fn_showUnitInfo(p_andruavUnit);
 }
 
 export function fn_changeAltitude(p_andruavUnit, p_onApply) {
@@ -1665,7 +1629,7 @@ export function fn_changeAltitude(p_andruavUnit, p_onApply) {
 		}
 	};
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displayAltitudeDialog, {
+	js_dialogs.fn_showAltitude({
 		p_andruavUnit: p_andruavUnit,
 		p_onApply: applyCallback
 	});
@@ -1715,7 +1679,7 @@ export function fn_changeSpeed(p_andruavUnit, p_initSpeed, p_onApply) {
 		}
 	};
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displaySpeedDialog, {
+	js_dialogs.fn_showSpeed({
 		p_andruavUnit: p_andruavUnit,
 		p_initValue: v_speed_val,
 		p_onApply: applyCallback,
@@ -1737,7 +1701,7 @@ export function fn_changeUDPPort(p_andruavUnit, init_pot) {
 		js_globals.v_andruavFacade.API_setUdpProxyClientPort(p_andruavUnit, parseInt(v_port_val));
 	};
 
-	js_eventEmitter.fn_dispatch(js_event.EE_displaySpeedDialog, {
+	js_dialogs.fn_showSpeed({
 		p_andruavUnit: p_andruavUnit,
 		p_initValue: v_port_val,
 		p_onApply: applyCallback,
@@ -1764,7 +1728,7 @@ function fn_retreiveCamerasList(p_andruavUnit) {
 				return;
 			}
 			else {
-				js_eventEmitter.fn_dispatch(js_event.EE_displayStreamDlgForm, p_session);
+				js_dialogs.fn_showStream(p_session);
 			}
 		}
 	}
@@ -1789,7 +1753,7 @@ export function toggleRecrodingVideo(p_andruavUnit) {
 				return;
 			}
 			else {
-				js_eventEmitter.fn_dispatch(js_event.EE_displayStreamDlgForm, p_session);
+				js_dialogs.fn_showStream(p_session);
 			}
 		}
 	}
@@ -2251,7 +2215,7 @@ function initMap() {
 		fn_gps_getLocation();
 	}
 	catch (e) {
-		console.log(e);
+		console.error('[initMap] failed — js_leafletmap.m_Map is', js_leafletmap.m_Map, e);
 	}
 
 };
@@ -3004,7 +2968,7 @@ function EVT_msgFromUnit_IMG(me, data) { //,p_andruavUnit, bin, description, lat
 		reader.readAsDataURL(blob);
 
 		const imageSrc = 'data:image/jpeg;base64,' + js_helpers.fn_arrayBufferToBase64(data.img);
-		js_eventEmitter.fn_dispatch(js_event.EE_displayFpvDialog, { image_src: imageSrc, party_id: data.v_unit ? data.v_unit.getPartyID() : null });
+		js_dialogs.fn_showFpv({ image_src: imageSrc, party_id: data.v_unit ? data.v_unit.getPartyID() : null });
 	}
 
 	const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
@@ -3739,6 +3703,8 @@ export function fn_on_ready() {
 		// Finds the nearest ADSB marker within a pixel threshold and opens its
 		// popup, replacing per-marker click listeners (which made each marker
 		// interactive and thus hit-testable on every mousemove).
+		// Guard: initMap() can fail (e.g. HMR re-init), leaving m_Map null.
+		if (js_leafletmap.m_Map) {
 		js_leafletmap.m_Map.on('click', function (e) {
 			const clickPt = e.containerPoint;
 			const list = (js_adsbUnit && js_adsbUnit.List) ? Object.values(js_adsbUnit.List) : [];
@@ -3755,6 +3721,7 @@ export function fn_on_ready() {
 				best.p_marker.openPopup();
 			}
 		});
+		} // end if (js_leafletmap.m_Map)
 		// Re-evaluate which ADSB aircraft are visible whenever the map view
 		// changes (pan or zoom) - not just when fresh ADSB data arrives - so
 		// aircraft scrolling into view reappear immediately (rather than

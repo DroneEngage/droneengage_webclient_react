@@ -8,6 +8,7 @@ import * as js_common from '../../js/js_common.js'
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
 
@@ -48,7 +49,7 @@ class ClssCtrlUnitMainBar extends React.Component {
   fn_toggleCamera(p_andruavUnit) {
     function fn_callback(p_session) {
       if (p_session?.status === 'connected') {
-        js_eventEmitter.fn_dispatch(js_event.EE_displayCameraDlgForm, p_session);
+        js_dialogs.fn_showCamera(p_session);
       }
     }
     js_globals.v_andruavFacade.API_requestCameraList(p_andruavUnit, fn_callback);

@@ -6,6 +6,7 @@ import FileSaver from 'file-saver';
 
 import { js_globals } from '../../js/js_globals.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import { js_dialogs } from '../../js/app/dialogService.js'
 import * as js_common from '../../js/js_common.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
@@ -462,7 +463,7 @@ export default class ClssCVideoScreen extends React.Component {
         }
         
         // Dispatch event to show gimbal control dialog
-        js_eventEmitter.fn_dispatch(js_event.EE_displayViewLinkGimbal, {
+        js_dialogs.fn_showViewLinkGimbal({
             m_unit: andruavUnit
         });
     }

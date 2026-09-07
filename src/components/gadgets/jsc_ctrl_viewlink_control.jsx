@@ -2,8 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 import { js_globals } from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter'
+import { js_dialogs } from '../../js/app/dialogService.js'
 
 
 /**
@@ -30,7 +29,7 @@ function ClssCtrlViewlinkControl({ id, className, p_unit, t }) {
 
         e.preventDefault();
 
-        js_eventEmitter.fn_dispatch(js_event.EE_displayViewLinkGimbal, {
+        js_dialogs.fn_showViewLinkGimbal({
             m_unit: andruavUnit
         });
     };

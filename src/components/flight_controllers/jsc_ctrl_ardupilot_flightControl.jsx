@@ -3,6 +3,7 @@ import { withTranslation } from 'react-i18next';
 import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
+import { js_dialogs } from '../../js/app/dialogService.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
 import * as js_helpers from '../../js/js_helpers'
@@ -785,7 +786,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_ServoControl(p_andruavUnit)
     {
-        js_eventEmitter.fn_dispatch (js_event.EE_displayServoForm, p_andruavUnit.getPartyID());
+        js_dialogs.fn_showServo(p_andruavUnit.getPartyID());
     }
 
     fn_changeAltitudeWrapper(v_andruavUnit) {

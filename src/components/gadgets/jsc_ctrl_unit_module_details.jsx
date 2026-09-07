@@ -3,8 +3,7 @@ import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_globals } from '../../js/js_globals.js';
-import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
+import { js_dialogs } from '../../js/app/dialogService.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {
@@ -70,7 +69,7 @@ export default class ClssModuleDetails extends React.Component {
     fn_configModule(p_module) {
 
         function fn_callback(p_params) {
-            js_eventEmitter.fn_dispatch(js_event.EE_displayConfigGenerator, { 'p_unit': p_params.p_unit, 'module': p_params.p_module });
+            js_dialogs.fn_showConfigGenerator({ 'p_unit': p_params.p_unit, 'module': p_params.p_module });
         }
         js_globals.v_andruavFacade.API_fetchConfigJSON(this.props.p_unit, p_module, fn_callback);
     }
