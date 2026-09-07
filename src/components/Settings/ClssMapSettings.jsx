@@ -275,6 +275,7 @@ class ClssMapSettings extends React.Component {
           <CPasswordReveal
             className="col-sm-8"
             id="txt_leaflet_access_token"
+            tokenMode
             value={leafletAccessToken}
             onChange={this.fn_handleLeafletAccessTokenChange}
           />
@@ -303,6 +304,7 @@ class ClssMapSettings extends React.Component {
           <CPasswordReveal
             className="col-sm-8"
             id="txt_mapbox_access_token"
+            tokenMode
             value={mapboxAccessToken}
             onChange={this.fn_handleMapboxAccessTokenChange}
           />
