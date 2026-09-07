@@ -15,6 +15,7 @@
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_helpers from '../js_helpers.js';
 import { js_globals } from '../js_globals.js';
+import { v_gamepad_button_types, v_total_gampad_buttons, STICK_LEFT_HORIZONTAL, STICK_LEFT_VERTICAL, STICK_RIGHT_HORIZONTAL, STICK_RIGHT_VERTICAL, STICK_MODE_MAPPING } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
@@ -46,7 +47,7 @@ class fn_Obj_padStatus {
         * the source physical GamePad.
         */
         this.p_button_routing = new Array(10).fill(0); // Preallocate and initialize
-        this.p_buttons = new Array(js_globals.v_total_gampad_buttons).fill().map(() => ({
+        this.p_buttons = new Array(v_total_gampad_buttons).fill().map(() => ({
             m_pressed: false,
             m_timestamp: 0,
             m_longPress: false
@@ -58,7 +59,7 @@ class fn_Obj_padStatus {
         this.p_other_channel_routing = [];
         this.p_axesChanged = false;
         this.p_axesOtherChanged = false;
-        this.p_button_type = new Array(js_globals.v_total_gampad_buttons).fill('on/off'); // Initialize button types
+        this.p_button_type = new Array(v_total_gampad_buttons).fill('on/off'); // Initialize button types
     }
 }
 
@@ -116,7 +117,7 @@ class CAndruavGamePad {
      */
     fn_updatePadConfig(padStatus) {
         if (!js_globals?.STICK_MODE_MAPPING) {
-            console.error("js_globals.STICK_MODE_MAPPING is not defined");
+            console.error("STICK_MODE_MAPPING is not defined");
             return false;
         }
 
@@ -144,7 +145,7 @@ class CAndruavGamePad {
 
         const { functionMappings, mode, axisReversed, buttonsFunction, buttonTypes } = json_config;
         padStatus.p_gamepad_mode_index = mode - 1;
-        const functions_per_mode = js_globals.STICK_MODE_MAPPING[padStatus.p_gamepad_mode_index];
+        const functions_per_mode = STICK_MODE_MAPPING[padStatus.p_gamepad_mode_index];
 
         padStatus.p_channel_axis_reverse = axisReversed?.length ? axisReversed : (new Array(10).fill(1));
         padStatus.p_button_routing = buttonsFunction || padStatus.p_button_routing;
@@ -296,17 +297,17 @@ class CAndruavGamePad {
         const channel_routing = c_padStatus.p_channel_routing;
         if (channel_routing.length === 0) return;
 
-        const functions_per_mode = js_globals.STICK_MODE_MAPPING[c_padStatus.p_gamepad_mode_index];
+        const functions_per_mode = STICK_MODE_MAPPING[c_padStatus.p_gamepad_mode_index];
 
         if (!p_gamepad.axes || channel_routing.some(val => val === undefined)) {
             return;
         }
 
         const mappings = [
-            { axis: js_globals.STICK_LEFT_HORIZONTAL, routing: functions_per_mode.RUD },
-            { axis: js_globals.STICK_LEFT_VERTICAL, routing: functions_per_mode.THR },
-            { axis: js_globals.STICK_RIGHT_HORIZONTAL, routing: functions_per_mode.ALE },
-            { axis: js_globals.STICK_RIGHT_VERTICAL, routing: functions_per_mode.ELE }
+            { axis: STICK_LEFT_HORIZONTAL, routing: functions_per_mode.RUD },
+            { axis: STICK_LEFT_VERTICAL, routing: functions_per_mode.THR },
+            { axis: STICK_RIGHT_HORIZONTAL, routing: functions_per_mode.ALE },
+            { axis: STICK_RIGHT_VERTICAL, routing: functions_per_mode.ELE }
         ];
 
         mappings.forEach(({ axis, routing }) => {
@@ -385,7 +386,7 @@ class CAndruavGamePad {
             const buttonType = c_padStatus.p_button_type[i] || 'on/off';
             button.m_assigned_function = c_padStatus.p_button_routing[i];
 
-            if (buttonType === js_globals.v_gamepad_button_types[0]) {
+            if (buttonType === v_gamepad_button_types[0]) {
                 // toggle: Toggles state on each press
                 if (c_pressed && !button.m_lastPressed) {
                     button.m_pressed = !button.m_pressed; // Toggle state
@@ -394,7 +395,7 @@ class CAndruavGamePad {
                     button_indicies.push(i);
                     js_common.fn_console_log(`Button ${i} toggled to ${button.m_pressed ? 'on' : 'off'}`);
                 }
-            } else if (buttonType === js_globals.v_gamepad_button_types[1]) {
+            } else if (buttonType === v_gamepad_button_types[1]) {
                 // press: On when pressed, off when released
                 if (button.m_pressed !== c_pressed) {
                     button.m_pressed = c_pressed;
@@ -403,7 +404,7 @@ class CAndruavGamePad {
                     button_indicies.push(i);
                     js_common.fn_console_log(`Button ${i} ${c_pressed ? 'pressed' : 'released'}`);
                 }
-            } else if (buttonType === js_globals.v_gamepad_button_types[2]) {
+            } else if (buttonType === v_gamepad_button_types[2]) {
                 // long on/off: Toggles state only after a long press
                 if (c_pressed && !button.m_lastPressed) {
                     button.m_timestamp = c_now; // Start timing the press

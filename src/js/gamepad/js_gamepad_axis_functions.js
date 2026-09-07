@@ -4,6 +4,7 @@ import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js'
 import * as js_common from '../js_common.js'
 
 import { js_globals } from '../js_globals.js';
+import { GP_EPSILON_CHANGE, GP_MIN_GAP_FAST_MS } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js'
 import { js_eventEmitter } from '../events/js_eventEmitter.js'
 
@@ -89,8 +90,8 @@ class CGamePadAxisFunctions {
 
         // Iterate over channel routing and execute corresponding action
         const now = Date.now();
-        const epsilon = js_globals.GP_EPSILON_CHANGE;
-        const minGap = js_globals.GP_MIN_GAP_FAST_MS;
+        const epsilon = GP_EPSILON_CHANGE;
+        const minGap = GP_MIN_GAP_FAST_MS;
 
         other_channel_routing.forEach((item) => {
             if (!item || !item.key) {

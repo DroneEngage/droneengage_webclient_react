@@ -16,6 +16,7 @@
 
 /*jshint esversion: 6 */
 import { js_globals } from '../../js_globals.js';
+import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
@@ -110,8 +111,8 @@ class CAndruavClientFacade {
         if (axes === null || axes === undefined) return;
 
         const now = Date.now();
-        const epsilon = js_globals.GP_EPSILON_CHANGE;
-        const heartbeat = js_globals.GP_HEARTBEAT_MS;
+        const epsilon = GP_EPSILON_CHANGE;
+        const heartbeat = GP_HEARTBEAT_MS;
 
         let shouldSend = false;
         let reason = 'initial';
@@ -1588,8 +1589,8 @@ class CAndruavClientFacade {
         p_me.v_axes = c_controller.p_unified_virtual_axis;
 
         const now = Date.now();
-        const sudden = js_globals.GP_SUDDEN_CHANGE;
-        const minGap = js_globals.GP_MIN_GAP_FAST_MS;
+        const sudden = GP_SUDDEN_CHANGE;
+        const minGap = GP_MIN_GAP_FAST_MS;
 
         let isSudden = false;
         if (p_me.lastSentAxes !== null) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { js_globals } from '../../js/js_globals.js';
+import { v_gamepad_function_array, v_gamepad_button_function_array, v_gamepad_configuration, v_gamepad_button_types, STICK_MODE_RUD, STICK_MODE_ELE, STICK_MODE_ALE, STICK_MODE_THR } from '../../js/config/gamepadMap.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import { js_speak } from '../../js/js_speak.js';
@@ -46,7 +47,7 @@ export default class ClssGamepadTester extends React.Component {
   loadSavedConfigurations = () => {
     const updatedConfigs = { ...this.state.configPreferences };
 
-    js_globals.v_gamepad_configuration.forEach(config => {
+    v_gamepad_configuration.forEach(config => {
       const savedConfig = js_localStorage.fn_getGamePadConfig(config);
       if (savedConfig) {
         updatedConfigs[config] = JSON.parse(savedConfig);
@@ -64,12 +65,12 @@ export default class ClssGamepadTester extends React.Component {
     });
   };
 
-  isItemExist = (array, required = [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE, js_globals.STICK_MODE_THR]) => {
+  isItemExist = (array, required = [STICK_MODE_RUD, STICK_MODE_ELE, STICK_MODE_ALE, STICK_MODE_THR]) => {
     return required.every(val => array.includes(val));
   };
 
   onDataChanged = () => {
-    const valid_axis = this.isItemExist(this.state.axisFunctions, [js_globals.STICK_MODE_RUD, js_globals.STICK_MODE_ELE, js_globals.STICK_MODE_ALE, js_globals.STICK_MODE_THR]);
+    const valid_axis = this.isItemExist(this.state.axisFunctions, [STICK_MODE_RUD, STICK_MODE_ELE, STICK_MODE_ALE, STICK_MODE_THR]);
     if (valid_axis) {
       this.txtSaveRef.current.className = css_to_save;
       this.m_invalid_settings = false;
@@ -151,15 +152,15 @@ export default class ClssGamepadTester extends React.Component {
       const firstGamepad = connectedGamepads[0];
       const newAxisFunctions = new Array(firstGamepad.axes.length).fill('undefined');
       const newButtonFunctions = new Array(firstGamepad.buttons.length).fill('undefined');
-      const newButtonTypes = new Array(firstGamepad.buttons.length).fill(js_globals.v_gamepad_button_types[0]);
+      const newButtonTypes = new Array(firstGamepad.buttons.length).fill(v_gamepad_button_types[0]);
       const { selectedConfig, configPreferences } = this.state;
       const currentConfig = configPreferences[selectedConfig].functionMappings;
       const axisReversed = configPreferences[selectedConfig].axisReversed || [];
       const buttonTypes = configPreferences[selectedConfig].buttonTypes || [];
 
       Object.entries(currentConfig).forEach(([functionName, mapping]) => {
-        const isAxisFunction = js_globals.v_gamepad_function_array.includes(functionName);
-        const isButtonFunction = js_globals.v_gamepad_button_function_array.includes(functionName);
+        const isAxisFunction = v_gamepad_function_array.includes(functionName);
+        const isButtonFunction = v_gamepad_button_function_array.includes(functionName);
         if (isAxisFunction && mapping.type === 'axis') {
           newAxisFunctions[mapping.index] = functionName;
         } else if (isButtonFunction && mapping.type === 'button') {
@@ -252,7 +253,7 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   fn_assignFunctionToAxis = (axisIndex, functionName) => {
-    const functionIndex = js_globals.v_gamepad_function_array.indexOf(functionName);
+    const functionIndex = v_gamepad_function_array.indexOf(functionName);
     if (functionIndex === -1 && functionName !== 'undefined') return;
 
     this.setState(prevState => {
@@ -287,7 +288,7 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   fn_assignFunctionToButton = (buttonIndex, functionName) => {
-    const functionIndex = js_globals.v_gamepad_button_function_array.indexOf(functionName);
+    const functionIndex = v_gamepad_button_function_array.indexOf(functionName);
     if (functionIndex === -1 && functionName !== 'undefined') return;
 
     this.setState(prevState => {
@@ -325,7 +326,7 @@ export default class ClssGamepadTester extends React.Component {
   };
 
   fn_assignButtonType = (buttonIndex, buttonType) => {
-    if (!js_globals.v_gamepad_button_types.includes(buttonType)) return;
+    if (!v_gamepad_button_types.includes(buttonType)) return;
 
     this.setState(prevState => {
       const newConfigPreferences = { ...prevState.configPreferences };
@@ -388,7 +389,7 @@ export default class ClssGamepadTester extends React.Component {
               onChange={this.handleConfigChange}
               className="ms-3 form-control-sm "
             >
-              {js_globals.v_gamepad_configuration.map((config, idx) => (
+              {v_gamepad_configuration.map((config, idx) => (
                 <option key={idx} value={config}>
                   {config}
                 </option>
@@ -471,7 +472,7 @@ export default class ClssGamepadTester extends React.Component {
                         onChange={(e) => this.fn_assignFunctionToAxis(i, e.target.value)}
                         className={`form-control h-75 ${axisFunctions[i] === 'undefined' ? '' : !this.m_invalid_settings ? 'bg-success txt-theme-aware' : 'bg-warning text-dark'} w-75`}
                       >
-                        {js_globals.v_gamepad_function_array.map((func, idx) => (
+                        {v_gamepad_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
                             {func}
                           </option>
@@ -513,7 +514,7 @@ export default class ClssGamepadTester extends React.Component {
                         onChange={(e) => this.fn_assignFunctionToButton(i, e.target.value)}
                         className={`form-control h-75 ${buttonFunctions[i] === 'undefined' ? '' : 'bg-success txt-theme-aware'} w-50`}
                       >
-                        {js_globals.v_gamepad_button_function_array.map((func, idx) => (
+                        {v_gamepad_button_function_array.map((func, idx) => (
                           <option key={idx} value={func}>
                             {func}
                           </option>
@@ -521,11 +522,11 @@ export default class ClssGamepadTester extends React.Component {
                       </select>
                       <select
                         id={`2value`}
-                        value={buttonTypes[i] || js_globals.v_gamepad_button_types[0]}
+                        value={buttonTypes[i] || v_gamepad_button_types[0]}
                         onChange={(e) => this.fn_assignButtonType(i, e.target.value)}
                         className="form-control h-75 ms-2 bg-primary txt-theme-aware w-25"
                       >
-                        {js_globals.v_gamepad_button_types.map((type, idx) => (
+                        {v_gamepad_button_types.map((type, idx) => (
                           <option key={idx} value={type}>
                             {type}
                           </option>

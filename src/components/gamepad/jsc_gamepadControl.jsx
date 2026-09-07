@@ -3,6 +3,7 @@ import React    from 'react';
 
 
 import {js_globals} from '../../js/js_globals.js';
+import { STICK_MODE_MAPPING, STICK_MODE_MAPPING_NAMES } from '../../js/config/gamepadMap.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
@@ -64,11 +65,11 @@ class ClssGamePadAxesControl extends React.Component {
 
         const other_channel_routing = c_padStatus.p_other_channel_routing;
         const c_mode = c_padStatus.p_gamepad_mode_index;
-        const v_axis = [js_globals.STICK_MODE_MAPPING[c_mode].RUD,
-                        js_globals.STICK_MODE_MAPPING[c_mode].THR,
-                        js_globals.STICK_MODE_MAPPING[c_mode].ALE,
-                        js_globals.STICK_MODE_MAPPING[c_mode].ELE];  // Stick Left Horiz, Stick Left Vert, Stick Right Horiz, Stick Right Vert
-        const labels = js_globals.STICK_MODE_MAPPING_NAMES[c_mode]
+        const v_axis = [STICK_MODE_MAPPING[c_mode].RUD,
+                        STICK_MODE_MAPPING[c_mode].THR,
+                        STICK_MODE_MAPPING[c_mode].ALE,
+                        STICK_MODE_MAPPING[c_mode].ELE];  // Stick Left Horiz, Stick Left Vert, Stick Right Horiz, Stick Right Vert
+        const labels = STICK_MODE_MAPPING_NAMES[c_mode]
         const c_unified_virtual_axis = c_padStatus.p_unified_virtual_axis;
 
         const me = this;

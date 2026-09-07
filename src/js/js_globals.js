@@ -54,54 +54,9 @@ class GLOBALS {
 		this.v_enable_wind = false;          // wind arrow for selected unit (toggled in Preferences)
 		this.v_gamePadMode = 2;
 
-		// GamePad Functions Assignment
-		this.v_gamepad_function_array = ["undefined", "THR", "ALE", "RUD", "ELE", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
-		this.v_gamepad_button_function_array = ["undefined", "ARM", "RTL", "Land", "Auto", "Brake", "Loiter", "Guided", "TGT", "SRV9", "SRV10", "SRV11", "SRV12", "SRV13", "SRV14", "SRV15", "SRV16"];
-		this.v_gamepad_configuration = ["1", "2", "3", "4", "5"];
-		this.v_gamepad_button_types = ['on/off', 'press', 'long on/off'];
+		// GamePad mapping tables moved to src/js/config/gamepadMap.js
 		this.active_gamepad_index = 0;
-		this.v_total_gampad_buttons = 12;
 
-		this.STICK_LEFT_HORIZONTAL = 0;
-		this.STICK_LEFT_VERTICAL = 1;
-		this.STICK_RIGHT_HORIZONTAL = 2;
-		this.STICK_RIGHT_VERTICAL = 3;
-
-		this.STICK_MODE_RUD = "RUD";
-		this.STICK_MODE_ELE = "ELE";
-		this.STICK_MODE_ALE = "ALE";
-		this.STICK_MODE_THR = "THR";
-		this.STICK_MODE_AX1 = "AX1";
-		this.STICK_MODE_AX2 = "AX2";
-
-		this.STICK_MODE_MAPPING =
-			[
-				{ "RUD": 0, "ELE": 1, "ALE": 2, "THR": 3, "AX1": 4, "AX2": 5 },		// MODE 1
-				{ "RUD": 0, "THR": 1, "ALE": 2, "ELE": 3, "AX1": 4, "AX2": 5 },    	// MODE 2
-				{ "ALE": 0, "ELE": 1, "RUD": 2, "THR": 3, "AX1": 4, "AX2": 5 },		// MODE 3
-				{ "ALE": 0, "THR": 1, "RUD": 2, "ELE": 3, "AX1": 4, "AX2": 5 }		// MODE 4
-
-			];
-
-		this.STICK_MODE_MAPPING_NAMES =
-			[
-				["RUD", "ELE", "ALE", "THR", "AX1", "AX2"],    	// MODE 1
-				["RUD", "THR", "ALE", "ELE", "AX1", "AX2"],		// MODE 2
-				["ALE", "ELE", "RUD", "THR", "AX1", "AX2"],		// MODE 3
-				["ALE", "THR", "RUD", "ELE", "AX1", "AX2"]		// MODE 4
-
-			];
-
-		this.BUTTON_FUNTION_UNUSED = 0;
-		this.BUTTON_FUNTION_ARM = 1;
-		this.BUTTON_FUNTION_RTL = 2;
-		this.BUTTON_FUNTION_LAND = 3;
-		this.GP_EPSILON_CHANGE = 0.02;
-		this.GP_SUDDEN_CHANGE = 0.20;
-		this.GP_MIN_GAP_FAST_MS = 80;
-		this.GP_HEARTBEAT_MS = 2500;
-
-		
 		// Mission File Extension
 		this.v_mission_file_extension = '.de';
 
