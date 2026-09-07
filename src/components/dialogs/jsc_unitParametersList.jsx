@@ -10,6 +10,7 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { fn_do_modal_confirmation, fn_do_modal_alert, fn_helpPage } from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService, js_dialogs } from '../../js/app/dialogService.js';
 
 class ClssParameterItem extends React.Component {
     constructor() {
@@ -47,7 +48,7 @@ class ClssParameterItem extends React.Component {
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (!p_approved) return;
             js_globals.v_andruavFacade.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
-            js_eventEmitter.fn_dispatch(js_event.EE_displayParameters, me.props.prop_unit);
+            js_dialogs.fn_showParameters(me.props.prop_unit);
         }, "YES");
     }
 
@@ -138,17 +139,16 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         this.modalRef = React.createRef();
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayParameters, this, this.fn_displayForm);
         js_eventEmitter.fn_subscribe(js_event.EE_updateParameters, this, this.fn_updateForm);
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayForm(this, this.props.dialogProps?.unit);
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayParameters, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_updateParameters, this);
         if (this.modalRef.current) {
             this.modalRef.current.style.display = 'none';
@@ -185,12 +185,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
     }
 
     fn_closeDialog() {
-        this.m_close = true;
-        this.modalRef.current.style.opacity = '';
-        this.modalRef.current.style.display = 'none';
-        if (this.state.p_unit) {
-            this.setState({ p_unit: null });
-        }
+        fn_closeDialogService();
     }
 
     fn_getCurrentPartyID() {

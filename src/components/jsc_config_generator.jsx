@@ -12,8 +12,6 @@ import { withTranslation } from 'react-i18next';
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages'
 import { js_globals } from '../js/js_globals.js';
-import { EVENTS as js_event } from '../js/events/js_eventList.js'
-import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { fn_do_modal_alert, fn_do_modal_confirmation } from '../js/js_main.js';
 import {
   buildInitialValues,
@@ -26,10 +24,11 @@ import {
   handleSave,
   setNested,
 } from '../js/helpers/js_form_utils.js';
+import { fn_closeDialog as fn_closeDialogService } from '../js/app/dialogService.js';
 
 /**
  * ClssConfigGenerator generates a form based on a JSON configuration loaded from a file.
- * It is triggered by the EE_displayConfigGenerator event with {p_unit, module}.
+ * It is triggered by the dialogService fn_showConfigGenerator with {p_unit, module}.
  */
 class ClssConfigGenerator extends React.Component {
   /**
@@ -65,18 +64,15 @@ class ClssConfigGenerator extends React.Component {
     this.handleAddArrayItem = this.handleAddArrayItem.bind(this);
     this.handleRemoveArrayItem = this.handleRemoveArrayItem.bind(this);
     this.fn_shutdownModule = this.fn_shutdownModule.bind(this);
-
-    // Subscribe to event
-    js_eventEmitter.fn_subscribe(js_event.EE_displayConfigGenerator, this, this.fn_displayForm);
   }
 
   componentDidMount () {
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayForm(this, this.props.dialogProps);
   }
 
     
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe(js_event.EE_displayConfigGenerator, this);
   }
 
   /**
@@ -595,7 +591,7 @@ class ClssConfigGenerator extends React.Component {
 
 
   fn_close() {
-    this.setState({ visible: false });
+    fn_closeDialogService();
   }
 
   render() {

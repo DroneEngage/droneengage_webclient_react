@@ -10,6 +10,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 
 class ClssStreamChannel extends React.Component {
 
@@ -160,23 +161,18 @@ export default class ClssStreamDialog extends ClssDialogBase
         
         this.modal_ctrl_stream_dlg  = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayStreamDlgForm,this, this.fn_displayDialog);
-        js_eventEmitter.fn_subscribe(js_event.EE_hideStreamDlgForm,this, this.fn_closeDialog);
-
-        
     }
 
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayStreamDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_hideStreamDlgForm,this);
-    } 
+    }
 
     componentDidMount () {
         this.modalRef = this.modal_ctrl_stream_dlg;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps?.session);
     }
 
     fn_displayDialog (p_me, p_session)
@@ -219,6 +215,7 @@ export default class ClssStreamDialog extends ClssDialogBase
         {
             this.state.p_session = null;
         }
+        fn_closeDialogService();
     }
 
 

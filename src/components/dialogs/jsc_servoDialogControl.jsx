@@ -7,6 +7,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {fn_helpPage} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 
 
 class ClssServoUnit extends React.Component {
@@ -210,7 +211,6 @@ export default class ClssServoControl extends ClssDialogBase {
         
 
         js_eventEmitter.fn_subscribe(js_event.EE_servoOutputUpdate, this, this.fn_updateData);
-        js_eventEmitter.fn_subscribe(js_event.EE_displayServoForm, this, this.fn_displayForm);
     }
 
 
@@ -235,12 +235,13 @@ export default class ClssServoControl extends ClssDialogBase {
 
     componentWillUnmount() {
         js_eventEmitter.fn_unsubscribe(js_event.EE_servoOutputUpdate, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayServoForm, this);
     }
 
     componentDidMount() {
         this.modalRef = this.modal_ctrl_srv;
         super.componentDidMount();
+
+        if (this.props.dialogProps) this.fn_displayForm(this, this.props.dialogProps?.partyID);
 
         if (this.modal_ctrl_srv.current) {
             this.modal_ctrl_srv.current.style.display = 'none';
@@ -255,6 +256,10 @@ export default class ClssServoControl extends ClssDialogBase {
                 }
             };
         }
+    }
+
+    fn_closeDialog() {
+        fn_closeDialogService();
     }
 
     render() {

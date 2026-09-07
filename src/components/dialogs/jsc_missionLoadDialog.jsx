@@ -1,9 +1,8 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { js_globals } from '../../js/js_globals.js';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 
 class ClssMissionLoadDialog extends ClssModalDialogBase {
@@ -19,17 +18,15 @@ class ClssMissionLoadDialog extends ClssModalDialogBase {
         this.p_deleteCallback = null;
         this.m_flag_mounted = false;
         this.key = Math.random().toString();
-
-        js_eventEmitter.fn_subscribe(js_event.EE_displayMissionLoadDialog, this, this.fn_displayDialog);
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps);
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayMissionLoadDialog, this);
         if (this.modalRef.current) {
             this.modalRef.current.style.display = 'none';
         }
@@ -50,7 +47,7 @@ class ClssMissionLoadDialog extends ClssModalDialogBase {
     }
 
     fn_closeDialog() {
-        this.setState({ is_open: false });
+        fn_closeDialogService();
     }
 
     fn_onSelect(missionId) {

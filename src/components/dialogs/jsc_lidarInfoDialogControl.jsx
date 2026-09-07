@@ -3,11 +3,9 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
-
 import {ClssCtrlLidarDevice} from '../gadgets/jsc_ctrl_lidar_device.jsx'
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 
 export default class ClssLidarInfoDialog extends ClssDialogBase
 {
@@ -25,8 +23,8 @@ export default class ClssLidarInfoDialog extends ClssDialogBase
         this.rotation_ticks = 0;
 
         this.modal_ctrl_lidar_info = React.createRef();
+
         
-        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitLidarShow,this, this.fn_displayDialog);
         
         
     
@@ -36,12 +34,12 @@ export default class ClssLidarInfoDialog extends ClssDialogBase
         this.modalRef = this.modal_ctrl_lidar_info;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps?.unit);
     }
 
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitLidarShow,this);
     } 
 
 
@@ -82,8 +80,7 @@ export default class ClssLidarInfoDialog extends ClssDialogBase
 
     fn_closeDialog()
     {
-	    this.modal_ctrl_lidar_info.current.style.opacity = '';
-        this.modal_ctrl_lidar_info.current.style.display = 'none';
+        fn_closeDialogService();
     }
 
 

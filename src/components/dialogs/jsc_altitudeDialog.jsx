@@ -1,10 +1,9 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { js_globals } from '../../js/js_globals.js';
 import { CONST_METER_TO_FEET } from '../../js/js_helpers.js';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 
 class ClssAltitudeDialog extends ClssModalDialogBase {
@@ -21,17 +20,15 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
         this.key = Math.random().toString();
         this.modalRef = React.createRef();
         this.altitudeInputRef = React.createRef();
-
-        js_eventEmitter.fn_subscribe(js_event.EE_displayAltitudeDialog, this, this.fn_displayDialog);
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps);
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayAltitudeDialog, this);
         if (this.modalRef.current) {
             this.modalRef.current.style.display = 'none';
         }
@@ -73,6 +70,7 @@ class ClssAltitudeDialog extends ClssModalDialogBase {
 
     fn_closeDialog() {
         this.setState({ is_open: false, p_andruavUnit: null });
+        fn_closeDialogService();
     }
 
     fn_getCurrentPartyID() {

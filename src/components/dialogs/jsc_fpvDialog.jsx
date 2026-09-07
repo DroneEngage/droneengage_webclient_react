@@ -4,9 +4,8 @@ import React from 'react';
 import Draggable from 'react-draggable';
 import { withTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import * as js_common from '../../js/js_common.js';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import { js_globals } from '../../js/js_globals.js';
 import { fn_saveData } from '../../js/js_helpers.js';
 
@@ -51,18 +50,16 @@ class ClssFpvDialog extends ClssDialogBase {
         this.modal_ctrl_fpv = React.createRef();
         this.bodyRef = React.createRef();
         this.imgRef = React.createRef();
-
-        js_eventEmitter.fn_subscribe(js_event.EE_displayFpvDialog, this, this.fn_displayDialog);
     }
 
     componentDidMount() {
         this.modalRef = this.modal_ctrl_fpv;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps);
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayFpvDialog, this);
         if (this.modal_ctrl_fpv.current) {
             this.modal_ctrl_fpv.current.style.display = 'none';
         }
@@ -103,6 +100,7 @@ class ClssFpvDialog extends ClssDialogBase {
             this.modal_ctrl_fpv.current.style.display = 'none';
         }
         this.setState({ m_visible: false });
+        fn_closeDialogService();
     }
 
     fn_onSave() {

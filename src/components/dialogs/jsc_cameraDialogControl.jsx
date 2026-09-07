@@ -5,13 +5,12 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import {js_globals} from '../../js/js_globals.js';
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import * as js_common from '../../js/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService, js_dialogs } from '../../js/app/dialogService.js';
 
 class ClssCameraDevice extends React.Component {
 
@@ -35,7 +34,7 @@ class ClssCameraDevice extends React.Component {
         js_globals.v_andruavFacade.API_SwitchCamera(this.props.prop_session.m_unit.getPartyID(), v_track.id);
 
         fn_VIDEO_login (this.props.prop_session, v_track.id);
-        js_eventEmitter.fn_dispatch (js_event.EE_hideStreamDlgForm);
+        js_dialogs.fn_hideStream();
     }
 
     fn_videoRecord(p_startRecord)
@@ -153,10 +152,7 @@ export default class ClssCameraDialog extends ClssDialogBase
         this.modal_ctrl_cam = React.createRef();
         this.txt_TotalImages = React.createRef();
         this.txt_ShootingInterval = React.createRef();
-        
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayCameraDlgForm,this, this.fn_displayDialog);
-        js_eventEmitter.fn_subscribe(js_event.EE_hideCameraDlgForm,this, this.fn_closeDialog);
     }
 
 
@@ -164,6 +160,7 @@ export default class ClssCameraDialog extends ClssDialogBase
         this.modalRef = this.modal_ctrl_cam;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps?.session);
 
         // Compact mode: the mobile sheet is not rendered until a session exists,
         // so the input refs are null at mount time. defaultValue on the inputs
@@ -179,9 +176,7 @@ export default class ClssCameraDialog extends ClssDialogBase
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayCameraDlgForm,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_hideCameraDlgForm,this);
-    } 
+    }
 
     
     fn_displayDialog (p_me, p_session)
@@ -262,6 +257,7 @@ export default class ClssCameraDialog extends ClssDialogBase
         {
             this.state.p_session = null;
         }
+        fn_closeDialogService();
     }
 
 

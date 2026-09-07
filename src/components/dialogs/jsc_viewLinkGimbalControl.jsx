@@ -12,6 +12,7 @@ import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import {
     VIEWLINK_CAMERA_ACTIVATE_EO,
@@ -64,8 +65,6 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         this.modal_ctrl_gimbal_dlg = React.createRef();
         this.joystick_ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayViewLinkGimbal, this, this.fn_displayDialog);
-        js_eventEmitter.fn_subscribe(js_event.EE_hideViewLinkGimbal, this, this.fn_closeDialog);
         js_eventEmitter.fn_subscribe(js_event.EE_viewLinkGimbalAttitude, this, this.fn_onGimbalAttitude);
 
 
@@ -73,8 +72,6 @@ class ClssViewLinkGimbal extends ClssDialogBase {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayViewLinkGimbal, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_hideViewLinkGimbal, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_viewLinkGimbalAttitude, this);
     }
 
@@ -82,6 +79,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         this.modalRef = this.modal_ctrl_gimbal_dlg;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps);
     }
 
     fn_displayDialog(p_me, p_session) {
@@ -120,6 +118,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
             irDigitalZoomLevel: 1.0,
             joystick_mode: 'location'
         });
+        fn_closeDialogService();
     }
 
     fn_getCurrentPartyID() {

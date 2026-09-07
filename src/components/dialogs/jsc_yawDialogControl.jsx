@@ -10,6 +10,7 @@ import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
+import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 
 export default class ClssYawDialog extends ClssDialogBase
 {
@@ -31,7 +32,6 @@ export default class ClssYawDialog extends ClssDialogBase
         this.m_actual_angle_deg = 0;
         this.m_selected_angle_deg = 0;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_displayYawDlgForm,this, this.fn_displayDialog);
         js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this, this.fn_onUnitNavUpdated);
         
     }
@@ -41,12 +41,12 @@ export default class ClssYawDialog extends ClssDialogBase
         this.modalRef = this.modal_ctrl_yaw;
         super.componentDidMount();
         this.m_flag_mounted = true;
+        if (this.props.dialogProps) this.fn_displayDialog(this, this.props.dialogProps?.unit);
     }
 
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_displayYawDlgForm,this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
     } 
 
@@ -56,15 +56,16 @@ export default class ClssYawDialog extends ClssDialogBase
         if (p_andruavUnit == null) {
 		    return;
 		}
-        
+
         p_me.p_andruavUnit = p_andruavUnit;
+        p_me.p_onApply = p_me.props.dialogProps?.onApply || null;
         p_me.m_actual_angle_deg = p_me.fn_getCurrentYawDeg(p_andruavUnit);
         p_me.m_selected_angle_deg = p_me.m_actual_angle_deg;
 
         if (p_me.m_flag_mounted === false)return ;
-        
+
         p_me.setState({'m_update': p_me.state.m_update +1});
-        
+
         p_me.modal_ctrl_yaw.current.style.display = 'block';
 		setTimeout(function () {
             p_me.fn_initKnob();
@@ -165,17 +166,30 @@ export default class ClssYawDialog extends ClssDialogBase
 
     fn_onYaw(e)
     {
-        const target_angle_deg = parseInt(this.yaw_knob.current.value);
-        const current_angle_deg = this.fn_getCurrentYawDeg(this.p_andruavUnit).toFixed(1);
-		let direction = js_helpers.isClockwiseAngle (current_angle_deg, target_angle_deg);
-		fn_doYAW(this.p_andruavUnit, $('#yaw_knob').val(), 0, !direction, false);
-			
+        const target_angle = parseInt(this.yaw_knob.current.value);
+        if (typeof this.p_onApply === 'function') {
+            // In callback mode, pass only the target angle; direction will be computed per-unit by the caller
+            this.p_onApply(this.p_andruavUnit, target_angle);
+        }
+        else {
+            const target_angle_deg = target_angle;
+            const current_angle_deg = this.fn_getCurrentYawDeg(this.p_andruavUnit).toFixed(1);
+            let direction = js_helpers.isClockwiseAngle(current_angle_deg, target_angle_deg);
+            fn_doYAW(this.p_andruavUnit, target_angle, 0, !direction, false);
+        }
     }
 
     fn_Reset()
     {
         this.m_selected_angle_deg = 0;
         this.fn_setKnobValue(0);
+        if (typeof this.p_onApply === 'function') {
+            // -1 indicates reset-to-heading; caller will handle direction per-unit
+            this.p_onApply(this.p_andruavUnit, -1);
+        }
+        else {
+            fn_doYAW(this.p_andruavUnit, -1, 0, true, false);
+        }
         if (this.m_flag_mounted === true)
         {
             this.setState({'m_update': this.state.m_update +1});
@@ -184,12 +198,7 @@ export default class ClssYawDialog extends ClssDialogBase
 
     fn_closeDialog()
     {
-	    this.modal_ctrl_yaw.current.style.opacity = '';
-        this.modal_ctrl_yaw.current.style.display = 'none';
-        if ((this.state !== null && this.state !== undefined) && (this.state.hasOwnProperty('p_session') === true))
-        {
-            this.state.p_session = null;            
-        }
+        fn_closeDialogService();
     }
 
 
