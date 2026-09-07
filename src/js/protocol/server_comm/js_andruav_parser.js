@@ -93,7 +93,7 @@ class CAndruavClientParser {
 
         this.m_lastparamatersUpdateTime = 0;
 
-        // m_andruavGeoFences removed — moved to js_geoFenceRegistry (services/geo/geoFenceRegistry.js).
+        // geofence registry moved to js_geoFenceRegistry (services/geo/geoFenceRegistry.js).
         this.videoFrameCount = 0;
         this.mavlinkProcessor = new MAVLink20Processor(null, 0, 0);
 
