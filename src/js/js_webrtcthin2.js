@@ -189,6 +189,20 @@ class AndruavStream {
 
     // Ensure the singleton instance is set
     AndruavStream.instance = this;
+
+    // Subscribe once to EE_andruavSignalling — replaces the old
+    // js_globals.v_andruavClient signalling injection.
+    this.fn_initSignalling();
+  }
+
+  // Subscribe once to the EE_andruavSignalling event. The event payload is
+  // { unit, signal }; this unwraps it and invokes the existing handler.
+  fn_initSignalling() {
+    if (this.m_signallingSubscribed) return;
+    js_eventEmitter.fn_subscribe(js_event.EE_andruavSignalling, this, (payload) => {
+      this.fn_handleSignalling(payload.unit, payload.signal);
+    });
+    this.m_signallingSubscribed = true;
   }
 
   /**
@@ -295,8 +309,8 @@ class AndruavStream {
    * @returns {CTalk} The CTalk instance for the initiated call.
    */
   joinStream(dialConfig) {
-    js_globals.v_andruavClient.EVT_andruavSignalling = this.EVT_andruavSignalling.bind(this);
-
+    // Signalling is now delivered via the EE_andruavSignalling event; the
+    // subscription is set up once in the constructor (fn_initSignalling).
     const conversationKey = dialConfig.targetVideoTrack ?? dialConfig.number;
     let talk = this.conversations[conversationKey];
 
@@ -374,7 +388,7 @@ class AndruavStream {
    * @param {object} andruavUnit - Information about the sending unit.
    * @param {object} p_signal - The signalling packet.
    */
-  async EVT_andruavSignalling(andruavUnit, p_signal) {
+  async fn_handleSignalling(andruavUnit, p_signal) {
     js_common.fn_console_log(`WEBRTC to WEB: ${JSON.stringify(p_signal)}`);
 
     this.debugCallback(p_signal);

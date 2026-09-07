@@ -33,6 +33,8 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
          CONST_TYPE_AndruavMessage_CameraList,
          CONST_TYPE_AndruavMessage_SOUND_LIST,
+         CONST_TYPE_AndruavMessage_CONFIG_STATUS,
+         CONST_TYPE_AndruavMessage_Signaling,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
@@ -672,6 +674,53 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const msg = fn_decode(raw, 1);
         const result = fn_reduce(makeUnit(), msg);
         expect(result.patches[0].value).toEqual([]);
+    });
+
+    // --- TASK-02.5: CONFIG_STATUS / Signaling ---
+
+    test('CONFIG_STATUS: R:true -> __configStatusReply with moduleKey + template', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_CONFIG_STATUS, 'u', {
+            R: true, k: 'video_stream', b: '<template>...</template>',
+        });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe('__configStatusReply');
+        expect(result.events[0].payload.unit).toBe(unit);
+        expect(result.events[0].payload.moduleKey).toBe('video_stream');
+        expect(result.events[0].payload.template).toBe('<template>...</template>');
+    });
+
+    test('CONFIG_STATUS: R absent -> no events', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_CONFIG_STATUS, 'u', { k: 'x', b: 'y' });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(0);
+    });
+
+    test('Signaling: wrapped (w) -> event signal is payload.w', () => {
+        const innerSignal = { channel: 'ch1', packet: { sdp: 'offer' } };
+        const raw = frame(CONST_TYPE_AndruavMessage_Signaling, 'u', { w: innerSignal });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_andruavSignalling);
+        expect(result.events[0].payload.unit).toBe(unit);
+        expect(result.events[0].payload.signal).toBe(innerSignal);
+    });
+
+    test('Signaling: bare payload -> event signal is the payload itself', () => {
+        const bareSignal = { channel: 'ch2', packet: { hangup: true } };
+        const raw = frame(CONST_TYPE_AndruavMessage_Signaling, 'u', bareSignal);
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events[0].payload.signal).toBe(bareSignal);
     });
 });
 

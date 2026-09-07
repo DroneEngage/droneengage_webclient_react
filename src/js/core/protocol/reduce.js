@@ -43,6 +43,8 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_SearchTargetList,
          CONST_TYPE_AndruavMessage_CameraList,
          CONST_TYPE_AndruavMessage_SOUND_LIST,
+         CONST_TYPE_AndruavMessage_CONFIG_STATUS,
+         CONST_TYPE_AndruavMessage_Signaling,
          CONST_TYPE_AndruavMessage_GeoFence,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
@@ -157,6 +159,10 @@ export function fn_reduce(unit, msg) {
             return reduceCameraList(unit, msg);
         case CONST_TYPE_AndruavMessage_SOUND_LIST:
             return reduceSoundList(unit, msg);
+        case CONST_TYPE_AndruavMessage_CONFIG_STATUS:
+            return reduceConfigStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_Signaling:
+            return reduceSignaling(unit, msg);
         default:
             return null;
     }
@@ -203,7 +209,9 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_SearchTargetList
         || type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation
         || type === CONST_TYPE_AndruavMessage_CameraList
-        || type === CONST_TYPE_AndruavMessage_SOUND_LIST;
+        || type === CONST_TYPE_AndruavMessage_SOUND_LIST
+        || type === CONST_TYPE_AndruavMessage_CONFIG_STATUS
+        || type === CONST_TYPE_AndruavMessage_Signaling;
 }
 
 // ---------------------------------------------------------------------------
@@ -1113,6 +1121,37 @@ function reduceSoundList(unit, msg) {
             session: { status: 'connected', m_unit: unit } } });
     }
     return { patches, events };
+}
+
+// ---------------------------------------------------------------------------
+// CONFIG_STATUS — request/reply for module config templates.
+//
+// The reply (R === true) needs the unit's module registry, which is an
+// impure runtime concern. The reducer returns a __configStatusReply
+// pseudo-event; runtime resolves the module, sets the template, and fires
+// the callback once via js_callbackRegistry.
+// ---------------------------------------------------------------------------
+function reduceConfigStatus(unit, msg) {
+    const p = msg.payload;
+    if (p.R !== true) return { patches: [], events: [] };
+    return {
+        patches: [],
+        events: [{ name: '__configStatusReply', payload: {
+            unit, moduleKey: p.k, template: p.b } }],
+    };
+}
+
+// Signaling — WebRTC SDP/ICE/hangup delivery. The signal is payload.w when
+// present (wrapped form), otherwise the bare payload. Dispatch
+// EE_andruavSignalling with { unit, signal }; js_webrtcthin2 subscribes and
+// invokes the existing handler.
+function reduceSignaling(unit, msg) {
+    const p = msg.payload;
+    const signal = (p && p.hasOwnProperty('w')) ? p.w : p;
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_andruavSignalling, payload: { unit, signal } }],
+    };
 }
 
 /**

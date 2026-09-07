@@ -125,6 +125,8 @@ const EVENT_LIST = Object.freeze({
 
 			"EE_onSoundListUpdated",
 
+			"EE_andruavSignalling",
+
 			"EE_onMissionItemToggle",
 			"EE_onTrackingStatusChanged",
 			"EE_onTrackingAIStatusChanged",

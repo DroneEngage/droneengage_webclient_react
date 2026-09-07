@@ -30,7 +30,8 @@ import { js_callbackRegistry } from '../../protocol/callbackRegistry.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_SearchTargetList,
-         CONST_TYPE_AndruavMessage_TargetTrackingtLocation } from '../../protocol/messages/js_andruavMessages.js';
+         CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
+         CONST_TYPE_AndruavMessage_CONFIG_STATUS } from '../../protocol/messages/js_andruavMessages.js';
 
 /**
  * Handle one inbound frame. Returns true if the message type was migrated
@@ -125,6 +126,10 @@ export function fn_handleFrame(p_frame, evt) {
                 js_callbackRegistry.fn_fireOnce(ev.payload.messageType, ev.payload.session);
                 continue;
             }
+            if (ev.name === '__configStatusReply') {
+                fn_handleConfigStatusReply(ev.payload);
+                continue;
+            }
             js_eventEmitter.fn_dispatch(ev.name, ev.payload);
         }
     }
@@ -191,6 +196,16 @@ function callUnitMethod(unit, methodPath, arg) {
         if (Array.isArray(arg)) parent[methodName](...arg);
         else parent[methodName](arg);
     }
+}
+
+// CONFIG_STATUS reply: resolve the module, set its template, fire the
+// callback once. Mirrors the old parser case exactly.
+function fn_handleConfigStatusReply(payload) {
+    const { unit, moduleKey, template } = payload;
+    const module = unit.m_modules.getModuleByKey(moduleKey);
+    if (!module) return; // PUBLISH ERROR (old case returned without callback)
+    module.template = template;
+    js_callbackRegistry.fn_fireOnce(CONST_TYPE_AndruavMessage_CONFIG_STATUS, { p_unit: unit, p_module: module });
 }
 
 // GeoFenceAttachStatus: apply attach/detach intent to the shared registry.

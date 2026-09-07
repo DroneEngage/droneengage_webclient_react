@@ -45,10 +45,9 @@ class CAndruavClientParser {
     constructor() {
         // waypoint cache moved to js_waypointCache (services/waypoint/waypointCache.js).
         // callback registry moved to js_callbackRegistry (protocol/callbackRegistry.js).
+        // signalling callback moved to EE_andruavSignalling event subscription.
         this.fn_init();
         //this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
-
-        this.EVT_andruavSignalling = {}
 
         Object.seal(this);
     }
@@ -177,22 +176,8 @@ class CAndruavClientParser {
 
         switch (msg.messageType) {
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS: {
-               p_jmsg = msg.msgPayload;
-
-               if (p_jmsg.R === true) { // this is a reply to request.
-                        const c_module  = p_unit.m_modules.getModuleByKey(p_jmsg.k)
-                        if (!c_module)
-                        {
-                            // PUBLISH ERROR
-                            return ;
-                        }
-                        c_module.template = p_jmsg.b;
-
-                        js_callbackRegistry.fn_fireOnce(msg.messageType, {p_unit:p_unit , p_module:c_module});
-                }
-            }
-                break;
+            // CONFIG_STATUS removed — migrated to core/protocol/reduce.js
+            // (reduceConfigStatus) + runtime.js (__configStatusReply).
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_STATUS: {
                 p_jmsg = msg.msgPayload;
@@ -534,16 +519,9 @@ class CAndruavClientParser {
                 break;
 
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_Signaling: {
-
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-                let signal = p_jmsg.w || p_jmsg;
-                this.EVT_andruavSignalling(p_unit, signal);
-            }
-                break;
+            // Signaling removed — migrated to core/protocol/reduce.js
+            // (reduceSignaling) + EE_andruavSignalling event subscription
+            // in js_webrtcthin2.js.
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_Error: {
                 let v_error = {};
