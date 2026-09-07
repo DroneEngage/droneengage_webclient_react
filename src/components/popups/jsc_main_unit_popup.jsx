@@ -20,9 +20,6 @@ class ClssMainUnitPopup extends React.Component {
       return;
     }
     this.state.initialized = true;
-    if (this.props.OnComplete !== null && this.props.OnComplete !== undefined) {
-      this.props.OnComplete();
-    }
   }
 
   generatePopup() {

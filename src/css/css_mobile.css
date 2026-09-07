@@ -1160,12 +1160,13 @@ body.mobile-mode {
 }
 
 /* ── Main map context menu (jsc_main_context_menu.jsx) on mobile ───────────
-   Rendered into a Leaflet popup via ReactDOM.createRoot() + tempContainer -
-   it lives in Leaflet's own DOM tree (a sibling of #mapid, not a descendant
-   of .mobile-page), so it's detected via body.mobile-mode instead of a
-   p_compact prop, and styled here instead of the *-container-scoped rules
-   above. Desktop's si-07x/smaller2/smaller3 classes (down to 0.5rem) are
-   fine for a mouse but unreadable/untappable on a phone. */
+   Rendered into a Leaflet/Mapbox popup via React createPortal (see
+   <MapPopupHost/> and mapPopupService) - it lives in the map's own DOM
+   tree (a sibling of #mapid, not a descendant of .mobile-page), so it's
+   detected via body.mobile-mode instead of a p_compact prop, and styled
+   here instead of the *-container-scoped rules above. Desktop's
+   si-07x/smaller2/smaller3 classes (down to 0.5rem) are fine for a mouse
+   but unreadable/untappable on a phone. */
 body.mobile-mode .leaflet-popup-content-wrapper {
   max-width: min(280px, calc(100vw - 40px));
   border-radius: 12px;

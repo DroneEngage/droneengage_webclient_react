@@ -1201,13 +1201,27 @@ class CLeafLetAndruavMap {
     }
 
     fn_hideInfoWindow(p_infoWindow) {
-        
-        if (p_infoWindow == null) 
+
+        if (p_infoWindow == null)
             return;
-        
+
 
         p_infoWindow.remove();
         p_infoWindow = null;
+    }
+
+    /**
+     * Returns the DOM node React should portal into for a popup created
+     * by fn_showInfoWindow. For Leaflet that is the popup's content
+     * container (`.leaflet-popup-content`). Returns null if the popup
+     * is not currently on the map (getElement returns null before the
+     * popup is opened).
+     */
+    fn_getPopupContentElement(p_infoWindow) {
+        if (p_infoWindow == null) return null;
+        const el = p_infoWindow.getElement ? p_infoWindow.getElement() : null;
+        if (el == null) return null;
+        return el.querySelector('.leaflet-popup-content') || null;
     }
 
 

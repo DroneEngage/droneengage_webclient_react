@@ -28,11 +28,6 @@ export class ClssWaypointStepContextMenu extends React.Component {
         }
 
         this.state.initialized = true;
-
-        if (this.props.OnComplete !== null && this.props.OnComplete !== undefined)
-        {
-            this.props.OnComplete();
-        }
     }
 
 

@@ -1062,7 +1062,14 @@ div#displays {
 
 
 /* ADSB toggle button (under the +/- zoom controls).
-   active = ADSB enabled (highlighted), inactive = disabled (dimmed). */
+   active = ADSB enabled (highlighted), inactive = disabled (dimmed).
+   The ADSB and Wind toggles are grouped as a single visual bar (no gap
+   between them), matching the +/- zoom button pair. */
+.leaflet-adsb-toggle-control {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
 .leaflet-adsb-toggle-control a.leaflet-adsb-toggle-btn {
 	display: flex;
 	align-items: center;
@@ -1095,7 +1102,14 @@ div#displays {
 
 /* Wind-arrow toggle button (under the ADSB toggle, topleft).
    active = wind arrow enabled (highlighted), inactive = disabled (dimmed).
-   Mirrors the ADSB toggle styling. */
+   Mirrors the ADSB toggle styling. Grouped with the ADSB toggle as a
+   single visual bar — no margin between them, square top corners. */
+.leaflet-wind-toggle-control {
+	margin-top: 0 !important;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
 .leaflet-wind-toggle-control a.leaflet-wind-toggle-btn {
 	display: flex;
 	align-items: center;

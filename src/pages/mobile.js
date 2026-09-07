@@ -32,6 +32,7 @@ import ClssGamePadControl from '../components/gamepad/jsc_gamepadControl.jsx';
 import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import ClssNewsDisplay from '../components/jsc_news_display.jsx';
 import ClssNewsWrite from '../components/jsc_news_write.jsx';
+import MapPopupHost from '../components/popups/MapPopupHost.jsx';
 import MobileLoginPanel from '../components/gadgets/mobile/jsc_mobileLogin.jsx';
 import ClssMobileTelemetryPanel from '../components/gadgets/mobile/jsc_mobile_telemetry_panel.jsx';
 import DialogHost from '../components/DialogHost.jsx';
@@ -521,6 +522,7 @@ const Mobile = () => {
           <ClssModuleDetails />
           <ClssGamePadControl p_index={js_preferences.fn_getActiveGamepadIndex()} />
           <DialogHost />
+          <MapPopupHost />
         </>,
         document.body
       )}

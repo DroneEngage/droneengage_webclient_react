@@ -696,6 +696,19 @@ class CAndruavMap3D {
     }
 
     /**
+     * Returns the DOM node React should portal into for a popup created
+     * by fn_showInfoWindow. For Mapbox GL JS that is the popup's content
+     * container (`.mapboxgl-popup-content`). Returns null if the popup
+     * is not currently on the map.
+     */
+    fn_getPopupContentElement(p_infoWindow) {
+        if (p_infoWindow == null) return null;
+        const el = p_infoWindow.getElement ? p_infoWindow.getElement() : null;
+        if (el == null) return null;
+        return el.querySelector('.mapboxgl-popup-content') || null;
+    }
+
+    /**
      * Dynamically loads Mapbox GL JS + CSS if not already present.
      */
     async fn_loadMapboxSdk() {

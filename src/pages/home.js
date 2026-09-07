@@ -30,6 +30,7 @@ import ClssGCSChat from '../components/jsc_gcs_chat.jsx';
 import ClssNewsDisplay from '../components/jsc_news_display.jsx';
 import ClssNewsWrite from '../components/jsc_news_write.jsx';
 import DialogHost from '../components/DialogHost.jsx';
+import MapPopupHost from '../components/popups/MapPopupHost.jsx';
 import { fn_on_ready } from '../js/js_main';
 import { js_layout } from '../js/state/layoutStore.js';
 import { useLayout } from '../js/hooks/useLayout.js';
@@ -169,6 +170,7 @@ const Home = () => {
           <ClssModuleDetails />
           <ClssGamePadControl p_index={js_preferences.fn_getActiveGamepadIndex()} />
           <DialogHost />
+          <MapPopupHost />
         </div>
 
         <div id="row_2" className={profile.row2.visible ? `${profile.row2.col} ${isRow2Collapsed ? 'collapsed-right' : ''}` : 'd-none'}>

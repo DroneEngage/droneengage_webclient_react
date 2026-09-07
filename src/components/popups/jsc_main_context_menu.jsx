@@ -30,19 +30,14 @@ export class ClssMainContextMenu extends React.Component {
         }
 
         this.state.initialized = true;
-
-        if (this.props.OnComplete !== null && this.props.OnComplete !== undefined)
-        {
-            this.props.OnComplete();
-        }
     }
 
 
-    /** True when rendered on the mobile page. This component is mounted
-     *  dynamically via ReactDOM.createRoot() from js_main.js (see
-     *  fn_generateContextMenuHTML), not composed into mobile.js's JSX tree,
-     *  so it has no p_compact prop to read - body.mobile-mode is the same
-     *  flag mobile.js itself toggles on mount/unmount. */
+    /** True when rendered on the mobile page. This component is portaled
+     *  into a Leaflet/Mapbox popup via <MapPopupHost/> (see
+     *  fn_generateContextMenuHTML), not composed into mobile.js's JSX
+     *  tree, so it has no p_compact prop to read - body.mobile-mode is
+     *  the same flag mobile.js itself toggles on mount/unmount. */
     fn_isCompact() {
         return document.body.classList.contains('mobile-mode');
     }

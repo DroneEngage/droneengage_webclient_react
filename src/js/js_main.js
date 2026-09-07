@@ -3,7 +3,7 @@ import React from 'react';
 import * as js_session from './state/session.js';
 import * as js_preferences from './state/preferences.js';
 import { CONST_MAP_GOOLE, v_mission_file_extension } from './config/constants.js';
-import ReactDOM from "react-dom/client";
+
 
 
 import $ from 'jquery';
@@ -45,10 +45,7 @@ import { js_unitUiPrefs } from './state/unitUiPrefs.js'
 import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
 import { js_geoFenceRegistry } from './services/geo/geoFenceRegistry.js'
 import { js_dialogs } from './app/dialogService.js'
-
-import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
-import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
-import ClssMainUnitPopup from '../components/popups/jsc_main_unit_popup.jsx'
+import { mapPopupService } from './services/map/mapPopupService.js'
 // eslint-disable-next-line no-unused-vars
 import { js_websocket_bridge } from './CPC/js_websocket_bridge.js'
 import i18n from './i18n.js';
@@ -86,9 +83,6 @@ fn_initFacadeSubscriptions();
 	});
 }
 
-var v_context_busy = false;
-
-var info_unit_context_popup = null;
 // eslint-disable-next-line no-unused-vars
 var v_lastHighlightedUnit = null;
 let selectedMissionFilesToRead = "";
@@ -2041,135 +2035,26 @@ function hlp_generateFlyHereMenu(lat, lng) {
 
 
 function fn_generateContextMenuHTML(v_lat, v_lng) {
-	if (v_context_busy === true) return;
-
-	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-
-	v_context_busy = true;
-	// Create a temporary container for the popup content
-	const tempContainer = document.createElement('div');
-
-	const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-		<ClssMainContextMenu
-			p_lat={v_lat}
-			p_lng={v_lng}
-			OnComplete={() => {
-
-				// Create a DIV in leaflet popup 
-				const htmlContent = tempContainer.innerHTML;
-
-				// REACT POPUP LIMITATION: This creates static HTML content
-				// Interactive React elements (links, buttons, events) will not work
-				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
-				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
-
-				// now add your div that contains ReactDOM to it.
-				info_unit_context_popup = mapAdapter.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
-
-				// now your ReactDom div is under the active popup
-
-				info_unit_context_popup.on('remove', function () {
-					info_unit_context_popup = null;
-					tempContainer.remove();
-				});
-				v_context_busy = false;
-			}}
-		/>
-	);
+	mapPopupService.fn_openPopup('context-menu', { p_lat: v_lat, p_lng: v_lng }, v_lat, v_lng);
 }
 
 function fn_generateContextMenuHTML_MissionItem(v_lat, v_lng, p_wayPointStep, p_andruavUnit) {
-	if (v_context_busy === true) return;
-
-	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-
-	v_context_busy = true;
-	// Create a temporary container for the popup content
-	const tempContainer = document.createElement('div');
-
-	const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-		<ClssWaypointStepContextMenu
-			p_unit={p_andruavUnit}
-			p_waypoint={p_wayPointStep}
-			p_lat={v_lat} p_lng={v_lng}
-			OnComplete={() => {
-
-				// Create a DIV in leaflet popup 
-				const htmlContent = tempContainer.innerHTML;
-
-				// REACT POPUP LIMITATION: This creates static HTML content
-				// Interactive React elements (links, buttons, events) will not work
-				// See documentation in fn_generateContextMenuHTML_MainUnitPopup for details
-				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
-
-				// now add your div that contains ReactDOM to it.
-				info_unit_context_popup = mapAdapter.fn_bindPopup(info_unit_context_popup, tempContainer, v_lat, v_lng);
-
-				// now your ReactDom div is under the active popup
-
-				info_unit_context_popup.on('remove', function () {
-					info_unit_context_popup = null;
-					tempContainer.remove();
-				});
-				v_context_busy = false;
-			}}
-		/>
-	);
+	mapPopupService.fn_openPopup('mission-item', {
+		p_unit: p_andruavUnit,
+		p_waypoint: p_wayPointStep,
+		p_lat: v_lat,
+		p_lng: v_lng,
+	}, v_lat, v_lng);
 }
 
 
 
 function fn_generateContextMenuHTML_MainUnitPopup(v_lat, v_lng, v_andruavUnit, v_ignore) {
-
-
-	if (v_context_busy === true) return;
-
-	const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-
-	v_context_busy = true;
-	// Create a temporary container for the popup content
-	const tempContainer = document.createElement('div');
-
-
-	const root = ReactDOM.createRoot(tempContainer);
-	root.render(
-		<ClssMainUnitPopup
-			p_unit={v_andruavUnit}
-			p_lat={v_lat}
-			p_lng={v_lng}
-
-			OnComplete={() => {
-				// Step 3: Extract the HTML
-				const htmlContent = tempContainer.innerHTML;
-
-				// IMPORTANT: React popup limitation
-				// This approach creates a static HTML snapshot for Leaflet popups.
-				// - React event handlers and interactive elements will NOT work after tempContainer.remove()
-				// - Links, buttons, and other interactive elements become non-functional
-				// - This is intentional for display-only popups to avoid React/Leaflet integration complexity
-				// 
-				// FUTURE: If interactive popups are needed, consider:
-				// 1. Using Leaflet's popupopen/popupclose events to mount/unmount React components
-				// 2. Implementing a React portal system for Leaflet popups
-				// 3. Using a React-Leaflet integration library
-				//
-				// Current limitation documented: Static popup content only
-				tempContainer.remove();  // the HTML is not linked to REACT object anymore so links will not be working.
-
-				info_unit_context_popup = mapAdapter.fn_showInfoWindow(null, htmlContent, v_lat, v_lng);
-				if (v_ignore === true) {
-					info_unit_context_popup.m_ignoreMouseOut = true;
-				}
-				info_unit_context_popup.on('remove', function () {
-					info_unit_context_popup = null;
-				});
-				v_context_busy = false;
-			}}
-		/>
-	);
-
+	mapPopupService.fn_openPopup('unit-popup', {
+		p_unit: v_andruavUnit,
+		p_lat: v_lat,
+		p_lng: v_lng,
+	}, v_lat, v_lng, { ignoreMouseOut: v_ignore === true });
 }
 
 
@@ -2813,7 +2698,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			js_leafletmap.fn_addListenerOnMouseOverMarker(layers.m_marker,
 				function (p_lat, p_lng) {
 
-					if (info_unit_context_popup !== null) return;
+					if (mapPopupService.fn_isOpen() === true) return;
 
 
 					let clickTimer = setTimeout(() => {
@@ -2826,12 +2711,8 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 							// pointer is out then deregister in mouse-out event.
 							js_leafletmap.fn_removeListenerOnMouseOutClickMarker(layers.m_marker);
 							clearTimeout(clickTimer);
-							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
-								// hide me if marked hide.
-								const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
-								info_unit_context_popup = null;
-							}
+							// hide me unless the popup is pinned (opened from a click).
+							mapPopupService.fn_closeIfNotPinned();
 						});
 
 
@@ -2911,7 +2792,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			js_map3d.fn_addListenerOnMouseOverMarker(marker3d,
 				function (p_lat, p_lng) {
 
-					if (info_unit_context_popup !== null) return;
+					if (mapPopupService.fn_isOpen() === true) return;
 
 
 					let clickTimer = setTimeout(() => {
@@ -2924,12 +2805,8 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 							// pointer is out then deregister in mouse-out event.
 							js_map3d.fn_removeListenerOnMouseOutClickMarker(marker3d);
 							clearTimeout(clickTimer);
-							if ((info_unit_context_popup == null) || (!info_unit_context_popup.hasOwnProperty('m_ignoreMouseOut')) || (info_unit_context_popup.m_ignoreMouseOut !== true)) {
-								// hide me if marked hide.
-								const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-								mapAdapter.fn_hideInfoWindow(info_unit_context_popup);
-								info_unit_context_popup = null;
-							}
+							// hide me unless the popup is pinned (opened from a click).
+							mapPopupService.fn_closeIfNotPinned();
 						});
 
 

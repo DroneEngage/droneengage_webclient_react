@@ -25,6 +25,7 @@ import ClssFooterControl from '../components/jsc_footer'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'
 import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
 import DialogHost from '../components/DialogHost.jsx'
+import MapPopupHost from '../components/popups/MapPopupHost.jsx'
 import { fn_on_ready } from '../js/js_main'
 
 fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
@@ -68,6 +69,7 @@ const Planning = () => {
 					</div>
 
 					<DialogHost />
+				<MapPopupHost />
 				</div>
 			</div>
 
