@@ -199,7 +199,7 @@ class AndruavStream {
   // { unit, signal }; this unwraps it and invokes the existing handler.
   fn_initSignalling() {
     if (this.m_signallingSubscribed) return;
-    js_eventEmitter.fn_subscribe(js_event.EE_andruavSignalling, this, (payload) => {
+    js_eventEmitter.fn_subscribe(js_event.EE_andruavSignalling, this, (_me, payload) => {
       this.fn_handleSignalling(payload.unit, payload.signal);
     });
     this.m_signallingSubscribed = true;
