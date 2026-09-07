@@ -2960,6 +2960,8 @@ var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 			gui.m_marker_destination = null;
 			p_andruavUnit.m_Geo_Tags.p_DestinationPoint.m_needsIcon = true;
 		}
+		// Also remove the 3D map destination marker when the feature is gated off.
+		js_map3d.fn_clearDestinationPoint(p_andruavUnit);
 		return;
 	}
 	let v_latlng = js_leafletmap.fn_getLocationObjectBy_latlng(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat, p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng);
@@ -2975,6 +2977,18 @@ var EVT_DistinationPointChanged = function (me, p_andruavUnit) {
 
 
 	js_leafletmap.fn_setPosition(gui.m_marker_destination, v_latlng)
+
+	// Mirror the destination marker on the 3D map using the same icon logic.
+	// p_DestinationPoint.alt is in millimeters (raw MAVLink relative_alt),
+	// but fn_syncDestinationPoint expects meters above terrain (same as
+	// fn_syncUnit's alt_relative), so divide by 1000.
+	js_map3d.fn_syncDestinationPoint(
+		p_andruavUnit,
+		p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lat,
+		p_andruavUnit.m_Geo_Tags.p_DestinationPoint.lng,
+		getDestinationPointIcon(p_andruavUnit),
+		(p_andruavUnit.m_Geo_Tags.p_DestinationPoint.alt || 0) / 1000
+	);
 };
 
 

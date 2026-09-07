@@ -204,3 +204,25 @@
 .css_map3d_target_drag_handle:active {
   cursor: grabbing;
 }
+
+/* Destination / swarm-target ground marker (3D map).
+ * Small ground-level icon showing where a unit's target is — a swarm
+ * formation slot (small drone icon) or a guided-point destination icon.
+ * Mirrors the leaflet destination marker in EVT_DistinationPointChanged. */
+.css_map3d_destination_marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  cursor: pointer;
+}
+
+.css_map3d_destination_marker_icon {
+  width: 28px;
+  height: 28px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
+  transform-origin: center center;
+}

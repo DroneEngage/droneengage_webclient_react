@@ -521,6 +521,27 @@ class CAndruavMap3D {
         this.m_missionCircleIds = new Map();    // unitId -> array of { sourceId, layerId }
         this.m_missionSyncGeneration = new Map(); // unitId -> counter, guards stale elevation retries
         this.m_missionData = new Map();          // unitId -> { wayPointArray, color } (latest mission, for replay)
+
+        // ---- 3D destination/swarm-target markers (mirrors leaflet's
+        // EVT_DistinationPointChanged) ----
+        // Small ground-level DOM markers showing where each unit's target is:
+        //   - CONST_DESTINATION_SWARM_MY_LOCATION: a small drone icon (the
+        //     swarm formation slot this unit should occupy)
+        //   - CONST_DESTINATION_GUIDED_POINT: a destination icon
+        // Kept on the ground (altitude 0) to match the 2D map behaviour.
+        // m_destinationData is preserved across hide/show so fn_show can replay.
+        this.m_destinationMarkers = new Map();   // unitId -> mapboxgl.Marker
+        this.m_destinationData = new Map();      // unitId -> { lat, lng, iconUrl, altRelative, color }
+
+        // ---- 3D destination circles (ground + altitude ring, GLB mode only) ----
+        // In GLB mode the destination DOM icon is hidden (transparent) and the
+        // target is represented by a ground circle + altitude circle pair,
+        // matching how the drone itself is surrounded by circles.
+        this.m_destGroundSources = new Map();    // unitId -> sourceId
+        this.m_destGroundLayers = new Map();     // unitId -> layerId
+        this.m_destAltSources = new Map();       // unitId -> sourceId
+        this.m_destAltLayers = new Map();        // unitId -> layerId
+
         this.m_terrainExaggeration = 1.3;        // current terrain exaggeration factor (adjustable via x1/x2/x5 buttons)
         this.m_modelSizeMultiplierUnits = 1;     // user-selected size multiplier for drone units (x1/x2/x5, top-left)
         this.m_modelSizeMultiplierAdsb = 1;      // user-selected size multiplier for ADSB aircraft (x1/x2/x5, top-left)
@@ -821,6 +842,9 @@ class CAndruavMap3D {
             if (this.m_isVisible) this.m_map.resize();
             // Draw any missions that arrived while the map was still loading.
             this.fn_replayMissions();
+            // Draw any destination/swarm-target markers that arrived while
+            // the map was still loading.
+            this.fn_replayDestinationPoints();
         });
 
         // Toggle DOM markers vs. 3D glTF models, and rescale the models to
@@ -1146,6 +1170,16 @@ class CAndruavMap3D {
             this.fn_applyMarkerIconForMode(marker, showModels);
         });
 
+        // Destination markers: swap icon to transparent in GLB mode (circles
+        // represent the target instead), restore the real icon in icon mode.
+        this.m_destinationMarkers.forEach(marker => {
+            this.fn_applyMarkerIconForMode(marker, showModels);
+        });
+
+        // Toggle destination circle visibility: visible in GLB mode, hidden
+        // in icon mode (the DOM icon represents the target instead).
+        this.fn_updateDestinationCircleVisibility(showModels);
+
         // In GLB mode, ADSB DOM markers swap between their real icon (below
         // threshold — the 3D model layer is hidden by minzoom, so the DOM
         // marker must be visible with correct heading) and the transparent
@@ -1305,6 +1339,14 @@ class CAndruavMap3D {
                     }
                 }
             });
+            this.m_destinationMarkers.forEach(marker => {
+                if (marker && typeof marker.getAltitude === 'function' && typeof marker.setAltitude === 'function') {
+                    const cur = marker.getAltitude();
+                    if (Number.isFinite(cur) && cur !== 0) {
+                        marker.setAltitude(cur * ratio);
+                    }
+                }
+            });
         }
 
         // The ADSB tether/altitude-circle use 'line-elevation-reference':
@@ -1353,10 +1395,22 @@ class CAndruavMap3D {
                     this.fn_applyMarkerIconForMode(marker, adsbGlb);
                 });
 
+                // Same re-projection + icon-mode fix for destination markers.
+                this.m_destinationMarkers.forEach(marker => {
+                    const lngLat = marker.getLngLat?.();
+                    if (lngLat) marker.setLngLat(lngLat);
+
+                    this.fn_applyMarkerIconForMode(marker, this.m_modelLodActive);
+                });
+
                 // Re-draw any missions that were stored while the 3D tab was
                 // hidden — markers created against a zero-size container don't
                 // project correctly, so we replay them now that it's visible.
                 this.fn_replayMissions();
+
+                // Re-draw any destination/swarm-target markers that were
+                // stored while the 3D tab was hidden (same reason as missions).
+                this.fn_replayDestinationPoints();
 
                 // fn_flushAdsbTethers() was skipped while hidden (see its
                 // m_isVisible guard) - if an aircraft is/was selected, its
@@ -2185,6 +2239,12 @@ class CAndruavMap3D {
         this.m_missionGroundLayers.clear();
         this.m_missionCircleIds.clear();
         this.m_missionSyncGeneration.clear();
+
+        // Destination circles (per unit) — m_destinationData is kept for replay
+        this.m_destGroundSources.clear();
+        this.m_destGroundLayers.clear();
+        this.m_destAltSources.clear();
+        this.m_destAltLayers.clear();
 
         // ADSB shared layers (single set, flagged)
         this.m_adsbLayersReady = false;
@@ -3202,6 +3262,296 @@ class CAndruavMap3D {
             const unit = js_session.fn_getAndruavUnitList()?.fn_getUnit(id);
             if (unit) {
                 this.fn_drawMission(unit, wayPointArray, color);
+            }
+        });
+    }
+
+    // ====================================================================
+    //  3D destination / swarm-target markers
+    //  Mirrors the leaflet drawing in js_main.js#EVT_DistinationPointChanged:
+    //  a marker per unit showing where its target is (a swarm formation slot
+    //  icon or a guided-point destination icon). In GLB mode the DOM icon is
+    //  swapped to transparent and the target is shown as a ground cross +
+    //  altitude cross pair (same pattern as the guided-target crosshair),
+    //  matching how the drone itself is surrounded by markers.
+    // ====================================================================
+
+    /**
+     * Builds a GeoJSON FeatureCollection with two perpendicular line segments
+     * (N-S and E-W) forming a + cross centered at [lng, lat].
+     * @param {number} lat
+     * @param {number} lng
+     * @param {number} armLength - half-arm length in meters
+     * @returns {object} GeoJSON FeatureCollection (two LineString features)
+     */
+    fn_buildCrossGeoJSON(lat, lng, armLength) {
+        const latRad = lat * Math.PI / 180;
+        const metersPerDegLat = 111320;
+        const metersPerDegLng = 111320 * Math.cos(latRad);
+        const dLng = armLength / metersPerDegLng;
+        const dLat = armLength / metersPerDegLat;
+        const crossH = [[lng - dLng, lat], [lng + dLng, lat]];   // horizontal (E-W)
+        const crossV = [[lng, lat - dLat], [lng, lat + dLat]];   // vertical (N-S)
+
+        return {
+            type: 'FeatureCollection',
+            features: [
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: crossH }, properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: crossV }, properties: {} }
+            ]
+        };
+    }
+
+    /**
+     * Ensures the ground-cross + altitude-cross GeoJSON layers exist for a
+     * destination marker (identified by unit party ID). Same line style as
+     * the drone's tether circles but cross-shaped geometry. Visibility is
+     * toggled by fn_updateDestinationCircleVisibility based on GLB mode.
+     */
+    fn_ensureDestinationCircles(id, color) {
+        if (!this.m_map || !this.m_isReady) return;
+        if (this.m_destGroundSources.has(id)) return;
+
+        const emptyFC = { type: 'FeatureCollection', features: [] };
+
+        // --- Ground cross (drapes on terrain) ---
+        const groundSourceId = `de-dest-ground-${id}`;
+        const groundLayerId = `de-dest-ground-layer-${id}`;
+
+        this.m_map.addSource(groundSourceId, {
+            type: 'geojson',
+            data: emptyFC
+        });
+
+        this.m_map.addLayer({
+            id: groundLayerId,
+            type: 'line',
+            source: groundSourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+                // No line-z-offset => drapes on terrain.
+            },
+            paint: {
+                'line-color': color,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        this.m_destGroundSources.set(id, groundSourceId);
+        this.m_destGroundLayers.set(id, groundLayerId);
+
+        // --- Altitude cross (elevated to destination altitude) ---
+        const altSourceId = `de-dest-altcross-${id}`;
+        const altLayerId = `de-dest-altcross-layer-${id}`;
+
+        this.m_map.addSource(altSourceId, {
+            type: 'geojson',
+            data: emptyFC
+        });
+
+        this.m_map.addLayer({
+            id: altLayerId,
+            type: 'line',
+            source: altSourceId,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+                'line-z-offset': 0,   // updated per fn_syncDestinationCircles
+                'line-elevation-reference': 'sea',
+                'line-elevation-ground-scale': 1.0
+            },
+            paint: {
+                'line-color': color,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
+                'line-opacity': 0.9
+            }
+        });
+
+        this.m_destAltSources.set(id, altSourceId);
+        this.m_destAltLayers.set(id, altLayerId);
+    }
+
+    /**
+     * Updates the ground-cross + altitude-cross geometry for a destination
+     * marker. Called from fn_syncDestinationPoint on every destination update.
+     */
+    fn_syncDestinationCircles(id, color, lat, lng, altRelative) {
+        if (!this.m_map || !this.m_isReady) return;
+        this.fn_ensureDestinationCircles(id, color);
+
+        const CROSS_ARM = 5;  // meters — matches drone circle radius (fn_syncTether)
+        const crossGeo = this.fn_buildCrossGeoJSON(lat, lng, CROSS_ARM);
+
+        // Ground cross
+        const groundSourceId = this.m_destGroundSources.get(id);
+        const groundSource = this.m_map?.getSource(groundSourceId);
+        if (groundSource) {
+            groundSource.setData(crossGeo);
+        }
+
+        // Altitude cross — elevated to the destination's absolute altitude
+        const exag = this.m_terrainExaggeration || 1;
+        const terrainElev = (typeof this.m_map.queryTerrainElevation === 'function')
+            ? ((this.m_map.queryTerrainElevation([lng, lat]) || 0) / exag)
+            : 0;
+        const destAlt = terrainElev + (Number.isFinite(altRelative) ? altRelative : 0);
+
+        const altSourceId = this.m_destAltSources.get(id);
+        const altLayerId = this.m_destAltLayers.get(id);
+        const altSource = this.m_map?.getSource(altSourceId);
+        if (altSource && altLayerId && this.m_map.getLayer(altLayerId)) {
+            altSource.setData(crossGeo);
+            this.m_map.setLayoutProperty(altLayerId, 'line-z-offset', destAlt);
+        }
+    }
+
+    /**
+     * Toggles visibility of destination circle layers. In GLB mode the circles
+     * are visible and the DOM icon is transparent; in icon mode the circles
+     * are hidden and the DOM icon shows.
+     */
+    fn_updateDestinationCircleVisibility(modelActive) {
+        const visibility = modelActive ? 'visible' : 'none';
+        this.m_destGroundLayers.forEach((layerId) => {
+            if (this.m_map?.getLayer(layerId)) {
+                this.m_map.setLayoutProperty(layerId, 'visibility', visibility);
+            }
+        });
+        this.m_destAltLayers.forEach((layerId) => {
+            if (this.m_map?.getLayer(layerId)) {
+                this.m_map.setLayoutProperty(layerId, 'visibility', visibility);
+            }
+        });
+    }
+
+    /**
+     * Syncs (creates or updates) a unit's destination marker on the 3D map.
+     * The marker floats at the destination's altitude (meters above terrain,
+     * same convention as fn_syncUnit's alt_relative), matching the 3D
+     * representation of the drone itself. The icon URL selects the image
+     * (small drone icon for swarm targets, destination icon for guided points).
+     * @param {*} unit
+     * @param {number} lat
+     * @param {number} lng
+     * @param {string} iconUrl - image URL for the marker icon
+     * @param {number} [altRelative] - altitude above terrain (meters); defaults to 0
+     */
+    fn_syncDestinationPoint(unit, lat, lng, iconUrl, altRelative = 0) {
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        const color = this.fn_getTetherColor(unit);
+
+        // Store for replay (survives hide/show + style reloads) even when the
+        // 3D view is hidden — fn_show / the 'load' handler will replay it.
+        this.m_destinationData.set(id, { lat, lng, iconUrl, altRelative, color });
+
+        // Skip the actual marker work while the 3D view is hidden (same
+        // rationale as fn_syncUnit / fn_syncMissionWaypoints).
+        if (!this.m_map || !this.m_isReady || !this.m_isVisible) return;
+
+        let marker = this.m_destinationMarkers.get(id);
+
+        if (!marker) {
+            const el = document.createElement('div');
+            el.className = 'css_map3d_destination_marker';
+            el.title = `Target of: ${unit.m_unitName || id}`;
+
+            const iconEl = document.createElement('div');
+            iconEl.className = 'css_map3d_destination_marker_icon';
+            el.appendChild(iconEl);
+
+            marker = js_mapboxVendor.fn_createMarker({
+                element: el,
+                anchor: 'center',
+                pitchAlignment: 'viewport',
+                rotationAlignment: 'viewport'
+            })
+            .setLngLat([lng, lat])
+            .addTo(this.m_map);
+
+            this.m_destinationMarkers.set(id, marker);
+
+            // Apply the current GLB LOD state to the new marker (transparent
+            // icon + circles in GLB mode, real icon in icon mode).
+            this.fn_applyMarkerIconForMode(marker, this.m_modelLodActive);
+        } else {
+            marker.setLngLat([lng, lat]);
+        }
+
+        // Apply altitude so the marker floats at the target's height above
+        // the 3D terrain, matching the drone marker behaviour (fn_syncUnit).
+        // Marker altitude does NOT scale with terrain exaggeration (unlike
+        // line-z-offset), so we multiply by the current exaggeration factor
+        // to keep the icon at the same visual height as the elevated lines.
+        if (Number.isFinite(altRelative) && typeof marker.setAltitude === 'function') {
+            marker.setAltitude(altRelative * this.m_terrainExaggeration);
+        }
+
+        // Apply / update the icon image (stored as _realIconUrl so
+        // fn_applyMarkerIconForMode can restore it when leaving GLB mode).
+        if (iconUrl) {
+            marker._realIconUrl = iconUrl;
+            if (!marker._modelActive) {
+                const iconEl = marker.getElement?.()?.querySelector('.css_map3d_destination_marker_icon');
+                if (iconEl) {
+                    iconEl.style.backgroundImage = `url('${iconUrl}')`;
+                }
+            }
+        }
+
+        // Sync the ground + altitude circles (visible in GLB mode, hidden in
+        // icon mode — visibility toggled by fn_updateDestinationCircleVisibility).
+        this.fn_syncDestinationCircles(id, color, lat, lng, altRelative);
+    }
+
+    /**
+     * Removes a unit's destination marker from the 3D map (and its stored
+     * replay data). Called when the destination is hidden by feature flags
+     * or when the unit is disposed.
+     * @param {*} unit
+     */
+    fn_clearDestinationPoint(unit) {
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        const marker = this.m_destinationMarkers.get(id);
+        if (marker) {
+            marker.remove();
+            this.m_destinationMarkers.delete(id);
+        }
+        this.m_destinationData.delete(id);
+
+        // Remove destination circle layers/sources
+        const groundLayerId = this.m_destGroundLayers.get(id);
+        const groundSourceId = this.m_destGroundSources.get(id);
+        this.fn_removeLayerAndSource(groundLayerId, groundSourceId);
+        this.m_destGroundLayers.delete(id);
+        this.m_destGroundSources.delete(id);
+
+        const altLayerId = this.m_destAltLayers.get(id);
+        const altSourceId = this.m_destAltSources.get(id);
+        this.fn_removeLayerAndSource(altLayerId, altSourceId);
+        this.m_destAltLayers.delete(id);
+        this.m_destAltSources.delete(id);
+    }
+
+    /**
+     * Replays all stored destination markers onto the map.  Called after the
+     * map finishes loading and whenever the 3D tab is shown (fn_show), so
+     * destinations that arrived while the map wasn't ready or was hidden get
+     * drawn.
+     */
+    fn_replayDestinationPoints() {
+        if (!this.m_map || !this.m_isReady) return;
+        this.m_destinationData.forEach(({ lat, lng, iconUrl, altRelative }, id) => {
+            const unit = js_session.fn_getAndruavUnitList()?.fn_getUnit(id);
+            if (unit) {
+                this.fn_syncDestinationPoint(unit, lat, lng, iconUrl, altRelative);
             }
         });
     }
