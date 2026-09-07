@@ -147,6 +147,10 @@ export function fn_reduce(unit, msg) {
             return reduceGeoFenceAttachStatus(unit, msg);
         case CONST_TYPE_AndruavMessage_WayPoints:
             return reduceWayPoints(unit, msg);
+        case CONST_TYPE_AndruavMessage_SearchTargetList:
+            return reduceSearchTargetList(unit, msg);
+        case CONST_TYPE_AndruavMessage_TargetTrackingtLocation:
+            return reduceTargetTrackingLocation(unit, msg);
         default:
             return null;
     }
@@ -189,7 +193,9 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_GeoFence
         || type === CONST_TYPE_AndruavMessage_ExternalGeoFence
         || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
-        || type === CONST_TYPE_AndruavMessage_WayPoints;
+        || type === CONST_TYPE_AndruavMessage_WayPoints
+        || type === CONST_TYPE_AndruavMessage_SearchTargetList
+        || type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation;
 }
 
 // ---------------------------------------------------------------------------
@@ -1016,6 +1022,56 @@ function reduceWayPoints(unit, msg) {
     }
     // Return the decoded waypoints; runtime owns the cache + dispatch.
     return { patches: [], events: [], waypoints: { wps, isChunk } };
+}
+
+// ---------------------------------------------------------------------------
+// SearchTargetList / TargetTrackingtLocation — experimental tracking messages.
+//
+// Both are gated by CONST_EXPERIMENTAL_FEATURES_ENABLED. That flag check is a
+// transport-level decision (drop the message before any side effect) and
+// lives in runtime.js, not here. reduce stays pure: it uses msg.receivedAt
+// instead of the wall clock for lastUpdate.
+// ---------------------------------------------------------------------------
+function reduceSearchTargetList(unit, msg) {
+    const p = msg.payload;
+    if (!p.hasOwnProperty('t')) return { patches: [], events: [] };
+    const targets = {};
+    for (const item of p.t) {
+        const c_search_target = {};
+        c_search_target.m_name = item.n;
+        c_search_target.m_type = item.hasOwnProperty('t') ? item.t : 'na';
+        targets[c_search_target.m_name] = c_search_target;
+    }
+    return {
+        patches: [{ path: 'm_DetectedTargets.m_searchable_targets', value: targets }],
+        events: [{ name: js_event.EE_SearchableTarget, payload: unit }],
+    };
+}
+
+function reduceTargetTrackingLocation(unit, msg) {
+    const items = msg.payload.t;
+    const list = [];
+    for (const item of items) {
+        const c_target = {};
+        c_target.x1 = item.a;
+        c_target.y1 = item.b;
+        if (item.hasOwnProperty('r')) {
+            c_target.m_radius = item.r;
+        } else {
+            c_target.x2 = item.c;
+            c_target.y2 = item.d;
+        }
+        if (item.hasOwnProperty('p')) {
+            c_target.m_propability = item.p;
+        }
+        c_target.m_name = item.hasOwnProperty('n') ? item.n : 'default';
+        c_target.lastUpdate = msg.receivedAt; // pure: use receivedAt, not the wall clock
+        list.push(c_target);
+    }
+    return {
+        patches: [{ path: 'm_DetectedTargets.m_targets.m_list', value: list }],
+        events: [{ name: js_event.EE_DetectedTarget, payload: unit }],
+    };
 }
 
 /**

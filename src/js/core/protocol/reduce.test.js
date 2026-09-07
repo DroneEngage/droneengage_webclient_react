@@ -29,6 +29,8 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
          CONST_TYPE_AndruavMessage_WayPoints,
+         CONST_TYPE_AndruavMessage_SearchTargetList,
+         CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
@@ -519,6 +521,81 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const wp = result.waypoints.wps[0];
         expect(wp.m_Header_Required).toBe(false);
         expect(wp.m_Xtrack_Location).toBe(0);
+    });
+
+    // --- TASK-02.3: tracking messages ---
+
+    test('SearchTargetList: 2 items (one with t, one without -> m_type na)', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_SearchTargetList, 'u', {
+            t: [
+                { n: 'target-a', t: 'vehicle' },
+                { n: 'target-b' },
+            ],
+        });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(1);
+        expect(result.patches[0].path).toBe('m_DetectedTargets.m_searchable_targets');
+        const targets = result.patches[0].value;
+        expect(targets['target-a'].m_type).toBe('vehicle');
+        expect(targets['target-b'].m_type).toBe('na');
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_SearchableTarget);
+    });
+
+    test('SearchTargetList: missing t -> no patches, no events', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_SearchTargetList, 'u', { n: 'x' });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(0);
+    });
+
+    test('TargetTrackingtLocation: rectangle + radius target, lastUpdate === receivedAt', () => {
+        const receivedAt = 1700000005678;
+        const raw = frame(CONST_TYPE_AndruavMessage_TargetTrackingtLocation, 'u', {
+            t: [
+                { a: 10, b: 20, c: 30, d: 40, p: 0.9, n: 'rect' },
+                { a: 50, b: 60, r: 15, n: 'circle' },
+            ],
+        });
+        const msg = fn_decode(raw, receivedAt);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(1);
+        expect(result.patches[0].path).toBe('m_DetectedTargets.m_targets.m_list');
+        const list = result.patches[0].value;
+        expect(list).toHaveLength(2);
+
+        // rectangle target
+        expect(list[0].x1).toBe(10);
+        expect(list[0].y1).toBe(20);
+        expect(list[0].x2).toBe(30);
+        expect(list[0].y2).toBe(40);
+        expect(list[0].m_propability).toBe(0.9);
+        expect(list[0].m_name).toBe('rect');
+        expect(list[0].lastUpdate).toBe(receivedAt);
+
+        // radius target
+        expect(list[1].m_radius).toBe(15);
+        expect(list[1].x2).toBeUndefined();
+        expect(list[1].m_name).toBe('circle');
+        expect(list[1].lastUpdate).toBe(receivedAt);
+
+        expect(result.events[0].name).toBe(js_event.EE_DetectedTarget);
+    });
+
+    test('TargetTrackingtLocation: default name when n absent', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_TargetTrackingtLocation, 'u', {
+            t: [{ a: 1, b: 2, c: 3, d: 4 }],
+        });
+        const msg = fn_decode(raw, 42);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches[0].value[0].m_name).toBe('default');
+        expect(result.patches[0].value[0].lastUpdate).toBe(42);
     });
 });
 

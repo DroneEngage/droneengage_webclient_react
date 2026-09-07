@@ -27,7 +27,9 @@ import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
 import { js_waypointCache } from '../../services/waypoint/waypointCache.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
-         CONST_TYPE_AndruavMessage_ExternalGeoFence } from '../../protocol/messages/js_andruavMessages.js';
+         CONST_TYPE_AndruavMessage_ExternalGeoFence,
+         CONST_TYPE_AndruavMessage_SearchTargetList,
+         CONST_TYPE_AndruavMessage_TargetTrackingtLocation } from '../../protocol/messages/js_andruavMessages.js';
 
 /**
  * Handle one inbound frame. Returns true if the message type was migrated
@@ -52,6 +54,16 @@ export function fn_handleFrame(p_frame, evt) {
     // old switch's early `return;`). Checked here so reduce stays pure.
     if (msg.type === CONST_TYPE_AndruavMessage_ExternalGeoFence && msg.senderID !== '_sys_') {
         return true;
+    }
+
+    // SearchTargetList / TargetTrackingtLocation: experimental-feature gate.
+    // When the flag is off, the old switch returns early (drops the message).
+    // Return false so the old switch runs its early-return — no double side
+    // effect. Once the old cases are deleted this guard still drops cleanly.
+    if ((msg.type === CONST_TYPE_AndruavMessage_SearchTargetList
+            || msg.type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation)
+        && js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+        return false;
     }
 
     const isIDMessage = (msg.type === 1004 /* CONST_TYPE_AndruavMessage_ID */);

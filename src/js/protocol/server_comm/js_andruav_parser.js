@@ -577,68 +577,9 @@ class CAndruavClientParser {
             }
                 break;
 
-            // CODEBLOCK_START
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_SearchTargetList: {
-                if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
-                    return;
-                }
-
-                p_jmsg = msg.msgPayload;
-                if (!p_jmsg.hasOwnProperty('t'))
-                    break;
-
-                const c_len = p_jmsg.t.length;
-                for (let i = 0; i < c_len; ++i) {
-                    const c_targetItem = p_jmsg.t[i];
-                    let c_search_target = {};
-                    c_search_target.m_name = c_targetItem.n;
-                    if (c_targetItem.hasOwnProperty('t')) {
-                        c_search_target.m_type = c_targetItem.t;
-                    } else {
-                        c_search_target.m_type = "na";
-                    } p_unit.m_DetectedTargets.m_searchable_targets[c_search_target.m_name] = c_search_target;
-                }
-                js_common.fn_console_log(JSON.stringify(p_jmsg));
-                js_eventEmitter.fn_dispatch(js_event.EE_SearchableTarget, p_unit);
-            }
-            // CODEBLOCK_END
-
-            // CODEBLOCK_START
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTrackingtLocation: {
-                if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
-                    return;
-                }
-
-                p_jmsg = msg.msgPayload.t;
-                const c_len = p_jmsg.length;
-                p_unit.m_DetectedTargets.m_targets.m_list = [];
-                for (let i = 0; i < c_len; ++i) {
-                    const c_targetItem = p_jmsg[i];
-                    let c_target = {};
-                    c_target.x1 = c_targetItem.a;
-                    c_target.y1 = c_targetItem.b;
-                    if (c_targetItem.hasOwnProperty('r')) {
-                        c_target.m_radius = c_targetItem.r;
-                    } else {
-                        c_target.x2 = c_targetItem.c;
-                        c_target.y2 = c_targetItem.d;
-                    }
-                    if (c_targetItem.hasOwnProperty('p')) {
-                        c_target.m_propability = c_targetItem.p;
-                    }
-                    if (c_targetItem.hasOwnProperty('n')) {
-                        c_target.m_name = c_targetItem.n;
-                    } else {
-                        c_target.m_name = 'default';
-                    } c_target.lastUpdate = Date.now();
-
-                    p_unit.m_DetectedTargets.m_targets.m_list.push(c_target);
-                }
-                js_common.fn_console_log(JSON.stringify(p_jmsg));
-                js_eventEmitter.fn_dispatch(js_event.EE_DetectedTarget, p_unit);
-            }
-                break;
-            // CODEBLOCK_END
+            // SearchTargetList / TargetTrackingtLocation removed — migrated to
+            // core/protocol/reduce.js. The experimental-feature gate is checked
+            // in runtime.js (fn_handleFrame) before reduce runs.
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_DroneReport: {
                 p_jmsg = msg.msgPayload;
