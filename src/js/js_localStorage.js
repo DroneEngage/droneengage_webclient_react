@@ -2,6 +2,16 @@
 import { js_globals } from './js_globals.js';
 import * as js_common from './js_common.js'
 import * as js_siteConfig from './js_siteConfig.js';
+import {
+	LS_LANG, LS_EMAIL, LS_LOGIN_NAME, LS_ACCESS_CODE, LS_UNIT_ID,
+	LS_UNIT_ID_SHARED, LS_WEB_GCS, LS_GROUP_NAME, LS_DISPLAY_MODE,
+	LS_METRIC_SYS, LS_GAME_PAD_CONFIG_PREFIX, LS_GAME_PAD_CONFIG_INDEX,
+	LS_DEFAULT_ALT, LS_ENABLE_SPEECH, LS_ENABLE_ADSB, LS_ENABLE_AISSTREAM,
+	LS_ENABLE_WIND, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER, LS_ADSB_REFRESH_RATE_MS,
+	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
+	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
+	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
+} from './storage/keys.js';
 
 class CLocalStorage {
     constructor() {
@@ -64,116 +74,116 @@ class CLocalStorage {
 
     // Language
     fn_setLanguage(value) {
-        this._setValue(js_globals.LS_LANG, value);
+        this._setValue(LS_LANG, value);
     }
 
     fn_getLanguage() {
-        return this._getValue(js_globals.LS_LANG, 'en');
+        return this._getValue(LS_LANG, 'en');
     }
 
     // Email
     fn_setEmail(value) {
-        this._setValue(js_globals.LS_EMAIL, value);
+        this._setValue(LS_EMAIL, value);
     }
 
     fn_getEmail() {
-        return this._getValue(js_globals.LS_EMAIL, '');
+        return this._getValue(LS_EMAIL, '');
     }
 
     // LoginName
     fn_setLoginName(value) {
-        this._setValue(js_globals.LS_LOGIN_NAME, value);
+        this._setValue(LS_LOGIN_NAME, value);
     }
 
     fn_getLoginName() {
-        return this._getValue(js_globals.LS_LOGIN_NAME, '');
+        return this._getValue(LS_LOGIN_NAME, '');
     }
 
     // Access Code
     fn_setAccessCode(value) {
-        this._setValue(js_globals.LS_ACCESS_CODE, value);
+        this._setValue(LS_ACCESS_CODE, value);
     }
 
     fn_getAccessCode() {
-        return this._getValue(js_globals.LS_ACCESS_CODE, '');
+        return this._getValue(LS_ACCESS_CODE, '');
     }
 
     // Unit ID
     fn_setUnitID(value) {
-        this._setSessionValue(js_globals.LS_UNIT_ID, value);
+        this._setSessionValue(LS_UNIT_ID, value);
     }
 
     fn_setUnitIDShared(value) {
-        this._setValue(js_globals.LS_UNIT_ID_SHARED, value);
+        this._setValue(LS_UNIT_ID_SHARED, value);
     }
 
     fn_resetUnitID() {
-        this.fn_setUnitID(js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
+        this.fn_setUnitID(LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
 
     fn_resetUnitIDShared() {
-        const v = js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3);
+        const v = LS_WEB_GCS + js_common.fn_generateRandomString(3);
         this.fn_setUnitIDShared(v);
         return v;
     }
     fn_getUnitID() {
-        return this._getSessionValue(js_globals.LS_UNIT_ID, js_globals.LS_WEB_GCS + js_common.fn_generateRandomString(3));
+        return this._getSessionValue(LS_UNIT_ID, LS_WEB_GCS + js_common.fn_generateRandomString(3));
     }
 
     fn_getUnitIDShared() {
-        const v = this._getValue(js_globals.LS_UNIT_ID_SHARED, null);
+        const v = this._getValue(LS_UNIT_ID_SHARED, null);
         if (v !== null && v !== undefined && v.length > 0) return v;
         return this.fn_resetUnitIDShared();
     }
 
     // Group Name
     fn_setGroupName(value) {
-        this._setValue(js_globals.LS_GROUP_NAME, value);
+        this._setValue(LS_GROUP_NAME, value);
     }
 
     fn_getGroupName() {
-        return this._getValue(js_globals.LS_GROUP_NAME, '1');
+        return this._getValue(LS_GROUP_NAME, '1');
     }
 
     // Display Mode
     fn_setDisplayMode(value) {
-        this._setValue(js_globals.LS_DISPLAY_MODE, value);
+        this._setValue(LS_DISPLAY_MODE, value);
     }
 
     fn_getDisplayMode() {
-        return parseInt(this._getValue(js_globals.LS_DISPLAY_MODE, 0));
+        return parseInt(this._getValue(LS_DISPLAY_MODE, 0));
     }
 
     // Metric System
     fn_setMetricSystem(value) {
-        this._setValue(js_globals.LS_METRIC_SYS, value.toString());
+        this._setValue(LS_METRIC_SYS, value.toString());
     }
 
     fn_getMetricSystem() {
-        return this._getValue(js_globals.LS_METRIC_SYS, js_globals.v_useMetricSystem.toString()) === 'true';
+        return this._getValue(LS_METRIC_SYS, js_globals.v_useMetricSystem.toString()) === 'true';
     }
 
     fn_setGamePadConfig(config_index, value) {
-        this._setValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, value);
+        this._setValue(`${LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, value);
     }
 
 
     fn_getGamePadConfig(config_index) {
-        const value = js_localStorage._getValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, `{"functionMappings":{"THR":{"type":"axis","index":1},"ALE":{"type":"axis","index":3},"ELE":{"type":"axis","index":4},"RUD":{"type":"axis","index":0},"ARM":{"type":"button","index":2},"RTL":{"type":"button","index":0},"Land":{"type":"button","index":3},"Auto":{"type":"button","index":1}},"axisReversed":[1,1,1,1,1,1,1,1],"buttonsFunction":["RTL","Auto","ARM","Land","undefined","undefined","undefined","undefined","undefined","undefined","undefined"],"buttonTypes":["on/off","on/off","on/off","on/off", "on/off", "on/off", "on/off","on/off", "on/off","on/off", "on/off"], "mode":1}`);
+        const value = js_localStorage._getValue(`${LS_GAME_PAD_CONFIG_PREFIX}${config_index}`, `{"functionMappings":{"THR":{"type":"axis","index":1},"ALE":{"type":"axis","index":3},"ELE":{"type":"axis","index":4},"RUD":{"type":"axis","index":0},"ARM":{"type":"button","index":2},"RTL":{"type":"button","index":0},"Land":{"type":"button","index":3},"Auto":{"type":"button","index":1}},"axisReversed":[1,1,1,1,1,1,1,1],"buttonsFunction":["RTL","Auto","ARM","Land","undefined","undefined","undefined","undefined","undefined","undefined","undefined"],"buttonTypes":["on/off","on/off","on/off","on/off", "on/off", "on/off", "on/off","on/off", "on/off","on/off", "on/off"], "mode":1}`);
         return value;
     }
 
 
     fn_setGamePadConfigIndex(value) {
-        this._setValue(js_globals.LS_GAME_PAD_CONFIG_INDEX, value.toString());
+        this._setValue(LS_GAME_PAD_CONFIG_INDEX, value.toString());
     }
 
     fn_getGamePadConfigIndex() {
-        return parseInt(this._getValue(js_globals.LS_GAME_PAD_CONFIG_INDEX, '0'));
+        return parseInt(this._getValue(LS_GAME_PAD_CONFIG_INDEX, '0'));
     }
 
     fn_exportGamePadConfigs() {
-        const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
+        const configPrefix = LS_GAME_PAD_CONFIG_PREFIX;
         const configs = {};
 
         // Iterate through localStorage to find all game pad configs
@@ -201,11 +211,11 @@ class CLocalStorage {
 
     // Default Altitude
     fn_setDefaultAltitude(value) {
-        this._setValue(js_globals.LS_DEFAULT_ALT, value.toString());
+        this._setValue(LS_DEFAULT_ALT, value.toString());
     }
 
     fn_getDefaultAltitude() {
-        return parseInt(this._getValue(js_globals.LS_DEFAULT_ALT, js_globals.CONST_DEFAULT_ALTITUDE.toString()));
+        return parseInt(this._getValue(LS_DEFAULT_ALT, js_globals.CONST_DEFAULT_ALTITUDE.toString()));
     }
 
     // Default Radius
@@ -235,63 +245,63 @@ class CLocalStorage {
 
     // Speech Enabled
     fn_setSpeechEnabled(value) {
-        this._setValue(js_globals.LS_ENABLE_SPEECH, value.toString());
+        this._setValue(LS_ENABLE_SPEECH, value.toString());
     }
 
     fn_getSpeechEnabled() {
-        return this._getValue(js_globals.LS_ENABLE_SPEECH, 'true') === 'true';
+        return this._getValue(LS_ENABLE_SPEECH, 'true') === 'true';
     }
 
     // ADSB Enabled (runtime preference). Always returns false when the
     // site feature flag CONST_FEATURE.DISABLE_ADSB is true — the feature
     // does not exist in that case, regardless of the stored preference.
     fn_setADSBEnabled(value) {
-        this._setValue(js_globals.LS_ENABLE_ADSB, value.toString());
+        this._setValue(LS_ENABLE_ADSB, value.toString());
     }
 
     fn_getADSBEnabled() {
         if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_ADSB === true) {
             return false;
         }
-        return this._getValue(js_globals.LS_ENABLE_ADSB, 'true') === 'true';
+        return this._getValue(LS_ENABLE_ADSB, 'true') === 'true';
     }
 
     // AISStream Enabled (runtime preference). Always returns false when the
     // site feature flag CONST_FEATURE.DISABLE_AISStream is true — the feature
     // does not exist in that case, regardless of the stored preference.
     fn_setAISStreamEnabled(value) {
-        this._setValue(js_globals.LS_ENABLE_AISSTREAM, value.toString());
+        this._setValue(LS_ENABLE_AISSTREAM, value.toString());
     }
 
     fn_getAISStreamEnabled() {
         if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_AISStream === true) {
             return false;
         }
-        return this._getValue(js_globals.LS_ENABLE_AISSTREAM, 'true') === 'true';
+        return this._getValue(LS_ENABLE_AISSTREAM, 'true') === 'true';
     }
 
     // Wind arrow Enabled (runtime preference). Always returns false when the
     // site feature flag CONST_FEATURE.DISABLE_WIND is true — the feature
     // does not exist in that case, regardless of the stored preference.
     fn_setWindEnabled(value) {
-        this._setValue(js_globals.LS_ENABLE_WIND, value.toString());
+        this._setValue(LS_ENABLE_WIND, value.toString());
     }
 
     fn_getWindEnabled() {
         if (js_siteConfig.CONST_FEATURE && js_siteConfig.CONST_FEATURE.DISABLE_WIND === true) {
             return false;
         }
-        return this._getValue(js_globals.LS_ENABLE_WIND, 'false') === 'true';
+        return this._getValue(LS_ENABLE_WIND, 'false') === 'true';
     }
 
     // ADSB geolocation fallback radius in kilometers (used when no drones
     // are online). Stored in km as the canonical unit.
     fn_setAdsbRadiusKm(value) {
-        this._setValue(js_globals.LS_ADSB_RADIUS_KM, value.toString());
+        this._setValue(LS_ADSB_RADIUS_KM, value.toString());
     }
 
     fn_getAdsbRadiusKm() {
-        const v = parseInt(this._getValue(js_globals.LS_ADSB_RADIUS_KM, ''));
+        const v = parseInt(this._getValue(LS_ADSB_RADIUS_KM, ''));
         const max = (js_siteConfig.CONST_ADSB_CONFIG && js_siteConfig.CONST_ADSB_CONFIG.RADIUS_KM) || 850;
         if (isNaN(v) || v < 2 || v > max) return null;
         return v;
@@ -301,87 +311,87 @@ class CLocalStorage {
     // (then config.local/config.json, then js_siteConfig defaults). These
     // back the editable fields in the ADSB settings tab.
     fn_setAdsbProvider(value) {
-        this._setValue(js_globals.LS_ADSB_PROVIDER, value);
+        this._setValue(LS_ADSB_PROVIDER, value);
     }
 
     fn_getAdsbProvider() {
-        return this._getValue(js_globals.LS_ADSB_PROVIDER, '');
+        return this._getValue(LS_ADSB_PROVIDER, '');
     }
 
     fn_removeAdsbProvider() {
-        this._removeValue(js_globals.LS_ADSB_PROVIDER);
+        this._removeValue(LS_ADSB_PROVIDER);
     }
 
     fn_setAdsbRefreshRateMs(value) {
-        this._setValue(js_globals.LS_ADSB_REFRESH_RATE_MS, value);
+        this._setValue(LS_ADSB_REFRESH_RATE_MS, value);
     }
 
     fn_getAdsbRefreshRateMs() {
-        const v = parseInt(this._getValue(js_globals.LS_ADSB_REFRESH_RATE_MS, ''));
+        const v = parseInt(this._getValue(LS_ADSB_REFRESH_RATE_MS, ''));
         return isNaN(v) || v < 1000 ? null : v;
     }
 
     fn_removeAdsbRefreshRateMs() {
-        this._removeValue(js_globals.LS_ADSB_REFRESH_RATE_MS);
+        this._removeValue(LS_ADSB_REFRESH_RATE_MS);
     }
 
     fn_setAdsbOpenSkyClientId(value) {
-        this._setValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID, value);
+        this._setValue(LS_ADSB_OPENSKY_CLIENT_ID, value);
     }
 
     fn_getAdsbOpenSkyClientId() {
-        return this._getValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID, '');
+        return this._getValue(LS_ADSB_OPENSKY_CLIENT_ID, '');
     }
 
     fn_removeAdsbOpenSkyClientId() {
-        this._removeValue(js_globals.LS_ADSB_OPENSKY_CLIENT_ID);
+        this._removeValue(LS_ADSB_OPENSKY_CLIENT_ID);
     }
 
     fn_setAdsbOpenSkyClientSecret(value) {
-        this._setValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET, value);
+        this._setValue(LS_ADSB_OPENSKY_CLIENT_SECRET, value);
     }
 
     fn_getAdsbOpenSkyClientSecret() {
-        return this._getValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET, '');
+        return this._getValue(LS_ADSB_OPENSKY_CLIENT_SECRET, '');
     }
 
     fn_removeAdsbOpenSkyClientSecret() {
-        this._removeValue(js_globals.LS_ADSB_OPENSKY_CLIENT_SECRET);
+        this._removeValue(LS_ADSB_OPENSKY_CLIENT_SECRET);
     }
 
     // Volume
     fn_setVolume(value) {
-        this._setValue(js_globals.LS_DEFAULT_VOLUME, value.toString());
+        this._setValue(LS_DEFAULT_VOLUME, value.toString());
     }
 
     fn_getVolume() {
-        return parseInt(this._getValue(js_globals.LS_DEFAULT_VOLUME, js_globals.CONST_DEFAULT_VOLUME.toString()));
+        return parseInt(this._getValue(LS_DEFAULT_VOLUME, js_globals.CONST_DEFAULT_VOLUME.toString()));
     }
 
     // Tabs Display Enabled
     fn_setTabsDisplayEnabled(value) {
-        this._setValue(js_globals.LS_TAB_DISPLAY_ENABLED, value.toString());
+        this._setValue(LS_TAB_DISPLAY_ENABLED, value.toString());
     }
 
     fn_getTabsDisplayEnabled() {
-        return this._getValue(js_globals.LS_TAB_DISPLAY_ENABLED, 'true') === 'true';
+        return this._getValue(LS_TAB_DISPLAY_ENABLED, 'true') === 'true';
     }
 
     fn_setGCSShowMe(value) {
-        this._setValue(js_globals.LS_SHOW_ME_GCS, value.toString());
+        this._setValue(LS_SHOW_ME_GCS, value.toString());
     }
 
     fn_getGCSShowMe() {
-        return this._getValue(js_globals.LS_SHOW_ME_GCS, 'true') === 'true';
+        return this._getValue(LS_SHOW_ME_GCS, 'true') === 'true';
     }
 
     // Unit Sort Enabled
     fn_setUnitSortEnabled(value) {
-        this._setValue(js_globals.LS_UNIT_SORTED_ENABLED, value.toString());
+        this._setValue(LS_UNIT_SORTED_ENABLED, value.toString());
     }
 
     fn_getUnitSortEnabled() {
-        return this._getValue(js_globals.LS_UNIT_SORTED_ENABLED, 'true') === 'true';
+        return this._getValue(LS_UNIT_SORTED_ENABLED, 'true') === 'true';
     }
 
     // Advanced Options Enabled
@@ -404,19 +414,19 @@ class CLocalStorage {
 
     // Selected Theme
     fn_setSelectedTheme(value) {
-        this._setValue(js_globals.LS_SELECTED_THEME, value);
+        this._setValue(LS_SELECTED_THEME, value);
     }
 
     fn_getSelectedTheme() {
-        return this._getValue(js_globals.LS_SELECTED_THEME, 'default');
+        return this._getValue(LS_SELECTED_THEME, 'default');
     }
 
     fn_setWebConnectorEnabled(value) {
-        this._setValue(js_globals.LS_WEBCONNECTOR_ENABLED, value === true ? 'true' : 'false');
+        this._setValue(LS_WEBCONNECTOR_ENABLED, value === true ? 'true' : 'false');
     }
 
     fn_getWebConnectorEnabled() {
-        return this._getValue(js_globals.LS_WEBCONNECTOR_ENABLED, 'true') === 'true';
+        return this._getValue(LS_WEBCONNECTOR_ENABLED, 'true') === 'true';
     }
 
     // WS2WS/Mavlink3D Enabled
@@ -495,11 +505,11 @@ class CLocalStorage {
 
     // SMS Phone Number (used by Andruav SMS-with-location control)
     fn_setSMSPhoneNumber(value) {
-        this._setValue(js_globals.LS_SMS_PHONE_NUMBER, value);
+        this._setValue(LS_SMS_PHONE_NUMBER, value);
     }
 
     fn_getSMSPhoneNumber() {
-        return this._getValue(js_globals.LS_SMS_PHONE_NUMBER, '');
+        return this._getValue(LS_SMS_PHONE_NUMBER, '');
     }
 }
 

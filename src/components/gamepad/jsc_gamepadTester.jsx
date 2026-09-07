@@ -4,6 +4,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import { js_speak } from '../../js/js_speak.js';
 import { fn_helpPage, fn_do_modal_alert } from '../../js/js_main.js';
+import { LS_GAME_PAD_CONFIG_PREFIX } from '../../js/storage/keys.js';
 
 const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
 const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';
@@ -98,7 +99,7 @@ export default class ClssGamepadTester extends React.Component {
     reader.onload = function(e) {
       try {
         const configs = JSON.parse(e.target.result);
-        const configPrefix = js_globals.LS_GAME_PAD_CONFIG_PREFIX;
+        const configPrefix = LS_GAME_PAD_CONFIG_PREFIX;
 
         for (let i = js_localStorage.length - 1; i >= 0; i--) {
           const key = js_localStorage.key(i);
@@ -221,7 +222,7 @@ export default class ClssGamepadTester extends React.Component {
       },
       axisFunctions: prevState.axisFunctions.map(() => 'undefined'),
     }), () => {
-      js_localStorage._removeValue(`${js_globals.LS_GAME_PAD_CONFIG_PREFIX}${selectedConfig}`);
+      js_localStorage._removeValue(`${LS_GAME_PAD_CONFIG_PREFIX}${selectedConfig}`);
       this.checkGamepads();
     });
   };

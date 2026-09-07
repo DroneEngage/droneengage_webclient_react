@@ -167,40 +167,7 @@ class GLOBALS {
 			'#57FF33'  // Lighter Green
 		];
 
-		// LOCAL STORAGE
-		this.LS_UNIT_ID = '_vUnitID';
-		this.LS_UNIT_ID_SHARED = '_vUnitIDShared';
-		this.LS_EMAIL = '_vEmail;'
-		this.LS_LOGIN_NAME = '_vLoginName;'
-		this.LS_GROUP_NAME = '_vGroupName;'
-		this.LS_LANG = '_vLang';
-		this.LS_WEB_GCS = 'WEB_GCS_';
-		this.LS_ACCESS_CODE = '_vAccessCode';
-		this.LS_DISPLAY_MODE = '_vDisplayMode';
-		this.LS_GAME_PAD_MODE = 'gamepad_mode_';
-		this.LS_GAME_PAD_CONFIG_PREFIX = 'gamepad_config_';
-		this.LS_GAME_PAD_CONFIG_INDEX = '_vv_gamePadConfigIndex';
-		this.LS_DEFAULT_ALT = '_vDefaultAltitude';
-		this.LS_ENABLE_SPEECH = '_vv_speechEnabled';
-		this.LS_DEFAULT_VOLUME = '_vDefaultVolume';
-		this.LS_TAB_DISPLAY_ENABLED = '_vTabsDisplayEnabled';
-		this.LS_METRIC_SYS = '_vv_useMetricSystem';
-		this.LS_SHOW_ME_GCS = '_vGCSShowMe';
-		this.LS_UNIT_SORTED_ENABLED = '_vUnitSortEnabled';
-		this.LS_SELECTED_THEME = '_vSelectedTheme';
-		this.LS_WEBCONNECTOR_ENABLED = '_vWSPluginEnabled';
-		this.LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
-		this.LS_ENABLE_ADSB = '_vADSBEnabled';
-		this.LS_ENABLE_AISSTREAM = '_vAISStreamEnabled';
-		this.LS_ENABLE_WIND = '_vWindEnabled';
-		this.LS_ADSB_RADIUS_KM = '_vADSBRadiusKm';
-		// ADSB provider config overrides (editable from the ADSB settings tab).
-		// localStorage has highest priority, then config.local/config.json,
-		// then the defaults in js_siteConfig.CONST_ADSB_CONFIG.
-		this.LS_ADSB_PROVIDER = '_vADSBProvider';
-		this.LS_ADSB_REFRESH_RATE_MS = '_vADSBRefreshRateMs';
-		this.LS_ADSB_OPENSKY_CLIENT_ID = '_vADSBOpenSkyClientId';
-		this.LS_ADSB_OPENSKY_CLIENT_SECRET = '_vADSBOpenSkyClientSecret';
+		// LOCAL STORAGE keys moved to src/js/storage/keys.js
 
 
 
