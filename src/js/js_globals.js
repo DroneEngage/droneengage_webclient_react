@@ -15,54 +15,8 @@ class GLOBALS {
 		// waypoint cache moved to js_waypointCache (services/waypoint/waypointCache.js).
 
 		this.m_current_tab_status = 'unknown';
-		
-		this.planes_icon = ['/images/planetracker_r_0d_.png',
-			'/images/planetracker_y_0d_.png',
-			'/images/planetracker_g_0d_.png',
-			'/images/planetracker_b_0d_.png'];
 
-
-		this.quad_icon = ['/images/drone_qq_1_0d.png',
-			'/images/drone_qq_2_0d.png',
-			'/images/drone_qq_3_0d.png',
-			'/images/drone_qq_4_0d.png'];
-
-
-		this.rover_icon = ['/images/car1.png',
-			'/images/car2.png',
-			'/images/car3.png',
-			'/images/car4.png'];
-
-
-		this.boat_icon = ['/images/boat1.png',
-			'/images/boat2.png',
-			'/images/boat3.png',
-			'/images/boat4.png'];
-
-
-		this.flightPath_colors = [
-			'#75A4D3',
-			'#75D3A4',
-			'#A475D3',
-			'#A4D375',
-			'#D3A475',
-			'#D375A4'
-		];
-
-
-		this.swarm_quad_location_icon = [
-			'/images/drone_q1_32x32.png',
-			'/images/drone_q2_32x32.png',
-			'/images/drone_q3_32x32.png',
-			'/images/drone_q4_32x32.png',
-		];
-
-		this.swarm_plane_location_icon = [
-			'/images/drone_1_32x32.png',
-			'/images/drone_2_32x32.png',
-			'/images/drone_3_32x32.png',
-			'/images/drone_4_32x32.png',
-		];
+		// icon/colour arrays moved to src/js/config/assets.js
 
 
 
@@ -151,21 +105,7 @@ class GLOBALS {
 		// Mission File Extension
 		this.v_mission_file_extension = '.de';
 
-		// map Color Selection
-		this.v_colorDrawPathes = [
-			'#FF5733', // Vivid Orange-Red (XYZ)
-			'#33FF57', // Bright Lime Green (ZYX)
-			'#5733FF', // Deep Blue-Violet (YZX)
-			'#FF33C7', // Magenta-Pink (XZY)
-			'#33C7FF', // Cyan-Blue (ZXY)
-			'#C7FF33', // Chartreuse Yellow (YXZ)
-			'#FFC733', // Golden Yellow
-			'#33FFC7', // Sea Green
-			'#C733FF', // Purple
-			'#3357FF', // Darker Blue
-			'#FF3357', // Darker Red
-			'#57FF33'  // Lighter Green
-		];
+		// map Color Selection moved to src/js/config/assets.js
 
 		// LOCAL STORAGE keys moved to src/js/storage/keys.js
 
@@ -309,15 +249,7 @@ class GLOBALS {
 		this.CONST_IR_DIGITAL_ZOOM_MIN = 1.0;
 		this.CONST_IR_DIGITAL_ZOOM_MAX = 32.0; // A40TR-Pro
 
-		// Dialog Icons
-		this.DIALOG_ICONS = {
-			GOTO: '↗',
-			CLOSE: '×',
-			MINIMIZE: '▼',
-			MAXIMIZE: '▲',
-			OPAQUE: '●',
-			TRANSPARENT: '○',
-		};
+		// Dialog Icons moved to src/js/config/assets.js
 
 	}
 

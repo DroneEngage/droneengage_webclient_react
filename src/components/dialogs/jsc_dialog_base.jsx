@@ -2,6 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js';
 import { js_globals } from '../../js/js_globals.js';
+import { DIALOG_ICONS } from '../../js/config/assets.js';
 
 class ClssDialogBase extends React.Component {
     constructor(props) {
@@ -78,21 +79,21 @@ class ClssDialogBase extends React.Component {
             <div className="card-header bg-warning text-dark js-draggable-handle">
                 <strong>{p_title}</strong>
                 <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_closeDialog()}>
-                    {js_globals.DIALOG_ICONS.CLOSE}
+                    {DIALOG_ICONS.CLOSE}
                 </button>
                 {!isCompact && (
                     <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
-                        {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+                        {this.state.isMinimized ? DIALOG_ICONS.MAXIMIZE : DIALOG_ICONS.MINIMIZE}
                     </button>
                 )}
                 {!isCompact && (
                     <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_opacityDialog()}>
-                        {this.state.opaque_clicked ? js_globals.DIALOG_ICONS.OPAQUE : js_globals.DIALOG_ICONS.TRANSPARENT}
+                        {this.state.opaque_clicked ? DIALOG_ICONS.OPAQUE : DIALOG_ICONS.TRANSPARENT}
                     </button>
                 )}
                 {showGotoButton && hasValidPartyID && (
                     <button type="button" className="btn btn-sm btn-link text-dark float-end p-0 ms-2" onClick={() => this.fn_gotoUnit()}>
-                        {js_globals.DIALOG_ICONS.GOTO}
+                        {DIALOG_ICONS.GOTO}
                     </button>
                 )}
                 {extraHeaderButtons}

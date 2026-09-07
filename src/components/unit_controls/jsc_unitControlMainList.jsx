@@ -6,6 +6,7 @@ import { withTranslation } from 'react-i18next';
 
 import * as js_common from '../../js/js_common.js'
 import {js_globals} from '../../js/js_globals.js';
+import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 
@@ -322,7 +323,7 @@ class ClssAndruavUnitList extends React.Component {
                             {v_hasUnits === true
                             ? <>
                                 <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
-                                    {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+                                    {this.state.isMinimized ? DIALOG_ICONS.MAXIMIZE : DIALOG_ICONS.MINIMIZE}
                                 </button>
                                 <button type="button" className={`btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2 ${v_tabsEnabled ? 'bi bi-list-ul' : 'bi bi-list-nested'}`} title={t('globalSettings:tabsDisplayLabel')} onClick={() => this.fn_toggleTabsDisplay()}>
                                 </button>

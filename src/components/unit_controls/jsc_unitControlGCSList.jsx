@@ -2,6 +2,7 @@ import React    from 'react';
 import { withTranslation } from 'react-i18next';
 
 import {js_globals} from '../../js/js_globals.js';
+import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
@@ -141,7 +142,7 @@ class ClssAndruavUnitGCSList extends React.Component {
                 <div className="card-header user-select-none py-1 border-bottom border-light rounded-top txt-theme-aware">
                     <strong>{t('home:onlineGCS')}</strong>
                     <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
-                        {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+                        {this.state.isMinimized ? DIALOG_ICONS.MAXIMIZE : DIALOG_ICONS.MINIMIZE}
                     </button>
                 </div>
                 <div className="py-1" style={{ display: this.state.isMinimized ? 'none' : 'block' }}>

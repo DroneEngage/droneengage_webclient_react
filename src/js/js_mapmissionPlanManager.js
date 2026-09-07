@@ -1,4 +1,5 @@
 import { js_globals } from './js_globals.js';
+import { v_colorDrawPathes } from './config/assets.js';
 import { ClssAndruavMissionPlan } from './js_plan_mission.js';
 
 /**
@@ -32,7 +33,7 @@ class ClssAndruavMissionPlanManager {
      */
     fn_createNewMission() {
         // Determine the initial color for the mission path from globals
-        const c_initColor = js_globals.v_colorDrawPathes[this.m_missionCounter % js_globals.v_colorDrawPathes.length];
+        const c_initColor = v_colorDrawPathes[this.m_missionCounter % v_colorDrawPathes.length];
 
         // Create a new mission plan instance
         let v_missionPlan = new ClssAndruavMissionPlan(this.m_missionCounter, c_initColor);

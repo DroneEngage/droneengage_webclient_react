@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { fn_gotoUnit_byPartyID } from '../../js/js_main.js';
 import { js_globals } from '../../js/js_globals.js';
+import { DIALOG_ICONS } from '../../js/config/assets.js';
 
 class ClssModalDialogBase extends React.Component {
     constructor(props) {
@@ -77,11 +78,11 @@ class ClssModalDialogBase extends React.Component {
                             className="btn btn-sm btn-link text-white p-0 ms-2"
                             onClick={() => this.fn_gotoUnit()}
                         >
-                            {js_globals.DIALOG_ICONS.GOTO}
+                            {DIALOG_ICONS.GOTO}
                         </button>
                     )}
                     <button type="button" className="btn btn-sm btn-link text-white p-0 ms-2" onClick={() => this.fn_closeDialog()} aria-label="Close">
-                        {js_globals.DIALOG_ICONS.CLOSE}
+                        {DIALOG_ICONS.CLOSE}
                     </button>
                 </div>
             </div>

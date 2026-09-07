@@ -15,6 +15,7 @@ import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';
+import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from './config/assets.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_speak } from './js_speak'
 import * as js_common from './js_common.js'
@@ -2582,11 +2583,11 @@ var EVT_msgFromUnit_WayPoints = function (me, data) {
 	}
 
 	if (LngLatPoints.length > 0) {
-		p_andruavUnit.m_wayPoint.polylines = js_leafletmap.fn_drawMissionPolyline(LngLatPoints, js_globals.flightPath_colors[p_andruavUnit.m_index % 4]);
+		p_andruavUnit.m_wayPoint.polylines = js_leafletmap.fn_drawMissionPolyline(LngLatPoints, flightPath_colors[p_andruavUnit.m_index % 4]);
 	}
 
 	// Mirror the mission on the 3D map (markers + elevated path + loiter rings).
-	js_map3d.fn_syncMissionWaypoints(p_andruavUnit, wayPointArray, js_globals.flightPath_colors[p_andruavUnit.m_index % 4]);
+	js_map3d.fn_syncMissionWaypoints(p_andruavUnit, wayPointArray, flightPath_colors[p_andruavUnit.m_index % 4]);
 }
 
 
@@ -2696,13 +2697,13 @@ function getDestinationPointIcon(p_andruavUnit) {
 			{
 				switch (p_andruavUnit.m_VehicleType) {
 					case js_andruavUnit.VEHICLE_PLANE:
-						return js_globals.swarm_plane_location_icon[c_vehicle_index];
+						return swarm_plane_location_icon[c_vehicle_index];
 					case js_andruavUnit.VEHICLE_TRI:
 					case js_andruavUnit.VEHICLE_QUAD:
 					case js_andruavUnit.VEHICLE_VTOL:
 					case js_andruavUnit.VEHICLE_ROVER:
 					default:
-						return js_globals.swarm_quad_location_icon[c_vehicle_index];
+						return swarm_quad_location_icon[c_vehicle_index];
 				}
 			}
 		default:
@@ -2722,25 +2723,25 @@ export function getVehicleIcon(p_andruavUnit, applyBearing) {
 		switch (p_andruavUnit.m_VehicleType) {
 			case js_andruavUnit.VEHICLE_TRI:
 				p_andruavUnit.m_VehicleType_TXT = "Tricopter";
-				return js_globals.quad_icon[p_andruavUnit.m_index % 4];
+				return quad_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_QUAD:
 				p_andruavUnit.m_VehicleType_TXT = "Quadcopter";
-				return js_globals.quad_icon[p_andruavUnit.m_index % 4];
+				return quad_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_VTOL:
 				p_andruavUnit.m_VehicleType_TXT = "VTOL Wings";
-				return js_globals.planes_icon[p_andruavUnit.m_index % 4];
+				return planes_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_PLANE:
 				p_andruavUnit.m_VehicleType_TXT = "Fixed Wings";
-				return js_globals.planes_icon[p_andruavUnit.m_index % 4];
+				return planes_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_HELI:
 				p_andruavUnit.m_VehicleType_TXT = "Heli";
 				return '/images/heli_1_32x32.png';
 			case js_andruavUnit.VEHICLE_ROVER:
 				p_andruavUnit.m_VehicleType_TXT = "Rover";
-				return js_globals.rover_icon[p_andruavUnit.m_index % 4];
+				return rover_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_BOAT:
 				p_andruavUnit.m_VehicleType_TXT = "Boat";
-				return js_globals.boat_icon[p_andruavUnit.m_index % 4];
+				return boat_icon[p_andruavUnit.m_index % 4];
 			case js_andruavUnit.VEHICLE_SUBMARINE:
 				p_andruavUnit.m_VehicleType_TXT = "Submarine";
 				return '/images/submarine_gb_32x32.png';
@@ -2780,7 +2781,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			p_andruavUnit.m_flightPathHistory.fn_flush();
 			js_map3d.fn_flushPath(p_andruavUnit);
 			layers.m_flightPath_style = {
-				color: js_globals.flightPath_colors[p_andruavUnit.m_index % 4],
+				color: flightPath_colors[p_andruavUnit.m_index % 4],
 				opacity: 0.8,
 				weight: 5,
 				dashArray: '5, 5'

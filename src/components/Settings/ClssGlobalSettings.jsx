@@ -2,6 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 import * as js_andruav_facade from '../../js/protocol/server_comm/js_andruav_facade.js';
 import { js_globals } from '../../js/js_globals.js';
+import { DIALOG_ICONS } from '../../js/config/assets.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
@@ -130,7 +131,7 @@ class ClssGlobalSettings extends React.Component {
           <div className="card-header text-center user-select-none">
             <strong>{t('globalSettings:settingsTitle')}</strong>
             <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
-              {this.state.isMinimized ? js_globals.DIALOG_ICONS.MAXIMIZE : js_globals.DIALOG_ICONS.MINIMIZE}
+              {this.state.isMinimized ? DIALOG_ICONS.MAXIMIZE : DIALOG_ICONS.MINIMIZE}
             </button>
           </div>
           <div className="card-body" style={{ display: this.state.isMinimized ? 'none' : 'block' }}>
