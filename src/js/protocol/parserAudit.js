@@ -5,7 +5,7 @@
  * classify it:
  *   - migrated   → in fn_isMigrated (handled by reduce/runtime)
  *   - binary     → handled by parseBinaryAndruavMessage
- *   - old-switch → has a live case in parseCommunicationMessage
+ *   - old-switch → (empty — parseCommunicationMessage was deleted)
  *   - UNHANDLED  → in none of the above — a missed case
  *
  * In dev mode, logs the classification summary + any unhandled types.
@@ -24,37 +24,9 @@ const BINARY_TYPES = new Set([
     js_andruavMessages.CONST_TYPE_AndruavMessage_IMG,
 ]);
 
-// Types that have a live case in parseCommunicationMessage (the old switch).
-// These are the fallback bodies for earlier-migrated types. If the switch
-// is deleted, remove this set.
-const OLD_SWITCH_TYPES = new Set([
-    js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_STATUS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_Chat,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_UdpProxy_Info,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_GPS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_CameraFlash,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_CameraZoom,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_Node,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_BSSID,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_CommSignalsStatus,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_Communication_Line_Status,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_ID,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_ACTION,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_INFO,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_RemoteExecute,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_POW,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_DistinationLocation,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_GEOFenceHit,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_DroneReport,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_GPIO_STATUS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_STATUS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_Error,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_NAV_INFO,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_STATUS,
-    js_andruavMessages.CONST_TYPE_AndruavMessage_MODULE_HEALTH_STATUS,
-]);
+// parseCommunicationMessage was deleted in TASK-02.6. There is no old
+// switch fallback. This set is kept empty for the classification logic.
+const OLD_SWITCH_TYPES = new Set([]);
 
 export function fn_auditMessageTypes() {
     const all = [];

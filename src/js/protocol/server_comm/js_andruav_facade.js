@@ -29,7 +29,6 @@ import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { CCommandAPI } from '../messages/js_commands_api.js'
 import {CCommandAPI_ViewLink} from '../messages/js_commands_api_viewlinks.js'
 import * as js_andruav_ws from './js_andruav_ws.js';
-import * as js_andruav_parser from './js_andruav_parser.js'
 
 
 import { mavlink20 } from '../../js_mavlink_v2.js'

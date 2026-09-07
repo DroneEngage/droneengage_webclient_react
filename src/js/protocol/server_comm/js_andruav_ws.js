@@ -604,14 +604,11 @@ class CAndruavClientWS {
 
                             case CMD_COMM_GROUP:
                             case CMD_COMM_INDIVIDUAL:
-                                // TASK-02: try the new pure decode/reduce/effects path
-                                // first. If the message type is migrated, fn_handleFrame
-                                // does everything and returns true; otherwise fall through
-                                // to the old switch. Both paths must not run for the same
-                                // frame.
-                                if (!fn_handleFrame(p_jmsg, evt)) {
-                                    js_andruav_parser.AndruavClientParser.parseCommunicationMessage(Me, p_jmsg, evt);
-                                }
+                                // TASK-02: fn_handleFrame handles all migrated JSON
+                                // message types via the pure decode/reduce/effects
+                                // pipeline. Unmigrated types are logged (dev mode)
+                                // and silently dropped — the old switch is gone.
+                                fn_handleFrame(p_jmsg, evt);
                                 break;
                         }
                         // js_common.fn_console_log('msg:' + JSON.stringify(p_jmsg)); // Disable in production for perf
