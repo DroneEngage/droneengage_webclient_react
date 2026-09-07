@@ -4,6 +4,7 @@
     "lib": ["ES2020", "DOM"],
     "module": "ESNext",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "allowJs": true,
     "checkJs": false,
     "noEmit": true,
