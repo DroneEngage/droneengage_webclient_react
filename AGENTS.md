@@ -3,14 +3,21 @@
 Browser-based GCS for DroneEngage/Andruav. React 19 + Bootstrap 5 + Leaflet,
 built with `react-scripts` (CRA) + a custom `webpack.config.js` override.
 
-## Build / lint
+## Build / lint / typecheck
 
-    npm run build   # production build (react-scripts build --config-overrides ./webpack.config.js)
-    npm run lint    # eslint src
-    npm start       # dev server (HTTPS, openssl-legacy-provider)
+    npm run build       # production build (react-scripts build --config-overrides ./webpack.config.js)
+    npm run lint        # eslint src
+    npm run typecheck   # tsc --noEmit (checks src/js/core/**/* only)
+    npm start           # dev server (HTTPS, openssl-legacy-provider)
 
 The build emits warnings from pre-existing code; treat only **errors** as
 failures. ESLint config is in `package.json` (`eslintConfig`).
+
+`npm run typecheck` runs TypeScript in check-only mode (`tsc --noEmit`)
+scoped to `src/js/core/**/*` by `tsconfig.json` (TASK-06). It does NOT
+type-check plain `.js` files (`checkJs: false`) and does NOT add a build
+step — CRA/babel still compiles `.ts` files for the bundle. Run it
+alongside `npm run lint` in any CI that lints.
 
 ## ADSB abstraction layer
 
