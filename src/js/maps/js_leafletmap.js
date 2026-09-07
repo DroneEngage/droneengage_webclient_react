@@ -533,6 +533,20 @@ class CLeafLetAndruavMap {
         let v_site_copyright;
          v_site_copyright = '&copy; <a href="' + (js_siteConfig.CONST_HOME_URL || '#') + '">' + (js_siteConfig.CONST_TITLE || 'Map') + '</a>';
 
+        // HMR / re-init guard: if the container element already has a Leaflet
+        // map attached (container._leaflet_id set), L.map() throws
+        // "Map container is already initialized". After a hot module reload the
+        // singleton is re-created (m_Map=null) but the DOM element keeps the
+        // stale _leaflet_id, so the re-init throws and m_Map stays null — which
+        // then crashes every downstream m_Map.on(...) / m_Map.xxx call.
+        // Clear the stale id so L.map() accepts the container. The orphaned old
+        // map instance is GC'd; this path only occurs during HMR, not in prod.
+        const container = (typeof p_mapelement === 'string')
+            ? document.getElementById(p_mapelement)
+            : p_mapelement;
+        if (container && container._leaflet_id != null) {
+            container._leaflet_id = null;
+        }
 
         this.m_Map = L.map(p_mapelement, {
             center: [51.505, -0.09],

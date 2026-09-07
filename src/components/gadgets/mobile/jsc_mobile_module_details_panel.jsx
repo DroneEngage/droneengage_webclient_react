@@ -15,7 +15,7 @@ import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
  * ClssModuleDetails in the desktop details tab.
  */
 const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation();
   const [, forceUpdate] = useState(0);
   const [expandedModule, setExpandedModule] = useState(null);
   const tickRef = useRef(0);
