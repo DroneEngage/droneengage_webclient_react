@@ -95,7 +95,7 @@ class CAndruavClientParser {
 
         this.m_lastparamatersUpdateTime = 0;
 
-        this.m_andruavGeoFences = {}; // list of fences each fence ha s list of attached units.
+        // m_andruavGeoFences removed — moved to js_geoFenceRegistry (services/geo/geoFenceRegistry.js).
         this.videoFrameCount = 0;
         this.mavlinkProcessor = new MAVLink20Processor(null, 0, 0);
 
@@ -164,61 +164,9 @@ class CAndruavClientParser {
         }
     }
 
-    #prv_parseFenceInfo(p_andruavUnit, p_jmsg) {
-        let fencetype;
-        let m_shouldKeepOutside = false;
-        // var jmsg 				= msg.msgPayload;
-
-        let v_geoFenceName = p_jmsg.n;
-        let v_maximumDistance = (p_jmsg.hasOwnProperty('r')) ? p_jmsg.r : 0; // optional
-        if (p_jmsg.hasOwnProperty('o')) { // 1 if restricted area
-            if (typeof p_jmsg.o === 'number') {
-                // p_jmsg.o is an integer [backward compatibility]
-                m_shouldKeepOutside = (p_jmsg.o === 1);
-            } else if (typeof p_jmsg.o === 'boolean') {
-                // p_jmsg.o is a boolean
-                m_shouldKeepOutside = p_jmsg.o;
-            }
-        }
-        if (p_jmsg.hasOwnProperty('t')) { // 1 if restricted area
-            switch (p_jmsg.t) {
-                case 1: fencetype = js_andruavMessages.CONST_TYPE_LinearFence;
-                    break;
-
-                case 2: fencetype = js_andruavMessages.CONST_TYPE_PolygonFence;
-                    break;
-
-                case 3: fencetype = js_andruavMessages.CONST_TYPE_CylinderFence;
-                    break;
-            }
-        }
-        let geoFenceInfo = {};
-        let LngLatPoints = [];
-
-        let count = (fencetype === js_andruavMessages.CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
-
-        for (let i = 0; i < count; ++i) {
-            let lnglat = {};
-            lnglat.lat = parseFloat(p_jmsg[i].a);
-            lnglat.lng = parseFloat(p_jmsg[i].g);
-            if (p_jmsg[i].hasOwnProperty('l'))
-                lnglat.alt = parseFloat(p_jmsg[i].l);
-            else
-                lnglat.alt = 0;
-            // altitude
-            LngLatPoints.push(lnglat);
-        }
-        geoFenceInfo.m_shouldKeepOutside = m_shouldKeepOutside;
-        geoFenceInfo.fencetype = fencetype;
-        geoFenceInfo.LngLatPoints = LngLatPoints;
-        geoFenceInfo.m_geoFenceName = v_geoFenceName;
-        geoFenceInfo.m_maximumDistance = v_maximumDistance;
-
-        geoFenceInfo.isEditable = (p_andruavUnit === null || p_andruavUnit === undefined);
-        js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitGeoFenceUpdated, { unit: p_andruavUnit, fence: geoFenceInfo });
-    };
-
-
+    // #prv_parseFenceInfo removed — its pure body moved to fn_parseFenceInfo
+    // in core/protocol/reduce.js. The GeoFence/ExternalGeoFence reducers wrap
+    // its output in an EE_andruavUnitGeoFenceUpdated event.
 
 
     // #prv_onNewUnitAdded removed — the 3 facade calls moved to
@@ -565,20 +513,6 @@ class CAndruavClientParser {
                     js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                 }
                 break;
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_ExternalGeoFence: {
-                if (msg.senderName !== '_sys_')
-                    return;
-
-                // this is a system command
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-                this.#prv_parseFenceInfo(null, p_jmsg);
-
-            }
-                break;
-
             case js_andruavMessages.CONST_TYPE_AndruavMessage_HomeLocation:
                 {
 
@@ -614,66 +548,6 @@ class CAndruavClientParser {
 
                 }
                 break;
-
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFence:
-                {
-                    p_jmsg = msg.msgPayload;
-                    if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                        p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                    }
-                    this.#prv_parseFenceInfo(p_unit, p_jmsg); //msg.msgPayload);
-                }
-                break;
-
-
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_GeoFenceAttachStatus: {
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-                const geoFenceAttachStatus = {};
-                geoFenceAttachStatus.fenceName = p_jmsg.n;
-                geoFenceAttachStatus.isAttachedToFence = p_jmsg.a;
-                const fence = this.m_andruavGeoFences[geoFenceAttachStatus.fenceName];
-
-                if (geoFenceAttachStatus.isAttachedToFence === true) { /*
-						* If Action Attach:
-						*  // we need to
-							// 1- Make sure we have this fence --- if not then ask for it from this drone.
-							// 2- Add this Drone to the fence
-						*/
-                    if (fence === null || fence === undefined) {
-                        js_eventEmitter.fn_dispatch('__facadeRequestGeoFences', { unit: p_unit, fenceName: geoFenceAttachStatus.fenceName });
-                        return;
-                    } else {
-                        if (fence.Units[p_unit.getPartyID()] === null || fence.Units[p_unit.getPartyID()] === undefined) { // not added to this fence .. attach p_unit to fence with missing measures.
-                            let geoFenceInfo = {};
-                            geoFenceInfo.hasValue = false;
-                            geoFenceInfo.fenceName = fence.m_geoFenceName;
-                            geoFenceInfo.m_inZone = false; // remember isValid = false
-                            geoFenceInfo.distance = Number.NaN;
-                            geoFenceInfo.m_shouldKeepOutside = fence.m_shouldKeepOutside;
-
-                            fence.Units[p_unit.getPartyID()] = {};
-                            fence.Units[p_unit.getPartyID()].geoFenceInfo = geoFenceInfo;
-                        }
-                        // else every thig already is there
-                    }
-                } else { /*
-						* If Action DeAttach:
-						// 1- Deattach Drone from fence... if we dont have this fence then we DONT want IT
-						// If another drone uses it we will know and ask for it from that drone.
-						* 			
-						* */
-                    if ((fence !== null && fence !== undefined)) {
-                        if (fence.Units[p_unit.getPartyID()] !== null && fence.Units[p_unit.getPartyID()] !== undefined) {
-                            delete fence.Units[p_unit.getPartyID()];
-                        }
-                    }
-                }
-            }
-                break;
-
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_GEOFenceHit: {
                 p_jmsg = msg.msgPayload;

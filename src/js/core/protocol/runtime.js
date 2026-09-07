@@ -24,7 +24,9 @@ import { EVENTS as js_event } from '../../events/js_eventList.js';
 import { js_globals } from '../../js_globals.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
-import { CONST_TYPE_AndruavMessage_CommSignalsStatus } from '../../protocol/messages/js_andruavMessages.js';
+import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
+import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
+         CONST_TYPE_AndruavMessage_ExternalGeoFence } from '../../protocol/messages/js_andruavMessages.js';
 
 /**
  * Handle one inbound frame. Returns true if the message type was migrated
@@ -42,6 +44,13 @@ export function fn_handleFrame(p_frame, evt) {
     // runs cleanly with no double getOrCreateUnit / message accounting.
     if (!fn_isMigrated(msg.type)) {
         return false;
+    }
+
+    // ExternalGeoFence: transport-level senderName guard. Only '_sys_' is
+    // allowed to send external fences; anything else is dropped (matches the
+    // old switch's early `return;`). Checked here so reduce stays pure.
+    if (msg.type === CONST_TYPE_AndruavMessage_ExternalGeoFence && msg.senderID !== '_sys_') {
+        return true;
     }
 
     const isIDMessage = (msg.type === 1004 /* CONST_TYPE_AndruavMessage_ID */);
@@ -92,6 +101,12 @@ export function fn_handleFrame(p_frame, evt) {
                     notifyUnitFieldChanged(pid, fp);
                 }
             }
+            // Runtime-only pseudo-events (prefixed __) are handled here, not
+            // dispatched through the event emitter.
+            if (ev.name === '__geoFenceAttach') {
+                fn_handleGeoFenceAttach(ev.payload);
+                continue;
+            }
             js_eventEmitter.fn_dispatch(ev.name, ev.payload);
         }
     }
@@ -138,6 +153,34 @@ function callUnitMethod(unit, methodPath, arg) {
     if (parent && typeof parent[methodName] === 'function') {
         if (Array.isArray(arg)) parent[methodName](...arg);
         else parent[methodName](arg);
+    }
+}
+
+// GeoFenceAttachStatus: apply attach/detach intent to the shared registry.
+// Mirrors the old parser case exactly: attach adds the unit if the fence
+// exists (or requests it if missing); detach removes the unit.
+function fn_handleGeoFenceAttach(payload) {
+    const { unit, fenceName, isAttached } = payload;
+    const fence = js_geoFenceRegistry.fn_get(fenceName);
+    if (isAttached === true) {
+        if (fence === null) {
+            js_eventEmitter.fn_dispatch('__facadeRequestGeoFences', { unit, fenceName });
+            return;
+        }
+        if (js_geoFenceRegistry.fn_getUnit(fenceName, unit.getPartyID()) === null) {
+            const geoFenceInfo = {
+                hasValue: false,
+                fenceName: fence.m_geoFenceName,
+                m_inZone: false,
+                distance: Number.NaN,
+                m_shouldKeepOutside: fence.m_shouldKeepOutside,
+            };
+            js_geoFenceRegistry.fn_addUnit(fenceName, unit.getPartyID(), geoFenceInfo);
+        }
+    } else {
+        if (fence !== null) {
+            js_geoFenceRegistry.fn_removeUnit(fenceName, unit.getPartyID());
+        }
     }
 }
 

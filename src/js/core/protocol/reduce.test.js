@@ -25,6 +25,12 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_AI_Recognition_STATUS,
          CONST_TYPE_AndruavMessage_ID,
          CONST_TYPE_AndruavMessage_HomeLocation,
+         CONST_TYPE_AndruavMessage_GeoFence,
+         CONST_TYPE_AndruavMessage_ExternalGeoFence,
+         CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
+         CONST_TYPE_LinearFence,
+         CONST_TYPE_PolygonFence,
+         CONST_TYPE_CylinderFence,
          CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST,
          CONST_TASHKEEL_SERB_NO_SWARM,
          CONST_Unknown_Telemetry } from '../../protocol/messages/js_andruavMessages.js';
@@ -360,6 +366,96 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const result = fn_reduce(unit, msg);
         const dispatches = result.ops.filter(o => o.op === 'dispatch');
         expect(dispatches.some(o => o.name === js_event.EE_onAndruavUnitSwarmUpdated)).toBe(true);
+    });
+
+    // --- TASK-02.1: geofence messages ---
+
+    test('GeoFence: linear fence produces EE_andruavUnitGeoFenceUpdated with fence info', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_GeoFence, 'party-uav-1', {
+            n: 'fence-linear', t: 1, c: 2, o: 1, r: 500,
+            0: { a: '30.05', g: '31.23', l: '100' },
+            1: { a: '30.06', g: '31.24', l: '110' },
+        });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_andruavUnitGeoFenceUpdated);
+        const fence = result.events[0].payload.fence;
+        expect(fence.m_geoFenceName).toBe('fence-linear');
+        expect(fence.fencetype).toBe(CONST_TYPE_LinearFence);
+        expect(fence.m_shouldKeepOutside).toBe(true);
+        expect(fence.m_maximumDistance).toBe(500);
+        expect(fence.isEditable).toBe(false); // unit is non-null
+        expect(fence.LngLatPoints).toHaveLength(2);
+        expect(fence.LngLatPoints[0].lat).toBeCloseTo(30.05);
+        expect(fence.LngLatPoints[0].lng).toBeCloseTo(31.23);
+        expect(fence.LngLatPoints[0].alt).toBeCloseTo(100);
+        expect(result.events[0].payload.unit).toBe(unit);
+    });
+
+    test('GeoFence: polygon fence with boolean o', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_GeoFence, 'u', {
+            n: 'fence-poly', t: 2, c: 3, o: false,
+            0: { a: '1', g: '2' },
+            1: { a: '3', g: '4' },
+            2: { a: '5', g: '6' },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const fence = result.events[0].payload.fence;
+        expect(fence.fencetype).toBe(CONST_TYPE_PolygonFence);
+        expect(fence.m_shouldKeepOutside).toBe(false);
+        expect(fence.LngLatPoints).toHaveLength(3);
+        // missing 'l' -> alt 0
+        expect(fence.LngLatPoints[0].alt).toBe(0);
+    });
+
+    test('GeoFence: cylinder fence reads only 1 point', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_GeoFence, 'u', {
+            n: 'fence-cyl', t: 3, c: 5, r: 200, o: 1,
+            0: { a: '10', g: '20', l: '30' },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const fence = result.events[0].payload.fence;
+        expect(fence.fencetype).toBe(CONST_TYPE_CylinderFence);
+        expect(fence.m_maximumDistance).toBe(200);
+        expect(fence.LngLatPoints).toHaveLength(1); // cylinder: count=1 regardless of c
+    });
+
+    test('ExternalGeoFence: unit is null -> isEditable true', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_ExternalGeoFence, '_sys_', {
+            n: 'ext-fence', t: 1, c: 1, o: true,
+            0: { a: '1', g: '2', l: '3' },
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        const fence = result.events[0].payload.fence;
+        expect(fence.isEditable).toBe(true);
+        expect(result.events[0].payload.unit).toBeNull();
+    });
+
+    test('GeoFenceAttachStatus: returns __geoFenceAttach pseudo-event', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_GeoFenceAttachStatus, 'u', { n: 'fence-1', a: true });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe('__geoFenceAttach');
+        expect(result.events[0].payload.unit).toBe(unit);
+        expect(result.events[0].payload.fenceName).toBe('fence-1');
+        expect(result.events[0].payload.isAttached).toBe(true);
+    });
+
+    test('GeoFenceAttachStatus: detach intent', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_GeoFenceAttachStatus, 'u', { n: 'fence-1', a: false });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events[0].payload.isAttached).toBe(false);
     });
 });
 

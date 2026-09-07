@@ -39,6 +39,7 @@ import { fn_initFacadeSubscriptions } from './core/protocol/runtime.js'
 import { js_layout } from './state/layoutStore.js'
 import { js_unitUiPrefs } from './state/unitUiPrefs.js'
 import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
+import { js_geoFenceRegistry } from './services/geo/geoFenceRegistry.js'
 
 import { ClssMainContextMenu } from '../components/popups/jsc_main_context_menu.jsx'
 import { ClssWaypointStepContextMenu } from '../components/popups/jsc_waypoint_step_content_menu.jsx'
@@ -1805,17 +1806,17 @@ export function fn_isBadFencing(p_andruavUnit) {
 
 	if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return 0b00;
 
-	const keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
-	const size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
+	const keys = js_geoFenceRegistry.fn_keys();
+	const size = js_geoFenceRegistry.fn_size();
 
-	/* 
+	/*
 		bit 0: out of green zone
 		bit 1: in bad zone
 		bit 2: in good zone
 	*/
 	let v_res = 0b00; // bit 1 is good & bit 0 is for bad
 	for (let i = 0; i < size; ++i) {
-		let fence = js_globals.v_andruavClient.m_andruavGeoFences[keys[i]];
+		let fence = js_geoFenceRegistry.fn_get(keys[i]);
 
 		if ((fence.Units !== null && fence.Units !== undefined) && (fence.Units.hasOwnProperty(p_andruavUnit.getPartyID()))) {
 			let geoFenceHitInfo = fence.Units[p_andruavUnit.getPartyID()].geoFenceHitInfo;
@@ -3361,11 +3362,11 @@ function EVT_andruavUnitGeoFenceBeforeDelete(me, geoFenceInfo) {
 	else {
 		// hide all
 
-		let keys = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences);
-		let size = Object.keys(js_globals.v_andruavClient.m_andruavGeoFences).length;
+		let keys = js_geoFenceRegistry.fn_keys();
+		let size = js_geoFenceRegistry.fn_size();
 
 		for (let i = 0; i < size; ++i) {
-			geoFenceInfo = js_globals.v_andruavClient.m_andruavGeoFences[keys[i]];
+			geoFenceInfo = js_geoFenceRegistry.fn_get(keys[i]);
 
 			if (geoFenceInfo.flightPath !== null && geoFenceInfo.flightPath !== undefined) {
 				js_leafletmap.fn_hideItem(geoFenceInfo.flightPath);
@@ -3391,14 +3392,14 @@ function EVT_andruavUnitGeoFenceUpdated(me, data) {
 	}
 
 	let v_geoFence = null;
-	let oldgeoFenceInfo = js_globals.v_andruavClient.m_andruavGeoFences[geoFenceInfo.m_geoFenceName];
+	let oldgeoFenceInfo = js_geoFenceRegistry.fn_get(geoFenceInfo.m_geoFenceName);
 
 	switch (geoFenceInfo.fencetype) {
 		case js_andruavMessages.CONST_TYPE_LinearFence:
 			v_geoFence = js_leafletmap.fn_drawPolyline(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 			geoFenceInfo.flightPath = v_geoFence;
 
-			if (!js_globals.v_andruavClient.m_andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName)) {
+			if (!js_geoFenceRegistry.fn_has(geoFenceInfo.m_geoFenceName)) {
 				oldgeoFenceInfo = geoFenceInfo;
 				oldgeoFenceInfo.Units = {};
 			} else {
@@ -3414,7 +3415,7 @@ function EVT_andruavUnitGeoFenceUpdated(me, data) {
 			v_geoFence = js_leafletmap.fn_drawPolygon(geoFenceCoordinates, geoFenceInfo.m_shouldKeepOutside);
 			geoFenceInfo.flightPath = v_geoFence;
 
-			if (!js_globals.v_andruavClient.m_andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName)) {
+			if (!js_geoFenceRegistry.fn_has(geoFenceInfo.m_geoFenceName)) {
 				oldgeoFenceInfo = geoFenceInfo;
 				oldgeoFenceInfo.Units = {};
 			} else {
@@ -3430,7 +3431,7 @@ function EVT_andruavUnitGeoFenceUpdated(me, data) {
 			v_geoFence = js_leafletmap.fn_drawCircle(geoFenceCoordinates[0], geoFenceInfo.m_maximumDistance, geoFenceInfo.m_shouldKeepOutside);
 			geoFenceInfo.flightPath = v_geoFence;
 
-			if (!js_globals.v_andruavClient.m_andruavGeoFences.hasOwnProperty(geoFenceInfo.m_geoFenceName)) {
+			if (!js_geoFenceRegistry.fn_has(geoFenceInfo.m_geoFenceName)) {
 				oldgeoFenceInfo = geoFenceInfo;
 				oldgeoFenceInfo.Units = {};
 			} else {
@@ -3446,8 +3447,9 @@ function EVT_andruavUnitGeoFenceUpdated(me, data) {
 			break;
 	}
 
-	// IMPORTANT: Update the global geofence storage with the current info
-	js_globals.v_andruavClient.m_andruavGeoFences[geoFenceInfo.m_geoFenceName] = oldgeoFenceInfo;
+	// IMPORTANT: Update the global geofence storage with the current info.
+	// This handler is the sole writer of fn_set (adds Leaflet flightPath + Units).
+	js_geoFenceRegistry.fn_set(geoFenceInfo.m_geoFenceName, oldgeoFenceInfo);
 
 	if (v_geoFence !== null) {
 		var _dblClickTimer;
@@ -3483,7 +3485,7 @@ function EVT_andruavUnitGeoFenceHit(me, data) {
 	const p_andruavUnit = data.unit;
 	const geoFenceHitInfo = data.fenceHit;
 
-	var fence = js_globals.v_andruavClient.m_andruavGeoFences[geoFenceHitInfo.fenceName];
+	var fence = js_geoFenceRegistry.fn_get(geoFenceHitInfo.fenceName);
 	if ((fence === undefined) || (fence === null)) {
 		js_globals.v_andruavFacade.API_requestGeoFences(p_andruavUnit, geoFenceHitInfo.fenceName);
 		return;

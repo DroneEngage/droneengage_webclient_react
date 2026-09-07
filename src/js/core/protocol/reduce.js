@@ -41,6 +41,12 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_Viewlink_STATUS,
          CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
          CONST_TYPE_AndruavMessage_SearchTargetList,
+         CONST_TYPE_AndruavMessage_GeoFence,
+         CONST_TYPE_AndruavMessage_ExternalGeoFence,
+         CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
+         CONST_TYPE_LinearFence,
+         CONST_TYPE_PolygonFence,
+         CONST_TYPE_CylinderFence,
          CONST_SDR_ACTION_SDR_INFO,
          CONST_SDR_ACTION_LIST_SDR_DEVICES,
          CONST_SDR_ACTION_TRIGGER,
@@ -115,6 +121,12 @@ export function fn_reduce(unit, msg) {
             return reduceRemoteExecute(unit, msg);
         case CONST_TYPE_AndruavMessage_Viewlink_STATUS:
             return reduceViewlinkStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_GeoFence:
+            return reduceGeoFence(unit, msg);
+        case CONST_TYPE_AndruavMessage_ExternalGeoFence:
+            return reduceExternalGeoFence(unit, msg);
+        case CONST_TYPE_AndruavMessage_GeoFenceAttachStatus:
+            return reduceGeoFenceAttachStatus(unit, msg);
         default:
             return null;
     }
@@ -153,7 +165,10 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_P2P_INFO
         || type === CONST_TYPE_AndruavMessage_SDR_ACTION
         || type === CONST_TYPE_AndruavMessage_RemoteExecute
-        || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS;
+        || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS
+        || type === CONST_TYPE_AndruavMessage_GeoFence
+        || type === CONST_TYPE_AndruavMessage_ExternalGeoFence
+        || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus;
 }
 
 // ---------------------------------------------------------------------------
@@ -804,6 +819,88 @@ function reduceViewlinkStatus(unit, msg) {
         default:
             return { patches: [], events: [] };
     }
+}
+
+// ---------------------------------------------------------------------------
+// GeoFence / ExternalGeoFence / GeoFenceAttachStatus
+//
+// fn_parseFenceInfo is the pure body of the old #prv_parseFenceInfo: it builds
+// a geoFenceInfo object from the payload. It does NOT dispatch — the reducer
+// wraps its output in an EE_andruavUnitGeoFenceUpdated event.
+// ---------------------------------------------------------------------------
+function fn_parseFenceInfo(p_jmsg, p_andruavUnit) {
+    let fencetype;
+    let m_shouldKeepOutside = false;
+
+    let v_geoFenceName = p_jmsg.n;
+    let v_maximumDistance = (p_jmsg.hasOwnProperty('r')) ? p_jmsg.r : 0;
+    if (p_jmsg.hasOwnProperty('o')) {
+        if (typeof p_jmsg.o === 'number') {
+            m_shouldKeepOutside = (p_jmsg.o === 1);
+        } else if (typeof p_jmsg.o === 'boolean') {
+            m_shouldKeepOutside = p_jmsg.o;
+        }
+    }
+    if (p_jmsg.hasOwnProperty('t')) {
+        switch (p_jmsg.t) {
+            case 1: fencetype = CONST_TYPE_LinearFence; break;
+            case 2: fencetype = CONST_TYPE_PolygonFence; break;
+            case 3: fencetype = CONST_TYPE_CylinderFence; break;
+        }
+    }
+
+    let geoFenceInfo = {};
+    let LngLatPoints = [];
+    let count = (fencetype === CONST_TYPE_CylinderFence) ? 1 : p_jmsg.c;
+    for (let i = 0; i < count; ++i) {
+        let lnglat = {};
+        lnglat.lat = parseFloat(p_jmsg[i].a);
+        lnglat.lng = parseFloat(p_jmsg[i].g);
+        if (p_jmsg[i].hasOwnProperty('l')) lnglat.alt = parseFloat(p_jmsg[i].l);
+        else lnglat.alt = 0;
+        LngLatPoints.push(lnglat);
+    }
+    geoFenceInfo.m_shouldKeepOutside = m_shouldKeepOutside;
+    geoFenceInfo.fencetype = fencetype;
+    geoFenceInfo.LngLatPoints = LngLatPoints;
+    geoFenceInfo.m_geoFenceName = v_geoFenceName;
+    geoFenceInfo.m_maximumDistance = v_maximumDistance;
+    geoFenceInfo.isEditable = (p_andruavUnit === null || p_andruavUnit === undefined);
+    return geoFenceInfo;
+}
+
+function reduceGeoFence(unit, msg) {
+    const fence = fn_parseFenceInfo(msg.payload, unit);
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_andruavUnitGeoFenceUpdated, payload: { unit, fence } }],
+    };
+}
+
+function reduceExternalGeoFence(unit, msg) {
+    // senderName === '_sys_' guard is a transport-level concern checked by
+    // runtime before calling reduce. unit is null -> isEditable = true.
+    const fence = fn_parseFenceInfo(msg.payload, null);
+    return {
+        patches: [],
+        events: [{ name: js_event.EE_andruavUnitGeoFenceUpdated, payload: { unit: null, fence } }],
+    };
+}
+
+// GeoFenceAttachStatus reads/writes the shared fence registry — that is an
+// impure runtime concern. The reducer returns a declarative attach/detach
+// intent as a runtime-only pseudo-event; runtime applies it to
+// js_geoFenceRegistry and dispatches __facadeRequestGeoFences when a fence
+// is missing.
+function reduceGeoFenceAttachStatus(unit, msg) {
+    const p = msg.payload;
+    return {
+        patches: [],
+        events: [{
+            name: '__geoFenceAttach',
+            payload: { unit, fenceName: p.n, isAttached: p.a },
+        }],
+    };
 }
 
 /**
