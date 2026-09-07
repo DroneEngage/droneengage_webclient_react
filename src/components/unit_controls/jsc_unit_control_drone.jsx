@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
@@ -124,7 +125,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
         res.btn_servo_class = " btn-success ";
 
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
             res.btn_servo_class = " disabled hidden ";
         }
 

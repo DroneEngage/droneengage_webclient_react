@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
@@ -122,9 +123,9 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
             }
         }
 
-        if (distance > js_globals.CONST_DFM_FAR) {
+        if (distance > CONST_DFM_FAR) {
             v_distanceToMe_class = "bg-danger text-white cursor_hand";
-        } else if (distance > js_globals.CONST_DFM_SAFE) {
+        } else if (distance > CONST_DFM_SAFE) {
             v_distanceToMe_class = "bg-info text-white";
         } else {
             v_distanceToMe_class = "bg-success text-white";

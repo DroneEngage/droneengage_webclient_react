@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { CONST_MAP_GOOLE, v_mission_file_extension } from './config/constants.js';
 import ReactDOM from "react-dom/client";
 
 
@@ -2307,7 +2308,7 @@ export function fn_readMissionFile(p_mission, p_andruavUnit) {
 	const file = selectedMissionFilesToRead[0];
 
 
-	const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
+	const is_de_file = (file.name.indexOf(v_mission_file_extension) !== -1);
 	const reader = new FileReader();
 
 	// If we use onloadend, we need to check the readyState.
@@ -2363,7 +2364,7 @@ export function fn_putWayPoints_direct(p_andruavUnit, p_eraseFirst, p_files) {
 
 	const file = p_files[0];
 
-	const is_de_file = (file.name.indexOf(js_globals.v_mission_file_extension) !== -1);
+	const is_de_file = (file.name.indexOf(v_mission_file_extension) !== -1);
 	const reader = new FileReader();
 
 	// If we use onloadend, we need to check the readyState.
@@ -2654,7 +2655,7 @@ function EVT_andruavUnitVehicleTypeUpdated(me, p_andruavUnit) {
 	}
 
 	const v_htmlTitle = "<p class='text-white margin_zero fs-6'>" + p_andruavUnit.m_unitName + "</p>";
-	const v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
+	const v_image = getVehicleIcon(p_andruavUnit, (CONST_MAP_GOOLE === true));
 	js_leafletmap.fn_setVehicleIcon(layers.m_marker, v_image, p_andruavUnit.m_unitName, null, false, false, v_htmlTitle, [64, 64]);
 
 	const marker3d = js_map3d.fn_getUnitMarker(p_andruavUnit);
@@ -2775,7 +2776,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			js_adsbManager.fn_getADSBDataForUnit(p_andruavUnit);
 		}
 
-		let v_image = getVehicleIcon(p_andruavUnit, (js_globals.CONST_MAP_GOOLE === true));
+		let v_image = getVehicleIcon(p_andruavUnit, (CONST_MAP_GOOLE === true));
 
 		if (marker === null || marker === undefined) {
 			// create a buffer for flight path
@@ -3279,7 +3280,7 @@ function fn_showAdSBInfo(event, _adsb) {
 // 					}
 // 				}
 
-// 				if (js_globals.CONST_MAP_GOOLE === true) {
+// 				if (CONST_MAP_GOOLE === true) {
 // 					markerContent += '<br> sea-lvl alt:' + p_elevation + ' m.</p>';
 // 				}
 // 			}
@@ -3684,7 +3685,7 @@ export function fn_on_ready() {
 		$(document).prop('title', js_siteConfig.CONST_TITLE);
 	});
 
-	if ((typeof (js_globals.CONST_MAP_GOOLE) == "undefined") || (js_globals.CONST_MAP_GOOLE === true)) {
+	if ((typeof (CONST_MAP_GOOLE) == "undefined") || (CONST_MAP_GOOLE === true)) {
 		let v_script = window.document.createElement('script');
 		v_script.type = 'text/javascript';
 
@@ -3692,7 +3693,7 @@ export function fn_on_ready() {
 		window.document.body.append(v_script);
 	}
 	else
-		if ((typeof (js_globals.CONST_MAP_GOOLE) !== "undefined") && (js_globals.CONST_MAP_GOOLE === false)) {
+		if ((typeof (CONST_MAP_GOOLE) !== "undefined") && (CONST_MAP_GOOLE === false)) {
 			initMap();
 		}
 

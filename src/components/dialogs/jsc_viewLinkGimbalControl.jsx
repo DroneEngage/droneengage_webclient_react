@@ -1,4 +1,5 @@
 import 'jquery-ui-dist/jquery-ui.min.js';
+import { CONST_IR_DIGITAL_ZOOM_MAX, CONST_IR_DIGITAL_ZOOM_MIN, CONST_OPTICAL_ZOOM_MAX, CONST_OPTICAL_ZOOM_MIN } from '../../js/config/constants.js';
 
 import React from 'react';
 import Draggable from "react-draggable";
@@ -569,8 +570,8 @@ class ClssViewLinkGimbal extends ClssDialogBase {
                                                         type="range"
                                                         orient="vertical"
                                                         className="form-range"
-                                                        min={js_globals.CONST_OPTICAL_ZOOM_MIN}
-                                                        max={js_globals.CONST_OPTICAL_ZOOM_MAX}
+                                                        min={CONST_OPTICAL_ZOOM_MIN}
+                                                        max={CONST_OPTICAL_ZOOM_MAX}
                                                         step={0.05}
                                                         value={this.state.zoomLevel}
                                                         onChange={this.handleZoomChange}
@@ -589,8 +590,8 @@ class ClssViewLinkGimbal extends ClssDialogBase {
                                                         type="range"
                                                         orient="vertical"
                                                         className="form-range"
-                                                        min={js_globals.CONST_IR_DIGITAL_ZOOM_MIN}
-                                                        max={js_globals.CONST_IR_DIGITAL_ZOOM_MAX}
+                                                        min={CONST_IR_DIGITAL_ZOOM_MIN}
+                                                        max={CONST_IR_DIGITAL_ZOOM_MAX}
                                                         step={0.05}
                                                         value={this.state.irDigitalZoomLevel}
                                                         onChange={this.handleIRDigitalZoomChange}

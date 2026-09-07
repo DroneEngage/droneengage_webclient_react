@@ -1,4 +1,5 @@
 import React    from 'react';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED, v_mission_file_extension } from '../../js/config/constants.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_globals} from '../../../js/js_globals.js';
@@ -106,7 +107,7 @@ export class ClssSingleMissionControlBar extends React.Component {
     {
         const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1 (v_andruavUnit);
-        js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + js_globals.v_mission_file_extension,"text/plain;charset=utf-8");
+        js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + v_mission_file_extension,"text/plain;charset=utf-8");
     }
 
     /**
@@ -315,7 +316,7 @@ export class ClssSingleMissionControlBar extends React.Component {
         const c_key = this.key;
 
         let v_saveAsTask = [];
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED===false)
         {
                 v_saveAsTask.push (<button  key={'mp1bst1' + this.props.p_mission.m_id  + this.key}  id="geo_btn_geosave_db"  className="btn btn-danger btn-sm ctrlbtn" title ="Save into System" type="button" onClick={ (e) => this.fn_saveDBMission(e) } >Save</button>);
                 v_saveAsTask.push (<button  key={'mp1bst2' + this.props.p_mission.m_id  + this.key} id="geo_btn_geodelete_db_me"  className="btn btn-danger btn-sm ctrlbtn" title ="Delete Any Related Mission from System for this Unit" type="button" onClick={ (e) => this.fn_deleteDBMission(e) } >Delete</button>);

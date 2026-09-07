@@ -6,6 +6,7 @@
 *********************************************************************************** */
 
 import $ from 'jquery';
+import { CONST_DEBUG_SHOW_ANCHOR_DOTS } from '../config/constants.js';
 import L from 'leaflet';
 import 'leaflet-rotatedmarker';
 
@@ -1031,7 +1032,7 @@ class CLeafLetAndruavMap {
         }
 
         // Add debug anchor dot if enabled
-        if (js_globals.CONST_DEBUG_SHOW_ANCHOR_DOTS === true) {
+        if (CONST_DEBUG_SHOW_ANCHOR_DOTS === true) {
             // The anchor is relative to iconSize (the icon container), not the text
             // So the dot position is simply at v_iconAnchor coordinates within the icon container
             const dotHtml = `<div style="position: absolute; left: ${v_iconAnchor[0]}px; top: ${v_iconAnchor[1]}px; width: 6px; height: 6px; background: white; border: 1px solid black; border-radius: 50%; transform: translate(-50%, -50%); z-index: 1000; pointer-events: none;"></div>`;

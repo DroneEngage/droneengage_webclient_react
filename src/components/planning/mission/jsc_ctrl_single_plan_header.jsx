@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import * as js_common from '../../../js/js_common.js'
@@ -165,7 +166,7 @@ export class ClssSingle_Plan_Header extends React.Component {
 
             );
 
-            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
+            if (CONST_EXPERIMENTAL_FEATURES_ENABLED === true) {
                 v_partyIDCtrl.push(
                     <div id="geofence2" key={'mp2' + this.props.p_mission.m_id} className="row margin_zero css_margin_top_small">
                         <div className="col-12">
@@ -176,7 +177,7 @@ export class ClssSingle_Plan_Header extends React.Component {
                 );
             }
 
-            if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+            if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
                 // overwrite with this if public version 
                 v_partyIDCtrl = [];
             }

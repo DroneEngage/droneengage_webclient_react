@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 import { js_globals } from './js_globals.js';
+import { CONST_DEFAULT_VOLUME } from '../config/constants.js';
 import * as js_common from './js_common.js'
 import * as js_siteConfig from './js_siteConfig.js';
 import {
@@ -365,7 +366,7 @@ class CLocalStorage {
     }
 
     fn_getVolume() {
-        return parseInt(this._getValue(LS_DEFAULT_VOLUME, js_globals.CONST_DEFAULT_VOLUME.toString()));
+        return parseInt(this._getValue(LS_DEFAULT_VOLUME, CONST_DEFAULT_VOLUME.toString()));
     }
 
     // Tabs Display Enabled

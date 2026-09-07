@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { CONST_DEFAULT_SPEED_STEP } from '../../js/config/constants.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import * as js_helpers from '../../js/js_helpers.js'
@@ -127,7 +128,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
 
     return (
         <p key={key + 'spd_ctrl'} className={className + ' rounded-3 text-warning cursor_hand textunit_w135'} title='Ground Speed'>
-            <span title={"decrease speed"} onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, - js_globals.CONST_DEFAULT_SPEED_STEP)}>
+            <span title={"decrease speed"} onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, - CONST_DEFAULT_SPEED_STEP)}>
                 <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                 </svg>
@@ -137,7 +138,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
                     {'GS: ' + v_speed_text}
                     &nbsp;</b></small>
             </span>
-            <span title="increase speed" onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, + js_globals.CONST_DEFAULT_SPEED_STEP)}>
+            <span title="increase speed" onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, + CONST_DEFAULT_SPEED_STEP)}>
                 <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z" />
                 </svg>

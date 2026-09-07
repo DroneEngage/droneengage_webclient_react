@@ -1,4 +1,5 @@
 import React    from 'react';
+import { CONST_MAX_MESSAGE_LOG } from '../../js/config/constants.js';
 
 import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
@@ -88,7 +89,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
         // Render only ever shows the last CONST_MAX_MESSAGE_LOG entries; without
         // this the array (and every message/unit reference inside it) grows
         // unbounded over a long session.
-        const v_cap = js_globals.CONST_MAX_MESSAGE_LOG;
+        const v_cap = CONST_MAX_MESSAGE_LOG;
         if (p_me.state.m_message.length > v_cap) {
             p_me.state.m_message.splice(0, p_me.state.m_message.length - v_cap);
         }
@@ -118,7 +119,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
 
         //TODO: make paging here
         let len = this.state.m_message.length>0?this.state.m_message.length:0;
-        let min = Math.max(len - js_globals.CONST_MAX_MESSAGE_LOG,0);
+        let min = Math.max(len - CONST_MAX_MESSAGE_LOG,0);
         for (let i=len-1; i>=min; --i) 
         {
             v_messages.push(<ClssAndruavMessageItem key={this.props.p_unit.getPartyID() + "_log" + i} p_index={i} p_msg={this.state.m_message[i]}/>)

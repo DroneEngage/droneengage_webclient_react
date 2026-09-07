@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 import { js_globals } from '../../js/js_globals.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
@@ -57,7 +58,7 @@ export default class ClssCVideoTrackerLayer extends React.Component {
     }
 
     fn_targetDetected(p_me, p_unit) {
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
             return;
         }
 

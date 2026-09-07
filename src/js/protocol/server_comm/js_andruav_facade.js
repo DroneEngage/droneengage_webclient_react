@@ -16,6 +16,7 @@
 
 /*jshint esversion: 6 */
 import { js_globals } from '../../js_globals.js';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
@@ -753,7 +754,7 @@ class CAndruavClientFacade {
     API_FireDeEvent(p_andruavUnit, p_event_id) {
         const c_party = p_andruavUnit != null ? p_andruavUnit.getPartyID() : null;
 
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
         }
 
@@ -764,7 +765,7 @@ class CAndruavClientFacade {
     // CODEBLOCK_START
     API_requestSearchableTargets(p_andruavUnit) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) { // used to test behavior after removing code and as double check
             return;
         }
 

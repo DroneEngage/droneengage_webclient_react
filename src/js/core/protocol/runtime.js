@@ -12,6 +12,7 @@
  */
 
 import { fn_decode } from './decode.js';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { fn_reduce, fn_isMigrated, WAYPOINT_NO_CHUNK, WAYPOINT_LAST_CHUNK } from './reduce.js';
 import { fn_effects } from './effects.js';
 import { fn_setByPath, fn_getByPath } from './path.js';
@@ -72,7 +73,7 @@ export function fn_handleFrame(p_frame, evt) {
     // effect. Once the old cases are deleted this guard still drops cleanly.
     if ((msg.type === CONST_TYPE_AndruavMessage_SearchTargetList
             || msg.type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation)
-        && js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+        && CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
         return false;
     }
 

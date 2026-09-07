@@ -16,6 +16,7 @@
 /*jshint esversion: 6 */
 
 import * as js_siteConfig from './js_siteConfig.js';
+import { CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT, CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH, CONST_MAX_SDR_SPECTRUM_LENGTH } from '../config/constants.js';
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
 import { js_globals } from "./js_globals.js";
@@ -570,8 +571,8 @@ class C_SDR {
     this.m_detectedSignal.push(reading);
     this.m_detectedSignal_new = true;
     // Ensure the array length is within the maximum limit
-    if (this.m_detectedSignal.length > js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH) {
-      this.m_detectedSignal = this.m_detectedSignal.slice(-js_globals.CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH);
+    if (this.m_detectedSignal.length > CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH) {
+      this.m_detectedSignal = this.m_detectedSignal.slice(-CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH);
     }
 
   }
@@ -598,8 +599,8 @@ class C_SDR {
     this.m_spectrum_data.push(spectrumData); // Add the new data to the array
 
     // Ensure the array length is within the maximum limit
-    if (this.m_spectrum_data.length > js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH) {
-      this.m_spectrum_data = this.m_spectrum_data.slice(-js_globals.CONST_MAX_SDR_SPECTRUM_LENGTH);
+    if (this.m_spectrum_data.length > CONST_MAX_SDR_SPECTRUM_LENGTH) {
+      this.m_spectrum_data = this.m_spectrum_data.slice(-CONST_MAX_SDR_SPECTRUM_LENGTH);
     }
   }
 }
@@ -1332,7 +1333,7 @@ export class CAndruavUnitObject {
     this.m_Nav_Info = new C_NavInfo(this);
     this.m_Terrain_Info = new C_Terrain(this);
     this.m_flightPathHistory = new js_circularBuffer.ClssCustomCircularBuffer(
-      js_globals.CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT
+      CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT
     );
     this.m_Geo_Tags = new C_GeoTags(this);
     this.m_Telemetry = new C_Telemetry(this);

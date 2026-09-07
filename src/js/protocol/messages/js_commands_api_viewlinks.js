@@ -9,6 +9,7 @@
 
 
 import * as js_andruavMessages from './js_andruavMessages.js';
+import { CONST_IR_DIGITAL_ZOOM_MAX, CONST_IR_DIGITAL_ZOOM_MIN, CONST_OPTICAL_ZOOM_MAX, CONST_OPTICAL_ZOOM_MIN } from '../../config/constants.js';
 import * as js_common from '../../js_common.js'
 import { js_globals } from '../../js_globals.js'
 import { mavlink20 } from '../../js_mavlink_v2.js'
@@ -96,7 +97,7 @@ export class CCommandAPI_ViewLink {
         if (typeof p_optical_zoom !== 'number') {
             return ;
         } else {
-            p_optical_zoom = Math.max(js_globals.CONST_OPTICAL_ZOOM_MIN, Math.min(js_globals.CONST_OPTICAL_ZOOM_MAX, p_optical_zoom));
+            p_optical_zoom = Math.max(CONST_OPTICAL_ZOOM_MIN, Math.min(CONST_OPTICAL_ZOOM_MAX, p_optical_zoom));
         }
         
         const msg = {
@@ -123,7 +124,7 @@ export class CCommandAPI_ViewLink {
         if (typeof p_ir_digital_zoom !== 'number') {
             return ;
         } else {
-            p_ir_digital_zoom = Math.max(js_globals.CONST_IR_DIGITAL_ZOOM_MIN, Math.min(js_globals.CONST_IR_DIGITAL_ZOOM_MAX, p_ir_digital_zoom));
+            p_ir_digital_zoom = Math.max(CONST_IR_DIGITAL_ZOOM_MIN, Math.min(CONST_IR_DIGITAL_ZOOM_MAX, p_ir_digital_zoom));
         }
         
         const msg = {

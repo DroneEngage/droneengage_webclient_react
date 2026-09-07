@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import React    from 'react';
 import { withTranslation } from 'react-i18next';
 
@@ -624,11 +625,11 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
                 default:
                 {
-                    if (target.wp_dist > js_globals.CONST_DFM_FAR)
+                    if (target.wp_dist > CONST_DFM_FAR)
                     {
                         res.wp_dist.css = ' bg-danger txt-theme-aware ';
                     }
-                    else if (target.wp_dist > js_globals.CONST_DFM_SAFE)
+                    else if (target.wp_dist > CONST_DFM_SAFE)
                     {
                         res.wp_dist.css = ' bg-info  txt-theme-aware ';
                     }

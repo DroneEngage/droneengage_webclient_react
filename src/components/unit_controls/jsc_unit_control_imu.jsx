@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import * as js_helpers from '../../js/js_helpers.js';
 import { js_globals } from '../../js/js_globals.js';
@@ -204,9 +205,9 @@ class ClssCtrlDroneIMU extends React.Component {
                     distanceToWP_class = 'bg-secondary text-white cursor_hand bi bi-geo-alt-fill';
                     break;
                 default:
-                    if (target.wp_dist > js_globals.CONST_DFM_FAR) {
+                    if (target.wp_dist > CONST_DFM_FAR) {
                         distanceToWP_class = 'bg-danger text-white cursor_hand bi bi-geo-alt-fill';
-                    } else if (target.wp_dist > js_globals.CONST_DFM_SAFE) {
+                    } else if (target.wp_dist > CONST_DFM_SAFE) {
                         distanceToWP_class = 'bg-warning text-dark cursor_hand bi bi-geo-alt-fill';
                     } else {
                         distanceToWP_class = 'bg-info text-white cursor_hand bi bi-geo-alt-fill';

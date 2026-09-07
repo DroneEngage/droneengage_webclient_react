@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 
 import React from 'react';
 
@@ -619,7 +620,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
     
     fnl_div_clicked(e) {
-        if (js_globals.CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
+        if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
             // used to test behavior after removing code and as double check
             return;
         }
