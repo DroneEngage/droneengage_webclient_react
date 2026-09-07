@@ -1,5 +1,6 @@
 import * as js_siteConfig from '../js_siteConfig';
 import { js_globals } from '../js_globals.js';
+import { CONST_MAP3D_TETHER_COLORS, CONST_MAP3D_CIRCLE_WIDTH, CONST_MAP3D_TRAIL_WIDTH, CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH, CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY, CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT, CONST_MAP3D_MODEL_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM, CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR, CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE, CONST_MAP3D_FOLLOW_ZOOM, CONST_MAP3D_FOLLOW_DURATION_MS, CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND, CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH, CONST_MAP3D_FOLLOW_ALT_REF } from '../config/mapStyle.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
@@ -227,8 +228,8 @@ class ModelSizeControl {
 
         const dir = isPlus ? +1 : -1;
         const step = ev.shiftKey
-            ? js_globals.CONST_MAP3D_MODEL_SIZE_STEP_BIG
-            : js_globals.CONST_MAP3D_MODEL_SIZE_STEP;
+            ? CONST_MAP3D_MODEL_SIZE_STEP_BIG
+            : CONST_MAP3D_MODEL_SIZE_STEP;
 
         const btn = isPlus ? this._incBtn : this._decBtn;
         if (btn && !btn.disabled) {
@@ -252,7 +253,7 @@ class ModelSizeControl {
             if (pendingTimer) return;   // a click is already pending (waiting for a possible dblclick)
             pendingTimer = setTimeout(() => {
                 pendingTimer = null;
-                this._step(dir, js_globals.CONST_MAP3D_MODEL_SIZE_STEP);
+                this._step(dir, CONST_MAP3D_MODEL_SIZE_STEP);
             }, DBLCLICK_DELAY);
         });
 
@@ -263,7 +264,7 @@ class ModelSizeControl {
                 clearTimeout(pendingTimer);
                 pendingTimer = null;
             }
-            this._step(dir, js_globals.CONST_MAP3D_MODEL_SIZE_STEP_BIG);
+            this._step(dir, CONST_MAP3D_MODEL_SIZE_STEP_BIG);
         });
     }
 
@@ -274,9 +275,9 @@ class ModelSizeControl {
      * @param {number} dir -1 to decrease, +1 to increase
      * @param {number} step amount to step (defaults to CONST_MAP3D_MODEL_SIZE_STEP)
      */
-    _step(dir, step = js_globals.CONST_MAP3D_MODEL_SIZE_STEP) {
-        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
-        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+    _step(dir, step = CONST_MAP3D_MODEL_SIZE_STEP) {
+        const min = CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = CONST_MAP3D_MODEL_SIZE_MAX;
 
         const current = this._target === 'adsb'
             ? this._map3d.m_modelSizeMultiplierAdsb
@@ -296,8 +297,8 @@ class ModelSizeControl {
      * gets a visual signal that the range edge has been reached.
      */
     _updateButtonStates() {
-        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
-        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+        const min = CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = CONST_MAP3D_MODEL_SIZE_MAX;
         const current = this._target === 'adsb'
             ? this._map3d.m_modelSizeMultiplierAdsb
             : this._map3d.m_modelSizeMultiplierUnits;
@@ -558,7 +559,7 @@ class CAndruavMap3D {
         this.m_modelUpdateScheduled = false;
 
         // glTF-model twin of the ADSB DOM markers, used only when
-        // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
+        // CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
         this.m_adsbModelFeatures = new Map();   // icao_address -> GeoJSON Feature
     }
 
@@ -970,9 +971,9 @@ class CAndruavMap3D {
      * @returns {number} zoom level
      */
     fn_computeFollowZoom(altAboveGround) {
-        const zGround = js_globals.CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND;
-        const zHigh = js_globals.CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH;
-        const altRef = js_globals.CONST_MAP3D_FOLLOW_ALT_REF;
+        const zGround = CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND;
+        const zHigh = CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH;
+        const altRef = CONST_MAP3D_FOLLOW_ALT_REF;
         const alt = Math.max(0, Number(altAboveGround) || 0);
         if (alt >= altRef) return zHigh;
         const t = alt / altRef;   // 0 at ground, 1 at altRef
@@ -1044,7 +1045,7 @@ class CAndruavMap3D {
                 id: 'unit-3d-models-layer',
                 type: 'model',
                 source: 'unit-3d-models',
-                minzoom: js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
+                minzoom: CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
                 layout: {
                     'model-id': ['get', 'modelId']
                 },
@@ -1072,7 +1073,7 @@ class CAndruavMap3D {
         }
 
         // ADSB traffic's glTF twin — only populated/shown when
-        // js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (fn_syncAdsbObject).
+        // CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (fn_syncAdsbObject).
         // minzoom gates the 3D model the same way as the unit layer above:
         // below CONST_MAP3D_MODEL_ZOOM_THRESHOLD the real-world scale needed
         // for pixel-constant compensation becomes so enormous that Mapbox's
@@ -1093,7 +1094,7 @@ class CAndruavMap3D {
                 id: 'adsb-3d-models-layer',
                 type: 'model',
                 source: 'adsb-3d-models',
-                minzoom: js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
+                minzoom: CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
                 layout: {
                     'model-id': ['get', 'modelId']
                 },
@@ -1152,7 +1153,7 @@ class CAndruavMap3D {
     fn_updateModelLod() {
         if (!this.m_map || !this.m_modelLayerReady) return;
 
-        const showModels = this.m_map.getZoom() >= js_globals.CONST_MAP3D_MODEL_ZOOM_THRESHOLD;
+        const showModels = this.m_map.getZoom() >= CONST_MAP3D_MODEL_ZOOM_THRESHOLD;
         if (showModels === this.m_modelLodActive) return;
         this.m_modelLodActive = showModels;
 
@@ -1165,7 +1166,7 @@ class CAndruavMap3D {
         // marker must be visible with correct heading) and the transparent
         // placeholder (at/above threshold — the 3D model renders instead).
         // In icon mode ADSB markers always show their real icon, so skip.
-        if (js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB) {
+        if (CONST_MAP3D_ADSB_RENDER_MODE === CONST_MAP3D_ADSB_RENDER_MODE_GLB) {
             this.m_adsbMarkers.forEach(marker => {
                 this.fn_applyMarkerIconForMode(marker, showModels);
             });
@@ -1187,11 +1188,11 @@ class CAndruavMap3D {
      * @param {'unit'|'adsb'} [target='unit'] - which multiplier to apply
      */
     fn_computeModelScale(zoom, target = 'unit') {
-        const refZoom = js_globals.CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM;
-        const base = js_globals.CONST_MAP3D_MODEL_SCALE;
-        const exponent = js_globals.CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT;
-        const minFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MIN_FACTOR;
-        const maxFactor = js_globals.CONST_MAP3D_MODEL_SCALE_MAX_FACTOR;
+        const refZoom = CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM;
+        const base = CONST_MAP3D_MODEL_SCALE;
+        const exponent = CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT;
+        const minFactor = CONST_MAP3D_MODEL_SCALE_MIN_FACTOR;
+        const maxFactor = CONST_MAP3D_MODEL_SCALE_MAX_FACTOR;
         const multiplier = (target === 'adsb' ? this.m_modelSizeMultiplierAdsb : this.m_modelSizeMultiplierUnits) || 1;
 
         const zoomFactor = Math.min(maxFactor, Math.max(minFactor, Math.pow(2, (refZoom - zoom) * exponent)));
@@ -1209,9 +1210,9 @@ class CAndruavMap3D {
      * @returns {number} tether width
      */
     fn_computeTetherWidth(altAboveGround) {
-        const min = js_globals.CONST_MAP3D_TETHER_MIN;
-        const max = js_globals.CONST_MAP3D_TETHER_MAX;
-        const maxAlt = js_globals.CONST_MAP3D_TETHER_MAX_ALT;
+        const min = CONST_MAP3D_TETHER_MIN;
+        const max = CONST_MAP3D_TETHER_MAX;
+        const maxAlt = CONST_MAP3D_TETHER_MAX_ALT;
         const alt = Math.max(0, Number(altAboveGround) || 0);
         if (alt >= maxAlt) return max;
         return min + (max - min) * (alt / maxAlt);
@@ -1255,8 +1256,8 @@ class CAndruavMap3D {
      */
     fn_setModelSizeMultiplier(factor, target) {
         if (!Number.isFinite(factor) || factor <= 0) return;
-        const min = js_globals.CONST_MAP3D_MODEL_SIZE_MIN;
-        const max = js_globals.CONST_MAP3D_MODEL_SIZE_MAX;
+        const min = CONST_MAP3D_MODEL_SIZE_MIN;
+        const max = CONST_MAP3D_MODEL_SIZE_MAX;
         const clamped = Math.min(max, Math.max(min, factor));
         if (target === 'adsb') {
             this.m_modelSizeMultiplierAdsb = clamped;
@@ -1359,7 +1360,7 @@ class CAndruavMap3D {
                 });
 
                 // Same re-projection fix for ADSB traffic markers.
-                const adsbGlb = js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+                const adsbGlb = CONST_MAP3D_ADSB_RENDER_MODE === CONST_MAP3D_ADSB_RENDER_MODE_GLB;
                 this.m_adsbMarkers.forEach(marker => {
                     const lngLat = marker.getLngLat?.();
                     if (lngLat) marker.setLngLat(lngLat);
@@ -1652,7 +1653,7 @@ class CAndruavMap3D {
                         bearing: this.m_followBearing,
                         pitch: this.m_followPitch,
                         zoom: this.m_followZoom,
-                        duration: js_globals.CONST_MAP3D_FOLLOW_DURATION_MS,
+                        duration: CONST_MAP3D_FOLLOW_DURATION_MS,
                         essential: true
                     });
                 }
@@ -1806,7 +1807,7 @@ class CAndruavMap3D {
     fn_ensureAdsbSharedLayers() {
         if (!this.m_map || !this.m_isReady || this.m_adsbLayersReady) return;
 
-        const color = js_globals.CONST_MAP3D_ADSB_TETHER_COLOR;
+        const color = CONST_MAP3D_ADSB_TETHER_COLOR;
         const empty = { type: 'FeatureCollection', features: [] };
 
         // --- Vertical tether cylinder (aircraft → ground) ---
@@ -1817,7 +1818,7 @@ class CAndruavMap3D {
             source: 'de-adsb-tether',
             paint: {
                 'fill-extrusion-color': color,
-                'fill-extrusion-opacity': js_globals.CONST_MAP3D_ADSB_TETHER_OPACITY,
+                'fill-extrusion-opacity': CONST_MAP3D_ADSB_TETHER_OPACITY,
                 'fill-extrusion-base': 0,
                 'fill-extrusion-height': ['get', 'height']
             }
@@ -1832,7 +1833,7 @@ class CAndruavMap3D {
             layout: { 'line-cap': 'round', 'line-join': 'round' },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.9
             }
         });
@@ -1854,7 +1855,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.9
             }
         });
@@ -1917,7 +1918,7 @@ class CAndruavMap3D {
         const normalizedHeading = (headingDeg + 360) % 360;
         this.m_adsbTetherData.set(icao, { lng, lat, terrainElev, altAboveGround });
 
-        const isGlbMode = js_globals.CONST_MAP3D_ADSB_RENDER_MODE === js_globals.CONST_MAP3D_ADSB_RENDER_MODE_GLB;
+        const isGlbMode = CONST_MAP3D_ADSB_RENDER_MODE === CONST_MAP3D_ADSB_RENDER_MODE_GLB;
 
         // In GLB mode: sync the 3D model AND keep the DOM marker alive but
         // transparent (opacity:0) so it still catches click/hover natively —
@@ -2003,7 +2004,7 @@ class CAndruavMap3D {
     /**
      * Updates (or creates) the GeoJSON feature backing this aircraft's entry
      * in the 'adsb-3d-models' source — the glTF twin of the ADSB DOM marker,
-     * used only when js_globals.CONST_MAP3D_ADSB_RENDER_MODE === 'glb'. See
+     * used only when CONST_MAP3D_ADSB_RENDER_MODE === 'glb'. See
      * fn_syncUnitModel for the rotation/scale conventions (identical here,
      * except ADSB only carries heading — no roll/pitch — so x/y stay 0).
      */
@@ -2212,7 +2213,7 @@ class CAndruavMap3D {
      */
     fn_getTetherColor(unit) {
         const idx = unit?.m_index ?? 0;
-        const colors = js_globals.CONST_MAP3D_TETHER_COLORS;
+        const colors = CONST_MAP3D_TETHER_COLORS;
         return colors[idx % colors.length];
     }
 
@@ -2265,7 +2266,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_TETHER_MIN,  // updated per fn_syncTether
+                'line-width': CONST_MAP3D_TETHER_MIN,  // updated per fn_syncTether
                 'line-opacity': 0.8
             }
         });
@@ -2297,7 +2298,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.9
             }
         });
@@ -2335,7 +2336,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.9
             }
         });
@@ -2552,7 +2553,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_TRAIL_WIDTH,
+                'line-width': CONST_MAP3D_TRAIL_WIDTH,
                 'line-opacity': 0.85,
                 'line-dasharray': [0.1, 3]
             }
@@ -2778,7 +2779,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_TRAIL_WIDTH,
+                'line-width': CONST_MAP3D_TRAIL_WIDTH,
                 'line-opacity': 0.7,
                 'line-dasharray': [2, 1]
             }
@@ -2826,7 +2827,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_MISSION_DROP_WIDTH,
+                'line-width': CONST_MAP3D_MISSION_DROP_WIDTH,
                 'line-opacity': 0.5,
                 'line-dasharray': [1, 1]
             }
@@ -2874,7 +2875,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_GATE_WIDTH,
+                'line-width': CONST_MAP3D_GATE_WIDTH,
                 'line-opacity': 0.8
             }
         });
@@ -2913,7 +2914,7 @@ class CAndruavMap3D {
             },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.9
             }
         });
@@ -2954,7 +2955,7 @@ class CAndruavMap3D {
             layout: { 'line-cap': 'round', 'line-join': 'round' },
             paint: {
                 'line-color': color,
-                'line-width': js_globals.CONST_MAP3D_CIRCLE_WIDTH,
+                'line-width': CONST_MAP3D_CIRCLE_WIDTH,
                 'line-opacity': 0.8
             }
         });
@@ -3290,8 +3291,8 @@ class CAndruavMap3D {
         // vertical component. At any realistic zoom this looks perfectly
         // vertical. (Same trick as the drone tether line in fn_syncTether.)
         const DROP_TINY_OFFSET = 0.00001;  // ~1 meter in degrees
-        const GATE_RADIUS = js_globals.CONST_MAP3D_GATE_RADIUS;
-        const GROUND_RADIUS = js_globals.CONST_MAP3D_WP_GROUND_RADIUS;
+        const GATE_RADIUS = CONST_MAP3D_GATE_RADIUS;
+        const GROUND_RADIUS = CONST_MAP3D_WP_GROUND_RADIUS;
         let allResolved = true;
 
         validSteps.forEach((wayPointStep, i) => {

@@ -15,6 +15,7 @@ import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
 import * as js_helpers from './js_helpers'
 import { js_globals } from './js_globals.js';
+import { CONST_MAP_WIND_ARROW_REFRESH_MS } from './config/mapStyle.js';
 import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from './config/assets.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_speak } from './js_speak'
@@ -215,7 +216,7 @@ function fn_updateWindArrow(p_andruavUnit) {
  */
 function fn_refreshWindArrowPosition() {
 	if (!js_localStorage.fn_getWindEnabled()) return;
-	if (Date.now() - js_leafletmap.m_windArrowLastRefresh < js_globals.CONST_MAP_WIND_ARROW_REFRESH_MS) return;
+	if (Date.now() - js_leafletmap.m_windArrowLastRefresh < CONST_MAP_WIND_ARROW_REFRESH_MS) return;
 	fn_updateAllWindArrows();
 }
 

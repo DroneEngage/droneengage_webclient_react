@@ -205,7 +205,7 @@ export let CONST_ADSB_CONFIG = {
  *
  * The WebClient fetches wind data from Open-Meteo (free, no API key) via
  * js_windProvider.js and draws a wind arrow next to the currently selected
- * DroneEngage unit on the map. See js_globals.CONST_MAP_WIND_ARROW_* for
+ * DroneEngage unit on the map. See config/mapStyle.js CONST_MAP_WIND_ARROW_* for
  * the visual constants.
  *
  *   ENABLED:        default state (overridable from Preferences + localStorage)
