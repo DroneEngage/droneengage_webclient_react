@@ -467,7 +467,9 @@ export function reduceID(unit, msg) {
     // Phase 3: modules.
     if (p.m1) {
         triggers.onModuleChanged = p.m1.length !== unit.m_modules.m_list.length;
-        ops.push({ op: 'method', method: 'm_modules.addModules', arg: p.m1, notifyFields: ['m_modules.has_fcb', 'm_modules.has_viewlink', 'm_modules.has_ai_recognition', 'm_modules.has_p2p', 'm_modules.has_sdr'] });
+        // callUnitMethod spreads array args, so wrap p.m1 in an array so
+        // addModules receives the modules array as its single argument.
+        ops.push({ op: 'method', method: 'm_modules.addModules', arg: [p.m1], notifyFields: ['m_modules.has_fcb', 'm_modules.has_viewlink', 'm_modules.has_ai_recognition', 'm_modules.has_p2p', 'm_modules.has_sdr'] });
     }
 
     // Phase 4: home location sub-message.
