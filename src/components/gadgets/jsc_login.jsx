@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
 import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
@@ -6,7 +7,6 @@ import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
 import * as js_common from '../../js/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_globals } from '../../js/js_globals.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
@@ -92,8 +92,8 @@ class ClssLoginControl extends React.Component {
     if (!p_data || !p_data.unit) return;
 
     // Ignore own messages.
-    if (js_globals.v_andruavWS && js_globals.v_andruavWS.m_andruavUnit) {
-      if (p_data.unit.getPartyID() === js_globals.v_andruavWS.m_andruavUnit.getPartyID()) {
+    if (js_session.fn_getAndruavWS() && js_session.fn_getAndruavWS().m_andruavUnit) {
+      if (p_data.unit.getPartyID() === js_session.fn_getAndruavWS().m_andruavUnit.getPartyID()) {
         return;
       }
     }
@@ -161,9 +161,9 @@ class ClssLoginControl extends React.Component {
           host = 'localhost';
           port = '8080';
         }
-      } else if (js_globals.v_andruavClient && js_globals.v_andruavClient.v_auth) {
+      } else if (js_session.fn_getAndruavClient() && js_session.fn_getAndruavClient().v_auth) {
         // Fallback to auth module if probedUrl not available
-        const authModule = js_globals.v_andruavClient.v_auth;
+        const authModule = js_session.fn_getAndruavClient().v_auth;
         host = authModule.m_auth_ip;
         port = authModule._m_auth_port;
       } else {
@@ -300,22 +300,22 @@ class ClssLoginControl extends React.Component {
     }
     switch (tabStatus) {
       case 'new':
-        js_globals.m_current_tab_status = 'new';
+        js_session.fn_setCurrentTabStatus('new');
         console.log('This is a newly opened tab.');
         break;
       case 'refresh':
-        js_globals.m_current_tab_status = 'refresh';
+        js_session.fn_setCurrentTabStatus('refresh');
         console.log('This tab was refreshed.');
         break;
       case 'duplicate':
-        js_globals.m_current_tab_status = 'duplicate';
+        js_session.fn_setCurrentTabStatus('duplicate');
         console.log('This tab is a duplicate.');
         if (usePlugin !== true) {
           js_localStorage.fn_resetUnitID();
         }
         break;
       default:
-        js_globals.m_current_tab_status = 'unknown';
+        js_session.fn_setCurrentTabStatus('unknown');
         console.log('Unknown tab status.');
     }
 

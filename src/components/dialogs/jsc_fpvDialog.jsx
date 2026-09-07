@@ -1,4 +1,5 @@
 import 'jquery-ui-dist/jquery-ui.min.js';
+import * as js_session from '../../js/state/session.js';
 
 import React from 'react';
 import Draggable from 'react-draggable';
@@ -6,7 +7,6 @@ import { withTranslation } from 'react-i18next';
 
 import * as js_common from '../../js/js_common.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
-import { js_globals } from '../../js/js_globals.js';
 import { fn_saveData } from '../../js/js_helpers.js';
 
 import ClssDialogBase from './jsc_dialog_base.jsx';
@@ -110,7 +110,7 @@ class ClssFpvDialog extends ClssDialogBase {
         // Build a descriptive filename: fpv_<unitName>_<timestamp>.png
         let unitName = 'image';
         if (this.state.party_id) {
-            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.party_id);
+            const p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.party_id);
             if (p_andruavUnit && p_andruavUnit.m_unitName) {
                 unitName = p_andruavUnit.m_unitName;
             }
@@ -265,7 +265,7 @@ class ClssFpvDialog extends ClssDialogBase {
 
         let unitName = '';
         if (this.state.party_id) {
-            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.party_id);
+            const p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.party_id);
             if (p_andruavUnit) {
                 unitName = p_andruavUnit.m_unitName;
             }

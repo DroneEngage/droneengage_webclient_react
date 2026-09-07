@@ -1,8 +1,8 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
-import { js_globals } from '../../js/js_globals.js';
 import { js_dialogs } from '../../js/app/dialogService.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
@@ -35,7 +35,7 @@ export default class ClssModuleDetails extends React.Component {
               this.props.t('are_you_sure_apply_settings'), function (p_approved) {
                 if (p_approved === false) return;
         
-                js_globals.v_andruavFacade.API_doModuleConfigAction(me.props.p_unit, c_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
+                js_session.fn_getAndruavFacade().API_doModuleConfigAction(me.props.p_unit, c_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_Restart);
 
             
                 console.log('Submitted:', me.state.output);
@@ -51,7 +51,7 @@ export default class ClssModuleDetails extends React.Component {
         fn_do_modal_confirmation("VERY DANGEROUS ACTION! - Completely ShutDown Board - NO Restart" + v_andruavUnit.m_unitName,
                     "Are you sure you want to completly shutdown the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
-                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
+                        js_session.fn_getAndruavFacade().API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_SHUT_DOWN_HW);
                     }, this.props.t('yes'), "bg-danger text-white");
     }
 
@@ -62,7 +62,7 @@ export default class ClssModuleDetails extends React.Component {
         fn_do_modal_confirmation("VERY DANGEROUS ACTION! - Completely Reboot Board" + v_andruavUnit.m_unitName,
                     "Are you sure you want to completly reboot the BOARD?", function (p_approved) {
                         if (p_approved === false) return;
-                        js_globals.v_andruavFacade.API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_RESTART_HW);
+                        js_session.fn_getAndruavFacade().API_doModuleConfigAction(v_andruavUnit, p_module_key, js_andruavMessages.CONST_TYPE_CONFIG_ACTION_RESTART_HW);
                     }, this.props.t('yes'), "bg-danger text-white");
     }
 
@@ -71,7 +71,7 @@ export default class ClssModuleDetails extends React.Component {
         function fn_callback(p_params) {
             js_dialogs.fn_showConfigGenerator({ 'p_unit': p_params.p_unit, 'module': p_params.p_module });
         }
-        js_globals.v_andruavFacade.API_fetchConfigJSON(this.props.p_unit, p_module, fn_callback);
+        js_session.fn_getAndruavFacade().API_fetchConfigJSON(this.props.p_unit, p_module, fn_callback);
     }
 
     render() {

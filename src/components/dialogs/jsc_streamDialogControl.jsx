@@ -1,9 +1,9 @@
 import 'jquery-ui-dist/jquery-ui.min.js';
+import * as js_session from '../../js/state/session.js';
 
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
@@ -225,7 +225,7 @@ export default class ClssStreamDialog extends ClssDialogBase
         let p_andruavUnit = null;
 
         if (this.state.p_session) {
-            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID());
+            p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID());
         }
 
         const isNoStreams = p_andruavUnit === null;

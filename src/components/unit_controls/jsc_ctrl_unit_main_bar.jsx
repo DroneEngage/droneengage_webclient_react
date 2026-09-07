@@ -1,11 +1,11 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
 import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import { js_dialogs } from '../../js/app/dialogService.js'
@@ -52,7 +52,7 @@ class ClssCtrlUnitMainBar extends React.Component {
         js_dialogs.fn_showCamera(p_session);
       }
     }
-    js_globals.v_andruavFacade.API_requestCameraList(p_andruavUnit, fn_callback);
+    js_session.fn_getAndruavFacade().API_requestCameraList(p_andruavUnit, fn_callback);
   }
 
   fn_onUpdate(me, p_andruavUnit) {

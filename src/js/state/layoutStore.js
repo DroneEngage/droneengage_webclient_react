@@ -36,9 +36,9 @@
  */
 
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
+import * as js_session from './session.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import { js_localStorage } from '../js_localStorage.js';
-import { js_globals } from '../js_globals.js';
 
 export const EE_LAYOUT_CHANGED = js_event.EE_LayoutChanged;
 
@@ -160,7 +160,7 @@ class CLayoutStore {
 			showMap3d: false,
 			showVideo: true,
 			btn: { settings: true, map: true, map3d: true, video: true },
-			activeTab: js_globals.m_current_tab_status || 'unknown',
+			activeTab: js_session.fn_getCurrentTabStatus() || 'unknown',
 		};
 	}
 

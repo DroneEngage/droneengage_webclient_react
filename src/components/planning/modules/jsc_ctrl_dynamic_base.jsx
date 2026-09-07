@@ -1,4 +1,5 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import {
     buildInitialValues,
     buildInitialEnabled,
@@ -10,7 +11,6 @@ import {
     deepMerge,
     inferEnabled,
 } from '../../../js/helpers/js_form_utils.js';
-import { js_globals } from '../../../js/js_globals.js';
 import ClssCtrlSWARMFormation from '../../gadgets/jsc_mctrl_swarm_formation.jsx';
 
 class ClssModulePlanningBase extends React.Component {
@@ -183,7 +183,7 @@ class ClssModulePlanningBase extends React.Component {
           />
         );
       case 'ctrl_unit_dropdown':
-        const units = js_globals.m_andruavUnitList.fn_getUnitValues() || [];
+        const units = js_session.fn_getAndruavUnitList().fn_getUnitValues() || [];
         const options = [
           ...config.fixed_list.map(([val, label, className]) => ({ value: val, label, className })),
           ...units.map(unit => ({ value: unit.getPartyID(), label: unit.m_unitName }))

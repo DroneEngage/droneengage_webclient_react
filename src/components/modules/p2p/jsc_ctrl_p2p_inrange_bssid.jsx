@@ -5,10 +5,10 @@
  */
 
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 
 
 import * as js_helpers from '../../../js/js_helpers.js'
-import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 
@@ -33,7 +33,7 @@ class CLASS_CTRL_P2P_IN_RANGE_BSSID_INFO  extends React.Component {
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_bssid;
-        const unit = js_globals.m_andruavUnitList.fn_getUnitByP2PMac(v_inrange_node.bssid);
+        const unit = js_session.fn_getAndruavUnitList().fn_getUnitByP2PMac(v_inrange_node.bssid);
         
         let p2 = v_andruavUnit.getPartyID();
         if (unit!=null)

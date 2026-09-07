@@ -1,6 +1,6 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import * as js_helpers from '../../js/js_helpers.js'
@@ -40,7 +40,7 @@ export class ClssCVideoControl extends React.Component {
         if (this.state.needsTabActivation && this.state.lastadded) {
             const v_obj = this.state.m_videoScreens[this.state.lastadded];
             if (v_obj) {
-                const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
+                const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(v_obj.v_unit);
                 const tabPaneId = 'cam_' + andruavUnit.getPartyID() + v_obj.v_track;
                 const tabSelector = 'a[href="#' + tabPaneId + '"]';
                 
@@ -112,12 +112,12 @@ export class ClssCVideoControl extends React.Component {
             const v_screen = this.state.m_videoScreens[v_key];
             if (!v_screen) return;
 
-            const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_screen.v_unit);
+            const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(v_screen.v_unit);
             if (andruavUnit) {
                 const talk = andruavUnit.m_Video.m_videoactiveTracks[v_screen.v_track];
                 if (talk) {
                     talk.hangup(true);
-                    js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(andruavUnit, false, talk.number, v_screen.v_track);
+                    js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_streamVideo(andruavUnit, false, talk.number, v_screen.v_track);
                 }
                 andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
             }
@@ -197,7 +197,7 @@ export class ClssCVideoControl extends React.Component {
             const v_key = arr[i];
             const v_obj = this.state.m_videoScreens[v_key];
             if (v_obj !== null && v_obj !== undefined) {
-                const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(v_obj.v_unit);
+                const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(v_obj.v_unit);
 
                 if (this.state.lastadded === v_key) {
                     _first = "active show";

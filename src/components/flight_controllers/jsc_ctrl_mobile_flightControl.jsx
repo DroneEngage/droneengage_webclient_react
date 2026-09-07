@@ -1,6 +1,6 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
-import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import {mavlink20} from '../../js/js_mavlink_v2.js';
@@ -92,7 +92,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
 
     hlp_canConnect ()
     {
-        return js_globals.v_andruavFacade !== null && js_globals.v_andruavFacade !== undefined;
+        return js_session.fn_getAndruavFacade() !== null && js_session.fn_getAndruavFacade() !== undefined;
     }
 
     hlp_isBlocked ()
@@ -108,8 +108,8 @@ export class ClssCtrlMobileFlightControl extends React.Component {
     fn_connectToFCB (p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (js_globals.v_andruavFacade === null || js_globals.v_andruavFacade === undefined) return;
-        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
+        if (js_session.fn_getAndruavFacade() === null || js_session.fn_getAndruavFacade() === undefined) return;
+        js_session.fn_getAndruavFacade().API_connectToFCB(p_andruavUnit);
     }
 
     hlp_getMobileButtonStyles (p_andruavUnit)
@@ -257,7 +257,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         const btn = this.hlp_getMobileButtonStyles(v_andruavUnit);
         if (!btn.btn_arm_enabled) return;
         this.fn_doConfirm(btn.btn_arm_confirmTitle, btn.btn_arm_confirmMessage, function () {
-            js_globals.v_andruavFacade.API_do_Arm(v_andruavUnit, !v_andruavUnit.m_isArmed, false);
+            js_session.fn_getAndruavFacade().API_do_Arm(v_andruavUnit, !v_andruavUnit.m_isArmed, false);
         });
     }
 
@@ -273,7 +273,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             const flightMode = me.hlp_isPX4()
                 ? js_andruavUnit.CONST_FLIGHT_PX4_AUTO_TAKEOFF
                 : js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF;
-            js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, flightMode);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(v_andruavUnit, flightMode);
         });
     }
 
@@ -289,7 +289,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             const flightMode = me.hlp_isPX4()
                 ? js_andruavUnit.CONST_FLIGHT_PX4_AUTO_MISSION
                 : js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO;
-            js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, flightMode);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(v_andruavUnit, flightMode);
         });
     }
 
@@ -315,7 +315,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             else {
                 flightMode = js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER;
             }
-            js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, flightMode);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(v_andruavUnit, flightMode);
         });
     }
 
@@ -329,10 +329,10 @@ export class ClssCtrlMobileFlightControl extends React.Component {
         const me = this;
         this.fn_doConfirm(btn.btn_land_confirmTitle, btn.btn_land_confirmMessage, function () {
             if (me.hlp_isPX4()) {
-                js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_LAND);
+                js_session.fn_getAndruavFacade().API_do_FlightMode(v_andruavUnit, js_andruavUnit.CONST_FLIGHT_PX4_AUTO_LAND);
             }
             else {
-                js_globals.v_andruavFacade.API_do_Land(v_andruavUnit);
+                js_session.fn_getAndruavFacade().API_do_Land(v_andruavUnit);
             }
         });
     }
@@ -349,7 +349,7 @@ export class ClssCtrlMobileFlightControl extends React.Component {
             const flightMode = me.hlp_isPX4()
                 ? js_andruavUnit.CONST_FLIGHT_PX4_OFF_BOARD
                 : js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED;
-            js_globals.v_andruavFacade.API_do_FlightMode(v_andruavUnit, flightMode);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(v_andruavUnit, flightMode);
         });
     }
 

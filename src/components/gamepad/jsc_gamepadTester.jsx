@@ -1,5 +1,4 @@
 import React from 'react';
-import { js_globals } from '../../js/js_globals.js';
 import { v_gamepad_function_array, v_gamepad_button_function_array, v_gamepad_configuration, v_gamepad_button_types, STICK_MODE_RUD, STICK_MODE_ELE, STICK_MODE_ALE, STICK_MODE_THR } from '../../js/config/gamepadMap.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_localStorage } from '../../js/js_localStorage.js';

@@ -1,7 +1,6 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import * as js_andruav_facade from '../../js/protocol/server_comm/js_andruav_facade.js';
-import { js_globals } from '../../js/js_globals.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter';

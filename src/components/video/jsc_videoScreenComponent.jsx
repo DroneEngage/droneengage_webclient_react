@@ -1,11 +1,11 @@
 import $ from 'jquery';
+import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 
 import React from 'react';
 
 import FileSaver from 'file-saver';
 
-import { js_globals } from '../../js/js_globals.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import { js_dialogs } from '../../js/app/dialogService.js'
 import * as js_common from '../../js/js_common.js'
@@ -155,12 +155,12 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     fnl_switchcam(e, p_obj) {
-        js_globals.v_andruavFacade.API_SwitchCamera(this.props.obj.v_unit, p_obj.v_track);
+        js_session.fn_getAndruavFacade().API_SwitchCamera(this.props.obj.v_unit, p_obj.v_track);
     }
 
 
     fnl_takeLocalImage(e) {
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (!c_andruavUnit) return;
         fn_takeLocalImage(c_andruavUnit, this.props.obj.v_track);
     }
@@ -182,7 +182,7 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     fnl_recordVideo(v_e) {
-        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) {
             return;
         }
@@ -208,11 +208,11 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     fnl_stopVideo(v_e) {
-        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         v_talk.hangup(true);
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
+        js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_streamVideo(v_andruavUnit, false, v_talk.number, this.props.obj.v_track);
         v_andruavUnit.m_Video.VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         
         // Dispatch event to close the whole tab
@@ -310,7 +310,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fn_lnkVideo() {
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         const c_talk = c_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
         const v_video = window.document.getElementById("videoObject" + c_talk.targetVideoTrack);
         if (v_video === null || v_video === undefined) return;
@@ -348,7 +348,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fnl_requestPIP(e) {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
 
         if (v_andruavUnit === null || v_andruavUnit === undefined) {
             return;
@@ -428,7 +428,7 @@ export default class ClssCVideoScreen extends React.Component {
 
     fnl_zoomInOut(e, p_zoomIn, p_obj) {
         js_common.fn_console_log("p_cameraIndex: " + JSON.stringify(p_obj));
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_zoomCamera(p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
+        js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_zoomCamera(p_obj.v_unit, p_obj.v_track, p_zoomIn, null, 0.1);
     }
 
     fnl_flashOnOff (e, p_obj)
@@ -447,7 +447,7 @@ export default class ClssCVideoScreen extends React.Component {
             return ; 
         }
         js_common.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
-        js_globals.v_andruavFacade.API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
+        js_session.fn_getAndruavFacade().API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
 
         this.state.m_flash = v_flashValue;
     }
@@ -458,7 +458,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fnl_showLaserControl(e) {
-        const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (andruavUnit == null) {
             return;
         }
@@ -470,10 +470,10 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fnl_rotate(v_e) {
-        let v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         this.m_rotation = (this.m_rotation + 1) % 4;
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_rotateVideo(v_andruavUnit, this.m_rotations[this.m_rotation], this.props.obj.v_track);
+        js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_rotateVideo(v_andruavUnit, this.m_rotations[this.m_rotation], this.props.obj.v_track);
     }
 
     fnl_mirror_local(v_e) {
@@ -502,7 +502,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     fnl_div_mouseDown(e) {
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null) {
             return;
         }
@@ -604,12 +604,12 @@ export default class ClssCVideoScreen extends React.Component {
 
         if ((w < 0.01) || (h < 0.01)) return ;
         
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null) {
             return;
         }
 
-        js_globals.v_andruavFacade.API_SendTrackCRegion(
+        js_session.fn_getAndruavFacade().API_SendTrackCRegion(
             c_andruavUnit,
             parseFloat(x1.toFixed(3)),
             parseFloat(y1.toFixed(3)),
@@ -626,7 +626,7 @@ export default class ClssCVideoScreen extends React.Component {
         }
 
         js_common.fn_console_log("x:" + e.nativeEvent.offsetX + "y:" + e.nativeEvent.offsetY);
-        const c_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (c_andruavUnit == null) {
             return;
         }
@@ -634,7 +634,7 @@ export default class ClssCVideoScreen extends React.Component {
         // send new points
         const p = this.fn_normalizeClientPointToVideo(e.clientX, e.clientY);
         if (p == null) return;
-        js_globals.v_andruavFacade.API_SendTrackPoint(
+        js_session.fn_getAndruavFacade().API_SendTrackPoint(
             c_andruavUnit,
             parseFloat(p.x.toFixed(3)),
             parseFloat(p.y.toFixed(3)),
@@ -643,7 +643,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     render() {
-        const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.obj.v_unit);
+        const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (andruavUnit === null || andruavUnit === undefined) {
             return null;
         }

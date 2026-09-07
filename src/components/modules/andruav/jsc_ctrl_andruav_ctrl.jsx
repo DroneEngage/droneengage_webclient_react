@@ -1,6 +1,6 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../../js/js_globals.js';
 import { js_localStorage } from '../../../js/js_localStorage.js'
 
 export class ClssCtrlAndruavCtrl extends React.Component {
@@ -37,18 +37,18 @@ export class ClssCtrlAndruavCtrl extends React.Component {
     }
 
     fn_makeFlash(p_andruavUnit) {
-        js_globals.v_andruavFacade.API_makeFlash(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_makeFlash(p_andruavUnit);
         this.setState((s) => ({ m_flashActive: !s.m_flashActive }));
     }
 
     fn_makeSiren(p_andruavUnit) {
-        js_globals.v_andruavFacade.API_makeSiren(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_makeSiren(p_andruavUnit);
         this.setState((s) => ({ m_sirenActive: !s.m_sirenActive }));
     }
 
     fn_sendSMS(p_andruavUnit) {
         const p_phoneNumber = this.m_smsNumberRef.current.value;
-        js_globals.v_andruavFacade.API_sendSMSLocation(p_andruavUnit, p_phoneNumber);
+        js_session.fn_getAndruavFacade().API_sendSMSLocation(p_andruavUnit, p_phoneNumber);
     }
 
     fn_saveSMSNumber() {

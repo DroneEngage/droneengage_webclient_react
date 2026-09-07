@@ -1,9 +1,9 @@
 
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import * as js_common from '../../../js/js_common.js'
 
-import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 
@@ -114,7 +114,7 @@ export  class ClssSinglePlanContainer extends React.Component {
         }
 
 
-        const andruavSelectedUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_party_id);
+        const andruavSelectedUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.m_party_id);
 
         let item = [];
         

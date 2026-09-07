@@ -5,9 +5,9 @@
  */
 
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
-import { js_globals } from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 
@@ -30,18 +30,18 @@ export class ClssCtrlExperimental extends React.Component {
     }
 
     fn_ConnectToLocalCommServer(p_andruavUnit) {
-        js_globals.v_andruavFacade.API_connectToLocalCommServer(p_andruavUnit, "192.168.1.144", "9967")
+        js_session.fn_getAndruavFacade().API_connectToLocalCommServer(p_andruavUnit, "192.168.1.144", "9967")
     }
 
     fn_scanP2P(p_andruavUnit) {
     }
 
     fn_setCommunicationChannel_WS(p_andruavUnit, ws_state, duration) {
-        js_globals.v_andruavFacade.API_SetCommunicationChannel(p_andruavUnit, ws_state, null, duration, null, null, null);
+        js_session.fn_getAndruavFacade().API_SetCommunicationChannel(p_andruavUnit, ws_state, null, duration, null, null, null);
     }
 
     fn_setCommunicationChannel_Local_WS(p_andruavUnit, local_state, duration) {
-        js_globals.v_andruavFacade.API_SetCommunicationChannel(p_andruavUnit, null, null, null, null, local_state, duration);
+        js_session.fn_getAndruavFacade().API_SetCommunicationChannel(p_andruavUnit, null, null, null, null, local_state, duration);
     }
 
     fn_setDEPilotTasks(p_andruavUnit)
@@ -50,11 +50,11 @@ export class ClssCtrlExperimental extends React.Component {
         
         // Call the DEPILOT mode control API
         
-        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
-        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
-        //js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, 250.0);
+        //js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
+        //js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
+        //js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, 10000, null, null);
+        js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, 10, null);
+        js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, 250.0);
         
     }
 

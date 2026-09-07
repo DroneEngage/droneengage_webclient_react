@@ -14,7 +14,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 
-import { js_globals } from '../js/js_globals.js';
 import { js_localStorage } from '../js/js_localStorage.js';
 import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter';

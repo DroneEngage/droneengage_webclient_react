@@ -23,8 +23,8 @@
  */
 
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
+import * as js_session from '../state/session.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
-import { js_globals } from '../js_globals.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_adsbUnit } from '../js_adsbUnit.js';
 import * as js_siteConfig from '../js_siteConfig.js';
@@ -229,7 +229,7 @@ class AdsbManager {
      * @returns {Array} array of {lat, lng, unit} for units with valid GPS.
      */
     _collectOnlineDrones() {
-        const list = js_globals.m_andruavUnitList;
+        const list = js_session.fn_getAndruavUnitList();
         if (!list || typeof list.fn_getUnitValues !== 'function') return [];
         const units = list.fn_getUnitValues();
         if (!units) return [];
@@ -311,10 +311,10 @@ class AdsbManager {
         }
 
         // No drones — fall back to geolocation if available.
-        if (this._geolocationAvailable && js_globals.myposition && js_globals.myposition.coords) {
+        if (this._geolocationAvailable && js_session.fn_getMyposition() && js_session.fn_getMyposition().coords) {
             this._setArea(
-                js_globals.myposition.coords.latitude,
-                js_globals.myposition.coords.longitude,
+                js_session.fn_getMyposition().coords.latitude,
+                js_session.fn_getMyposition().coords.longitude,
                 this._effectiveGeolocationRadiusKm(),
                 'geolocation'
             );

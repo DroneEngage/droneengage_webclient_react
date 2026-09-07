@@ -1,6 +1,6 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 
@@ -36,7 +36,7 @@ export class ClssCtrlAUDIO extends React.Component {
         // to handle it, so sending unconditionally is safe.
         const v_andruavUnit = this.props.p_unit;
         if (v_andruavUnit && v_andruavUnit.getPartyID && v_andruavUnit.getPartyID()) {
-            js_globals.v_andruavFacade.API_requestSoundList(v_andruavUnit, null);
+            js_session.fn_getAndruavFacade().API_requestSoundList(v_andruavUnit, null);
         }
     }
 
@@ -66,13 +66,13 @@ export class ClssCtrlAUDIO extends React.Component {
         const p_language = this.state.m_currentLanguage;
         const p_pitch = parseInt(this.m_pitchRef.current.value);
         const p_volume = parseInt(this.m_volumeRef.current.value);
-        js_globals.v_andruavFacade.API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
+        js_session.fn_getAndruavFacade().API_soundTextToSpeech(p_andruavUnit, p_text, p_language, p_pitch, p_volume);
     }
 
     fn_playFile(p_andruavUnit) {
         const p_file = this.m_soundSelectRef.current ? this.m_soundSelectRef.current.value : '';
         if (p_file === '' || p_file === null || p_file === undefined) return;
-        js_globals.v_andruavFacade.API_soundPlayFile(p_andruavUnit, p_file);
+        js_session.fn_getAndruavFacade().API_soundPlayFile(p_andruavUnit, p_file);
     }
 
     render() {

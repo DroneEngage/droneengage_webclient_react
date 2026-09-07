@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
-import { js_globals } from '../../js/js_globals';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
@@ -23,7 +23,7 @@ function ClssCtrlUDPPoxyTelemetry({ p_unit, i18n, t }) {
   useEventSubscription(js_event.EE_Language_Changed, fn_updateLanguage);
 
   const fn_requestUdpProxyStatus = (p_andruavUnit) => {
-    js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_andruavUnit);
   };
 
   const fn_changeTelemetryOptimizationLevel = (p_andruavUnit, step) => {
@@ -31,21 +31,21 @@ function ClssCtrlUDPPoxyTelemetry({ p_unit, i18n, t }) {
     let next_step = p_andruavUnit.m_Telemetry.m_telemetry_level + step;
     if (next_step < 0) next_step = 0;
     if (next_step > 3) next_step = 3;
-    js_globals.v_andruavFacade.API_adjustTelemetryDataRate(p_andruavUnit, next_step);
-    js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_adjustTelemetryDataRate(p_andruavUnit, next_step);
+    js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_andruavUnit);
     p_andruavUnit.m_Telemetry.m_telemetry_level = next_step;
   };
 
   const fn_pauseTelemetry = (p_andruavUnit) => {
     if (p_andruavUnit == null) return;
-    js_globals.v_andruavFacade.API_pauseTelemetry(p_andruavUnit);
-    js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_pauseTelemetry(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_andruavUnit);
   };
 
   const fn_startTelemetry = (p_andruavUnit) => {
     if (p_andruavUnit == null) return;
-    js_globals.v_andruavFacade.API_resumeTelemetry(p_andruavUnit);
-    js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_resumeTelemetry(p_andruavUnit);
+    js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_andruavUnit);
   };
 
   if (!js_andruavAuth.fn_do_canControl()) {

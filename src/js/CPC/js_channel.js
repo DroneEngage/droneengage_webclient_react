@@ -1,4 +1,4 @@
-import { js_globals } from '../js_globals.js';
+import * as js_session from '../state/session.js';
 import { EVENTS as js_event } from '../events/js_eventList.js'
 import * as js_helpers from '../js_helpers.js';
 import * as js_andruavUnit from '../js_andruavUnit.js';
@@ -26,7 +26,7 @@ class CChannelCommunicator {
         this.receiveMessage();
 
         // this.m_timer = setInterval(() => {
-        //     if (js_globals.m_current_tab_status === 'duplicate')
+        //     if (js_session.fn_getCurrentTabStatus() === 'duplicate')
         //     {
         //         this.sendMessage();
         //     }

@@ -1,11 +1,11 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 import Draggable from 'react-draggable';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import * as js_common from '../../js/js_common.js';
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import { fn_do_modal_confirmation, fn_do_modal_alert, fn_helpPage } from '../../js/js_main.js';
@@ -47,7 +47,7 @@ class ClssParameterItem extends React.Component {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (!p_approved) return;
-            js_globals.v_andruavFacade.API_WriteParameter(me.props.prop_unit, me.props.prop_param);
+            js_session.fn_getAndruavFacade().API_WriteParameter(me.props.prop_unit, me.props.prop_param);
             js_dialogs.fn_showParameters(me.props.prop_unit);
         }, "YES");
     }
@@ -214,7 +214,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Reload all parameters from FCB?", function (p_approved) {
             if (!p_approved) return;
-            js_globals.v_andruavFacade.API_requestParamList(me.state.p_unit);
+            js_session.fn_getAndruavFacade().API_requestParamList(me.state.p_unit);
         }, "YES");
     }
 
@@ -223,7 +223,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         const me = this;
         fn_do_modal_confirmation("Confirmation", "Write Parameter to FCB?", function (p_approved) {
             if (!p_approved) return;
-            js_globals.v_andruavFacade.API_WriteAllParameters(me.state.p_unit);
+            js_session.fn_getAndruavFacade().API_WriteAllParameters(me.state.p_unit);
         }, "YES");
     }
 
@@ -233,7 +233,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
 
     fn_createParametersCtrl(p_andruavUnit) {
         if (p_andruavUnit && Object.keys(p_andruavUnit.m_FCBParameters.m_list_by_index_shadow).length === 0) {
-            js_globals.v_andruavFacade.API_requestParamList(p_andruavUnit);
+            js_session.fn_getAndruavFacade().API_requestParamList(p_andruavUnit);
         }
 
         return (

@@ -1,10 +1,10 @@
 import $ from 'jquery'; 
+import * as js_session from '../../js/state/session.js';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {js_globals} from '../../js/js_globals.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import * as js_common from '../../js/js_common.js'
 
@@ -31,7 +31,7 @@ class ClssCameraDevice extends React.Component {
         // attached USB webcam reported in CAMERA_LIST_MESSAGE) before joining its WebRTC track -
         // same AndruavMessage_CameraSwitch already used by the live-view "switch camera" button,
         // just driven by the selected track id instead of a plain front/back toggle.
-        js_globals.v_andruavFacade.API_SwitchCamera(this.props.prop_session.m_unit.getPartyID(), v_track.id);
+        js_session.fn_getAndruavFacade().API_SwitchCamera(this.props.prop_session.m_unit.getPartyID(), v_track.id);
 
         fn_VIDEO_login (this.props.prop_session, v_track.id);
         js_dialogs.fn_hideStream();
@@ -56,7 +56,7 @@ class ClssCameraDevice extends React.Component {
         }
 
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
+        js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             camera_index,
             1,
             0,
@@ -75,7 +75,7 @@ class ClssCameraDevice extends React.Component {
             camera_index = js_andruavMessages.CONST_CAMERA_SOURCE_MOBILE;
         }
 
-        js_globals.v_andruavFacade.API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
+        js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_takeImage2(this.props.prop_session.m_unit.getPartyID(),
             this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id,
             this.props.prop_parent.fn_getNumOfShots(),
             this.props.prop_parent.fn_getInterval(),
@@ -181,7 +181,7 @@ export default class ClssCameraDialog extends ClssDialogBase
     
     fn_displayDialog (p_me, p_session)
     {
-        const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_session.m_unit.getPartyID());
+        const p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(p_session.m_unit.getPartyID());
 		if (p_andruavUnit == null) {
 		    return;
 		}

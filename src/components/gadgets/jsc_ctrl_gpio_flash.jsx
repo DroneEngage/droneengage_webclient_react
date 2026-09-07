@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
@@ -41,7 +41,7 @@ export default function ClssCtrlGPIO_Flash({ id, className, title, p_unit }) {
 
         const target_status = fn_isGPIOFlashAllON(gpio_flash) ? 0 : 1;
         gpio_flash.forEach(element => {
-            js_globals.v_andruavFacade.API_writeGPIO(p_unit, element.pin_module_key, element.pin_number, target_status);
+            js_session.fn_getAndruavFacade().API_writeGPIO(p_unit, element.pin_module_key, element.pin_number, target_status);
         });
     };
 

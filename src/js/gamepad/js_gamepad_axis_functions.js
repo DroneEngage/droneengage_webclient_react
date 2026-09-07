@@ -1,10 +1,10 @@
 import * as js_andruavUnit from '../js_andruavUnit'
+import * as js_session from '../state/session.js';
 import * as js_preferences from '../state/preferences.js';
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_common from '../js_common.js'
 
-import { js_globals } from '../js_globals.js';
 import { GP_EPSILON_CHANGE, GP_MIN_GAP_FAST_MS } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js'
 import { js_eventEmitter } from '../events/js_eventEmitter.js'
@@ -20,28 +20,28 @@ class CGamePadAxisFunctions {
         this.m_axisActions = {
             [js_andruavUnit.VEHICLE_UNKNOWN]: {
                 'SRV9': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "9", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "9", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV10': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "10", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "10", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV11': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "11", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "11", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV12': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "12", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "12", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV13': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "13", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "13", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV14': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "14", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "14", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV15': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "15", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "15", (parseFloat(val) + 1) * 500 + 1000)
                 },
                 'SRV16': {
-                    execute: (unit, val) => js_globals.v_andruavFacade.API_do_ServoChannel(unit, "16", (parseFloat(val) + 1) * 500 + 1000)
+                    execute: (unit, val) => js_session.fn_getAndruavFacade().API_do_ServoChannel(unit, "16", (parseFloat(val) + 1) * 500 + 1000)
                 }
             },
             [js_andruavUnit.VEHICLE_TRI]: {},
@@ -68,7 +68,7 @@ class CGamePadAxisFunctions {
 
 
     fn_executeAxis() {
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        const c_currentEngagedUnitRX = js_session.fn_getAndruavUnitList().getEngagedUnitRX();
 
         // Exit if no engaged unit
         if (!c_currentEngagedUnitRX) {

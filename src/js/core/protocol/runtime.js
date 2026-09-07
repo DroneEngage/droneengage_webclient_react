@@ -12,6 +12,7 @@
  */
 
 import { fn_decode } from './decode.js';
+import * as js_session from '../../state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { fn_reduce, fn_isMigrated, WAYPOINT_NO_CHUNK, WAYPOINT_LAST_CHUNK } from './reduce.js';
 import { fn_effects } from './effects.js';
@@ -23,7 +24,6 @@ import { notifyUnitFieldChanged } from '../../store/unitStore.js';
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
 import { fn_unitError, fn_waypointsEvent } from '../../events/eventPayloads.js';
-import { js_globals } from '../../js_globals.js';
 import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade.js';
 import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
@@ -268,9 +268,9 @@ function fn_executeOps(unit, ops) {
                 // Internal pseudo-events (prefixed __) are runtime concerns
                 // that don't go through the event emitter.
                 if (op.name === '__listAdd') {
-                    js_globals.m_andruavUnitList.Add(unit.getPartyID(), unit);
+                    js_session.fn_getAndruavUnitList().Add(unit.getPartyID(), unit);
                 } else if (op.name === '__listPutUnit') {
-                    js_globals.m_andruavUnitList.putUnit(unit.getPartyID(), unit);
+                    js_session.fn_getAndruavUnitList().putUnit(unit.getPartyID(), unit);
                 } else if (op.name === '__delayedVersionNotice') {
                     const payload = op.payload;
                     setTimeout(() => {

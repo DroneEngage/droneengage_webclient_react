@@ -3,7 +3,6 @@ import * as js_preferences from '../../js/state/preferences.js';
 import ClssModulePlanningBase from './jsc_ctrl_dynamic_base.jsx';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages';
-import { js_globals } from '../../../js/js_globals.js';
 import { CCommandAPI } from '../../../js/protocol/messages/js_commands_api.js'
 
 export class ClssP2P_Planning extends ClssModulePlanningBase {

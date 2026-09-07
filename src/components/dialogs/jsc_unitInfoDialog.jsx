@@ -1,7 +1,7 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import { js_globals } from '../../js/js_globals.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
@@ -74,7 +74,7 @@ class ClssUnitInfoDialog extends ClssModalDialogBase {
         const unitDescription = this.unitDescriptionRef.current.value;
 
         if (unitName && unitName.trim() !== '' && unitDescription && unitDescription.trim() !== '') {
-            js_globals.v_andruavFacade.API_setUnitName(this.state.p_andruavUnit, unitName, unitDescription);
+            js_session.fn_getAndruavFacade().API_setUnitName(this.state.p_andruavUnit, unitName, unitDescription);
         }
         
         this.fn_closeDialog();

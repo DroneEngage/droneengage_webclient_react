@@ -1,4 +1,5 @@
 import '../css/bootstrap-icons/font/bootstrap-icons.css';
+import * as js_session from '../js/state/session.js';
 import * as js_preferences from '../js/state/preferences.js';
 import '../css/css_styles.css';
 import '../css/css_styles2.css';
@@ -15,7 +16,6 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation, withTranslation } from 'react-i18next';
 
-import { js_globals } from '../js/js_globals.js';
 import * as js_siteConfig from '../js/js_siteConfig.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
@@ -187,11 +187,11 @@ const Mobile = () => {
 
   const getDroneUnits = () => {
     // Use fn_getUnitsSorted() — same method ClssAndruavUnitList uses in home.js.
-    // Unlike fn_getUnitValues(), it does not guard on js_globals.v_andruavClient,
+    // Unlike fn_getUnitValues(), it does not guard on js_session.fn_getAndruavClient(),
     // which can be unset during reconnection/session-restore and cause the mobile
     // status bar to show "No Unit" even when units exist in the global list.
-    if (!js_globals.m_andruavUnitList) return [];
-    const units = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+    if (!js_session.fn_getAndruavUnitList()) return [];
+    const units = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
     if (!units) return [];
     return units.filter((u) => u && u.m_defined === true && u.m_IsGCS === false);
   };
@@ -211,11 +211,11 @@ const Mobile = () => {
   const handleSelectUnit = (partyId) => {
     setSelectedPartyId(partyId);
     setShowUnitList(false);
-    const unit = js_globals.m_andruavUnitList
-      ? js_globals.m_andruavUnitList.fn_getUnit(partyId)
+    const unit = js_session.fn_getAndruavUnitList()
+      ? js_session.fn_getAndruavUnitList().fn_getUnit(partyId)
       : null;
-    if (unit && js_globals.v_andruavFacade) {
-      js_globals.v_andruavFacade.API_requestID(partyId);
+    if (unit && js_session.fn_getAndruavFacade()) {
+      js_session.fn_getAndruavFacade().API_requestID(partyId);
       fn_gotoUnit_byPartyID(partyId);
     }
   };
@@ -228,7 +228,7 @@ const Mobile = () => {
 
   const openCameraDialog = () => {
     if (!selectedUnit) return;
-    js_globals.v_andruavFacade.API_requestCameraList(selectedUnit, (p_session) => {
+    js_session.fn_getAndruavFacade().API_requestCameraList(selectedUnit, (p_session) => {
       if (p_session && p_session.status === 'connected') {
         js_dialogs.fn_showCamera(p_session);
       }

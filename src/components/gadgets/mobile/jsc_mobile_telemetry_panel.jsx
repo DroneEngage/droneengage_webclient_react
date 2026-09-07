@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import { useTranslation } from 'react-i18next';
 
-import { js_globals } from '../../../js/js_globals.js';
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
@@ -32,8 +32,8 @@ const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
   }, [p_unit, refresh, listenerObj]);
 
   useEffect(() => {
-    if (p_isOpen && p_unit && js_globals.v_andruavFacade) {
-      js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_unit);
+    if (p_isOpen && p_unit && js_session.fn_getAndruavFacade()) {
+      js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_unit);
     }
   }, [p_isOpen, p_unit]);
 
@@ -61,14 +61,14 @@ const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
   const isPaused = telemetry.m_udpProxy_paused === true;
 
   const fn_requestStatus = () => {
-    js_globals.v_andruavFacade.API_requestUdpProxyStatus(p_unit);
+    js_session.fn_getAndruavFacade().API_requestUdpProxyStatus(p_unit);
   };
 
   const fn_toggleOnOff = () => {
     if (isPaused) {
-      js_globals.v_andruavFacade.API_resumeTelemetry(p_unit);
+      js_session.fn_getAndruavFacade().API_resumeTelemetry(p_unit);
     } else {
-      js_globals.v_andruavFacade.API_pauseTelemetry(p_unit);
+      js_session.fn_getAndruavFacade().API_pauseTelemetry(p_unit);
     }
     fn_requestStatus();
   };
@@ -77,7 +77,7 @@ const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
     let next = telemetry.m_telemetry_level + step;
     if (next < 0) next = 0;
     if (next > 3) next = 3;
-    js_globals.v_andruavFacade.API_adjustTelemetryDataRate(p_unit, next);
+    js_session.fn_getAndruavFacade().API_adjustTelemetryDataRate(p_unit, next);
     telemetry.m_telemetry_level = next;
     fn_requestStatus();
   };

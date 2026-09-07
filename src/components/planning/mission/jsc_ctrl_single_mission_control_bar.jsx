@@ -1,8 +1,8 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED, v_mission_file_extension } from '../../js/config/constants.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
-import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
@@ -90,7 +90,7 @@ export class ClssSingleMissionControlBar extends React.Component {
         if (missionData == null) return;
         if (this.props.p_mission == null) return;
 
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
 
         this.props.p_mission.fn_deleteAll();
         this.props.p_mission.fn_importAsDE_V1(v_andruavUnit, missionData);
@@ -105,7 +105,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_exportMission ()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1 (v_andruavUnit);
         js_helpers.fn_saveAs (c_mission_text,"Mission" + Date.now() + v_mission_file_extension,"text/plain;charset=utf-8");
     }
@@ -117,7 +117,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_putWayPoints(p_eraseFirst)
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Upload Mission", "Please select a drone unit first.");
             return ;
@@ -129,7 +129,7 @@ export class ClssSingleMissionControlBar extends React.Component {
             "Are you sure you want to upload mission?", function (p_approved) {
                 if (p_approved === false) return;
                 
-                js_globals.v_andruavFacade.API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
+                js_session.fn_getAndruavFacade().API_uploadDEMission(v_andruavUnit, p_eraseFirst, JSON.parse(c_mission_text));
 
             }, "YES", "bg-danger txt-theme-aware");
         
@@ -140,7 +140,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_loadWayPointsFromFile()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Load Mission", "Please select a drone unit first.");
             return ;
@@ -154,7 +154,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_requestWayPoints(p_fromFCB)
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Read Mission", "Please select a drone unit first.");
             return ;
@@ -167,7 +167,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_clearWayPoints()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Clear Mission", "Please select a drone unit first.");
             return ;
@@ -185,7 +185,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_saveDBMission ()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Save Mission", "Please select a drone unit first.");
             return ;
@@ -205,7 +205,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      */
     fn_deleteDBMission()
     {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         if (v_andruavUnit===null) {
             fn_do_modal_alert("Delete Mission", "Please select a drone unit first.");
             return ;
@@ -214,7 +214,7 @@ export class ClssSingleMissionControlBar extends React.Component {
         fn_do_modal_confirmation("Delete Mission for " + v_andruavUnit.m_unitName,
             "Are you sure you want to delete all related mission tasks from the system?", function (p_approved) {
                 if (p_approved === false) return;
-                js_globals.v_andruavFacade.API_disableWayPointTasks(js_andruavAuth.m_username,js_globals.v_andruavWS.m_groupName,Me.props.m_selected_unit);
+                js_session.fn_getAndruavFacade().API_disableWayPointTasks(js_andruavAuth.m_username,js_session.fn_getAndruavWS().m_groupName,Me.props.m_selected_unit);
             }, "YES", "bg-danger txt-theme-aware");
     }
 
@@ -251,7 +251,7 @@ export class ClssSingleMissionControlBar extends React.Component {
     fn_saveMissionToCloud() {
         if (this.props.p_mission == null) return;
 
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1(v_andruavUnit);
 
         if (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown") {
@@ -264,7 +264,7 @@ export class ClssSingleMissionControlBar extends React.Component {
                     const missionName = unitId + ' Mission ' + new Date().toISOString().slice(0, 10);
                     const missionData = JSON.parse(c_mission_text);
 
-                    js_globals.v_andruavFacade.API_saveMission(unitId, missionId, missionName, missionData);
+                    js_session.fn_getAndruavFacade().API_saveMission(unitId, missionId, missionName, missionData);
                 }, "YES", "bg-info txt-theme-aware");
         } else {
             const missionName = window.prompt("Enter mission name:", "Mission " + new Date().toISOString().slice(0, 10));
@@ -273,7 +273,7 @@ export class ClssSingleMissionControlBar extends React.Component {
             const missionId = '_general_' + '_' + Date.now();
             const missionData = JSON.parse(c_mission_text);
 
-            js_globals.v_andruavFacade.API_saveMission('_general_', missionId, missionName, missionData);
+            js_session.fn_getAndruavFacade().API_saveMission('_general_', missionId, missionName, missionData);
         }
     }
 
@@ -284,7 +284,7 @@ export class ClssSingleMissionControlBar extends React.Component {
      * The most recent mission will be imported and displayed on the map.
      */
     fn_loadMissionFromCloud() {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
             ? v_andruavUnit.m_unitName
             : '_general_';
@@ -293,7 +293,7 @@ export class ClssSingleMissionControlBar extends React.Component {
             "Are you sure you want to load mission from cloud storage? Current mission will be replaced.", function (p_approved) {
                 if (p_approved === false) return;
 
-                js_globals.v_andruavFacade.API_loadMission(unitId);
+                js_session.fn_getAndruavFacade().API_loadMission(unitId);
             }, "YES", "bg-info txt-theme-aware");
     }
 
@@ -303,12 +303,12 @@ export class ClssSingleMissionControlBar extends React.Component {
      * a selection dialog. The user can then pick one to load.
      */
     fn_listMissionsFromCloud() {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.props.m_selected_unit);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
             ? v_andruavUnit.m_unitName
             : '_general_';
 
-        js_globals.v_andruavFacade.API_loadMission(unitId);
+        js_session.fn_getAndruavFacade().API_loadMission(unitId);
     }
 
     render ()

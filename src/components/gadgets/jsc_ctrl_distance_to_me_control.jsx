@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import * as js_helpers from '../../js/js_helpers.js';
@@ -35,7 +35,7 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
     // not show the prompt again, so we inform the user via the standard
     // webclient alert dialog instead of failing silently.
     const fn_requestMyLocation = () => {
-        if (js_globals.myposition != null) return;
+        if (js_session.fn_getMyposition() != null) return;
         if (!navigator.geolocation) {
             fn_do_modal_alert(
                 t('unit_control_imu:distance.locationDeniedTitle'),
@@ -45,11 +45,11 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
         }
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                js_globals.myposition = position;
+                js_session.fn_setMyposition(position);
                 setTick((t) => t + 1);
             },
             () => {
-                js_globals.myposition = null;
+                js_session.fn_setMyposition(null);
                 setTick((t) => t + 1);
                 // PERMISSION_DENIED (also returned when the user previously
                 // selected "Block", in which case the browser no longer
@@ -87,14 +87,14 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
         v_distanceToMe_class = "bg-danger text-white cursor_hand";
         v_distanceToMe_text = t('unit_control_imu:distance.noUnitGPS');
         v_distance_val = "No GPS";
-    } else if (js_globals.myposition === null || js_globals.myposition === undefined) {
+    } else if (js_session.fn_getMyposition() === null || js_session.fn_getMyposition() === undefined) {
         v_distanceToMe_text = t('unit_control_imu:distance.noGCSGPS');
         v_distanceToMe_class = "bg-danger text-white cursor_hand";
         v_distance_val = "No GCS";
     } else {
         const v_lat2 = p_unit.m_Nav_Info.p_Location.lat;
         const v_lng2 = p_unit.m_Nav_Info.p_Location.lng;
-        const distance = js_helpers.fn_calcDistance(js_globals.myposition.coords.latitude, js_globals.myposition.coords.longitude, v_lat2, v_lng2);
+        const distance = js_helpers.fn_calcDistance(js_session.fn_getMyposition().coords.latitude, js_session.fn_getMyposition().coords.longitude, v_lat2, v_lng2);
 
         if (js_preferences.fn_getUseMetricSystem() === true) {
             const KM_1 = 1000;

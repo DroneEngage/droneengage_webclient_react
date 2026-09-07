@@ -16,10 +16,10 @@
 /*jshint esversion: 6 */
 
 import * as js_siteConfig from './js_siteConfig.js';
+import * as js_session from './state/session.js';
 import { CONST_DEFAULT_FLIGHTPATH_STEPS_COUNT, CONST_MAX_SDR_DETECTED_SIGNAL_LENGTH, CONST_MAX_SDR_SPECTRUM_LENGTH } from '../config/constants.js';
 import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
 import * as js_circularBuffer from "./js_circularBuffer";
-import { js_globals } from "./js_globals.js";
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_eventEmitter } from './events/js_eventEmitter.js'
 import { mavlink20 } from "./js_mavlink_v2.js";
@@ -1530,12 +1530,12 @@ class CAndruavUnitList {
   }
 
   fn_getUnitKeys() {
-    if (!js_globals.v_andruavClient) return undefined;
+    if (!js_session.fn_getAndruavClient()) return undefined;
     return Array.from(this.List.keys());
   }
 
   fn_getUnitValues() {
-    if (!js_globals.v_andruavClient) return undefined;
+    if (!js_session.fn_getAndruavClient()) return undefined;
     return Array.from(this.List.values());
   }
 
@@ -1563,7 +1563,7 @@ class CAndruavUnitList {
   }
 
   fn_getUnitCount() {
-    if (!js_globals.v_andruavClient || !this.List) return 0;
+    if (!js_session.fn_getAndruavClient() || !this.List) return 0;
     return this.List.size;
   }
 

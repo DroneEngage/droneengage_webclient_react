@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DEFAULT_SPEED_STEP } from '../../js/config/constants.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import * as js_helpers from '../../js/js_helpers.js'
-import { js_globals } from '../../js/js_globals.js';
 import { js_speak } from '../../js/js_speak'
 import { fn_changeSpeed as fn_changeSpeed_main } from '../../js/js_main.js'
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
@@ -70,7 +70,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
 
         js_speak.fn_speak(v_speak);
 
-        js_globals.v_andruavFacade.API_do_ChangeSpeed2(p_andruavUnit, parseFloat(p_speed));
+        js_session.fn_getAndruavFacade().API_do_ChangeSpeed2(p_andruavUnit, parseFloat(p_speed));
     };
 
 

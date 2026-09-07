@@ -1,4 +1,4 @@
-import { js_globals } from '../js_globals.js';
+import * as js_session from '../state/session.js';
 import { CAndruavUnitObject } from '../js_andruavUnit.js';
 import { CONST_TYPE_AndruavMessage_ID } from '../protocol/messages/js_andruavMessages.js';
 
@@ -16,7 +16,7 @@ import { CONST_TYPE_AndruavMessage_ID } from '../protocol/messages/js_andruavMes
  * @returns {{unit: CAndruavUnitObject, isNew: boolean, shouldRequestID: boolean}}
  */
 export function fn_getOrCreateUnit(p_partyID, p_requestIdIfNew) {
-    let v_unit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+    let v_unit = js_session.fn_getAndruavUnitList().fn_getUnit(p_partyID);
     let isNew = false;
     let shouldRequestID = false;
 
@@ -26,8 +26,8 @@ export function fn_getOrCreateUnit(p_partyID, p_requestIdIfNew) {
         v_unit.m_IsMe = false;
         v_unit.m_defined = false;
         v_unit.setPartyID(p_partyID);
-        v_unit.m_index = js_globals.m_andruavUnitList.count;
-        js_globals.m_andruavUnitList.Add(v_unit.getPartyID(), v_unit);
+        v_unit.m_index = js_session.fn_getAndruavUnitList().count;
+        js_session.fn_getAndruavUnitList().Add(v_unit.getPartyID(), v_unit);
 
         if (p_requestIdIfNew) {
             if (v_unit.m_Messages.fn_sendMessageAllowed(CONST_TYPE_AndruavMessage_ID)) {

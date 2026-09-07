@@ -1,8 +1,8 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 
-import { js_globals } from '../js/js_globals.js';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
@@ -59,7 +59,7 @@ class ClssGCSChat extends ClssDialogBase {
     }
 
     fn_getGCSUnits() {
-        const units = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitValues()) || [];
+        const units = (js_session.fn_getAndruavUnitList() && js_session.fn_getAndruavUnitList().fn_getUnitValues()) || [];
         return units.filter(u => u && u.m_defined === true && u.m_IsGCS === true).sort((a, b) => {
             const nameA = a.m_unitName || a.getPartyID() || '';
             const nameB = b.m_unitName || b.getPartyID() || '';
@@ -92,8 +92,8 @@ class ClssGCSChat extends ClssDialogBase {
         if (!p_unit || !p_message) return;
 
         // Avoid echoing own messages when broadcast returns them.
-        if (js_globals.v_andruavWS && js_globals.v_andruavWS.m_andruavUnit) {
-            if (p_unit.getPartyID() === js_globals.v_andruavWS.m_andruavUnit.getPartyID()) {
+        if (js_session.fn_getAndruavWS() && js_session.fn_getAndruavWS().m_andruavUnit) {
+            if (p_unit.getPartyID() === js_session.fn_getAndruavWS().m_andruavUnit.getPartyID()) {
                 return;
             }
         }

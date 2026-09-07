@@ -1,7 +1,7 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
-import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import { js_dialogs } from '../../js/app/dialogService.js'
@@ -21,9 +21,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 	{
 		super (props);
 		    const p_andruavUnit = this.props.v_andruavUnit;
-		    const hasSameTypeUnits = js_globals.m_andruavUnitList &&
-		        typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
-		        js_globals.m_andruavUnitList.fn_hasSameTypeUnits(p_andruavUnit);
+		    const hasSameTypeUnits = js_session.fn_getAndruavUnitList() &&
+		        typeof js_session.fn_getAndruavUnitList().fn_hasSameTypeUnits === 'function' &&
+		        js_session.fn_getAndruavUnitList().fn_hasSameTypeUnits(p_andruavUnit);
 		    this.state = {
 		        m_VehicleType: p_andruavUnit.m_VehicleType,
 		        m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
@@ -90,9 +90,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         const { v_andruavUnit } = nextProps;
-        const hasSameTypeUnits = js_globals.m_andruavUnitList &&
-            typeof js_globals.m_andruavUnitList.fn_hasSameTypeUnits === 'function' &&
-            js_globals.m_andruavUnitList.fn_hasSameTypeUnits(v_andruavUnit);
+        const hasSameTypeUnits = js_session.fn_getAndruavUnitList() &&
+            typeof js_session.fn_getAndruavUnitList().fn_hasSameTypeUnits === 'function' &&
+            js_session.fn_getAndruavUnitList().fn_hasSameTypeUnits(v_andruavUnit);
 
         if (v_andruavUnit.m_VehicleType !== prevState.m_VehicleType ||
             v_andruavUnit.m_is_ready_to_arm !== prevState.m_is_ready_to_arm ||
@@ -552,8 +552,8 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             return;
         }
 
-        if (this.state.m_applyOnAllSameType === true && js_globals.m_andruavUnitList && typeof js_globals.m_andruavUnitList.fn_getUnitValues === 'function') {
-            const units = js_globals.m_andruavUnitList.fn_getUnitValues() || [];
+        if (this.state.m_applyOnAllSameType === true && js_session.fn_getAndruavUnitList() && typeof js_session.fn_getAndruavUnitList().fn_getUnitValues === 'function') {
+            const units = js_session.fn_getAndruavUnitList().fn_getUnitValues() || [];
             units.forEach((unit) => {
                 if (unit && unit.m_VehicleType === v_andruavUnit.m_VehicleType) {
                     actionCallback(unit);
@@ -607,7 +607,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     if (p_approved === false) 
                     {
                         me.fn_applyAction(v_andruavUnit, (unit) => {
-                            js_globals.v_andruavFacade.API_do_Arm(unit, true, false);
+                            js_session.fn_getAndruavFacade().API_do_Arm(unit, true, false);
                         });
                         return;
                     }
@@ -615,7 +615,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     {
 					    js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
                         me.fn_applyAction(v_andruavUnit, (unit) => {
-                            js_globals.v_andruavFacade.API_do_Arm(unit, true, true);
+                            js_session.fn_getAndruavFacade().API_do_Arm(unit, true, true);
                         });
                         return ;
                     }
@@ -631,7 +631,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     if (p_approved === false) return;
 					js_speak.fn_speak('DANGEROUS EMERGENCY DISARM');
                     me.fn_applyAction(v_andruavUnit, (unit) => {
-                            js_globals.v_andruavFacade.API_do_Arm(unit, false, true);
+                            js_session.fn_getAndruavFacade().API_do_Arm(unit, false, true);
                     });
                 }, "KILL-MOTORS", "bg-danger txt-theme-aware");
 
@@ -641,102 +641,102 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_doTakeOffPlane(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_TAKEOFF);
         });
     }
 
     fn_doLand(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_Land(unit);
+            js_session.fn_getAndruavFacade().API_do_Land(unit);
         });
     }
 
     fn_doSurface(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_SURFACE);
         });
     }
 
     fn_doManual(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_MANUAL);
         });
     }
 
     fn_doAcro(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ACRO);
         });
     }
 
     fn_doStabilize(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_STABILIZE);
         });
     }
     
     fn_doAltHold(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_ALT_HOLD);
         });
     }
     
     fn_doRTL(v_andruavUnit, smart) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, smart === true ? js_andruavUnit.CONST_FLIGHT_CONTROL_SMART_RTL : js_andruavUnit.CONST_FLIGHT_CONTROL_RTL);
         });
     }
 
 
     fn_doCruise(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CRUISE);
         });
     }
 
 
     fn_doCircle(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_CIRCLE);
         });
     }
 
     fn_doFBWA(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWA);
         });
     }
 
     fn_doFBWB(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_FBWB);
         });
     }
 
 
     fn_doQStabilize(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QSTABILIZE);
         });
     }
     fn_doQLoiter(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLOITER);
         });
     }
     fn_doQHover(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QHOVER);
         });
     }
     fn_doQLand(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QLAND);
         });
     }
     fn_doQRTL(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_QRTL);
         });
     }
 
@@ -745,43 +745,43 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 
     fn_doGuided(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED);
         });
     }
 
     fn_doGuidedNoGPS(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED_NO_GPS);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_GUIDED_NO_GPS);
         });
     }
 
     fn_doAuto(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_AUTO);
         });
     }
 
     fn_doPosHold(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_POSTION_HOLD);
         });
     }
 
     fn_doLoiter(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_LOITER);
         });
     }
 
     fn_doBrake(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_BRAKE);
         });
     }
 
     fn_doHold(v_andruavUnit) {
         this.fn_applyAction(v_andruavUnit, (unit) => {
-            js_globals.v_andruavFacade.API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
+            js_session.fn_getAndruavFacade().API_do_FlightMode(unit, js_andruavUnit.CONST_FLIGHT_CONTROL_HOLD);
         });
     }
 
@@ -795,7 +795,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             const me = this;
             fn_changeAltitude(v_andruavUnit, function (p_baseUnit, p_altitudeCmd) {
                 me.fn_applyAction(v_andruavUnit, function (unit) {
-                    js_globals.v_andruavFacade.API_do_ChangeAltitude(unit, p_altitudeCmd);
+                    js_session.fn_getAndruavFacade().API_do_ChangeAltitude(unit, p_altitudeCmd);
                 });
             });
         }
@@ -812,7 +812,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             fn_changeSpeed(v_andruavUnit, initSpeed, function (p_baseUnit, p_speedCmd) {
                 me.fn_applyAction(v_andruavUnit, function (unit) {
                     unit.m_Nav_Info.p_UserDesired.m_NavSpeed = p_speedCmd;
-                    js_globals.v_andruavFacade.API_do_ChangeSpeed2(unit, p_speedCmd);
+                    js_session.fn_getAndruavFacade().API_do_ChangeSpeed2(unit, p_speedCmd);
                 });
             });
         }

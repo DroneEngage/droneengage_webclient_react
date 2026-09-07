@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
-import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 import { useUnitField } from '../../js/hooks/useUnitField.js'
@@ -38,12 +38,12 @@ function ClssCtrlObjectTrackerAIList({ p_unit, title, className, t }) {
 
     // Request the AI class list once on mount (was in the constructor).
     useEffect(() => {
-        js_globals.v_andruavFacade.API_GetTrackingAIClassList(p_unit);
+        js_session.fn_getAndruavFacade().API_GetTrackingAIClassList(p_unit);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fnl_trackerAIOff = useCallback(() => {
-        js_globals.v_andruavFacade.API_DisableTrackingAI(p_unit);
+        js_session.fn_getAndruavFacade().API_DisableTrackingAI(p_unit);
     }, [p_unit]);
 
     const fnl_trackerAIOnOff = useCallback((e) => {
@@ -53,9 +53,9 @@ function ClssCtrlObjectTrackerAIList({ p_unit, title, className, t }) {
         }
         else
         {
-            js_globals.v_andruavFacade.API_EnableTrackingAI(p_unit);
+            js_session.fn_getAndruavFacade().API_EnableTrackingAI(p_unit);
             if (selectedUnits.length == 0) return ; // nothing to select
-            js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, selectedUnits);
+            js_session.fn_getAndruavFacade().API_SendTrackAISelect(p_unit, selectedUnits);
         }
 
         js_eventEmitter.fn_dispatch(js_event.EE_onTrackingAIStatusChanged, p_unit);
@@ -77,7 +77,7 @@ function ClssCtrlObjectTrackerAIList({ p_unit, title, className, t }) {
 
         if (newSelectedUnits.length === 0) return; // nothing to select
 
-        js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, newSelectedUnits);
+        js_session.fn_getAndruavFacade().API_SendTrackAISelect(p_unit, newSelectedUnits);
 
         setSelectedUnits(newSelectedUnits);
     }, [p_unit]);
@@ -96,7 +96,7 @@ function ClssCtrlObjectTrackerAIList({ p_unit, title, className, t }) {
         // the newly computed list.)
         setSelectedUnits(newSelectedUnits);
         if (newSelectedUnits.length > 0) { // Only send if there are selected units
-            js_globals.v_andruavFacade.API_SendTrackAISelect(p_unit, newSelectedUnits);
+            js_session.fn_getAndruavFacade().API_SendTrackAISelect(p_unit, newSelectedUnits);
         } else {
             // Optionally, if no items are selected, you might want to pause tracking
             fnl_trackerAIOff();

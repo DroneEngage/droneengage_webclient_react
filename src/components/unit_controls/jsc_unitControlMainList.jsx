@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 
 import React    from 'react';
@@ -6,7 +7,6 @@ import { withTranslation } from 'react-i18next';
 
 
 import * as js_common from '../../js/js_common.js'
-import {js_globals} from '../../js/js_globals.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
@@ -220,12 +220,12 @@ class ClssAndruavUnitList extends React.Component {
             {
                 // Sort the array alphabetically
                 // returns array
-                sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+                sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
             }
             else
             {
                 // returns list
-                sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+                sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
             }
 
             const v_prop = this.props;

@@ -1,9 +1,9 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import * as js_helpers from '../../js/js_helpers.js';
-import { js_globals } from '../../js/js_globals.js';
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import { hlp_getFlightMode, fn_switchGPS, fn_openFenceManager, fn_isBadFencing } from '../../js/js_main.js';
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
@@ -38,7 +38,7 @@ class ClssCtrlDroneIMU extends React.Component {
 
     fn_connectToFCB(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_connectToFCB(p_andruavUnit);
     }
 
     hlp_getGPS(p_andruavUnit) {

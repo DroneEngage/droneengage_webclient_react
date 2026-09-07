@@ -1,7 +1,6 @@
 import React    from 'react';
 import { CONST_MAX_MESSAGE_LOG } from '../../js/config/constants.js';
 
-import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 

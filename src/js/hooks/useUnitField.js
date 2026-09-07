@@ -1,5 +1,5 @@
 import { useSyncExternalStore, useCallback } from 'react';
-import { js_globals } from '../js_globals.js';
+import * as js_session from '../state/session.js';
 import { subscribeUnitField } from '../store/unitStore.js';
 
 /**
@@ -26,7 +26,7 @@ export function useUnitField(partyId, fieldPath) {
         [partyId, fieldPath]
     );
     const getSnapshot = useCallback(() => {
-        const list = js_globals.m_andruavUnitList;
+        const list = js_session.fn_getAndruavUnitList();
         if (!list) return undefined;
         const unit = list.fn_getUnit(partyId);
         if (!unit) return undefined;

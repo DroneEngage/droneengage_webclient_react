@@ -15,7 +15,7 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-import { js_globals } from '../../js_globals.js';
+import * as js_session from '../../state/session.js';
 import * as js_preferences from '../../state/preferences.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
@@ -107,7 +107,7 @@ class CAndruavClientFacade {
 
     // EVENT HANDLER AREA
     #fn_sendRXChannels(p_me) {
-        const unit = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        const unit = js_session.fn_getAndruavUnitList().getEngagedUnitRX();
         if (!unit) return;
         const axes = p_me.v_axes;
         if (axes === null || axes === undefined) return;
@@ -158,8 +158,8 @@ class CAndruavClientFacade {
     */
     API_requestID(p_partyID) {
         const cmd = CCommandAPI.API_requestID();
-        if (js_globals.v_andruavWS !== null && js_globals.v_andruavWS !== undefined) {
-            js_globals.v_andruavWS.API_sendCMD(p_partyID, cmd.mt, cmd.ms);
+        if (js_session.fn_getAndruavWS() !== null && js_session.fn_getAndruavWS() !== undefined) {
+            js_session.fn_getAndruavWS().API_sendCMD(p_partyID, cmd.mt, cmd.ms);
         }
     }
 
@@ -169,10 +169,10 @@ class CAndruavClientFacade {
     * @param {*} p_text chat text message.
     */
     API_sendChatMessage(p_target, p_text) {
-        if (js_globals.v_andruavWS === null || js_globals.v_andruavWS === undefined) return;
+        if (js_session.fn_getAndruavWS() === null || js_session.fn_getAndruavWS() === undefined) return;
 
         const cmd = CCommandAPI.API_sendChatMessage(p_text);
-        js_globals.v_andruavWS.API_sendCMD(p_target, cmd.mt, cmd.ms);
+        js_session.fn_getAndruavWS().API_sendCMD(p_target, cmd.mt, cmd.ms);
     };
 
 
@@ -181,34 +181,34 @@ class CAndruavClientFacade {
     * @param {*} p_target is partyID not a unit object.
     */
     API_sendID(p_target) {
-        if (js_globals.v_andruavWS === null || js_globals.v_andruavWS === undefined) return;
-        if (js_globals.v_andruavWS.m_andruavUnit === null || js_globals.v_andruavWS.m_andruavUnit === undefined) return;
+        if (js_session.fn_getAndruavWS() === null || js_session.fn_getAndruavWS() === undefined) return;
+        if (js_session.fn_getAndruavWS().m_andruavUnit === null || js_session.fn_getAndruavWS().m_andruavUnit === undefined) return;
 
         let msg = {
             VT: js_andruavUnit.CONST_VEHICLE_GCS, // VehicleType
-            GS: js_globals.v_andruavWS.m_andruavUnit.m_IsGCS, // IsCGS
+            GS: js_session.fn_getAndruavWS().m_andruavUnit.m_IsGCS, // IsCGS
             VR: 0, // VideoRecording [OPTIONAL in later Andruav versions]
             //FI: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_useFCBIMU, // useFCBIMU
             //AR: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isArmed, // m_isArmed
             //FL: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_isFlying, // m_isFlying
-            SD: js_globals.v_andruavWS.m_andruavUnit.m_IsShutdown,
+            SD: js_session.fn_getAndruavWS().m_andruavUnit.m_IsShutdown,
             //TP: js_andruav_ws.AndruavClientWS.m_andruavUnit.m_telemetry_protocol,
-            UD: js_globals.v_andruavWS.m_andruavUnit.m_unitName,
-            DS: js_globals.v_andruavWS.m_andruavUnit.Description,
-            p: js_globals.v_andruavWS.m_permissions
+            UD: js_session.fn_getAndruavWS().m_andruavUnit.m_unitName,
+            DS: js_session.fn_getAndruavWS().m_andruavUnit.Description,
+            p: js_session.fn_getAndruavWS().m_permissions
         };
 
         // embedding messages - new technique.
-        if ((js_globals.myposition !== null)
+        if ((js_session.fn_getMyposition() !== null)
             && (js_siteConfig.CONST_DONT_BROADCAST_GCS_LOCATION === false)
         ) {
-            const loc = js_globals.myposition.coords;
+            const loc = js_session.fn_getMyposition().coords;
             const cmd = CCommandAPI.API_do_SendHomeLocation(null, loc.latitude, loc.longitude, loc.altitude, loc.accuracy, loc.altitudeAccuracy);
             msg[cmd.mt] = cmd.ms;
         }
 
 
-        js_globals.v_andruavWS.API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_ID, msg);
+        js_session.fn_getAndruavWS().API_sendCMD(p_target, js_andruavMessages.CONST_TYPE_AndruavMessage_ID, msg);
     };
 
     API_requestP2P(p_andruavUnit) {
@@ -1059,7 +1059,7 @@ class CAndruavClientFacade {
 
 
     API_CONST_RemoteCommand_recordVideo(p_target, p_trackId, p_OnOff) {
-        let v_unit = js_globals.m_andruavUnitList.fn_getUnit(p_target);
+        let v_unit = js_session.fn_getAndruavUnitList().fn_getUnit(p_target);
         if (v_unit === null || v_unit === undefined) { // you may declare an error message or send for ID Request
             return;
         }
@@ -1165,7 +1165,7 @@ class CAndruavClientFacade {
     * Tell drone I will send you control -gamepad- info.
     */
     API_engageRX(p_andruavUnit) {
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        const c_currentEngagedUnitRX = js_session.fn_getAndruavUnitList().getEngagedUnitRX();
         if ((c_currentEngagedUnitRX) &&
             (c_currentEngagedUnitRX.getPartyID() !== p_andruavUnit.getPartyID())) { // This webGCS is already engaged with another Drone. so Tell Drone I am no longer controlling you.
             this.API_disengageRX(c_currentEngagedUnitRX);
@@ -1180,7 +1180,7 @@ class CAndruavClientFacade {
     */
     API_disengageRX(p_andruavUnit) {
 
-        js_globals.m_andruavUnitList.disengageUnitRX(p_andruavUnit);
+        js_session.fn_getAndruavUnitList().disengageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_disengageRX();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
 
@@ -1190,7 +1190,7 @@ class CAndruavClientFacade {
 
     API_engageGamePad(p_andruavUnit) {
 
-        js_globals.m_andruavUnitList.engageUnitRX(p_andruavUnit);
+        js_session.fn_getAndruavUnitList().engageUnitRX(p_andruavUnit);
         const cmd = CCommandAPI.API_engageGamePad();
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
         js_eventEmitter.fn_dispatch(js_event.EE_requestGamePad, p_andruavUnit);
@@ -1579,7 +1579,7 @@ class CAndruavClientFacade {
 
     // receives event from gamepad and store it for sending.
     #fn_sendAxes(p_me) { // game pad should be attached to a unit.
-        const c_currentEngagedUnitRX = js_globals.m_andruavUnitList.getEngagedUnitRX();
+        const c_currentEngagedUnitRX = js_session.fn_getAndruavUnitList().getEngagedUnitRX();
         if (!c_currentEngagedUnitRX)
             return;
 

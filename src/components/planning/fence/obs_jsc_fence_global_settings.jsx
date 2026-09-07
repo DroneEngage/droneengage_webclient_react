@@ -1,7 +1,7 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
-import {js_globals} from '../../../js/js_globals.js';
 import {js_localStorage} from '../../../js/js_localStorage.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
@@ -64,7 +64,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
         setTimeout (function ()
 		{
-		    js_globals.v_andruavFacade.API_requestReloadLocalGroupGeoFenceTasks (null);
+		    js_session.fn_getAndruavFacade().API_requestReloadLocalGroupGeoFenceTasks (null);
 		}, 3000);
     }
 
@@ -74,7 +74,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
         setTimeout (function ()
 		{
-		    js_globals.v_andruavFacade.API_requestReloadLocalGroupGeoFenceTasks (null);
+		    js_session.fn_getAndruavFacade().API_requestReloadLocalGroupGeoFenceTasks (null);
 		}, 3000);
     }
     
@@ -130,7 +130,7 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
     fn_exportFences()
     {
         const v = new js_fence_plan.ClssAndruavFencePlan(1);
-        const fence_res = v.fn_generateAndruavFenceData(js_globals.v_map_shapes);
+        const fence_res = v.fn_generateAndruavFenceData(js_session.fn_getMapShapes());
         const de_file = {
             'fileType': 'de_plan',
             'fences': fence_res

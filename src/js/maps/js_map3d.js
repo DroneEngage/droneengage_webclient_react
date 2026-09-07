@@ -1,4 +1,5 @@
 import * as js_siteConfig from '../js_siteConfig';
+import * as js_session from '../state/session.js';
 import { js_globals } from '../js_globals.js';
 import { CONST_MAP3D_TETHER_COLORS, CONST_MAP3D_CIRCLE_WIDTH, CONST_MAP3D_TRAIL_WIDTH, CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH, CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY, CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT, CONST_MAP3D_MODEL_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM, CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR, CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE, CONST_MAP3D_FOLLOW_ZOOM, CONST_MAP3D_FOLLOW_DURATION_MS, CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND, CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH, CONST_MAP3D_FOLLOW_ALT_REF } from '../config/mapStyle.js';
 import { js_localStorage } from '../js_localStorage.js';
@@ -3214,7 +3215,7 @@ class CAndruavMap3D {
         if (!this.m_map || !this.m_isReady) return;
         this.m_missionData.forEach(({ wayPointArray, color }, id) => {
             // Need the unit object — look it up from the global unit list.
-            const unit = js_globals.m_andruavUnitList?.fn_getUnit(id);
+            const unit = js_session.fn_getAndruavUnitList()?.fn_getUnit(id);
             if (unit) {
                 this.fn_drawMission(unit, wayPointArray, color);
             }

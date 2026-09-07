@@ -1,11 +1,11 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import * as js_common from '../../../js/js_common.js'
 
 
-import { js_globals } from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 
@@ -126,9 +126,9 @@ export class ClssSingle_Plan_Header extends React.Component {
 
 
     fn_requestWayPoints(fromFCB) {
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_partyID);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.m_partyID);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
-        js_globals.v_andruavFacade.API_requestWayPoints(v_andruavUnit, fromFCB);
+        js_session.fn_getAndruavFacade().API_requestWayPoints(v_andruavUnit, fromFCB);
     }
 
     componentWillUnmount() {

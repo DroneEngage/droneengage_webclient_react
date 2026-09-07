@@ -1,9 +1,9 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 
 
 import * as js_common from '../../js/js_common.js'
 
-import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {ClssCtrlUnitIcon} from './jsc_ctrl_unit_icon.jsx'
@@ -119,12 +119,12 @@ export class ClssAndruavUnitDropDownList extends React.Component {
         {
             // Sort the array alphabetically
             // returns array
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
         }
         else
         {
             // returns list
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
         }
         
         const v_prop = this.props;
@@ -176,7 +176,7 @@ export class ClssAndruavUnitDropDownList extends React.Component {
             }
         });
 
-        const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.m_selected_party_id);
+        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.m_selected_party_id);
 
 
         return (

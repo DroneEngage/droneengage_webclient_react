@@ -20,7 +20,6 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 import React, { useEffect } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
 
-import { js_globals } from '../js/js_globals.js'
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'
 import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMainList.jsx'

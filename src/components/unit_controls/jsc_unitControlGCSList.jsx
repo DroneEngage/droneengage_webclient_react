@@ -1,7 +1,7 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import {js_globals} from '../../js/js_globals.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
@@ -102,11 +102,11 @@ class ClssAndruavUnitGCSList extends React.Component {
         let sortedPartyIDs;
         if (js_localStorage.fn_getUnitSortEnabled() === true)
         {
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
         }
         else
         {
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
         }
 
         const units_gcs = [];

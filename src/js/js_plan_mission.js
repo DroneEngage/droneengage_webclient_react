@@ -3,7 +3,7 @@
     30 Aug 2024
 *****************************************************/
 import * as js_helpers from "./js_helpers.js";
-import { js_globals } from "./js_globals.js";
+import * as js_session from './state/session.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_eventEmitter } from "./events/js_eventEmitter.js";
 import { js_leafletmap } from "./maps/js_leafletmap.js";
@@ -310,21 +310,21 @@ export class ClssAndruavMissionPlan {
     // Delete Old Shapes
     if (p_missionV110 !== null && p_missionV110 !== undefined) {
       if (
-        js_globals.v_andruavWS !== null &&
-        js_globals.v_andruavWS !== undefined &&
-        js_globals.v_andruavWS.fn_isRegistered() === true
+        js_session.fn_getAndruavWS() !== null &&
+        js_session.fn_getAndruavWS() !== undefined &&
+        js_session.fn_getAndruavWS().fn_isRegistered() === true
       ) {
-        js_globals.v_andruavFacade.API_requestDeleteFenceByName(c_party, null); // deattach drones from all fences in the group
-        js_globals.v_andruavFacade.API_disableWayPointTasks(
+        js_session.fn_getAndruavFacade().API_requestDeleteFenceByName(c_party, null); // deattach drones from all fences in the group
+        js_session.fn_getAndruavFacade().API_disableWayPointTasks(
           js_andruavAuth.m_username,
-          js_globals.v_andruavWS.m_groupName,
+          js_session.fn_getAndruavWS().m_groupName,
           c_party,
           "_drone_",
           1
         );
-        js_globals.v_andruavFacade.API_saveWayPointTasks(
+        js_session.fn_getAndruavFacade().API_saveWayPointTasks(
           js_andruavAuth.m_username,
-          js_globals.v_andruavWS.m_groupName,
+          js_session.fn_getAndruavWS().m_groupName,
           c_party,
           "_drone_",
           1,
@@ -410,7 +410,7 @@ export class ClssAndruavMissionPlan {
    */
   fn_exportFencesToDE_V1() {
     const v = new ClssAndruavFencePlan(1);
-    return v.fn_generateAndruavFenceData(js_globals.v_map_shapes);
+    return v.fn_generateAndruavFenceData(js_session.fn_getMapShapes());
   }
 
   /**

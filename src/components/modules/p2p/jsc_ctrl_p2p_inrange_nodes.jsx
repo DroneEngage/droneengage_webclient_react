@@ -5,9 +5,9 @@
  */
 
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
-import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 
@@ -29,7 +29,7 @@ class ClssCtrlP2PInRangeNodeInfo  extends React.Component {
         
         const v_andruavUnit = this.props.p_unit;
         const v_inrange_node = this.props.p_inrange_node;
-        const unit = js_globals.m_andruavUnitList.fn_getUnit(v_inrange_node.partyID);
+        const unit = js_session.fn_getAndruavUnitList().fn_getUnit(v_inrange_node.partyID);
         let txt_node_name;
 
         let p2 = v_andruavUnit.getPartyID();

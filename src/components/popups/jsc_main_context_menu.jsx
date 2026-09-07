@@ -1,6 +1,6 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals.js'
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_leafletmap } from '../../js/maps/js_leafletmap.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit'
@@ -52,10 +52,10 @@ export class ClssMainContextMenu extends React.Component {
         let sortedPartyIDs;
         if (js_localStorage.fn_getUnitSortEnabled() === true) {
             // Sort the array alphabetically
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
         }
         else {
-            sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
         }
 
         const p_lat = this.props.p_lat;
@@ -67,7 +67,7 @@ export class ClssMainContextMenu extends React.Component {
 
         sortedPartyIDs.map(function (p_andruavUnit) {
 
-            //let p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(object);
+            //let p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(object);
             if ((p_andruavUnit !== null && p_andruavUnit !== undefined) && (p_andruavUnit.m_IsGCS !== true)) {
                 if ((p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_ROVER)
                     || (p_andruavUnit.m_VehicleType === js_andruavUnit.VEHICLE_BOAT)) {

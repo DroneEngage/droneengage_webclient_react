@@ -1,6 +1,6 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import { js_dialogs } from '../../js/app/dialogService.js'
@@ -89,24 +89,24 @@ export class ClssAndruavUnitBase extends React.Component {
 
     fn_takeTXCtrl(e, p_andruavUnit) {
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
-        js_globals.v_andruavFacade.API_TXCtrl(p_andruavUnit, js_andruavMessages.CONST_TX_SIGNAL_FREEZE_ALL);
+        js_session.fn_getAndruavFacade().API_TXCtrl(p_andruavUnit, js_andruavMessages.CONST_TX_SIGNAL_FREEZE_ALL);
         js_eventEmitter.fn_dispatch(js_event.EE_requestGamePad, p_andruavUnit);
     }
 
     fn_releaseTXCtrl(p_andruavUnit) {
         p_andruavUnit.m_Telemetry.m_rxEngaged = false;
-        js_globals.v_andruavFacade.API_TXCtrl(p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
+        js_session.fn_getAndruavFacade().API_TXCtrl(p_andruavUnit, js_andruavMessages.CONST_RC_SUB_ACTION_RELEASED);
         js_eventEmitter.fn_dispatch(js_event.EE_requestGamePadRelease, p_andruavUnit);  // Fixed event name for clarity
     }
 
     fn_displayParamsDialog(p_andruavUnit) {
-        if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
+        if (js_session.fn_getAndruavClient() === null || js_session.fn_getAndruavClient() === undefined) return;
 
         js_dialogs.fn_showParameters(p_andruavUnit);
     }
 
     fn_displayLidarDialog(p_andruavUnit) {
-        if (js_globals.v_andruavClient === null || js_globals.v_andruavClient === undefined) return;
+        if (js_session.fn_getAndruavClient() === null || js_session.fn_getAndruavClient() === undefined) return;
 
         js_dialogs.fn_showLidarInfo(p_andruavUnit);
     }

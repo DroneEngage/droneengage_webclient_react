@@ -25,7 +25,7 @@
  */
 
 import React from 'react';
-import { js_globals } from '../../../js/js_globals.js';
+import * as js_session from '../../js/state/session.js';
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
@@ -63,7 +63,7 @@ export class ClssCtrlTelnet extends React.Component {
         this.m_flag_mounted = false;
         // Close the session when the component unmounts (tab switched away).
         if (this.state.m_connected && this.state.m_session_id) {
-            js_globals.v_andruavFacade.API_telnetClose(this.props.p_unit, this.state.m_session_id);
+            js_session.fn_getAndruavFacade().API_telnetClose(this.props.p_unit, this.state.m_session_id);
         }
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelnetStatus, this);
         js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelnetData, this);
@@ -159,7 +159,7 @@ export class ClssCtrlTelnet extends React.Component {
         const v_andruavUnit = this.props.p_unit;
         this.m_outputBuffer = '';
         this.setState({ m_output: '', m_error: '' });
-        js_globals.v_andruavFacade.API_telnetOpen(v_andruavUnit, null);
+        js_session.fn_getAndruavFacade().API_telnetOpen(v_andruavUnit, null);
     }
 
     /**
@@ -167,7 +167,7 @@ export class ClssCtrlTelnet extends React.Component {
      */
     fn_closeSession() {
         if (!this.state.m_session_id) return;
-        js_globals.v_andruavFacade.API_telnetClose(this.props.p_unit, this.state.m_session_id);
+        js_session.fn_getAndruavFacade().API_telnetClose(this.props.p_unit, this.state.m_session_id);
     }
 
     /**
@@ -175,7 +175,7 @@ export class ClssCtrlTelnet extends React.Component {
      */
     fn_sendToPty(data) {
         if (!this.state.m_connected || !this.state.m_session_id) return;
-        js_globals.v_andruavFacade.API_telnetData(this.props.p_unit, this.state.m_session_id, data);
+        js_session.fn_getAndruavFacade().API_telnetData(this.props.p_unit, this.state.m_session_id, data);
     }
 
     /**

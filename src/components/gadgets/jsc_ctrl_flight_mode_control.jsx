@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { hlp_getFlightMode } from '../../js/js_main.js';
@@ -28,7 +28,7 @@ function ClssCtrlDrone_FlightMode_Ctrl({ t, p_unit, isHUD, id, className, x, y, 
 
     const fn_connectToFCB = (p_andruavUnit) => {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_connectToFCB(p_andruavUnit);
     };
 
     if (!p_unit) return null;

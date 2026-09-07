@@ -1,8 +1,8 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
-import { js_globals } from '../../../js/js_globals.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 import { js_localStorage } from '../../../js/js_localStorage.js';
 import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/js_main.js';
@@ -94,8 +94,8 @@ class MobileLoginPanel extends React.Component {
           host = 'localhost';
           port = '8080';
         }
-      } else if (js_globals.v_andruavClient && js_globals.v_andruavClient.v_auth) {
-        const authModule = js_globals.v_andruavClient.v_auth;
+      } else if (js_session.fn_getAndruavClient() && js_session.fn_getAndruavClient().v_auth) {
+        const authModule = js_session.fn_getAndruavClient().v_auth;
         host = authModule.m_auth_ip;
         port = authModule._m_auth_port;
       } else {

@@ -1,7 +1,7 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import { js_globals } from '../../js/js_globals.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 
@@ -80,7 +80,7 @@ class ClssMissionLoadDialog extends ClssModalDialogBase {
         if (!approved) return;
 
         // Call delete API
-        js_globals.v_andruavFacade.API_deleteMission(missionId);
+        js_session.fn_getAndruavFacade().API_deleteMission(missionId);
 
         // Remove from local list immediately for responsive UI
         const remaining = Me.state.missions.filter(m => m.id !== missionId);

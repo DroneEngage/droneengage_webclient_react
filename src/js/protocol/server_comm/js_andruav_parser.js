@@ -15,7 +15,7 @@
  *************************************************************************************/
 
 /*jshint esversion: 6 */
-import { js_globals } from '../../js_globals.js';
+import * as js_session from '../../state/session.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
 import * as js_andruavUnit from '../../js_andruavUnit.js';
@@ -61,7 +61,7 @@ class CAndruavClientParser {
 
     _fn_checkStatus() {
         const now = Date.now();
-        const units = js_globals.m_andruavUnitList.fn_getUnitValues();
+        const units = js_session.fn_getAndruavUnitList().fn_getUnitValues();
         if (!units) return;
 
         for (const unit of units) {
@@ -128,8 +128,8 @@ class CAndruavClientParser {
             */
         // EVT_andruavUnitGeoFenceDeleted removed — no live callers.
 
-        js_globals.m_andruavUnitList = js_andruavUnit.AndruavUnitList;
-        js_globals.m_andruavUnitList.fn_resetList();
+        js_session.fn_setAndruavUnitList(js_andruavUnit.AndruavUnitList);
+        js_session.fn_getAndruavUnitList().fn_resetList();
         //this.m_adsbObjectList = new CADSBObjectList(); REACT2
         const Me = this;
         if (this.fn_timerID_checkStatus === null || this.fn_timerID_checkStatus === undefined) {

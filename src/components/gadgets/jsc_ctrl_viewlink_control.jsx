@@ -1,7 +1,7 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import { js_globals } from '../../js/js_globals.js';
 import { js_dialogs } from '../../js/app/dialogService.js'
 
 
@@ -22,7 +22,7 @@ function ClssCtrlViewlinkControl({ id, className, p_unit, t }) {
     const gimbalModeIndex = hasViewlink ? 1 : 0;
 
     const fnl_showLaserControl = (e) => {
-        const andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_unit.getPartyID());
+        const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(p_unit.getPartyID());
         if (andruavUnit == null) {
             return;
         }

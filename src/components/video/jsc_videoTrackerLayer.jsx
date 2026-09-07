@@ -1,6 +1,5 @@
 import React from 'react';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
-import { js_globals } from '../../js/js_globals.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 

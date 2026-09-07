@@ -1,4 +1,5 @@
 import $ from 'jquery'; 
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import React    from 'react';
@@ -6,7 +7,6 @@ import { withTranslation } from 'react-i18next';
 
 
 import * as js_helpers from '../../js/js_helpers.js'
-import {js_globals} from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
@@ -249,7 +249,7 @@ class ClssAndruavUnitDroneRow extends React.Component{
 
     fn_gotoUnit_byPartyID (e,p_partyID)
     {
-        js_globals.v_andruavFacade.API_requestID(p_partyID);
+        js_session.fn_getAndruavFacade().API_requestID(p_partyID);
         fn_gotoUnit_byPartyID(p_partyID);
     }
 
@@ -1008,11 +1008,11 @@ class ClssAndruavUnitListArray extends React.Component {
                 if (js_localStorage.fn_getUnitSortEnabled() === true)
                 {
                     // Sort the array alphabetically
-                    sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSortedBy_APID();
+                    sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
                 }
                 else
                 {
-                    sortedPartyIDs = js_globals.m_andruavUnitList.fn_getUnitsSorted();
+                    sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
                 }
                 sortedPartyIDs.map(function (object)
                 {

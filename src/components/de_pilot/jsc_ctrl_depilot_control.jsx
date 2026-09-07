@@ -1,6 +1,6 @@
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
-import {js_globals} from '../../js/js_globals';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
@@ -74,7 +74,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
             return;
         }
         // Call the DEPILOT mode control API
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, null, false, p_de_mode);
+        js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, null, false, p_de_mode);
     }
 
     fn_ToggleDEPilot(p_andruavUnit) {
@@ -87,7 +87,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
         });
         
         // Call the DEPILOT control API
-        js_globals.v_andruavFacade.API_engageDEPilotControl(p_andruavUnit, newEnabledState, null);
+        js_session.fn_getAndruavFacade().API_engageDEPilotControl(p_andruavUnit, newEnabledState, null);
     }
 
     hlp_adjustFlightModeButtonClass (p_className, p_isActive)

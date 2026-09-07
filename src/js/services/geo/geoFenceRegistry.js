@@ -1,9 +1,10 @@
+import * as js_session from '../../state/session.js';
 /**
  * TASK-02.1 — Single owner of geofence definitions.
  *
  * Replaces CAndruavClientParser.m_andruavGeoFences. The registry's lifetime
  * is the app's, not the parser's. js_main.js reads/writes here instead of
- * js_globals.v_andruavClient.m_andruavGeoFences.
+ * js_session.fn_getAndruavClient().m_andruavGeoFences.
  *
  * Each fence is keyed by name and holds:
  *   { m_geoFenceName, m_shouldKeepOutside, fencetype, LngLatPoints,

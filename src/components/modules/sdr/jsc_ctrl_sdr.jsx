@@ -5,7 +5,7 @@
  */
 
 import React    from 'react';
-import {js_globals} from '../../../js/js_globals.js';
+import * as js_session from '../../js/state/session.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
@@ -145,7 +145,7 @@ export class ClssCtrlSDR extends React.Component {
         const index = this.state.m_driver_index;
         if (this.state.m_updated.dr === true)   p_driver_index      = ((index === null)?0:parseInt(index));
         
-        js_globals.v_andruavFacade.API_setSDRConfig(p_andruavUnit, p_fequency_center,
+        js_session.fn_getAndruavFacade().API_setSDRConfig(p_andruavUnit, p_fequency_center,
             p_gain, p_sample_rate,
             p_decode_mode, p_driver_index, p_interval,
             p_display_bars, p_trigger_level); 
@@ -163,15 +163,15 @@ export class ClssCtrlSDR extends React.Component {
     
     fn_scanSDR(p_andruavUnit, p_on_off)
     {
-        js_globals.v_andruavFacade.API_scanSDRFreq(p_andruavUnit, p_on_off);
+        js_session.fn_getAndruavFacade().API_scanSDRFreq(p_andruavUnit, p_on_off);
         
     }
 
 
     fn_refresh(p_andruavUnit)
     {
-        js_globals.v_andruavFacade.API_requestSDR(p_andruavUnit);
-        js_globals.v_andruavFacade.API_scanSDRDrivers(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_requestSDR(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_scanSDRDrivers(p_andruavUnit);
     }
 
 

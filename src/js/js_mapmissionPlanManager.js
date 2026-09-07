@@ -1,4 +1,3 @@
-import { js_globals } from './js_globals.js';
 import { v_colorDrawPathes } from './config/assets.js';
 import { ClssAndruavMissionPlan } from './js_plan_mission.js';
 

@@ -4,7 +4,6 @@ import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.j
 import L from 'leaflet';
 
 import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'
-import {js_globals} from '../../../js/js_globals.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
 import {CFieldChecked} from '../../micro_gadgets/jsc_mctrl_field_check.jsx'

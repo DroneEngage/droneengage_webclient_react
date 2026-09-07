@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 
-import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 import * as js_siteConfig from '../../js/js_siteConfig.js'
@@ -42,9 +42,9 @@ function ClssCtrlObjectTracker({ p_unit, title, displayText, className, id }) {
 
     const fnl_trackerOnOff = useCallback((e) => {
         if (p_unit.m_tracker.m_enable_gui_tracker === true) {
-            js_globals.v_andruavFacade.API_PauseTracking(p_unit);
+            js_session.fn_getAndruavFacade().API_PauseTracking(p_unit);
         } else {
-            js_globals.v_andruavFacade.API_EnableTracking(p_unit);
+            js_session.fn_getAndruavFacade().API_EnableTracking(p_unit);
         }
         js_eventEmitter.fn_dispatch(js_event.EE_onTrackingStatusChanged, p_unit);
     }, [p_unit]);
@@ -55,7 +55,7 @@ function ClssCtrlObjectTracker({ p_unit, title, displayText, className, id }) {
         setAiDriverPending(true);
         setAiDriverLocalState(new_local_state);
         // Send the toggled command
-        js_globals.v_andruavFacade.API_EnableTracking_AIDriver(p_unit, new_local_state);
+        js_session.fn_getAndruavFacade().API_EnableTracking_AIDriver(p_unit, new_local_state);
     }, [p_unit, aiDriverLocalState]);
 
     if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null)

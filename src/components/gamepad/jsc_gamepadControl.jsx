@@ -3,7 +3,6 @@ import * as js_preferences from '../../js/state/preferences.js';
 import React    from 'react';
 
 
-import {js_globals} from '../../js/js_globals.js';
 import { STICK_MODE_MAPPING, STICK_MODE_MAPPING_NAMES } from '../../js/config/gamepadMap.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'

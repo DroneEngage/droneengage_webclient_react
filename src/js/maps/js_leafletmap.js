@@ -6,6 +6,7 @@
 *********************************************************************************** */
 
 import $ from 'jquery';
+import * as js_session from '../state/session.js';
 import * as js_preferences from '../state/preferences.js';
 import { CONST_DEBUG_SHOW_ANCHOR_DOTS } from '../config/constants.js';
 import L from 'leaflet';
@@ -625,7 +626,7 @@ class CLeafLetAndruavMap {
                 x.layer.pm.m_shape_type = x.shape;
                 js_eventEmitter.fn_dispatch(js_event.EE_onShapeCreated, x.layer)
                 // add to shapes list.
-                js_globals.v_map_shapes.push(x.layer);
+                js_session.fn_getMapShapes().push(x.layer);
                 let already_deleted = false;
                 x.layer.on('click', function (p_event) {
                         
@@ -701,7 +702,7 @@ class CLeafLetAndruavMap {
         marker.pm.enable();
         marker.pm.m_shape_type = 'Marker';
         // add to shapes list.
-        js_globals.v_map_shapes.push(marker);
+        js_session.fn_getMapShapes().push(marker);
         let already_deleted = false;
         marker.on('click', function (p_event) {
             if (p_event.originalEvent.ctrlKey===false)

@@ -15,7 +15,6 @@ import  'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import {fn_on_account_ready} from '../js/js_main_accounts'
 
-import {js_globals} from '../js/js_globals.js'
 
 import ClssHeaderControl from '../components/jsc_header'
 import ClssFooterControl from '../components/jsc_footer'

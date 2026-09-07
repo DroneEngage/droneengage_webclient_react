@@ -1,11 +1,11 @@
 import 'jquery-ui-dist/jquery-ui.min.js';
+import * as js_session from '../../js/state/session.js';
 import { CONST_IR_DIGITAL_ZOOM_MAX, CONST_IR_DIGITAL_ZOOM_MIN, CONST_OPTICAL_ZOOM_MAX, CONST_OPTICAL_ZOOM_MIN } from '../../js/config/constants.js';
 
 import React from 'react';
 import Draggable from "react-draggable";
 import { withTranslation } from 'react-i18next';
 
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
@@ -132,36 +132,36 @@ class ClssViewLinkGimbal extends ClssDialogBase {
     fn_toggleLaser() {
         const new_laser_state = this.state.laser_on === VIEWLINK_LASER_OFF ? VIEWLINK_LASER_ON : VIEWLINK_LASER_OFF;
         this.setState({ laser_on: new_laser_state });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Laser_Control(p_andruavUnit, new_laser_state);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Laser_Control(p_andruavUnit, new_laser_state);
         }
     }
 
     fn_toggleTracker() {
         const new_tracker_state = this.state.tracker_on === VIEWLINK_TRACKER_OFF ? VIEWLINK_TRACKER_ON : VIEWLINK_TRACKER_OFF;
         this.setState({ tracker_on: new_tracker_state });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Tracker_Control(p_andruavUnit, new_tracker_state);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Tracker_Control(p_andruavUnit, new_tracker_state);
         }
     }
 
     fn_toggleAI() {
         const new_ai_state = this.state.ai_on === VIEWLINK_AI_OFF ? VIEWLINK_AI_ON : VIEWLINK_AI_OFF;
         this.setState({ ai_on: new_ai_state });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_AI_Control(p_andruavUnit, new_ai_state);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_AI_Control(p_andruavUnit, new_ai_state);
         }
     }
 
     fn_toggleIRHot() {
         const new_ir_hot_state = this.state.ir_hot === 'WHITE' ? 'BLACK' : 'WHITE';
         this.setState({ ir_hot: new_ir_hot_state });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Set_IR_HOT(p_andruavUnit, new_ir_hot_state !== 'WHITE'); // we need the GUI to display white when white
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Set_IR_HOT(p_andruavUnit, new_ir_hot_state !== 'WHITE'); // we need the GUI to display white when white
         }
     }
 
@@ -183,9 +183,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         js_common.fn_console_log('View mode changed to:', nextMode, 'Constant:', nextModeConstant);
 
         // Send view mode command to drone
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Control(p_andruavUnit, nextModeConstant);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Camera_Control(p_andruavUnit, nextModeConstant);
         }
     }
 
@@ -206,16 +206,16 @@ class ClssViewLinkGimbal extends ClssDialogBase {
     }
 
     fn_getGimbalPosition() {
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Get_Status_Gimbal_Attitude(p_andruavUnit);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Get_Status_Gimbal_Attitude(p_andruavUnit);
         }
     }
 
     fn_getAllStatus() {
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Get_Status_All(p_andruavUnit);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Get_Status_All(p_andruavUnit);
         }
     }
 
@@ -268,9 +268,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
 
     fn_setIRDigitalZoomLevel(irDigitalZoomLevel) {
         this.setState({ irDigitalZoomLevel: irDigitalZoomLevel });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_andruavUnit, irDigitalZoomLevel);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Camera_IR_Digital_Zoom_Control(p_andruavUnit, irDigitalZoomLevel);
         }
     }
 
@@ -285,9 +285,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
 
     fn_setZoomLevel(zoomLevel) {
         this.setState({ zoomLevel: zoomLevel });
-        const p_andruavUnit = this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
+        const p_andruavUnit = this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null;
         if (p_andruavUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Camera_Zoom_Control(p_andruavUnit, zoomLevel);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Camera_Zoom_Control(p_andruavUnit, zoomLevel);
         }
     }
 
@@ -366,9 +366,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         js_common.fn_console_log('Sending Orientation - Vertical:', vertical, 'Horizontal:', horizontal);
 
         // Send to target drone if selected, otherwise send to current unit
-        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Absolute_Position(targetUnit, horizontal, vertical);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Gimbal_Control_Absolute_Position(targetUnit, horizontal, vertical);
         }
     }
 
@@ -378,9 +378,9 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         js_common.fn_console_log('Sending Orientation - Vertical:', vertical, 'Horizontal:', horizontal);
 
         // Send to target drone if selected, otherwise send to current unit
-        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_do_ViewLink_Gimbal_Control_Incremental_Adjust(targetUnit, horizontal, vertical);
+            js_session.fn_getAndruavFacade().API_do_ViewLink_Gimbal_Control_Incremental_Adjust(targetUnit, horizontal, vertical);
         }
     }
 
@@ -406,10 +406,10 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         js_common.fn_console_log('Sending Orientation - Vertical:', v, 'Horizontal:', h, 'Distance:', distance, 'Calculated Altitude:', relative_altitude);
 
         // Send to target drone if selected, otherwise send to current unit
-        const targetUnit = this.state.target_drone || (this.state.p_session ? js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
+        const targetUnit = this.state.target_drone || (this.state.p_session ? js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID()) : null);
         if (targetUnit) {
-            js_globals.v_andruavFacade.API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, relative_altitude, null);
-            js_globals.v_andruavFacade.API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, h);
+            js_session.fn_getAndruavFacade().API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_CHANGE_ALTITUDE, null, relative_altitude, null);
+            js_session.fn_getAndruavFacade().API_engageDEPilotControl(targetUnit, null, true, js_andruavMessages.CONST_DEPILOT_OP_STABILIZATION, null, null, h);
         }    
     }
 
@@ -418,7 +418,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         let p_andruavUnit = null;
 
         if (this.state.p_session) {
-            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.p_session.m_unit.getPartyID());
+            p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.p_session.m_unit.getPartyID());
         }
 
         const isNoUnit = p_andruavUnit === null;
@@ -447,7 +447,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
             ? 'bg-secondary'
             : 'bg-info';
 
-        const v_units = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitValues()) ? js_globals.m_andruavUnitList.fn_getUnitValues() : [];
+        const v_units = (js_session.fn_getAndruavUnitList() && js_session.fn_getAndruavUnitList().fn_getUnitValues()) ? js_session.fn_getAndruavUnitList().fn_getUnitValues() : [];
         const len = v_units.length;
         const c_items = [];
 

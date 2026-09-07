@@ -1,8 +1,8 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
-import { js_globals } from '../../js/js_globals.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {fn_helpPage} from '../../js/js_main.js';
@@ -49,7 +49,7 @@ class ClssServoUnit extends React.Component {
     handleClick(buttonType, servoValue) {
         if (!this.btn_disabled) {
             this.setState({ pendingButton: buttonType });
-            js_globals.v_andruavFacade.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
+            js_session.fn_getAndruavFacade().API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, servoValue);
         }
     }
 
@@ -60,7 +60,7 @@ class ClssServoUnit extends React.Component {
     handleSliderRelease() {
         if (!this.btn_disabled) {
             this.setState({ pendingButton: 'slider' });
-            js_globals.v_andruavFacade.API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, this.state.sliderValue);
+            js_session.fn_getAndruavFacade().API_do_ServoChannel(this.props.prop_party, this.props.prop_channel, this.state.sliderValue);
         }
     }
 
@@ -219,9 +219,9 @@ export default class ClssServoControl extends ClssDialogBase {
         if (p_me.modal_ctrl_srv.current) {
             p_me.modal_ctrl_srv.current.style.display = 'block';
 
-            const p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(p_partyID);
+            const p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(p_partyID);
             if (!p_andruavUnit) return ;
-            js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit); 
+            js_session.fn_getAndruavFacade().API_requestMavlinkServoChannel(p_andruavUnit); 
         }
     }
 
@@ -265,7 +265,7 @@ export default class ClssServoControl extends ClssDialogBase {
     render() {
         let p_andruavUnit = null;
         if (this.state.partyID !== null && this.state.partyID !== undefined) {
-            p_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.state.partyID);
+            p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.state.partyID);
         }
 
         let servos = [];
@@ -320,7 +320,7 @@ export default class ClssServoControl extends ClssDialogBase {
                         <div id="modal_ctrl_servo_footer" className="form-group text-center localcontainer" ref={this.footerRef}>
                             {this.fn_renderDialogFooter(
                                 <>
-                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_globals.v_andruavFacade.API_requestMavlinkServoChannel(p_andruavUnit)} >Refresh</button>
+                                    <button id="btnRefresh" type="button" className="btn btn-sm btn-warning" onClick={ (e) => js_session.fn_getAndruavFacade().API_requestMavlinkServoChannel(p_andruavUnit)} >Refresh</button>
                                     <button id="btnHelp" type="button" className="btn btn-sm btn-primary" onClick={ (e) => fn_helpPage(js_siteConfig.CONST_MANUAL_URL)}>Help</button>
                                 </>
                             )}

@@ -1,4 +1,4 @@
-import { js_globals } from '../../js_globals.js';
+import * as js_session from '../../state/session.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
@@ -412,7 +412,7 @@ class CAndruavClientWS {
             v_unit.m_Messages.m_lastActiveTime = Date.now();
 
             // Process the binary message
-            js_globals.v_andruavClient.parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
+            js_session.fn_getAndruavClient().parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
         } catch (error) {
             console.error("Error processing binary message:", error.message);
         }

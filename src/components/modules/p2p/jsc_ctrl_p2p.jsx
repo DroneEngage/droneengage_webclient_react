@@ -5,9 +5,9 @@
  */
 
 import React    from 'react';
+import * as js_session from '../../js/state/session.js';
 
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
-import {js_globals} from '../../../js/js_globals.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
@@ -41,22 +41,22 @@ export class ClssCtrlP2P extends React.Component {
 
     fn_resetP2P (p_andruavUnit)
     {
-        js_globals.v_andruavFacade.API_resetP2P(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_resetP2P(p_andruavUnit);
     }
 
     fn_scanP2P (p_andruavUnit)
     {
-        js_globals.v_andruavFacade.API_scanP2P(p_andruavUnit);
+        js_session.fn_getAndruavFacade().API_scanP2P(p_andruavUnit);
     }
 
     fn_setCommunicationChannel_P2P (p_andruavUnit, p2p_state)
     {
-        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, null, p2p_state, null, null, null, null);
+        js_session.fn_getAndruavFacade().API_SetCommunicationChannel (p_andruavUnit, null, p2p_state, null, null, null, null);
     }
 
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
-        js_globals.v_andruavFacade.API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
+        js_session.fn_getAndruavFacade().API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
     }
     
     fn_unitUpdated (p_me,p_andruavUnit)
@@ -140,7 +140,7 @@ export class ClssCtrlP2P extends React.Component {
         }
         if (v_andruavUnit.m_P2P.m_parent_address !== "" && v_andruavUnit.m_P2P.m_parent_address !== null && v_andruavUnit.m_P2P.m_parent_address !== undefined)
         {
-            const unit = js_globals.m_andruavUnitList.fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
+            const unit = js_session.fn_getAndruavUnitList().fn_getUnitByP2PMac(v_andruavUnit.m_P2P.m_parent_address);
             txt_parent_mac = v_andruavUnit.m_P2P.m_parent_address;
             if (unit !== null && unit !== undefined)
             {
@@ -152,7 +152,7 @@ export class ClssCtrlP2P extends React.Component {
         const  c_logical_parent_address= v_andruavUnit.m_P2P.m_logical_parent_address;
         if (c_logical_parent_address !== "" && c_logical_parent_address !== null && c_logical_parent_address !== undefined)
         {
-            const unit = js_globals.m_andruavUnitList.fn_getUnitByP2PMac(c_logical_parent_address);
+            const unit = js_session.fn_getAndruavUnitList().fn_getUnitByP2PMac(c_logical_parent_address);
             txt_logical_parent_mac = c_logical_parent_address;
             if (unit !== null && unit !== undefined)
             {

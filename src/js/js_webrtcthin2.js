@@ -1,4 +1,4 @@
-import { js_globals } from "./js_globals.js";
+import * as js_session from './state/session.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_eventEmitter } from './events/js_eventEmitter';
 import { fn_videoStatsEvent } from './events/eventPayloads.js';
@@ -150,7 +150,7 @@ class CTalk {
 
       this.m_actualFrameRate = currentFrameRate;
       //js_common.fn_console_log(`WEBRTC: ${this.targetVideoTrack} Frame Rate: ${this.m_actualFrameRate.toFixed(2)} FPS`);
-      const v_andruavUnit = js_globals.m_andruavUnitList.fn_getUnit(this.number);
+      const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.number);
       if (!v_andruavUnit?.m_Video) return;
       
       const deltaBytes = this.m_bytesReceived - this._lastBytesReceived;
@@ -192,7 +192,7 @@ class AndruavStream {
     AndruavStream.instance = this;
 
     // Subscribe once to EE_andruavSignalling — replaces the old
-    // js_globals.v_andruavClient signalling injection.
+    // js_session.fn_getAndruavClient() signalling injection.
     this.fn_initSignalling();
   }
 
@@ -377,10 +377,10 @@ class AndruavStream {
       packet: packet,
       channel: channel,
       id: phone,
-      number: js_globals.v_andruavWS.partyID,
+      number: js_session.fn_getAndruavWS().partyID,
     };
 
-    js_globals.v_andruavFacade.API_WebRTC_Signalling(phone, message);
+    js_session.fn_getAndruavFacade().API_WebRTC_Signalling(phone, message);
   }
 
   /**

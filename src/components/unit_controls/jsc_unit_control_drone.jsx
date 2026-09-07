@@ -1,10 +1,10 @@
 import React from 'react';
+import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js'
@@ -96,13 +96,13 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     fn_webRX_toggle(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
-            js_globals.v_andruavFacade.API_disengageRX(p_andruavUnit);
+            js_session.fn_getAndruavFacade().API_disengageRX(p_andruavUnit);
             js_eventEmitter.fn_dispatch(js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             p_andruavUnit.m_Telemetry.m_rxEngaged = false;
 
         }
         else {
-            js_globals.v_andruavFacade.API_engageRX(p_andruavUnit);
+            js_session.fn_getAndruavFacade().API_engageRX(p_andruavUnit);
         }
     }
 
@@ -428,8 +428,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     fn_connectToFCB (p_andruavUnit)
     {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (js_globals.v_andruavFacade === null || js_globals.v_andruavFacade === undefined) return;
-        js_globals.v_andruavFacade.API_connectToFCB(p_andruavUnit);
+        if (js_session.fn_getAndruavFacade() === null || js_session.fn_getAndruavFacade() === undefined) return;
+        js_session.fn_getAndruavFacade().API_connectToFCB(p_andruavUnit);
     }
 
 

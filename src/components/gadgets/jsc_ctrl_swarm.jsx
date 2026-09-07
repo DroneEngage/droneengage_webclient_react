@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
+import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages';
-import { js_globals } from '../../js/js_globals.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_localStorage } from '../../js/js_localStorage';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
@@ -50,14 +50,14 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
             onMakeSwarm(p_formationID);
         }
         if (isLeader === true) {
-            js_globals.v_andruavFacade.API_makeSwarm(
+            js_session.fn_getAndruavFacade().API_makeSwarm(
                 p_unit,
                 js_andruavMessages.CONST_TASHKEEL_SERB_NO_SWARM,
                 js_preferences.fn_getDefaultSwarmHorizontalDistance(),
                 js_preferences.fn_getDefaultSwarmVerticalDistance()
             );
         } else {
-            js_globals.v_andruavFacade.API_makeSwarm(
+            js_session.fn_getAndruavFacade().API_makeSwarm(
                 p_unit,
                 p_formationID,
                 js_preferences.fn_getDefaultSwarmHorizontalDistance(),
@@ -77,13 +77,13 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
             v_partyID = p_followUnit.getPartyID();
             v_do_follow = js_andruavMessages.CONST_TYPE_SWARM_FOLLOW;
         }
-        js_globals.v_andruavFacade.API_requestFromDroneToFollowAnother(p_unit, -1, v_partyID, v_do_follow);
+        js_session.fn_getAndruavFacade().API_requestFromDroneToFollowAnother(p_unit, -1, v_partyID, v_do_follow);
     };
 
     const fn_handleFormationChange = (newFormation) => {
         if (p_unit === null || p_unit === undefined) return;
         if (isLeader === true) {
-            js_globals.v_andruavFacade.API_makeSwarm(
+            js_session.fn_getAndruavFacade().API_makeSwarm(
                 p_unit,
                 newFormation,
                 js_localStorage.fn_getDefaultSwarmHorizontalDistance(),
@@ -99,7 +99,7 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
     const key = partyId;
     // fn_getUnitValues() returns undefined once v_andruavClient is cleared
     // (e.g. on logout); guard so the dropdown render does not crash.
-    const v_units = (js_globals.m_andruavUnitList && js_globals.m_andruavUnitList.fn_getUnitValues()) || [];
+    const v_units = (js_session.fn_getAndruavUnitList() && js_session.fn_getAndruavUnitList().fn_getUnitValues()) || [];
     const len = v_units.length;
     const c_items = [];
 
@@ -115,7 +115,7 @@ function ClssCtrlSWARM({ p_unit, className, i18n, t, onMakeSwarm, onRequestToFol
     if (following != null) {
         v_follower_class = "btn-danger";
         v_leader_dropdown_class = "bg-success txt-theme-aware";
-        const v_leaderUnit = js_globals.m_andruavUnitList.fn_getUnit(following);
+        const v_leaderUnit = js_session.fn_getAndruavUnitList().fn_getUnit(following);
         if (v_leaderUnit != null) {
             v_leader_title_follower = v_leaderUnit.m_unitName;
         } else {
