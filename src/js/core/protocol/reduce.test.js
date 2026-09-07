@@ -31,6 +31,8 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_WayPoints,
          CONST_TYPE_AndruavMessage_SearchTargetList,
          CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
+         CONST_TYPE_AndruavMessage_CameraList,
+         CONST_TYPE_AndruavMessage_SOUND_LIST,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
@@ -596,6 +598,80 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         const result = fn_reduce(makeUnit(), msg);
         expect(result.patches[0].value[0].m_name).toBe('default');
         expect(result.patches[0].value[0].lastUpdate).toBe(42);
+    });
+
+    // --- TASK-02.4: CameraList / SOUND_LIST ---
+
+    test('CameraList: reply (R:true) includes patch, EE_unitUpdated, __callbackReply', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_CameraList, 'u', {
+            T: [{ id: 'cam1', v: true }], R: true,
+        });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(1);
+        expect(result.patches[0].path).toBe('m_Video.m_videoTracks');
+        expect(result.patches[0].value).toEqual([{ id: 'cam1', v: true }]);
+
+        expect(result.events).toHaveLength(2);
+        expect(result.events[0].name).toBe(js_event.EE_unitUpdated);
+        expect(result.events[0].payload).toBe(unit);
+
+        expect(result.events[1].name).toBe('__callbackReply');
+        expect(result.events[1].payload.messageType).toBe(CONST_TYPE_AndruavMessage_CameraList);
+        expect(result.events[1].payload.session.status).toBe('connected');
+        expect(result.events[1].payload.session.m_unit).toBe(unit);
+    });
+
+    test('CameraList: non-reply (R absent) has no callback pseudo-event', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_CameraList, 'u', {
+            T: [{ id: 'cam1' }],
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_unitUpdated);
+        expect(result.events.find(e => e.name === '__callbackReply')).toBeUndefined();
+    });
+
+    test('CameraList: empty T -> no patches, no events', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_CameraList, 'u', { T: [], R: true });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(0);
+    });
+
+    test('SOUND_LIST: empty T -> m_files: [] and EE_onSoundListUpdated', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_SOUND_LIST, 'u', { T: [] });
+        const msg = fn_decode(raw, 1);
+        const unit = makeUnit();
+        const result = fn_reduce(unit, msg);
+
+        expect(result.patches).toHaveLength(1);
+        expect(result.patches[0].path).toBe('m_Sound.m_files');
+        expect(result.patches[0].value).toEqual([]);
+        expect(result.events).toHaveLength(1);
+        expect(result.events[0].name).toBe(js_event.EE_onSoundListUpdated);
+    });
+
+    test('SOUND_LIST: reply (R:true) includes __callbackReply', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_SOUND_LIST, 'u', {
+            T: [{ n: 'beep', f: '/sounds/beep.mp3' }], R: true,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events).toHaveLength(2);
+        expect(result.events[1].name).toBe('__callbackReply');
+        expect(result.events[1].payload.messageType).toBe(CONST_TYPE_AndruavMessage_SOUND_LIST);
+    });
+
+    test('SOUND_LIST: missing T -> m_files: []', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_SOUND_LIST, 'u', {});
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches[0].value).toEqual([]);
     });
 });
 

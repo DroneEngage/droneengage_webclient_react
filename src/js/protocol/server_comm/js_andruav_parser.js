@@ -25,6 +25,7 @@ import * as js_common from '../../js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
 import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
+import { js_callbackRegistry } from '../callbackRegistry.js';
 
 
 import { mavlink20, MAVLink20Processor } from '../../js_mavlink_v2.js'
@@ -43,7 +44,7 @@ const CONST_TASK_SCOPE_PARTYID = 3;
 class CAndruavClientParser {
     constructor() {
         // waypoint cache moved to js_waypointCache (services/waypoint/waypointCache.js).
-        this.v_callbackListeners = {};
+        // callback registry moved to js_callbackRegistry (protocol/callbackRegistry.js).
         this.fn_init();
         //this.m_mavlinkFTPProtocol = new C_MavlinkFTPProtocol();
 
@@ -144,23 +145,12 @@ class CAndruavClientParser {
 
     };
 
-
-
-
-    /*
-        This function is used by some messages to call back modules when the message 
-        is received. For now only one function can wait per mission and newer request overwrite older.
-    */
-    fn_callbackOnMessageID = function (p_callback, p_messageID) {
-        this.v_callbackListeners[p_messageID] = p_callback;
-    }
-
-    fn_callbackOnMessageID_Answer(p_messageID, v_session) {
-        if (this.v_callbackListeners.hasOwnProperty(p_messageID) === true) {
-            this.v_callbackListeners[p_messageID](v_session);
-            delete this.v_callbackListeners[p_messageID];
-        }
-    }
+    // The parser callback registry (single-shot request/reply) moved to
+    // js_callbackRegistry (protocol/callbackRegistry.js). The facade registers
+    // via js_callbackRegistry.fn_register; the reduce path signals
+    // __callbackReply, runtime calls js_callbackRegistry.fn_fireOnce. The
+    // CONFIG_STATUS case (still in this switch until TASK-02.5) calls
+    // js_callbackRegistry.fn_fireOnce directly.
 
     // #prv_parseFenceInfo removed — its pure body moved to fn_parseFenceInfo
     // in core/protocol/reduce.js. The GeoFence/ExternalGeoFence reducers wrap
@@ -189,22 +179,17 @@ class CAndruavClientParser {
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS: {
                p_jmsg = msg.msgPayload;
-               
-               if (p_jmsg.R === true) { // this is a reply to request.
-                        // if (this.v_callbackListeners.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList) === true) {
-                        //     this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList](v_session);
-                        //     delete this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList];
-                        // }
 
+               if (p_jmsg.R === true) { // this is a reply to request.
                         const c_module  = p_unit.m_modules.getModuleByKey(p_jmsg.k)
-                        if (!c_module) 
+                        if (!c_module)
                         {
                             // PUBLISH ERROR
                             return ;
                         }
                         c_module.template = p_jmsg.b;
-             
-                        this.fn_callbackOnMessageID_Answer(msg.messageType, {p_unit:p_unit , p_module:c_module});
+
+                        js_callbackRegistry.fn_fireOnce(msg.messageType, {p_unit:p_unit , p_module:c_module});
                 }
             }
                 break;
@@ -328,69 +313,8 @@ class CAndruavClientParser {
             }
                 break;
 
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList: {
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-
-                let v_session = {};
-                v_session.status = 'connected';
-                v_session.m_unit = p_unit;
-
-                if (p_jmsg.T.length !== 0) { /*
-								jsonVideoSource[CAMERA_SUPPORT_VIDEO "v"]           = true;
-								jsonVideoSource[CAMERA_LOCAL_NAME "ln"]             = deviceInfo.local_name;
-								jsonVideoSource[CAMERA_UNIQUE_NAME "id"]            = deviceInfo.unique_name;
-								jsonVideoSource[CAMERA_ACTIVE "active"]             = deviceInfo.active;
-								jsonVideoSource[CAMERA_TYPE "p"]                    = EXTERNAL_CAMERA_TYPE_RTCWEBCAM;
-								// [deprecated] jsonVideoSource[CAMERA_TYPE "f"]                    = ANDROID_DUAL_CAM; facing/rearing (true,false)
-								// [deprecated] jsonVideoSource[CAMERA_TYPE "z"]					= Support Zooming 
-								jsonVideoSource[CAMERA_TYPE "r"]					= video recording now
-                                jsonVideoSource[CAMERA_TYPE "s"]					= SUPPORT ZOOMING/RECORDING/ROTATION/DUALCAM/FLASHING
-							*/
-
-
-                    p_unit.m_Video.m_videoTracks = p_jmsg.T;
-                    js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, p_unit);
-
-                    if (p_jmsg.R === true) { // this is a reply to request.
-                        // if (this.v_callbackListeners.hasOwnProperty(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList) === true) {
-                        //     this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList](v_session);
-                        //     delete this.v_callbackListeners[js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList];
-                        // }
-                        this.fn_callbackOnMessageID_Answer(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList, v_session);
-                    }
-                } else {
-                    // NO AVAILABLE CAMERA
-                    // error: received emprty session.
-                }
-            }
-                break;
-
-
-            case js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST: {
-                p_jmsg = msg.msgPayload;
-                if (typeof p_jmsg === 'string' || p_jmsg instanceof String) { // backword compatible
-                    p_jmsg = JSON.parse(msg.msgPayload); // Internal message JSON
-                }
-
-                let v_session = {};
-                v_session.status = 'connected';
-                v_session.m_unit = p_unit;
-
-                // "T" is the sound file library: list of { n: name, f: file_path }.
-                // Store it on the unit and notify the audio gadget to refresh its
-                // dropdown. An empty list is valid (no configured sounds).
-                p_unit.m_Sound.m_files = Array.isArray(p_jmsg.T) ? p_jmsg.T : [];
-                js_eventEmitter.fn_dispatch(js_event.EE_onSoundListUpdated, p_unit);
-
-                if (p_jmsg.R === true) { // this is a reply to request.
-                    this.fn_callbackOnMessageID_Answer(js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST, v_session);
-                }
-            }
-                break;
-
+            // CameraList / SOUND_LIST removed — migrated to core/protocol/reduce.js
+            // (reduceCameraList / reduceSoundList) + runtime.js (__callbackReply).
 
             case js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_InRange_Node:
                 p_jmsg = msg.msgPayload;

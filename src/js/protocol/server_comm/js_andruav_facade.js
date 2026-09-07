@@ -34,6 +34,7 @@ import * as js_andruav_parser from './js_andruav_parser.js'
 
 import { mavlink20 } from '../../js_mavlink_v2.js'
 import { js_waypointCache } from '../../services/waypoint/waypointCache.js'
+import { js_callbackRegistry } from '../callbackRegistry.js'
 const WAYPOINT_NO_CHUNK = 0;
 const WAYPOINT_CHUNK = 1;
 const WAYPOINT_LAST_CHUNK = 999;
@@ -832,7 +833,7 @@ class CAndruavClientFacade {
     API_requestCameraList(p_andruavUnit, p_callback) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         if (p_callback !== null && p_callback !== undefined) {
-            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList);
+            js_callbackRegistry.fn_register(js_andruavMessages.CONST_TYPE_AndruavMessage_CameraList, p_callback);
         }
 
         let p_msg = {
@@ -846,7 +847,7 @@ class CAndruavClientFacade {
     API_requestSoundList(p_andruavUnit, p_callback) {
         if (p_andruavUnit.getPartyID() === null || p_andruavUnit.getPartyID() === undefined) return;
         if (p_callback !== null && p_callback !== undefined) {
-            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST);
+            js_callbackRegistry.fn_register(js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_LIST, p_callback);
         }
 
         let p_msg = {
@@ -1419,7 +1420,7 @@ class CAndruavClientFacade {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
 
         if (p_callback !== null && p_callback !== undefined) {
-            js_andruav_parser.AndruavClientParser.fn_callbackOnMessageID(p_callback, js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS);
+            js_callbackRegistry.fn_register(js_andruavMessages.CONST_TYPE_AndruavMessage_CONFIG_STATUS, p_callback);
         }
         const cmd = CCommandAPI.API_fetchConfigJSON(p_module);
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);

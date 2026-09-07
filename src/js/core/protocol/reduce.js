@@ -41,6 +41,8 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_Viewlink_STATUS,
          CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
          CONST_TYPE_AndruavMessage_SearchTargetList,
+         CONST_TYPE_AndruavMessage_CameraList,
+         CONST_TYPE_AndruavMessage_SOUND_LIST,
          CONST_TYPE_AndruavMessage_GeoFence,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_GeoFenceAttachStatus,
@@ -151,6 +153,10 @@ export function fn_reduce(unit, msg) {
             return reduceSearchTargetList(unit, msg);
         case CONST_TYPE_AndruavMessage_TargetTrackingtLocation:
             return reduceTargetTrackingLocation(unit, msg);
+        case CONST_TYPE_AndruavMessage_CameraList:
+            return reduceCameraList(unit, msg);
+        case CONST_TYPE_AndruavMessage_SOUND_LIST:
+            return reduceSoundList(unit, msg);
         default:
             return null;
     }
@@ -195,7 +201,9 @@ export function fn_isMigrated(type) {
         || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
         || type === CONST_TYPE_AndruavMessage_WayPoints
         || type === CONST_TYPE_AndruavMessage_SearchTargetList
-        || type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation;
+        || type === CONST_TYPE_AndruavMessage_TargetTrackingtLocation
+        || type === CONST_TYPE_AndruavMessage_CameraList
+        || type === CONST_TYPE_AndruavMessage_SOUND_LIST;
 }
 
 // ---------------------------------------------------------------------------
@@ -1072,6 +1080,39 @@ function reduceTargetTrackingLocation(unit, msg) {
         patches: [{ path: 'm_DetectedTargets.m_targets.m_list', value: list }],
         events: [{ name: js_event.EE_DetectedTarget, payload: unit }],
     };
+}
+
+// ---------------------------------------------------------------------------
+// CameraList / SOUND_LIST — field writes + dispatch + optional request/reply.
+//
+// The reply callback (R === true) is an impure runtime concern. The reducer
+// signals it as a __callbackReply pseudo-event; runtime calls
+// js_callbackRegistry.fn_fireOnce. This keeps reduce pure.
+// ---------------------------------------------------------------------------
+function reduceCameraList(unit, msg) {
+    const p = msg.payload;
+    // The old case skips everything when T is empty (no available camera).
+    if (!p.T || p.T.length === 0) return { patches: [], events: [] };
+    const patches = [{ path: 'm_Video.m_videoTracks', value: p.T }];
+    const events = [{ name: js_event.EE_unitUpdated, payload: unit }];
+    if (p.R === true) {
+        events.push({ name: '__callbackReply', payload: {
+            messageType: CONST_TYPE_AndruavMessage_CameraList,
+            session: { status: 'connected', m_unit: unit } } });
+    }
+    return { patches, events };
+}
+
+function reduceSoundList(unit, msg) {
+    const p = msg.payload;
+    const patches = [{ path: 'm_Sound.m_files', value: Array.isArray(p.T) ? p.T : [] }];
+    const events = [{ name: js_event.EE_onSoundListUpdated, payload: unit }];
+    if (p.R === true) {
+        events.push({ name: '__callbackReply', payload: {
+            messageType: CONST_TYPE_AndruavMessage_SOUND_LIST,
+            session: { status: 'connected', m_unit: unit } } });
+    }
+    return { patches, events };
 }
 
 /**

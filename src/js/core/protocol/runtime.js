@@ -26,6 +26,7 @@ import * as js_andruav_facade from '../../protocol/server_comm/js_andruav_facade
 import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
 import { js_waypointCache } from '../../services/waypoint/waypointCache.js';
+import { js_callbackRegistry } from '../../protocol/callbackRegistry.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_SearchTargetList,
@@ -118,6 +119,10 @@ export function fn_handleFrame(p_frame, evt) {
             // dispatched through the event emitter.
             if (ev.name === '__geoFenceAttach') {
                 fn_handleGeoFenceAttach(ev.payload);
+                continue;
+            }
+            if (ev.name === '__callbackReply') {
+                js_callbackRegistry.fn_fireOnce(ev.payload.messageType, ev.payload.session);
                 continue;
             }
             js_eventEmitter.fn_dispatch(ev.name, ev.payload);
