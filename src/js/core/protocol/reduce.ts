@@ -85,6 +85,7 @@ import type {
     TargetTrackingLocationPayload, CameraListPayload, SoundListPayload,
     ConfigStatusPayload, SignalingPayload, IDPayload, GimbalOrientation,
 } from './messages';
+import type { CAndruavUnit } from '../model/unit';
 
 // EVENTS is built dynamically via Array.reduce() in js_eventList.js, so its
 // keys are not statically inferable from the .js module (TS sees Readonly<{}>).
@@ -104,7 +105,7 @@ export const WAYPOINT_LAST_CHUNK = 999;
  * @param unit - the unit the message was received for.
  * @param msg - the decoded inbound message.
  */
-export function fn_reduce(unit: any, msg: Message): ReduceResult | null {
+export function fn_reduce(unit: CAndruavUnit, msg: Message): ReduceResult | null {
     if (!fn_isMigrated(msg.type)) {
         // Not yet migrated — runtime falls through to the old switch.
         return null;
@@ -235,7 +236,7 @@ export function fn_isMigrated(type: number): boolean {
 // GPS — highest frequency, simplest. Pure field writes + one dispatch.
 // Matches js_andruav_parser.js CONST_TYPE_AndruavMessage_GPS exactly.
 // ---------------------------------------------------------------------------
-function reduceGPS(unit: any, msg: Message): ReduceResult {
+function reduceGPS(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as GpsPayload;
     const patches: FieldPatch[] = [];
 
@@ -265,7 +266,7 @@ function reduceGPS(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // POW — power/battery. Mobile + optional FCB battery block.
 // ---------------------------------------------------------------------------
-function reducePOW(unit: any, msg: Message): ReduceResult {
+function reducePOW(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as PowPayload;
     const patches: FieldPatch[] = [];
 
@@ -297,7 +298,7 @@ function reducePOW(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // NAV_INFO — orientation + target nav data.
 // ---------------------------------------------------------------------------
-function reduceNavInfo(unit: any, msg: Message): ReduceResult {
+function reduceNavInfo(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as NavInfoPayload;
     const patches: FieldPatch[] = [];
 
@@ -317,7 +318,7 @@ function reduceNavInfo(unit: any, msg: Message): ReduceResult {
 // is imported by runtime (not reduce) to keep reduce free of globals. The rank
 // patch is added by runtime after reduce returns.
 // ---------------------------------------------------------------------------
-function reduceCommSignalsStatus(unit: any, msg: Message): ReduceResult {
+function reduceCommSignalsStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as CommSignalsStatusPayload;
     const patches: FieldPatch[] = [];
 
@@ -334,7 +335,7 @@ function reduceCommSignalsStatus(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // Communication_Line_Status — websocket + p2p line status. No event dispatch.
 // ---------------------------------------------------------------------------
-function reduceCommLineStatus(unit: any, msg: Message): ReduceResult {
+function reduceCommLineStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as CommLineStatusPayload;
     const patches: FieldPatch[] = [];
 
@@ -348,7 +349,7 @@ function reduceCommLineStatus(unit: any, msg: Message): ReduceResult {
 // Chat — dispatch only, no field writes. Payload may be stringified (decode
 // handles that). Original dispatches { unit, message: p_jmsg }.
 // ---------------------------------------------------------------------------
-function reduceChat(unit: any, msg: Message): ReduceResult {
+function reduceChat(unit: CAndruavUnit, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{ name: js_event.EE_onChatMessage, payload: { unit, message: msg.payload } }],
@@ -358,7 +359,7 @@ function reduceChat(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // UdpProxy_Info — telemetry proxy fields + one dispatch.
 // ---------------------------------------------------------------------------
-function reduceUdpProxyInfo(unit: any, msg: Message): ReduceResult {
+function reduceUdpProxyInfo(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as UdpProxyInfoPayload;
     const patches: FieldPatch[] = [];
 
@@ -376,7 +377,7 @@ function reduceUdpProxyInfo(unit: any, msg: Message): ReduceResult {
 // then dispatches EE_onTrackingStatusChanged. The method call is declared as
 // a Dispatch with a `method` field; runtime calls it before dispatching.
 // ---------------------------------------------------------------------------
-function reduceTrackingStatus(unit: any, msg: Message): ReduceResult {
+function reduceTrackingStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{
@@ -394,7 +395,7 @@ function reduceTrackingStatus(unit: any, msg: Message): ReduceResult {
 //  CLASS_LIST: calls m_tracker_ai.fn_addObjectClass(p_jmsg.c) + EE_onTrackingAIObjectListUpdate
 //  default:    calls m_tracker_ai.fn_updateTrackerStatus(p_jmsg.a) + EE_onTrackingAIStatusChanged
 // ---------------------------------------------------------------------------
-function reduceAIRecognition(unit: any, msg: Message): ReduceResult {
+function reduceAIRecognition(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload;
     if (p.a === CONST_TargetTracking_STATUS_AI_Recognition_CLASS_LIST) {
         return {
@@ -431,7 +432,7 @@ function reduceAIRecognition(unit: any, msg: Message): ReduceResult {
 // delayed REQUEST_SDR) are returned as effects Commands — see reduceIDEffects
 // which effects.js delegates to.
 // ---------------------------------------------------------------------------
-export function reduceID(unit: any, msg: Message): ReduceResult {
+export function reduceID(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as IDPayload;
     const ops: Op[] = [];
     const triggers: Record<string, boolean> = {
@@ -621,17 +622,17 @@ export function reduceID(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // CameraFlash / CameraZoom — dispatch only with {p_unit, p_jmsg} payload.
 // ---------------------------------------------------------------------------
-function reduceCameraFlash(unit: any, msg: Message): ReduceResult {
+function reduceCameraFlash(unit: CAndruavUnit, msg: Message): ReduceResult {
     return { patches: [], events: [{ name: js_event.EE_cameraFlashChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
 }
-function reduceCameraZoom(unit: any, msg: Message): ReduceResult {
+function reduceCameraZoom(unit: CAndruavUnit, msg: Message): ReduceResult {
     return { patches: [], events: [{ name: js_event.EE_cameraZoomChanged, payload: { p_unit: unit, p_jmsg: msg.payload } }] };
 }
 
 // ---------------------------------------------------------------------------
 // HomeLocation — field writes + EE_HomePointChanged.
 // ---------------------------------------------------------------------------
-function reduceHomeLocation(unit: any, msg: Message): ReduceResult {
+function reduceHomeLocation(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as HomeLocationPayload;
     return {
         patches: [
@@ -647,7 +648,7 @@ function reduceHomeLocation(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // DistinationLocation — method call fn_addDestinationPoint + dispatch.
 // ---------------------------------------------------------------------------
-function reduceDistinationLocation(unit: any, msg: Message): ReduceResult {
+function reduceDistinationLocation(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as DistinationLocationPayload;
     let destination_type = 0; // CONST_DESTINATION_GUIDED_POINT
     if (p.P !== null && p.P !== undefined) destination_type = p.P;
@@ -665,7 +666,7 @@ function reduceDistinationLocation(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // DroneReport — dispatch EE_msgFromUnit_WayPointsUpdated.
 // ---------------------------------------------------------------------------
-function reduceDroneReport(unit: any, msg: Message): ReduceResult {
+function reduceDroneReport(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as DroneReportPayload;
     return {
         patches: [],
@@ -676,7 +677,7 @@ function reduceDroneReport(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // GPIO_STATUS — method call m_GPIOs.addGPIO + dispatch.
 // ---------------------------------------------------------------------------
-function reduceGPIOStatus(unit: any, msg: Message): ReduceResult {
+function reduceGPIOStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{
@@ -693,7 +694,7 @@ function reduceGPIOStatus(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // TELNET_STATUS — dispatch only.
 // ---------------------------------------------------------------------------
-function reduceTelnetStatus(unit: any, msg: Message): ReduceResult {
+function reduceTelnetStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     return {
         patches: [],
         events: [{ name: js_event.EE_unitTelnetStatus, payload: { unit, msg: msg.payload } }],
@@ -703,7 +704,7 @@ function reduceTelnetStatus(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // Error — dispatch EE_andruavUnitError.
 // ---------------------------------------------------------------------------
-function reduceError(unit: any, msg: Message): ReduceResult {
+function reduceError(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as ErrorPayload;
     return {
         patches: [],
@@ -717,7 +718,7 @@ function reduceError(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // GEOFenceHit — dispatch EE_andruavUnitGeoFenceHit.
 // ---------------------------------------------------------------------------
-function reduceGeoFenceHit(unit: any, msg: Message): ReduceResult {
+function reduceGeoFenceHit(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as GeoFenceHitPayload;
     let m_shouldKeepOutside = false;
     if (typeof p.o === 'number') m_shouldKeepOutside = (p.o === 1);
@@ -735,7 +736,7 @@ function reduceGeoFenceHit(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // MODULE_HEALTH_STATUS — field writes + EE_unitUpdated.
 // ---------------------------------------------------------------------------
-function reduceModuleHealthStatus(unit: any, msg: Message): ReduceResult {
+function reduceModuleHealthStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as ModuleHealthStatusPayload;
     if (!p || !p.k) return { patches: [], events: [] };
     return {
@@ -750,7 +751,7 @@ function reduceModuleHealthStatus(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // P2P_InRange_Node — merge detected nodes into m_P2P.m_detected_node.
 // ---------------------------------------------------------------------------
-function reduceP2PInRangeNode(unit: any, msg: Message): ReduceResult {
+function reduceP2PInRangeNode(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as P2PInRangeNodePayload;
     if (!p || typeof p !== 'object') return { patches: [], events: [] };
     const node: Record<string, any> = {};
@@ -769,7 +770,7 @@ function reduceP2PInRangeNode(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // P2P_InRange_BSSID — merge detected BSSIDs into m_P2P.m_detected_bssid.
 // ---------------------------------------------------------------------------
-function reduceP2PInRangeBSSID(unit: any, msg: Message): ReduceResult {
+function reduceP2PInRangeBSSID(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as P2PInRangeBssidPayload;
     if (!p) return { patches: [], events: [] };
     const bssid: Record<string, any> = {};
@@ -787,7 +788,7 @@ function reduceP2PInRangeBSSID(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // P2P_INFO — field writes + EE_unitP2PUpdated.
 // ---------------------------------------------------------------------------
-function reduceP2PInfo(unit: any, msg: Message): ReduceResult {
+function reduceP2PInfo(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as P2PInfoPayload;
     const patches: FieldPatch[] = [
         { path: 'm_P2P.m_initialized', value: true },
@@ -811,7 +812,7 @@ function reduceP2PInfo(unit: any, msg: Message): ReduceResult {
 // SDR_ACTION — sub-switch with 3 cases. No facade call (the old null-unit
 // requestID is dead code — fn_getOrCreateUnit always returns a unit).
 // ---------------------------------------------------------------------------
-function reduceSDRAction(unit: any, msg: Message): ReduceResult {
+function reduceSDRAction(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as SdrActionPayload;
     switch (p.a) {
         case CONST_SDR_ACTION_SDR_INFO: {
@@ -852,7 +853,7 @@ function reduceSDRAction(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // RemoteExecute — sub-switch. The ID case calls API_sendID (facade) -> Command.
 // ---------------------------------------------------------------------------
-function reduceRemoteExecute(unit: any, msg: Message): ReduceResult {
+function reduceRemoteExecute(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as RemoteExecutePayload;
     // The only live case in the sub-switch is CONST_TYPE_AndruavMessage_ID ->
     // API_sendID. That becomes a Command returned by effects.
@@ -862,7 +863,7 @@ function reduceRemoteExecute(unit: any, msg: Message): ReduceResult {
 // ---------------------------------------------------------------------------
 // Viewlink_STATUS — gimbal attitude + LRF, method calls + dispatch.
 // ---------------------------------------------------------------------------
-function reduceViewlinkStatus(unit: any, msg: Message): ReduceResult {
+function reduceViewlinkStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as ViewlinkStatusPayload;
     switch (p.a) {
         case VIEWLINK_STATUS_GIMBAL_ATTITUDE: {
@@ -940,7 +941,7 @@ function fn_parseFenceInfo(p_jmsg: GeoFencePayload, p_andruavUnit: any): Record<
     return geoFenceInfo;
 }
 
-function reduceGeoFence(unit: any, msg: Message): ReduceResult {
+function reduceGeoFence(unit: CAndruavUnit, msg: Message): ReduceResult {
     const fence = fn_parseFenceInfo(msg.payload as GeoFencePayload, unit);
     return {
         patches: [],
@@ -948,7 +949,7 @@ function reduceGeoFence(unit: any, msg: Message): ReduceResult {
     };
 }
 
-function reduceExternalGeoFence(unit: any, msg: Message): ReduceResult {
+function reduceExternalGeoFence(unit: CAndruavUnit, msg: Message): ReduceResult {
     // senderName === '_sys_' guard is a transport-level concern checked by
     // runtime before calling reduce. unit is null -> isEditable = true.
     const fence = fn_parseFenceInfo(msg.payload as GeoFencePayload, null);
@@ -963,7 +964,7 @@ function reduceExternalGeoFence(unit: any, msg: Message): ReduceResult {
 // intent as a runtime-only pseudo-event; runtime applies it to
 // js_geoFenceRegistry and dispatches __facadeRequestGeoFences when a fence
 // is missing.
-function reduceGeoFenceAttachStatus(unit: any, msg: Message): ReduceResult {
+function reduceGeoFenceAttachStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as GeoFenceAttachStatusPayload;
     return {
         patches: [],
@@ -1046,7 +1047,7 @@ function fn_decodeWaypointStep(item: any): WayPointStep {
     return wayPointStep;
 }
 
-function reduceWayPoints(unit: any, msg: Message): ReduceResult {
+function reduceWayPoints(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as WayPointsPayload;
     const isChunk = p.i ?? WAYPOINT_NO_CHUNK;
     const count = p.n;
@@ -1068,7 +1069,7 @@ function reduceWayPoints(unit: any, msg: Message): ReduceResult {
 // lives in runtime.js, not here. reduce stays pure: it uses msg.receivedAt
 // instead of the wall clock for lastUpdate.
 // ---------------------------------------------------------------------------
-function reduceSearchTargetList(unit: any, msg: Message): ReduceResult {
+function reduceSearchTargetList(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as SearchTargetListPayload;
     if (p.t == null) return { patches: [], events: [] };
     const targets: Record<string, any> = {};
@@ -1084,7 +1085,7 @@ function reduceSearchTargetList(unit: any, msg: Message): ReduceResult {
     };
 }
 
-function reduceTargetTrackingLocation(unit: any, msg: Message): ReduceResult {
+function reduceTargetTrackingLocation(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as TargetTrackingLocationPayload;
     const items = p.t;
     const list: any[] = [];
@@ -1118,7 +1119,7 @@ function reduceTargetTrackingLocation(unit: any, msg: Message): ReduceResult {
 // signals it as a __callbackReply pseudo-event; runtime calls
 // js_callbackRegistry.fn_fireOnce. This keeps reduce pure.
 // ---------------------------------------------------------------------------
-function reduceCameraList(unit: any, msg: Message): ReduceResult {
+function reduceCameraList(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as CameraListPayload;
     // The old case skips everything when T is empty (no available camera).
     if (!p.T || p.T.length === 0) return { patches: [], events: [] };
@@ -1132,7 +1133,7 @@ function reduceCameraList(unit: any, msg: Message): ReduceResult {
     return { patches, events };
 }
 
-function reduceSoundList(unit: any, msg: Message): ReduceResult {
+function reduceSoundList(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as SoundListPayload;
     const patches: FieldPatch[] = [{ path: 'm_Sound.m_files', value: Array.isArray(p.T) ? p.T : [] }];
     const events: Dispatch[] = [{ name: js_event.EE_onSoundListUpdated, payload: unit }];
@@ -1152,7 +1153,7 @@ function reduceSoundList(unit: any, msg: Message): ReduceResult {
 // pseudo-event; runtime resolves the module, sets the template, and fires
 // the callback once via js_callbackRegistry.
 // ---------------------------------------------------------------------------
-function reduceConfigStatus(unit: any, msg: Message): ReduceResult {
+function reduceConfigStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as ConfigStatusPayload;
     if (p.R !== true) return { patches: [], events: [] };
     return {
@@ -1166,7 +1167,7 @@ function reduceConfigStatus(unit: any, msg: Message): ReduceResult {
 // present (wrapped form), otherwise the bare payload. Dispatch
 // EE_andruavSignalling with { unit, signal }; js_webrtcthin2 subscribes and
 // invokes the existing handler.
-function reduceSignaling(unit: any, msg: Message): ReduceResult {
+function reduceSignaling(unit: CAndruavUnit, msg: Message): ReduceResult {
     const p = msg.payload as SignalingPayload;
     const signal = (p && p.w != null) ? p.w : p;
     return {
@@ -1181,7 +1182,7 @@ function reduceSignaling(unit: any, msg: Message): ReduceResult {
  * Takes the reduce result (for isNewUnit) and the post-ops unit (for module
  * flags set by addModules). Called by effects.js (which stays pure).
  */
-export function reduceIDEffects(unit: any, reduceResult?: ReduceResult): import('./types').Command[] {
+export function reduceIDEffects(unit: CAndruavUnit, reduceResult?: ReduceResult): import('./types').Command[] {
     const cmds: import('./types').Command[] = [];
     if (reduceResult && reduceResult.isNewUnit) {
         // #prv_onNewUnitAdded: 3 requests.

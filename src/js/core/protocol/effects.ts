@@ -12,15 +12,14 @@ import { CONST_TYPE_AndruavMessage_ID,
          CONST_TYPE_AndruavMessage_RemoteExecute } from '../../protocol/messages/js_andruavMessages.js';
 import { reduceIDEffects } from './reduce';
 import type { Message, Command, ReduceResult } from './types';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { CAndruavUnit } from '../model/unit';
 
 /**
  * @param unit - the unit the message was received for.
  * @param msg - the decoded inbound message.
  * @param reduceResult - the result from fn_reduce (for ID effects).
  */
-export function fn_effects(unit: any, msg: Message, reduceResult?: ReduceResult): Command[] {
+export function fn_effects(unit: CAndruavUnit, msg: Message, reduceResult?: ReduceResult): Command[] {
     switch (msg.type) {
         case CONST_TYPE_AndruavMessage_ID:
             return reduceIDEffects(unit, reduceResult);
