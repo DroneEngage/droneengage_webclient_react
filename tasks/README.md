@@ -23,6 +23,7 @@ TASK-06  types on core/                 needs 02 (do incrementally after)
 TASK-08  layout state out of jQuery     no deps — independent
 TASK-09  mapbox vendor isolation        no deps — independent, touches js_map3d.js only
 TASK-10  draggable target marker (3D)   soft dep on 09 (marker-construction style only)
+TASK-11  smooth position interpolation  soft dep on 09 (landed); independent of 10
 ```
 
 TASK-02 is partially implemented (28 of ~38 JSON-switch cases migrated, the
