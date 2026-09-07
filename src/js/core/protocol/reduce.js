@@ -471,9 +471,11 @@ export function reduceID(unit, msg) {
     }
 
     // Phase 4: home location sub-message.
+    // fn_addHomePoint(p_lat, p_lng, p_altitude, p_radius_accuracy, p_altitude_accuracy)
+    // — callUnitMethod spreads array args, so pass positional args as an array.
     const sub = p[CONST_TYPE_AndruavMessage_HomeLocation];
     if (sub) {
-        ops.push({ op: 'method', method: 'm_Geo_Tags.fn_addHomePoint', arg: { T: sub.T, O: sub.O, A: sub.A, R: sub.R, H: sub.H } });
+        ops.push({ op: 'method', method: 'm_Geo_Tags.fn_addHomePoint', arg: [sub.T, sub.O, sub.A, sub.R, sub.H] });
         triggers.onHomePointChanged = true;
     }
 
