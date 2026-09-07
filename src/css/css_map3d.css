@@ -188,3 +188,19 @@
   background: #8e44ad;
   color: #fff;
 }
+
+/* Draggable handle for the guided-target ground marker (3D map).
+ * Invisible fill — the visible crosshair is the GeoJSON line layer; this
+ * element only exists to capture Mapbox's native drag gesture. Sized as
+ * a comfortable grab target around the crosshair. */
+.css_map3d_target_drag_handle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+}
+
+.css_map3d_target_drag_handle:active {
+  cursor: grabbing;
+}

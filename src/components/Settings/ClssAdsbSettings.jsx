@@ -248,6 +248,7 @@ class ClssAdsbSettings extends React.Component {
           <CPasswordReveal
             className="col-sm-8"
             id="txt_adsb_client_secret"
+            tokenMode
             ref={this.m_clientSecretRef}
             onChange={() => this.fn_changeClientSecret()}
           />

@@ -158,6 +158,29 @@ export function fn_getState() {
 	return m_state;
 }
 
+/**
+ * Repositions the currently-open popup and merges new props into it,
+ * without closing/reopening (avoids remounting the portaled React
+ * component). Used when a map feature backing the popup — e.g. the
+ * draggable 3D target marker — moves after the popup was opened.
+ * No-op if no popup is open.
+ *
+ * @param {number} p_lat
+ * @param {number} p_lng
+ * @param {object} [p_extraProps] - props to shallow-merge into the
+ *   current state's `props` (e.g. { p_lat, p_lng } so the context-menu
+ *   component re-renders with the dragged coordinates).
+ */
+export function fn_updatePopupPosition(p_lat, p_lng, p_extraProps) {
+	if (m_state == null || m_infoWindow == null) return;
+	const adapter = fn_getAdapter();
+	adapter.fn_bindPopup(m_infoWindow, null, p_lat, p_lng);
+	fn_setState({
+		...m_state,
+		props: { ...m_state.props, ...(p_extraProps || {}) },
+	});
+}
+
 export const mapPopupService = {
 	fn_openPopup,
 	fn_closePopup,
@@ -165,4 +188,5 @@ export const mapPopupService = {
 	fn_isOpen,
 	fn_isIgnoreMouseOut,
 	fn_getState,
+	fn_updatePopupPosition,
 };

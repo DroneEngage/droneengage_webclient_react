@@ -587,7 +587,12 @@ function fn_onMap3dDblClick(p_lat, p_lng) {
 	// Draw a ground-draped circle with a + crosshair at the clicked point
 	// (instead of a DOM marker pin), then immediately show the context
 	// popup — the 3D map's dblclick UX has always opened the popup directly.
-	js_map3d.fn_drawTargetMarker(p_lat, p_lng);
+	// The marker is draggable: on dragend we reposition the open popup and
+	// patch its p_lat/p_lng props so "Goto Here" / "Set Home" target the
+	// dragged position instead of the original double-click point.
+	js_map3d.fn_drawTargetMarker(p_lat, p_lng, (v_newLat, v_newLng) => {
+		mapPopupService.fn_updatePopupPosition(v_newLat, v_newLng, { p_lat: v_newLat, p_lng: v_newLng });
+	});
 	fn_generateContextMenuHTML(p_lat, p_lng);
 }
 

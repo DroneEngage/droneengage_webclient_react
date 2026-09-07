@@ -1,11 +1,12 @@
 import * as js_siteConfig from '../js_siteConfig';
 import * as js_session from '../state/session.js';
-import { CONST_MAP3D_TETHER_COLORS, CONST_MAP3D_CIRCLE_WIDTH, CONST_MAP3D_TRAIL_WIDTH, CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH, CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY, CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT, CONST_MAP3D_MODEL_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM, CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR, CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE, CONST_MAP3D_FOLLOW_ZOOM, CONST_MAP3D_FOLLOW_DURATION_MS, CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND, CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH, CONST_MAP3D_FOLLOW_ALT_REF } from '../config/mapStyle.js';
+import { CONST_MAP3D_TETHER_COLORS, CONST_MAP3D_CIRCLE_WIDTH, CONST_MAP3D_TRAIL_WIDTH, CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH, CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY, CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT, CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM, CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR, CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE, CONST_MAP3D_FOLLOW_ZOOM, CONST_MAP3D_FOLLOW_DURATION_MS, CONST_MAP3D_FOLLOW_ZOOM_AT_GROUND, CONST_MAP3D_FOLLOW_ZOOM_AT_HIGH, CONST_MAP3D_FOLLOW_ALT_REF } from '../config/mapStyle.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_andruavUnit from '../js_andruavUnit';
+import * as js_mapboxVendor from './js_mapboxVendor.js';
 import '../../css/css_map3d.css';
 
 /**
@@ -542,7 +543,7 @@ class CAndruavMap3D {
         this.m_isMapClickBound = false;
 
         // ---- 3D model (glTF) icon LOD ----
-        // Above CONST_MAP3D_MODEL_ZOOM_THRESHOLD, drone icons are rendered as
+        // Above CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD, drone icons are rendered as
         // real glTF models (arrow.glb / plane.glb) via a Mapbox 'model' layer
         // so they tilt in true 3D with roll/pitch (unlike the flat DOM
         // billboard marker, which only ever rotates in the screen plane).
@@ -561,6 +562,17 @@ class CAndruavMap3D {
         // glTF-model twin of the ADSB DOM markers, used only when
         // CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
         this.m_adsbModelFeatures = new Map();   // icao_address -> GeoJSON Feature
+
+        // ---- Guided-target ground marker drag handle ----
+        // The visible crosshair is a GeoJSON line layer (see
+        // fn_drawTargetMarker); this invisible draggable Mapbox Marker
+        // backs it so the user can reposition the target with native
+        // Mapbox drag physics. m_targetMarkerLatLng caches the current
+        // position; m_targetMarkerOnDragEnd is the js_main.js callback
+        // fired once on dragend to reposition the context-menu popup.
+        this.m_targetMarkerHandle = null;
+        this.m_targetMarkerOnDragEnd = null;
+        this.m_targetMarkerLatLng = null;
     }
 
     /**
@@ -645,7 +657,7 @@ class CAndruavMap3D {
             : undefined;
         const lngLat = (alt != null) ? [p_lng, p_lat, alt] : [p_lng, p_lat];
 
-        const popup = new window.mapboxgl.Popup({ closeOnClick: true })
+        const popup = js_mapboxVendor.fn_createPopup({ closeOnClick: true })
             .setLngLat(lngLat);
 
         if (typeof p_content === 'string') {
@@ -709,46 +721,6 @@ class CAndruavMap3D {
     }
 
     /**
-     * Dynamically loads Mapbox GL JS + CSS if not already present.
-     */
-    async fn_loadMapboxSdk() {
-        if (window.mapboxgl) return window.mapboxgl;
-
-        const loadCSS = () => {
-            const id = 'mapbox-gl-css';
-            if (document.getElementById(id)) return;
-            const link = document.createElement('link');
-            link.id = id;
-            link.rel = 'stylesheet';
-            link.href = 'https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.css';
-            document.head.appendChild(link);
-        };
-
-        const loadJS = () => new Promise((resolve, reject) => {
-            const id = 'mapbox-gl-js';
-            if (document.getElementById(id)) {
-                const el = document.getElementById(id);
-                if (el.dataset.loaded) return resolve();
-                el.addEventListener('load', () => { el.dataset.loaded = 'true'; resolve(); }, { once: true });
-                el.addEventListener('error', () => reject(new Error('Failed to load Mapbox GL JS')), { once: true });
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.id = id;
-            script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.js';
-            script.async = true;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Failed to load Mapbox GL JS'));
-            document.body.appendChild(script);
-        });
-
-        loadCSS();
-        await loadJS();
-        return window.mapboxgl;
-    }
-
-    /**
      * Initializes the 3D Mapbox map with terrain and buildings.
      */
     async fn_initMap(containerId) {
@@ -760,10 +732,10 @@ class CAndruavMap3D {
             return;
         }
 
-        const mapboxgl = await this.fn_loadMapboxSdk();
-        mapboxgl.accessToken = token;
+        await js_mapboxVendor.fn_loadMapboxSdk();
+        js_mapboxVendor.fn_setAccessToken(token);
 
-        this.m_map = new mapboxgl.Map({
+        this.m_map = js_mapboxVendor.fn_createMap({
             container: containerId,
             style: js_siteConfig.CONST_MAPBOX_STYLE || 'mapbox://styles/mapbox/standard',
             center: [24.767945, 42.144913],
@@ -1007,8 +979,8 @@ class CAndruavMap3D {
         }
 
         const token = js_localStorage.fn_getMapbox3DAccessToken() || js_siteConfig.CONST_MAPBOX_3D_ACCESS_TOKEN;
-        if (window.mapboxgl && token) {
-            window.mapboxgl.accessToken = token;
+        if (js_mapboxVendor.fn_getMapboxGl() && token) {
+            js_mapboxVendor.fn_setAccessToken(token);
         }
 
         const style = js_localStorage.fn_getMapboxStyle() || js_siteConfig.CONST_MAPBOX_STYLE || 'mapbox://styles/mapbox/standard';
@@ -1018,7 +990,7 @@ class CAndruavMap3D {
     /**
      * Registers the glTF models (arrow.glb / plane.glb) + the GeoJSON source
      * and 'model' layer used to render unit icons as real 3D objects once
-     * zoomed in past CONST_MAP3D_MODEL_ZOOM_THRESHOLD. See fn_syncUnit for
+     * zoomed in past CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD. See fn_syncUnit for
      * how per-unit position/rotation is pushed into the source, and
      * fn_updateModelLod for the DOM-marker/model swap.
      */
@@ -1058,7 +1030,7 @@ class CAndruavMap3D {
                 id: 'unit-3d-models-layer',
                 type: 'model',
                 source: 'unit-3d-models',
-                minzoom: CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
+                minzoom: CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD,
                 layout: {
                     'model-id': ['get', 'modelId']
                 },
@@ -1088,7 +1060,7 @@ class CAndruavMap3D {
         // ADSB traffic's glTF twin — only populated/shown when
         // CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (fn_syncAdsbObject).
         // minzoom gates the 3D model the same way as the unit layer above:
-        // below CONST_MAP3D_MODEL_ZOOM_THRESHOLD the real-world scale needed
+        // below CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD the real-world scale needed
         // for pixel-constant compensation becomes so enormous that Mapbox's
         // model-layer rendering loses rotation precision (models default to
         // north). Below the threshold the DOM markers (which handle rotation
@@ -1107,7 +1079,7 @@ class CAndruavMap3D {
                 id: 'adsb-3d-models-layer',
                 type: 'model',
                 source: 'adsb-3d-models',
-                minzoom: CONST_MAP3D_MODEL_ZOOM_THRESHOLD,
+                minzoom: CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD,
                 layout: {
                     'model-id': ['get', 'modelId']
                 },
@@ -1166,7 +1138,7 @@ class CAndruavMap3D {
     fn_updateModelLod() {
         if (!this.m_map || !this.m_modelLayerReady) return;
 
-        const showModels = this.m_map.getZoom() >= CONST_MAP3D_MODEL_ZOOM_THRESHOLD;
+        const showModels = this.m_map.getZoom() >= CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD;
         if (showModels === this.m_modelLodActive) return;
         this.m_modelLodActive = showModels;
 
@@ -1569,7 +1541,7 @@ class CAndruavMap3D {
         if (!marker) {
             const el = createMarkerElement();
 
-            marker = new window.mapboxgl.Marker({
+            marker = js_mapboxVendor.fn_createMarker({
                 element: el,
                 // Billboarded (always faces camera) for readability + click/hover.
                 // rotationAlignment:'map' keeps the icon spinning with map bearing.
@@ -1680,7 +1652,7 @@ class CAndruavMap3D {
      * Updates (or creates) the GeoJSON feature backing this unit's entry in
      * the 3D 'model' layer (unit-3d-models-layer) — the real glTF twin of
      * the DOM marker, shown instead of it once zoomed in past
-     * CONST_MAP3D_MODEL_ZOOM_THRESHOLD (see fn_updateModelLod).
+     * CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD (see fn_updateModelLod).
      *
      * model-rotation is [x, y, z] euler degrees applied in the model's
      * world/ENU frame: x tilts about the east-west axis (pitch), y tilts
@@ -1955,7 +1927,7 @@ class CAndruavMap3D {
             iconEl.style.transformOrigin = 'center center';
             el.appendChild(iconEl);
 
-            marker = new window.mapboxgl.Marker({
+            marker = js_mapboxVendor.fn_createMarker({
                 element: el,
                 // Billboarded like drone markers: icon rotates with map bearing,
                 // stays flat to the viewport otherwise.
@@ -2004,7 +1976,7 @@ class CAndruavMap3D {
         // In GLB mode, swap the icon to a transparent placeholder so the
         // marker is visually invisible but still catches click/hover for
         // the 3D model sitting on top of it — but ONLY when the 3D model
-        // layer is actually active (at/above CONST_MAP3D_MODEL_ZOOM_THRESHOLD).
+        // layer is actually active (at/above CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD).
         // Below the threshold the model layer is hidden by minzoom (the
         // enormous scale needed for pixel-constant compensation would lose
         // rotation precision in Mapbox), so the DOM marker must show its
@@ -2993,7 +2965,7 @@ class CAndruavMap3D {
         el.style.border = '2px solid #fff';
         el.style.boxShadow = '0 0 2px rgba(0,0,0,0.6)';
 
-        const marker = new window.mapboxgl.Marker({
+        const marker = js_mapboxVendor.fn_createMarker({
             element: el,
             anchor: 'center',
             pitchAlignment: 'viewport',
@@ -3241,7 +3213,7 @@ class CAndruavMap3D {
      * immediately, if nothing needed to change, or after the fit + idle).
      */
     fn_ensureBoundsVisible(validSteps, p_onSettled) {
-        if (!this.m_map || !window.mapboxgl || validSteps.length === 0) {
+        if (!this.m_map || !js_mapboxVendor.fn_getMapboxGl() || validSteps.length === 0) {
             p_onSettled();
             return;
         }
@@ -3255,7 +3227,7 @@ class CAndruavMap3D {
             return;
         }
 
-        const bounds = new window.mapboxgl.LngLatBounds();
+        const bounds = js_mapboxVendor.fn_createLngLatBounds();
         validSteps.forEach(w => bounds.extend([w.Longitude, w.Latitude]));
 
         this.m_map.fitBounds(bounds, { padding: 60, duration: 600, maxZoom: 18 });
@@ -3479,18 +3451,16 @@ class CAndruavMap3D {
     static TARGET_MARKER_WIDTH  = 3;
 
     /**
-     * Draws (or replaces) the guided-target ground marker: a circle with
-     * a + crosshair at its center, draped on the terrain.
+     * Builds the GeoJSON FeatureCollection for the guided-target ground
+     * marker (a circle ring + N-S/E-W crosshair segments) centered at
+     * the given [lng, lat]. Extracted from fn_drawTargetMarker so the
+     * drag handler can reposition the marker via source.setData() without
+     * a remove+re-add of the layer/source.
      * @param {number} lat
      * @param {number} lng
+     * @returns {object} GeoJSON FeatureCollection.
      */
-    fn_drawTargetMarker(lat, lng) {
-        if (!this.m_map || !this.m_isReady) return;
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-
-        // Remove any previous target marker.
-        this.fn_clearTargetMarker();
-
+    fn_buildTargetMarkerGeoJSON(lat, lng) {
         const R = CAndruavMap3D.TARGET_MARKER_RADIUS;
         const ringCoords = this.fn_generateCircleRing(lng, lat, R);
 
@@ -3503,16 +3473,38 @@ class CAndruavMap3D {
         const crossH = [[lng - dLng, lat], [lng + dLng, lat]];   // horizontal (E-W)
         const crossV = [[lng, lat - dLat], [lng, lat + dLat]];   // vertical (N-S)
 
+        return {
+            type: 'FeatureCollection',
+            features: [
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: ringCoords }, properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: crossH },    properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: crossV },    properties: {} }
+            ]
+        };
+    }
+
+    /**
+     * Draws (or replaces) the guided-target ground marker: a circle with
+     * a + crosshair at its center, draped on the terrain.
+     * @param {number} lat
+     * @param {number} lng
+     * @param {(newLat: number, newLng: number) => void} [p_onDragEnd]
+     *   optional callback fired once when the user finishes dragging the
+     *   marker handle, with the final lat/lng. Used by js_main.js to
+     *   reposition the context-menu popup so its "Goto Here" / "Set Home"
+     *   actions target the dragged position instead of the original
+     *   double-click point.
+     */
+    fn_drawTargetMarker(lat, lng, p_onDragEnd) {
+        if (!this.m_map || !this.m_isReady) return;
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        // Remove any previous target marker (layer/source + drag handle).
+        this.fn_clearTargetMarker();
+
         this.m_map.addSource(CAndruavMap3D.TARGET_MARKER_SOURCE, {
             type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: [
-                    { type: 'Feature', geometry: { type: 'LineString', coordinates: ringCoords }, properties: {} },
-                    { type: 'Feature', geometry: { type: 'LineString', coordinates: crossH },    properties: {} },
-                    { type: 'Feature', geometry: { type: 'LineString', coordinates: crossV },    properties: {} }
-                ]
-            }
+            data: this.fn_buildTargetMarkerGeoJSON(lat, lng)
         });
 
         this.m_map.addLayer({
@@ -3530,10 +3522,60 @@ class CAndruavMap3D {
                 'line-opacity': 0.9
             }
         });
+
+        // Draggable invisible handle: a native Mapbox Marker with no
+        // visible element, purely to get Mapbox's own drag-gesture physics
+        // (rather than a hand-rolled mousedown/mousemove/mouseup loop).
+        // The visible crosshair/circle stays the GeoJSON layer above; this
+        // handle only drives its position during a drag. Marker altitude
+        // defaults to the terrain surface at this lng/lat when terrain is
+        // enabled, which keeps it flush with the crosshair (see
+        // fn_createMissionWaypointMarker for the same default).
+        this.m_targetMarkerOnDragEnd = (typeof p_onDragEnd === 'function') ? p_onDragEnd : null;
+        this.m_targetMarkerLatLng = { lat, lng };
+
+        const handleEl = document.createElement('div');
+        handleEl.className = 'css_map3d_target_drag_handle';
+
+        this.m_targetMarkerHandle = js_mapboxVendor.fn_createMarker({
+            element: handleEl,
+            draggable: true,
+            anchor: 'center'
+        }).setLngLat([lng, lat]).addTo(this.m_map);
+
+        this.m_targetMarkerHandle.on('drag', () => {
+            const ll = this.m_targetMarkerHandle.getLngLat();
+            this.fn_updateTargetMarkerPosition(ll.lat, ll.lng);
+        });
+        this.m_targetMarkerHandle.on('dragend', () => {
+            const ll = this.m_targetMarkerHandle.getLngLat();
+            this.m_targetMarkerLatLng = { lat: ll.lat, lng: ll.lng };
+            if (typeof this.m_targetMarkerOnDragEnd === 'function') {
+                this.m_targetMarkerOnDragEnd(ll.lat, ll.lng);
+            }
+        });
     }
 
     /**
-     * Removes the guided-target ground marker if present.
+     * Repositions the existing guided-target ground marker (circle +
+     * crosshair) to the given coordinates by updating the GeoJSON source
+     * in place — cheap, and avoids the remove+re-add that
+     * fn_drawTargetMarker does (which would be janky at drag frame-rate).
+     * No-op if the marker source is not present.
+     * @param {number} lat
+     * @param {number} lng
+     */
+    fn_updateTargetMarkerPosition(lat, lng) {
+        const source = this.m_map?.getSource(CAndruavMap3D.TARGET_MARKER_SOURCE);
+        if (!source) return;
+        source.setData(this.fn_buildTargetMarkerGeoJSON(lat, lng));
+        this.m_targetMarkerLatLng = { lat, lng };
+    }
+
+    /**
+     * Removes the guided-target ground marker if present: both the
+     * GeoJSON line layer/source (the visible crosshair) and the invisible
+     * draggable handle Marker backing it.
      */
     fn_clearTargetMarker() {
         if (!this.m_map) return;
@@ -3541,6 +3583,12 @@ class CAndruavMap3D {
             CAndruavMap3D.TARGET_MARKER_LAYER,
             CAndruavMap3D.TARGET_MARKER_SOURCE
         );
+        if (this.m_targetMarkerHandle) {
+            this.m_targetMarkerHandle.remove();
+            this.m_targetMarkerHandle = null;
+        }
+        this.m_targetMarkerOnDragEnd = null;
+        this.m_targetMarkerLatLng = null;
     }
 
     /**

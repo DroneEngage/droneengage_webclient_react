@@ -30,14 +30,14 @@ export const CONST_MAP3D_TETHER_MAX_ALT = 2000;  // altitude (meters AGL) at whi
 // (arrow.glb / plane.glb) that tilts with roll/pitch in 3D. This
 // avoids the "too small / too big" problem of scaling a real-world
 // sized 3D model across the full zoom range (see js_map3d.js).
-export const CONST_MAP3D_MODEL_ZOOM_THRESHOLD = 8;
+export const CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD = 8;
 // model-scale [x,y,z] applied to arrow.glb/plane.glb *at
 // CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM*. Mapbox's model-scale paint
 // property doesn't support zoom expressions on a GeoJSON source, so
 // js_map3d.js recomputes this manually on every 'zoom' event: scale
 // is multiplied by 2^(referenceZoom - currentZoom) * exponent, the
 // same meters-per-pixel relationship tiles use.
-export const CONST_MAP3D_MODEL_SCALE = [2, 2, 2];
+export const CONST_MAP3D_MODEL_SCALE = [1, 1, 1];
 export const CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM = 22;
 // Pixel-constant compensation exponent. Mapbox model-scale is in
 // real-world meters; each zoom level halves meters-per-pixel, so to
@@ -60,7 +60,7 @@ export const CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT = 1;
 // high zoom (icon behaviour across the full range, not just below
 // the reference). MAX_FACTOR caps the growth at extreme zoom-out.
 export const CONST_MAP3D_MODEL_SCALE_MIN_FACTOR = 1;
-export const CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 200;
+export const CONST_MAP3D_MODEL_SCALE_MAX_FACTOR = 2000;
 
 // ---- Map3D model size multiplier range (ModelSizeControl +/- buttons) ----
 // The user-facing size multiplier (applied on top of the zoom-
@@ -124,7 +124,7 @@ Object.freeze({
 	CONST_MAP3D_MISSION_DROP_WIDTH, CONST_MAP3D_GATE_RADIUS, CONST_MAP3D_GATE_WIDTH,
 	CONST_MAP3D_WP_GROUND_RADIUS, CONST_MAP3D_ADSB_TETHER_COLOR, CONST_MAP3D_ADSB_TETHER_OPACITY,
 	CONST_MAP3D_TETHER_MIN, CONST_MAP3D_TETHER_MAX, CONST_MAP3D_TETHER_MAX_ALT,
-	CONST_MAP3D_MODEL_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM,
+	CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD, CONST_MAP3D_MODEL_SCALE, CONST_MAP3D_MODEL_SCALE_REFERENCE_ZOOM,
 	CONST_MAP3D_MODEL_SCALE_ZOOM_EXPONENT, CONST_MAP3D_MODEL_SCALE_MIN_FACTOR, CONST_MAP3D_MODEL_SCALE_MAX_FACTOR,
 	CONST_MAP3D_MODEL_SIZE_MIN, CONST_MAP3D_MODEL_SIZE_MAX, CONST_MAP3D_MODEL_SIZE_STEP, CONST_MAP3D_MODEL_SIZE_STEP_BIG,
 	CONST_MAP3D_ADSB_RENDER_MODE_ICON, CONST_MAP3D_ADSB_RENDER_MODE_GLB, CONST_MAP3D_ADSB_RENDER_MODE,
