@@ -2,7 +2,6 @@ import * as js_session from '../../state/session.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
-import * as js_andruavUnit from '../../js_andruavUnit.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../js_common.js'
@@ -12,7 +11,7 @@ import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
-import { fn_getOrCreateUnit } from '../../model/unitRegistry.js'
+import { fn_getOrCreateUnit, fn_createSelfUnit } from '../../model/unitRegistry.js'
 import { fn_handleFrame } from '../../core/protocol/runtime.js'
 
 
@@ -191,16 +190,7 @@ class CAndruavClientWS {
             return;
 
 
-        const v_unit = new js_andruavUnit.CAndruavUnitObject();
-        v_unit.m_IsMe = true;
-        v_unit.m_IsGCS = true;
-        v_unit.m_unitName = this.unitID;
-        v_unit.setPartyID(this.partyID);
-        v_unit.m_groupName = this.m_groupName;
-        v_unit.m_telemetry_protocol = js_andruavMessages.CONST_Unknown_Telemetry;
-        v_unit.m_VehicleType = js_andruavUnit.CONST_VEHICLE_GCS;
-
-        this.m_andruavUnit = v_unit;
+        this.m_andruavUnit = fn_createSelfUnit(this.partyID, this.unitID, this.m_groupName);
     };
 
     API_delMe() {
