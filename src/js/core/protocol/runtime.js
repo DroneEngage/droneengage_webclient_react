@@ -27,6 +27,7 @@ import * as js_helpers from '../../js_helpers.js';
 import { js_geoFenceRegistry } from '../../services/geo/geoFenceRegistry.js';
 import { js_waypointCache } from '../../services/waypoint/waypointCache.js';
 import { js_callbackRegistry } from '../../protocol/callbackRegistry.js';
+import { fn_auditMessageTypes } from '../../protocol/parserAudit.js';
 import { CONST_TYPE_AndruavMessage_CommSignalsStatus,
          CONST_TYPE_AndruavMessage_ExternalGeoFence,
          CONST_TYPE_AndruavMessage_SearchTargetList,
@@ -48,6 +49,12 @@ export function fn_handleFrame(p_frame, evt) {
     // Bail out BEFORE any side effects for unmigrated types, so the old switch
     // runs cleanly with no double getOrCreateUnit / message accounting.
     if (!fn_isMigrated(msg.type)) {
+        // Dead-man switch detection (Layer 1): warn in dev mode for any
+        // unmigrated type. If this fires AND the old switch's default fires
+        // (Layer 2), the type is truly unhandled — a missed case.
+        if (process.env.NODE_ENV !== 'production') {
+            console.warn(`[parser] type ${msg.type} not migrated — falling through to old switch`);
+        }
         return false;
     }
 
@@ -172,6 +179,9 @@ let _facadeSubscriptionsInitialized = false;
 export function fn_initFacadeSubscriptions() {
     if (_facadeSubscriptionsInitialized) return;
     _facadeSubscriptionsInitialized = true;
+
+    // Dead-man switch Layer 3: startup audit of all message types.
+    fn_auditMessageTypes();
 
     // From _fn_checkStatus in the parser.
     js_eventEmitter.fn_subscribe('__facadeGetHomeLocation', { __runtimeFacade: true }, (_me, unit) => {

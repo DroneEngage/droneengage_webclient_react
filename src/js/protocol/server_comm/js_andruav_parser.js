@@ -642,6 +642,16 @@ class CAndruavClientParser {
             }
                 break;
 
+            // Dead-man switch detection (Layer 2): any message that reaches
+            // the old switch AND matches no case lands here. Combined with
+            // Layer 1 (fn_handleFrame warning), this identifies truly
+            // unhandled message types — missed cases that need attention.
+            default:
+                if (process.env.NODE_ENV !== 'production') {
+                    console.warn(`[parser] type ${msg.messageType} reached old switch with no matching case — unhandled`);
+                }
+                break;
+
 
         };
 
