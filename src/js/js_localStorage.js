@@ -12,7 +12,7 @@ import {
 	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
-} from './storage/keys.js';
+} from './storage/localstorage_keys.js';
 
 class CLocalStorage {
     constructor() {

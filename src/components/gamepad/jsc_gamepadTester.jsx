@@ -4,7 +4,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import { js_speak } from '../../js/js_speak.js';
 import { fn_helpPage, fn_do_modal_alert } from '../../js/js_main.js';
-import { LS_GAME_PAD_CONFIG_PREFIX } from '../../js/storage/keys.js';
+import { LS_GAME_PAD_CONFIG_PREFIX } from '../../js/storage/localstorage_keys.js';
 
 const css_to_save = 'ms-3 p-1 px-2 btn btn-sm btn-danger ctrlbtn';
 const css_normal = 'ms-3 p-1 px-2 btn btn-sm border-danger ctrlbtn';
