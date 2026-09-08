@@ -428,6 +428,60 @@ class ChaseCamControl {
     }
 }
 
+/**
+ * Custom Mapbox GL control: a single toggle button that switches the 3D
+ * map between icons-only mode (all markers render as flat DOM icons, GLB
+ * models hidden) and the normal zoom-based LOD swap.  Mounted bottom-
+ * left of the 3D map, above the ChaseCamControl (follow) button.
+ *
+ * active = icons-only mode ON (flat icons everywhere, no GLB swap).
+ * inactive = normal LOD logic (GLB models above zoom threshold).
+ */
+class IconsOnlyControl {
+    constructor(map3d) {
+        this._map3d = map3d;
+        this._container = null;
+        this._btn = null;
+    }
+
+    onAdd() {
+        this._container = document.createElement('div');
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group css_map3d_iconsonly_ctrl';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'css_map3d_iconsonly_toggle';
+        btn.title = 'Toggle icons-only mode (force flat icons, disable 3D models)';
+        btn.innerHTML = '<i class="bi bi-badge-3d"></i>';
+        btn.addEventListener('click', () => {
+            const on = this._map3d.m_iconsOnlyMode;
+            this._map3d.fn_setIconsOnlyMode(!on);
+            this._updateState();
+        });
+        this._container.appendChild(btn);
+        this._btn = btn;
+        this._updateState();
+        return this._container;
+    }
+
+    _updateState() {
+        if (!this._btn) return;
+        if (this._map3d.m_iconsOnlyMode) {
+            this._btn.classList.add('active');
+        } else {
+            this._btn.classList.remove('active');
+        }
+    }
+
+    onRemove() {
+        this._btn = null;
+        if (this._container?.parentNode) {
+            this._container.parentNode.removeChild(this._container);
+        }
+        this._container = null;
+    }
+}
+
 class CAndruavMap3D {
     constructor() {
         this.m_map = null;
@@ -582,6 +636,11 @@ class CAndruavMap3D {
         // scaled 3D model looks wrong (too tiny/huge) once zoomed far out.
         this.m_modelLayerReady = false;
         this.m_modelLodActive = false;          // true when models are currently shown instead of DOM markers
+        // Icons-only mode: when true, the 3D map always renders flat DOM
+        // icons and never swaps to glTF models, regardless of zoom. Toggled
+        // by the IconsOnlyControl button (bottom-left, above follow). When
+        // false, the normal zoom-based LOD swap (fn_updateModelLod) applies.
+        this.m_iconsOnlyMode = js_localStorage.fn_getMap3dIconsOnly();
         this.m_unitModelFeatures = new Map();   // unitId -> GeoJSON Feature (kept so we can setData() the whole collection)
         // Guards the 'zoom' handler below: Mapbox fires 'zoom' continuously
         // (many times per second) during a zoom gesture, but the LOD/scale
@@ -877,6 +936,9 @@ class CAndruavMap3D {
         this.m_map.addControl(new ModelSizeControl(this, 'adsb', 'ADSB'), 'top-left');
         // Chase-cam (follow) toggle button, bottom-left.
         this.m_map.addControl(new ChaseCamControl(this), 'bottom-left');
+        // Icons-only toggle (force flat icons, disable GLB models) — placed
+        // bottom-left, above the follow button.
+        this.m_map.addControl(new IconsOnlyControl(this), 'bottom-left');
 
         // While follow mode is on, user drag/rotate/zoom/pitch gestures
         // pause the per-tick camera tracking and re-capture the frozen
@@ -1174,10 +1236,31 @@ class CAndruavMap3D {
     fn_updateModelLod() {
         if (!this.m_map || !this.m_modelLayerReady) return;
 
+        // Icons-only mode forces flat DOM icons at every zoom — the GLB
+        // model layers stay hidden and markers never swap to transparent.
+        if (this.m_iconsOnlyMode) {
+            if (this.m_modelLodActive) {
+                this.m_modelLodActive = false;
+                this.fn_applyIconModeToAllMarkers();
+            }
+            this.fn_setModelLayerVisibility(false);
+            return;
+        }
+
         const showModels = this.m_map.getZoom() >= CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD;
         if (showModels === this.m_modelLodActive) return;
         this.m_modelLodActive = showModels;
 
+        this.fn_applyLodToAllMarkers(showModels);
+        this.fn_setModelLayerVisibility(showModels);
+    }
+
+    /**
+     * Applies the given LOD state (true = GLB models, false = DOM icons)
+     * to every marker category: units, destinations, and ADSB (GLB mode only).
+     * Extracted from fn_updateModelLod so fn_setIconsOnlyMode can reuse it.
+     */
+    fn_applyLodToAllMarkers(showModels) {
         this.m_markers.forEach(marker => {
             this.fn_applyMarkerIconForMode(marker, showModels);
         });
@@ -1201,6 +1284,60 @@ class CAndruavMap3D {
             this.m_adsbMarkers.forEach(marker => {
                 this.fn_applyMarkerIconForMode(marker, showModels);
             });
+        }
+    }
+
+    /**
+     * Convenience: force every marker to its real DOM icon (icon mode).
+     * Used when entering icons-only mode.
+     */
+    fn_applyIconModeToAllMarkers() {
+        this.fn_applyLodToAllMarkers(false);
+    }
+
+    /**
+     * Shows or hides the 3D glTF model layers (unit + ADSB) by toggling
+     * their Mapbox layout 'visibility'. The layers are created with a
+     * minzoom that already hides them below the LOD threshold; this is an
+     * explicit on/off for icons-only mode (and the normal LOD swap).
+     * @param {boolean} visible
+     */
+    fn_setModelLayerVisibility(visible) {
+        if (!this.m_map || !this.m_modelLayerReady) return;
+        const v = visible ? 'visible' : 'none';
+        const unitLayer = this.m_map.getLayer('unit-3d-models-layer');
+        if (unitLayer) this.m_map.setLayoutProperty('unit-3d-models-layer', 'visibility', v);
+        const adsbLayer = this.m_map.getLayer('adsb-3d-models-layer');
+        if (adsbLayer) this.m_map.setLayoutProperty('adsb-3d-models-layer', 'visibility', v);
+    }
+
+    /**
+     * Toggles icons-only mode on the 3D map. When ON, all markers render
+     * as flat DOM icons and the glTF model layers are hidden, regardless of
+     * zoom. When OFF, the normal zoom-based LOD swap (fn_updateModelLod)
+     * resumes. Called by the IconsOnlyControl button.
+     * @param {boolean} on
+     */
+    fn_setIconsOnlyMode(on) {
+        this.m_iconsOnlyMode = !!on;
+        js_localStorage.fn_setMap3dIconsOnly(this.m_iconsOnlyMode);
+
+        if (!this.m_map || !this.m_modelLayerReady) return;
+
+        if (this.m_iconsOnlyMode) {
+            // Force icon mode immediately.
+            this.m_modelLodActive = false;
+            this.fn_applyIconModeToAllMarkers();
+            this.fn_setModelLayerVisibility(false);
+        } else {
+            // Re-evaluate the LOD for the current zoom (may re-enable GLB).
+            // Force m_modelLodActive to the opposite of what the zoom says so
+            // fn_updateModelLod's early-return guard doesn't skip the work,
+            // and explicitly restore model-layer visibility for the zoom.
+            const showModels = this.m_map.getZoom() >= CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD;
+            this.m_modelLodActive = !showModels; // force re-eval
+            this.fn_updateModelLod();
+            this.fn_updateModelScale();
         }
     }
 

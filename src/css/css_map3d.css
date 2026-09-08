@@ -189,6 +189,39 @@
   color: #fff;
 }
 
+/* Icons-only toggle control — single button, bottom-left of the 3D map,
+   stacked above the follow button. active = icons-only mode ON (flat DOM
+   icons everywhere, GLB models hidden). inactive = normal zoom-based LOD. */
+.css_map3d_iconsonly_ctrl {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.css_map3d_iconsonly_ctrl button.css_map3d_iconsonly_toggle {
+  border: none;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.css_map3d_iconsonly_ctrl button.css_map3d_iconsonly_toggle:hover {
+  background: #e0e0e0;
+}
+
+.css_map3d_iconsonly_ctrl button.css_map3d_iconsonly_toggle.active {
+  background: #2c3e50;
+  color: #fff;
+}
+
 /* Draggable handle for the guided-target ground marker (3D map).
  * Invisible fill — the visible crosshair is the GeoJSON line layer; this
  * element only exists to capture Mapbox's native drag gesture. Sized as

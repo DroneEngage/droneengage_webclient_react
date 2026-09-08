@@ -12,6 +12,7 @@ import {
 	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
+	LS_MAP3D_ICONS_ONLY,
 } from './storage/localstorage_keys.js';
 
 class CLocalStorage {
@@ -413,6 +414,17 @@ class CLocalStorage {
 
     fn_getAdvancedOptionsEnabled() {
         return this._getValue('_vAdvancedOptionsEnabled', 'true') === 'true';
+    }
+
+    // 3D Map Icons-Only mode (runtime preference). When true, the 3D map
+    // always renders flat DOM icons and never swaps to glTF models,
+    // regardless of zoom. Defaults to false (current GLB LOD logic).
+    fn_setMap3dIconsOnly(value) {
+        this._setValue(LS_MAP3D_ICONS_ONLY, value.toString());
+    }
+
+    fn_getMap3dIconsOnly() {
+        return this._getValue(LS_MAP3D_ICONS_ONLY, 'false') === 'true';
     }
 
     // GCS Display Enabled
