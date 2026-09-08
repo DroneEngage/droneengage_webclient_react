@@ -14,6 +14,27 @@ export const quad_icon = [
 	'/images/drone_qq_4_0d.png',
 ];
 
+// 3D glb color mapping for the quad variants. The 3D map (js_map3d.js
+// fn_syncUnitModel) picks a glb per unit by `m_index % 4` — the same
+// index used to pick the 2D quad_icon PNG above — so each 3D variant is
+// the 3D counterpart of its 2D icon. These hex colors are the ones baked
+// into public/models/quad[_1..4].glb by scripts/generate_quad_glb.js
+// (body / rear rotors / front rotors / chassis). Front rotors are white
+// across all variants to mark the drone's forward direction. Regenerate
+// the .glb files with these colors if the 2D icons ever change.
+//   idx 0 → quad.glb   (default, no 2D counterpart)
+//   idx 1 → quad_1.glb (matches drone_qq_1_0d.png)
+//   idx 2 → quad_2.glb (matches drone_qq_2_0d.png)
+//   idx 3 → quad_3.glb (matches drone_qq_3_0d.png)
+//   idx 4 → quad_4.glb (matches drone_qq_4_0d.png)
+export const quad_glb_colors = [
+	{ body: '#6c6c73', rearRotors: '#ed6150', frontRotors: '#ffffff', chassis: '#6c6c73' }, // quad.glb
+	{ body: '#36ab36', rearRotors: '#36ab36', frontRotors: '#ffffff', chassis: '#3671ab' }, // quad_1.glb
+	{ body: '#f65353', rearRotors: '#f65353', frontRotors: '#ffffff', chassis: '#36ab36' }, // quad_2.glb
+	{ body: '#3671ab', rearRotors: '#3671ab', frontRotors: '#ffffff', chassis: '#f65353' }, // quad_3.glb
+	{ body: '#f65353', rearRotors: '#f65353', frontRotors: '#ffffff', chassis: '#7584d3' }, // quad_4.glb
+];
+
 export const rover_icon = [
 	'/images/car1.png',
 	'/images/car2.png',
@@ -78,6 +99,6 @@ export const DIALOG_ICONS = Object.freeze({
 });
 
 Object.freeze({
-	planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors,
+	planes_icon, quad_icon, quad_glb_colors, rover_icon, boat_icon, flightPath_colors,
 	swarm_quad_location_icon, swarm_plane_location_icon, v_colorDrawPathes,
 });

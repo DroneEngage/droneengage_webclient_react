@@ -20,7 +20,7 @@ Each script:
 | ------------------------------- | ------------------------------- | ---------------------------------------------------- |
 | `generate_arrow_glb.js`         | `public/models/arrow.glb`       | Yellow-orange cone arrowhead (heading indicator).    |
 | `generate_plane_glb.js`         | `public/models/plane.glb`       | Yellow fixed-wing plane (fuselage + wings + fin).    |
-| `generate_quad_glb.js`          | `public/models/quad.glb`        | Quadcopter X-frame, 2 materials (body + red rotors). |
+| `generate_quad_glb.js`          | `public/models/quad.glb`        | Quadcopter X-frame, 4 materials (body + rear rotors + white front rotors + chassis). |
 | `generate_groundstation_glb.js` | `public/models/groundstation.glb` | Blue ground-station box + antenna rod + cap.       |
 | `generate_homebase_glb.js`      | `public/models/homebase.glb`      | Rounded helipad disc + rim + white "H" mark (home).|
 
