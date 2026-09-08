@@ -111,6 +111,15 @@
   padding: 3px 6px;
 }
 
+/* Override Mapbox GL's .mapboxgl-ctrl-group button:focus box-shadow, which
+   otherwise makes a clicked step button look "always pressed" (the minus
+   button is first and retains focus after a click). These buttons have
+   their own visual feedback (hover + disabled state). */
+.css_map3d_modelsize_ctrl button.css_map3d_modelsize_step:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .css_map3d_modelsize_ctrl button.css_map3d_modelsize_step:disabled {
   opacity: 0.35;
   cursor: not-allowed;
