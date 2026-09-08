@@ -7,6 +7,7 @@ import { EVENTS as js_event } from '../events/js_eventList.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_andruavUnit from '../js_andruavUnit';
 import * as js_mapboxVendor from './js_mapboxVendor.js';
+import { ModelHitTester } from './js_modelHitTester.js';
 import '../../css/css_map3d.css';
 
 /**
@@ -19,6 +20,24 @@ import '../../css/css_map3d.css';
  * a transparent icon on top of the model to handle interaction natively.
  */
 const TRANSPARENT_ICON_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+/**
+ * Ground footprint (meters) of each registered glTF model — the larger of
+ * the model's X/Z bounding-box extents. Used by fn_computeModelHitRadius
+ * to compute the on-screen hit radius for the ModelHitTester. Measured
+ * from the .glb POSITION accessor min/max in public/models/.
+ */
+const MODEL_FOOTPRINT_M = {
+    'drone-arrow': 2.5,
+    'drone-plane': 4.0,
+    'drone-quad': 2.456, 'drone-quad-1': 2.456, 'drone-quad-2': 2.456, 'drone-quad-3': 2.456, 'drone-quad-4': 2.456,
+    'drone-boat': 4.0, 'drone-boat-1': 4.0, 'drone-boat-2': 4.0, 'drone-boat-3': 4.0, 'drone-boat-4': 4.0,
+    'drone-car': 3.0, 'drone-car-1': 3.0, 'drone-car-2': 3.0, 'drone-car-3': 3.0, 'drone-car-4': 3.0,
+    'ground-station': 1.0
+};
+const MODEL_FOOTPRINT_DEFAULT_M = 2.5;   // fallback for unknown modelIds
+const MODEL_HIT_MIN_PX = 32;             // never smaller than the CSS marker default
+const MODEL_HIT_MAX_PX = 480;            // cap so a huge multiplier can't cover the whole map
 
 /**
  * Custom Mapbox GL control: three buttons (x1, x2, x5) that switch the
@@ -653,6 +672,14 @@ class CAndruavMap3D {
         // CONST_MAP3D_ADSB_RENDER_MODE === 'glb' (see fn_syncAdsbObject).
         this.m_adsbModelFeatures = new Map();   // icao_address -> GeoJSON Feature
 
+        // ---- Screen-space hit testing for glTF models (GLB mode) ----
+        // Mapbox's model-layer hit-testing is broken for GeoJSON-backed
+        // model layers (mapbox-gl-js#13598).  The ModelHitTester works
+        // around this by tracking each model's screen-space circle and
+        // firing click/hover callbacks when the cursor is inside it.
+        // Enabled only while m_modelLodActive is true (GLB models visible).
+        this.m_modelHitTester = null;
+
         // ---- Guided-target ground marker drag handle ----
         // The visible crosshair is a GeoJSON line layer (see
         // fn_drawTargetMarker); this invisible draggable Mapbox Marker
@@ -696,15 +723,17 @@ class CAndruavMap3D {
      * Used to deselect the currently highlighted ADSB aircraft when the user
      * clicks anywhere that isn't a marker — DOM marker click handlers call
      * stopPropagation() so this only fires for actual background clicks.
-     * In GLB mode the DOM markers are kept alive but transparent (see
-     * fn_syncAdsbObject / fn_updateModelLod) precisely so they still catch
-     * clicks natively, avoiding the broken Mapbox model-layer hit-testing
-     * (mapbox-gl-js#13598).
+     * In GLB mode the DOM markers are transparent and have
+     * pointer-events:none, so clicks fall through to the canvas; the
+     * ModelHitTester consumes those that land on a glTF model before the
+     * background callbacks run.
      */
     fn_registerMapClickHandler() {
         if (!this.m_map || this.m_isMapClickBound) return;
 
-        this.m_map.on('click', () => {
+        this.m_map.on('click', (e) => {
+            // In GLB mode, check if the click hit a 3D model first.
+            if (this.m_modelHitTester?.consumeClick(e) === true) return;
             this.m_mapClickCallbacks.forEach(callback => callback());
         });
 
@@ -835,6 +864,12 @@ class CAndruavMap3D {
             antialias: true,
             doubleClickZoom: false
         });
+
+        // Screen-space hit tester for glTF models (enabled when GLB LOD is
+        // active — see fn_updateModelLod).  Created here, right after the
+        // map, so consumeClick is available before fn_registerMapClickHandler
+        // is called from js_main.js.
+        this.m_modelHitTester = new ModelHitTester(this.m_map);
 
         // Mapbox GL JS v3.x can throw uncaught DOMExceptions in its web
         // worker when a sprite/image in the style can't be decoded (e.g.
@@ -1242,6 +1277,7 @@ class CAndruavMap3D {
             if (this.m_modelLodActive) {
                 this.m_modelLodActive = false;
                 this.fn_applyIconModeToAllMarkers();
+                this.m_modelHitTester?.setEnabled(false);
             }
             this.fn_setModelLayerVisibility(false);
             return;
@@ -1253,6 +1289,8 @@ class CAndruavMap3D {
 
         this.fn_applyLodToAllMarkers(showModels);
         this.fn_setModelLayerVisibility(showModels);
+        // Enable screen-space hit testing only while GLB models are visible.
+        this.m_modelHitTester?.setEnabled(showModels);
     }
 
     /**
@@ -1329,6 +1367,7 @@ class CAndruavMap3D {
             this.m_modelLodActive = false;
             this.fn_applyIconModeToAllMarkers();
             this.fn_setModelLayerVisibility(false);
+            this.m_modelHitTester?.setEnabled(false);
         } else {
             // Re-evaluate the LOD for the current zoom (may re-enable GLB).
             // Force m_modelLodActive to the opposite of what the zoom says so
@@ -1650,6 +1689,100 @@ class CAndruavMap3D {
         if (iconEl && url) {
             iconEl.style.backgroundImage = `url('${url}')`;
         }
+        // In GLB mode the DOM marker is visually invisible; disable its
+        // pointer events so clicks/hover fall through to the canvas, where
+        // the ModelHitTester handles them via screen-space hit testing.
+        // In icon mode, restore pointer events for native DOM interaction.
+        const el = marker.getElement?.();
+        if (el) {
+            el.style.pointerEvents = modelActive ? 'none' : '';
+        }
+    }
+
+    /**
+     * Estimates the on-screen hit radius (pixels) of a glTF model so the
+     * ModelHitTester can use it as the circular hit area. The model is
+     * zoom-compensated to a roughly constant screen size
+     * (fn_computeModelScale), so on-screen px = footprint_m * scale /
+     * metersPerPixel, where metersPerPixel = 156543.03 * cos(lat) / 2^zoom.
+     * @param {string} modelId registered model id (e.g. 'drone-quad-1')
+     * @param {number} lat unit/aircraft latitude (degrees)
+     * @param {'unit'|'adsb'} [target='unit'] which size multiplier to apply
+     * @returns {number} hit radius in pixels (clamped)
+     */
+    fn_computeModelHitRadius(modelId, lat, target = 'unit') {
+        if (!this.m_map) return MODEL_HIT_MIN_PX;
+        const footprint = MODEL_FOOTPRINT_M[modelId] || MODEL_FOOTPRINT_DEFAULT_M;
+        const zoom = this.m_map.getZoom();
+        const scale = this.fn_computeModelScale(zoom, target)[0];
+        // Clamp cos(lat) so high-latitude drones don't blow up the hit area
+        // (and to avoid divide-by-near-zero near the poles).
+        const cosLat = Math.max(0.1, Math.cos((Number.isFinite(lat) ? lat : 0) * Math.PI / 180));
+        const metersPerPixel = 156543.03 * cosLat / Math.pow(2, zoom);
+        const px = footprint * scale / metersPerPixel;
+        return Math.max(MODEL_HIT_MIN_PX, Math.min(MODEL_HIT_MAX_PX, px));
+    }
+
+    /**
+     * Registers (or replaces) a screen-space hit target for a glTF model
+     * with the ModelHitTester. The target's screen center is read from the
+     * DOM marker's getBoundingClientRect (which accounts for altitude and
+     * terrain projection — map.project() does not). Click/hover callbacks
+     * invoke the marker's existing DOM event handlers (stored by
+     * fn_addListenerOnMarker) so the same js_main.js callbacks fire
+     * regardless of whether the user clicks the 32x32 DOM marker or the
+     * larger glb hit area.
+     * @param {string} id unique target id (unit partyId or ADSB icao)
+     * @param {mapboxgl.Marker} marker the DOM marker backing this model
+     * @param {string} modelId registered model id (for footprint lookup)
+     * @param {number} lat unit/aircraft latitude (degrees)
+     * @param {'unit'|'adsb'} [target='unit'] which size multiplier to apply
+     * @param {Function} [adsbClickCallback] ADSB-only click callback (units
+     *        use marker.m_event_handlers; ADSB uses a direct callback)
+     */
+    fn_registerModelHitTarget(id, marker, modelId, lat, target = 'unit', adsbClickCallback = null) {
+        if (!this.m_modelHitTester || !marker) return;
+
+        const map = this.m_map;
+        const canvas = map.getCanvas();
+
+        this.m_modelHitTester.addTarget(id, {
+            // Screen center from the DOM marker's actual rendered position
+            // (accounts for altitude/terrain — map.project() does not).
+            getScreenCenter: () => {
+                const el = marker.getElement?.();
+                if (!el) return null;
+                const rect = el.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                return {
+                    x: rect.left - canvasRect.left + rect.width / 2,
+                    y: rect.top - canvasRect.top + rect.height / 2
+                };
+            },
+            getScreenRadius: () => this.fn_computeModelHitRadius(modelId, lat, target),
+
+            // Units: invoke the DOM event handlers stored by
+            // fn_addListenerOnMarker (click/mouseover/mouseout).
+            // ADSB: invoke the direct callback (fn_syncAdsbObject binds
+            // click via addEventListener, not fn_addListenerOnMarker).
+            onClick: () => {
+                if (adsbClickCallback) {
+                    adsbClickCallback();
+                } else {
+                    marker.m_event_handlers?.click?.forEach(h => h());
+                }
+            },
+            onMouseEnter: () => {
+                if (!adsbClickCallback) {
+                    marker.m_event_handlers?.mouseover?.forEach(h => h());
+                }
+            },
+            onMouseLeave: () => {
+                if (!adsbClickCallback) {
+                    marker.m_event_handlers?.mouseout?.forEach(h => h());
+                }
+            }
+        });
     }
 
     /**
@@ -1945,6 +2078,14 @@ class CAndruavMap3D {
             geometry: { type: 'Point', coordinates: [lng, lat] }
         });
 
+        // Register a screen-space hit target so clicks/hover on the glb
+        // model are detected by the ModelHitTester (the DOM marker has
+        // pointer-events:none in GLB mode).
+        const marker = this.m_markers.get(id);
+        if (marker) {
+            this.fn_registerModelHitTarget(id, marker, modelId, lat, 'unit');
+        }
+
         this.fn_flushUnitModels();
     }
 
@@ -2195,6 +2336,10 @@ class CAndruavMap3D {
         // stopPropagation keeps the background map-click handler (which
         // deselects) from also firing right after selecting an aircraft.
         if (markerEl && typeof onClickCallback === 'function' && !marker._adsbClickBound) {
+            // Store the callback so the ModelHitTester can invoke it in GLB
+            // mode (where the DOM marker has pointer-events:none and the
+            // hit tester dispatches clicks instead).
+            marker._adsbClickCallback = () => onClickCallback(p_adsbObject);
             markerEl.addEventListener('click', (evt) => {
                 evt.stopPropagation();
                 onClickCallback(p_adsbObject);
@@ -2224,6 +2369,14 @@ class CAndruavMap3D {
         // rotation precision in Mapbox), so the DOM marker must show its
         // real icon with correct heading instead.
         this.fn_applyMarkerIconForMode(marker, isGlbMode && this.m_modelLodActive);
+
+        // fn_syncAdsbModel (called above) tries to register the hit target
+        // but on the first tick the marker doesn't exist yet in
+        // m_adsbMarkers. Register here too to cover the first tick —
+        // addTarget is idempotent (replaces if already registered).
+        if (isGlbMode && marker._adsbClickCallback) {
+            this.fn_registerModelHitTarget(icao, marker, 'drone-plane', lat, 'adsb', marker._adsbClickCallback);
+        }
 
         return marker;
     }
@@ -2257,6 +2410,15 @@ class CAndruavMap3D {
             },
             geometry: { type: 'Point', coordinates: [lng, lat] }
         });
+
+        // Register a screen-space hit target so clicks on the glb model
+        // are detected by the ModelHitTester (the DOM marker has
+        // pointer-events:none in GLB mode). The click callback was stored
+        // on the marker by fn_syncAdsbObject (marker._adsbClickCallback).
+        const marker = this.m_adsbMarkers.get(icao);
+        if (marker) {
+            this.fn_registerModelHitTarget(icao, marker, 'drone-plane', lat, 'adsb', marker._adsbClickCallback);
+        }
 
         this.fn_flushAdsbModels();
     }
@@ -2371,6 +2533,8 @@ class CAndruavMap3D {
         const icao = p_adsbObject?.m_icao_address;
         if (!icao) return;
 
+        this.m_modelHitTester?.removeTarget(icao);
+
         const marker = this.m_adsbMarkers.get(icao);
         if (marker) {
             marker.remove();
@@ -2443,6 +2607,10 @@ class CAndruavMap3D {
 
         // glTF model LOD layer (single set, flagged)
         this.m_modelLayerReady = false;
+
+        // Disable hit testing while the model layer is being rebuilt —
+        // fn_setupModelLodLayer → fn_updateModelLod will re-enable it.
+        this.m_modelHitTester?.setEnabled(false);
     }
 
     /**
