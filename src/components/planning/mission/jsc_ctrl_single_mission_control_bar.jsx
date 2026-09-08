@@ -244,9 +244,8 @@ export class ClssSingleMissionControlBar extends React.Component {
 
     /**
      * Save the current mission to cloud storage.
-     * If a drone is selected and identified, uses the drone's unitID (m_unitName)
-     * as the storage key so the drone can later query for its own plan by name.
-     * Otherwise prompts for a name and saves to the general bucket.
+     * Missions are saved under the '_general_' unit scope so they are shared
+     * across all drones in the account, not tied to a specific one.
      */
     fn_saveMissionToCloud() {
         if (this.props.p_mission == null) return;
@@ -254,40 +253,24 @@ export class ClssSingleMissionControlBar extends React.Component {
         const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
         const c_mission_text = this.props.p_mission.fn_exportToDE_V1(v_andruavUnit);
 
-        if (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown") {
-            const unitId = v_andruavUnit.m_unitName;
-            fn_do_modal_confirmation("Save Mission to Cloud",
-                "Save mission for " + unitId + " to cloud storage?", function (p_approved) {
-                    if (p_approved === false) return;
+        const missionName = window.prompt("Enter mission name:", "Mission " + new Date().toISOString().slice(0, 10));
+        if (missionName === null || missionName === "") return;
 
-                    const missionId = unitId + '_' + Date.now();
-                    const missionName = unitId + ' Mission ' + new Date().toISOString().slice(0, 10);
-                    const missionData = JSON.parse(c_mission_text);
+        const unitId = '_general_';
+        const missionId = unitId + '_' + Date.now();
+        const missionData = JSON.parse(c_mission_text);
 
-                    js_session.fn_getAndruavFacade().API_saveMission(unitId, missionId, missionName, missionData);
-                }, "YES", "bg-info txt-theme-aware");
-        } else {
-            const missionName = window.prompt("Enter mission name:", "Mission " + new Date().toISOString().slice(0, 10));
-            if (missionName === null || missionName === "") return;
-
-            const missionId = '_general_' + '_' + Date.now();
-            const missionData = JSON.parse(c_mission_text);
-
-            js_session.fn_getAndruavFacade().API_saveMission('_general_', missionId, missionName, missionData);
-        }
+        js_session.fn_getAndruavFacade().API_saveMission(unitId, missionId, missionName, missionData);
     }
 
     /**
      * Load a mission from cloud storage.
      * Shows a confirmation dialog before proceeding.
-     * If a drone is selected, loads missions for that drone. Otherwise loads general missions.
-     * The most recent mission will be imported and displayed on the map.
+     * Lists all missions saved under '_general_' regardless of the selected
+     * drone. The user picks one from the selection dialog.
      */
     fn_loadMissionFromCloud() {
-        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
-        const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
-            ? v_andruavUnit.m_unitName
-            : '_general_';
+        const unitId = '_general_';
 
         fn_do_modal_confirmation("Load Mission from Cloud",
             "Are you sure you want to load mission from cloud storage? Current mission will be replaced.", function (p_approved) {
@@ -299,14 +282,11 @@ export class ClssSingleMissionControlBar extends React.Component {
 
     /**
      * List missions from cloud storage without loading.
-     * Fetches all saved missions for the selected drone (or general) and shows
-     * a selection dialog. The user can then pick one to load.
+     * Fetches all missions saved under '_general_' and shows a selection
+     * dialog. The user can then pick one to load.
      */
     fn_listMissionsFromCloud() {
-        const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.m_selected_unit);
-        const unitId = (v_andruavUnit !== null && v_andruavUnit.m_defined === true && v_andruavUnit.m_unitName && v_andruavUnit.m_unitName !== "unknown")
-            ? v_andruavUnit.m_unitName
-            : '_general_';
+        const unitId = '_general_';
 
         js_session.fn_getAndruavFacade().API_loadMission(unitId);
     }
