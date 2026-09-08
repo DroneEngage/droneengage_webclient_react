@@ -542,6 +542,16 @@ class CAndruavMap3D {
         this.m_destAltSources = new Map();       // unitId -> sourceId
         this.m_destAltLayers = new Map();        // unitId -> layerId
 
+        // ---- 3D home markers (mirrors leaflet's EVT_HomePointChanged) ----
+        // A ground-draped helipad (circle ring + "H" line segments) marks each
+        // unit's home position, plus a small DOM home icon for click interaction
+        // (opens the "Home of <unit>" info popup, same as the 2D map).
+        // m_homeData is preserved across hide/show so fn_show can replay.
+        this.m_homeMarkers = new Map();         // unitId -> mapboxgl.Marker
+        this.m_homeData = new Map();            // unitId -> { lat, lng, color }
+        this.m_homeSources = new Map();         // unitId -> sourceId
+        this.m_homeLayers = new Map();          // unitId -> layerId
+
         this.m_terrainExaggeration = 1.3;        // current terrain exaggeration factor (adjustable via x1/x2/x5 buttons)
         this.m_modelSizeMultiplierUnits = 1;     // user-selected size multiplier for drone units (x1/x2/x5, top-left)
         this.m_modelSizeMultiplierAdsb = 1;      // user-selected size multiplier for ADSB aircraft (x1/x2/x5, top-left)
@@ -845,6 +855,8 @@ class CAndruavMap3D {
             // Draw any destination/swarm-target markers that arrived while
             // the map was still loading.
             this.fn_replayDestinationPoints();
+            // Draw any home markers that arrived while the map was still loading.
+            this.fn_replayHomePoints();
         });
 
         // Toggle DOM markers vs. 3D glTF models, and rescale the models to
@@ -1403,6 +1415,12 @@ class CAndruavMap3D {
                     this.fn_applyMarkerIconForMode(marker, this.m_modelLodActive);
                 });
 
+                // Same re-projection fix for home markers.
+                this.m_homeMarkers.forEach(marker => {
+                    const lngLat = marker.getLngLat?.();
+                    if (lngLat) marker.setLngLat(lngLat);
+                });
+
                 // Re-draw any missions that were stored while the 3D tab was
                 // hidden — markers created against a zero-size container don't
                 // project correctly, so we replay them now that it's visible.
@@ -1411,6 +1429,10 @@ class CAndruavMap3D {
                 // Re-draw any destination/swarm-target markers that were
                 // stored while the 3D tab was hidden (same reason as missions).
                 this.fn_replayDestinationPoints();
+
+                // Re-draw any home markers that were stored while the 3D tab
+                // was hidden (same reason as missions/destinations).
+                this.fn_replayHomePoints();
 
                 // fn_flushAdsbTethers() was skipped while hidden (see its
                 // m_isVisible guard) - if an aircraft is/was selected, its
@@ -2274,6 +2296,10 @@ class CAndruavMap3D {
         this.m_destGroundLayers.clear();
         this.m_destAltSources.clear();
         this.m_destAltLayers.clear();
+
+        // Home helipad layers (per unit) — m_homeData is kept for replay
+        this.m_homeSources.clear();
+        this.m_homeLayers.clear();
 
         // ADSB shared layers (single set, flagged)
         this.m_adsbLayersReady = false;
@@ -3581,6 +3607,203 @@ class CAndruavMap3D {
             const unit = js_session.fn_getAndruavUnitList()?.fn_getUnit(id);
             if (unit) {
                 this.fn_syncDestinationPoint(unit, lat, lng, iconUrl, altRelative);
+            }
+        });
+    }
+
+    // ---- Home helipad ground marker (circle ring + "H") ----
+    // Drawn for each unit's home position, mirroring the 2D leaflet home
+    // marker (EVT_HomePointChanged).  Uses a single GeoJSON source + line
+    // layer per unit, terrain-draped (no elevation), so the helipad sits
+    // flat on the ground.  A small DOM home icon is added on top for click
+    // interaction (opens the "Home of <unit>" info popup, same as 2D).
+    static HOME_MARKER_RADIUS = 8;       // helipad circle radius (meters)
+    static HOME_MARKER_COLOR  = '#3b82f6'; // blue — matches home_b icon family
+    static HOME_MARKER_WIDTH  = 3;
+    static HOME_H_HALF        = 3;       // "H" bar half-length (meters)
+    static HOME_H_BAR         = 0.6;     // "H" stroke thickness (meters)
+
+    /**
+     * Builds the GeoJSON FeatureCollection for the home helipad ground
+     * marker: a circle ring (the pad outline) + an "H" made of three line
+     * segments (two verticals + one horizontal crossbar).  All terrain-
+     * draped (no elevation), matching the guided-target marker style.
+     * @param {number} lat
+     * @param {number} lng
+     * @returns {object} GeoJSON FeatureCollection.
+     */
+    fn_buildHomeMarkerGeoJSON(lat, lng) {
+        const R = CAndruavMap3D.HOME_MARKER_RADIUS;
+        const ringCoords = this.fn_generateCircleRing(lng, lat, R);
+
+        const latRad = lat * Math.PI / 180;
+        const metersPerDegLat = 111320;
+        const metersPerDegLng = 111320 * Math.cos(latRad);
+
+        const hHalf = CAndruavMap3D.HOME_H_HALF;        // vertical bar half-length (meters)
+        const hBar  = CAndruavMap3D.HOME_H_BAR;         // stroke thickness (meters)
+        const hGap  = R * 0.45;                         // horizontal gap between the two verticals
+
+        // Convert meter offsets to degree offsets.
+        const dLat = hHalf / metersPerDegLat;
+        const dLngV = hBar / metersPerDegLng;           // vertical bar thickness (X)
+        const dLatV = hBar / metersPerDegLat;           // vertical bar thickness (Y)
+        const gapLng = hGap / metersPerDegLng;
+        const hHalfLng = gapLng;   // crossbar spans between the two verticals
+
+        // Two vertical bars (N-S) and one horizontal crossbar (E-W).
+        // Each is a thin rectangle approximated by its outline as a closed
+        // LineString (5 points).
+        const vBarWest = [
+            [lng - gapLng - dLngV, lat + dLat],
+            [lng - gapLng + dLngV, lat + dLat],
+            [lng - gapLng + dLngV, lat - dLat],
+            [lng - gapLng - dLngV, lat - dLat],
+            [lng - gapLng - dLngV, lat + dLat]
+        ];
+        const vBarEast = [
+            [lng + gapLng - dLngV, lat + dLat],
+            [lng + gapLng + dLngV, lat + dLat],
+            [lng + gapLng + dLngV, lat - dLat],
+            [lng + gapLng - dLngV, lat - dLat],
+            [lng + gapLng - dLngV, lat + dLat]
+        ];
+        const hCross = [
+            [lng - hHalfLng, lat + dLatV],
+            [lng + hHalfLng, lat + dLatV],
+            [lng + hHalfLng, lat - dLatV],
+            [lng - hHalfLng, lat - dLatV],
+            [lng - hHalfLng, lat + dLatV]
+        ];
+
+        return {
+            type: 'FeatureCollection',
+            features: [
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: ringCoords }, properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: vBarWest },  properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: vBarEast },  properties: {} },
+                { type: 'Feature', geometry: { type: 'LineString', coordinates: hCross },    properties: {} }
+            ]
+        };
+    }
+
+    /**
+     * Syncs (creates or updates) a unit's home helipad marker on the 3D map:
+     * a ground-draped circle + "H" line layer, plus a small DOM home icon
+     * for click interaction.  Mirrors the 2D leaflet home marker in
+     * EVT_HomePointChanged (js_main.js).
+     * @param {*} unit
+     * @param {number} lat
+     * @param {number} lng
+     */
+    fn_syncHomePoint(unit, lat, lng) {
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        const color = CAndruavMap3D.HOME_MARKER_COLOR;
+
+        // Store for replay (survives hide/show + style reloads) even when the
+        // 3D view is hidden — fn_show / the 'load' handler will replay it.
+        this.m_homeData.set(id, { lat, lng, color });
+
+        // Skip the actual marker work while the 3D view is hidden (same
+        // rationale as fn_syncUnit / fn_syncDestinationPoint).
+        if (!this.m_map || !this.m_isReady || !this.m_isVisible) return;
+
+        // --- GeoJSON helipad line layer (circle + "H") ---
+        const sourceId = `de-home-${id}`;
+        const layerId = `de-home-layer-${id}`;
+
+        if (!this.m_map.getSource(sourceId)) {
+            this.m_map.addSource(sourceId, {
+                type: 'geojson',
+                data: this.fn_buildHomeMarkerGeoJSON(lat, lng)
+            });
+            this.m_map.addLayer({
+                id: layerId,
+                type: 'line',
+                source: sourceId,
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                    // No line-z-offset / line-elevation-reference => drapes on terrain.
+                },
+                paint: {
+                    'line-color': color,
+                    'line-width': CAndruavMap3D.HOME_MARKER_WIDTH,
+                    'line-opacity': 0.9
+                }
+            });
+            this.m_homeSources.set(id, sourceId);
+            this.m_homeLayers.set(id, layerId);
+        } else {
+            this.m_map.getSource(sourceId).setData(this.fn_buildHomeMarkerGeoJSON(lat, lng));
+        }
+
+        // --- DOM home icon (click → home info popup) ---
+        let marker = this.m_homeMarkers.get(id);
+        if (!marker) {
+            const el = document.createElement('div');
+            el.className = 'css_map3d_home_marker';
+            el.title = `Home of: ${unit.m_unitName || id}`;
+
+            const iconEl = document.createElement('div');
+            iconEl.className = 'css_map3d_home_marker_icon';
+            iconEl.style.backgroundImage = `url('/images/home_b_24x24.png')`;
+            el.appendChild(iconEl);
+
+            marker = js_mapboxVendor.fn_createMarker({
+                element: el,
+                anchor: 'center',
+                pitchAlignment: 'viewport',
+                rotationAlignment: 'viewport'
+            })
+            .setLngLat([lng, lat])
+            .addTo(this.m_map);
+
+            this.m_homeMarkers.set(id, marker);
+        } else {
+            marker.setLngLat([lng, lat]);
+        }
+    }
+
+    /**
+     * Removes a unit's home helipad marker from the 3D map (and its stored
+     * replay data).  Called when the home point is cleared or the unit is
+     * disposed.
+     * @param {*} unit
+     */
+    fn_clearHomePoint(unit) {
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+
+        const marker = this.m_homeMarkers.get(id);
+        if (marker) {
+            marker.remove();
+            this.m_homeMarkers.delete(id);
+        }
+        this.m_homeData.delete(id);
+
+        const layerId = this.m_homeLayers.get(id);
+        const sourceId = this.m_homeSources.get(id);
+        this.fn_removeLayerAndSource(layerId, sourceId);
+        this.m_homeLayers.delete(id);
+        this.m_homeSources.delete(id);
+    }
+
+    /**
+     * Replays all stored home markers onto the map.  Called after the map
+     * finishes loading and whenever the 3D tab is shown (fn_show), so home
+     * points that arrived while the map wasn't ready or was hidden get drawn.
+     */
+    fn_replayHomePoints() {
+        if (!this.m_map || !this.m_isReady) return;
+        this.m_homeData.forEach(({ lat, lng }, id) => {
+            const unit = js_session.fn_getAndruavUnitList()?.fn_getUnit(id);
+            if (unit) {
+                this.fn_syncHomePoint(unit, lat, lng);
             }
         });
     }

@@ -226,3 +226,25 @@
   filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
   transform-origin: center center;
 }
+
+/* Home helipad DOM icon (3D map).
+ * Small ground-level home icon sitting on top of the terrain-draped
+ * helipad circle + "H" line layer.  Click opens the "Home of <unit>"
+ * info popup, mirroring the leaflet home marker in EVT_HomePointChanged. */
+.css_map3d_home_marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  cursor: pointer;
+}
+
+.css_map3d_home_marker_icon {
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
+  transform-origin: center center;
+}

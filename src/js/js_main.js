@@ -2978,6 +2978,14 @@ var EVT_HomePointChanged = function (me, p_andruavUnit) {
 
 	js_leafletmap.fn_setPosition(layers.m_marker_home.home_marker, v_latlng);
 
+	// Mirror the home marker on the 3D map as a ground-draped helipad
+	// (circle + "H") + small home icon, matching the 2D map home marker.
+	js_map3d.fn_syncHomePoint(
+		p_andruavUnit,
+		p_andruavUnit.m_Geo_Tags.p_HomePoint.lat,
+		p_andruavUnit.m_Geo_Tags.p_HomePoint.lng
+	);
+
 
 
 };

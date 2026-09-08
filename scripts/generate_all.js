@@ -28,6 +28,7 @@ const scripts = [
     ['generate_plane_glb.js',         'plane.glb'],
     ['generate_quad_glb.js',          'quad.glb'],
     ['generate_groundstation_glb.js', 'groundstation.glb'],
+    ['generate_homebase_glb.js',      'homebase.glb'],
     ['generate_car_glb.js',           'car.glb'],
     ['generate_boat_glb.js',          'boat.glb'],
 ];
