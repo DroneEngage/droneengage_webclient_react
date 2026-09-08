@@ -21,11 +21,6 @@ export class ClssAndruavUnitBase extends React.Component {
         this.m_flag_mounted = false;
 
         this.lastUpdateTime = null;
-
-        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, this, this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated, this, this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOn, this, this.fn_unitTelemetryOn);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOff, this, this.fn_unitTelemetryOFF);
     }
 
     fn_unitUpdated(me, p_andruavUnit) {
@@ -76,6 +71,10 @@ export class ClssAndruavUnitBase extends React.Component {
     childcomponentWillUnmount() { };
 
     componentDidMount() {
+        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, this, this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated, this, this.fn_unitUpdated);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOn, this, this.fn_unitTelemetryOn);
+        js_eventEmitter.fn_subscribe(js_event.EE_unitTelemetryOff, this, this.fn_unitTelemetryOFF);
         this.childcomponentWillMount();
     }
 

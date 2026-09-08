@@ -32,14 +32,13 @@ class ClssGCSChat extends ClssDialogBase {
         this.fn_onChatToggle = this.fn_onChatToggle.bind(this);
         this.fn_unitAdded = this.fn_unitAdded.bind(this);
         this.fn_unitOnlineChanged = this.fn_unitOnlineChanged.bind(this);
+    }
 
+    componentDidMount() {
         js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
         js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
         js_eventEmitter.fn_subscribe(js_event.EE_unitAdded, this, this.fn_unitAdded);
         js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged, this, this.fn_unitOnlineChanged);
-    }
-
-    componentDidMount() {
         this.m_flag_mounted = true;
         this.modalRef = this.m_panelRef;
         super.componentDidMount();

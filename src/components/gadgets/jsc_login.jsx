@@ -51,7 +51,9 @@ class ClssLoginControl extends React.Component {
     this.fn_onNewsToggle = this.fn_onNewsToggle.bind(this);
     this.fn_toggleNews = this.fn_toggleNews.bind(this);
     this.fn_onWebConnectorNotRunning = this.fn_onWebConnectorNotRunning.bind(this);
+  }
 
+  componentDidMount() {
     js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
     js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
@@ -61,8 +63,67 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_subscribe(js_event.EE_onNewsToggle, this, this.fn_onNewsToggle);
     js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
 
-  }
+    this.m_flag_mounted = true;
 
+    const tabStatus = getTabStatus();
+
+    const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
+    const usePlugin = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true ? lsPluginEnabled : false;
+    this.state.use_plugin = usePlugin;
+    if (this.chkUsePluginRef.current) {
+      this.chkUsePluginRef.current.checked = usePlugin;
+    }
+    switch (tabStatus) {
+      case 'new':
+        js_session.fn_setCurrentTabStatus('new');
+        console.log('This is a newly opened tab.');
+        break;
+      case 'refresh':
+        js_session.fn_setCurrentTabStatus('refresh');
+        console.log('This tab was refreshed.');
+        break;
+      case 'duplicate':
+        js_session.fn_setCurrentTabStatus('duplicate');
+        console.log('This tab is a duplicate.');
+        if (usePlugin !== true) {
+          js_localStorage.fn_resetUnitID();
+        }
+        break;
+      default:
+        js_session.fn_setCurrentTabStatus('unknown');
+        console.log('Unknown tab status.');
+    }
+
+    const queryParams = QueryString;
+
+    const hasRequiredParams =
+      queryParams.accesscode !== undefined ||
+      queryParams.email !== undefined ||
+      queryParams.groupName !== undefined ||
+      queryParams.unitName !== undefined;
+
+    if (hasRequiredParams && this.txtAccessCodeRef.current) {
+      this.txtAccessCodeRef.current.value = queryParams.accesscode || '';
+      this.txtLoginNameRef.current.value = queryParams.loginName || queryParams.email || '';
+      this.txtGroupNameRef.current.value = queryParams.groupName || '';
+      this.txtUnitIDRef.current.value = queryParams.unitName || '';
+    } else if (this.txtLoginNameRef.current && this.txtAccessCodeRef.current) {
+      this.txtLoginNameRef.current.value = js_localStorage.fn_getLoginName();
+      this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
+      if (this.txtGroupNameRef.current) {
+        this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
+      }
+      if (this.txtUnitIDRef.current) {
+        this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
+      }
+    }
+
+    if (queryParams.connect !== undefined) {
+      this.clickConnect(null);
+    }
+
+    this.setState({ m_update: 1 });
+  }
 
   fn_onSocketStatus(me, params) {
     const { t } = me.props; // Access t function
@@ -284,72 +345,6 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_unsubscribe(js_event.EE_News_Push, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_onNewsToggle, this);
     js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
-  }
-
-  componentDidMount() {
-    
-    this.m_flag_mounted = true;
-  
-    const tabStatus = getTabStatus();
-
-    const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
-    const usePlugin = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true ? lsPluginEnabled : false;
-    this.state.use_plugin = usePlugin;
-    if (this.chkUsePluginRef.current) {
-      this.chkUsePluginRef.current.checked = usePlugin;
-    }
-    switch (tabStatus) {
-      case 'new':
-        js_session.fn_setCurrentTabStatus('new');
-        console.log('This is a newly opened tab.');
-        break;
-      case 'refresh':
-        js_session.fn_setCurrentTabStatus('refresh');
-        console.log('This tab was refreshed.');
-        break;
-      case 'duplicate':
-        js_session.fn_setCurrentTabStatus('duplicate');
-        console.log('This tab is a duplicate.');
-        if (usePlugin !== true) {
-          js_localStorage.fn_resetUnitID();
-        }
-        break;
-      default:
-        js_session.fn_setCurrentTabStatus('unknown');
-        console.log('Unknown tab status.');
-    }
-
-    const queryParams = QueryString;
-
-    const hasRequiredParams =
-      queryParams.accesscode !== undefined ||
-      queryParams.email !== undefined ||
-      queryParams.groupName !== undefined ||
-      queryParams.unitName !== undefined;
-
-    if (hasRequiredParams && this.txtAccessCodeRef.current) {
-      this.txtAccessCodeRef.current.value = queryParams.accesscode || '';
-      this.txtLoginNameRef.current.value = queryParams.loginName || queryParams.email || '';
-      this.txtGroupNameRef.current.value = queryParams.groupName || '';
-      this.txtUnitIDRef.current.value = queryParams.unitName || '';
-    } else if (this.txtLoginNameRef.current && this.txtAccessCodeRef.current) {
-      this.txtLoginNameRef.current.value = js_localStorage.fn_getLoginName();
-      this.txtAccessCodeRef.current.value = js_localStorage.fn_getAccessCode();
-      if (this.txtGroupNameRef.current) {
-        this.txtGroupNameRef.current.value = js_localStorage.fn_getGroupName();
-      }
-      if (this.txtUnitIDRef.current) {
-        this.txtUnitIDRef.current.value = usePlugin === true ? js_localStorage.fn_getUnitIDShared() : js_localStorage.fn_getUnitID();
-      }
-    }
-
-    if (queryParams.connect !== undefined) {
-      this.clickConnect(null);
-    }
-
-    this.setState({ m_update: 1 });
-
-    
   }
 
   render() {
