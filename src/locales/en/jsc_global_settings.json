@@ -33,5 +33,6 @@
     "enableADSBLabel": "Enable ADSB",
     "adsbRadiusLabel": "ADSB Radius",
     "enableAISStreamLabel": "Enable AIS",
-    "enableWindLabel": "Enable Wind Arrow"
+    "enableWindLabel": "Enable Wind Arrow",
+    "enableSmoothMovementLabel": "Smooth movement"
 }

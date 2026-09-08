@@ -100,6 +100,12 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
+  fn_enableSmoothMovement(e) {
+    const enabled = e.currentTarget.checked;
+    js_localStorage.fn_setSmoothMovementEnabled(enabled);
+    js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
+  }
+
   render() {
     const { t } = this.props;
     const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
@@ -226,6 +232,18 @@ class ClssPreferences extends React.Component {
             />
           </div>
         )}
+        <div className="row mb-12 align-items-center">
+          <label htmlFor="check_enable_smooth_movement" className={`col-sm-4 col-form-label ${dir}`}>
+            {t('globalSettings:enableSmoothMovementLabel')}
+          </label>
+          <input
+            className="form-check-input col-sm-8"
+            type="checkbox"
+            id="check_enable_smooth_movement"
+            defaultChecked={js_localStorage.fn_getSmoothMovementEnabled()}
+            onClick={(e) => this.fn_enableSmoothMovement(e)}
+          />
+        </div>
       </fieldset>
     );
   }

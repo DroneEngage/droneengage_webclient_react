@@ -1558,7 +1558,7 @@ class CAndruavMap3D {
      * marker floats `alt_relative` meters above the ground, giving a true 3D
      * "flying" representation.
      */
-    fn_syncUnit(unit, markerIconUrl = null) {
+    fn_syncUnit(unit, markerIconUrl = null, p_overrideLat, p_overrideLng, p_overrideYawDeg) {
         // Skip while the 3D view is hidden (e.g. user is on the 2D map):
         // this does real work per call (Mapbox marker create/update, terrain
         // queries downstream) that's wasted on an invisible map, and was
@@ -1568,7 +1568,14 @@ class CAndruavMap3D {
         // natural telemetry tick repopulates anything missed while hidden.
         if (!this.m_map || !this.m_isReady || !this.m_isVisible || !unit?.m_Nav_Info?.p_Location) return;
 
-        const { lat, lng } = unit.m_Nav_Info.p_Location;
+        // p_overrideLat/p_overrideLng (degrees) and p_overrideYawDeg
+        // (degrees, 0-360) come from the positionSmoother interpolation
+        // layer (TASK-11). When finite they override the raw telemetry
+        // position/yaw so the marker, tether, model, and follow-cam all
+        // track the interpolated position. When not finite (no smoother
+        // in play), fall back to the raw per-tick values exactly as before.
+        const lat = Number.isFinite(p_overrideLat) ? p_overrideLat : unit.m_Nav_Info.p_Location.lat;
+        const lng = Number.isFinite(p_overrideLng) ? p_overrideLng : unit.m_Nav_Info.p_Location.lng;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
         // Relative altitude (meters above launch/home) — used as the height
@@ -1639,13 +1646,24 @@ class CAndruavMap3D {
             this.m_map.easeTo({ center: [lng, lat], duration: 500, pitch: 53 });
         }
 
-        // Apply yaw rotation (in degrees)
-        const yaw = unit?.m_Nav_Info?.p_Orientation?.yaw;
+        // Apply yaw rotation (in degrees). p_overrideYawDeg (from the
+        // positionSmoother, TASK-11) is already degrees 0-360; otherwise
+        // convert the raw radians yaw to degrees.
         let normalizedYaw = 0;
-        if (Number.isFinite(yaw)) {
-            const deg = (yaw * 180 / Math.PI) % 360;
-            normalizedYaw = (deg + 360) % 360;
+        let hasYaw = false;
+        if (Number.isFinite(p_overrideYawDeg)) {
+            normalizedYaw = (p_overrideYawDeg % 360 + 360) % 360;
+            hasYaw = true;
+        } else {
+            const yaw = unit?.m_Nav_Info?.p_Orientation?.yaw;
+            if (Number.isFinite(yaw)) {
+                const deg = (yaw * 180 / Math.PI) % 360;
+                normalizedYaw = (deg + 360) % 360;
+                hasYaw = true;
+            }
+        }
 
+        if (hasYaw) {
             if (typeof marker.setRotation === 'function') {
                 marker.setRotation(normalizedYaw);
             } else {
@@ -1929,7 +1947,7 @@ class CAndruavMap3D {
      *   the aircraft's icon is clicked (bound once per marker).
      * @returns {mapboxgl.Marker|null}
      */
-    fn_syncAdsbObject(p_adsbObject, markerIconUrl, onClickCallback) {
+    fn_syncAdsbObject(p_adsbObject, markerIconUrl, onClickCallback, p_overrideLat, p_overrideLng, p_overrideHeadingDeg) {
         // Skip while the 3D view is hidden. Confirmed via trace + code
         // inspection as the actual dominant cost during 2D-map pan/zoom:
         // this runs a synchronous Mapbox terrain-elevation query
@@ -1940,8 +1958,12 @@ class CAndruavMap3D {
         // position from cache when the 3D view becomes visible again.
         if (!this.m_map || !this.m_isReady || !this.m_isVisible || !p_adsbObject) return null;
 
-        const lat = p_adsbObject.m_lat;
-        const lng = p_adsbObject.m_lon;
+        // p_overrideLat/p_overrideLng (degrees) and p_overrideHeadingDeg
+        // (degrees, 0-360) come from the positionSmoother interpolation
+        // layer (TASK-11). When finite they override the raw telemetry
+        // position/heading. When not finite, fall back to raw values.
+        const lat = Number.isFinite(p_overrideLat) ? p_overrideLat : p_adsbObject.m_lat;
+        const lng = Number.isFinite(p_overrideLng) ? p_overrideLng : p_adsbObject.m_lon;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
         const icao = p_adsbObject.m_icao_address;
@@ -1953,8 +1975,15 @@ class CAndruavMap3D {
         // CADSBObject.updateFromNormalized).
         const terrainElev = this.fn_getRawTerrainElevation(lat, lng);
         const altAboveGround = Math.max((Number(p_adsbObject.m_altitude) || 0) - terrainElev, 0);
-        const headingDeg = ((Number(p_adsbObject.m_heading) || 0) * 180 / Math.PI) % 360;
-        const normalizedHeading = (headingDeg + 360) % 360;
+        // Heading override (from positionSmoother, TASK-11) is already
+        // degrees 0-360; otherwise convert the raw radians heading.
+        let normalizedHeading;
+        if (Number.isFinite(p_overrideHeadingDeg)) {
+            normalizedHeading = (p_overrideHeadingDeg % 360 + 360) % 360;
+        } else {
+            const headingDeg = ((Number(p_adsbObject.m_heading) || 0) * 180 / Math.PI) % 360;
+            normalizedHeading = (headingDeg + 360) % 360;
+        }
         this.m_adsbTetherData.set(icao, { lng, lat, terrainElev, altAboveGround });
 
         const isGlbMode = CONST_MAP3D_ADSB_RENDER_MODE === CONST_MAP3D_ADSB_RENDER_MODE_GLB;

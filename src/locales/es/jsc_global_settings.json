@@ -33,5 +33,6 @@
   "enableADSBLabel": "Habilitar ADSB",
     "adsbRadiusLabel": "ADSB Radius",
   "enableAISStreamLabel": "Habilitar AIS",
-  "enableWindLabel": "Habilitar flecha de viento"
+  "enableWindLabel": "Habilitar flecha de viento",
+  "enableSmoothMovementLabel": "Smooth movement"
 }

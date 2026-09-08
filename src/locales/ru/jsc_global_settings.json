@@ -33,5 +33,6 @@
   "enableADSBLabel": "Включить ADSB",
     "adsbRadiusLabel": "ADSB Radius",
   "enableAISStreamLabel": "Включить AIS",
-  "enableWindLabel": "Включить стрелку ветра"
+  "enableWindLabel": "Включить стрелку ветра",
+  "enableSmoothMovementLabel": "Smooth movement"
 }

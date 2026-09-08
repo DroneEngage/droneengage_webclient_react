@@ -19,6 +19,21 @@ type-check plain `.js` files (`checkJs: false`) and does NOT add a build
 step — CRA/babel still compiles `.ts` files for the bundle. Run it
 alongside `npm run lint` in any CI that lints.
 
+`tsconfig.json` pins `moduleResolution: "node"` + `ignoreDeprecations:
+"6.0"`. The project pins `typescript@4.9.5` where `"node"` is the only
+valid `moduleResolution` that supports `resolveJsonModule`, but newer TS
+language servers (5.x, used by IDEs) deprecate `"node"` (now `"node10"`).
+`ignoreDeprecations` is a no-op in 4.9.5 and silences the warning in 5.x,
+so both the CLI checker and the IDE are happy.
+
+The TASK-06 event-payload factories live in `src/js/events/eventPayloads.js`
+(plain JSDoc-typed JS, NOT `.ts`) — an earlier TASK-06 step had promoted
+them to `src/js/core/events/eventPayloads.ts`, but that was reverted;
+the `.ts` copy is gone and the three importers
+(`js_webrtcthin2.js`, `core/protocol/runtime.js`, the batching test) point
+back at the original `src/js/events/` path. The `core/protocol/*.ts` and
+`core/model/*.ts` files from TASK-06 are unaffected.
+
 ## ADSB abstraction layer
 
 ADSB traffic is fetched through a provider abstraction so different backends can
@@ -89,9 +104,83 @@ enable toggle + radius slider live in this tab (moved out of
 
 ADSB is gated by `js_globals.v_EnableADSB` and `js_globals.CONST_DISABLE_ADSG`.
 
+## 3D map (Mapbox GL JS)
+
+The 3D map is `src/js/maps/js_map3d.js` (`CAndruavMap3D`), a Mapbox GL JS
+v3 view with glTF vehicle models (LOD swap to flat icons below
+`CONST_MAP3D_MODEL_TO_ICON_ZOOM_THRESHOLD`), terrain exaggeration,
+per-unit tethers, chase-cam, ADSB rendering, and mission waypoints.
+Visual constants live in `src/js/config/mapStyle.js` (frozen).
+
+### Mapbox vendor isolation (TASK-09)
+
+`src/js/maps/js_mapboxVendor.js` is the **single point of contact** with
+the Mapbox GL JS vendor API. All `window.mapboxgl` global access and every
+`new mapboxgl.X(...)` construction call site lives here, so an SDK version
+bump or breaking API change is a one-file diff. The SDK version string
+exists exactly once (`MAPBOX_SDK_VERSION = 'v3.27.0'`) instead of being
+duplicated across the two CDN URLs. Exports: `fn_loadMapboxSdk`,
+`fn_getMapboxGl`, `fn_setAccessToken`, `fn_createMap`, `fn_createMarker`,
+`fn_createPopup`, `fn_createLngLatBounds`.
+
+This is intentionally NOT a generic engine-agnostic map abstraction — it
+only relocates the existing construction call sites. Method calls on
+already-constructed Map/Marker/Popup instances (`addControl`, `fitBounds`,
+`setLngLat`, `once('idle', ...)`, etc.) stay in `js_map3d.js`.
+
+### Draggable guided-target marker (TASK-10)
+
+The 3D map double-click draws a ground-draped circle + crosshair
+(`fn_drawTargetMarker`) and immediately opens the context-menu popup.
+The marker is now **draggable**: an invisible Mapbox `Marker` backs the
+GeoJSON line layer to capture native Mapbox drag gestures. On `dragend`,
+`js_main.js`'s callback fires `mapPopupService.fn_updatePopupPosition`
+to reposition the open popup and patch its `p_lat`/`p_lng` props so
+"Goto Here" / "Set Home" target the dragged position instead of the
+original double-click point.
+
+### Destination / swarm-target markers
+
+`fn_syncDestinationPoint` / `fn_clearDestinationPoint` mirror the 2D
+Leaflet destination markers (`EVT_DistinationPointChanged` in
+`js_main.js`) on the 3D map: small drone icons at swarm-target positions,
+floating at the target's altitude. In GLB mode the DOM icon is swapped
+to transparent and the target is shown as a ground circle + altitude
+ring pair (same pattern as the guided-target crosshair), toggled
+automatically with the LOD state. `p_DestinationPoint.alt` is in
+millimeters (raw MAVLink relative_alt) and is divided by 1000 to meters
+above terrain at the call site.
+
+## Map popups (React portals)
+
+`src/js/services/map/mapPopupService.js` is the single source of truth
+for map popups (context menu, mission item, unit popup) rendered via
+React portals. It replaces the old detached-root + `innerHTML`
+round-trip: the active map adapter (`js_leafletmap` or `js_map3d`,
+selected via `js_layout.fn_getMapMode()`) provides an empty popup shell,
+`fn_getPopupContentElement` returns its content DOM node, and the
+`<MapPopupHost />` component (mounted inside the i18n/theme provider
+tree) portals the real React component into that node. Because the
+component tree stays connected, context (i18n, theme), event handlers,
+and interactive elements all work normally inside popups.
+
+The service is a subscribable singleton (notifications go through
+`js_eventEmitter` as `EE_MapPopupChanged`); React reads it via the
+`useMapPopup()` hook, `js_main.js` writes via `fn_openPopup` /
+`fn_closePopup`. `fn_updatePopupPosition` repositions the open popup
+and merges new props without closing/reopening (used by the draggable
+3D target marker).
+
 ## Notes
 
 - `js_mavlink_v2.js` is eslint-ignored (generated).
 - The old `v_ADSB_Exchange`/`v_adsbObject` jQuery implementation and the
   `AdsbExchangeProvider` (VirtualRadar endpoint) have been removed; OpenSky
   is the active aircraft provider.
+- The `tasks/` directory holds the structural-refactor task specs
+  (TASK-01 … TASK-11) and `README.md` with their dependency order and the
+  rules that apply to every task (behaviour-preserving, `fn_`/`m_`/`p_`
+  naming, never edit `js_mavlink_v2.js`, don't touch the build, don't
+  rename rendering-contract fields, safety-critical events stay
+  immediate, leave the tree green, commit per step). `MapPlan.md` holds
+  a 3D-map gap analysis vs. QGC/DJI/Auterion/UgCS.

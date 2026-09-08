@@ -43,6 +43,7 @@ import { fn_initFacadeSubscriptions } from './core/protocol/runtime.js'
 import { js_layout } from './state/layoutStore.js'
 import { js_unitUiPrefs } from './state/unitUiPrefs.js'
 import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
+import { positionSmoother } from './services/motion/positionSmoother.js'
 import { js_geoFenceRegistry } from './services/geo/geoFenceRegistry.js'
 import { js_dialogs } from './app/dialogService.js'
 import { mapPopupService } from './services/map/mapPopupService.js'
@@ -868,6 +869,7 @@ function fn_adsbExpiredUpdate(me) {
 				js_leafletmap.fn_hideItem(adsb_obj.p_marker);
 			}
 			js_map3d.fn_removeAdsbMarker(adsb_obj);
+			positionSmoother.fn_removeEntity('adsb:' + adsb_obj.m_icao_address);
 			if (v_adsbMap3dSelectedIcao === adsb_obj.m_icao_address) {
 				fn_clearAdsbMap3dSelection();
 			}
@@ -899,6 +901,7 @@ function fn_clearAdsbFromMap() {
 				adsb_obj.p_marker = null;
 			}
 			js_map3d.fn_removeAdsbMarker(adsb_obj);
+			positionSmoother.fn_removeEntity('adsb:' + adsb_obj.m_icao_address);
 		}
 	}
 	fn_clearAdsbMap3dSelection();
@@ -1151,12 +1154,21 @@ function fn_renderSingleAdsb(p_adsbObject) {
 		p_adsbObject.p_marker = v_marker;
 	}
 
-	js_leafletmap.fn_setPosition_bylatlng(p_adsbObject.p_marker, p_adsbObject.m_lat, p_adsbObject.m_lon, p_adsbObject.m_heading);
-	js_leafletmap.fn_showItem(p_adsbObject.p_marker);
-
-	// Mirror the same aircraft on the 3D map. Clicking it selects it (shows
-	// the tether/rings + a popup), same UX as clicking the leaflet marker.
-	js_map3d.fn_syncAdsbObject(p_adsbObject, icon, fn_onAdsbMap3dMarkerClick);
+	// Route the ADS-B marker position through the shared positionSmoother
+	// (TASK-11). Source heading is radians → degrees once here; back to
+	// radians only for the Leaflet call. The 3D map takes degrees via the
+	// p_overrideHeadingDeg param added to fn_syncAdsbObject.
+	positionSmoother.fn_pushSample(
+		'adsb:' + p_adsbObject.m_icao_address,
+		p_adsbObject.m_lat,
+		p_adsbObject.m_lon,
+		(p_adsbObject.m_heading * 180 / Math.PI + 360) % 360,
+		(iLat, iLng, iHeadingDeg) => {
+			js_leafletmap.fn_setPosition_bylatlng(p_adsbObject.p_marker, iLat, iLng, iHeadingDeg * Math.PI / 180);
+			js_leafletmap.fn_showItem(p_adsbObject.p_marker);
+			js_map3d.fn_syncAdsbObject(p_adsbObject, icon, fn_onAdsbMap3dMarkerClick, iLat, iLng, iHeadingDeg);
+		}
+	);
 
 	var v_popup = fn_buildAdsbPopupHtml(p_adsbObject);
 
@@ -2776,10 +2788,33 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 
 		}
 
-		js_leafletmap.fn_setPosition_bylatlng(layers.m_marker, p_andruavUnit.m_Nav_Info.p_Location.lat, p_andruavUnit.m_Nav_Info.p_Location.lng, p_andruavUnit.m_Nav_Info.p_Orientation.yaw);
+		// Route the marker position through the shared positionSmoother
+		// (TASK-11): when smoothing is enabled and a prior sample exists,
+		// the renderFn below is called on every animation frame with the
+		// interpolated lat/lng/yaw until the interpolation finishes, then a
+		// final call carries the exact target. When smoothing is disabled
+		// or this is the first sample, renderFn fires once synchronously.
+		// Source yaw is radians → convert to degrees once here; convert
+		// back to radians only for the Leaflet call (fn_setPosition_bylatlng
+		// requires radians). The 3D map takes degrees directly via the
+		// p_overrideYawDeg param added to fn_syncUnit.
+		positionSmoother.fn_pushSample(
+			'unit:' + p_andruavUnit.getPartyID(),
+			p_andruavUnit.m_Nav_Info.p_Location.lat,
+			p_andruavUnit.m_Nav_Info.p_Location.lng,
+			(p_andruavUnit.m_Nav_Info.p_Orientation.yaw * 180 / Math.PI + 360) % 360,
+			(iLat, iLng, iYawDeg) => {
+				js_leafletmap.fn_setPosition_bylatlng(layers.m_marker, iLat, iLng, iYawDeg * Math.PI / 180);
+				js_map3d.fn_syncUnit(p_andruavUnit, v_image, iLat, iLng, iYawDeg);
+			}
+		);
 		fn_refreshWindArrowPosition();
-		const marker3d = js_map3d.fn_syncUnit(p_andruavUnit, v_image);
 
+		// fn_syncUnit now runs inside the smoother's renderFn (above), so its
+		// return value isn't captured here. The first fn_pushSample call
+		// fires renderFn synchronously (creating the marker), so fetch it
+		// via fn_getUnitMarker for the one-time event attachment below.
+		const marker3d = js_map3d.fn_getUnitMarker(p_andruavUnit);
 		if (marker3d && layers.m_marker3d_events_attached !== true) {
 			layers.m_marker3d_events_attached = true;
 

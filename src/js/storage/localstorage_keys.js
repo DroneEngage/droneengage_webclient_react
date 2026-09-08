@@ -25,6 +25,7 @@ export const LS_SMS_PHONE_NUMBER = '_vSMSPhoneNumber';
 export const LS_ENABLE_ADSB = '_vADSBEnabled';
 export const LS_ENABLE_AISSTREAM = '_vAISStreamEnabled';
 export const LS_ENABLE_WIND = '_vWindEnabled';
+export const LS_ENABLE_SMOOTH_MOVEMENT = '_vSmoothMovementEnabled';
 export const LS_ADSB_RADIUS_KM = '_vADSBRadiusKm';
 // ADSB provider config overrides (editable from the ADSB settings tab).
 // localStorage has highest priority, then config.local/config.json,
@@ -41,6 +42,6 @@ Object.freeze({
 	LS_ENABLE_SPEECH, LS_DEFAULT_VOLUME, LS_TAB_DISPLAY_ENABLED, LS_METRIC_SYS,
 	LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED, LS_SELECTED_THEME,
 	LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER, LS_ENABLE_ADSB,
-	LS_ENABLE_AISSTREAM, LS_ENABLE_WIND, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER,
+	LS_ENABLE_AISSTREAM, LS_ENABLE_WIND, LS_ENABLE_SMOOTH_MOVEMENT, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER,
 	LS_ADSB_REFRESH_RATE_MS, LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET,
 });

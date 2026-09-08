@@ -8,7 +8,7 @@ import {
 	LS_UNIT_ID_SHARED, LS_WEB_GCS, LS_GROUP_NAME, LS_DISPLAY_MODE,
 	LS_METRIC_SYS, LS_GAME_PAD_CONFIG_PREFIX, LS_GAME_PAD_CONFIG_INDEX,
 	LS_DEFAULT_ALT, LS_ENABLE_SPEECH, LS_ENABLE_ADSB, LS_ENABLE_AISSTREAM,
-	LS_ENABLE_WIND, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER, LS_ADSB_REFRESH_RATE_MS,
+	LS_ENABLE_WIND, LS_ENABLE_SMOOTH_MOVEMENT, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER, LS_ADSB_REFRESH_RATE_MS,
 	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
@@ -293,6 +293,17 @@ class CLocalStorage {
             return false;
         }
         return this._getValue(LS_ENABLE_WIND, 'false') === 'true';
+    }
+
+    // Smooth (interpolated) unit & ADS-B movement Enabled (runtime
+    // preference). Quality-of-life feature, default ON. Unlike Wind/AIS,
+    // this is not behind a CONST_FEATURE.DISABLE_* site flag — always shown.
+    fn_setSmoothMovementEnabled(value) {
+        this._setValue(LS_ENABLE_SMOOTH_MOVEMENT, value.toString());
+    }
+
+    fn_getSmoothMovementEnabled() {
+        return this._getValue(LS_ENABLE_SMOOTH_MOVEMENT, 'true') === 'true';
     }
 
     // ADSB geolocation fallback radius in kilometers (used when no drones
