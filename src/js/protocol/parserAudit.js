@@ -7,6 +7,9 @@
  *   - binary     → handled by parseBinaryAndruavMessage
  *   - outbound   → GCS→drone commands sent via API_sendCMD / 'mt': fields
  *   - old-switch → (empty — parseCommunicationMessage was deleted)
+ *   - known-noop → inbound but intentionally not processed by the GCS
+ *                  (deprecated aliases, old telemetry variants, module-
+ *                  specific status with no GCS UI)
  *   - UNHANDLED  → in none of the above — a potentially missed inbound case
  *
  * In dev mode, logs the classification summary + any unhandled types.
@@ -60,17 +63,48 @@ const OUTBOUND_TYPES = new Set([
     js_andruavMessages.CONST_TYPE_AndruavMessage_Sync_EventFire,
     js_andruavMessages.CONST_TYPE_AndruavMessage_TargetTracking_ACTION,
     js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_ACTION,
+    js_andruavMessages.CONST_TYPE_AndruavMessage_TELNET_REMOTE_EXECUTE,
     js_andruavMessages.CONST_TYPE_AndruavMessage_Unit_Name,
     js_andruavMessages.CONST_TYPE_AndruavMessage_UploadWayPoints,
     js_andruavMessages.CONST_TYPE_AndruavMessage_Upload_DE_Mission,
     js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_ACTION,
     js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_PLAY_FILE,
     js_andruavMessages.CONST_TYPE_AndruavMessage_SOUND_TEXT_TO_SPEECH,
+    js_andruavMessages.CONST_TYPE_AndruavMessage_FollowMe_Guided,
+    js_andruavMessages.CONST_TYPE_AndruavMessage_LocalServer_REMOTE_EXECUTE,
 ]);
 
 // parseCommunicationMessage was deleted in TASK-02.6. There is no old
 // switch fallback. This set is kept empty for the classification logic.
 const OLD_SWITCH_TYPES = new Set([]);
+
+// Inbound message types the GCS intentionally does NOT process. These are
+// either deprecated aliases (e.g. BinaryIMU = IMU), old telemetry variants
+// superseded by migrated types (Telemetry → NAV_INFO/GPS), or module-
+// specific telemetry/status the web client has no UI for (IMU raw data,
+// IR camera status, MAVLink events, P2P status, etc.). They arrive on the
+// wire but are silently dropped — classifying them here keeps the audit
+// useful for genuinely missed cases instead of warning about known no-ops.
+const KNOWN_NOOP_TYPES = new Set([
+    js_andruavMessages.CONST_TYPE_AndruavMessage_Telemetry,          // old, superseded by NAV_INFO/GPS
+    js_andruavMessages.CONST_TYPE_AndruavMessage_VideoFrame,         // video handled by WebRTC, not the parser
+    js_andruavMessages.CONST_TYPE_AndruavMessage_IMU,               // raw IMU, GCS doesn't display
+    js_andruavMessages.CONST_TYPE_AndruavMessage_BinaryIMU,          // deprecated alias for IMU (same value)
+    js_andruavMessages.CONST_TYPE_AndruavMessage_IMUStatistics,     // IMU stats, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_SensorsStatus,     // sensor status, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_SwarmReport,        // swarm report, not handled
+    js_andruavMessages.CONST_TYPE_AndruavMessage_UpdateSwarm,        // swarm update, not handled
+    js_andruavMessages.CONST_TYPE_AndruavMessage_Ping_Unit,         // ping, transport-level
+    js_andruavMessages.CONST_TYPE_AndruavMessage_Viewlink_Telemetry,// viewlink telemetry, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_LightTelemetry,    // lightweight telemetry variant
+    js_andruavMessages.CONST_TYPE_AndruavMessage_P2P_STATUS,        // P2P status, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_SDR_TRIGGER,       // SDR trigger, module-internal
+    js_andruavMessages.CONST_TYPE_AndruavMessage_Mission_Item_Sequence, // mission item sequence, not handled
+    js_andruavMessages.CONST_TYPE_AndruavMessage_LocalServer_STATUS,// local server status, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_MAVLINK_EVENTS,    // MAVLink events, not displayed
+    js_andruavMessages.CONST_TYPE_AndruavMessage_IR_CAMERA_MI48_ACTION, // IR camera action, module-internal
+    js_andruavMessages.CONST_TYPE_AndruavMessage_IR_CAMERA_MI48_STATUS, // IR camera status, not displayed
+]);
 
 export function fn_auditMessageTypes() {
     const all = [];
@@ -84,6 +118,7 @@ export function fn_auditMessageTypes() {
     const binary = [];
     const outbound = [];
     const oldSwitch = [];
+    const knownNoop = [];
     const unhandled = [];
 
     for (const { name, value } of all) {
@@ -95,17 +130,19 @@ export function fn_auditMessageTypes() {
             outbound.push(name);
         } else if (OLD_SWITCH_TYPES.has(value)) {
             oldSwitch.push(name);
+        } else if (KNOWN_NOOP_TYPES.has(value)) {
+            knownNoop.push(name);
         } else {
             unhandled.push(name);
         }
     }
 
     if (process.env.NODE_ENV !== 'production') {
-        console.info(`[parser-audit] ${all.length} message types: ${migrated.length} migrated, ${binary.length} binary, ${outbound.length} outbound, ${oldSwitch.length} old-switch, ${unhandled.length} unhandled`);
+        console.info(`[parser-audit] ${all.length} message types: ${migrated.length} migrated, ${binary.length} binary, ${outbound.length} outbound, ${oldSwitch.length} old-switch, ${knownNoop.length} known-noop, ${unhandled.length} unhandled`);
         if (unhandled.length > 0) {
             console.warn(`[parser-audit] unhandled types (deprecated or missed inbound cases):`, unhandled);
         }
     }
 
-    return { total: all.length, migrated, binary, outbound, oldSwitch, unhandled };
+    return { total: all.length, migrated, binary, outbound, oldSwitch, knownNoop, unhandled };
 }
