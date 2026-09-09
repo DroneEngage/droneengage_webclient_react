@@ -2,7 +2,7 @@ import React    from 'react';
 import { CONST_MAX_MESSAGE_LOG } from '../../js/config/constants.js';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 class ClssAndruavMessageItem extends React.Component {
 
@@ -59,7 +59,9 @@ export  class ClssCtrlUnitLog  extends React.Component {
         
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_onMessage, this, this.fn_onMessage);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -68,7 +70,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
         return update;
     }
 
-    fn_onMessage (p_me, p_msg)
+    fn_onMessage (p_msg)
     {
         /*
             c_msg.m_unit = p_andruavUnit;
@@ -77,9 +79,9 @@ export  class ClssCtrlUnitLog  extends React.Component {
 			c_msg.m_error = p_error
 		*/
 
-        if (p_me.props.p_unit.getPartyID() !== p_msg.m_unit.getPartyID()) return ;
-        
-        p_me.state.m_message.push ({
+        if (this.props.p_unit.getPartyID() !== p_msg.m_unit.getPartyID()) return ;
+
+        this.state.m_message.push ({
             m_msg: p_msg,
             time: (new Date()).toLocaleTimeString()
         });
@@ -89,13 +91,13 @@ export  class ClssCtrlUnitLog  extends React.Component {
         // this the array (and every message/unit reference inside it) grows
         // unbounded over a long session.
         const v_cap = CONST_MAX_MESSAGE_LOG;
-        if (p_me.state.m_message.length > v_cap) {
-            p_me.state.m_message.splice(0, p_me.state.m_message.length - v_cap);
+        if (this.state.m_message.length > v_cap) {
+            this.state.m_message.splice(0, this.state.m_message.length - v_cap);
         }
 
-        
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     componentDidMount() {
@@ -110,7 +112,8 @@ export  class ClssCtrlUnitLog  extends React.Component {
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
-		js_eventEmitter.fn_unsubscribe (js_event.EE_onMessage,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     render () {
@@ -126,6 +129,7 @@ export  class ClssCtrlUnitLog  extends React.Component {
         
         return (
             <div key={this.props.p_unit.getPartyID() + "_msgctrl"} className="">
+                 <EventBridge eventName={js_event.EE_onMessage} onEvent={(p_msg) => this.fn_onMessage(p_msg)} />
                  <div key='params' id="parameters_sublist" className='d-flex justify-content-end'>
                             <button type="button" className='btn btn-success btn-sm ctrlbtn me-5'  title='Clear Messages' onClick={(e) => this.fn_clear(e)}>Clear</button>
                  </div>

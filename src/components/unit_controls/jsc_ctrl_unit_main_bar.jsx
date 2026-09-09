@@ -7,7 +7,7 @@ import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
@@ -33,8 +33,9 @@ class ClssCtrlUnitMainBar extends React.Component {
       m_update: 0,
     };
 
-    js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, this, this.fn_onUpdate);
-    js_eventEmitter.fn_subscribe(js_event.EE_unitPowUpdated, this, this.fn_onUpdate);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
   }
 
   componentDidMount() {
@@ -42,8 +43,8 @@ class ClssCtrlUnitMainBar extends React.Component {
   }
 
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   fn_toggleCamera(p_andruavUnit) {
@@ -55,9 +56,9 @@ class ClssCtrlUnitMainBar extends React.Component {
     js_session.fn_getAndruavFacade().API_requestCameraList(p_andruavUnit, fn_callback);
   }
 
-  fn_onUpdate(me, p_andruavUnit) {
-    if (me.m_flag_mounted === false) return;
-    me.setState({ m_update: me.state.m_update + 1 });
+  fn_onUpdate(p_andruavUnit) {
+    if (this.m_flag_mounted === false) return;
+    this.setState({ m_update: this.state.m_update + 1 });
   }
 
   hlp_getBatteryCSSClass(p_andruavUnit) {
@@ -364,6 +365,8 @@ class ClssCtrlUnitMainBar extends React.Component {
 
     return (
       <div key={id} className="row ms-1 padding_zero user-select-none">
+        <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_onUpdate(p_andruavUnit)} />
+        <EventBridge eventName={js_event.EE_unitPowUpdated} onEvent={(p_andruavUnit) => this.fn_onUpdate(p_andruavUnit)} />
         <div key={id + '__1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <ClssCtrlUnitIcon p_unit={v_andruavUnit} />
         </div>

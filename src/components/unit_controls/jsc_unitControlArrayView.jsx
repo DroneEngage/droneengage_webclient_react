@@ -26,6 +26,7 @@ import {ClssCtrlVibration} from '../gadgets/jsc_ctrl_vibration.jsx'
 import {ClssCtrlBattery} from '../gadgets/jsc_ctrl_battery.jsx'
 
 import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../../js/js_main.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 class ClssAndruavUnitDroneHeader extends React.Component{
 
@@ -150,9 +151,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
         this.m_lastRenderTs = 0;
         this.m_pendingRender = false;
         this.m_throttleHandle = null;
-        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this,this.fn_unitUpdated);
-        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_onPreferenceChanged);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
@@ -161,9 +162,8 @@ class ClssAndruavUnitDroneRow extends React.Component{
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
         if (this.m_throttleHandle) {
             clearTimeout(this.m_throttleHandle);
             this.m_throttleHandle = null;
@@ -171,45 +171,45 @@ class ClssAndruavUnitDroneRow extends React.Component{
     }
 
 
-    fn_unitUpdated(p_me,p_andruavUnit)
+    fn_unitUpdated(p_andruavUnit)
     {
-        if (p_andruavUnit.getPartyID() !== p_me.props.p_unit.getPartyID()) return ;
-        if (p_me.m_flag_mounted === false)return ;
+        if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) return ;
+        if (this.m_flag_mounted === false)return ;
         // Throttle: skip the re-render if the last one was less than
         // CONST_ROW_THROTTLE_MS ago, but schedule a trailing update so
         // the latest telemetry is eventually displayed (not dropped).
         const now = Date.now();
-        const elapsed = now - p_me.m_lastRenderTs;
+        const elapsed = now - this.m_lastRenderTs;
         if (elapsed >= 200) {
-            p_me.m_lastRenderTs = now;
-            p_me.m_pendingRender = false;
-            if (p_me.m_throttleHandle) {
-                clearTimeout(p_me.m_throttleHandle);
-                p_me.m_throttleHandle = null;
+            this.m_lastRenderTs = now;
+            this.m_pendingRender = false;
+            if (this.m_throttleHandle) {
+                clearTimeout(this.m_throttleHandle);
+                this.m_throttleHandle = null;
             }
-            p_me.setState({'m_update': p_me.state.m_update +1});
-        } else if (!p_me.m_pendingRender) {
-            p_me.m_pendingRender = true;
+            this.setState({'m_update': this.state.m_update +1});
+        } else if (!this.m_pendingRender) {
+            this.m_pendingRender = true;
             const delay = 200 - elapsed;
-            p_me.m_throttleHandle = setTimeout(() => {
-                p_me.m_throttleHandle = null;
-                p_me.m_pendingRender = false;
-                p_me.m_lastRenderTs = Date.now();
-                if (p_me.m_flag_mounted) {
-                    p_me.setState({'m_update': p_me.state.m_update +1});
+            this.m_throttleHandle = setTimeout(() => {
+                this.m_throttleHandle = null;
+                this.m_pendingRender = false;
+                this.m_lastRenderTs = Date.now();
+                if (this.m_flag_mounted) {
+                    this.setState({'m_update': this.state.m_update +1});
                 }
             }, delay);
         }
     }
 
-    fn_onPreferenceChanged(p_me)
+    fn_onPreferenceChanged()
     {
         // EE_onPreferenceChanged is dispatched with no payload (see
         // ClssAndruavUnitListArray.fn_onPreferenceChanged below for the
         // same pattern), so this cannot reuse fn_unitUpdated's
         // partyID-matching signature.
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     
@@ -777,6 +777,9 @@ class ClssAndruavUnitDroneRow extends React.Component{
         
         return (
             <div key={this.key+'1'} className = 'row  mt-0 me-0 ms-0 mb-2 text-nowrap border-bottom bg-gradient'>
+                <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={() => this.fn_onPreferenceChanged()} />
                 <div key={this.key+'2'} className = {'col-2  col-lg-1   css_margin_zero text-center cursor_hand  si-09x  ' + v_id_class} onClick={ (e) => this.fn_gotoUnit_byPartyID(e,v_andruavUnit.getPartyID())}>
                     <div key={this.key+'23'} className = 'row  css_margin_zero '>
                         <div key={this.key+'24'} className = {'col-12  css_margin_zero css_padding_zero '+ v_id_icon}>{v_id_text}</div>
@@ -879,10 +882,10 @@ class ClssAndruavUnitListArray extends React.Component {
         this.key = Math.random().toString();
 
         this.m_flag_mounted = false;
-        
-        js_eventEmitter.fn_subscribe (js_event.EE_onPreferenceChanged, this, this.fn_onPreferenceChanged);
-        js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
+
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
         // EE_unitUpdated removed: it re-rendered the ENTIRE list on every
         // unit update from ANY unit (no party ID filter). With N units, one
         // telemetry tick re-rendered all N rows + their children. The rows
@@ -900,31 +903,30 @@ class ClssAndruavUnitListArray extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     
 
 
 
-    fn_unitAdded (me,p_andruavUnit)
+    fn_unitAdded (p_andruavUnit)
     {
-        if (me.m_flag_mounted === false)return ;
-        
+        if (this.m_flag_mounted === false)return ;
+
         js_common.fn_console_log ("REACT:fn_unitAdded" );
-         // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
-         me.setState({ 
-            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
+         // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs
+         this.setState({
+            andruavUnitPartyIDs: this.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
         });
     }
-    
-    fn_onPreferenceChanged(me)
+
+    fn_onPreferenceChanged()
     {
-        if (me.m_flag_mounted === false)return ;
-        
-        me.setState({'m_update': me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_updateMapStatus(p_andruavUnit)
@@ -950,19 +952,19 @@ class ClssAndruavUnitListArray extends React.Component {
         return ;
     }
 
-    fn_onSocketStatus (me,params) {
-       
-        if (me.m_flag_mounted === false)return ;
+    fn_onSocketStatus (params) {
+
+        if (this.m_flag_mounted === false)return ;
 
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
-        {				
+        {
                 $('#andruavUnits').show();
         }
         else
-        {				
-                if (me._isMounted !== true) return ;
-        
-                me.setState({andruavUnitPartyIDs:[]});
+        {
+                if (this._isMounted !== true) return ;
+
+                this.setState({andruavUnitPartyIDs:[]});
         }
     }
     fn_OnClick()
@@ -1054,7 +1056,12 @@ class ClssAndruavUnitListArray extends React.Component {
 						</div>);
 
         return (
-            <div key={'ClssAndruavUnitListArray_main' + this.key} className='margin_zero padding_zero row'>{unit}</div>
+            <div key={'ClssAndruavUnitListArray_main' + this.key} className='margin_zero padding_zero row'>
+                <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={() => this.fn_onPreferenceChanged()} />
+                <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+                <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
+                {unit}
+            </div>
         );
     }
 };

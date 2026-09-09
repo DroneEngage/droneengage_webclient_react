@@ -36,6 +36,7 @@ import ClssCtrlDroneIMU from './jsc_unit_control_imu.jsx'
 import { ClssAndruavUnitBase } from './jsc_unit_control_base.jsx'
 import ClssCtrlUnitMainBar from './jsc_ctrl_unit_main_bar.jsx'
 import ClssCtrlUnitPlanningBar from './jsc_ctrl_unit_planning_bar.jsx'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 /**
  * This class is full control of Drone.
@@ -65,8 +66,10 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         js_unitUiPrefs.fn_setUnitPref(this.props.p_unit.getPartyID(), 'speed_link', false);
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe (js_event.EE_OldModule,this,this.fn_update);
-        
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
+
     }
 
     componentDidMount() {
@@ -75,22 +78,22 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     }
 
 
-    fn_update(p_me)
+    fn_update()
     {
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.setState({'m_update': this.state.m_update +1});
     }
 
-    fn_requestGamePad(me, p_andruavUnit) {
+    fn_requestGamePad(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.getPartyID() !== me.props.p_unit.getPartyID()) {
+        if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) {
             // someone else wanta GamePad, I will release it if I have it.
             return; // not me
         }
 
         p_andruavUnit.m_Telemetry.m_rxEngaged = true;
 
-        if (me.m_flag_mounted === false) return;
-        me.setState({ 'm_update': me.state.m_update + 1 });
+        if (this.m_flag_mounted === false) return;
+        this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
     fn_webRX_toggle(p_andruavUnit) {
@@ -411,17 +414,21 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     }
 
     childcomponentWillMount() {
-        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad, this, this.fn_requestGamePad);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     childcomponentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        js_eventEmitter.fn_unsubscribe (js_event.EE_OldModule, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
 
@@ -543,6 +550,10 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         return (
 
             <div key={id + "1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + (v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS)}>
+
+                {super.render()}
+                <EventBridge eventName={js_event.EE_OldModule} onEvent={() => this.fn_update()} />
+                <EventBridge eventName={js_event.EE_requestGamePad} onEvent={(p_andruavUnit) => this.fn_requestGamePad(p_andruavUnit)} />
 
                 {main_bar}
 

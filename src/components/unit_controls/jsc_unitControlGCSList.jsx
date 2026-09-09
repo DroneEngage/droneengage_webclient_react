@@ -4,12 +4,12 @@ import { withTranslation } from 'react-i18next';
 
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 
 /**
@@ -29,39 +29,36 @@ class ClssAndruavUnitGCSList extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitArmedUpdated,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_andruavUnitFCBUpdated,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
-    fn_unitOnlineChanged(me,p_andruavUnit)
+    fn_unitOnlineChanged(p_andruavUnit)
     {
-        if (me.m_flag_mounted === false) return ;
-        me.setState({ 'm_update': me.state.m_update+1});
+        if (this.m_flag_mounted === false) return ;
+        this.setState({ 'm_update': this.state.m_update+1});
     }
 
-    fn_unitAdded (me,p_andruavUnit)
+    fn_unitAdded (p_andruavUnit)
     {
-        if (me.m_flag_mounted === false) return ;
+        if (this.m_flag_mounted === false) return ;
         if (p_andruavUnit.m_IsGCS !== true) return ;
 
-        if (me.state.andruavUnitPartyIDs.includes(p_andruavUnit.getPartyID())) return ;
-        me.setState({
-            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
+        if (this.state.andruavUnitPartyIDs.includes(p_andruavUnit.getPartyID())) return ;
+        this.setState({
+            andruavUnitPartyIDs: this.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
         });
     }
 
-    fn_onSocketStatus (me,params) {
-        if (me.m_flag_mounted === false) return ;
+    fn_onSocketStatus (params) {
+        if (this.m_flag_mounted === false) return ;
 
         if (params.status !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {
             // reset on disconnect
-            me.state.andruavUnitPartyIDs = [];
-            me.setState({'m_update': me.state.m_update +1});
+            this.state.andruavUnitPartyIDs = [];
+            this.setState({'m_update': this.state.m_update +1});
         }
     }
 
@@ -70,12 +67,8 @@ class ClssAndruavUnitGCSList extends React.Component {
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_requestGamePadonSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitArmedUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitFCBUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     fn_toggleMinimize() {
@@ -139,6 +132,12 @@ class ClssAndruavUnitGCSList extends React.Component {
 
         return (
             <div key='gcs_list_main' className='padding_zero margin_zero mb-1'>
+                <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+                <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_andruavUnitArmedUpdated} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_andruavUnitFCBUpdated} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
                 <div className="card-header user-select-none py-1 border-bottom border-light rounded-top txt-theme-aware">
                     <strong>{t('home:onlineGCS')}</strong>
                     <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>

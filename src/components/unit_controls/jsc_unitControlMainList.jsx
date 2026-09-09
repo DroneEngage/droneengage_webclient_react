@@ -25,6 +25,7 @@ import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js
 
 import {ClssAndruavUnitDrone} from './jsc_unit_control_drone.jsx'
 import ClssUnitTabHeaderItem from './jsc_unit_tab_header.jsx'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 
 /**
@@ -68,9 +69,9 @@ class ClssAndruavUnitList extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonPreferenceChanged, this, this.fn_onPreferenceChanged);
-        js_eventEmitter.fn_subscribe (js_event.EE_requestGamePadonSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded,this,this.fn_unitAdded);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
         // EE_unitOnlineChanged / EE_andruavUnitArmedUpdated / EE_andruavUnitFCBUpdated
         // used to all funnel into fn_unitOnlineChanged, forcing this whole list
         // (every connected unit's tab header) to re-render on any single unit's
@@ -78,16 +79,14 @@ class ClssAndruavUnitList extends React.Component {
         // via useUnitField (see jsc_unit_tab_header.jsx), bridged from the same
         // three events in js_main.js - so only the affected unit's header
         // re-renders, not the whole list.
-        js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged,this,this.fn_unitOnlineChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitHighlighted,this,this.fn_unitOnUnitHighlighted);
-        
+
     }
 
-    fn_unitOnUnitHighlighted (p_me, p_andruavUnit)
+    fn_unitOnUnitHighlighted (p_andruavUnit)
     {
-        if (p_me.m_flag_mounted === false) return ;
+        if (this.m_flag_mounted === false) return ;
 
-        p_me.fn_setActiveUnit(p_andruavUnit.getPartyID());
+        this.fn_setActiveUnit(p_andruavUnit.getPartyID());
     }
 
     /**
@@ -110,39 +109,39 @@ class ClssAndruavUnitList extends React.Component {
         });
     }
       
-    fn_unitOnlineChanged(me,p_andruavUnit)
+    fn_unitOnlineChanged(p_andruavUnit)
     {
-        if (me.m_flag_mounted === false) return ;
-        
+        if (this.m_flag_mounted === false) return ;
+
         // render is initiated via updating state
-        me.setState({ 'm_update': me.state.m_update+1});
+        this.setState({ 'm_update': this.state.m_update+1});
     }
 
-    fn_unitAdded (me,p_andruavUnit)
+    fn_unitAdded (p_andruavUnit)
     {
-        if (me.m_flag_mounted === false) return ;
-    
+        if (this.m_flag_mounted === false) return ;
+
         js_common.fn_console_log ("REACT:fn_unitAdded" );
 
-         if (me.state.andruavUnitPartyIDs.includes(p_andruavUnit.getPartyID())) return ;
-         // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs      
-         me.setState({ 
-            andruavUnitPartyIDs: me.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
+         if (this.state.andruavUnitPartyIDs.includes(p_andruavUnit.getPartyID())) return ;
+         // http://stackoverflow.com/questions/26253351/correct-modification-of-state-arrays-in-reactjs
+         this.setState({
+            andruavUnitPartyIDs: this.state.andruavUnitPartyIDs.concat([p_andruavUnit.getPartyID()])
         });
     }
 
-    fn_onSocketStatus (me,params) {
-       
-        if (me.m_flag_mounted === false) return ;
-    
+    fn_onSocketStatus (params) {
+
+        if (this.m_flag_mounted === false) return ;
+
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
-        {				
+        {
                 $('#andruavUnits').show();
         }
         else
-        {				
-                me.state.andruavUnitPartyIDs = [];
-                me.setState({'m_update': me.state.m_update +1});
+        {
+                this.state.andruavUnitPartyIDs = [];
+                this.setState({'m_update': this.state.m_update +1});
         }
     }
 
@@ -150,10 +149,10 @@ class ClssAndruavUnitList extends React.Component {
         this.m_flag_mounted = true;
     }
 
-    fn_onPreferenceChanged(me)
+    fn_onPreferenceChanged()
     {
-        if (me.m_flag_mounted === false) return ;
-        me.setState({'m_update': me.state.m_update +1});
+        if (this.m_flag_mounted === false) return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_toggleMinimize() {
@@ -189,12 +188,8 @@ class ClssAndruavUnitList extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_requestGamePadonSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitHighlighted,this);
-        
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     render() {
@@ -316,6 +311,11 @@ class ClssAndruavUnitList extends React.Component {
 
     return (
                 <div key='main' className='margin_zero width_100'>
+                    <EventBridge eventName={js_event.EE_requestGamePadonPreferenceChanged} onEvent={() => this.fn_onPreferenceChanged()} />
+                    <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+                    <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
+                    <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
+                    <EventBridge eventName={js_event.EE_unitHighlighted} onEvent={(p_andruavUnit) => this.fn_unitOnUnitHighlighted(p_andruavUnit)} />
                     {v_showCard === true
                     ? (
                     <div className="mb-3 padding_zero">
