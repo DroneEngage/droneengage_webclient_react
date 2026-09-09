@@ -875,10 +875,18 @@ class ClssAndruavUnitListArray extends React.Component {
 		super ();
 		this.state = {
 			andruavUnitPartyIDs : [],
-		    m_update: 0
+		    m_update: 0,
+            // m_opaque mirrors the legacy `attr('opacity')` flag on the
+            // parent #andruav_unit_list_array_float container: true when the
+            // list is pinned opaque, false when it fades to 0.8 on mouseout.
+            // Only the #obaq icon (rendered below) is owned by this component;
+            // the parent container is rendered by pages/home.js (and mobile.js),
+            // so its opacity/mouseout handling stays jQuery-driven (see
+            // FINDINGS.md — entangled with js_main.js enableDragging()).
+            m_opaque: false
 		};
-        
-        
+
+
         this.key = Math.random().toString();
 
         this.m_flag_mounted = false;
@@ -958,7 +966,12 @@ class ClssAndruavUnitListArray extends React.Component {
 
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {
-                $('#andruavUnits').show();
+                // #andruavUnits is rendered by pages/home.js (row_2) and
+                // pages/mobile.js; this component only reaches up to reveal it
+                // on socket registration. Direct DOM keeps the exact
+                // show-on-register behaviour without jQuery.
+                const v_andruavUnits = document.getElementById('andruavUnits');
+                if (v_andruavUnits) v_andruavUnits.style.display = 'block';
         }
         else
         {
@@ -969,23 +982,33 @@ class ClssAndruavUnitListArray extends React.Component {
     }
     fn_OnClick()
     {
-            if ($('#andruav_unit_list_array_float').attr('opacity') == null) {
-                $('#andruav_unit_list_array_float').attr('opacity', '1.0');
-                $('#andruav_unit_list_array_float').css('opacity', '1.0');
-                $('#andruav_unit_list_array_float').off('mouseout');
-                $('#andruav_unit_list_array_float #obaq').removeClass('bi-x-diamond');
-                $('#andruav_unit_list_array_float #obaq').addClass('bi-x-diamond-fill');
+            // The #obaq icon is rendered by this component (see render()), so
+            // its bi-x-diamond / bi-x-diamond-fill toggle is driven by React
+            // state (m_opaque). The parent #andruav_unit_list_array_float
+            // container is NOT owned by this component — its opacity and
+            // mouseout handler are managed with jQuery because they are
+            // entangled with js_main.js enableDragging() (jQuery UI
+            // .draggable() + .on('mouseout')), which is out of scope for
+            // TASK-15. Only the .attr/.css calls were converted to direct DOM;
+            // the .off/.on('mouseout') calls remain jQuery so they correctly
+            // remove/re-add js_main's jQuery-registered mouseout handler.
+            const v_float = document.getElementById('andruav_unit_list_array_float');
+            if (v_float === null || v_float === undefined) return;
+
+            if (v_float.getAttribute('opacity') == null) {
+                v_float.setAttribute('opacity', '1.0');
+                v_float.style.opacity = '1.0';
+                $(v_float).off('mouseout');
+                this.setState({ m_opaque: true });
             }
             else {
-                $('#andruav_unit_list_array_float').attr('opacity', null);
-                $('#andruav_unit_list_array_float').on("mouseout", function () {
-                    $('#andruav_unit_list_array_float').css('opacity', '0.8');
+                v_float.removeAttribute('opacity');
+                $(v_float).on("mouseout", function () {
+                    v_float.style.opacity = '0.8';
                 });
-                $('#andruav_unit_list_array_float #obaq').removeClass('bi-x-diamond-fill');
-                $('#andruav_unit_list_array_float #obaq').addClass('bi-x-diamond');
-                
+                this.setState({ m_opaque: false });
             }
-        
+
     }
 
     render() {
@@ -1049,7 +1072,7 @@ class ClssAndruavUnitListArray extends React.Component {
                                     <h3 className="text-success text-start">Units</h3>
                                 </div>
                                 <div key={'ClssAndruavUnitListArray2' + this.key} className="col-1 float-right">
-                                    <span key={'ClssAndruavUnitListArray3' + this.key} id ='obaq' className="cursor_hand bi bi-x-diamond" onClick={ (e) => this.fn_OnClick()}></span>
+                                    <span key={'ClssAndruavUnitListArray3' + this.key} id ='obaq' className={"cursor_hand bi " + (this.state.m_opaque ? 'bi-x-diamond-fill' : 'bi-x-diamond')} onClick={ (e) => this.fn_OnClick()}></span>
                                 </div>
 							</div>
                             {units_details} 
