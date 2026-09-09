@@ -1,16 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
 
 /**
  * Canvas-drawn bearing indicator. target_bearing/nav_bearing only drive an
  * imperative canvas draw (they are never rendered as JSX text), so they
- * stay in a ref rather than state - only a tick bump (on EE_unitNavUpdated
- * for this unit) triggers the redraw effect, matching the original
- * fn_update -> setState({m_update}) -> componentDidUpdate -> draw() chain.
+ * are read via useUnitField and a redraw effect fires when either changes.
  */
 function draw(c_ctx, dims, target_deg, bearing_deg) {
     if (!c_ctx) return; // Ensure context is available
@@ -57,27 +54,17 @@ function draw(c_ctx, dims, target_deg, bearing_deg) {
 
 export function ClssCtrlDirections({ p_unit }) {
     const key = useState(() => Math.random().toString())[0];
-    const [tick, setTick] = useState(0);
 
     const dirRef = useRef(null);
-    const bearingsRef = useRef({ target: 0, nav: 0 });
     const canvasCtxRef = useRef(null);
     const canvasDimsRef = useRef({ width: 0, height: 0, centerX: 0, centerY: 0, radius: 0 });
 
-    const fn_update = useCallback((p_andruavUnit) => {
-        try {
-            if (p_unit && p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-            bearingsRef.current = {
-                target: p_andruavUnit.m_Nav_Info._Target.target_bearing,
-                nav: p_andruavUnit.m_Nav_Info.p_Desired.nav_bearing,
-            };
-            setTick((t) => t + 1);
-        } catch (ex) {
-            console.error("Error in fn_update:", ex);
-        }
-    }, [p_unit]);
-
-    useEventSubscription(js_event.EE_unitNavUpdated, fn_update);
+    // Field-granular: read the two bearings reactively; the redraw effect
+    // below fires only when one of them changes (not on every coarse nav
+    // update for the whole unit).
+    const _partyId = p_unit?.getPartyID();
+    const targetBearing = useUnitField(_partyId, 'm_Nav_Info._Target.target_bearing');
+    const navBearing = useUnitField(_partyId, 'm_Nav_Info.p_Desired.nav_bearing');
 
     // One-time canvas setup + initial draw, mirroring the original's
     // componentDidMount.
@@ -103,12 +90,11 @@ export function ClssCtrlDirections({ p_unit }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Redraw whenever a matching EE_unitNavUpdated ticks, mirroring the
-    // original's componentDidUpdate.
+    // Redraw whenever the reactive bearings change, mirroring the original's
+    // componentDidUpdate.
     useEffect(() => {
-        if (tick === 0) return; // initial draw already done above
-        draw(canvasCtxRef.current, canvasDimsRef.current, bearingsRef.current.target, bearingsRef.current.nav);
-    }, [tick]);
+        draw(canvasCtxRef.current, canvasDimsRef.current, targetBearing, navBearing);
+    }, [targetBearing, navBearing]);
 
     return (
         <div key={key + 'dir'} className='css_hud_div'>
