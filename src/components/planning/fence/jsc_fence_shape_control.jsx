@@ -3,9 +3,9 @@ import $ from 'jquery';
 import React    from 'react';
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 
 const DEFAULT_DISTANCE = 10;
@@ -410,77 +410,71 @@ export default class ClssFence_Shape_Control extends React.Component {
 		};
 
     
-	    js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe (js_event.EE_onShapeCreated, this, this.fn_onShapeCreated);
-        js_eventEmitter.fn_subscribe (js_event.EE_onShapeSelected, this, this.fn_onShapeSelected);
-        js_eventEmitter.fn_subscribe (js_event.EE_onShapeEdited, this, this.fn_onShapeEdited);
-        js_eventEmitter.fn_subscribe (js_event.EE_onShapeDeleted, this, this.fn_onShapeDeleted);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
 
-    fn_onSocketStatus (me,p_params) {
+    fn_onSocketStatus (p_params) {
 
         if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
-        {				
-            me.setState({is_connected:true});
+        {
+            this.setState({is_connected:true});
         }
         else
-        {				
-            me.setState({is_connected:false});
+        {
+            this.setState({is_connected:false});
         }
     }
-    
 
-    fn_onShapeCreated (me, p_shape) 
+
+    fn_onShapeCreated (p_shape)
     {
         // Mission waypoint markers are not fences; ignore them here.
         if (p_shape.pm.m_shape_type === 'Marker') return;
 
         js_common.fn_console_log ("fn_onShapeCreated: " + p_shape);
-        me.setState({m_shape: p_shape});
+        this.setState({m_shape: p_shape});
     }
 
-    
+
     /**
-     * 
-     * @param {*} me 
-     * @param {*} p_event 
+     *
+     * @param {*} p_event
      *      p_event
-            { 
+            {
                 latlng: { lat, lng}
                 target: shape
             }
      */
-    fn_onShapeSelected (me, p_event) 
+    fn_onShapeSelected (p_event)
     {
-        me.setState({m_shape: p_event});
+        this.setState({m_shape: p_event});
     }
 
-    fn_onShapeEdited(me, p_shape)
+    fn_onShapeEdited(p_shape)
     {
         if (p_shape.pm.m_shape_type === 'Marker') return;
-        me.setState({m_shape: p_shape});
+        this.setState({m_shape: p_shape});
     }
 
-    fn_onShapeDeleted (me, p_shape) 
+    fn_onShapeDeleted (p_shape)
     {
         if (p_shape.pm.m_shape_type === 'Marker') return;
 
-        if (p_shape.m_geofenceInfo!= null) 
+        if (p_shape.m_geofenceInfo!= null)
         {
             p_shape.m_geofenceInfo.m_deleted = true;
         }
-        me.setState({m_shape: null});
+        this.setState({m_shape: null});
     }
 
     
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onShapeCreated,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onShapeSelected,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onShapeEdited,this);
-        js_eventEmitter.fn_unsubscribe (js_event.EE_onShapeDeleted,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     _renderswitch (v_unit)
@@ -541,7 +535,14 @@ export default class ClssFence_Shape_Control extends React.Component {
 
     return (
 
-                <div key='ClssFence_Shape_Control'>{v_unit}</div>
+                <div key='ClssFence_Shape_Control'>
+                    <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(p_params) => this.fn_onSocketStatus(p_params)} />
+                    <EventBridge eventName={js_event.EE_onShapeCreated} onEvent={(p_shape) => this.fn_onShapeCreated(p_shape)} />
+                    <EventBridge eventName={js_event.EE_onShapeSelected} onEvent={(p_event) => this.fn_onShapeSelected(p_event)} />
+                    <EventBridge eventName={js_event.EE_onShapeEdited} onEvent={(p_shape) => this.fn_onShapeEdited(p_shape)} />
+                    <EventBridge eventName={js_event.EE_onShapeDeleted} onEvent={(p_shape) => this.fn_onShapeDeleted(p_shape)} />
+                    {v_unit}
+                </div>
             );
     }
 };

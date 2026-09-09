@@ -4,6 +4,7 @@ import * as js_common from '../../../js/js_common.js';
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import { js_leafletmap } from '../../../js/maps/js_leafletmap.js';
 import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
 import { setSelectedMissionFilePathToRead } from '../../../js/js_main.js';
@@ -26,12 +27,9 @@ export default class ClssMission_Container extends React.Component {
         
         this.mission_file_ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
-        js_eventEmitter.fn_subscribe(js_event.EE_onPlanToggle, this, this.fn_onPlanToggle);
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeCreated, this, this.fn_onShapeCreated);
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeSelected, this, this.fn_onShapeSelected);
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeEdited, this, this.fn_onShapeEdited);
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeDeleted, this, this.fn_onShapeDeleted);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount() {
@@ -52,39 +50,39 @@ export default class ClssMission_Container extends React.Component {
         setSelectedMissionFilePathToRead(this.mission_file_ref.current.files);
     }
 
-    fn_onSocketStatus(me, p_params) {
+    fn_onSocketStatus(p_params) {
         if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-            me.setState({ is_connected: true });
+            this.setState({ is_connected: true });
         } else {
-            me.setState({ is_connected: false });
+            this.setState({ is_connected: false });
         }
     }
 
-    fn_onPlanToggle(me, p_params) {
-        
+    fn_onPlanToggle(p_params) {
+
         const c_mission = p_params.p_mission;
 
         if (p_params.p_switch_next) {
             // switch to next mission
             js_mapmission_planmanager.fn_activateNextMission(c_mission.m_id);
-            me.m_active_id = c_mission.m_id;
+            this.m_active_id = c_mission.m_id;
         } else {
             // make this the current mission
             js_mapmission_planmanager.fn_setCurrentMission(c_mission.m_id);
-            me.m_active_id = c_mission.m_id;
+            this.m_active_id = c_mission.m_id;
         }
 
-        if (me.m_flag_mounted === false)return;
-        me.setState({ m_update: me.state.m_update + 1 });
+        if (this.m_flag_mounted === false)return;
+        this.setState({ m_update: this.state.m_update + 1 });
     }
 
-    fn_onShapeCreated(me, p_shape) {
+    fn_onShapeCreated(p_shape) {
         js_common.fn_console_log("fn_onShapeCreated: " + p_shape);
 
         if (p_shape.pm.m_shape_type !== 'Marker') {
             // A fence shape was drawn: add it to the combined list and select it.
-            me.setState({ p_fences: [...me.state.p_fences, p_shape] });
-            me.m_active_id = CONST_FENCE_TAB_ID;
+            this.setState({ p_fences: [...this.state.p_fences, p_shape] });
+            this.m_active_id = CONST_FENCE_TAB_ID;
             return;
         }
 
@@ -110,27 +108,27 @@ export default class ClssMission_Container extends React.Component {
                 target: shape
             }
     */
-    fn_onShapeSelected(me, p_event) {
+    fn_onShapeSelected(p_event) {
         // A fence shape was selected directly on the map (not via the sidebar
         // tab list): switch the active tab to Fences so its editor becomes visible.
         if (p_event == null || p_event.pm == null) return;
         if (p_event.pm.m_shape_type === 'Marker') return;
 
-        me.m_active_id = CONST_FENCE_TAB_ID;
-        if (me.m_flag_mounted === false) return;
-        me.setState({ m_update: me.state.m_update + 1 });
+        this.m_active_id = CONST_FENCE_TAB_ID;
+        if (this.m_flag_mounted === false) return;
+        this.setState({ m_update: this.state.m_update + 1 });
     }
 
-    fn_onShapeEdited(me, p_shape) {
+    fn_onShapeEdited(p_shape) {
         if (p_shape.m_main_de_mission == null) return; // geo fence not mission
         p_shape.m_main_de_mission.fn_updatePath(true);
     }
 
-    fn_onShapeDeleted(me, p_shape) {
+    fn_onShapeDeleted(p_shape) {
         if (p_shape === null || p_shape === undefined ) return ;
         if (p_shape.m_main_de_mission == null) {
             // a fence shape was removed: drop it from the combined list.
-            me.setState({ p_fences: me.state.p_fences.filter(x => x !== p_shape) });
+            this.setState({ p_fences: this.state.p_fences.filter(x => x !== p_shape) });
             return;
         }
         p_shape.m_main_de_mission.fn_deleteMe(p_shape.id);
@@ -147,13 +145,8 @@ export default class ClssMission_Container extends React.Component {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onPlanToggle, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeCreated, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeSelected, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeEdited, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeDeleted, this);
-
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     // Add this method to handle the tab switch event
@@ -324,6 +317,12 @@ export default class ClssMission_Container extends React.Component {
 
         return (
             <div key="ClssCMissionsContainer" className="width_100">
+                <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(p_params) => this.fn_onSocketStatus(p_params)} />
+                <EventBridge eventName={js_event.EE_onPlanToggle} onEvent={(p_params) => this.fn_onPlanToggle(p_params)} />
+                <EventBridge eventName={js_event.EE_onShapeCreated} onEvent={(p_shape) => this.fn_onShapeCreated(p_shape)} />
+                <EventBridge eventName={js_event.EE_onShapeSelected} onEvent={(p_event) => this.fn_onShapeSelected(p_event)} />
+                <EventBridge eventName={js_event.EE_onShapeEdited} onEvent={(p_shape) => this.fn_onShapeEdited(p_shape)} />
+                <EventBridge eventName={js_event.EE_onShapeDeleted} onEvent={(p_shape) => this.fn_onShapeDeleted(p_shape)} />
                 {v_ctrl}
             </div>
         );

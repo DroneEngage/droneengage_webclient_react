@@ -7,7 +7,7 @@ import * as js_common from '../../../js/js_common.js'
 
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 import { ClssSingleMissionControlBar } from './jsc_ctrl_single_mission_control_bar.jsx'
 import { ClssAndruavUnitDropDownList } from '../../gadgets/jsc_ctrl_unit_drop_down_list.jsx'
@@ -45,7 +45,9 @@ export class ClssSingle_Plan_Header extends React.Component {
         this.pc_Ref = React.createRef();
         this.cp_Ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_mapMissionUpdate, this, this.fn_missionUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
@@ -66,9 +68,9 @@ export class ClssSingle_Plan_Header extends React.Component {
     }
 
 
-    fn_missionUpdated(me) {
-        if (me.m_flag_mounted === false)return ;
-        me.setState({'m_update': me.state.m_update +1});
+    fn_missionUpdated() {
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     
@@ -132,7 +134,8 @@ export class ClssSingle_Plan_Header extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_mapMissionUpdate, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     
@@ -187,6 +190,7 @@ export class ClssSingle_Plan_Header extends React.Component {
         let v_class = (this.props.p_isCurrent === true) ? "flex-grow-1 text-warning border border-warning rounded text-center cursor_hand padding_zero" : "flex-grow-1  txt-theme-aware border  border-secondry rounded text-center cursor_hand padding_zero"
         return (
             <div key={"plan" + this.props.p_mission.m_id} id="m_hdr" className="col  col-sm-12 margin_zero" >
+                <EventBridge eventName={js_event.EE_mapMissionUpdate} onEvent={() => this.fn_missionUpdated()} />
                 <div className="form-inline  margin_zero padding_zero">
                     <div className="card-header text-center d-flex align-items-center">
                         <p onClick={(e) => this.fn_onClick(e)} className={v_class}>{this.props.p_isCollapsed===true?'+   ':'-   '}<strong>{'Mission #' + this.props.p_mission.m_id + ' Panel (' + (this.props.p_mission.fn_getMissionDistance() / 1000.0).toFixed(1) + ' km)'}</strong></p>

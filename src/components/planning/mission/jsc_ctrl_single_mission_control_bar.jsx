@@ -6,6 +6,7 @@ import * as js_helpers from '../../../js/js_helpers.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
 
 import {
@@ -44,15 +45,15 @@ export class ClssSingleMissionControlBar extends React.Component {
     componentDidMount () 
     {
         this.m_flag_mounted = true;
-        this.m_missionLoadedCallback = (p_listener, p_payload) => {
-            this.fn_onMissionLoaded(p_payload);
-        };
-        js_eventEmitter.fn_subscribe(js_event.EE_Mission_Loaded, this, this.m_missionLoadedCallback);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Mission_Loaded, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     /**
@@ -305,6 +306,7 @@ export class ClssSingleMissionControlBar extends React.Component {
             
         return (
             <div id="geofence" key={'m_c_b' + c_key} className="d-flex flex-wrap gap-1 css_margin_top_small" >
+                <EventBridge eventName={js_event.EE_Mission_Loaded} onEvent={(p_payload) => this.fn_onMissionLoaded(p_payload)} />
                 <button  id='pre_geo_btn_generate' key={'mp1b1' + c_key} className='btn btn-primary btn-sm ctrlbtn'   title ="Export Mission as File" type="button "  onClick={ (e) => this.fn_exportMission() } >Export</button>
                 <button  id='geo_btn_georeset'  key={'mp1b2' + c_key} className="btn btn-warning btn-sm ctrlbtn" title ="Reset Mission on Map" type="button" onClick={ (e) => this.fn_deleteMission() } >Reset</button>
                 <button  id='geo_btn_geoupload'  key={'mp1b3' + c_key} className="btn btn-danger btn-sm ctrlbtn" title ="Save Mission on Unit" type="button" onClick={ (e) => this.fn_putWayPoints(true)}  >Upload</button>

@@ -3,7 +3,7 @@ import * as js_session from '../../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {js_localStorage} from '../../../js/js_localStorage.js'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_mission_plan from '../../../js/js_plan_mission.js'
 import * as js_fence_plan from '../../../js/js_mission_fence.js'
@@ -11,6 +11,7 @@ import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMes
 
 import {js_leafletmap} from '../../../js/maps/js_leafletmap.js'
 import {fn_do_modal_confirmation, fn_submitShapes, fn_deleteShapesinDB} from '../../../js/js_main.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 
 const res_FenceClssGlobalSettingsControl =
@@ -53,7 +54,9 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 		};
 
     
-        js_eventEmitter.fn_subscribe (js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     fn_deleteShapesinDB ()
@@ -78,21 +81,21 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 		}, 3000);
     }
     
-    fn_onSocketStatus (me,p_params) {
+    fn_onSocketStatus (p_params) {
         js_common.fn_console_log ('REACT:' + JSON.stringify(p_params));
 
         if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
-        {				
-                    me.setState({is_connected:true});
+        {
+                    this.setState({is_connected:true});
                     //$('#andruavUnits').show();
-                        
-                
+
+
         }
         else
-        {				
-            
-                me.setState({is_connected:false});
-                   
+        {
+
+                this.setState({is_connected:false});
+
                 //$('#andruavUnits').hide();
         }
     }
@@ -139,7 +142,8 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
     }
 
     componentWillUnmount () {
-    		js_eventEmitter.fn_unsubscribe (js_event.EE_onSocketStatus,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
 	}
 
     
@@ -167,7 +171,10 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
     return (
 
-                <div key='fgsc'>{v_unit}</div>
+                <div key='fgsc'>
+                    <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(p_params) => this.fn_onSocketStatus(p_params)} />
+                    {v_unit}
+                </div>
             );
     }
 };

@@ -2,7 +2,7 @@ import React    from 'react';
 
 import { mavlink20 } from '../../../js/js_mavlink_v2.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 /**
  * Editable lat/lng/alt form for the currently selected waypoint (p_shape).
@@ -39,12 +39,15 @@ export class CWayPointLocation extends React.Component {
         // We save the caret position on change and restore it after the render.
         this.m_pendingCaret = null;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeEdited, this, this.fn_onShapeEdited);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeEdited, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidUpdate()
@@ -77,11 +80,11 @@ export class CWayPointLocation extends React.Component {
      * Keeps the form in sync when the marker is dragged directly on the map
      * (Leaflet-Geoman 'pm:edit') rather than edited through this form.
      */
-    fn_onShapeEdited(me, p_shape)
+    fn_onShapeEdited(p_shape)
     {
-        if (!p_shape || !me.props.p_shape || p_shape.id !== me.props.p_shape.id) return;
-        const lnglat = me.props.p_shape.getLatLng();
-        me.setState({
+        if (!p_shape || !this.props.p_shape || p_shape.id !== this.props.p_shape.id) return;
+        const lnglat = this.props.p_shape.getLatLng();
+        this.setState({
             lat: lnglat.lat,
             lng: lnglat.lng,
         });
@@ -205,6 +208,7 @@ export class CWayPointLocation extends React.Component {
         const alt_id = "txt_alt" + this.props.p_shape.id + "_" + this.props.p_shape.m_main_de_mission.m_id;
 
         return (<div className="margin_zero css_margin_top_small">
+                    <EventBridge eventName={js_event.EE_onShapeEdited} onEvent={(p_shape) => this.fn_onShapeEdited(p_shape)} />
                     <p className="form-control-label txt-theme-aware mb-0">3D-Location </p>
                     <div className="row margin_zero">
                         <div className="col-4">

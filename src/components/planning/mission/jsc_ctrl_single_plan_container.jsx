@@ -6,6 +6,7 @@ import * as js_common from '../../../js/js_common.js'
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 import {ClssSingle_Mission_Item_Card} from './jsc_ctrl_single_mission_item_card.jsx'
 import {ClssSingle_Plan_Header} from './jsc_ctrl_single_plan_header.jsx'
@@ -25,8 +26,9 @@ export  class ClssSinglePlanContainer extends React.Component {
         
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_onShapeSelected, this, this.fn_displayGeoForm);
-        js_eventEmitter.fn_subscribe(js_event.EE_onMissionReset, this, this.fn_resetMission);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount () {
@@ -34,12 +36,12 @@ export  class ClssSinglePlanContainer extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onShapeSelected, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onMissionReset, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     
-    fn_displayGeoForm(me, p_event) {
+    fn_displayGeoForm(p_event) {
 
         js_common.fn_console_log("Mission Selected");
         // not a marker
@@ -48,13 +50,13 @@ export  class ClssSinglePlanContainer extends React.Component {
             return;
         }
 
-        if (me.props.p_missionPlan.m_id !== p_event.m_main_de_mission.m_id) {
+        if (this.props.p_missionPlan.m_id !== p_event.m_main_de_mission.m_id) {
             js_common.fn_console_log("Not Me");
             return;
         }
 
-        if (me.props.p_isCurrent === false) {
-            js_eventEmitter.fn_dispatch(js_event.EE_onPlanToggle, { p_switch_next: false, p_mission: me.props.p_missionPlan });
+        if (this.props.p_isCurrent === false) {
+            js_eventEmitter.fn_dispatch(js_event.EE_onPlanToggle, { p_switch_next: false, p_mission: this.props.p_missionPlan });
         }
 
         
@@ -68,14 +70,14 @@ export  class ClssSinglePlanContainer extends React.Component {
             p_event.m_main_de_mission.fn_updatePath(true);
         }
             
-        if (me.m_flag_mounted === false)return ;
-        me.setState({ s_shape: p_event });
+        if (this.m_flag_mounted === false)return ;
+        this.setState({ s_shape: p_event });
         
     }
 
-    fn_resetMission(p_me)
+    fn_resetMission()
     {
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
@@ -140,6 +142,8 @@ export  class ClssSinglePlanContainer extends React.Component {
         return (
             <div key='fsc' className="margin_zero width_100">
 
+                <EventBridge eventName={js_event.EE_onShapeSelected} onEvent={(p_event) => this.fn_displayGeoForm(p_event)} />
+                <EventBridge eventName={js_event.EE_onMissionReset} onEvent={() => this.fn_resetMission()} />
                 <div className="row margin_zero">
                     {item}
                 </div>
