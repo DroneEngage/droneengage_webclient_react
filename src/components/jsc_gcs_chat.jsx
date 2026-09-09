@@ -299,17 +299,19 @@ class ClssGCSChat extends ClssDialogBase {
             title = `${title} *`;
         }
 
-        if (this.state.isVisible === false) {
-            return null;
-        }
-
+        // EventBridge siblings must stay mounted even while the panel is
+        // hidden: the EE_onChatToggle subscription is what re-shows the
+        // panel, and EE_onChatMessage accrues unread counts while hidden.
+        // They render null, so they don't affect layout.
         return (
+            <>
+            <EventBridge eventName={js_event.EE_onChatMessage} onEvent={(data) => this.fn_onChatMessage(data)} />
+            <EventBridge eventName={js_event.EE_onChatToggle} onEvent={(data) => this.fn_onChatToggle(data)} />
+            <EventBridge eventName={js_event.EE_unitAdded} onEvent={(data) => this.fn_unitAdded(data)} />
+            <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(data) => this.fn_unitOnlineChanged(data)} />
+            {this.state.isVisible === true && (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel=".gcs-chat-minimize-btn, button, input, select, textarea">
             <div className="card css_ontop gcs-chat-panel" ref={this.m_panelRef}>
-                <EventBridge eventName={js_event.EE_onChatMessage} onEvent={(data) => this.fn_onChatMessage(data)} />
-                <EventBridge eventName={js_event.EE_onChatToggle} onEvent={(data) => this.fn_onChatToggle(data)} />
-                <EventBridge eventName={js_event.EE_unitAdded} onEvent={(data) => this.fn_unitAdded(data)} />
-                <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(data) => this.fn_unitOnlineChanged(data)} />
                 {this.fn_renderDialogHeader(title)}
                 {!this.state.isMinimized && (
                     <div className="card-body p-2">
@@ -382,6 +384,8 @@ class ClssGCSChat extends ClssDialogBase {
                 {this.fn_renderDialogFooter()}
             </div>
             </Draggable>
+            )}
+            </>
         );
     }
 }

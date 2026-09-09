@@ -118,10 +118,6 @@ class ClssNewsDisplay extends ClssDialogBase {
         const { t } = this.props;
         const title = t('news.title') || 'News';
 
-        if (this.state.isVisible === false) {
-            return null;
-        }
-
         const news = this.fn_getActiveNews();
 
         const sendingDisabled = js_siteConfig_CONST_FEATURE
@@ -138,12 +134,18 @@ class ClssNewsDisplay extends ClssDialogBase {
             </button>
         );
 
+        // EventBridge siblings must stay mounted even while the panel is
+        // hidden: the EE_onNewsToggle subscription is what re-shows the
+        // panel, and EE_News_Push accrues unread counts while hidden.
+        // They render null, so they don't affect layout.
         return (
+            <>
+            <EventBridge eventName={js_event.EE_News_Loaded} onEvent={(p_payload) => this.fn_onNewsLoaded(p_payload)} />
+            <EventBridge eventName={js_event.EE_News_Push} onEvent={(p_payload) => this.fn_onNewsPush(p_payload)} />
+            <EventBridge eventName={js_event.EE_onNewsToggle} onEvent={(p_data) => this.fn_onNewsToggle(p_data)} />
+            {this.state.isVisible === true && (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
                 <div className="card css_ontop news-display-panel" ref={this.m_panelRef}>
-                    <EventBridge eventName={js_event.EE_News_Loaded} onEvent={(p_payload) => this.fn_onNewsLoaded(p_payload)} />
-                    <EventBridge eventName={js_event.EE_News_Push} onEvent={(p_payload) => this.fn_onNewsPush(p_payload)} />
-                    <EventBridge eventName={js_event.EE_onNewsToggle} onEvent={(p_data) => this.fn_onNewsToggle(p_data)} />
                     {this.fn_renderDialogHeader(title, false, composeButton)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2 news-display-body">
@@ -168,6 +170,8 @@ class ClssNewsDisplay extends ClssDialogBase {
                     )}
                 </div>
             </Draggable>
+            )}
+            </>
         );
     }
 }

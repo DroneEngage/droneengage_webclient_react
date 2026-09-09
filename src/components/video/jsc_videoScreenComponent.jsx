@@ -12,13 +12,13 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js'
 
-import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord, fn_showVideoMainTab } from '../../js/js_main.js'
-import ClssCtrlGPIO_Flash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
+import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord } from '../../js/js_main.js'
+import ClssCtrlGpioFlash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'
-import { ClssCtrlDrone_Altitude_Ctrl } from '../gadgets/jsc_ctrl_altitude_control.jsx'
-import { ClssCtrlDrone_Speed_Ctrl } from '../gadgets/jsc_ctrl_speed_control.jsx'
-import ClssCtrlDrone_FlightMode_Ctrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx'
+import { ClssCtrlDrone_Altitude_Ctrl as ClssCtrlDroneAltitudeCtrl } from '../gadgets/jsc_ctrl_altitude_control.jsx'
+import { ClssCtrlDrone_Speed_Ctrl as ClssCtrlDroneSpeedCtrl } from '../gadgets/jsc_ctrl_speed_control.jsx'
+import ClssCtrlDroneFlightModeCtrl from '../gadgets/jsc_ctrl_flight_mode_control.jsx'
 import { ClssCtrlDEPilot } from '../de_pilot/jsc_ctrl_depilot.jsx'
 import ClssCtrlDistanceToMeControl from '../gadgets/jsc_ctrl_distance_to_me_control.jsx'
 import ClssCtrlOpacityControl from '../gadgets/jsc_ctrl_opacity_control.jsx'
@@ -142,7 +142,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
     
-    fn_gotoUnit_byPartyID(v_e) {
+    fn_gotoUnit_byPartyID() {
         fn_showMap();
         fn_gotoUnit_byPartyID(this.props.obj.v_unit);
     }
@@ -153,7 +153,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
 
-    fnl_takeLocalImage(e) {
+    fnl_takeLocalImage() {
         const c_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (!c_andruavUnit) return;
         fn_takeLocalImage(c_andruavUnit, this.props.obj.v_track);
@@ -175,7 +175,7 @@ export default class ClssCVideoScreen extends React.Component {
     }
 
 
-    fnl_recordVideo(v_e) {
+    fnl_recordVideo() {
         let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) {
             return;
@@ -201,7 +201,7 @@ export default class ClssCVideoScreen extends React.Component {
 
 
 
-    fnl_stopVideo(v_e) {
+    fnl_stopVideo() {
         let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         const v_talk = v_andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
@@ -243,10 +243,10 @@ export default class ClssCVideoScreen extends React.Component {
         if ((!p_obj.p_jmsg.hasOwnProperty('f'))
             && (typeof p_obj.p_jmsg['f'] !== 'number')) return;
 
-        this.state.m_flash = p_obj.p_jmsg['f'];
-        js_common.fn_console_log("Flash Updated", this.state.m_flash);
+        const flashValue = p_obj.p_jmsg['f'];
+        js_common.fn_console_log("Flash Updated", flashValue);
         if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
+        this.setState({ m_flash: flashValue, 'm_update': this.state.m_update +1});
     }
 
     fn_zoomChanged(p_obj) {
@@ -258,10 +258,10 @@ export default class ClssCVideoScreen extends React.Component {
         if ((!p_obj.p_jmsg.hasOwnProperty('b'))
             && (typeof p_obj.p_jmsg['b'] !== 'number')) return;
 
-        this.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
-        js_common.fn_console_log("Zoom Updated", this.state.m_zoom);
+        const zoomValue = (p_obj.p_jmsg['b'] !== 0.0);
+        js_common.fn_console_log("Zoom Updated", zoomValue);
         if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
+        this.setState({ m_zoom: zoomValue, 'm_update': this.state.m_update +1});
     }
 
     // Convert a client (screen) coordinate to normalized coordinates within the rendered video area (0..1)
@@ -343,7 +343,7 @@ export default class ClssCVideoScreen extends React.Component {
 
     }
 
-    fnl_requestPIP(e) {
+    fnl_requestPIP() {
         const v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
 
         if (v_andruavUnit === null || v_andruavUnit === undefined) {
@@ -373,7 +373,7 @@ export default class ClssCVideoScreen extends React.Component {
         );
     }
 
-    fnl_requestVideoFullScreen(e) {
+    fnl_requestVideoFullScreen() {
         const c_ele = this.drawingContainerRef.current;
         if (!c_ele) return;
         
@@ -407,14 +407,14 @@ export default class ClssCVideoScreen extends React.Component {
         }
     }
 
-    fnl_toggleVideoFitMode(e) {
+    fnl_toggleVideoFitMode() {
         this.m_videoFitModeIndex = (this.m_videoFitModeIndex + 1) % this.m_videoFitModes.length;
         js_common.fn_console_log("Video fit mode: " + this.m_videoFitModeLabels[this.m_videoFitModeIndex]);
         if (this.m_flag_mounted === false) return;
         this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
-    fnl_toggleGimbalControl(e) {
+    fnl_toggleGimbalControl() {
         this.m_gimbalModeIndex = (this.m_gimbalModeIndex + 1) % this.m_gimbalModeIcons.length;
         this.setState({ m_gimbal_enabled: this.m_gimbalModeIndex === 1 });
         js_common.fn_console_log("Gimbal control: " + this.m_gimbalModeLabels[this.m_gimbalModeIndex]);
@@ -445,7 +445,7 @@ export default class ClssCVideoScreen extends React.Component {
         js_common.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
         js_session.fn_getAndruavFacade().API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);
 
-        this.state.m_flash = v_flashValue;
+        this.setState({ m_flash: v_flashValue });
     }
 
     fnl_trackOnOff (e,obj)
@@ -453,7 +453,7 @@ export default class ClssCVideoScreen extends React.Component {
         console.log(obj);
     }
 
-    fnl_showLaserControl(e) {
+    fnl_showLaserControl() {
         const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (andruavUnit == null) {
             return;
@@ -465,14 +465,14 @@ export default class ClssCVideoScreen extends React.Component {
         });
     }
 
-    fnl_rotate(v_e) {
+    fnl_rotate() {
         let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
         if (v_andruavUnit === null || v_andruavUnit === undefined) return;
         this.m_rotation = (this.m_rotation + 1) % 4;
         js_session.fn_getAndruavFacade().API_CONST_RemoteCommand_rotateVideo(v_andruavUnit, this.m_rotations[this.m_rotation], this.props.obj.v_track);
     }
 
-    fnl_mirror_local(v_e) {
+    fnl_mirror_local() {
         if (this.m_mirrored === true) {
             this.m_mirrored = false;
             this.m_transform_mirrored = "scaleX(1)";
@@ -486,7 +486,7 @@ export default class ClssCVideoScreen extends React.Component {
         this.setState({'m_update': this.state.m_update +1});
     }
 
-    fnl_rotate_local(v_e) {
+    fnl_rotate_local() {
 
 
         this.m_rotation = (this.m_rotation + 1) % 4;
@@ -640,8 +640,23 @@ export default class ClssCVideoScreen extends React.Component {
 
     render() {
         const andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(this.props.obj.v_unit);
+
+        // EventBridge siblings must stay mounted even while the unit is
+        // temporarily missing from the unit list: the video/flash/zoom/redraw
+        // events are what bring the screen back to life when the unit
+        // returns. They render null, so they don't affect layout.
+        const eventBridges = (
+            <>
+                <EventBridge eventName={js_event.EE_videoStreamRedraw} onEvent={(p_obj) => this.fn_videoRedraw(p_obj)} />
+                <EventBridge eventName={js_event.EE_cameraFlashChanged} onEvent={(p_obj) => this.fn_flashChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_cameraZoomChanged} onEvent={(p_obj) => this.fn_zoomChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+            </>
+        );
+
         if (andruavUnit === null || andruavUnit === undefined) {
-            return null;
+            return eventBridges;
         }
         const isCompact = this.props.p_compact === true;
         const talk = andruavUnit.m_Video.m_videoactiveTracks[this.props.obj.v_track];
@@ -657,11 +672,7 @@ export default class ClssCVideoScreen extends React.Component {
         if (talk === null || talk === undefined || talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
-                    <EventBridge eventName={js_event.EE_videoStreamRedraw} onEvent={(p_obj) => this.fn_videoRedraw(p_obj)} />
-                    <EventBridge eventName={js_event.EE_cameraFlashChanged} onEvent={(p_obj) => this.fn_flashChanged(p_obj)} />
-                    <EventBridge eventName={js_event.EE_cameraZoomChanged} onEvent={(p_obj) => this.fn_zoomChanged(p_obj)} />
-                    <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
-                    <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+                    {eventBridges}
                     <h4 key="h" className='bg-danger txt-theme-aware rounded_6px'>{andruavUnit.m_unitName}</h4>
                     <div key="d" >NO VIDEO</div>
                 </div>
@@ -682,19 +693,11 @@ export default class ClssCVideoScreen extends React.Component {
         let css_zoomCam = '';
         let css_flashCam = '';
         let css_flashCam_title = '';
-        let css_rotateCam = '';
         if (andruavUnit.m_Video.supportZoom(this.props.obj.v_index)) {
             css_zoomCam = ' text-success ';
         }
         else {
             css_zoomCam = ' hidden ';
-        }
-
-        if (andruavUnit.m_Video.supportRotation(this.props.obj.v_index)) {
-            css_rotateCam = "cursor_hand ";
-        }
-        else {
-            css_rotateCam = 'hidden';
         }
 
 
@@ -709,7 +712,6 @@ export default class ClssCVideoScreen extends React.Component {
             }
             else {
                 // state was initialized disabled and this is the first tie to setup it.
-                this.state.m_flash = js_andruavMessages.CONST_FLASH_OFF;
                 css_flashCam = "cursor_hand css_camera_flash_off";
                 css_flashCam_title = "Flash Off";
             }
@@ -790,7 +792,7 @@ export default class ClssCVideoScreen extends React.Component {
                     <img
                         id="btnPIP"
                         className="cursor_hand css_video_pip"
-                        alt="Picture in Picture"
+                        alt="PIP"
                         title="Picture in Picture"
                         onClick={(e) => this.fnl_requestPIP(e)}
                     />
@@ -908,7 +910,7 @@ export default class ClssCVideoScreen extends React.Component {
                     <ClssCtrlObjectTracker p_unit={andruavUnit} title='object tracker' />
                 </div>,
                 <div key={key + "15"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
-                    <ClssCtrlGPIO_Flash p_unit={andruavUnit} title='flash light' />
+                    <ClssCtrlGpioFlash p_unit={andruavUnit} title='flash light' />
                 </div>,
                 <div key={key + "vl"} className="d-flex justify-content-center align-items-center padding_zero m-0 ms-1">
                     <ClssCtrlViewlinkControl p_unit={andruavUnit} />
@@ -928,11 +930,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         return (
             <div id={divID} className={"css_videoScreen tab-pane fade " + activeClass}>
-                <EventBridge eventName={js_event.EE_videoStreamRedraw} onEvent={(p_obj) => this.fn_videoRedraw(p_obj)} />
-                <EventBridge eventName={js_event.EE_cameraFlashChanged} onEvent={(p_obj) => this.fn_flashChanged(p_obj)} />
-                <EventBridge eventName={js_event.EE_cameraZoomChanged} onEvent={(p_obj) => this.fn_zoomChanged(p_obj)} />
-                <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
-                <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+                {eventBridges}
                 <h4 key="h" className="bg-primary txt-theme-aware rounded_6px">
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>
@@ -1015,7 +1013,7 @@ export default class ClssCVideoScreen extends React.Component {
                 p_containerRef={this.drawingContainerRef}
             />
             {!isCompact && (
-            <ClssCtrlDrone_Altitude_Ctrl
+            <ClssCtrlDroneAltitudeCtrl
                 p_unit={andruavUnit}
                 isHUD={true}
                 x="10px"
@@ -1042,7 +1040,7 @@ export default class ClssCVideoScreen extends React.Component {
             />
             )}
             {!isCompact && (
-            <ClssCtrlDrone_Speed_Ctrl
+            <ClssCtrlDroneSpeedCtrl
                 p_unit={andruavUnit}
                 isHUD={true}
                 x="10px"
@@ -1055,7 +1053,7 @@ export default class ClssCVideoScreen extends React.Component {
             />
             )}
             {!isCompact && (
-            <ClssCtrlDrone_FlightMode_Ctrl
+            <ClssCtrlDroneFlightModeCtrl
                 p_unit={andruavUnit}
                 isHUD={true}
                 x="10px"

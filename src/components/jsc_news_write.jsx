@@ -92,18 +92,19 @@ class ClssNewsWrite extends ClssDialogBase {
         const { t } = this.props;
         const title = t('news.write_title') || 'Post News (Account)';
 
-        if (this.state.isVisible === false) {
-            return null;
-        }
-
+        // EventBridge must stay mounted even while the panel is hidden:
+        // the EE_onNewsWriteToggle subscription is what re-shows the panel.
+        // It renders null, so it doesn't affect layout.
         return (
+            <>
+            <EventBridge eventName={js_event.EE_onNewsWriteToggle} onEvent={(p_data) => this.fn_onNewsWriteToggle(p_data)} />
+            {this.state.isVisible === true && (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
                 <div
                     className="card css_ontop news-write-panel p-0"
                     ref={this.m_panelRef}
                     onKeyDown={(e) => e.stopPropagation()}
                 >
-                    <EventBridge eventName={js_event.EE_onNewsWriteToggle} onEvent={(p_data) => this.fn_onNewsWriteToggle(p_data)} />
                     {this.fn_renderDialogHeader(title, false)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2">
@@ -154,6 +155,8 @@ class ClssNewsWrite extends ClssDialogBase {
                     )}
                 </div>
             </Draggable>
+            )}
+            </>
         );
     }
 }

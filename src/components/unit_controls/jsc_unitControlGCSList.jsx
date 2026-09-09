@@ -34,7 +34,7 @@ class ClssAndruavUnitGCSList extends React.Component {
         // useEventSubscription.
     }
 
-    fn_unitOnlineChanged(p_andruavUnit)
+    fn_unitOnlineChanged()
     {
         if (this.m_flag_mounted === false) return ;
         this.setState({ 'm_update': this.state.m_update+1});
@@ -57,8 +57,7 @@ class ClssAndruavUnitGCSList extends React.Component {
         if (params.status !== js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {
             // reset on disconnect
-            this.state.andruavUnitPartyIDs = [];
-            this.setState({'m_update': this.state.m_update +1});
+            this.setState({ andruavUnitPartyIDs: [], 'm_update': this.state.m_update +1 });
         }
     }
 
@@ -87,57 +86,60 @@ class ClssAndruavUnitGCSList extends React.Component {
     render() {
         const { t } = this.props;
 
-        // Respect GCS display preference
-        if (js_localStorage.fn_getGCSDisplayEnabled() === false) return null;
+        // EventBridge siblings must stay mounted even while the list is empty
+        // or GCS display is disabled: EE_unitAdded / EE_onPreferenceChanged /
+        // EE_requestGamePadonSocketStatus are what populate the list and
+        // re-enable display. They render null, so they don't affect layout.
+        const gcsDisplayEnabled = js_localStorage.fn_getGCSDisplayEnabled() !== false;
 
-        if (this.state.andruavUnitPartyIDs.length === 0) return null;
+        let units_gcs = [];
+        if (gcsDisplayEnabled && this.state.andruavUnitPartyIDs.length > 0) {
+            let sortedPartyIDs;
+            if (js_localStorage.fn_getUnitSortEnabled() === true)
+            {
+                sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
+            }
+            else
+            {
+                sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
+            }
 
-        let sortedPartyIDs;
-        if (js_localStorage.fn_getUnitSortEnabled() === true)
-        {
-            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSortedBy_APID();
+            const me = this;
+            sortedPartyIDs.forEach(function (object)
+            {
+                if (object === null || object === undefined) return ;
+                if (object.m_defined !== true) return ;
+                if (object.m_IsGCS !== true) return ;
+
+                const partyID = object.getPartyID();
+                const v_andruavUnit = object;
+
+                // hide offline GCS units
+                const v_shutdown = v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS;
+                if (v_shutdown) return;
+
+                units_gcs.push(
+                    <span
+                        key={'gcs_badge_' + partyID}
+                        className={`d-inline-flex align-items-center badge bg-secondary text-warning css_margin_zero margin_right_4px margin_left_4px cursor_hand IsGCS_true IsShutdown_${v_shutdown}`}
+                        onClick={ () => me.fn_gotoIfLocationExists(v_andruavUnit) }
+                    >
+                        <strong className="ms-1">{v_andruavUnit.m_unitName}</strong>
+                    </span>
+                );
+            });
         }
-        else
-        {
-            sortedPartyIDs = js_session.fn_getAndruavUnitList().fn_getUnitsSorted();
-        }
-
-        const units_gcs = [];
-        const me = this;
-        sortedPartyIDs.map(function (object)
-        {
-            if (object === null || object === undefined) return ;
-            if (object.m_defined !== true) return ;
-            if (object.m_IsGCS !== true) return ;
-
-            const partyID = object.getPartyID();
-            const v_andruavUnit = object;
-
-            // hide offline GCS units
-            const v_shutdown = v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS;
-            if (v_shutdown) return;
-
-            units_gcs.push(
-                <span
-                    key={'gcs_badge_' + partyID}
-                    className={`d-inline-flex align-items-center badge bg-secondary text-warning css_margin_zero margin_right_4px margin_left_4px cursor_hand IsGCS_true IsShutdown_${v_shutdown}`}
-                    onClick={ () => me.fn_gotoIfLocationExists(v_andruavUnit) }
-                >
-                    <strong className="ms-1">{v_andruavUnit.m_unitName}</strong>
-                </span>
-            );
-        });
-
-        if (units_gcs.length === 0) return null;
 
         return (
+            <>
+            <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+            <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
+            <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={() => this.fn_unitOnlineChanged()} />
+            <EventBridge eventName={js_event.EE_andruavUnitArmedUpdated} onEvent={() => this.fn_unitOnlineChanged()} />
+            <EventBridge eventName={js_event.EE_andruavUnitFCBUpdated} onEvent={() => this.fn_unitOnlineChanged()} />
+            <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={() => this.fn_unitOnlineChanged()} />
+            {gcsDisplayEnabled === true && units_gcs.length > 0 && (
             <div key='gcs_list_main' className='padding_zero margin_zero mb-1'>
-                <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
-                <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_andruavUnitArmedUpdated} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_andruavUnitFCBUpdated} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
                 <div className="card-header user-select-none py-1 border-bottom border-light rounded-top txt-theme-aware">
                     <strong>{t('home:onlineGCS')}</strong>
                     <button type="button" className="btn btn-sm btn-link txt-theme-aware float-end p-0 ms-2" onClick={() => this.fn_toggleMinimize()}>
@@ -150,6 +152,8 @@ class ClssAndruavUnitGCSList extends React.Component {
                     </div>
                 </div>
             </div>
+            )}
+            </>
         );
     }
 };
