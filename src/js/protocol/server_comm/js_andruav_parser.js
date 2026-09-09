@@ -620,6 +620,7 @@ class CAndruavClientParser {
                 // Extract the float data
                 let floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
                 v_unit.m_SDR.addSpectrumData(andruavCMD.ms, floatData)
+                notifyUnitFieldChanged(v_unit.getPartyID(), 'm_SDR.m_spectrum_data');
                 js_eventEmitter.fn_dispatch(js_event.EE_unitSDRSpectrum, v_unit);
 
                 for (let i = 0; i < floatData.length; i++) {

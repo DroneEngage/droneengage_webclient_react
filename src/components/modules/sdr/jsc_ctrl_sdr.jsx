@@ -6,8 +6,7 @@
 
 import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
-import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import ClassSDRSpectrumVisualizer from './jsc_ctrl_sdr_spectrum.jsx'
 
@@ -40,22 +39,42 @@ export class ClssCtrlSDR extends React.Component {
 		};
 
         this.m_flag_mounted = false;
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_unsubs = [];
     }
 
     componentWillUnmount () {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
-    componentDidMount () 
+    componentDidMount ()
     {
         this.m_flag_mounted = true;
         const  v_andruavUnit = this.props.p_unit;
         this.fn_copyData(this,v_andruavUnit);
+
+        // Field-granular: re-sync local form state only when the SDR config
+        // fields actually change, not on every coarse EE_unitSDRUpdated.
+        const partyId = v_andruavUnit.getPartyID();
+        const fields = [
+            'm_SDR.m_center_frequency',
+            'm_SDR.m_driver_index',
+            'm_SDR.m_sample_rate',
+            'm_SDR.m_gain',
+            'm_SDR.m_interval',
+            'm_SDR.m_display_bars',
+            'm_SDR.m_trigger_level',
+            'm_SDR.m_status',
+            'm_SDR.m_available_drivers',
+        ];
+        for (const fp of fields) {
+            this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                if (this.m_flag_mounted === false) return;
+                this.fn_copyData(this, this.props.p_unit);
+                this.setState({m_update:this.state.m_update});
+            }));
+        }
     }
 
     fn_copyData(p_me, p_andruavUnit)
@@ -71,8 +90,10 @@ export class ClssCtrlSDR extends React.Component {
 
     fn_unitUpdated (p_unit)
     {
+        // Retained for any external callers; field-store subscriptions in
+        // componentDidMount now drive the re-sync/re-render.
         if (this.state.m_update == 0) return ;
-        
+
         this.fn_copyData(this, p_unit);
         this.setState({m_update:this.state.m_update});
     }
@@ -270,7 +291,6 @@ export class ClssCtrlSDR extends React.Component {
 
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_sdr"} className={this.props.className}>
-                <EventBridge eventName={js_event.EE_unitSDRUpdated} onEvent={(p_unit) => this.fn_unitUpdated(p_unit)} />
                 <div key={v_andruavUnit.getPartyID() + 'sdr_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'sdr_11'} className="col-6 col-md-6 ">
                         <div key={v_andruavUnit.getPartyID() + 'sdr_111'} className='row css_margin_zero padding_zero '>

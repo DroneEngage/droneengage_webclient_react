@@ -11,8 +11,7 @@
 
 
 import React from 'react';
-import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 
 import ClassBarChart from '../../gadgets/jsc_ctrl_bar_chart'
 
@@ -24,26 +23,28 @@ class ClassSDRSpectrumVisualizer extends React.Component {
         };
 
         this.m_flag_mounted = false;
-
-        // Event subscription is owned by the EventBridge sibling rendered
-        // below (useEventSubscription auto-unsubscribes on unmount).
+        this.m_unsubSpectrum = null;
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
+        // Field-granular: re-render only when the spectrum array changes,
+        // not on every coarse EE_unitSDRSpectrum for the whole unit.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            this.m_unsubSpectrum = subscribeUnitField(partyId, 'm_SDR.m_spectrum_data', () => {
+                if (this.m_flag_mounted === false) return;
+                this.setState({m_update:this.state.m_update});
+            });
+        }
     }
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
-        // Unsubscription is handled automatically by the EventBridge
-        // sibling (useEventSubscription) on unmount.
-    }
-
-    fn_unitUpdated (p_me, p_unit)
-    {
-        if (p_me.m_flag_mounted === false) return;
-        //p_me.fn_copyData(p_me, p_unit);
-        p_me.setState({m_update:p_me.state.m_update});
+        if (this.m_unsubSpectrum) {
+            this.m_unsubSpectrum();
+            this.m_unsubSpectrum = null;
+        }
     }
 
     render()
@@ -56,7 +57,6 @@ class ClassSDRSpectrumVisualizer extends React.Component {
         {
             return (
                 <React.Fragment>
-                    <EventBridge eventName={js_event.EE_unitSDRSpectrum} onEvent={(p_unit) => this.fn_unitUpdated(this, p_unit)} />
                     <div>No Spectrum Data</div>
                 </React.Fragment>
             );
@@ -70,7 +70,6 @@ class ClassSDRSpectrumVisualizer extends React.Component {
 
         return (
             <React.Fragment>
-                <EventBridge eventName={js_event.EE_unitSDRSpectrum} onEvent={(p_unit) => this.fn_unitUpdated(this, p_unit)} />
                 <ClassBarChart data={data} labels={labels} />
             </React.Fragment>
         );
