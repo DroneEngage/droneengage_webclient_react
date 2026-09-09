@@ -137,7 +137,9 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         expect(byPath['m_Power._FCB.p_Battery.FCB_BatteryVoltage']).toBe(22.2);
         expect(byPath['m_Power._FCB.p_Battery.FCB_BatteryTemprature']).toBe(34);
         expect(byPath['m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed']).toBe(500);
-        expect(result.events[0].name).toBe(js_event.EE_unitPowUpdated);
+        // EE_unitPowUpdated was retired (TASK-13); POW reduce no longer
+        // dispatches a coarse event — field-store notifications cover it.
+        expect(result.events).toEqual([]);
     });
 
     test('POW: no FV -> FCB p_hasPowerInfo false', () => {

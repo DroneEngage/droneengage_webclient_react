@@ -74,9 +74,6 @@ const FORBIDDEN_BATCHED_BY_NAME_PATTERN = Object.freeze(
 const BATCHED_EVENTS = Object.freeze([
     js_event.EE_unitUpdated,
     js_event.EE_unitNavUpdated,
-    js_event.EE_unitPowUpdated,
-    js_event.EE_unitSDRUpdated,
-    js_event.EE_unitSDRSpectrum,
     js_event.EE_msgFromUnit_GPS,
     js_event.EE_andruavUnitFCBUpdated,
     js_event.EE_GamePad_Axes_Updated,

@@ -300,7 +300,6 @@ class CAndruavClientParser {
                             'm_Power._FCB.p_Battery.FCB_BatteryCurrent', 'm_Power._FCB.p_Battery.FCB_BatteryRemaining',
                             'm_Power._FCB.p_Battery.FCB_BatteryTemprature', 'm_Power._FCB.p_Battery.FCB_TotalCurrentConsumed',
                         ]);
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                     }
                     break;
                 case mavlink20.MAVLINK_MSG_ID_BATTERY2:
@@ -313,7 +312,6 @@ class CAndruavClientParser {
                             'm_Power._FCB.p_Battery2.p_hasPowerInfo', 'm_Power._FCB.p_Battery2.FCB_BatteryVoltage',
                             'm_Power._FCB.p_Battery2.FCB_BatteryCurrent',
                         ]);
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
 
                     }
                     break;
@@ -553,7 +551,6 @@ class CAndruavClientParser {
                         ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                     }
                     break;
 
@@ -581,7 +578,6 @@ class CAndruavClientParser {
                             'm_Power._FCB.p_Battery.FCB_BatteryRemaining', 'm_GPS_Info1.m_isValid',
                         ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
-                        js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                     }
                     break;
@@ -623,7 +619,6 @@ class CAndruavClientParser {
                 let floatData = new Float32Array(data.buffer.slice(v_internalCommandIndexByteBased));
                 v_unit.m_SDR.addSpectrumData(andruavCMD.ms, floatData)
                 notifyUnitFieldChanged(v_unit.getPartyID(), 'm_SDR.m_spectrum_data');
-                js_eventEmitter.fn_dispatch(js_event.EE_unitSDRSpectrum, v_unit);
 
                 for (let i = 0; i < floatData.length; i++) {
                     js_common.fn_console_log(`Float value at index ${i}: ${floatData[i]}`);

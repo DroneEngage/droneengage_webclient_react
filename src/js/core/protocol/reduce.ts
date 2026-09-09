@@ -292,7 +292,7 @@ function reducePOW(unit: CAndruavUnit, msg: Message): ReduceResult {
         patches.push({ path: 'm_Power._FCB.p_Battery.p_hasPowerInfo', value: false });
     }
 
-    return { patches, events: [{ name: js_event.EE_unitPowUpdated, payload: unit }] };
+    return { patches, events: [] };
 }
 
 // ---------------------------------------------------------------------------
@@ -827,11 +827,11 @@ function reduceSDRAction(unit: CAndruavUnit, msg: Message): ReduceResult {
                 { path: 'm_SDR.m_interval', value: p.t },
                 { path: 'm_SDR.m_trigger_level', value: p.l },
             ];
-            return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
+            return { patches, events: [] };
         }
         case CONST_SDR_ACTION_LIST_SDR_DEVICES: {
             const patches: FieldPatch[] = [{ path: 'm_SDR.m_available_drivers', value: p.dr === null ? [] : p.dr }];
-            return { patches, events: [{ name: js_event.EE_unitSDRUpdated, payload: unit }] };
+            return { patches, events: [] };
         }
         case CONST_SDR_ACTION_TRIGGER: {
             // addDetectedSignal is an impure unit method — use method dispatch.

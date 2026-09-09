@@ -113,12 +113,12 @@ describe('js_eventEmitter per-event rAF batching', () => {
         const okCalls = [];
 
         js_eventEmitter.fn_subscribe(
-            js_event.EE_unitPowUpdated,
+            js_event.EE_unitNavUpdated,
             listenerBad,
             () => { throw new Error('boom'); }
         );
         js_eventEmitter.fn_subscribe(
-            js_event.EE_unitPowUpdated,
+            js_event.EE_unitNavUpdated,
             listenerOk,
             (_l, data) => okCalls.push(data.getPartyID())
         );
@@ -127,7 +127,7 @@ describe('js_eventEmitter per-event rAF batching', () => {
         const consoleErr = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         try {
-            js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, makeUnit('party-P'));
+            js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, makeUnit('party-P'));
             await nextFrame();
 
             // The good listener still ran despite the bad one throwing.
@@ -135,8 +135,8 @@ describe('js_eventEmitter per-event rAF batching', () => {
             expect(consoleErr).toHaveBeenCalled();
         } finally {
             consoleErr.mockRestore();
-            js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated, listenerBad);
-            js_eventEmitter.fn_unsubscribe(js_event.EE_unitPowUpdated, listenerOk);
+            js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated, listenerBad);
+            js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated, listenerOk);
         }
     });
 
