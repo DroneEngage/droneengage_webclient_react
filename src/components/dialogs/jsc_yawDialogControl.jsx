@@ -6,7 +6,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
@@ -32,7 +32,9 @@ export default class ClssYawDialog extends ClssDialogBase
         this.m_actual_angle_deg = 0;
         this.m_selected_angle_deg = 0;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_unitNavUpdated,this, this.fn_onUnitNavUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
         
     }
 
@@ -47,7 +49,8 @@ export default class ClssYawDialog extends ClssDialogBase
 
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitNavUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     } 
 
     
@@ -74,16 +77,16 @@ export default class ClssYawDialog extends ClssDialogBase
     }
 
 
-    fn_onUnitNavUpdated(p_me, p_andruavUnit)
+    fn_onUnitNavUpdated(p_andruavUnit)
     {
-        if (p_me.m_flag_mounted === false || p_me.p_andruavUnit == null || p_andruavUnit == null) return;
-        if (p_me.p_andruavUnit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+        if (this.m_flag_mounted === false || this.p_andruavUnit == null || p_andruavUnit == null) return;
+        if (this.p_andruavUnit.getPartyID() !== p_andruavUnit.getPartyID()) return;
 
-        p_me.m_actual_angle_deg = p_me.fn_getCurrentYawDeg(p_andruavUnit);
+        this.m_actual_angle_deg = this.fn_getCurrentYawDeg(p_andruavUnit);
 
-        if (p_me.modal_ctrl_yaw.current != null && p_me.modal_ctrl_yaw.current.style.display === 'block')
+        if (this.modal_ctrl_yaw.current != null && this.modal_ctrl_yaw.current.style.display === 'block')
         {
-            p_me.setState({'m_update': p_me.state.m_update +1});
+            this.setState({'m_update': this.state.m_update +1});
         }
     }
 
@@ -215,6 +218,7 @@ export default class ClssYawDialog extends ClssDialogBase
         return (
             <Draggable nodeRef={this.modal_ctrl_yaw} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
+                    <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_onUnitNavUpdated(p_andruavUnit)} />
 					{this.fn_renderDialogHeader('YAW' + (this.p_andruavUnit ? ' of ' + this.p_andruavUnit.m_unitName : ''))}
 					{!this.state.isMinimized && (
 					<div className="card-body">

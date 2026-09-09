@@ -4,7 +4,7 @@ import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import {fn_helpPage} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
@@ -210,7 +210,9 @@ export default class ClssServoControl extends ClssDialogBase {
         this.btnCloseRef = React.createRef();
         
 
-        js_eventEmitter.fn_subscribe(js_event.EE_servoOutputUpdate, this, this.fn_updateData);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
@@ -225,8 +227,8 @@ export default class ClssServoControl extends ClssDialogBase {
         }
     }
 
-    fn_updateData(p_me, p_andruavUnit) {
-        p_me.setState({ 'partyID': p_andruavUnit.getPartyID() });
+    fn_updateData(p_andruavUnit) {
+        this.setState({ 'partyID': p_andruavUnit.getPartyID() });
     }
 
     fn_getCurrentPartyID() {
@@ -234,7 +236,8 @@ export default class ClssServoControl extends ClssDialogBase {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_servoOutputUpdate, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount() {
@@ -311,6 +314,7 @@ export default class ClssServoControl extends ClssDialogBase {
             return (
                 <Draggable nodeRef={this.modal_ctrl_srv} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                     <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2  " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
+                        <EventBridge eventName={js_event.EE_servoOutputUpdate} onEvent={(p_andruavUnit) => this.fn_updateData(p_andruavUnit)} />
                         {this.fn_renderDialogHeader("Servo's of " + v_unitName)}
                         {!this.state.isMinimized && (
                         <div id="ctrl_main" className="form-group text-center  " ref={this.ctrlMainRef}>

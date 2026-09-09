@@ -7,7 +7,7 @@ import Draggable from "react-draggable";
 import { withTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 import * as js_common from '../../js/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
@@ -66,14 +66,17 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         this.modal_ctrl_gimbal_dlg = React.createRef();
         this.joystick_ref = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_viewLinkGimbalAttitude, this, this.fn_onGimbalAttitude);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
 
 
     }
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_viewLinkGimbalAttitude, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount() {
@@ -229,11 +232,11 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         return colorMap[this.state.current_view_mode] || 'btn-primary';
     }
 
-    fn_onGimbalAttitude(p_me, p_status) {
-        if (p_me.m_flag_mounted === false) return;
+    fn_onGimbalAttitude(p_status) {
+        if (this.m_flag_mounted === false) return;
         
         const c_gimbal = (p_status && p_status.gm) ? p_status.gm : p_status;
-        p_me.setState({
+        this.setState({
             gimbal_yaw: c_gimbal.y,
             gimbal_pitch: c_gimbal.p,
             gimbal_roll: c_gimbal.r
@@ -253,7 +256,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         const tracking_target_type = tracking.tt;
         const tracking_target_type_text = tracking.ttt;
 
-        p_me.setState({
+        this.setState({
             lrf_distance_m: lrf_distance_m,
             lrf_age_seconds: lrf_age_seconds,
             tracking_status: tracking_status,
@@ -481,6 +484,7 @@ class ClssViewLinkGimbal extends ClssDialogBase {
         return (
             <Draggable nodeRef={this.modal_ctrl_gimbal_dlg} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_gimbal_dlg"} id="modal_ctrl_gimbal_dlg" title={t('gimbal_control')} className="card css_ontop border-light p-2 position-fixed" ref={this.modal_ctrl_gimbal_dlg} style={{ zIndex: 1050, top: '100px', left: '100px' }}>
+                    <EventBridge eventName={js_event.EE_viewLinkGimbalAttitude} onEvent={(p_status) => this.fn_onGimbalAttitude(p_status)} />
                     {this.fn_renderDialogHeader(isNoUnit ? t('gimbal_control') : t('gimbal_control') + ' ' + this.state.p_session?.m_unit.m_unitName)}
 
                     {!this.state.isMinimized && (

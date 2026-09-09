@@ -7,7 +7,7 @@ import Draggable from 'react-draggable';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import * as js_common from '../../js/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
+import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { fn_do_modal_confirmation, fn_do_modal_alert, fn_helpPage } from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService, js_dialogs } from '../../js/app/dialogService.js';
@@ -139,7 +139,9 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         this.modalRef = React.createRef();
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_updateParameters, this, this.fn_updateForm);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount() {
@@ -149,7 +151,8 @@ export default class ClssUnitParametersList extends ClssDialogBase {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_updateParameters, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
         if (this.modalRef.current) {
             this.modalRef.current.style.display = 'none';
         }
@@ -176,12 +179,12 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         p_me.m_close = false;
     }
 
-    fn_updateForm(p_me, p_andruavUnit) {
+    fn_updateForm(p_andruavUnit) {
 
-        if (p_me.m_close) return;
+        if (this.m_close) return;
 
-        if (!p_me.m_flag_mounted) return;
-        p_me.setState({ p_unit: p_andruavUnit, m_update: p_me.state.m_update + 1 });
+        if (!this.m_flag_mounted) return;
+        this.setState({ p_unit: p_andruavUnit, m_update: this.state.m_update + 1 });
     }
 
     fn_closeDialog() {
@@ -309,6 +312,7 @@ export default class ClssUnitParametersList extends ClssDialogBase {
                     ref={this.modalRef}
                     title="Parameters Control"
                 >
+                    <EventBridge eventName={js_event.EE_updateParameters} onEvent={(p_andruavUnit) => this.fn_updateForm(p_andruavUnit)} />
                     {this.fn_renderDialogHeader('Parameters of: ' + v_Name)}
                     {!this.state.isMinimized && (
                     <div id="ctrl_main" className="card-body">

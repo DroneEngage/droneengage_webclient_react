@@ -5,7 +5,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
@@ -24,9 +24,9 @@ class ClssStreamChannel extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
-        js_eventEmitter.fn_subscribe (js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
-        js_eventEmitter.fn_subscribe (js_event.EE_unitUpdated, this, this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
 
     }
 
@@ -34,37 +34,37 @@ class ClssStreamChannel extends React.Component {
         this.m_flag_mounted = true;
     }
 
-    fn_videoStarted(p_me,p_obj)
+    fn_videoStarted(p_obj)
     {
         // p_obj.talk
         // p_obj.andruavUnit
-        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
-        if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
+        if (this.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
+        if (this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
 
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.setState({'m_update': this.state.m_update +1});
 
         console.log ("video started");
 
     }
 
-    fn_videoStopped(p_me,p_obj)
+    fn_videoStopped(p_obj)
     {
         // p_obj.talk
         // p_obj.andruavUnit
-        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
-        if (p_me.props.prop_session.m_unit.m_Video.m_videoTracks[p_me.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
+        if (this.props.prop_session.m_unit.getPartyID() !== p_obj.andruavUnit.getPartyID()) return ;
+        if (this.props.prop_session.m_unit.m_Video.m_videoTracks[this.props.prop_track_number].id !== p_obj.talk.stream.id) return ;
 
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.setState({'m_update': this.state.m_update +1});
 
         console.log ("video stopped");
     }
 
-    fn_unitUpdated(p_me,p_obj)
+    fn_unitUpdated(p_obj)
     {
         // p_obj.andruavUnit
-        if (p_me.props.prop_session.m_unit.getPartyID() !== p_obj.getPartyID()) return ;
+        if (this.props.prop_session.m_unit.getPartyID() !== p_obj.getPartyID()) return ;
 
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.setState({'m_update': this.state.m_update +1});
     }
 
    
@@ -83,9 +83,8 @@ class ClssStreamChannel extends React.Component {
 
     componentWillUnmount () 
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     render ()  {
@@ -96,7 +95,7 @@ class ClssStreamChannel extends React.Component {
         {
 
             return (
-                <div></div>
+                <div><EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStarted(p_obj)} /><EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStopped(p_obj)} /><EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_obj) => this.fn_unitUpdated(p_obj)} /></div>
             );
         }
         else
@@ -128,6 +127,9 @@ class ClssStreamChannel extends React.Component {
 
             return (
                     <div className={isCompact ? "row al_l css_margin_zero" : "d-flex al_l css_margin_zero"}>
+                            <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStarted(p_obj)} />
+                            <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStopped(p_obj)} />
+                            <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_obj) => this.fn_unitUpdated(p_obj)} />
                             <div className={labelColClass + " si-09x css_margin_zero txt-theme-aware"}>
                             <label>{`${v_track.ln} ${actual_fps>0?` - ${actual_fps} fps`:''}`}</label>
                             </div>

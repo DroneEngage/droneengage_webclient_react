@@ -11,9 +11,9 @@
  * `activeDialog: null` and unmounts the dialog.
  */
 
-import React, { useEffect, useSyncExternalStore } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { subscribeDialog, fn_getDialogState, js_dialogs } from '../js/app/dialogService.js';
-import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
+import { useEventSubscription } from '../js/hooks/useEventSubscription.js';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 
 import ClssAlertDialog from './dialogs/jsc_alertDialog.jsx';
@@ -59,17 +59,7 @@ const DialogHost = () => {
 
     // Bridge EE_andruavUnitLidarShow (not an EE_display* event, but the lidar
     // dialog lives in DialogHost now). This subscription is app-lifetime.
-    useEffect(() => {
-        const lidarBridge = { __dialogHostLidarBridge: true };
-        js_eventEmitter.fn_subscribe(
-            js_event.EE_andruavUnitLidarShow,
-            lidarBridge,
-            (_me, p_unit) => js_dialogs.fn_showLidarInfo(p_unit)
-        );
-        return () => {
-            js_eventEmitter.fn_unsubscribe(js_event.EE_andruavUnitLidarShow, lidarBridge);
-        };
-    }, []);
+    useEventSubscription(js_event.EE_andruavUnitLidarShow, (p_unit) => js_dialogs.fn_showLidarInfo(p_unit));
 
     if (!activeDialog) return null;
 
