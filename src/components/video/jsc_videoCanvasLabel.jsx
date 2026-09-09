@@ -1,5 +1,5 @@
 import React from 'react';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 
 export default class ClssCVideoCanvasLabel extends React.Component {
@@ -29,14 +29,16 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         this.fnl_handleResize = this.fnl_handleResize.bind(this);
         this.fnl_handleFullscreenChange = this.fnl_handleFullscreenChange.bind(this);
         
-        js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
                 
     }
 
-    fn_EE_changeOpacity(me, params) {
+    fn_EE_changeOpacity(params) {
         if (params && params.opacity !== undefined) {
-            me.setState({ m_opacity: params.opacity }, () => {
-                me.fn_draw();
+            this.setState({ m_opacity: params.opacity }, () => {
+                this.fn_draw();
             });
         }
     }
@@ -73,7 +75,8 @@ export default class ClssCVideoCanvasLabel extends React.Component {
         document.removeEventListener('mozfullscreenchange', this.fnl_handleFullscreenChange);
         document.removeEventListener('MSFullscreenChange', this.fnl_handleFullscreenChange);
 
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
         
         if (this.m_resizeObserver) {
             this.m_resizeObserver.disconnect();
@@ -269,6 +272,7 @@ export default class ClssCVideoCanvasLabel extends React.Component {
                 className={css_class}
                 style={style}
             >
+                <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
                 <canvas
                     ref={this.m_canvasRef}
                     style={{

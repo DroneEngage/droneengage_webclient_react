@@ -1,6 +1,6 @@
 import React from 'react';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 
 export default class ClssCVideoTrackerLayer extends React.Component {
@@ -21,7 +21,9 @@ export default class ClssCVideoTrackerLayer extends React.Component {
         this.fn_syncCanvasSize();
         
         window.addEventListener('resize', this.fnl_handleResize);
-        js_eventEmitter.fn_subscribe(js_event.EE_DetectedTarget, this, this.fn_targetDetected);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
 
         const c_video = this.props.p_videoRef && this.props.p_videoRef.current;
         if (c_video && window.ResizeObserver) {
@@ -38,7 +40,8 @@ export default class ClssCVideoTrackerLayer extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.fnl_handleResize);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_DetectedTarget, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
         
         if (this.m_resizeObserver) {
             this.m_resizeObserver.disconnect();
@@ -56,17 +59,17 @@ export default class ClssCVideoTrackerLayer extends React.Component {
         }
     }
 
-    fn_targetDetected(p_me, p_unit) {
+    fn_targetDetected(p_unit) {
         if (CONST_EXPERIMENTAL_FEATURES_ENABLED === false) {
             return;
         }
 
         // We expect p_obj to contain v_unit (unit partyID)
-        if (!p_me.props.p_obj || p_me.props.p_obj.v_unit !== p_unit.getPartyID()) {
+        if (!this.props.p_obj || this.props.p_obj.v_unit !== p_unit.getPartyID()) {
             return;
         }
 
-        p_me.fnl_drawTargets(p_unit.m_DetectedTargets.m_targets);
+        this.fnl_drawTargets(p_unit.m_DetectedTargets.m_targets);
     }
 
     fnl_drawTargets(p_targets) {
@@ -203,7 +206,9 @@ export default class ClssCVideoTrackerLayer extends React.Component {
     render() {
         const { zIndex, pointerEvents } = this.props;
         return (
-            <canvas
+            <React.Fragment>
+                <EventBridge eventName={js_event.EE_DetectedTarget} onEvent={(p_unit) => this.fn_targetDetected(p_unit)} />
+                <canvas
                 id={this.props.id}
                 ref={this.m_canvasRef}
                 className={this.props.className}
@@ -213,6 +218,7 @@ export default class ClssCVideoTrackerLayer extends React.Component {
                     zIndex: zIndex || 'auto'
                 }}
             />
+            </React.Fragment>
         );
     }
 }

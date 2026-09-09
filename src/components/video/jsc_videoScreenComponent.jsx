@@ -27,6 +27,7 @@ import ClssCtrlViewlinkControl from '../gadgets/jsc_ctrl_viewlink_control.jsx'
 import ClssCVideoHUDOverlay from './jsc_videoHUDOverlayComponent.jsx'
 
 import ClssCVideoTrackerLayer from './jsc_videoTrackerLayer.jsx'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 export default class ClssCVideoScreen extends React.Component {
 
@@ -89,20 +90,18 @@ export default class ClssCVideoScreen extends React.Component {
         this.m_gimbalModeIcons = ["bi bi-arrows-expand txt-theme-aware cursor_hand css_large_icon text-muted", "bi bi-crosshair txt-theme-aware cursor_hand css_large_icon text-warning"];
         this.m_gimbalModeIndex = 0;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamRedraw, this, this.fn_videoRedraw);
-        js_eventEmitter.fn_subscribe(js_event.EE_cameraFlashChanged, this, this.fn_flashChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_cameraZoomChanged, this, this.fn_zoomChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStreamChanged);
-        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStreamChanged);
-        
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
+
     }
     
-    fn_videoStreamChanged(p_me, p_obj) {
+    fn_videoStreamChanged(p_obj) {
         // Re-render when video stream starts or stops for this track
-        if (p_me.props.obj.v_unit === p_obj.andruavUnit.getPartyID() && 
-            p_me.props.obj.v_track === p_obj.talk.targetVideoTrack) {
-            if (p_me.m_flag_mounted) {
-                p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+        if (this.props.obj.v_unit === p_obj.andruavUnit.getPartyID() &&
+            this.props.obj.v_track === p_obj.talk.targetVideoTrack) {
+            if (this.m_flag_mounted) {
+                this.setState({ 'm_update': this.state.m_update + 1 });
             }
         }
     }
@@ -133,12 +132,8 @@ export default class ClssCVideoScreen extends React.Component {
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamRedraw, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_cameraFlashChanged, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_cameraZoomChanged, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onWebRTC_Video_Statistics, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
 
         // Remove fullscreen event listeners
         document.removeEventListener('fullscreenchange', this.fnl_handleFullscreenChange);
@@ -227,21 +222,21 @@ export default class ClssCVideoScreen extends React.Component {
 
 
 
-    fn_videoRedraw(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.andruavUnit.getPartyID()) {
+    fn_videoRedraw(p_obj) {
+        if (this.props.obj.v_unit !== p_obj.andruavUnit.getPartyID()) {
             return;
         }
-        if (p_me.props.obj.v_track !== p_obj.v_track) {
+        if (this.props.obj.v_track !== p_obj.v_track) {
             return;
         }
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
 
-    fn_flashChanged(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
+    fn_flashChanged(p_obj) {
+        if (this.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
             return;
         }
 
@@ -249,14 +244,14 @@ export default class ClssCVideoScreen extends React.Component {
         if ((!p_obj.p_jmsg.hasOwnProperty('f'))
             && (typeof p_obj.p_jmsg['f'] !== 'number')) return;
 
-        p_me.state.m_flash = p_obj.p_jmsg['f'];
-        js_common.fn_console_log("Flash Updated", p_me.state.m_flash);
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.state.m_flash = p_obj.p_jmsg['f'];
+        js_common.fn_console_log("Flash Updated", this.state.m_flash);
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
-    fn_zoomChanged(p_me, p_obj) {
-        if (p_me.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
+    fn_zoomChanged(p_obj) {
+        if (this.props.obj.v_unit !== p_obj.p_unit.getPartyID()) {
             return;
         }
 
@@ -264,10 +259,10 @@ export default class ClssCVideoScreen extends React.Component {
         if ((!p_obj.p_jmsg.hasOwnProperty('b'))
             && (typeof p_obj.p_jmsg['b'] !== 'number')) return;
 
-        p_me.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
-        js_common.fn_console_log("Zoom Updated", p_me.state.m_zoom);
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        this.state.m_zoom = (p_obj.p_jmsg['b'] !== 0.0);
+        js_common.fn_console_log("Zoom Updated", this.state.m_zoom);
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     // Convert a client (screen) coordinate to normalized coordinates within the rendered video area (0..1)
@@ -661,6 +656,11 @@ export default class ClssCVideoScreen extends React.Component {
         if (talk === null || talk === undefined || talk.VideoStreaming === js_andruavUnit.CONST_VIDEOSTREAMING_OFF) {
             return (
                 <div id={divID} className={"css_videoScreen tab-pane fade in " + activeClass}>
+                    <EventBridge eventName={js_event.EE_videoStreamRedraw} onEvent={(p_obj) => this.fn_videoRedraw(p_obj)} />
+                    <EventBridge eventName={js_event.EE_cameraFlashChanged} onEvent={(p_obj) => this.fn_flashChanged(p_obj)} />
+                    <EventBridge eventName={js_event.EE_cameraZoomChanged} onEvent={(p_obj) => this.fn_zoomChanged(p_obj)} />
+                    <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+                    <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
                     <h4 key="h" className='bg-danger txt-theme-aware rounded_6px'>{andruavUnit.m_unitName}</h4>
                     <div key="d" >NO VIDEO</div>
                 </div>
@@ -927,6 +927,11 @@ export default class ClssCVideoScreen extends React.Component {
 
         return (
             <div id={divID} className={"css_videoScreen tab-pane fade " + activeClass}>
+                <EventBridge eventName={js_event.EE_videoStreamRedraw} onEvent={(p_obj) => this.fn_videoRedraw(p_obj)} />
+                <EventBridge eventName={js_event.EE_cameraFlashChanged} onEvent={(p_obj) => this.fn_flashChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_cameraZoomChanged} onEvent={(p_obj) => this.fn_zoomChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
+                <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(p_obj) => this.fn_videoStreamChanged(p_obj)} />
                 <h4 key="h" className="bg-primary txt-theme-aware rounded_6px">
                     {andruavUnit.m_unitName + ' track: ' + andruavUnit.m_Video.m_videoTracks[this.props.obj.v_index].ln}
                 </h4>

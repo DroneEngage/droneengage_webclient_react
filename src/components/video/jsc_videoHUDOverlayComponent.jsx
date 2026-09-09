@@ -1,7 +1,7 @@
 import React    from 'react';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 import * as js_helpers from '../../js/js_helpers.js'
 
@@ -30,16 +30,17 @@ export default class ClssCVideoHUDOverlay extends React.Component {
 
         this.fnl_handleResize = this.fnl_handleResize.bind(this);
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitNavUpdated,this,this.fn_update);
-        js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
 
         this.m_resizeObserver = null;
         this.m_raf_id = null;
     }
 
-    fn_EE_changeOpacity(me, params) {
+    fn_EE_changeOpacity(params) {
         if (params && params.opacity !== undefined) {
-            me.setState({ 'm_opacity': params.opacity });
+            this.setState({ 'm_opacity': params.opacity });
         }
     }
 
@@ -93,8 +94,8 @@ export default class ClssCVideoHUDOverlay extends React.Component {
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitNavUpdated,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
 
         window.removeEventListener('resize', this.fnl_handleResize);
 
@@ -165,16 +166,16 @@ export default class ClssCVideoHUDOverlay extends React.Component {
     }
 
 
-    fn_update (p_me,p_andruavUnit)
+    fn_update (p_andruavUnit)
     {
         try {
-            if (p_me.props.p_unit && p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+            if (this.props.p_unit && this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
 
-            p_me.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
-            p_me.c_pitch = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.pitch).toFixed(1);
-            p_me.c_roll = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.roll).toFixed(1);
+            this.c_yaw = (js_helpers.CONST_RADIUS_TO_DEGREE * ((p_andruavUnit.m_Nav_Info.p_Orientation.yaw + js_helpers.CONST_PTx2) % js_helpers.CONST_PTx2)).toFixed(1);
+            this.c_pitch = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.pitch).toFixed(1);
+            this.c_roll = (js_helpers.CONST_RADIUS_TO_DEGREE * p_andruavUnit.m_Nav_Info.p_Orientation.roll).toFixed(1);
 
-            p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+            this.setState({ 'm_update': this.state.m_update + 1 });
         } catch (ex) {
             console.error("Error in fn_update:", ex);
         }
@@ -302,6 +303,8 @@ export default class ClssCVideoHUDOverlay extends React.Component {
                     opacity: this.state.m_opacity
                 }}
             >
+                <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_update(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
                 <canvas
                     ref={this.m_canvasRef}
                     style={{

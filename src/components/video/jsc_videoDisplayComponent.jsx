@@ -1,13 +1,13 @@
 import React from 'react';
 import * as js_session from '../../js/state/session.js';
 
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import { fn_showVideoMainTab } from '../../js/js_main.js'
 import ClssCVideoScreen from './jsc_videoScreenComponent.jsx'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 
 export class ClssCVideoControl extends React.Component {
@@ -25,9 +25,9 @@ export class ClssCVideoControl extends React.Component {
         
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStarted, this, this.fn_videoStarted);
-        js_eventEmitter.fn_subscribe(js_event.EE_videoStreamStopped, this, this.fn_videoStopped);
-        js_eventEmitter.fn_subscribe(js_event.EE_videoTabClose, this, this.fn_closeVideoTab);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     
@@ -75,33 +75,33 @@ export class ClssCVideoControl extends React.Component {
     }
     
     
-    fn_videoStarted(p_me, p_obj) {
+    fn_videoStarted(p_obj) {
         p_obj.andruavUnit.m_Video.m_videoactiveTracks[p_obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_ON;
 
         let vid = p_obj.andruavUnit.getPartyID() + p_obj.talk.targetVideoTrack;
-        if (p_me.state.m_videoScreens.hasOwnProperty(vid) === false) {
-            p_me.state.m_videoScreens[vid] = {};
-            const c_screen = p_me.state.m_videoScreens[vid];
+        if (this.state.m_videoScreens.hasOwnProperty(vid) === false) {
+            this.state.m_videoScreens[vid] = {};
+            const c_screen = this.state.m_videoScreens[vid];
             c_screen.v_unit = p_obj.andruavUnit.getPartyID();
             c_screen.v_track = p_obj.talk.targetVideoTrack;
             c_screen.v_index = js_helpers.fn_findWithAttributeIndex(p_obj.andruavUnit.m_Video.m_videoTracks, "id", p_obj.talk.targetVideoTrack);
-            p_me.state.lastadded = vid;
-            p_me.state.needsTabActivation = true; // Flag to activate tab after render
+            this.state.lastadded = vid;
+            this.state.needsTabActivation = true; // Flag to activate tab after render
         }
 
-        if (p_me.props.p_compact === true) {
+        if (this.props.p_compact === true) {
             // Compact (mobile) view only ever shows one camera at a time. Keeping more than
             // one tab-pane mounted is what was flickering: each pane runs its own live WebRTC
             // <video>, and the active/show classes get juggled between React props and the
             // imperative DOM patch in componentDidUpdate. Closing the others removes the
             // second pane instead of just hiding it.
-            p_me.fn_closeOtherScreens(vid);
+            this.fn_closeOtherScreens(vid);
         }
 
         fn_showVideoMainTab();
 
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
 
     }
 
@@ -130,44 +130,43 @@ export class ClssCVideoControl extends React.Component {
     }
 
 
-    fn_closeVideoTab(p_me, p_obj) {
+    fn_closeVideoTab(p_obj) {
         const vid = p_obj.unitPartyID + p_obj.trackID;
-        if (p_me.state.m_videoScreens.hasOwnProperty(vid)) {
-            delete p_me.state.m_videoScreens[vid];
+        if (this.state.m_videoScreens.hasOwnProperty(vid)) {
+            delete this.state.m_videoScreens[vid];
         }
 
-        if (p_me.state.lastadded === vid) {
-            p_me.state.lastadded = null;
-            p_me.state.needsTabActivation = false;
+        if (this.state.lastadded === vid) {
+            this.state.lastadded = null;
+            this.state.needsTabActivation = false;
         }
-        
-        if (p_me.m_flag_mounted === false) return;
-        p_me.setState({'m_update': p_me.state.m_update + 1});
+
+        if (this.m_flag_mounted === false) return;
+        this.setState({'m_update': this.state.m_update + 1});
     }
 
 
-    fn_videoStopped(p_me, obj) {
+    fn_videoStopped(obj) {
 
         obj.andruavUnit.m_Video.m_videoactiveTracks[obj.talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
         const vid = obj.andruavUnit.getPartyID() + obj.talk.targetVideoTrack;
-        if (p_me.state.m_videoScreens.hasOwnProperty(vid)) {
-            delete p_me.state.m_videoScreens[vid];
+        if (this.state.m_videoScreens.hasOwnProperty(vid)) {
+            delete this.state.m_videoScreens[vid];
         }
 
-        if (p_me.state.lastadded === vid) {
-            p_me.state.lastadded = null;
-            p_me.state.needsTabActivation = false;
+        if (this.state.lastadded === vid) {
+            this.state.lastadded = null;
+            this.state.needsTabActivation = false;
         }
 
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStarted, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoStreamStopped, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_videoTabClose, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
 
@@ -182,6 +181,9 @@ export class ClssCVideoControl extends React.Component {
         if (len === 0) {
             return (
                 <div className="container-fluid localcontainer">
+                    <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStarted(p_obj)} />
+                    <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(obj) => this.fn_videoStopped(obj)} />
+                    <EventBridge eventName={js_event.EE_videoTabClose} onEvent={(p_obj) => this.fn_closeVideoTab(p_obj)} />
                     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '100px' }}>
                         <div> No Camera Active</div>
                     </div>
@@ -216,6 +218,9 @@ export class ClssCVideoControl extends React.Component {
 
         return (
             <div className="container-fluid localcontainer">
+                <EventBridge eventName={js_event.EE_videoStreamStarted} onEvent={(p_obj) => this.fn_videoStarted(p_obj)} />
+                <EventBridge eventName={js_event.EE_videoStreamStopped} onEvent={(obj) => this.fn_videoStopped(obj)} />
+                <EventBridge eventName={js_event.EE_videoTabClose} onEvent={(p_obj) => this.fn_closeVideoTab(p_obj)} />
                 <ul className="nav  nav-tabs">
                     {out_h}
                 </ul>
