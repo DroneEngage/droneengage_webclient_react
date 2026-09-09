@@ -184,6 +184,16 @@ export default class ClssGamePadControl extends React.Component {
 
         this.key = Math.random().toString();
 
+        // rootRef points at the #modal_ctrl_gamepad root div rendered below,
+        // replacing the legacy jQuery id selectors on it. m_opaque
+        // mirrors the legacy `attr('opacity')` pin flag on that div: true
+        // when pinned opaque, false when it fades to 0.4 on mouseout. It is
+        // an instance field (not state) because it is not read in render —
+        // opacity is applied directly to the DOM node, exactly as the
+        // jQuery .css('opacity', ...) calls did, avoiding re-renders.
+        this.rootRef = React.createRef();
+        this.m_opaque = false;
+
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
 
         // Event subscriptions are owned by EventBridge siblings rendered
@@ -267,11 +277,12 @@ export default class ClssGamePadControl extends React.Component {
         if (this.m_flag_mounted === false)return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
         this.state.m_andruavUnit = p_andruavUnit;
-        $('#modal_ctrl_gamepad').find('#btnGoto').off("click");
-        $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
-            fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.getPartyID()));
-        });
-        $('#modal_ctrl_gamepad').show();
+        // The #btnGoto button is rendered below with its own React onClick
+        // (fn_gotoUnitPressed), so the legacy jQuery .off('click')/.on('click')
+        // binding here was redundant — and its handler read a non-existent
+        // attr(partyID) (see FINDINGS.md). Show the modal via the ref instead
+        // of the legacy jQuery .show() on the id selector.
+        if (this.rootRef.current) this.rootRef.current.style.display = 'block';
 
        this.setState({'m_update': this.state.m_update +1});
 
@@ -282,7 +293,7 @@ export default class ClssGamePadControl extends React.Component {
         if (this.m_flag_mounted === false)return ;
 
         this.state.m_andruavUnit = null;
-        $('#modal_ctrl_gamepad').hide();
+        if (this.rootRef.current) this.rootRef.current.style.display = 'none';
 
         this.setState({'m_update': this.state.m_update +1});
 
@@ -300,32 +311,45 @@ export default class ClssGamePadControl extends React.Component {
 
     componentDidMount () {
 
-        $('#modal_ctrl_gamepad').hide();
-        $('#modal_ctrl_gamepad').draggable({
-            handle: '.js-draggable-handle',
-            cancel: 'button, input, textarea, select, option, a'
-        });
-        $('#modal_ctrl_gamepad').on("mouseover", function () {
-            $('#modal_ctrl_gamepad').css('opacity', '1.0');
-        });
-        $('#modal_ctrl_gamepad').on("mouseout", function () {
-            const opacity = $('#modal_ctrl_gamepad').attr('opacity') ;
-            if ( opacity === null || opacity  === undefined) {
-                $('#modal_ctrl_gamepad').css('opacity', '0.4');
-            }
-        });
-        $('#modal_ctrl_gamepad').find('#opaque_btn').on('click', function () {
-            const opacity = $('#modal_ctrl_gamepad').attr('opacity') ;
-            if (opacity === null || opacity === undefined) {
-                $('#modal_ctrl_gamepad').attr('opacity', '1.0');
-                $('#modal_ctrl_gamepad').css('opacity', '1.0');
-            }
-            else {
-                $('#modal_ctrl_gamepad').attr('opacity', null);
-            }
-        });
-        
+        if (this.rootRef.current) this.rootRef.current.style.display = 'none';
+        // .draggable() is jQuery UI — out of scope for TASK-15 (same as
+        // js_main.js enableDragging()). It stays a jQuery call, but on the
+        // ref DOM node instead of an id selector.
+        if (this.rootRef.current) {
+            $(this.rootRef.current).draggable({
+                handle: '.js-draggable-handle',
+                cancel: 'button, input, textarea, select, option, a'
+            });
+        }
+        // mouseover / mouseout / opaque_btn click are now React handlers on
+        // the root div and the button (see render), so they no longer need
+        // jQuery .on() registration here.
+
         this.m_flag_mounted = true;
+    }
+
+    fn_onMouseOver ()
+    {
+        if (this.rootRef.current) this.rootRef.current.style.opacity = '1.0';
+    }
+
+    fn_onMouseOut ()
+    {
+        // Match the legacy mouseout: only fade to 0.4 when not pinned
+        // opaque (m_opaque mirrors the old attr('opacity') flag).
+        if (this.m_opaque) return;
+        if (this.rootRef.current) this.rootRef.current.style.opacity = '0.4';
+    }
+
+    fn_onOpaqueClick ()
+    {
+        // Toggle the opaque pin. When pinning, force opacity to 1.0; when
+        // unpinning, leave the current opacity in place (it drops to 0.4
+        // on the next mouseout), exactly as the legacy handler did.
+        this.m_opaque = !this.m_opaque;
+        if (this.m_opaque && this.rootRef.current) {
+            this.rootRef.current.style.opacity = '1.0';
+        }
     }
 
     fn_gotoUnitPressed()
@@ -372,7 +396,7 @@ export default class ClssGamePadControl extends React.Component {
             gamepad_title = v_controller.id.toString();
         }
 
-        return (<div id="modal_ctrl_gamepad" key={"m1_" + this.key} title="GamePad Control" className="css_ontop">
+        return (<div id="modal_ctrl_gamepad" key={"m1_" + this.key} ref={this.rootRef} title="GamePad Control" className="css_ontop" onMouseOver={(e) => this.fn_onMouseOver(e)} onMouseOut={(e) => this.fn_onMouseOut(e)}>
   <EventBridge eventName={js_event.EE_GamePad_Connected} onEvent={(p_obj) => this.fn_gamePadConnected(p_obj)} />
   <EventBridge eventName={js_event.EE_GamePad_Disconnected} onEvent={(p_obj) => this.fn_gamePadDisconnected(p_obj)} />
   <EventBridge eventName={js_event.EE_requestGamePad} onEvent={(p_andruavUnit) => this.fn_requestGamePad(p_andruavUnit)} />
@@ -389,6 +413,7 @@ export default class ClssGamePadControl extends React.Component {
         data-bs-toggle="button"
         aria-pressed="false"
         autoComplete="off"
+        onClick={(e) => this.fn_onOpaqueClick(e)}
       >
         opaque
       </button>
