@@ -1,6 +1,6 @@
 # Refactor Tasks — droneengage_webclient_react
 
-Eight self-contained implementation tasks derived from the architecture review.
+Twelve self-contained implementation tasks derived from the architecture review.
 Each `TASK-NN-*.md` is written to be handed to a coding model **on its own**, with
 no other context. Read this file first — it holds the rules that apply to all of them.
 
@@ -24,7 +24,26 @@ TASK-08  layout state out of jQuery     no deps — independent
 TASK-09  mapbox vendor isolation        no deps — independent, touches js_map3d.js only
 TASK-10  draggable target marker (3D)   soft dep on 09 (marker-construction style only)
 TASK-11  smooth position interpolation  soft dep on 09 (landed); independent of 10
+TASK-12  EventBridge migration           no deps — independent, mechanical
+TASK-13  event bus state retirement      needs 03 (parts b/c) + 12 — finishes 03
+TASK-14  fix core typecheck gate         needs 06 — fixes a currently-broken acceptance check
+TASK-15  reduce jQuery in heavy components  needs 08 (steps 1-4) — finishes 08 step 5
 ```
+
+TASK-13, TASK-14, and TASK-15 are follow-ups written after an audit found TASK-03, TASK-06,
+and TASK-08 respectively landed only partially against their own Acceptance sections:
+
+- **TASK-03** shipped the dialog service and typed domain events, but the ~29 coarse
+  `EE_unit*` state events were never retired, and the component migration target changed
+  underneath it — TASK-12 moved class components to `EventBridge` instead of the
+  `useUnitField` the original spec assumed. TASK-13 reconciles that and finishes the
+  retirement.
+- **TASK-06** added TypeScript to `core/`, but `npm run typecheck` currently fails on a
+  transitive `@types/node` version pulling in syntax the pinned TypeScript can't parse — a
+  broken acceptance gate, not unfinished scope. TASK-14 is a small, isolated config fix.
+- **TASK-08** converted the layout-switching mechanism to a React store (steps 1-4), but
+  step 5 — reducing jQuery inside the three heaviest components — was deferred as "the long
+  tail" and has zero progress. TASK-15 picks it up.
 
 TASK-02 is partially implemented (28 of ~38 JSON-switch cases migrated, the
 core/protocol modules exist, the parser↔facade cycle is broken). The six
@@ -35,6 +54,18 @@ group at a time and TASK-02.6 cannot run until all five are done.
 
 Do **not** start TASK-04 early. It is the widest diff in the set and it must run
 after the other seams have stopped moving, or it will conflict with all of them.
+
+TASK-12 completes the event-subscription leak-guard migration started in
+"Plan1: Event-subscription hook + leak guard". Every React class component
+still using the manual `fn_subscribe`/`componentWillUnmount fn_unsubscribe`
+pairing is migrated to `EventBridge` (class components) or `useEventSubscription`
+(function components that used manual `fn_subscribe` inside `useEffect`).
+Non-React JS modules (`js_main.js`, `js_map3d.js`, etc.) are out of scope.
+`jsc_user_list.jsx` is also excluded — it uses a different emitter
+(`window.StreamSensLibs.EventEmitter`). The migration is mechanical and
+behaviour-preserving; two pre-existing bugs were fixed along the way
+(orphaned unsubscribe in `jsc_videoScreenComponent.jsx`, `this`-in-function-component
+in `pages/home.js`).
 
 ## Rules that apply to every task
 
