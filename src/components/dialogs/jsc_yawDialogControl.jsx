@@ -5,8 +5,6 @@ import 'jquery-knob/dist/jquery.knob.min.js';
 import React    from 'react';
 import Draggable from "react-draggable";
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
