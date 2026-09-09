@@ -22,10 +22,14 @@ import { subscribeUnitField } from '../store/unitStore.js';
  */
 export function useUnitField(partyId, fieldPath) {
     const subscribe = useCallback(
-        (onChange) => subscribeUnitField(partyId, fieldPath, onChange),
+        (onChange) => {
+            if (!partyId || !fieldPath) return () => {};
+            return subscribeUnitField(partyId, fieldPath, onChange);
+        },
         [partyId, fieldPath]
     );
     const getSnapshot = useCallback(() => {
+        if (!partyId || !fieldPath) return undefined;
         const list = js_session.fn_getAndruavUnitList();
         if (!list) return undefined;
         const unit = list.fn_getUnit(partyId);

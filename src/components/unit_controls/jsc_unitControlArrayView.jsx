@@ -813,8 +813,8 @@ class ClssAndruavUnitDroneRow extends React.Component{
                         </ul>
                 </div>
                 <div key={this.key+'6'} className = {'col-4  col-lg-2   d-grid css_margin_zero  si-07x  css_dotted_border  ' + css_battery_enabled}>
-                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat1"} id={v_andruavUnit.getPartyID() + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery} p_unit={v_andruavUnit}/>
-                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat2"} id={v_andruavUnit.getPartyID() + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2} p_unit={v_andruavUnit}/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat1"} id={v_andruavUnit.getPartyID() + "_ctrl_bat1"} m_title='Batt1' m_battery={v_andruavUnit.m_Power._FCB.p_Battery} p_unit={v_andruavUnit} m_batteryFieldPath="m_Power._FCB.p_Battery"/>
+                        <ClssCtrlBattery key={v_andruavUnit.getPartyID() + "_ctrl_bat2"} id={v_andruavUnit.getPartyID() + "_ctrl_bat2"} m_title='Batt2' m_battery={v_andruavUnit.m_Power._FCB.p_Battery2} p_unit={v_andruavUnit} m_batteryFieldPath="m_Power._FCB.p_Battery2"/>
                 </div>
                 <div key={this.key+'7'} className = 'col-4  col-lg-2   d-none d-lg-grid css_margin_zero css_padding_zero css_dotted_border  '>
                     <div className = 'row  css_margin_zero css_padding_zero'>

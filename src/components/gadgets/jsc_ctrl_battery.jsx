@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 
 
 function hlp_getFCBBatteryCSSClass(v_battery)
@@ -47,27 +48,33 @@ function hlp_getFCBBatteryCSSClass(v_battery)
  * (optional) to filter EE_unitPowUpdated by party ID. Without p_unit, the
  * callback falls back to the original unfiltered behavior (any unit's
  * power update ticks this gadget) for backward compatibility.
+ *
+ * m_batteryFieldPath is the dot-path to the battery object (e.g.
+ * 'm_Power._FCB.p_Battery'). When provided, the gadget subscribes to the
+ * individual battery sub-fields via useUnitField and re-renders only when
+ * one of them changes — replacing the coarse EE_unitPowUpdated trigger.
  */
-export function ClssCtrlBattery({ className, m_title, m_battery, p_unit }) {
+export function ClssCtrlBattery({ className, m_title, m_battery, p_unit, m_batteryFieldPath }) {
     const [isCompact, setIsCompact] = useState(true);
-    const [, setTick] = useState(0);
     const key = useState(() => Math.random().toString())[0];
 
-    const fn_update = useCallback((p_andruavUnit) => {
-        // Filter by party ID when p_unit is available so a power update
-        // from unit A doesn't re-render unit B's battery gadget. Without
-        // p_unit, fall back to the original unfiltered behavior.
-        if (p_unit && p_andruavUnit && p_andruavUnit.getPartyID) {
-            if (p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-        }
-        setTick((t) => t + 1);
-    }, [p_unit]);
+    // Field-granular re-render: subscribe to the displayed battery
+    // sub-fields. All are patched together in one power update, so any
+    // one firing is enough, but subscribing to all displayed fields
+    // keeps the contract explicit.
+    const _partyId = p_unit?.getPartyID();
+    const _fp = m_batteryFieldPath;
+    useUnitField(_partyId, _fp ? `${_fp}.p_hasPowerInfo` : null);
+    useUnitField(_partyId, _fp ? `${_fp}.FCB_BatteryRemaining` : null);
+    useUnitField(_partyId, _fp ? `${_fp}.FCB_BatteryVoltage` : null);
+    useUnitField(_partyId, _fp ? `${_fp}.FCB_BatteryCurrent` : null);
+    useUnitField(_partyId, _fp ? `${_fp}.FCB_TotalCurrentConsumed` : null);
+    useUnitField(_partyId, _fp ? `${_fp}.FCB_BatteryTemprature` : null);
 
     const fn_toggle_global = useCallback((p_compact) => {
         setIsCompact(p_compact);
     }, []);
 
-    useEventSubscription(js_event.EE_unitPowUpdated, fn_update);
     useEventSubscription(js_event.EE_BattViewToggle, fn_toggle_global);
 
     const fn_toggle = () => setIsCompact((c) => !c);
