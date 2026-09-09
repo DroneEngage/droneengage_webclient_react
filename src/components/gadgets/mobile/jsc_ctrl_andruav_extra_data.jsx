@@ -1,8 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx';
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import * as js_helpers from '../../../js/js_helpers.js';
 
 
@@ -15,25 +14,38 @@ class ClssAndruavExtraData extends React.Component {
 
         this.m_flag_mounted = false;
         this.key = Math.random().toString();
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_unsubs = [];
     }
 
     componentWillUnmount() {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
-    }
-
-    fn_unitUpdated(p_andruavUnit) {
-        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-        if (this.m_flag_mounted === false) return;
-        this.setState({ 'm_update': this.state.m_update + 1 });
+        // Field-granular: re-render only when a displayed SignalStatus field
+        // changes, replacing the coarse EE_unitUpdated trigger.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = [
+                'm_SignalStatus.m_mobile',
+                'm_SignalStatus.m_mobileSignalLevel',
+                'm_SignalStatus.m_mobileNetworkType',
+                'm_SignalStatus.m_mobileNetworkTypeRank',
+                'm_SignalStatus.m_operatorName',
+                'm_SignalStatus.m_countryIso',
+                'm_SignalStatus.m_dataState',
+            ];
+            const me = this;
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                    if (me.m_flag_mounted === false) return;
+                    me.setState({ 'm_update': me.state.m_update + 1 });
+                }));
+            }
+        }
     }
 
     /***
@@ -95,7 +107,6 @@ class ClssAndruavExtraData extends React.Component {
 
         return (
             <div key={this.key + 'extra_data'} className='row css_margin_zero padding_zero border-top border-secondary'>
-                <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
                 <div key={this.key + 'extra_data_1'} className="col-4">
                     <p key={this.key + 'extra_data_1p'} className="textunit_w135 user-select-all m-0 no-wrap">
                         <span>
