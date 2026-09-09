@@ -1,7 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 
 import * as js_helpers from '../../js/js_helpers.js'
 
@@ -170,16 +169,13 @@ export function ClssCtrlHUD({ id, p_unit }) {
     const canvasDimsRef = useRef({ width: 0, height: 0, centerX: 0, centerY: 0, radius: 0 });
     const themeColorsRef = useRef(null);
 
-    const fn_update = useCallback((p_andruavUnit) => {
-        try {
-            if (p_unit && p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-            setTick((t) => t + 1);
-        } catch (ex) {
-            console.error("Error in fn_update:", ex);
-        }
-    }, [p_unit]);
-
-    useEventSubscription(js_event.EE_unitNavUpdated, fn_update);
+    // Field-granular re-render: only re-render when the displayed orientation
+    // fields change, not on every coarse EE_unitNavUpdated for the whole unit.
+    // setTick is retained for the theme-change observer below.
+    const _partyId = p_unit?.getPartyID();
+    useUnitField(_partyId, 'm_Nav_Info.p_Orientation.yaw');
+    useUnitField(_partyId, 'm_Nav_Info.p_Orientation.pitch');
+    useUnitField(_partyId, 'm_Nav_Info.p_Orientation.roll');
 
     // One-time canvas setup + initial draw + theme observer, mirroring the
     // original's componentDidMount/componentWillUnmount pair.
