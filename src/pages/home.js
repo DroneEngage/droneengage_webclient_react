@@ -16,7 +16,7 @@ import { useTranslation, withTranslation } from 'react-i18next';
 
 import { js_localStorage } from '../js/js_localStorage.js';
 import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
-import { js_eventEmitter } from '../js/events/js_eventEmitter';
+import { useEventSubscription } from '../js/hooks/useEventSubscription.js';
 import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';
 import ClssGlobalSettings from '../components/Settings';
@@ -66,22 +66,10 @@ const Home = () => {
     fn_on_ready();
   }, []);
 
+  useEventSubscription('EE_UnitSystemChanged', (data) => setIsMetricSystem(data.isMetric));
+
   useEffect(() => {
-    // Listen for unit system change events
-    const handleUnitSystemChange = (listener, data) => {
-      setIsMetricSystem(data.isMetric);
-    };
-    
-    // Subscribe to the custom event
-    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, handleUnitSystemChange);
-    
-    // Set initial state
     setIsMetricSystem(js_preferences.fn_getUseMetricSystem());
-    
-    // Cleanup on unmount
-    return () => {
-      js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
-    };
   }, []);
 
   const toggleRow2 = () => {
