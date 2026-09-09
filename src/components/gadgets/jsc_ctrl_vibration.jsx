@@ -3,6 +3,7 @@ import React    from 'react';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 
 export class ClssCtrlVibration extends React.Component {
@@ -16,21 +17,39 @@ export class ClssCtrlVibration extends React.Component {
 		};
 
         this.m_flag_mounted = false;
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_unsubs = [];
     }
 
     componentDidMount () 
     {
         this.m_flag_mounted = true;
+        // Field-granular: re-render only when a displayed Vibration field
+        // changes, replacing the parent's coarse re-render piggyback.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = [
+                'm_Vibration.m_vibration_x',
+                'm_Vibration.m_vibration_y',
+                'm_Vibration.m_vibration_z',
+                'm_Vibration.m_clipping_0',
+                'm_Vibration.m_clipping_1',
+                'm_Vibration.m_clipping_2',
+            ];
+            const me = this;
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                    if (me.m_flag_mounted === false) return;
+                    me.setState({ 'm_update': me.state.m_update + 1 });
+                }));
+            }
+        }
     }
 
     childcomponentWillUnmount ()
     {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     fn_toggle_global(p_compact)

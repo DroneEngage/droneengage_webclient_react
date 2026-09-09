@@ -3,8 +3,7 @@ import * as js_session from '../../js/state/session.js';
 import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/js_siteConfig.js'
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 import {fn_helpPage} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
@@ -208,7 +207,7 @@ export default class ClssServoControl extends ClssDialogBase {
         this.ctrlMainRef = React.createRef();
         this.footerRef = React.createRef();
         this.btnCloseRef = React.createRef();
-        
+        this.m_unsubs = [];
 
         // Event subscriptions are owned by EventBridge siblings rendered
         // below (see render()), which auto-unsubscribe on unmount via
@@ -224,6 +223,13 @@ export default class ClssServoControl extends ClssDialogBase {
             const p_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(p_partyID);
             if (!p_andruavUnit) return ;
             js_session.fn_getAndruavFacade().API_requestMavlinkServoChannel(p_andruavUnit); 
+            // Field-granular: subscribe to m_Servo.m_values for this unit,
+            // replacing the coarse EE_servoOutputUpdate re-render trigger.
+            for (const fn of p_me.m_unsubs) fn();
+            p_me.m_unsubs = [];
+            p_me.m_unsubs.push(subscribeUnitField(p_partyID, 'm_Servo.m_values', () => {
+                p_me.fn_updateData(p_andruavUnit);
+            }));
         }
     }
 
@@ -236,8 +242,8 @@ export default class ClssServoControl extends ClssDialogBase {
     }
 
     componentWillUnmount() {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount() {
@@ -314,7 +320,6 @@ export default class ClssServoControl extends ClssDialogBase {
             return (
                 <Draggable nodeRef={this.modal_ctrl_srv} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                     <div key={this.key + 'modal_ctrl_servo'} id="modal_ctrl_servo" title="SERVO Control" data-bs-toggle="tooltip"  className="card  css_ontop border-light p-2  " prop_partyid={c_partyID} ref={this.modal_ctrl_srv}>
-                        <EventBridge eventName={js_event.EE_servoOutputUpdate} onEvent={(p_andruavUnit) => this.fn_updateData(p_andruavUnit)} />
                         {this.fn_renderDialogHeader("Servo's of " + v_unitName)}
                         {!this.state.isMinimized && (
                         <div id="ctrl_main" className="form-group text-center  " ref={this.ctrlMainRef}>

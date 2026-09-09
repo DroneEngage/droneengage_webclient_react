@@ -234,6 +234,7 @@ class CAndruavClientParser {
 
 
                         p_unit.m_Servo.m_values = v_servoOutputs;
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Servo.m_values');
 
                         js_eventEmitter.fn_dispatch(js_event.EE_servoOutputUpdate, p_unit);
 
@@ -433,6 +434,12 @@ class CAndruavClientParser {
                         p_unit.m_EKF.m_compass_variance = c_mavlinkMessage.compass_variance;
                         p_unit.m_EKF.m_terrain_alt_variance = c_mavlinkMessage.terrain_alt_variance;
                         p_unit.m_EKF.m_airspeed_variance = c_mavlinkMessage.airspeed_variance;
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_velocity_variance');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_pos_horiz_variance');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_pos_vert_variance');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_compass_variance');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_terrain_alt_variance');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_EKF.m_airspeed_variance');
                     }
                     break;
 
@@ -445,6 +452,12 @@ class CAndruavClientParser {
                         p_unit.m_Vibration.m_clipping_0 = c_mavlinkMessage.clipping_0;
                         p_unit.m_Vibration.m_clipping_1 = c_mavlinkMessage.clipping_1;
                         p_unit.m_Vibration.m_clipping_2 = c_mavlinkMessage.clipping_2;
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_vibration_x');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_vibration_y');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_vibration_z');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_clipping_0');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_clipping_1');
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Vibration.m_clipping_2');
                     }
                     break;
 
@@ -660,6 +673,7 @@ class CAndruavClientParser {
                     v_servoOutputs.m_servo7 = v_values[6];
                     v_servoOutputs.m_servo8 = v_values[7];
                     v_unit.m_Servo.m_values = v_servoOutputs;
+                    notifyUnitFieldChanged(v_unit.getPartyID(), 'm_Servo.m_values');
                     js_eventEmitter.fn_dispatch(js_event.EE_servoOutputUpdate, v_unit);
                 }
                 break;
