@@ -3086,6 +3086,21 @@ class CAndruavMap3D {
         }
     }
 
+    /**
+     * Updates the line-color of a unit's 3D path trail layer in place,
+     * so a user-selected path color is reflected on the 3D map without
+     * recreating the trail. No-op if the trail layer does not exist yet.
+     */
+    fn_setPathTrailColor(unit, color) {
+        if (!this.m_map || !this.m_isReady || !color) return;
+        const id = unit?.getPartyID?.();
+        if (!id) return;
+        const layerId = this.m_pathLayers.get(id);
+        if (layerId && this.m_map.getLayer(layerId)) {
+            this.m_map.setPaintProperty(layerId, 'line-color', color);
+        }
+    }
+
     // ====================================================================
     //  3D mission waypoints (read from unit)
     //  Mirrors the mission drawing done on the leaflet map in

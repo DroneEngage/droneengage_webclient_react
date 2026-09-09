@@ -6,6 +6,7 @@
   "takePhoto": "Сделать фото",
   "startLiveStream": "Начать прямую трансляцию",
   "startRecordingOnDrone": "Начать запись на дроне",
+  "changePathColor": "Изменить цвет траектории дрона",
   "andruavBatteryTooltip": "Батарея Andruav: {{level}}% {{charging}} {{temp}}",
   "fcbBatteryTooltip": "Батарея FCB: {{remaining}}% {{voltage}}В {{current}}А {{consumed}} мАч {{temp}}°C",
   "networkSignal": "{{networkType}} [{{networkName}}] {{level}} дБм"

@@ -6,6 +6,7 @@
   "takePhoto": "Tomar Foto",
   "startLiveStream": "Iniciar Transmisión en Vivo",
   "startRecordingOnDrone": "Iniciar Grabación en Drones",
+  "changePathColor": "Cambiar el color de la ruta del dron",
   "andruavBatteryTooltip": "Batería Andruav: {{level}}% {{charging}} {{temp}}",
   "fcbBatteryTooltip": "Batería FCB: {{remaining}}% {{voltage}}V {{current}}A {{consumed}} mAh {{temp}}°C",
   "networkSignal": "{{networkType}} [{{networkName}}] {{level}} dBm"

@@ -1778,6 +1778,40 @@ export function toggleRecrodingVideo(p_andruavUnit) {
 
 
 /**
+ * Changes the flight-path color of a single drone on the home map.
+ * Updates the Leaflet style used for new path segments, restyles the
+ * already-drawn Leaflet polylines, updates the 3D map trail layer color,
+ * and remembers the selection on the unit so it survives re-renders and
+ * is reused when the marker is recreated.
+ * @param {*} p_andruavUnit
+ * @param {string} p_color - CSS color string (e.g. '#75A4D3')
+ */
+export function fn_changeUnitPathColor(p_andruavUnit, p_color) {
+	if (p_andruavUnit === null || p_andruavUnit === undefined || !p_color) return;
+
+	p_andruavUnit.m_pathColor = p_color;
+
+	const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
+	if (layers.m_flightPath_style) {
+		layers.m_flightPath_style.color = p_color;
+	}
+
+	// Restyle already-drawn Leaflet flight-path segments.
+	const flightPath = p_andruavUnit.m_Nav_Info.m_FlightPath;
+	if (Array.isArray(flightPath)) {
+		for (const segment of flightPath) {
+			if (segment && typeof segment.setStyle === 'function') {
+				segment.setStyle({ color: p_color });
+			}
+		}
+	}
+
+	// Update the 3D map trail layer color in place.
+	js_map3d.fn_setPathTrailColor(p_andruavUnit, p_color);
+}
+
+
+/**
    return should be good & bad in the same time for different fences.
 */
 export function fn_isBadFencing(p_andruavUnit) {
@@ -2686,7 +2720,7 @@ function EVT_msgFromUnit_GPS(me, p_andruavUnit) {
 			p_andruavUnit.m_flightPathHistory.fn_flush();
 			js_map3d.fn_flushPath(p_andruavUnit);
 			layers.m_flightPath_style = {
-				color: flightPath_colors[p_andruavUnit.m_index % 4],
+				color: p_andruavUnit.m_pathColor || flightPath_colors[p_andruavUnit.m_index % 4],
 				opacity: 0.8,
 				weight: 5,
 				dashArray: '5, 5'

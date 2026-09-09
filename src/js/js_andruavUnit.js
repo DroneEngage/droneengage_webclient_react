@@ -1194,6 +1194,7 @@ export class CAndruavUnitObject {
 
   constructor() {
     this.m_index = 0;
+    this.m_pathColor = null; // user-selected flight path color (null = use index-based default)
 
     this.m_defined = false;
     this.m_IsMe = false;

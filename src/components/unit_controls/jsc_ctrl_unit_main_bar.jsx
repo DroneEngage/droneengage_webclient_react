@@ -19,8 +19,11 @@ import {
   fn_changeUnitInfo,
   fn_gotoUnit_byPartyID,
   toggleVideo,
-  toggleRecrodingVideo
+  toggleRecrodingVideo,
+  fn_changeUnitPathColor
 } from '../../js/js_main.js'
+
+import { flightPath_colors } from '../../js/config/assets.js'
 
 
 
@@ -35,6 +38,8 @@ class ClssCtrlUnitMainBar extends React.Component {
     };
     this.m_flag_mounted = false;
     this.m_unsubs = [];
+    this.cp_Ref = React.createRef();
+    this.pc_Ref = React.createRef();
   }
 
   componentDidMount() {
@@ -56,6 +61,29 @@ class ClssCtrlUnitMainBar extends React.Component {
         this.m_unsubs.push(subscribeUnitField(partyId, fp, () => this.fn_onUpdate(this.props.p_unit)));
       }
     }
+    this.fn_refreshPathColor();
+  }
+
+  fn_getPathColor() {
+    const v_andruavUnit = this.props.p_unit;
+    if (!v_andruavUnit) return flightPath_colors[0];
+    return v_andruavUnit.m_pathColor || flightPath_colors[v_andruavUnit.m_index % 4];
+  }
+
+  fn_refreshPathColor() {
+    if (this.pc_Ref?.current) {
+      this.pc_Ref.current.style.backgroundColor = this.fn_getPathColor();
+    }
+  }
+
+  fn_simClick() {
+    this.cp_Ref?.current?.click();
+  }
+
+  fn_changePathColor(p_andruavUnit) {
+    const v_color = this.cp_Ref?.current?.value;
+    fn_changeUnitPathColor(p_andruavUnit, v_color);
+    this.fn_refreshPathColor();
   }
 
   componentWillUnmount() {
@@ -396,6 +424,10 @@ class ClssCtrlUnitMainBar extends React.Component {
           <i className={recvideo_class} title={t('unitBar:startRecordingOnDrone')} onClick={() => toggleRecrodingVideo(v_andruavUnit)}></i>
         </div>
         {rows}
+        <div key={id + '__6'} className="col-auto padding_zero d-none d-sm-flex justify-content-end align-items-center">
+          <input type='color' className="border hidden" ref={this.cp_Ref} value={this.fn_getPathColor()} onChange={() => this.fn_changePathColor(v_andruavUnit)} />
+          <p ref={this.pc_Ref} onClick={() => this.fn_simClick()} className="btn btn-sm px-1 py-0 txt-theme-aware border border-primary rounded text-center cursor_hand" title={t('unitBar:changePathColor')} style={{ fontSize: '0.7rem', lineHeight: '1rem', minWidth: '1.2rem' }}>C</p>
+        </div>
       </div>
     );
   }

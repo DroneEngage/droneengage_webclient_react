@@ -118,7 +118,7 @@ export class ModelHitTester {
      */
     consumeClick(e) {
         if (!this._enabled) return false;
-        const hit = this._hitTest(e.point.x, e.point.y);
+        const hit = this._hitTest(e.point.x, e.point.y, this._hoveredId);
         if (!hit) return false;
         hit.target.onClick?.();
         return true;
@@ -127,15 +127,30 @@ export class ModelHitTester {
     /**
      * Finds the target whose circular hit area contains the given screen
      * point.  When multiple targets overlap, the one whose center is
-     * nearest to the point wins.
+     * nearest to the point wins — except that the currently-hovered target
+     * is kept as long as the cursor is still inside its hit area (sticky
+     * hover).
+     *
+     * The sticky rule matters when two models are drawn on top of each
+     * other (e.g. a drone and a coincident ADS-B aircraft, or two swarm
+     * units at the same spot).  The nearest-center tiebreaker uses a strict
+     * `<`, so sub-pixel jitter in the two markers' getBoundingClientRect()
+     * is enough to oscillate the winner between them on every mousemove.
+     * Each oscillation fires onMouseLeave + onMouseEnter, and because the
+     * hover popup opens on a 200ms timer but closes immediately on leave,
+     * the popup flickers open/close.  Sticking to the hovered target until
+     * the cursor actually leaves its hit area removes the oscillation.
      * @param {number} x pixel x relative to canvas
      * @param {number} y pixel y relative to canvas
+     * @param {string} [preferId] id of the currently-hovered target; if the
+     *   cursor is still inside it, it wins over a nearer overlapping target.
      * @returns {{id: string, target: HitTarget} | null}
      * @private
      */
-    _hitTest(x, y) {
+    _hitTest(x, y, preferId = null) {
         let best = null;
         let bestDist2 = Infinity;
+        let preferred = null;
         for (const [id, target] of this._targets) {
             const center = target.getScreenCenter();
             if (!center) continue;
@@ -144,12 +159,17 @@ export class ModelHitTester {
             const dx = x - center.x;
             const dy = y - center.y;
             const dist2 = dx * dx + dy * dy;
-            if (dist2 <= radius * radius && dist2 < bestDist2) {
+            if (dist2 > radius * radius) continue;     // cursor outside this target
+            // Cursor is inside this target's hit area.
+            if (id === preferId) {
+                preferred = { id, target };            // sticky: keep current hover
+            }
+            if (dist2 < bestDist2) {
                 best = { id, target };
                 bestDist2 = dist2;
             }
         }
-        return best;
+        return preferred || best;
     }
 
     /**
@@ -160,7 +180,7 @@ export class ModelHitTester {
      */
     _onMouseMove(e) {
         if (!this._enabled) return;
-        const hit = this._hitTest(e.point.x, e.point.y);
+        const hit = this._hitTest(e.point.x, e.point.y, this._hoveredId);
 
         // Update cursor — only write when state changes to avoid
         // triggering a style recalc on every mousemove tick.

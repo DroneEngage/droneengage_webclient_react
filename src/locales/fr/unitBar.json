@@ -5,6 +5,7 @@
   "takePhoto": "Prendre une Photo",
   "startLiveStream": "Démarrer Stream en direct",
   "startRecordingOnDrone": "Démarrer l'enregistrement sur le Drone",
+  "changePathColor": "Changer la couleur du trajet du drone",
   "andruavBatteryTooltip": "Andruav batt: {{level}}% {{charging}} {{temp}}",
   "fcbBatteryTooltip": "FCB batt: {{remaining}}% {{voltage}}V {{current}}A {{consumed}} mAh {{temp}}°C",
   "networkSignal": "{{networkType}} [{{networkName}}] {{level}} dBm"

@@ -28,16 +28,15 @@ keep going").
 
 ## jsc_fence_shape_control.jsx (14 → 0 in code)
 
-- **Pre-existing bug (not fixed):** `ClssPolygonControl` renders its
-  name/checkbox inputs with ids `#name_edit_shape` / `#chk_restricted_area`,
-  but the shared `ClssShapeControl.fn_editShape` / `fn_displayShapeData`
-  read/write `#name` / `#chk`. So for a Polygon fence, typing a name never
-  takes effect — `fn_editShape` reads the (missing) `#name` and falls back
-  to a random `fence_XXXX` name, and the restricted-area checkbox state is
-  never shown. This refactor preserves that behaviour exactly: the
-  `nameRef`/`chkRef` are only attached in the subclasses that render
-  `#name`/`#chk` (Polyline/Circle/Rectangle), so for Polygon the refs stay
-  null and the guards reproduce the legacy no-op.
+- **Pre-existing bug (FIXED):** `ClssPolygonControl` rendered its
+  name/checkbox inputs with ids `#name_edit_shape` / `#chk_restricted_area`
+  but did not attach the shared `nameRef`/`chkRef`, so
+  `ClssShapeControl.fn_editShape` / `fn_displayShapeData` skipped them —
+  typing a name never took effect (fell back to a random `fence_XXXX`
+  name) and the restricted-area checkbox state was never shown. The
+  TASK-15 refactor preserved this no-op exactly. The bug has since been
+  fixed: `nameRef`/`chkRef` are now attached to the Polygon inputs (the
+  unique ids are kept), so the name and checkbox work for polygon fences.
 - `ClssPolygonControl.fn_displayShapeData` also writes to `#distance`,
   which Polygon does not render — a no-op. `distanceRef` is declared on the
   parent but only attached by `ClssPolylineControl`, so the guard
