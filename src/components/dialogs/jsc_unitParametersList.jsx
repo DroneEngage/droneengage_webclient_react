@@ -1,6 +1,6 @@
 import React from 'react';
 import * as js_session from '../../js/state/session.js';
-import $ from 'jquery';
+import 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 import Draggable from 'react-draggable';
 
@@ -28,7 +28,7 @@ class ClssParameterItem extends React.Component {
     }
 
     fn_onParamChanged(e) {
-        const val = $('#' + e.target.id).val();
+        const val = e.target.value;
         this.props.prop_param.modified_value = val;
         this.props.prop_param.is_dirty = true;
         if (!val || isNaN(val)) {

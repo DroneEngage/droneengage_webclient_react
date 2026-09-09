@@ -87,7 +87,6 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
         if (p_params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {
                     this.setState({is_connected:true});
-                    //$('#andruavUnits').show();
 
 
         }
@@ -96,7 +95,6 @@ export default class ClssFenceGlobalSettingsControl extends React.Component {
 
                 this.setState({is_connected:false});
 
-                //$('#andruavUnits').hide();
         }
     }
 

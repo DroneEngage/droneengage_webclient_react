@@ -39,7 +39,7 @@ class ClssUserEntry extends  React.Component {
     {
         if (this.state.new_item !== true)
         {
-            this.props.prop_single_item.modified_value = $('#' + e.target.id).val();
+            this.props.prop_single_item.modified_value = e.target.value;
             this.props.prop_single_item.is_dirty = true;
             if ((this.props.prop_single_item.modified_value=="") )
             {
@@ -54,7 +54,7 @@ class ClssUserEntry extends  React.Component {
         }
         else
         {
-            this.props.prop_single_item.modified_value = $('#' + e.target.id).val();
+            this.props.prop_single_item.modified_value = e.target.value;
             this.props.prop_single_item.is_dirty = true;
             if ((this.props.prop_single_item.modified_value=="") )
             {
@@ -77,8 +77,13 @@ class ClssUserEntry extends  React.Component {
         fn_do_modal_confirmation("Confirmation", "Save User?", function (p_approved) {
             if (p_approved === false) return;
             window.StreamSensLibs.WebAdmin.fn_do_add_user(this.props.prop_single_item);
-            $('#prop_val_acc')[0].value='';
-            $('#prop_val_pwd')[0].value='';
+            // #prop_val_acc / #prop_val_pwd are rendered below; clear them
+            // via direct DOM (the callback is a regular function so `this`
+            // is not bound to the component — getElementById avoids it).
+            const v_acc = document.getElementById('prop_val_acc');
+            if (v_acc) v_acc.value = '';
+            const v_pwd = document.getElementById('prop_val_pwd');
+            if (v_pwd) v_pwd.value = '';
         }, "YES");
     }
 

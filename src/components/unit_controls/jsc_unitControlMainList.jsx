@@ -1,4 +1,3 @@
-import $ from 'jquery'; 
 import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 
@@ -136,7 +135,10 @@ class ClssAndruavUnitList extends React.Component {
 
         if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED)
         {
-                $('#andruavUnits').show();
+                // #andruavUnits is rendered by pages/home.js (row_2); show it
+                // on socket registration via direct DOM instead of jQuery.
+                const v_andruavUnits = document.getElementById('andruavUnits');
+                if (v_andruavUnits) v_andruavUnits.style.display = 'block';
         }
         else
         {

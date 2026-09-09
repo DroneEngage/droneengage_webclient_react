@@ -1,4 +1,4 @@
-import $ from 'jquery'; 
+import 'jquery';
 import * as js_session from '../../js/state/session.js';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
@@ -208,12 +208,14 @@ export default class ClssCameraDialog extends ClssDialogBase
 
    fn_getInterval()
     {
-        return $('#txt_ShootingInterval').val();
+        // txt_ShootingInterval is rendered below with ref={this.txt_ShootingInterval}
+        return this.txt_ShootingInterval.current ? this.txt_ShootingInterval.current.value : undefined;
     }
 
     fn_getNumOfShots()
     {
-        return $('#txt_TotalImages').val();
+        // txt_TotalImages is rendered below with ref={this.txt_TotalImages}
+        return this.txt_TotalImages.current ? this.txt_TotalImages.current.value : undefined;
     }
 
     fn_getGCSSmall()
@@ -231,12 +233,16 @@ export default class ClssCameraDialog extends ClssDialogBase
         // and card refs may be null here.
         if (this.txt_TotalImages.current) {
             this.txt_TotalImages.current.onmousedown = function () {
-                $(this).parents('tr').removeClass('draggable');
+                // `this` is the input DOM node; stop its <tr> from being
+                // draggable while the user interacts with the field.
+                const v_tr = this.closest('tr');
+                if (v_tr) v_tr.classList.remove('draggable');
             };
         }
         if (this.txt_ShootingInterval.current) {
             this.txt_ShootingInterval.current.onmousedown = function () {
-                $(this).parents('tr').removeClass('draggable');
+                const v_tr = this.closest('tr');
+                if (v_tr) v_tr.classList.remove('draggable');
             };
         }
 

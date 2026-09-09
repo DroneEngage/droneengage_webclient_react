@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import React from 'react';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
@@ -149,7 +147,13 @@ export default class ClssLoginControl extends React.Component {
 
         this.state.initialized = true;
 
-        $('#txtLoginName').val(js_localStorage.fn_getLoginName());
+        // #txtLoginName is rendered below with ref={this.m_loginNameRef};
+        // seed it from localStorage via the ref instead of jQuery. (The
+        // input also has defaultValue=fn_getLoginName(), so this is the
+        // matching imperative set on mount.)
+        if (this.m_loginNameRef.current) {
+            this.m_loginNameRef.current.value = js_localStorage.fn_getLoginName();
+        }
         loadCaptchaEnginge(6);
     }
 

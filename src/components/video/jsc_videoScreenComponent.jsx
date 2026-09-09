@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import * as js_session from '../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.js';
 
@@ -332,8 +331,10 @@ export default class ClssCVideoScreen extends React.Component {
 
     fnl_requestPictureInPicture(p_andruavUnit, videoTrackID) {
         const c_talk = p_andruavUnit.m_Video.m_videoactiveTracks[videoTrackID];
-        const c_videoctrl = '#videoObject' + c_talk.targetVideoTrack;
-        const c_video = $(c_videoctrl)[0];
+        // The legacy jQuery wrapped an id selector and took [0]; that is
+        // equivalent to document.getElementById for an id selector — use the
+        // DOM API directly.
+        const c_video = document.getElementById('videoObject' + c_talk.targetVideoTrack);
         if (c_video === null || c_video === undefined) {
             return;
         }
