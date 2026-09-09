@@ -744,7 +744,7 @@ function reduceModuleHealthStatus(unit: CAndruavUnit, msg: Message): ReduceResul
     return {
         patches: [{
             path: `m_moduleHealth.${p.k}`,
-            value: { rss: p.rs, vmpeak: p.pk, vmswap: p.sw, threads: p.th, slope: p.sl, trend: p.tr, status: p.hs, uptime: p.up, timestamp: msg.receivedAt },
+            value: { rss: p.rs, peak: p.pk, vmswap: p.sw, threads: p.th, slope: p.sl, trend: p.tr, status: p.hs, uptime: p.up, timestamp: msg.receivedAt },
         }],
         events: [{ name: js_event.EE_unitUpdated, payload: unit }],
     };

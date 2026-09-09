@@ -122,7 +122,7 @@ export interface GeoFenceHitPayload {
 export interface ModuleHealthStatusPayload {
     k: string;                  // module key
     rs: number;                 // rss
-    pk: number;                 // vmpeak
+    pk: number;                 // peak RSS over rolling window
     sw: number;                 // vmswap
     th: number;                 // threads
     sl: number;                 // slope

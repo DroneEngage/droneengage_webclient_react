@@ -227,7 +227,7 @@ export default class ClssModuleDetails extends React.Component {
                                         <div className="col-6">
                                             <div className="d-flex align-items-center">
                                                 <small className="text-muted me-2 text-capitalize">{t('peak_colon')}</small>
-                                                <span className="fw-bold text-muted">{health.vmpeak != null ? `${health.vmpeak.toFixed(1)} MB` : '-'}</span>
+                                                <span className="fw-bold text-muted">{health.peak != null ? `${health.peak.toFixed(1)} MB` : '-'}</span>
                                             </div>
                                         </div>
                                         <div className="col-6">

@@ -186,7 +186,7 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
                           </div>
                           <div className="mobile-module-detail-row">
                             <span className="mobile-sheet-label">{t('peak_colon')}</span>
-                            <span className="mobile-sheet-value text-muted">{health.vmpeak != null ? `${health.vmpeak.toFixed(1)} MB` : '-'}</span>
+                            <span className="mobile-sheet-value text-muted">{health.peak != null ? `${health.peak.toFixed(1)} MB` : '-'}</span>
                           </div>
                           <div className="mobile-module-detail-row">
                             <span className="mobile-sheet-label">{t('swap_colon')}</span>
