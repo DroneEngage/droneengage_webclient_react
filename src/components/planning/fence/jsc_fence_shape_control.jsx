@@ -75,12 +75,12 @@ class ClssShapeControl extends React.Component {
 
         // Refs to the form fields rendered by the subclasses. They are
         // declared on the parent so the shared fn_displayShapeData /
-        // fn_editShape can read/write them. Each subclass only attaches the
-        // ref for the input it actually renders (e.g. ClssPolygonControl
-        // renders #name_edit_shape / #chk_restricted_area instead of
-        // #name / #chk, so it leaves nameRef/chkRef unattached — preserving
-        // the legacy no-op where the #geo #name selector matched nothing
-        // for it).
+        // fn_editShape can read/write them. Each subclass attaches the
+        // ref for the input it actually renders. ClssPolygonControl
+        // renders #name_edit_shape / #chk_restricted_area (unique ids)
+        // and attaches nameRef/chkRef so the name and restricted-area
+        // checkbox work for polygon fences. distanceRef/radiusRef are
+        // only attached by the subclasses that render those fields.
         this.nameRef = React.createRef();
         this.chkRef = React.createRef();
         this.distanceRef = React.createRef();
@@ -223,10 +223,10 @@ class ClssPolygonControl extends ClssShapeControl {
                 <div className="card-body">
                 <div className="form-group">
                     <label>Name</label>
-                    <input type='text' id='name_edit_shape' className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
+                    <input type='text' id='name_edit_shape' ref={this.nameRef} className="form-control input-sm"  onChange={(e) => this.fn_editShape()}/>
                 </div>
                 <div className="form-check form-switch">
-                <input className="form-check-input " type="checkbox" id='chk_restricted_area' onChange={(e) => this.fn_onCheck(e)}/>
+                <input className="form-check-input " type="checkbox" id='chk_restricted_area' ref={this.chkRef} onChange={(e) => this.fn_onCheck(e)}/>
                 <label className="form-check-label" htmlFor="chk_restricted_area">Restricted Area</label>
                 </div>
                 <ClssFenceAction shape={this.props.shape} hardClssFenceAction={this.props.shape.m_geofenceInfo && this.props.shape.m_geofenceInfo.isHardFence!=null?this.props.shape.m_geofenceInfo.isHardFence:0}/>
