@@ -2,6 +2,7 @@ import React    from 'react';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 
 import * as js_helpers from '../../js/js_helpers.js'
 
@@ -36,6 +37,7 @@ export default class ClssCVideoHUDOverlay extends React.Component {
 
         this.m_resizeObserver = null;
         this.m_raf_id = null;
+        this.m_unsubs = [];
     }
 
     fn_EE_changeOpacity(params) {
@@ -79,6 +81,18 @@ export default class ClssCVideoHUDOverlay extends React.Component {
         }
 
         this.setState({ 'm_update': 1 });
+
+        // Field-granular: re-render only when the orientation fields
+        // change, not on every coarse EE_unitNavUpdated for the whole unit.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = ['m_Nav_Info.p_Orientation.yaw', 'm_Nav_Info.p_Orientation.pitch', 'm_Nav_Info.p_Orientation.roll'];
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                    this.fn_update(this.props.p_unit);
+                }));
+            }
+        }
     }
 
 
@@ -94,8 +108,8 @@ export default class ClssCVideoHUDOverlay extends React.Component {
 
 
     componentWillUnmount () {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
 
         window.removeEventListener('resize', this.fnl_handleResize);
 
@@ -303,7 +317,6 @@ export default class ClssCVideoHUDOverlay extends React.Component {
                     opacity: this.state.m_opacity
                 }}
             >
-                <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_update(p_andruavUnit)} />
                 <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
                 <canvas
                     ref={this.m_canvasRef}
