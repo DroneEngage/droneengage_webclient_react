@@ -65,36 +65,6 @@ const Mobile = () => {
     forceUpdate(tickRef.current);
   }, []);
 
-  // Throttled refresh for high-frequency telemetry events (EE_unitNavUpdated,
-  // EE_unitPowUpdated, EE_msgFromUnit_GPS). These fire at 10-50Hz per unit
-  // (every MAVLink ATTITUDE/GPS/BATTERY packet). The mobile page reads
-  // nav/power fields in its telemetry grid, so it needs to re-render — but
-  // 5Hz (200ms) is fast enough for a mobile HUD and cuts the re-render rate
-  // 4-10x, preventing the main-thread flooding that makes the map hang.
-  // Low-frequency events (unitAdded, armed, flying, video, socket, etc.)
-  // use the immediate refresh above so discrete state changes appear instantly.
-  const throttleRef = useRef({ lastTs: 0, pending: false, handle: null });
-  const refreshThrottled = useCallback(() => {
-    const now = Date.now();
-    const state = throttleRef.current;
-    const elapsed = now - state.lastTs;
-    if (elapsed >= 200) {
-      state.lastTs = now;
-      state.pending = false;
-      if (state.handle) { clearTimeout(state.handle); state.handle = null; }
-      refresh();
-    } else if (!state.pending) {
-      state.pending = true;
-      const delay = 200 - elapsed;
-      state.handle = setTimeout(() => {
-        state.handle = null;
-        state.pending = false;
-        state.lastTs = Date.now();
-        refresh();
-      }, delay);
-    }
-  }, [refresh]);
-
   useEffect(() => {
     js_preferences.fn_setMapEditor(false);
     fn_on_ready();
@@ -117,8 +87,13 @@ const Mobile = () => {
     const unitSystemListener = unitSystemListenerRef.current;
     js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', unitSystemListener, handleUnitSystemChange);
 
-    // Low-frequency events: re-render immediately so discrete state changes
-    // (armed, flying, online, video, socket, module) appear without delay.
+    // High-frequency telemetry events (EE_unitNavUpdated, EE_unitPowUpdated,
+    // EE_msgFromUnit_GPS) were previously throttled here to re-render the
+    // mobile telemetry grid. The grid gadgets now self-render via field-store
+    // subscriptions (useUnitField/subscribeUnitField), so these coarse
+    // throttled subscriptions are no longer needed. The low-frequency events
+    // below remain so discrete state changes (armed, flying, online, video,
+    // socket, module) appear instantly.
     const immediateEvents = [
       js_event.EE_unitAdded,
       js_event.EE_unitUpdated,
@@ -133,23 +108,9 @@ const Mobile = () => {
       js_event.EE_OldModule,
     ];
 
-    // High-frequency telemetry events: throttled to 5Hz (200ms) to avoid
-    // main-thread flooding. The mobile telemetry grid reads nav/power/GPS
-    // fields from the unit object, so it needs periodic re-renders, but
-    // 50Hz is overkill for a mobile HUD and starves the map/gesture thread.
-    const throttledEvents = [
-      js_event.EE_unitNavUpdated,
-      js_event.EE_unitPowUpdated,
-      js_event.EE_msgFromUnit_GPS,
-    ];
-
     const listenerObj = {};
     immediateEvents.forEach((evt) => {
       js_eventEmitter.fn_subscribe(evt, listenerObj, refresh);
-    });
-    const throttleListenerObj = {};
-    throttledEvents.forEach((evt) => {
-      js_eventEmitter.fn_subscribe(evt, throttleListenerObj, refreshThrottled);
     });
 
     // Track login state changes
@@ -173,18 +134,11 @@ const Mobile = () => {
       immediateEvents.forEach((evt) => {
         js_eventEmitter.fn_unsubscribe(evt, listenerObj);
       });
-      throttledEvents.forEach((evt) => {
-        js_eventEmitter.fn_unsubscribe(evt, throttleListenerObj);
-      });
-      if (throttleRef.current.handle) {
-        clearTimeout(throttleRef.current.handle);
-        throttleRef.current.handle = null;
-      }
       js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Logined, authObj);
       js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, authObj);
       js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, authObj);
     };
-  }, [refresh, refreshThrottled]);
+  }, [refresh]);
 
   const getDroneUnits = () => {
     // Use fn_getUnitsSorted() — same method ClssAndruavUnitList uses in home.js.

@@ -339,6 +339,7 @@ class CAndruavClientParser {
                 case mavlink20.MAVLINK_MSG_ID_MISSION_COUNT:
                     {
                         p_unit.m_Nav_Info._Target.wp_count = c_mavlinkMessage.count; // including home location
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Nav_Info._Target.wp_count');
                     }
                     break;
 
@@ -347,6 +348,7 @@ class CAndruavClientParser {
                         if ((c_mavlinkMessage.mission_type === null || c_mavlinkMessage.mission_type === undefined) || (c_mavlinkMessage.mission_type === mavlink20.MAV_MISSION_TYPE_MISSION)) {
                             p_unit.m_Nav_Info._Target.wp_num = c_mavlinkMessage.seq;
                             p_unit.m_Nav_Info._Target.mission_state = c_mavlinkMessage.mission_state;
+                            notifyUnitFieldChanged(p_unit.getPartyID(), 'm_Nav_Info._Target.wp_num');
                             //p_unit.m_Nav_Info._Target.mission_mode = c_mavlinkMessage.mission_mode;  todo: later
                             //p_unit.m_Nav_Info._Target.wp_count= c_mavlinkMessage.total; // without home location todo: later
                         }

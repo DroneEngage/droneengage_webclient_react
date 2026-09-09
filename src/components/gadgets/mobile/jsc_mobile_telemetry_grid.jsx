@@ -3,6 +3,7 @@ import { withTranslation } from 'react-i18next';
 
 import { CONST_METER_TO_FEET } from '../../../js/js_helpers.js';
 import { fn_changeAltitude, fn_changeSpeed } from '../../../js/js_main.js';
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import ClssCtrlDistanceToMeControl from '../jsc_ctrl_distance_to_me_control.jsx';
 
 /**
@@ -22,6 +23,40 @@ class ClssMobileTelemetryGrid extends React.Component {
     constructor(props) {
         super(props);
         this.state = { m_update: 0 };
+        this.m_unsubs = [];
+    }
+
+    componentDidMount() {
+        // Field-granular: re-render only when a displayed field changes,
+        // replacing the parent's coarse throttled EE_unitNavUpdated/
+        // EE_unitPowUpdated/EE_msgFromUnit_GPS re-render.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = [
+                'm_Power._FCB.p_Battery.FCB_BatteryRemaining',
+                'm_Power._FCB.p_Battery.p_hasPowerInfo',
+                'm_Power._Mobile.p_Battery.BatteryLevel',
+                'm_Power._Mobile.p_Battery.p_hasPowerInfo',
+                'm_GPS_Info1.GPS3DFix',
+                'm_GPS_Info1.m_satCount',
+                'm_GPS_Info1.m_isValid',
+                'm_Nav_Info.p_Location.alt_relative',
+                'm_Nav_Info.p_Location.ground_speed',
+                'm_Nav_Info._Target.wp_num',
+                'm_Nav_Info._Target.wp_count',
+            ];
+            const me = this;
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                    me.setState({ m_update: me.state.m_update + 1 });
+                }));
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     // -- Battery -----------------------------------------------------------

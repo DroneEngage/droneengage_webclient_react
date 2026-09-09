@@ -8,6 +8,7 @@ import * as js_common from '../../js/js_common.js'
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
 
@@ -32,19 +33,35 @@ class ClssCtrlUnitMainBar extends React.Component {
     this.state = {
       m_update: 0,
     };
-
-    // Event subscriptions are owned by EventBridge siblings rendered
-    // below (see render()), which auto-unsubscribe on unmount via
-    // useEventSubscription.
+    this.m_flag_mounted = false;
+    this.m_unsubs = [];
   }
 
   componentDidMount() {
     this.m_flag_mounted = true;
+    // Field-granular: re-render when the mobile battery fields change,
+    // replacing the coarse EE_unitPowUpdated trigger. EE_unitUpdated is
+    // retained (broad unit-state re-render; that event remains for
+    // adsbManager side effects).
+    const partyId = this.props.p_unit?.getPartyID();
+    if (partyId) {
+      const fields = [
+        'm_Power._Mobile.p_Battery.BatteryLevel',
+        'm_Power._Mobile.p_Battery.PlugStatus',
+        'm_Power._Mobile.p_Battery.p_hasPowerInfo',
+        'm_Power._Mobile.p_Battery.Voltage',
+        'm_Power._Mobile.p_Battery.Health',
+      ];
+      for (const fp of fields) {
+        this.m_unsubs.push(subscribeUnitField(partyId, fp, () => this.fn_onUpdate(this.props.p_unit)));
+      }
+    }
   }
 
   componentWillUnmount() {
-    // Unsubscription is handled automatically by the EventBridge
-    // siblings (useEventSubscription) on unmount.
+    this.m_flag_mounted = false;
+    for (const fn of this.m_unsubs) fn();
+    this.m_unsubs = [];
   }
 
   fn_toggleCamera(p_andruavUnit) {
@@ -366,7 +383,6 @@ class ClssCtrlUnitMainBar extends React.Component {
     return (
       <div key={id} className="row ms-1 padding_zero user-select-none">
         <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_onUpdate(p_andruavUnit)} />
-        <EventBridge eventName={js_event.EE_unitPowUpdated} onEvent={(p_andruavUnit) => this.fn_onUpdate(p_andruavUnit)} />
         <div key={id + '__1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <ClssCtrlUnitIcon p_unit={v_andruavUnit} />
         </div>
