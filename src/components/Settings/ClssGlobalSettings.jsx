@@ -3,7 +3,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_andruav_facade from '../../js/protocol/server_comm/js_andruav_facade.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter';
+import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
 import { ClssFireEvent } from '../micro_gadgets/jsc_mctrl_fire_event.jsx';
 import { setSelectedMissionFilePathToWrite } from '../../js/js_main.js';
@@ -22,8 +22,9 @@ class ClssGlobalSettings extends React.Component {
     this.key = Math.random().toString();
     this.mission_file_ref = React.createRef();
     this.defaultTabRef = React.createRef();
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Logined, this, this.fn_onAuthStatus);
-    js_eventEmitter.fn_subscribe(js_event.EE_Language_Changed, this, this.fn_updateLanguage);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
 
   }
 
@@ -52,18 +53,18 @@ class ClssGlobalSettings extends React.Component {
     return false;
   }
 
-  fn_updateLanguage(p_me) {
-    if (p_me.m_flag_mounted === false) return;
-    p_me.setState({ m_update: p_me.state.m_update + 1 });
+  fn_updateLanguage() {
+    if (this.m_flag_mounted === false) return;
+    this.setState({ m_update: this.state.m_update + 1 });
   }
 
   fn_handleFileChange(e) {
     setSelectedMissionFilePathToWrite(this.mission_file_ref.current.files);
   }
 
-  fn_onAuthStatus(me, res) {
-    if (me.m_flag_mounted === false) return;
-    me.setState({ m_update: me.state.m_update + 1 });
+  fn_onAuthStatus(res) {
+    if (this.m_flag_mounted === false) return;
+    this.setState({ m_update: this.state.m_update + 1 });
   }
 
   componentDidMount() {
@@ -75,8 +76,8 @@ class ClssGlobalSettings extends React.Component {
 
   componentWillUnmount() {
     this.state.m_update = 0;
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Logined, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Language_Changed, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   fn_fireDeEvent(value) {
@@ -126,6 +127,8 @@ class ClssGlobalSettings extends React.Component {
 
     return (
       <div key={this.key + 'g1'} className="row margin_zero" dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+        <EventBridge eventName={js_event.EE_Auth_Logined} onEvent={(res) => this.fn_onAuthStatus(res)} />
+        <EventBridge eventName={js_event.EE_Language_Changed} onEvent={() => this.fn_updateLanguage()} />
         <div className="card txt-theme-aware border-light mb-3 padding_zero">
           <div className="card-header text-center user-select-none">
             <strong>{t('globalSettings:settingsTitle')}</strong>

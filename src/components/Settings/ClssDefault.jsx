@@ -3,7 +3,7 @@ import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../js/events/js_eventEmitter';
+import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { gui_toggleUnits } from '../../js/js_main';
 import { js_localStorage } from '../../js/js_localStorage';
 
@@ -34,7 +34,9 @@ class ClssDefault extends React.Component {
     this.state.CONST_DEFAULT_SWARM_HORIZONTAL_DISTANCE = js_localStorage.fn_getDefaultSwarmHorizontalDistance();
     this.state.CONST_DEFAULT_SWARM_VERTICAL_DISTANCE = js_localStorage.fn_getDefaultSwarmVerticalDistance();
 
-    js_eventEmitter.fn_subscribe(js_event.EE_onAdvancedMode, this, this.fn_advancedMode);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
   }
 
   componentDidMount() {
@@ -42,12 +44,13 @@ class ClssDefault extends React.Component {
   }
 
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onAdvancedMode, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
-  fn_advancedMode(p_me) {
-    if (p_me.m_flag_mounted === false) return;
-    p_me.setState({ m_update: p_me.state.m_update + 1 });
+  fn_advancedMode() {
+    if (this.m_flag_mounted === false) return;
+    this.setState({ m_update: this.state.m_update + 1 });
   }
 
   onChange(e) {
@@ -105,6 +108,9 @@ class ClssDefault extends React.Component {
   render() {
     const { t } = this.props;
     let v_gadgets = [];
+    v_gadgets.push(
+      <EventBridge key={this.key + 'eb'} eventName={js_event.EE_onAdvancedMode} onEvent={() => this.fn_advancedMode()} />
+    );
     v_gadgets.push(
       <div key={this.key + '1'} className="row me-0 ms-0" dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="col-xs-6 col-sm-6 col-lg-6">

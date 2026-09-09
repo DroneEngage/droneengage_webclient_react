@@ -4,6 +4,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter';
+import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { js_localStorage } from '../../js/js_localStorage';
 import { js_adsbManager } from '../../js/adsb/js_adsbManager.js';
 import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
@@ -58,8 +59,9 @@ class ClssAdsbSettings extends React.Component {
   }
 
   componentDidMount() {
-    js_eventEmitter.fn_subscribe('EE_UnitSystemChanged', this, this._boundOnUnitSystemChanged);
-    js_eventEmitter.fn_subscribe(js_event.EE_onPreferenceChanged, this, this._boundOnPreferenceChanged);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
     const cfg = js_siteConfig.CONST_ADSB_CONFIG || {};
 
     if (this.m_enableADSBRef.current) {
@@ -84,8 +86,8 @@ class ClssAdsbSettings extends React.Component {
   }
 
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe('EE_UnitSystemChanged', this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onPreferenceChanged, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   fn_enableADSB(e) {
@@ -172,6 +174,8 @@ class ClssAdsbSettings extends React.Component {
 
     return (
       <fieldset dir={this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+        <EventBridge eventName={'EE_UnitSystemChanged'} onEvent={() => this._onUnitSystemChanged()} />
+        <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={() => this._onPreferenceChanged()} />
         <div className="row mb-12 align-items-center flex-nowrap">
           <label htmlFor="check_enable_adsb" className={`col-sm-4 col-form-label${dir}`}>
             {t('globalSettings:enableADSBLabel')}
