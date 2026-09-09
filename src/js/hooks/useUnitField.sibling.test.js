@@ -11,9 +11,9 @@
  *
  * This is the "Real acceptance test" from TASK-13's spec.
  */
-import React from 'react';
+/* eslint-disable testing-library/no-unnecessary-act */
+import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { act } from 'react';
 
 import { CAndruavUnitObject, AndruavUnitList } from '../js_andruavUnit.js';
 import * as js_session from '../state/session.js';
