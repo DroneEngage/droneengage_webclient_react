@@ -1,19 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 
 export function ClssRX_MESSAGE({ p_unit }) {
-    const [, setTick] = useState(0);
-
-    const fn_unitUpdated = useCallback((p_andruavUnit) => {
-        if (p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-        setTick((t) => t + 1);
-    }, [p_unit]);
-
-    useEventSubscription(js_event.EE_unitUpdated, fn_unitUpdated);
+    // Field-granular re-render: only re-render when the message counters
+    // change, not on every coarse EE_unitUpdated for the whole unit.
+    const _partyId = p_unit?.getPartyID();
+    useUnitField(_partyId, 'm_Messages.m_messages_in');
+    useUnitField(_partyId, 'm_Messages.m_received_msg');
 
     let msg = [];
 

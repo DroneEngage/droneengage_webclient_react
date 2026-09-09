@@ -489,7 +489,7 @@ export function reduceID(unit: CAndruavUnit, msg: Message): ReduceResult {
         triggers.onModuleChanged = p.m1.length !== unit.m_modules.m_list.length;
         // callUnitMethod spreads array args, so wrap p.m1 in an array so
         // addModules receives the modules array as its single argument.
-        ops.push({ op: 'method', method: 'm_modules.addModules', arg: [p.m1], notifyFields: ['m_modules.has_fcb', 'm_modules.has_viewlink', 'm_modules.has_ai_recognition', 'm_modules.has_p2p', 'm_modules.has_sdr'] });
+        ops.push({ op: 'method', method: 'm_modules.addModules', arg: [p.m1], notifyFields: ['m_modules.has_fcb', 'm_modules.has_viewlink', 'm_modules.has_ai_recognition', 'm_modules.has_p2p', 'm_modules.has_sdr', 'm_modules.m_list'] });
     }
 
     // Phase 4: home location sub-message.

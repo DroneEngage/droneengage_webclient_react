@@ -1,8 +1,10 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../../js/hooks/useEventSubscription.js';
+import { useUnitField } from '../../../js/hooks/useUnitField.js';
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 
 /**
  * Compact mobile bottom-sheet that displays module version information for a
@@ -25,18 +27,34 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
     forceUpdate(tickRef.current);
   }, []);
 
-  // Filter EE_unitUpdated by party ID so a telemetry tick from unit A
-  // doesn't re-render unit B's module details panel. EE_OldModule is not
-  // unit-filtered in the original (it's a global module-list change event),
-  // so it stays unfiltered here.
-  const refreshIfUnit = useCallback((p_andruavUnit) => {
-    if (p_unit && p_andruavUnit && p_andruavUnit.getPartyID
-        && p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-    refresh();
-  }, [p_unit, refresh]);
+  // Field-granular re-render: subscribe to the module list (add/remove +
+  // version changes) and each module's health key. Replaces the coarse
+  // EE_unitUpdated subscription. EE_OldModule is a global module-list
+  // change event and stays unfiltered.
+  const _partyId = p_unit?.getPartyID();
+  useUnitField(_partyId, 'm_modules.m_list');
+
+  // Build the set of module health keys to watch from the current module
+  // list, then imperatively subscribe to each (dynamic keys can't use
+  // useUnitField in a loop — rules of hooks).
+  const moduleList = p_unit?.m_modules?.m_list;
+  const healthKeys = React.useMemo(() => {
+    if (!moduleList) return ['comm'];
+    const keys = new Set(['comm']);
+    for (const m of moduleList) {
+      if (m && m.k) keys.add(m.k);
+    }
+    return Array.from(keys);
+  }, [moduleList]);
+  useEffect(() => {
+    if (!_partyId) return;
+    const unsubs = healthKeys.map((k) =>
+      subscribeUnitField(_partyId, `m_moduleHealth.${k}`, refresh)
+    );
+    return () => { for (const fn of unsubs) fn(); };
+  }, [_partyId, healthKeys, refresh]);
 
   useEventSubscription(js_event.EE_OldModule, refresh);
-  useEventSubscription(js_event.EE_unitUpdated, refreshIfUnit);
 
   if (!p_isOpen) return null;
 

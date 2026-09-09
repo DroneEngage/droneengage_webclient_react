@@ -88,6 +88,8 @@ export function fn_handleFrame(p_frame, evt) {
     unit.m_Messages.m_received_msg++;
     unit.m_Messages.m_received_bytes += evt.data.length;
     unit.m_Messages.m_lastActiveTime = receivedAt;
+    notifyUnitFieldChanged(unit.getPartyID(), 'm_Messages.m_messages_in');
+    notifyUnitFieldChanged(unit.getPartyID(), 'm_Messages.m_received_msg');
 
     const result = fn_reduce(unit, msg);
     if (result === null) {

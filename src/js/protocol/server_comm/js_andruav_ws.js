@@ -13,6 +13,7 @@ import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'
 import { fn_getOrCreateUnit, fn_createSelfUnit } from '../../model/unitRegistry.js'
 import { fn_handleFrame } from '../../core/protocol/runtime.js'
+import { notifyUnitFieldChanged } from '../../store/unitStore.js'
 
 
 export const CMD_SYS_TASKS = 'tsk'; //'tsk'; // group broadcast
@@ -400,6 +401,8 @@ class CAndruavClientWS {
             v_unit.m_Messages.m_received_msg++;
             v_unit.m_Messages.m_received_bytes += data.length;
             v_unit.m_Messages.m_lastActiveTime = Date.now();
+            notifyUnitFieldChanged(v_unit.getPartyID(), 'm_Messages.m_messages_in');
+            notifyUnitFieldChanged(v_unit.getPartyID(), 'm_Messages.m_received_msg');
 
             // Process the binary message
             js_session.fn_getAndruavClient().parseBinaryAndruavMessage(v_unit, andruavCMD, data, out.nextIndex, byteLength);
