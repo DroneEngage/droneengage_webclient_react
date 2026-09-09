@@ -5,6 +5,7 @@ import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
+import { useUnitField } from '../../js/hooks/useUnitField.js';
 import * as js_helpers from '../../js/js_helpers.js';
 import { fn_do_modal_alert } from '../../js/js_main.js';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
@@ -13,11 +14,11 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
     const [, setTick] = useState(0);
 
-    const fn_update = useCallback((p_andruavUnit) => {
-        if (p_unit && p_andruavUnit.getPartyID() === p_unit.getPartyID()) {
-            setTick((t) => t + 1);
-        }
-    }, [p_unit]);
+    // Field-granular re-render: only re-render when the displayed location
+    // fields change, not on every coarse EE_unitNavUpdated for the whole unit.
+    const _partyId = p_unit?.getPartyID();
+    useUnitField(_partyId, 'm_Nav_Info.p_Location.lat');
+    useUnitField(_partyId, 'm_Nav_Info.p_Location.lng');
 
     const fn_EE_changeOpacity = useCallback((params) => {
         if (params && params.opacity !== undefined) {
@@ -25,7 +26,6 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
         }
     }, []);
 
-    useEventSubscription(js_event.EE_unitNavUpdated, fn_update);
     useEventSubscription(js_event.EE_Opacity_Control, fn_EE_changeOpacity);
 
     // Compact (mobile): tap to request browser location if not known.
