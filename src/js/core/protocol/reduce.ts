@@ -108,6 +108,7 @@ export const WAYPOINT_LAST_CHUNK = 999;
 export function fn_reduce(unit: CAndruavUnit, msg: Message): ReduceResult | null {
     if (!fn_isMigrated(msg.type)) {
         // Not yet migrated — runtime falls through to the old switch.
+        console.warn("Message type not migrated: " + msg.type);
         return null;
     }
     switch (msg.type) {
