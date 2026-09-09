@@ -24,6 +24,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import * as js_common from '../../js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
+import { notifyUnitFieldChanged } from '../../store/unitStore.js';
 
 
 import { mavlink20, MAVLink20Processor } from '../../js_mavlink_v2.js'
@@ -169,6 +170,19 @@ class CAndruavClientParser {
     // Command objects returned by reduceIDEffects and dispatched by runtime.js.
 
 
+    // TASK-13: notify the field-level store for each MAVLink field patched
+    // below, so useUnitField/UnitFieldValue subscribers re-render on MAVLink
+    // telemetry too — not only on the migrated Andruav JSON path (runtime.js).
+    // The coarse EE_unit* events dispatched alongside are being retired; the
+    // store is the data source that survives. Mirrors the notifyUnitFieldChanged
+    // calls runtime.js makes for each FieldPatch it applies.
+    #prv_notifyFields(p_unit, fieldPaths) {
+        const pid = p_unit.getPartyID();
+        for (let i = 0; i < fieldPaths.length; ++i) {
+            notifyUnitFieldChanged(pid, fieldPaths[i]);
+        }
+    }
+
     /**
     * Parse mavlink messages and try to extract information similar to Andruav Protocol to save traffic.
     * @param p_unit: never equal null.
@@ -190,6 +204,7 @@ class CAndruavClientParser {
                         const v_trigger_on_FCB = (p_unit.m_FCBParameters.m_systemID !== c_mavlinkMessage.header.srcSystem);
                         p_unit.m_FCBParameters.m_systemID = c_mavlinkMessage.header.srcSystem;
                         p_unit.m_FCBParameters.m_componentID = c_mavlinkMessage.header.srcComponent;
+                        this.#prv_notifyFields(p_unit, ['m_FCBParameters.m_systemID', 'm_FCBParameters.m_componentID']);
                         if (v_trigger_on_FCB === true) {
                             js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitFCBUpdated, p_unit);
                         }
@@ -235,6 +250,11 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info.p_Orientation.roll_speed = c_mavlinkMessage.rollspeed; // in radiuas
                         p_unit.m_Nav_Info.p_Orientation.pitch_speed = c_mavlinkMessage.pitchspeed; // in radiuas
                         p_unit.m_Nav_Info.p_Orientation.yaw_speed = c_mavlinkMessage.yawspeed;
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Orientation.roll', 'm_Nav_Info.p_Orientation.pitch',
+                            'm_Nav_Info.p_Orientation.yaw', 'm_Nav_Info.p_Orientation.roll_speed',
+                            'm_Nav_Info.p_Orientation.pitch_speed', 'm_Nav_Info.p_Orientation.yaw_speed',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
 
                     }
@@ -249,6 +269,11 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info._Target.target_bearing = c_mavlinkMessage.target_bearing;
                         p_unit.m_Nav_Info._Target.wp_dist = c_mavlinkMessage.wp_dist;
                         p_unit.m_Nav_Info._Target.alt_error = c_mavlinkMessage.alt_error;
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Desired.nav_roll', 'm_Nav_Info.p_Desired.nav_pitch',
+                            'm_Nav_Info.p_Desired.nav_bearing', 'm_Nav_Info._Target.target_bearing',
+                            'm_Nav_Info._Target.wp_dist', 'm_Nav_Info._Target.alt_error',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                     }
                     break;
@@ -270,6 +295,11 @@ class CAndruavClientParser {
                         p_unit.m_Power._FCB.p_Battery.FCB_BatteryTemprature = c_mavlinkMessage.temperature;
                         p_unit.m_Power._FCB.p_Battery.FCB_TotalCurrentConsumed = c_mavlinkMessage.current_consumed;
 
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Power._FCB.p_Battery.p_hasPowerInfo', 'm_Power._FCB.p_Battery.FCB_BatteryVoltage',
+                            'm_Power._FCB.p_Battery.FCB_BatteryCurrent', 'm_Power._FCB.p_Battery.FCB_BatteryRemaining',
+                            'm_Power._FCB.p_Battery.FCB_BatteryTemprature', 'm_Power._FCB.p_Battery.FCB_TotalCurrentConsumed',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                     }
                     break;
@@ -279,6 +309,10 @@ class CAndruavClientParser {
                         p_unit.m_Power._FCB.p_Battery2.FCB_BatteryVoltage = c_mavlinkMessage.voltage;
                         p_unit.m_Power._FCB.p_Battery2.FCB_BatteryCurrent = c_mavlinkMessage.current_battery * 10;
 
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Power._FCB.p_Battery2.p_hasPowerInfo', 'm_Power._FCB.p_Battery2.FCB_BatteryVoltage',
+                            'm_Power._FCB.p_Battery2.FCB_BatteryCurrent',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
 
                     }
@@ -294,6 +328,11 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info.p_Location.ground_speed = c_mavlinkMessage.vel / 100.0; // we should depend on VFR
                         p_unit.m_Nav_Info.p_Location.bearing = c_mavlinkMessage.yaw;
                         p_unit.m_GPS_Info1.m_isValid = true;
+                        this.#prv_notifyFields(p_unit, [
+                            'm_GPS_Info1.GPS3DFix', 'm_GPS_Info1.m_satCount', 'm_GPS_Info1.accuracy',
+                            'm_GPS_Info1.lat', 'm_GPS_Info1.lng', 'm_GPS_Info1.m_isValid',
+                            'm_Nav_Info.p_Location.ground_speed', 'm_Nav_Info.p_Location.bearing',
+                        ]);
                     }
                     break;
 
@@ -333,6 +372,11 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info.p_Location.ground_speed = c_mavlinkMessage.vel / 100.0; // we should depend on VFR
                         p_unit.m_Nav_Info.p_Location.bearing = c_mavlinkMessage.yaw;
                         p_unit.m_GPS_Info2.m_isValid = true;
+                        this.#prv_notifyFields(p_unit, [
+                            'm_GPS_Info2.GPS3DFix', 'm_GPS_Info2.m_satCount', 'm_GPS_Info2.accuracy',
+                            'm_GPS_Info2.lat', 'm_GPS_Info2.lng', 'm_GPS_Info2.m_isValid',
+                            'm_Nav_Info.p_Location.ground_speed', 'm_Nav_Info.p_Location.bearing',
+                        ]);
                     }
                     break;
 
@@ -357,6 +401,9 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info.p_Location.ground_speed = c_mavlinkMessage.groundspeed;
                         p_unit.m_Nav_Info.p_Location.air_speed = c_mavlinkMessage.airspeed;
                         p_unit.m_Throttle = c_mavlinkMessage.throttle; //Current throttle setting (0 to 100).
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Location.ground_speed', 'm_Nav_Info.p_Location.air_speed', 'm_Throttle',
+                        ]);
                     }
                     break;
 
@@ -367,6 +414,10 @@ class CAndruavClientParser {
                         p_unit.m_Nav_Info.p_Location.lng = (c_mavlinkMessage.lon * 0.0000001);
                         p_unit.m_Nav_Info.p_Location.alt_abs = c_mavlinkMessage.alt * 0.001;
                         p_unit.m_Nav_Info.p_Location.alt_relative = c_mavlinkMessage.relative_alt * 0.001;
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Location.lat', 'm_Nav_Info.p_Location.lng',
+                            'm_Nav_Info.p_Location.alt_abs', 'm_Nav_Info.p_Location.alt_relative',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                     }
                     break;
@@ -488,6 +539,16 @@ class CAndruavClientParser {
 
                         p_unit.m_GPS_Info1.m_isValid = true;
 
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Location.lat', 'm_Nav_Info.p_Location.lng',
+                            'm_Nav_Info.p_Location.alt_abs', 'm_Nav_Info.p_Location.alt_sp',
+                            'm_Nav_Info.p_Location.ground_speed', 'm_Nav_Info.p_Location.air_speed',
+                            'm_Nav_Info.p_Orientation.roll', 'm_Nav_Info.p_Orientation.pitch',
+                            'm_Nav_Info.p_Orientation.yaw', 'm_Nav_Info.p_Desired.nav_bearing',
+                            'm_Nav_Info._Target.target_bearing', 'm_Nav_Info._Target.wp_dist',
+                            'm_Nav_Info._Target.wp_num', 'm_GPS_Info1.GPS3DFix', 'm_GPS_Info1.m_satCount',
+                            'm_Power._FCB.p_Battery.FCB_BatteryRemaining', 'm_GPS_Info1.m_isValid',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
@@ -510,6 +571,13 @@ class CAndruavClientParser {
 
                         p_unit.m_GPS_Info1.m_isValid = true;
 
+                        this.#prv_notifyFields(p_unit, [
+                            'm_Nav_Info.p_Location.lat', 'm_Nav_Info.p_Location.lng',
+                            'm_Nav_Info.p_Location.alt_abs', 'm_Nav_Info.p_Orientation.yaw',
+                            'm_Nav_Info.p_Desired.nav_bearing', 'm_Nav_Info._Target.target_bearing',
+                            'm_Nav_Info._Target.wp_dist', 'm_Nav_Info._Target.wp_num',
+                            'm_Power._FCB.p_Battery.FCB_BatteryRemaining', 'm_GPS_Info1.m_isValid',
+                        ]);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitNavUpdated, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_unitPowUpdated, p_unit);
                         js_eventEmitter.fn_dispatch(js_event.EE_msgFromUnit_GPS, p_unit);
