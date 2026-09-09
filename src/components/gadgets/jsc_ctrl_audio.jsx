@@ -3,6 +3,7 @@ import * as js_session from '../../js/state/session.js';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 
 export class ClssCtrlAUDIO extends React.Component {
 
@@ -22,10 +23,7 @@ export class ClssCtrlAUDIO extends React.Component {
         this.m_volumeRef = React.createRef();
         this.m_languageRef = React.createRef();
         this.m_soundSelectRef = React.createRef();
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_unsubs = [];
     }
 
 
@@ -38,20 +36,21 @@ export class ClssCtrlAUDIO extends React.Component {
         const v_andruavUnit = this.props.p_unit;
         if (v_andruavUnit && v_andruavUnit.getPartyID && v_andruavUnit.getPartyID()) {
             js_session.fn_getAndruavFacade().API_requestSoundList(v_andruavUnit, null);
+            // Field-granular: re-render only when m_Sound.m_files changes,
+            // replacing the coarse EE_onSoundListUpdated trigger.
+            const me = this;
+            this.m_unsubs.push(subscribeUnitField(v_andruavUnit.getPartyID(), 'm_Sound.m_files', () => {
+                if (me.m_flag_mounted) {
+                    me.setState((prevState) => ({ m_update: prevState.m_update + 1 }));
+                }
+            }));
         }
     }
 
     componentWillUnmount() {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
-    }
-
-    fn_onSoundListUpdated(p_unit) {
-        // The sound module pushed (or replied with) an updated library. Force a
-        // re-render so the dropdown reflects the current p_unit.m_Sound.m_files.
-        if (this.m_flag_mounted) {
-            this.setState((prevState) => ({ m_update: prevState.m_update + 1 }));
-        }
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     fn_setLanguage(en) {
@@ -102,7 +101,6 @@ export class ClssCtrlAUDIO extends React.Component {
         return (
             <div id={id} key={id} className="ms-1">
                 <EventBridge eventName={js_event.EE_BattViewToggle} onEvent={(data) => this.fn_toggle_global(data)} />
-                <EventBridge eventName={js_event.EE_onSoundListUpdated} onEvent={(p_unit) => this.fn_onSoundListUpdated(p_unit)} />
                 <div className="row ">
                     <div className="col-6">
                         <div key={v_andruavUnit.getPartyID() + 'audio_111'} className='col-12 user-select-none '>

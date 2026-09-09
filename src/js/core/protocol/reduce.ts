@@ -687,6 +687,7 @@ function reduceGPIOStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
             // callUnitMethod spreads array args; addGPIO takes a single
             // array (the gpio list), so wrap it.
             methodArg: [msg.payload.s],
+            notifyFields: ['m_GPIOs.m_gpios'],
         }],
     };
 }

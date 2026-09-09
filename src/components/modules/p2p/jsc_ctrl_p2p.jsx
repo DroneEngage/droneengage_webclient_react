@@ -10,7 +10,7 @@ import * as js_session from '../../../js/state/session.js';
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 
 import {CLASS_CTRL_P2P_IN_RANGE_NODEs} from './jsc_ctrl_p2p_inrange_nodes.jsx'
@@ -26,20 +26,43 @@ export class ClssCtrlP2P extends React.Component {
 		};
 
         this.m_flag_mounted = false;
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_unsubs = [];
     }
 
     componentWillUnmount () {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount () 
     {
         this.m_flag_mounted = true;
+        // Field-granular: re-render only when a displayed m_P2P field
+        // changes, replacing the coarse EE_unitP2PUpdated trigger.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = [
+                'm_P2P.m_driver_connected',
+                'm_P2P.m_p2p_disabled',
+                'm_P2P.m_p2p_connected',
+                'm_P2P.m_connection_type',
+                'm_P2P.m_firmware',
+                'm_P2P.m_parent_connected',
+                'm_P2P.m_parent_address',
+                'm_P2P.m_logical_parent_address',
+                'm_P2P.m_address_1',
+                'm_P2P.m_wifi_channel',
+                'm_P2P.m_wifi_password',
+            ];
+            const me = this;
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => {
+                    if (me.m_flag_mounted === false) return;
+                    me.setState({ 'm_update': me.state.m_update + 1 });
+                }));
+            }
+        }
     }
 
     fn_resetP2P (p_andruavUnit)
@@ -60,13 +83,6 @@ export class ClssCtrlP2P extends React.Component {
     fn_setCommunicationChannel_WS (p_andruavUnit, ws_state, duration)
     {
         js_session.fn_getAndruavFacade().API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
-    }
-    
-    fn_unitUpdated (p_andruavUnit)
-    {
-        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
-        if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
     }
 
     render () 
@@ -194,7 +210,6 @@ export class ClssCtrlP2P extends React.Component {
         
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_p2p"} className={this.props.className}>
-                <EventBridge eventName={js_event.EE_unitP2PUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
                 <div key={v_andruavUnit.getPartyID() + 'p2p_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'p2p_11'} className="col-6 ">
                         <div key={v_andruavUnit.getPartyID() + 'p2p_111'} className='row css_margin_zero padding_zero '>

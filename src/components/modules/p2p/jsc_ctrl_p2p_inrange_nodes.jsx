@@ -8,8 +8,7 @@ import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
-import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 
 
 class ClssCtrlP2PInRangeNodeInfo  extends React.Component {
@@ -71,27 +70,30 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
                 m_update: 0
 		};
 
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_flag_mounted = false;
+        this.m_unsubs = [];
     }
 
 
     componentWillUnmount () {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount () 
     {
         this.m_flag_mounted = true;
-    }
-
-    fn_unitUpdated (p_andruavUnit)
-    {
-        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
-        if (this.m_flag_mounted === false)return ;
-        this.setState({'m_update': this.state.m_update +1});
+        // Field-granular: re-render only when m_P2P.m_detected_node
+        // changes, replacing the coarse EE_unitP2PUpdated trigger.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const me = this;
+            this.m_unsubs.push(subscribeUnitField(partyId, 'm_P2P.m_detected_node', () => {
+                if (me.m_flag_mounted === false) return;
+                me.setState({ 'm_update': me.state.m_update + 1 });
+            }));
+        }
     }
 
 
@@ -123,7 +125,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_NODEs extends React.Component {
         
         
         return (
-            <div key={v_andruavUnit.partID+'RANGE_NODE_INFO'} ><EventBridge eventName={js_event.EE_unitP2PUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />{rendered}{v_units}</div>
+            <div key={v_andruavUnit.partID+'RANGE_NODE_INFO'} >{rendered}{v_units}</div>
         )
     }
 }

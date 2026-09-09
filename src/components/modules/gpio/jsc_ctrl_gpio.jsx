@@ -7,7 +7,7 @@
 import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
 import {ClssCtrlGPIO_Port} from './jsc_ctrl_gpio_port.jsx'
@@ -19,29 +19,30 @@ export class ClssCtrlGPIO extends React.Component {
         this.state = {
                 m_update : 0,
 		};
-
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        this.m_flag_mounted = false;
+        this.m_unsubs = [];
     }
 
     componentWillUnmount () {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
         this.setState({ m_update: 1 });
         js_session.fn_getAndruavFacade().API_requestGPIOStatus(this.props.p_unit); // retrieve the GPIO status.
-    }
-
-    
-    fn_unitUpdated (p_unit)
-    {
-        if (this.m_flag_mounted === false)return ;
-        
-        this.setState(prevState => ({ m_update: prevState.m_update + 1 }));
+        // Field-granular: re-render only when m_GPIOs.m_gpios changes,
+        // replacing the coarse EE_unitGPIOUpdated trigger.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const me = this;
+            this.m_unsubs.push(subscribeUnitField(partyId, 'm_GPIOs.m_gpios', () => {
+                if (me.m_flag_mounted === false) return;
+                me.setState(prevState => ({ m_update: prevState.m_update + 1 }));
+            }));
+        }
     }
 
     fn_refreshGPIO (p_andruavUnit)
@@ -142,7 +143,6 @@ export class ClssCtrlGPIO extends React.Component {
 
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_gpio"} className={this.props.className}>
-                <EventBridge eventName={js_event.EE_unitGPIOUpdated} onEvent={(p_unit) => this.fn_unitUpdated(p_unit)} />
                 
                 
                 {gpios_buttons}
