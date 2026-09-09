@@ -64,7 +64,7 @@ class ClssLoginControl extends React.Component {
 
     const lsPluginEnabled = js_localStorage.fn_getWebConnectorEnabled();
     const usePlugin = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.ENABLED === true ? lsPluginEnabled : false;
-    this.state.use_plugin = usePlugin;
+    this.setState({ use_plugin: usePlugin });
     if (this.chkUsePluginRef.current) {
       this.chkUsePluginRef.current.checked = usePlugin;
     }
@@ -127,20 +127,17 @@ class ClssLoginControl extends React.Component {
     if (this.m_flag_mounted === false) return;
 
     if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-      this.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
-      this.state.username = this.txtUnitIDRef.current ? this.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
+      const username = this.txtUnitIDRef.current ? this.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
-      this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connected Successfully' });
+      this.setState({ is_connected: CONST_NOT_CONNECTION_ONLINE, username, m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connected Successfully' });
     } else {
-      this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
-      this.setState({ m_update: this.state.m_update + 1 });
+      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE, m_update: this.state.m_update + 1 });
     }
   }
 
   fn_onAuthInProgress() {
     if (this.m_flag_mounted === false) return;
-    this.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
-    this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
+    this.setState({ is_connected: CONST_NOT_CONNECTION_IN_PROGRESS, m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
   }
 
   fn_onChatMessage(p_data) {
@@ -235,12 +232,10 @@ class ClssLoginControl extends React.Component {
     // If the user has already stopped retrying (clicked Login to stop), do not
     // override the green OFFLINE state when an in-flight request finally fails.
     if (js_andruavAuth.m_retry_login === false) {
-      this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
-      this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: '' });
+      this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE, m_update: this.state.m_update + 1, errorMessage: '', successMessage: '' });
       return;
     }
-    this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
-    this.setState({ m_update: this.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
+    this.setState({ is_connected: CONST_NOT_CONNECTION_OFFLINE_FAILED, m_update: this.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
   }
 
   fn_onWebConnectorNotRunning(data) {
@@ -303,7 +298,7 @@ class ClssLoginControl extends React.Component {
     }
   }
 
-  clickConnect(e) {
+  clickConnect() {
     if (this.state.is_connected === CONST_NOT_CONNECTION_OFFLINE) {
       // offline (green) - start a new connection
       this.setState({ m_update: this.state.m_update + 1 });
@@ -375,7 +370,8 @@ class ClssLoginControl extends React.Component {
                       }
                       try {
                         console.info('[WebConnector] UI toggle', { enabled: enabled });
-                      } catch {
+                      } catch (err) {
+                        // ignore console errors
                       }
                     }}
                   />
@@ -547,6 +543,8 @@ class ClssLoginControl extends React.Component {
             <br />
           </div>
         );
+        break;
+      default:
         break;
     }
 
