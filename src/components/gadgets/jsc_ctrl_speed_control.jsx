@@ -4,6 +4,8 @@ import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DEFAULT_SPEED_STEP } from '../../js/config/constants.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
+import { useUnitField } from '../../js/hooks/useUnitField.js';
+import { notifyUnitFieldChanged } from '../../js/store/unitStore.js';
 import * as js_helpers from '../../js/js_helpers.js'
 import { js_speak } from '../../js/js_speak'
 import { fn_changeSpeed as fn_changeSpeed_main } from '../../js/js_main.js'
@@ -13,14 +15,13 @@ import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
-    const [, setTick] = useState(0);
     const key = useState(() => Math.random().toString())[0];
 
-    const fn_update = useCallback((p_andruavUnit) => {
-        if (p_unit && p_andruavUnit.getPartyID() === p_unit.getPartyID()) {
-            setTick((t) => t + 1);
-        }
-    }, [p_unit]);
+    // Field-granular re-render: only re-render when the displayed speed
+    // fields change, not on every coarse EE_unitNavUpdated for the whole unit.
+    const _partyId = p_unit?.getPartyID();
+    useUnitField(_partyId, 'm_Nav_Info.p_Location.ground_speed');
+    useUnitField(_partyId, 'm_Nav_Info.p_UserDesired.m_NavSpeed');
 
     const fn_EE_changeOpacity = useCallback((params) => {
         if (params && params.opacity !== undefined) {
@@ -28,7 +29,6 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
         }
     }, []);
 
-    useEventSubscription(js_event.EE_unitNavUpdated, fn_update);
     useEventSubscription(js_event.EE_Opacity_Control, fn_EE_changeOpacity);
 
     const fn_changeSpeed = (e, p_andruavUnit, p_speed) => {
@@ -59,6 +59,7 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
         let v_speak = "change speed to ";
         // save target speed as indication.
         p_andruavUnit.m_Nav_Info.p_UserDesired.m_NavSpeed = parseFloat(p_speed);
+        notifyUnitFieldChanged(p_andruavUnit.getPartyID(), 'm_Nav_Info.p_UserDesired.m_NavSpeed');
 
 
         if (js_preferences.fn_getUseMetricSystem() === true) {
