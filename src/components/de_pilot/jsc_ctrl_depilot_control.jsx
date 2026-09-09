@@ -2,7 +2,7 @@ import React    from 'react';
 import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import {fn_changeAltitude} from '../../js/js_main'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
@@ -21,9 +21,9 @@ export class ClssCtrlDEPilotControl extends React.Component {
 			m_opacity: ClssCVideoCanvasLabel.defaultProps.opacity
 		};
 		
-		// Subscribe to DroneEngage Pilot changes
-		js_eventEmitter.fn_subscribe(js_event.EE_onDroneEngagePilotChanged, this, this.fn_handleDroneEngagePilotChanged);
-		js_eventEmitter.fn_subscribe(js_event.EE_Opacity_Control, this, this.fn_EE_changeOpacity);
+		// Event subscriptions are owned by EventBridge siblings rendered
+		// below (see render()), which auto-unsubscribe on unmount via
+		// useEventSubscription.
     }
 
     componentDidMount() {
@@ -31,9 +31,8 @@ export class ClssCtrlDEPilotControl extends React.Component {
     }
 
     componentWillUnmount() {
-        // Unsubscribe from DroneEngage Pilot changes
-		js_eventEmitter.fn_unsubscribe(js_event.EE_onDroneEngagePilotChanged, this);
-		js_eventEmitter.fn_unsubscribe(js_event.EE_Opacity_Control, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -48,10 +47,10 @@ export class ClssCtrlDEPilotControl extends React.Component {
         return false;
     }
 
-    fn_handleDroneEngagePilotChanged(me, p_unit) {
+    fn_handleDroneEngagePilotChanged(p_unit) {
         // Only update if this event is for the current unit
-       	if (p_unit && p_unit.getPartyID() === me.props.p_unit.getPartyID()) {
-            me.setState({
+       	if (p_unit && p_unit.getPartyID() === this.props.p_unit.getPartyID()) {
+            this.setState({
                 m_dePilotEnabled: p_unit.m_de_pilot_enabled,
                 m_dePilotOperation: p_unit.m_de_pilot_operation,
                 m_dePilotPending: false  // Clear pending state when we receive confirmation
@@ -59,9 +58,9 @@ export class ClssCtrlDEPilotControl extends React.Component {
         }
     }
 
-    fn_EE_changeOpacity(me, params) {
+    fn_EE_changeOpacity(params) {
         if (params && params.opacity !== undefined) {
-            me.setState({ 'm_opacity': params.opacity });
+            this.setState({ 'm_opacity': params.opacity });
         }
     }
 
@@ -161,7 +160,10 @@ export class ClssCtrlDEPilotControl extends React.Component {
         if ((js_siteConfig.CONST_FEATURE.DISABLE_DE_PILOT === true))
         {
             return (
-                        <div className="disabled hidden"/>
+                        <div className="disabled hidden">
+                            <EventBridge eventName={js_event.EE_onDroneEngagePilotChanged} onEvent={(p_unit) => this.fn_handleDroneEngagePilotChanged(p_unit)} />
+                            <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
+                        </div>
                     );
         }
         const v_andruavUnit = this.props.p_unit;
@@ -173,8 +175,11 @@ export class ClssCtrlDEPilotControl extends React.Component {
         // HUD MODE - Canvas rendering
         if (this.props.isHUD === true) {
             return (
-                <ClssCVideoCanvasLabel
-                    x={this.props.x}
+                <React.Fragment>
+                    <EventBridge eventName={js_event.EE_onDroneEngagePilotChanged} onEvent={(p_unit) => this.fn_handleDroneEngagePilotChanged(p_unit)} />
+                    <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
+                    <ClssCVideoCanvasLabel
+                        x={this.props.x}
                     y={this.props.y}
                     originX={this.props.originX}
                     originY={this.props.originY}
@@ -192,6 +197,7 @@ export class ClssCtrlDEPilotControl extends React.Component {
                     p_title={{ text: t('depilotCtrl:title'), color: ClssCVideoCanvasLabel.defaultProps.title_color }}
                     p_value={{ text: operationText, color: this.state.m_dePilotEnabled ? ClssCVideoCanvasLabel.defaultProps.value_color : '#dc3545' }}
                 />
+                </React.Fragment>
             );
         }
 
@@ -200,6 +206,8 @@ export class ClssCtrlDEPilotControl extends React.Component {
         
         return (
             <div className='bg-body  pb-2 pe-1 ps-1 rounded-2'>
+                <EventBridge eventName={js_event.EE_onDroneEngagePilotChanged} onEvent={(p_unit) => this.fn_handleDroneEngagePilotChanged(p_unit)} />
+                <EventBridge eventName={js_event.EE_Opacity_Control} onEvent={(params) => this.fn_EE_changeOpacity(params)} />
                 <div key={id+"depilot"} id={id+"depilot"} className='col-12 al_l ctrldiv'>
                     <div className='btn-group w-100 d-flex flex-wrap'>
                         <div className='form-check form-switch me-3'>

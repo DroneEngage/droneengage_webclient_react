@@ -7,7 +7,7 @@
 import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import ClassSDRSpectrumVisualizer from './jsc_ctrl_sdr_spectrum.jsx'
 
@@ -41,11 +41,14 @@ export class ClssCtrlSDR extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitSDRUpdated,this,this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitSDRUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount () 
@@ -66,12 +69,12 @@ export class ClssCtrlSDR extends React.Component {
         p_me.state.m_trigger_level = p_andruavUnit.m_SDR.m_trigger_level;
     }
 
-    fn_unitUpdated (p_me, p_unit)
+    fn_unitUpdated (p_unit)
     {
-        if (p_me.state.m_update == 0) return ;
+        if (this.state.m_update == 0) return ;
         
-        p_me.fn_copyData(p_me, p_unit);
-        p_me.setState({m_update:p_me.state.m_update});
+        this.fn_copyData(this, p_unit);
+        this.setState({m_update:this.state.m_update});
     }
 
     fn_onDriver(e)
@@ -267,6 +270,7 @@ export class ClssCtrlSDR extends React.Component {
 
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_sdr"} className={this.props.className}>
+                <EventBridge eventName={js_event.EE_unitSDRUpdated} onEvent={(p_unit) => this.fn_unitUpdated(p_unit)} />
                 <div key={v_andruavUnit.getPartyID() + 'sdr_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'sdr_11'} className="col-6 col-md-6 ">
                         <div key={v_andruavUnit.getPartyID() + 'sdr_111'} className='row css_margin_zero padding_zero '>

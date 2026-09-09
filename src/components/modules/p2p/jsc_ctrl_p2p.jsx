@@ -10,7 +10,7 @@ import * as js_session from '../../../js/state/session.js';
 import * as js_siteConfig from '../../../js/js_siteConfig.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 
 import {CLASS_CTRL_P2P_IN_RANGE_NODEs} from './jsc_ctrl_p2p_inrange_nodes.jsx'
@@ -27,11 +27,14 @@ export class ClssCtrlP2P extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitP2PUpdated,this,this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitP2PUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount () 
@@ -59,11 +62,11 @@ export class ClssCtrlP2P extends React.Component {
         js_session.fn_getAndruavFacade().API_SetCommunicationChannel (p_andruavUnit, ws_state, null, duration, null, null, null);
     }
     
-    fn_unitUpdated (p_me,p_andruavUnit)
+    fn_unitUpdated (p_andruavUnit)
     {
-        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     render () 
@@ -191,6 +194,7 @@ export class ClssCtrlP2P extends React.Component {
         
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_p2p"} className={this.props.className}>
+                <EventBridge eventName={js_event.EE_unitP2PUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
                 <div key={v_andruavUnit.getPartyID() + 'p2p_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'p2p_11'} className="col-6 ">
                         <div key={v_andruavUnit.getPartyID() + 'p2p_111'} className='row css_margin_zero padding_zero '>

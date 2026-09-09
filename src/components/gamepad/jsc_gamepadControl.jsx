@@ -16,6 +16,7 @@ import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
 import { ClssGamePadAxisControl } from './jsc_gamepad_axis.jsx';
 import { ClssGamePadButton } from './jsc_gamepad_button.jsx';
 import {ClssSingleAxisProgressControl} from './jsc_gamepad_single_axis.jsx';
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 
 class ClssGamePadAxesControl extends React.Component {
@@ -30,24 +31,27 @@ class ClssGamePadAxesControl extends React.Component {
 
         this.key = Math.random().toString();
         this.m_flag_mounted = false;
-        
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Axes_Updated,this, this.fn_gamePadAxesUpdated);
+
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
     
     componentDidMount () {
         this.m_flag_mounted = true;
     }
 
-    fn_gamePadAxesUpdated(p_me,p_obj)
+    fn_gamePadAxesUpdated(p_obj)
     {
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     
-    componentWillUnmount () 
+    componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Axes_Updated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     render()
@@ -57,9 +61,10 @@ class ClssGamePadAxesControl extends React.Component {
         {
             return (
             <div className='gp_axes'>
+                <EventBridge eventName={js_event.EE_GamePad_Axes_Updated} onEvent={(p_obj) => this.fn_gamePadAxesUpdated(p_obj)} />
                 <p className="text-danger">No Input</p>
             </div>
-                
+
             );
         }
 
@@ -83,6 +88,7 @@ class ClssGamePadAxesControl extends React.Component {
         
         return (
             <div className='gp_axes'>
+                <EventBridge eventName={js_event.EE_GamePad_Axes_Updated} onEvent={(p_obj) => this.fn_gamePadAxesUpdated(p_obj)} />
                 <ClssGamePadAxisControl id='axes1' key={'axes1' + this.key} x={c_unified_virtual_axis[v_axis[0]]} y={c_unified_virtual_axis[v_axis[1]]} x_label={labels[0]} y_label={labels[1]}></ClssGamePadAxisControl>
                 <ClssGamePadAxisControl id='axes2' key={'axes2' + this.key} x={c_unified_virtual_axis[v_axis[2]]} y={c_unified_virtual_axis[v_axis[3]]} x_label={labels[2]} y_label={labels[3]}></ClssGamePadAxisControl>
                 {axis_ctrl}
@@ -106,24 +112,27 @@ class ClssGamePadButtonControl extends React.Component {
         };
 
         this.m_flag_mounted = false;
-                       
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Button_Updated,this, this.fn_gamePadButtonUpdated);
+
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
     
     componentDidMount() {
         this.m_flag_mounted = true;
     }
 
-    fn_gamePadButtonUpdated(p_me,p_obj)
+    fn_gamePadButtonUpdated(p_obj)
     {
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     
-    componentWillUnmount () 
+    componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Button_Updated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
 
@@ -131,15 +140,16 @@ class ClssGamePadButtonControl extends React.Component {
     {
         const c_padStatus = js_andruav_gamepad.fn_getGamePad(this.props.p_index);
         const button_routing = c_padStatus.p_button_routing;
-        
+
         if (c_padStatus== null)
         {
-            return (<div className='gp_buttons'></div>);
-            
+            return (<div className='gp_buttons'><EventBridge eventName={js_event.EE_GamePad_Button_Updated} onEvent={(p_obj) => this.fn_gamePadButtonUpdated(p_obj)} /></div>);
+
         }
 
         return (
             <div className='gp_buttons bg-dark opacity-75'>
+                <EventBridge eventName={js_event.EE_GamePad_Button_Updated} onEvent={(p_obj) => this.fn_gamePadButtonUpdated(p_obj)} />
                 <ClssGamePadButton id='btn0'  btn={c_padStatus.p_buttons[0]}  t='A' function={button_routing[0]}     color_active={"#FF4444"}        color_inactive='none' p_pressed={c_padStatus.p_buttons[0].m_pressed}></ClssGamePadButton>
                 <ClssGamePadButton id='btn1'  btn={c_padStatus.p_buttons[1]}  t='R' function={button_routing[1]}     color_active={"#375a7f"}        color_inactive='none' p_pressed={c_padStatus.p_buttons[1].m_pressed}></ClssGamePadButton>
                 <ClssGamePadButton id='btn2'  btn={c_padStatus.p_buttons[2]}  t='L' function={button_routing[2]}     color_active='yellow'             color_inactive='none' p_pressed={c_padStatus.p_buttons[2].m_pressed}></ClssGamePadButton>
@@ -176,11 +186,9 @@ export default class ClssGamePadControl extends React.Component {
 
         this.m_gamepad_config_index = js_localStorage.fn_getGamePadConfigIndex();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Connected,this, this.fn_gamePadConnected);
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Disconnected,this, this.fn_gamePadDisconnected);
-        js_eventEmitter.fn_subscribe(js_event.EE_requestGamePad,this, this.fn_requestGamePad);
-        js_eventEmitter.fn_subscribe(js_event.EE_releaseGamePad,this, this.fn_releaseGamePad);
-        js_eventEmitter.fn_subscribe(js_event.EE_GamePad_Control_Update,this, this.fn_onChangeConfig);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
@@ -208,22 +216,22 @@ export default class ClssGamePadControl extends React.Component {
         }
     }
 
-    fn_gamePadConnected(p_me,p_obj)
+    fn_gamePadConnected(p_obj)
     {
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
-    fn_gamePadDisconnected(p_me,p_obj)
+    fn_gamePadDisconnected(p_obj)
     {
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
-    fn_onChangeConfig (p_me)
+    fn_onChangeConfig ()
     {
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_changeConfig (p_config_index)
@@ -254,41 +262,38 @@ export default class ClssGamePadControl extends React.Component {
     /***
      * called when WebClient needs to assign gamePad readings to a given drone.
      */
-    fn_requestGamePad(p_me,p_andruavUnit)
+    fn_requestGamePad(p_andruavUnit)
     {
-        if (p_me.m_flag_mounted === false)return ;
+        if (this.m_flag_mounted === false)return ;
         if (p_andruavUnit === null || p_andruavUnit === undefined) return ;
-        p_me.state.m_andruavUnit = p_andruavUnit;
+        this.state.m_andruavUnit = p_andruavUnit;
         $('#modal_ctrl_gamepad').find('#btnGoto').off("click");
         $('#modal_ctrl_gamepad').find('#btnGoto').on('click', function () {
             fn_gotoUnit_byPartyID($('#modal_ctrl_gamepad').attr(p_andruavUnit.getPartyID()));
         });
         $('#modal_ctrl_gamepad').show();
 
-       p_me.setState({'m_update': p_me.state.m_update +1});
-        
+       this.setState({'m_update': this.state.m_update +1});
+
     }
-    
-    fn_releaseGamePad(p_me,p_andruavUnit)
+
+    fn_releaseGamePad(p_andruavUnit)
     {
-        if (p_me.m_flag_mounted === false)return ;
-        
-        p_me.state.m_andruavUnit = null;
-        $('#modal_ctrl_gamepad').hide();  
-        
-        p_me.setState({'m_update': p_me.state.m_update +1});
-        
+        if (this.m_flag_mounted === false)return ;
+
+        this.state.m_andruavUnit = null;
+        $('#modal_ctrl_gamepad').hide();
+
+        this.setState({'m_update': this.state.m_update +1});
+
     }
 
         
     componentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Connected,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Disconnected,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_requestGamePad,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_releaseGamePad,this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_GamePad_Control_Update,this);
-    }   
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
+    }
 
 
     
@@ -368,6 +373,11 @@ export default class ClssGamePadControl extends React.Component {
         }
 
         return (<div id="modal_ctrl_gamepad" key={"m1_" + this.key} title="GamePad Control" className="css_ontop">
+  <EventBridge eventName={js_event.EE_GamePad_Connected} onEvent={(p_obj) => this.fn_gamePadConnected(p_obj)} />
+  <EventBridge eventName={js_event.EE_GamePad_Disconnected} onEvent={(p_obj) => this.fn_gamePadDisconnected(p_obj)} />
+  <EventBridge eventName={js_event.EE_requestGamePad} onEvent={(p_andruavUnit) => this.fn_requestGamePad(p_andruavUnit)} />
+  <EventBridge eventName={js_event.EE_releaseGamePad} onEvent={(p_andruavUnit) => this.fn_releaseGamePad(p_andruavUnit)} />
+  <EventBridge eventName={js_event.EE_GamePad_Control_Update} onEvent={() => this.fn_onChangeConfig()} />
   <h4 id="title" className="modal-title text-warning js-draggable-handle">GamePad of {v_title}</h4>
   {this.m_output}
   <div id="modal_gamepad_footer" className="form-group bg-dark">

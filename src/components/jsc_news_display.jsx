@@ -4,6 +4,7 @@ import Draggable from 'react-draggable';
 
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
+import {EventBridge} from '../js/hooks/EventBridge.jsx';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
 import { CONST_FEATURE as js_siteConfig_CONST_FEATURE } from '../js/js_siteConfig.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
@@ -30,9 +31,9 @@ class ClssNewsDisplay extends ClssDialogBase {
         this.fn_onNewsPush = this.fn_onNewsPush.bind(this);
         this.fn_onNewsToggle = this.fn_onNewsToggle.bind(this);
 
-        js_eventEmitter.fn_subscribe(js_event.EE_News_Loaded, this, this.fn_onNewsLoaded);
-        js_eventEmitter.fn_subscribe(js_event.EE_News_Push, this, this.fn_onNewsPush);
-        js_eventEmitter.fn_subscribe(js_event.EE_onNewsToggle, this, this.fn_onNewsToggle);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount() {
@@ -43,9 +44,8 @@ class ClssNewsDisplay extends ClssDialogBase {
 
     componentWillUnmount() {
         this.m_flag_mounted = false;
-        js_eventEmitter.fn_unsubscribe(js_event.EE_News_Loaded, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_News_Push, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onNewsToggle, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     fn_isMounted() {
@@ -59,30 +59,30 @@ class ClssNewsDisplay extends ClssDialogBase {
     }
 
     // p_payload here is the LoadNews reply's msgPayload, shaped { s: 'OK', news: [...] } (or an error string)
-    fn_onNewsLoaded(me, p_payload) {
-        if (me.fn_isMounted() === false) return;
+    fn_onNewsLoaded(p_payload) {
+        if (this.fn_isMounted() === false) return;
         if (!p_payload || !Array.isArray(p_payload.news)) return;
 
         const newsById = {};
         p_payload.news.forEach(item => { newsById[item.id] = item; });
-        me.setState({ newsById });
+        this.setState({ newsById });
     }
 
     // p_payload here is the unsolicited NewsPush's msgPayload: a single news item
     // (possibly just { id, disabled: 1 } for a disable/delete).
-    fn_onNewsPush(me, p_payload) {
-        if (me.fn_isMounted() === false) return;
+    fn_onNewsPush(p_payload) {
+        if (this.fn_isMounted() === false) return;
         if (!p_payload || !p_payload.id) return;
 
-        me.setState(prevState => ({
+        this.setState(prevState => ({
             newsById: { ...prevState.newsById, [p_payload.id]: { ...prevState.newsById[p_payload.id], ...p_payload } }
         }));
     }
 
-    fn_onNewsToggle(me, p_data) {
-        if (me.fn_isMounted() === false) return;
+    fn_onNewsToggle(p_data) {
+        if (this.fn_isMounted() === false) return;
         const visible = p_data && p_data.visible === true;
-        me.setState({ isVisible: visible });
+        this.setState({ isVisible: visible });
     }
 
     fn_getActiveNews() {
@@ -141,6 +141,9 @@ class ClssNewsDisplay extends ClssDialogBase {
         return (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
                 <div className="card css_ontop news-display-panel" ref={this.m_panelRef}>
+                    <EventBridge eventName={js_event.EE_News_Loaded} onEvent={(p_payload) => this.fn_onNewsLoaded(p_payload)} />
+                    <EventBridge eventName={js_event.EE_News_Push} onEvent={(p_payload) => this.fn_onNewsPush(p_payload)} />
+                    <EventBridge eventName={js_event.EE_onNewsToggle} onEvent={(p_data) => this.fn_onNewsToggle(p_data)} />
                     {this.fn_renderDialogHeader(title, false, composeButton)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2 news-display-body">

@@ -27,7 +27,7 @@
 import React from 'react';
 import * as js_session from '../../../js/state/session.js';
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import { ansiToReact } from './js_ansi_parser.js'
 
@@ -51,8 +51,9 @@ export class ClssCtrlTelnet extends React.Component {
         this.m_outputRef = React.createRef();
         this.m_inputRef = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_unitTelnetStatus, this, this.fn_onTelnetStatus);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitTelnetData, this, this.fn_onTelnetData);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount() {
@@ -65,16 +66,16 @@ export class ClssCtrlTelnet extends React.Component {
         if (this.state.m_connected && this.state.m_session_id) {
             js_session.fn_getAndruavFacade().API_telnetClose(this.props.p_unit, this.state.m_session_id);
         }
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelnetStatus, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitTelnetData, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     /**
      * Handle TELNET_STATUS messages (open/close/error/list/resize).
      */
-    fn_onTelnetStatus(p_me, p_data) {
-        if (!p_me.m_flag_mounted) return;
-        const v_unit = p_me.props.p_unit;
+    fn_onTelnetStatus(p_data) {
+        if (!this.m_flag_mounted) return;
+        const v_unit = this.props.p_unit;
         if (!p_data || !p_data.unit || p_data.unit.getPartyID() !== v_unit.getPartyID()) return;
 
         const msg = p_data.msg;
@@ -83,25 +84,25 @@ export class ClssCtrlTelnet extends React.Component {
         const action = msg.a;
         switch (action) {
             case js_andruavMessages.CONST_TELNET_STATUS_OPENED:
-                p_me.setState({
+                this.setState({
                     m_session_id: msg.i || '',
                     m_connected: true,
                     m_error: '',
                 });
-                p_me.fn_appendOutput('\r\n*** Session opened: ' + (msg.i || '') + ' ***\r\n');
+                this.fn_appendOutput('\r\n*** Session opened: ' + (msg.i || '') + ' ***\r\n');
                 break;
 
             case js_andruavMessages.CONST_TELNET_STATUS_CLOSED:
-                p_me.fn_appendOutput('\r\n*** Session closed ***\r\n');
-                p_me.setState({
+                this.fn_appendOutput('\r\n*** Session closed ***\r\n');
+                this.setState({
                     m_connected: false,
                     m_session_id: '',
                 });
                 break;
 
             case js_andruavMessages.CONST_TELNET_STATUS_ERROR:
-                p_me.setState({ m_error: msg.e || 'Unknown error' });
-                p_me.fn_appendOutput('\r\n*** Error: ' + (msg.e || 'unknown') + ' ***\r\n');
+                this.setState({ m_error: msg.e || 'Unknown error' });
+                this.fn_appendOutput('\r\n*** Error: ' + (msg.e || 'unknown') + ' ***\r\n');
                 break;
 
             case js_andruavMessages.CONST_TELNET_STATUS_RESIZED:
@@ -120,15 +121,15 @@ export class ClssCtrlTelnet extends React.Component {
     /**
      * Handle TELNET_DATA (binary pty output) events.
      */
-    fn_onTelnetData(p_me, p_data) {
-        if (!p_me.m_flag_mounted) return;
-        const v_unit = p_me.props.p_unit;
+    fn_onTelnetData(p_data) {
+        if (!this.m_flag_mounted) return;
+        const v_unit = this.props.p_unit;
         if (!p_data || !p_data.unit || p_data.unit.getPartyID() !== v_unit.getPartyID()) return;
 
         // Only render output for our active session.
-        if (p_me.state.m_session_id && p_data.session_id !== p_me.state.m_session_id) return;
+        if (this.state.m_session_id && p_data.session_id !== this.state.m_session_id) return;
 
-        p_me.fn_appendOutput(p_data.data || '');
+        this.fn_appendOutput(p_data.data || '');
     }
 
     /**
@@ -234,6 +235,8 @@ export class ClssCtrlTelnet extends React.Component {
 
         return (
             <div id={id} key={id} className="ms-1">
+                <EventBridge eventName={js_event.EE_unitTelnetStatus} onEvent={(p_data) => this.fn_onTelnetStatus(p_data)} />
+                <EventBridge eventName={js_event.EE_unitTelnetData} onEvent={(p_data) => this.fn_onTelnetData(p_data)} />
                 {/* Toolbar: connect / disconnect / clear + control buttons */}
                 <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
                     {!isConnected ? (

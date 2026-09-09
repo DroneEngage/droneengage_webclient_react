@@ -4,6 +4,7 @@ import Draggable from 'react-draggable';
 
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
+import {EventBridge} from '../js/hooks/EventBridge.jsx';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
@@ -33,7 +34,9 @@ class ClssNewsWrite extends ClssDialogBase {
         this.m_panelRef = React.createRef();
 
         this.fn_onNewsWriteToggle = this.fn_onNewsWriteToggle.bind(this);
-        js_eventEmitter.fn_subscribe(js_event.EE_onNewsWriteToggle, this, this.fn_onNewsWriteToggle);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentDidMount() {
@@ -44,17 +47,18 @@ class ClssNewsWrite extends ClssDialogBase {
 
     componentWillUnmount() {
         this.m_flag_mounted = false;
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onNewsWriteToggle, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     fn_isMounted() {
         return this.m_flag_mounted;
     }
 
-    fn_onNewsWriteToggle(me, p_data) {
-        if (me.fn_isMounted() === false) return;
+    fn_onNewsWriteToggle(p_data) {
+        if (this.fn_isMounted() === false) return;
         const visible = p_data && p_data.visible === true;
-        me.setState({ isVisible: visible });
+        this.setState({ isVisible: visible });
     }
 
     fn_handlePost() {
@@ -99,6 +103,7 @@ class ClssNewsWrite extends ClssDialogBase {
                     ref={this.m_panelRef}
                     onKeyDown={(e) => e.stopPropagation()}
                 >
+                    <EventBridge eventName={js_event.EE_onNewsWriteToggle} onEvent={(p_data) => this.fn_onNewsWriteToggle(p_data)} />
                     {this.fn_renderDialogHeader(title, false)}
                     {!this.state.isMinimized && (
                         <div className="card-body p-2">

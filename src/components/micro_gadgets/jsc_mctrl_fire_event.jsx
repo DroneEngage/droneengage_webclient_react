@@ -2,7 +2,7 @@ import React from 'react';
 
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { js_localStorage } from '../../js/js_localStorage'
 
 export class ClssFireEvent extends React.Component {
@@ -18,16 +18,18 @@ export class ClssFireEvent extends React.Component {
 
     this.m_flag_mounted = false;
 
-    js_eventEmitter.fn_subscribe(js_event.EE_onAdvancedMode, this, this.fn_advancedMode);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
   }
 
   componentDidMount() {
     this.m_flag_mounted = true;
   }
 
-  fn_advancedMode(p_me) {
-    if (p_me.m_flag_mounted === false)return;
-    p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+  fn_advancedMode() {
+    if (this.m_flag_mounted === false)return;
+    this.setState({ 'm_update': this.state.m_update + 1 });
   }
 
   fn_fireEvent() {
@@ -35,18 +37,20 @@ export class ClssFireEvent extends React.Component {
   }
 
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onAdvancedMode, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   render() {
     if (js_localStorage.fn_getAdvancedOptionsEnabled() !== true) {
       return (
-        <div></div>
+        <div><EventBridge eventName={js_event.EE_onAdvancedMode} onEvent={() => this.fn_advancedMode()} /></div>
       )
     }
     else {
       return (
         <div className="form-group">
+          <EventBridge eventName={js_event.EE_onAdvancedMode} onEvent={() => this.fn_advancedMode()} />
           <label htmlFor="txt_ev" className="user-select-none  form-label txt-theme-aware "><small>{this.props.label}</small></label>
           <div className="input-group mb-3">
             <input id="txt_ev" type="number" min={0} max={2000} step="1.0" className="form-control input-sm input-sm txt_margin " placeholder="0" aria-label="0" ref={this.edit_Ref} />

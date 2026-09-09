@@ -7,7 +7,7 @@
 import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 
 import {ClssCtrlGPIO_Port} from './jsc_ctrl_gpio_port.jsx'
@@ -20,11 +20,14 @@ export class ClssCtrlGPIO extends React.Component {
                 m_update : 0,
 		};
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitGPIOUpdated,this,this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitGPIOUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount() {
@@ -34,11 +37,11 @@ export class ClssCtrlGPIO extends React.Component {
     }
 
     
-    fn_unitUpdated (p_me, p_unit)
+    fn_unitUpdated (p_unit)
     {
-        if (p_me.m_flag_mounted === false)return ;
+        if (this.m_flag_mounted === false)return ;
         
-        p_me.setState(prevState => ({ m_update: prevState.m_update + 1 }));
+        this.setState(prevState => ({ m_update: prevState.m_update + 1 }));
     }
 
     fn_refreshGPIO (p_andruavUnit)
@@ -139,6 +142,7 @@ export class ClssCtrlGPIO extends React.Component {
 
         return (
             <div key={v_andruavUnit.getPartyID() + "_ctl_gpio"} className={this.props.className}>
+                <EventBridge eventName={js_event.EE_unitGPIOUpdated} onEvent={(p_unit) => this.fn_unitUpdated(p_unit)} />
                 
                 
                 {gpios_buttons}

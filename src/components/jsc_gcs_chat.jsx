@@ -8,6 +8,7 @@ import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import { CONST_TARGETS_GCS } from '../js/protocol/server_comm/js_andruav_ws.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
+import EventBridge from '../js/hooks/EventBridge.jsx';
 
 class ClssGCSChat extends ClssDialogBase {
     constructor(props) {
@@ -35,10 +36,9 @@ class ClssGCSChat extends ClssDialogBase {
     }
 
     componentDidMount() {
-        js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
-        js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitAdded, this, this.fn_unitAdded);
-        js_eventEmitter.fn_subscribe(js_event.EE_unitOnlineChanged, this, this.fn_unitOnlineChanged);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
         this.m_flag_mounted = true;
         this.modalRef = this.m_panelRef;
         super.componentDidMount();
@@ -47,10 +47,8 @@ class ClssGCSChat extends ClssDialogBase {
 
     componentWillUnmount() {
         this.m_flag_mounted = false;
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onChatMessage, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onChatToggle, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitAdded, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitOnlineChanged, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     fn_isMounted() {
@@ -71,20 +69,20 @@ class ClssGCSChat extends ClssDialogBase {
         this.setState({ gcsUnits: this.fn_getGCSUnits() });
     }
 
-    fn_unitAdded(me, p_andruavUnit) {
-        if (me.fn_isMounted() === false) return;
+    fn_unitAdded(p_andruavUnit) {
+        if (this.fn_isMounted() === false) return;
         if (p_andruavUnit && p_andruavUnit.m_IsGCS === true) {
-            me.fn_refreshGCSList();
+            this.fn_refreshGCSList();
         }
     }
 
-    fn_unitOnlineChanged(me) {
-        if (me.fn_isMounted() === false) return;
-        me.fn_refreshGCSList();
+    fn_unitOnlineChanged() {
+        if (this.fn_isMounted() === false) return;
+        this.fn_refreshGCSList();
     }
 
-    fn_onChatMessage(me, p_data) {
-        if (me.fn_isMounted() === false) return;
+    fn_onChatMessage(p_data) {
+        if (this.fn_isMounted() === false) return;
 
         const p_unit = p_data.unit;
         const p_message = p_data.message;
@@ -104,19 +102,19 @@ class ClssGCSChat extends ClssDialogBase {
             isMe: false
         };
 
-        me.fn_appendMessage(msg);
+        this.fn_appendMessage(msg);
 
         // If dialog is minimized, increment unread count and re-dispatch with flag to trigger unread highlight
-        if (me.state.isMinimized === true) {
-            me.setState(prevState => ({ unreadCount: prevState.unreadCount + 1 }));
+        if (this.state.isMinimized === true) {
+            this.setState(prevState => ({ unreadCount: prevState.unreadCount + 1 }));
             js_eventEmitter.fn_dispatch(js_event.EE_onChatMessage, { ...p_data, minimized: true });
         }
     }
 
-    fn_onChatToggle(me, p_data) {
-        if (me.fn_isMounted() === false) return;
+    fn_onChatToggle(p_data) {
+        if (this.fn_isMounted() === false) return;
         const visible = p_data && p_data.visible === true;
-        me.setState({ isVisible: visible });
+        this.setState({ isVisible: visible });
     }
 
     fn_appendMessage(p_msg) {
@@ -308,6 +306,10 @@ class ClssGCSChat extends ClssDialogBase {
         return (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel=".gcs-chat-minimize-btn, button, input, select, textarea">
             <div className="card css_ontop gcs-chat-panel" ref={this.m_panelRef}>
+                <EventBridge eventName={js_event.EE_onChatMessage} onEvent={(data) => this.fn_onChatMessage(data)} />
+                <EventBridge eventName={js_event.EE_onChatToggle} onEvent={(data) => this.fn_onChatToggle(data)} />
+                <EventBridge eventName={js_event.EE_unitAdded} onEvent={(data) => this.fn_unitAdded(data)} />
+                <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={(data) => this.fn_unitOnlineChanged(data)} />
                 {this.fn_renderDialogHeader(title)}
                 {!this.state.isMinimized && (
                     <div className="card-body p-2">

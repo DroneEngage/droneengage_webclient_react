@@ -10,7 +10,7 @@ import * as js_session from '../../../js/state/session.js';
 
 import * as js_helpers from '../../../js/js_helpers.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../../js/events/js_eventEmitter.js'
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 
 
 
@@ -128,12 +128,15 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe (js_event.EE_unitP2PUpdated,this,this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
     componentWillUnmount () {
-        js_eventEmitter.fn_unsubscribe (js_event.EE_unitP2PUpdated,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount () 
@@ -141,11 +144,11 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
         this.m_flag_mounted = true;
     }
 
-    fn_unitUpdated (p_me,p_andruavUnit)
+    fn_unitUpdated (p_andruavUnit)
     {
-        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return ;
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
 
@@ -176,7 +179,7 @@ export class CLASS_CTRL_P2P_IN_RANGE_BSSIDs extends React.Component {
                 </div>);
         }
         return (
-            <div key={v_andruavUnit.partID+'rnbssid_'} >{rendered}{v_units}
+            <div key={v_andruavUnit.partID+'rnbssid_'} ><EventBridge eventName={js_event.EE_unitP2PUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />{rendered}{v_units}
             </div>
             
         )
