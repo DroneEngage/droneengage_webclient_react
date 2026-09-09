@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_session from '../../../js/state/session.js';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
+import EventBridge from '../../../js/hooks/EventBridge.jsx';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 import { js_localStorage } from '../../../js/js_localStorage.js';
 import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/js_main.js';
@@ -31,24 +31,15 @@ class MobileLoginPanel extends React.Component {
     this.m_chk_readonlyctrl = React.createRef();
     this.m_webConnectorRetried = false;
 
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_onAccessCodeGenerated);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_onAccessCodeError);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_onAccessCodeGenerated);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
-    js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
-    js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
   }
 
   componentWillUnmount() {
     this.m_flag_mounted = false;
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_BAD_Operation, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   componentDidMount() {
@@ -66,21 +57,21 @@ class MobileLoginPanel extends React.Component {
     }
   }
 
-  fn_onSocketStatus(me, params) {
-    if (me.m_flag_mounted === false) return;
+  fn_onSocketStatus(params) {
+    if (this.m_flag_mounted === false) return;
     if (params.status === 'registered') {
-      me.setState({ is_connected: CONST_ONLINE, errorMessage: '', successMessage: '' });
+      this.setState({ is_connected: CONST_ONLINE, errorMessage: '', successMessage: '' });
     } else {
-      me.setState({ is_connected: CONST_OFFLINE });
+      this.setState({ is_connected: CONST_OFFLINE });
     }
   }
 
-  fn_onAuthInProgress(me) {
-    me.setState({ is_connected: CONST_IN_PROGRESS, errorMessage: '' });
+  fn_onAuthInProgress() {
+    this.setState({ is_connected: CONST_IN_PROGRESS, errorMessage: '' });
   }
 
-  fn_onAuthBad(me, data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onAuthBad(data) {
+    if (this.m_flag_mounted === false) return;
 
     // SSL errors get their own security dialog, mirroring jsc_login.jsx.
     if (data && data.ssl === true) {
@@ -106,40 +97,40 @@ class MobileLoginPanel extends React.Component {
       return;
     }
 
-    me.setState({
+    this.setState({
       is_connected: CONST_FAILED,
       errorMessage: data && data.em ? data.em : 'Login failed',
       successMessage: '',
     });
   }
 
-  fn_onWebConnectorNotRunning(me) {
-    if (me.m_flag_mounted === false) return;
+  fn_onWebConnectorNotRunning() {
+    if (this.m_flag_mounted === false) return;
     // Auto-fallback: WebConnector plugin (127.0.0.1:9211) is not available on this
     // device (typical for mobile/Android). Silently disable it and retry with cloud
     // login instead of showing a modal dialog — better UX on touch devices.
-    if (me.m_webConnectorRetried === true) return;
-    me.m_webConnectorRetried = true;
+    if (this.m_webConnectorRetried === true) return;
+    this.m_webConnectorRetried = true;
     js_localStorage.fn_setWebConnectorEnabled(false);
-    if (me.m_loginNameRef.current && me.m_accessCodeRef.current) {
-      const email = me.m_loginNameRef.current.value.trim();
-      const accessCode = me.m_accessCodeRef.current.value.trim();
+    if (this.m_loginNameRef.current && this.m_accessCodeRef.current) {
+      const email = this.m_loginNameRef.current.value.trim();
+      const accessCode = this.m_accessCodeRef.current.value.trim();
       if (email && accessCode) {
         fn_connect(email, accessCode);
       }
     }
   }
 
-  fn_onAccessCodeGenerated(me, params) {
-    me.setState({
+  fn_onAccessCodeGenerated(params) {
+    this.setState({
       accessCode: params.accessCode || '',
       successMessage: 'Access code generated. Copy it and use it to login.',
       errorMessage: '',
     });
   }
 
-  fn_onAccessCodeError(me, params) {
-    me.setState({
+  fn_onAccessCodeError(params) {
+    this.setState({
       errorMessage: params && params.em ? params.em : 'Error generating access code',
       successMessage: '',
     });
@@ -229,6 +220,13 @@ class MobileLoginPanel extends React.Component {
     if (is_connected === CONST_ONLINE) {
       return (
         <div className="mobile-login-panel">
+          <EventBridge eventName={js_event.EE_Auth_Account_Created} onEvent={(data) => this.fn_onAccessCodeGenerated(data)} />
+          <EventBridge eventName={js_event.EE_Auth_Account_BAD_Operation} onEvent={(data) => this.fn_onAccessCodeError(data)} />
+          <EventBridge eventName={js_event.EE_Auth_Account_Regenerated} onEvent={(data) => this.fn_onAccessCodeGenerated(data)} />
+          <EventBridge eventName={js_event.EE_Auth_Login_In_Progress} onEvent={() => this.fn_onAuthInProgress()} />
+          <EventBridge eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_onAuthBad(data)} />
+          <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(data) => this.fn_onSocketStatus(data)} />
+          <EventBridge eventName={js_event.EE_WebConnector_Not_Running} onEvent={() => this.fn_onWebConnectorNotRunning()} />
           <div className="mobile-login-connected">
             <i className="bi bi-check-circle-fill" style={{ fontSize: '2rem' }} />
             <span>Connected</span>
@@ -253,6 +251,13 @@ class MobileLoginPanel extends React.Component {
 
     return (
       <div className="mobile-login-panel">
+        <EventBridge eventName={js_event.EE_Auth_Account_Created} onEvent={(data) => this.fn_onAccessCodeGenerated(data)} />
+        <EventBridge eventName={js_event.EE_Auth_Account_BAD_Operation} onEvent={(data) => this.fn_onAccessCodeError(data)} />
+        <EventBridge eventName={js_event.EE_Auth_Account_Regenerated} onEvent={(data) => this.fn_onAccessCodeGenerated(data)} />
+        <EventBridge eventName={js_event.EE_Auth_Login_In_Progress} onEvent={() => this.fn_onAuthInProgress()} />
+        <EventBridge eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_onAuthBad(data)} />
+        <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(data) => this.fn_onSocketStatus(data)} />
+        <EventBridge eventName={js_event.EE_WebConnector_Not_Running} onEvent={() => this.fn_onWebConnectorNotRunning()} />
         <div className="mobile-login-title">
           {isConnecting ? 'Connecting...' : 'Login'}
         </div>

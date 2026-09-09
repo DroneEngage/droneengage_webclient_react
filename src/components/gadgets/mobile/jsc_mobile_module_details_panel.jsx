@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
+import { useEventSubscription } from '../../../js/hooks/useEventSubscription.js';
 
 /**
  * Compact mobile bottom-sheet that displays module version information for a
@@ -19,7 +19,6 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
   const [, forceUpdate] = useState(0);
   const [expandedModule, setExpandedModule] = useState(null);
   const tickRef = useRef(0);
-  const listenerObj = useRef({}).current;
 
   const refresh = useCallback(() => {
     tickRef.current++;
@@ -36,14 +35,8 @@ const ClssMobileModuleDetailsPanel = ({ p_unit, p_isOpen, p_onClose }) => {
     refresh();
   }, [p_unit, refresh]);
 
-  useEffect(() => {
-    js_eventEmitter.fn_subscribe(js_event.EE_OldModule, listenerObj, refresh);
-    js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, listenerObj, refreshIfUnit);
-    return () => {
-      js_eventEmitter.fn_unsubscribe(js_event.EE_OldModule, listenerObj);
-      js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated, listenerObj);
-    };
-  }, [refresh, refreshIfUnit, listenerObj]);
+  useEventSubscription(js_event.EE_OldModule, refresh);
+  useEventSubscription(js_event.EE_unitUpdated, refreshIfUnit);
 
   if (!p_isOpen) return null;
 

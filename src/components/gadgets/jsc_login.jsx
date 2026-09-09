@@ -10,6 +10,7 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_localStorage } from '../../js/js_localStorage.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
+import EventBridge from '../../js/hooks/EventBridge.jsx';
 import { js_speak } from '../../js/js_speak.js';
 import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../../js/js_main.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
@@ -54,15 +55,9 @@ class ClssLoginControl extends React.Component {
   }
 
   componentDidMount() {
-    js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_onSocketStatus);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_onAuthInProgress);
-    js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_onAuthBad);
-    js_eventEmitter.fn_subscribe(js_event.EE_onChatMessage, this, this.fn_onChatMessage);
-    js_eventEmitter.fn_subscribe(js_event.EE_onChatToggle, this, this.fn_onChatToggle);
-    js_eventEmitter.fn_subscribe(js_event.EE_News_Push, this, this.fn_onNewsPush);
-    js_eventEmitter.fn_subscribe(js_event.EE_onNewsToggle, this, this.fn_onNewsToggle);
-    js_eventEmitter.fn_subscribe(js_event.EE_WebConnector_Not_Running, this, this.fn_onWebConnectorNotRunning);
-
+    // Event subscriptions are owned by EventBridge siblings rendered
+    // below (see render()), which auto-unsubscribe on unmount via
+    // useEventSubscription.
     this.m_flag_mounted = true;
 
     const tabStatus = getTabStatus();
@@ -125,31 +120,31 @@ class ClssLoginControl extends React.Component {
     this.setState({ m_update: 1 });
   }
 
-  fn_onSocketStatus(me, params) {
-    const { t } = me.props; // Access t function
+  fn_onSocketStatus(params) {
+    const { t } = this.props; // Access t function
     js_common.fn_console_log('REACT:' + JSON.stringify(params));
 
-    if (me.m_flag_mounted === false) return;
+    if (this.m_flag_mounted === false) return;
 
     if (params.status === js_andruavMessages.CONST_SOCKET_STATUS_REGISTERED) {
-      me.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
-      me.state.username = me.txtUnitIDRef.current ? me.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
+      this.state.is_connected = CONST_NOT_CONNECTION_ONLINE;
+      this.state.username = this.txtUnitIDRef.current ? this.txtUnitIDRef.current.value : js_localStorage.fn_getUnitID();
       js_speak.fn_speak(t('connectedSpeech')); // Translate "Connected"
-      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connected Successfully' });
+      this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connected Successfully' });
     } else {
-      me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
-      me.setState({ m_update: me.state.m_update + 1 });
+      this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
+      this.setState({ m_update: this.state.m_update + 1 });
     }
   }
 
-  fn_onAuthInProgress(me) {
-    if (me.m_flag_mounted === false) return;
-    me.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
-    me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
+  fn_onAuthInProgress() {
+    if (this.m_flag_mounted === false) return;
+    this.state.is_connected = CONST_NOT_CONNECTION_IN_PROGRESS;
+    this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: 'Connecting...' });
   }
 
-  fn_onChatMessage(me, p_data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onChatMessage(p_data) {
+    if (this.m_flag_mounted === false) return;
     if (!p_data || !p_data.unit) return;
 
     // Ignore own messages.
@@ -160,15 +155,15 @@ class ClssLoginControl extends React.Component {
     }
 
     // Increment unread if chat is hidden or minimized
-    if (me.state.is_chat_visible === false || p_data.minimized === true) {
-      me.setState(prevState => ({ chat_unread: prevState.chat_unread + 1 }));
+    if (this.state.is_chat_visible === false || p_data.minimized === true) {
+      this.setState(prevState => ({ chat_unread: prevState.chat_unread + 1 }));
     }
   }
 
-  fn_onChatToggle(me, p_data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onChatToggle(p_data) {
+    if (this.m_flag_mounted === false) return;
     const visible = p_data && p_data.visible === true;
-    me.setState({ is_chat_visible: visible, chat_unread: visible ? 0 : me.state.chat_unread });
+    this.setState({ is_chat_visible: visible, chat_unread: visible ? 0 : this.state.chat_unread });
   }
 
   fn_toggleChat(p_event) {
@@ -182,17 +177,17 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: nextVisible });
   }
 
-  fn_onNewsPush(me) {
-    if (me.m_flag_mounted === false) return;
-    if (me.state.is_news_visible === false) {
-      me.setState(prevState => ({ news_unread: prevState.news_unread + 1 }));
+  fn_onNewsPush() {
+    if (this.m_flag_mounted === false) return;
+    if (this.state.is_news_visible === false) {
+      this.setState(prevState => ({ news_unread: prevState.news_unread + 1 }));
     }
   }
 
-  fn_onNewsToggle(me, p_data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onNewsToggle(p_data) {
+    if (this.m_flag_mounted === false) return;
     const visible = p_data && p_data.visible === true;
-    me.setState({ is_news_visible: visible, news_unread: visible ? 0 : me.state.news_unread });
+    this.setState({ is_news_visible: visible, news_unread: visible ? 0 : this.state.news_unread });
   }
 
   fn_toggleNews(p_event) {
@@ -205,8 +200,8 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onNewsToggle, { visible: nextVisible });
   }
 
-  fn_onAuthBad(me, data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onAuthBad(data) {
+    if (this.m_flag_mounted === false) return;
     
     // Check if this is an SSL error and show security dialog
     if (data && data.ssl === true) {
@@ -240,16 +235,16 @@ class ClssLoginControl extends React.Component {
     // If the user has already stopped retrying (clicked Login to stop), do not
     // override the green OFFLINE state when an in-flight request finally fails.
     if (js_andruavAuth.m_retry_login === false) {
-      me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
-      me.setState({ m_update: me.state.m_update + 1, errorMessage: '', successMessage: '' });
+      this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE;
+      this.setState({ m_update: this.state.m_update + 1, errorMessage: '', successMessage: '' });
       return;
     }
-    me.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
-    me.setState({ m_update: me.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
+    this.state.is_connected = CONST_NOT_CONNECTION_OFFLINE_FAILED;
+    this.setState({ m_update: this.state.m_update + 1, errorMessage: 'Login Error: ' + msg, successMessage: '' });
   }
 
-  fn_onWebConnectorNotRunning(me, data) {
-    if (me.m_flag_mounted === false) return;
+  fn_onWebConnectorNotRunning(data) {
+    if (this.m_flag_mounted === false) return;
     
     const autoFallback = data && data.autoFallback === true;
     const fallbackStatus = autoFallback ? 'ENABLED' : 'DISABLED';
@@ -280,17 +275,17 @@ class ClssLoginControl extends React.Component {
           } else {
             // Disable WebConnector and retry
             js_localStorage.fn_setWebConnectorEnabled(false);
-            me.setState({ use_plugin: false });
-            if (me.chkUsePluginRef.current) {
-              me.chkUsePluginRef.current.checked = false;
+            this.setState({ use_plugin: false });
+            if (this.chkUsePluginRef.current) {
+              this.chkUsePluginRef.current.checked = false;
             }
             // Restore UnitID from non-shared storage
-            if (me.txtUnitIDRef.current) {
-              me.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
+            if (this.txtUnitIDRef.current) {
+              this.txtUnitIDRef.current.value = js_localStorage.fn_getUnitID();
             }
             console.info('[WebConnector] User disabled WebConnector, retrying...');
             // Trigger connect again with WebConnector disabled
-            me.clickConnect(null);
+            this.clickConnect(null);
           }
         }
       },
@@ -337,14 +332,8 @@ class ClssLoginControl extends React.Component {
   }
 
   componentWillUnmount() {
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onChatMessage, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onChatToggle, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_News_Push, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_onNewsToggle, this);
-    js_eventEmitter.fn_unsubscribe(js_event.EE_WebConnector_Not_Running, this);
+    // Unsubscription is handled automatically by the EventBridge
+    // siblings (useEventSubscription) on unmount.
   }
 
   render() {
@@ -561,6 +550,15 @@ class ClssLoginControl extends React.Component {
         break;
     }
 
+
+    control.push(<EventBridge key="eb_EE_onSocketStatus" eventName={js_event.EE_onSocketStatus} onEvent={(data) => this.fn_onSocketStatus(data)} />);
+    control.push(<EventBridge key="eb_EE_Auth_Login_In_Progress" eventName={js_event.EE_Auth_Login_In_Progress} onEvent={() => this.fn_onAuthInProgress()} />);
+    control.push(<EventBridge key="eb_EE_Auth_BAD_Logined" eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_onAuthBad(data)} />);
+    control.push(<EventBridge key="eb_EE_onChatMessage" eventName={js_event.EE_onChatMessage} onEvent={(data) => this.fn_onChatMessage(data)} />);
+    control.push(<EventBridge key="eb_EE_onChatToggle" eventName={js_event.EE_onChatToggle} onEvent={(data) => this.fn_onChatToggle(data)} />);
+    control.push(<EventBridge key="eb_EE_News_Push" eventName={js_event.EE_News_Push} onEvent={() => this.fn_onNewsPush()} />);
+    control.push(<EventBridge key="eb_EE_onNewsToggle" eventName={js_event.EE_onNewsToggle} onEvent={(data) => this.fn_onNewsToggle(data)} />);
+    control.push(<EventBridge key="eb_EE_WebConnector_Not_Running" eventName={js_event.EE_WebConnector_Not_Running} onEvent={(data) => this.fn_onWebConnectorNotRunning(data)} />);
 
     const v_chatIconClass = this.state.chat_unread > 0
       ? 'bi-chat-dots-fill text-danger'

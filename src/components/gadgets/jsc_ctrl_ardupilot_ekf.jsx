@@ -1,7 +1,7 @@
 import React    from 'react';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_eventEmitter} from '../../js/events/js_eventEmitter'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
 export class ClssCtrlArdupilotEkf extends React.Component {
     constructor()
@@ -16,12 +16,15 @@ export class ClssCtrlArdupilotEkf extends React.Component {
 
         this.m_flag_mounted = false;
 
-        js_eventEmitter.fn_subscribe(js_event.EE_EKFViewToggle,this,this.fn_toggle_global);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
-    childcomponentWillUnmount () 
+    childcomponentWillUnmount ()
     {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_EKFViewToggle,this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount () 
@@ -29,12 +32,12 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         this.m_flag_mounted = true;
     }
 
-    fn_toggle_global(p_me,p_compact)
+    fn_toggle_global(p_compact)
     {
-        p_me.state.is_compact = p_compact;
+        this.state.is_compact = p_compact;
 
-        if (p_me.m_flag_mounted === false)return ;
-        p_me.setState({'m_update': p_me.state.m_update +1});
+        if (this.m_flag_mounted === false)return ;
+        this.setState({'m_update': this.state.m_update +1});
     }
 
     fn_toggle()
@@ -109,6 +112,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         {
             return (
                 <div className = {'css_margin_zero css_padding_zero  al_c txt-theme-aware cursor_hand ' + this.getSingleCSS()} onClick={ (e) => this.fn_toggle()}>
+                    <EventBridge eventName={js_event.EE_EKFViewToggle} onEvent={(p_compact) => this.fn_toggle_global(p_compact)} />
                     EFK
                 </div>
             );
@@ -117,6 +121,7 @@ export class ClssCtrlArdupilotEkf extends React.Component {
         {
             return (
                 <div className = 'row  css_margin_zero css_padding_zero'  onClick={ (e) => this.fn_toggle()}>
+                <EventBridge eventName={js_event.EE_EKFViewToggle} onEvent={(p_compact) => this.fn_toggle_global(p_compact)} />
                 <div className = {'col-2  css_margin_zero css_padding_zero '+ gui_V.css}  title ={'velocity variance X: '  + gui_V.value}>V</div>
                 <div className = {'col-2  css_margin_zero css_padding_zero '+ gui_PH.css} title ={'pos horiz variance X: '  + gui_PH.value}>PH</div>
                 <div className = {'col-2  css_margin_zero css_padding_zero '+ gui_PV.css} title ={'pos vert variance X: '  + gui_PV.value}>PV</div>

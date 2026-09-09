@@ -3,7 +3,7 @@ import $ from 'jquery';
 import React from 'react';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
+import EventBridge from '../../js/hooks/EventBridge.jsx';
 
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js'
 import { js_localStorage } from '../../js/js_localStorage.js'
@@ -29,26 +29,19 @@ export default class ClssLoginControl extends React.Component {
         this.m_chk_fullctrl = React.createRef();
         this.m_chk_readonlyctrl = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Created, this, this.fn_EE_permissionReceived);
-        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_BAD_Operation, this, this.fn_EE_permissionBadLogin);
-        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Account_Regenerated, this, this.fn_EE_permissionReceived);
-        js_eventEmitter.fn_subscribe(js_event.EE_Auth_Login_In_Progress, this, this.fn_EE_authInProgress);
-        js_eventEmitter.fn_subscribe(js_event.EE_Auth_BAD_Logined, this, this.fn_EE_authBadLogin);
-        js_eventEmitter.fn_subscribe(js_event.EE_onSocketStatus, this, this.fn_EE_socketStatus);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Created, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_BAD_Operation, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Account_Regenerated, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_Login_In_Progress, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_Auth_BAD_Logined, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onSocketStatus, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
-    fn_EE_permissionReceived(me, params) {
+    fn_EE_permissionReceived(params) {
         // Update the state with the received account info
-        me.setState({
+        this.setState({
             accountId: params.accountId || '',
             loginId: params.loginId || '',
             accessCode: params.accessCode || '',
@@ -57,32 +50,32 @@ export default class ClssLoginControl extends React.Component {
         });
     }
 
-    fn_EE_permissionBadLogin(me, params) {
-        me.setState({ 
+    fn_EE_permissionBadLogin(params) {
+        this.setState({ 
             errorMessage: "Error: " + params.em,
             successMessage: ''
         });
         loadCaptchaEnginge(6); 
     }
 
-    fn_EE_authInProgress(me) {
-        me.setState({
+    fn_EE_authInProgress() {
+        this.setState({
             errorMessage: '',
             successMessage: 'Connecting...',
         });
     }
 
-    fn_EE_authBadLogin(me, params) {
+    fn_EE_authBadLogin(params) {
         const msg = params && params.em ? params.em : 'Login failed';
-        me.setState({
+        this.setState({
             errorMessage: 'Login Error: ' + msg,
             successMessage: '',
         });
     }
 
-    fn_EE_socketStatus(me, params) {
+    fn_EE_socketStatus(params) {
         if (params && params.status === 'registered') {
-            me.setState({
+            this.setState({
                 errorMessage: '',
                 successMessage: 'Connected Successfully',
             });
@@ -166,6 +159,12 @@ export default class ClssLoginControl extends React.Component {
         
         return (
             <div>
+                <EventBridge eventName={js_event.EE_Auth_Account_Created} onEvent={(data) => this.fn_EE_permissionReceived(data)} />
+                <EventBridge eventName={js_event.EE_Auth_Account_BAD_Operation} onEvent={(data) => this.fn_EE_permissionBadLogin(data)} />
+                <EventBridge eventName={js_event.EE_Auth_Account_Regenerated} onEvent={(data) => this.fn_EE_permissionReceived(data)} />
+                <EventBridge eventName={js_event.EE_Auth_Login_In_Progress} onEvent={() => this.fn_EE_authInProgress()} />
+                <EventBridge eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_EE_authBadLogin(data)} />
+                <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(data) => this.fn_EE_socketStatus(data)} />
                 <p className="bg-success txt-theme-aware text-center p-2"><strong>{login}</strong></p>
                 
                 {this.state.errorMessage && (

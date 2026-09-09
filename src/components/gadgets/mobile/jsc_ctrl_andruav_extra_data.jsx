@@ -2,7 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
+import {EventBridge} from '../../../js/hooks/EventBridge.jsx';
 import * as js_helpers from '../../../js/js_helpers.js';
 
 
@@ -16,21 +16,24 @@ class ClssAndruavExtraData extends React.Component {
         this.m_flag_mounted = false;
         this.key = Math.random().toString();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_unitUpdated, this, this.fn_unitUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_unitUpdated, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
     }
 
-    fn_unitUpdated(p_me, p_andruavUnit) {
-        if (p_me.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-        if (p_me.m_flag_mounted === false) return;
-        p_me.setState({ 'm_update': p_me.state.m_update + 1 });
+    fn_unitUpdated(p_andruavUnit) {
+        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+        if (this.m_flag_mounted === false) return;
+        this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
     /***
@@ -92,6 +95,7 @@ class ClssAndruavExtraData extends React.Component {
 
         return (
             <div key={this.key + 'extra_data'} className='row css_margin_zero padding_zero border-top border-secondary'>
+                <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
                 <div key={this.key + 'extra_data_1'} className="col-4">
                     <p key={this.key + 'extra_data_1p'} className="textunit_w135 user-select-all m-0 no-wrap">
                         <span>

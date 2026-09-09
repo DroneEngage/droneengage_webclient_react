@@ -3,7 +3,7 @@ import * as js_session from '../../../js/state/session.js';
 import { useTranslation } from 'react-i18next';
 
 import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
+import { useEventSubscription } from '../../../js/hooks/useEventSubscription.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 
 const TELEMETRY_LEVEL_LABEL = ['OFF', '1', '2', '3'];
@@ -13,23 +13,16 @@ const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
   const [, forceUpdate] = useState(0);
   const [copiedField, setCopiedField] = useState(null);
   const tickRef = useRef(0);
-  const listenerObj = useRef({}).current;
 
   const refresh = useCallback(() => {
     tickRef.current++;
     forceUpdate(tickRef.current);
   }, []);
 
-  useEffect(() => {
-    const handleProxyInfo = (listener, p_andruavUnit) => {
-      if (!p_unit || !p_andruavUnit || p_andruavUnit.getPartyID() !== p_unit.getPartyID()) return;
-      refresh();
-    };
-    js_eventEmitter.fn_subscribe(js_event.EE_onProxyInfoUpdated, listenerObj, handleProxyInfo);
-    return () => {
-      js_eventEmitter.fn_unsubscribe(js_event.EE_onProxyInfoUpdated, listenerObj);
-    };
-  }, [p_unit, refresh, listenerObj]);
+  useEventSubscription(js_event.EE_onProxyInfoUpdated, (p_andruavUnit) => {
+    if (!p_unit || !p_andruavUnit || p_andruavUnit.getPartyID() !== p_unit.getPartyID()) return;
+    refresh();
+  });
 
   useEffect(() => {
     if (p_isOpen && p_unit && js_session.fn_getAndruavFacade()) {

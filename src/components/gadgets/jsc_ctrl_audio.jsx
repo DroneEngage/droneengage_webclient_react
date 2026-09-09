@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_session from '../../js/state/session.js';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import { js_eventEmitter } from '../../js/events/js_eventEmitter'
+import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 export class ClssCtrlAUDIO extends React.Component {
 
@@ -23,8 +23,9 @@ export class ClssCtrlAUDIO extends React.Component {
         this.m_languageRef = React.createRef();
         this.m_soundSelectRef = React.createRef();
 
-        js_eventEmitter.fn_subscribe(js_event.EE_BattViewToggle, this, this.fn_toggle_global);
-        js_eventEmitter.fn_subscribe(js_event.EE_onSoundListUpdated, this, this.fn_onSoundListUpdated);
+        // Event subscriptions are owned by EventBridge siblings rendered
+        // below (see render()), which auto-unsubscribe on unmount via
+        // useEventSubscription.
     }
 
 
@@ -41,15 +42,15 @@ export class ClssCtrlAUDIO extends React.Component {
     }
 
     componentWillUnmount() {
-        js_eventEmitter.fn_unsubscribe(js_event.EE_BattViewToggle, this);
-        js_eventEmitter.fn_unsubscribe(js_event.EE_onSoundListUpdated, this);
+        // Unsubscription is handled automatically by the EventBridge
+        // siblings (useEventSubscription) on unmount.
     }
 
-    fn_onSoundListUpdated(p_me, p_unit) {
+    fn_onSoundListUpdated(p_unit) {
         // The sound module pushed (or replied with) an updated library. Force a
         // re-render so the dropdown reflects the current p_unit.m_Sound.m_files.
-        if (p_me.m_flag_mounted) {
-            p_me.setState((prevState) => ({ m_update: prevState.m_update + 1 }));
+        if (this.m_flag_mounted) {
+            this.setState((prevState) => ({ m_update: prevState.m_update + 1 }));
         }
     }
 
@@ -100,6 +101,8 @@ export class ClssCtrlAUDIO extends React.Component {
             : [];
         return (
             <div id={id} key={id} className="ms-1">
+                <EventBridge eventName={js_event.EE_BattViewToggle} onEvent={(data) => this.fn_toggle_global(data)} />
+                <EventBridge eventName={js_event.EE_onSoundListUpdated} onEvent={(p_unit) => this.fn_onSoundListUpdated(p_unit)} />
                 <div className="row ">
                     <div className="col-6">
                         <div key={v_andruavUnit.getPartyID() + 'audio_111'} className='col-12 user-select-none '>
