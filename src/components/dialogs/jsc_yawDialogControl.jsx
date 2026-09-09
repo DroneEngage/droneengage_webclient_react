@@ -7,6 +7,7 @@ import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 import {fn_doYAW} from '../../js/js_main.js'
 import * as js_helpers from '../../js/js_helpers.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
@@ -31,11 +32,12 @@ export default class ClssYawDialog extends ClssDialogBase
 
         this.m_actual_angle_deg = 0;
         this.m_selected_angle_deg = 0;
+        this.m_unsubs = [];
 
         // Event subscriptions are owned by EventBridge siblings rendered
         // below (see render()), which auto-unsubscribe on unmount via
         // useEventSubscription.
-        
+
     }
 
 
@@ -49,9 +51,9 @@ export default class ClssYawDialog extends ClssDialogBase
 
     componentWillUnmount ()
     {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
-    } 
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
+    }
 
     
     fn_displayDialog(p_me, p_andruavUnit)
@@ -64,6 +66,15 @@ export default class ClssYawDialog extends ClssDialogBase
         p_me.p_onApply = p_me.props.dialogProps?.onApply || null;
         p_me.m_actual_angle_deg = p_me.fn_getCurrentYawDeg(p_andruavUnit);
         p_me.m_selected_angle_deg = p_me.m_actual_angle_deg;
+
+        // Field-granular: subscribe to yaw changes for this unit, replacing
+        // the coarse EE_unitNavUpdated trigger.
+        for (const fn of p_me.m_unsubs) fn();
+        p_me.m_unsubs = [];
+        const partyId = p_andruavUnit.getPartyID();
+        p_me.m_unsubs.push(subscribeUnitField(partyId, 'm_Nav_Info.p_Orientation.yaw', () => {
+            p_me.fn_onUnitNavUpdated(p_andruavUnit);
+        }));
 
         if (p_me.m_flag_mounted === false)return ;
 
@@ -218,7 +229,7 @@ export default class ClssYawDialog extends ClssDialogBase
         return (
             <Draggable nodeRef={this.modal_ctrl_yaw} handle=".js-draggable-handle" cancel="button, input, textarea, select, option, a">
                 <div key={this.key + "modal_ctrl_yaw"} id="modal_ctrl_yaw" title="YAW Control" className="card css_ontop border-light p-2" ref={this.modal_ctrl_yaw}>
-                    <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_onUnitNavUpdated(p_andruavUnit)} />
+                    {/* EE_unitNavUpdated retired for this dialog: yaw field-store subscription in fn_displayDialog */}
 					{this.fn_renderDialogHeader('YAW' + (this.p_andruavUnit ? ' of ' + this.p_andruavUnit.m_unitName : ''))}
 					{!this.state.isMinimized && (
 					<div className="card-body">
