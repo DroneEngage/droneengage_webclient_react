@@ -95,6 +95,15 @@ const EVENT_LIST = Object.freeze({
 			"EE_Auth_Account_Created",
 			"EE_Auth_Account_Regenerated",
 			"EE_Auth_Account_BAD_Operation",
+			"EE_Auth_Logout_Completed",
+			"EE_Auth_Logout_Failed",
+
+			"EE_TeamAdmin_InfoLoaded",
+			"EE_TeamAdmin_UsersLoaded",
+			"EE_TeamAdmin_UserAdded",
+			"EE_TeamAdmin_UserUpdated",
+			"EE_TeamAdmin_UserDeleted",
+			"EE_TeamAdmin_Error",
 
 			"EE_Video_State_Change",
 			"EE_unitGPIOUpdated",

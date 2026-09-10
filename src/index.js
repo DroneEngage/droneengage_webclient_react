@@ -71,6 +71,7 @@ async function fn_startApp() {
   const Home = lazy(() => import('./pages/home').then(m => ({ default: m.default })));
   const Planning = lazy(() => import('./pages/planning').then(m => ({ default: m.default })));
   const Accounts = lazy(() => import('./pages/accounts').then(m => ({ default: m.default })));
+  const AccountAdmin = lazy(() => import('./pages/admin').then(m => ({ default: m.default })));
   const NoPage = lazy(() => import('./pages/NoPage').then(m => ({ default: m.default })));
   const GamePadTesterPage = lazy(() => import('./pages/gamepadTester').then(m => ({ default: m.default })));
   const DebugPage = lazy(() => import('./pages/debug').then(m => ({ default: m.default })));
@@ -106,6 +107,8 @@ async function fn_startApp() {
               <Route path="accounts.html" element={<Accounts />} />
               <Route path="account" element={<Accounts />} />
               <Route path="account.html" element={<Accounts />} />
+              <Route path="accountadmin" element={<AccountAdmin />} />
+              <Route path="accountadmin.html" element={<AccountAdmin />} />
               <Route path="gamepad" element={<GamePadTesterPage />} />
               <Route path="debug" element={<DebugPage />} />
               <Route path="mobile" element={<Mobile />} />

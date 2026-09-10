@@ -80,6 +80,10 @@ export const fn_parseLoginResponse = (response) => {
         commServerAuthKey: comm ? comm.f : null,
         permission: response ? response[js_andruavMessages.CONST_PERMISSION] : null,
         permission2: response ? response[js_andruavMessages.CONST_PERMISSION2] : null,
+        // Team administration: TeamID (aid) and isadmin flag exposed by the
+        // authenticator so the webclient can gate its team-admin page.
+        teamId: response ? response[js_andruavMessages.CONST_ACCOUNT_ID_PARAMETER] : null,
+        isAdmin: response ? response[js_andruavMessages.CONST_IS_ADMIN_PARAMETER] === true : false,
         // partyId is NOT part of the cloud auth response.
         // It is only provided by the local WebConnector login endpoint (/w/wl/).
         // New name: `plugin_party_id` (preferred). Legacy name: `pid`.

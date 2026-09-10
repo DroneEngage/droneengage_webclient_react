@@ -70,10 +70,19 @@ export const CONST_ACCOUNT_MANAGMENT = "/am/";
 export const CONST_CMD_CREATE_ACCESSCODE = "c";
 export const CONST_CMD_REGENERATE_ACCESSCODE = "r";
 
+// Team user administration sub-commands (scoped to caller's team, isadmin-gated)
+export const CONST_CMD_LIST_TEAM_USERS    = "ltu"; // list logins in caller's team
+export const CONST_CMD_ADD_TEAM_USER      = "atu"; // add a login to caller's team
+export const CONST_CMD_UPDATE_TEAM_USER  = "utu"; // edit a login in caller's team
+export const CONST_CMD_DELETE_TEAM_USER   = "dtu"; // delete a login from caller's team
+export const CONST_CMD_GET_TEAM_INFO      = "gti"; // get caller's team info (read-only)
+
 export const CONST_ACCOUNT_NAME_PARAMETER = "acc";
 export const CONST_ACCESS_CODE_PARAMETER = "pwd";
 export const CONST_ACCOUNT_ID_PARAMETER = "aid";
 export const CONST_LOGIN_ID_PARAMETER = "lid";
+export const CONST_TARGET_LOGIN_PARAMETER = "tln";   // target login name for team-admin edit/delete
+export const CONST_IS_ADMIN_PARAMETER = "isadmin";    // isadmin flag (team-admin)
 export const CONST_SUB_COMMAND = "scm";
 export const CONST_ERROR_MSG = "em";
 export const CONST_ACTOR_TYPE = "at";

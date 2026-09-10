@@ -59,6 +59,8 @@ class CAndruavAuth {
         this._m_session_ID = null;
         this._m_party_ID = null;
         this._m_logined = false;
+        this._m_team_id = null;   // TeamID (aid) from login reply — for team admin
+        this._m_is_admin = false;  // isadmin flag from login reply — for team admin
         this.C_ERR_SUCCESS_DISPLAY_MESSAGE = 1001; // Legacy error code
 
         this.#m_accessCodeInProgress = false;
@@ -117,6 +119,23 @@ class CAndruavAuth {
      */
     fn_getPartyID() {
         return this._m_party_ID;
+    }
+
+    /**
+     * Gets the team ID (TeamID/aid) returned by the login reply.
+     * Used by the team-admin page to scope operations.
+     * @returns {string|number|null} The team ID or null if not logged in.
+     */
+    fn_getTeamID() {
+        return this._m_team_id;
+    }
+
+    /**
+     * Checks if the logged-in user is a team admin.
+     * @returns {boolean} True if the user has isadmin flag set.
+     */
+    fn_isTeamAdmin() {
+        return this._m_is_admin === true && this._m_logined === true;
     }
 
     /**
@@ -340,6 +359,8 @@ class CAndruavAuth {
 
                 this._m_permissions_ = parsed.permission;
                 this._m_perm = parsed.permission2 ?? DEFAULT_PERMISSIONS;
+                this._m_team_id = parsed.teamId;
+                this._m_is_admin = parsed.isAdmin;
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logined, parsed.raw);
                 return true;
             } else {
@@ -468,6 +489,8 @@ class CAndruavAuth {
             this.server_AuthKey = parsed.commServerAuthKey;
             this._m_permissions_ = parsed.permission;
             this._m_perm = parsed.permission2 ?? DEFAULT_PERMISSIONS;
+            this._m_team_id = parsed.teamId;
+            this._m_is_admin = parsed.isAdmin;
 
             // Store plugin's partyId in localStorage so it persists across page reloads
             if (parsed.partyId) {
@@ -700,6 +723,116 @@ class CAndruavAuth {
         }
     }
 
+    // ─── Team user administration API ──────────────────────────────────────
+    // These methods call the /w/am endpoint with team-admin sub-commands.
+    // The server scopes every operation to the caller's TeamID (derived from
+    // the session) and gates on the isadmin flag.
+
+    /**
+     * Fetch read-only info for the caller's team.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*,data:*}>}
+     */
+    async fn_getTeamInfo() {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_GET_TEAM_INFO, {});
+    }
+
+    /**
+     * List all logins belonging to the caller's team.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*,data:*}>}
+     */
+    async fn_listTeamUsers() {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_LIST_TEAM_USERS, {});
+    }
+
+    /**
+     * Add a new login to the caller's team.
+     * @param {string} loginName - Email/login name of the new user.
+     * @param {string} permission - Permission hex string (e.g. '0xffffffff').
+     * @param {boolean} isAdmin - Whether the new user is an admin.
+     * @param {string|null} accessCode - Optional access code; auto-generated if null/empty.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*,accessCode:*}>}
+     */
+    async fn_addTeamUser(loginName, permission, isAdmin, accessCode = null) {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_ADD_TEAM_USER, {
+            [js_andruavMessages.CONST_TARGET_LOGIN_PARAMETER]: loginName,
+            [js_andruavMessages.CONST_PERMISSION_PARAMETER]: permission,
+            [js_andruavMessages.CONST_IS_ADMIN_PARAMETER]: isAdmin,
+            [js_andruavMessages.CONST_ACCESS_CODE_PARAMETER]: accessCode,
+        });
+    }
+
+    /**
+     * Update an existing login in the caller's team.
+     * @param {string} targetLoginName - Email/login name of the user to edit.
+     * @param {string} permission - New permission hex string.
+     * @param {boolean} isAdmin - New admin flag.
+     * @param {string|null} accessCode - New access code; if null/empty the current one is kept.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*,accessCode:*}>}
+     */
+    async fn_updateTeamUser(targetLoginName, permission, isAdmin, accessCode = null) {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_UPDATE_TEAM_USER, {
+            [js_andruavMessages.CONST_TARGET_LOGIN_PARAMETER]: targetLoginName,
+            [js_andruavMessages.CONST_PERMISSION_PARAMETER]: permission,
+            [js_andruavMessages.CONST_IS_ADMIN_PARAMETER]: isAdmin,
+            [js_andruavMessages.CONST_ACCESS_CODE_PARAMETER]: accessCode,
+        });
+    }
+
+    /**
+     * Delete a login from the caller's team.
+     * @param {string} targetLoginName - Email/login name of the user to delete.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*}>}
+     */
+    async fn_deleteTeamUser(targetLoginName) {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_DELETE_TEAM_USER, {
+            [js_andruavMessages.CONST_TARGET_LOGIN_PARAMETER]: targetLoginName,
+        });
+    }
+
+    /**
+     * Internal helper: POST a team-admin request to /w/am.
+     * @param {string} subCommand - The CONST_CMD_* team-admin sub-command.
+     * @param {object} extraParams - Additional body parameters.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*,data:*,accessCode:*}>}
+     */
+    async #teamAdminRequest(subCommand, extraParams) {
+        if (!this._m_session_ID) {
+            return { ok: false, error: ERROR_CODES.NO_SESSION, errorMessage: 'Not logged in', data: null };
+        }
+
+        const url = this.#getBaseUrl(js_andruavMessages.CONST_ACCOUNT_MANAGMENT);
+        const keyValues = {
+            [js_andruavMessages.CONST_SUB_COMMAND]: subCommand,
+            [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
+            ...extraParams,
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(keyValues),
+                signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
+            }).then(res => res.json());
+
+            const ok = response.e === js_andruavMessages.CONST_ERROR_NON;
+            return {
+                ok: ok,
+                error: response.e ?? null,
+                errorMessage: response.em || null,
+                data: response.m_data || null,
+                accessCode: response[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER] || null,
+                raw: response,
+            };
+        } catch (error) {
+            const errorCode = error.name === 'AbortError' ? ERROR_CODES.NETWORK_ERROR : ERROR_CODES.UNKNOWN_ERROR;
+            const errorMessage = error.name === 'AbortError' ? 'Request timed out' : AUTH_ERROR_BAD_CONNECTION;
+            console.error('Team admin request error:', error);
+            return { ok: false, error: errorCode, errorMessage: errorMessage, data: null };
+        }
+    }
+
+
     /**
      * Logs out the current user and invalidates the session.
      * @returns {Promise<void>}
@@ -738,6 +871,8 @@ class CAndruavAuth {
                 this.m_accesscode = '';
                 this._m_permissions_ = '';
                 this._m_perm = 0;
+                this._m_team_id = null;
+                this._m_is_admin = false;
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Completed, {
                     e: js_andruavMessages.CONST_ERROR_NON,
                     em: 'Logout successful',
@@ -761,6 +896,8 @@ class CAndruavAuth {
         } finally {
             this._m_logined = false;
             this._m_session_ID = null;
+            this._m_team_id = null;
+            this._m_is_admin = false;
         }
     }
 
@@ -807,6 +944,8 @@ class CAndruavAuth {
         } finally {
             this._m_logined = false;
             this._m_session_ID = null;
+            this._m_team_id = null;
+            this._m_is_admin = false;
         }
     }
 }
