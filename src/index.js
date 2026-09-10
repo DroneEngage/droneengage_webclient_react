@@ -107,8 +107,8 @@ async function fn_startApp() {
               <Route path="accounts.html" element={<Accounts />} />
               <Route path="account" element={<Accounts />} />
               <Route path="account.html" element={<Accounts />} />
-              <Route path="accountadmin" element={<AccountAdmin />} />
-              <Route path="accountadmin.html" element={<AccountAdmin />} />
+              <Route path="team" element={<AccountAdmin />} />
+              <Route path="teamadmin" element={<AccountAdmin />} />
               <Route path="gamepad" element={<GamePadTesterPage />} />
               <Route path="debug" element={<DebugPage />} />
               <Route path="mobile" element={<Mobile />} />

@@ -24,8 +24,6 @@ export default class ClssLoginControl extends React.Component {
         };
 
         this.m_loginNameRef = React.createRef();
-        this.m_chk_fullctrl = React.createRef();
-        this.m_chk_readonlyctrl = React.createRef();
 
         // Event subscriptions are owned by EventBridge siblings rendered
         // below (see render()), which auto-unsubscribe on unmount via
@@ -109,17 +107,8 @@ export default class ClssLoginControl extends React.Component {
     fn_clickRegenerate(e) {
         e.preventDefault(); // Prevent default anchor behavior
         this.fn_validateCaptcha(() => {
-
-            // Check which radio button is selected
-            let v_permission = 0x0;
-            if (this.m_chk_fullctrl.current.checked) {
-                v_permission = '0xffffffff';
-            } else if (this.m_chk_readonlyctrl.current.checked) {
-                v_permission = '0xffff00ff';
-            } else {
-                v_permission = '0xffffffff';
-            }
-
+            // Public deployment always creates a Full Control (admin) account.
+            const v_permission = '0xffffffff';
             js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission);
         });
     }
@@ -216,19 +205,10 @@ export default class ClssLoginControl extends React.Component {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label d-block">Permissions:</label>
-                    <div className="form-check form-check-inline">
-                        <input className="form-check-input" ref={this.m_chk_fullctrl} type="radio" value="" id="input_fullctrl" name='grp_permission' defaultChecked />
-                        <label className="form-check-label" htmlFor="input_fullctrl">
-                            Full Control
-                        </label>
-                    </div>
-                    <div className="form-check form-check-inline">
-                        <input className="form-check-input" ref={this.m_chk_readonlyctrl} type="radio" value="" id="input_readonlyctrl" name='grp_permission' />
-                        <label className="form-check-label" htmlFor="input_readonlyctrl">
-                            Read Only
-                        </label>
-                    </div>
+                    <p className="text-warning small mb-0">
+                        <i className="bi bi-shield-check me-1"></i>
+                        This creates a new TeamID with a single Admin (Full Control) account.
+                    </p>
                 </div>
 
                 <div className="container p-0">
