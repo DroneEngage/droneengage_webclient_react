@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
+import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
 
 // Dark-theme-aware input style: ensures text is visible on dark background.
 // Bootstrap form-control defaults to white background which makes
@@ -32,7 +33,13 @@ const ClssTeamAdmin = ({ onLogout }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [successAccessCode, setSuccessAccessCode] = useState('');
+    const [copied, setCopied] = useState(false);
     const [filter, setFilter] = useState('');
+
+    // Pagination state (display-only; all users are loaded)
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
@@ -80,6 +87,28 @@ const ClssTeamAdmin = ({ onLogout }) => {
         loadAll();
     }, [loadAll]);
 
+    // ── Permission bit helpers ────────────────────────────────────────
+    // Bit 31 (0x80000000) = allow GCS login, bit 30 (0x40000000) = allow unit login.
+    // The remaining bits are preserved untouched in the hex text field.
+    const parsePerm = (hex) => {
+        const m = /^0x([0-9a-fA-F]{1,8})$/.exec((hex || '').trim());
+        return m ? parseInt(m[1], 16) >>> 0 : null;
+    };
+
+    const formatPerm = (val) => '0x' + (val >>> 0).toString(16).padStart(8, '0');
+
+    const isBitSet = (hex, bit) => {
+        const v = parsePerm(hex);
+        return v !== null && ((v & bit) >>> 0) === (bit >>> 0);
+    };
+
+    const toggleBit = (hex, bit, on) => {
+        const v = parsePerm(hex);
+        if (v === null) return hex;
+        const next = on ? (v | bit) : (v & ~bit);
+        return formatPerm(next);
+    };
+
     // ── Helpers ───────────────────────────────────────────────────────
     const regenerateAccessCode = () => {
         const chars = '0123456789abcdef';
@@ -93,6 +122,26 @@ const ClssTeamAdmin = ({ onLogout }) => {
     const clearMessages = () => {
         setError('');
         setSuccess('');
+        setSuccessAccessCode('');
+        setCopied(false);
+    };
+
+    const copyAccessCode = async () => {
+        try {
+            await navigator.clipboard.writeText(successAccessCode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            // Fallback for non-secure contexts
+            const ta = document.createElement('textarea');
+            ta.value = successAccessCode;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     // ── Add/Edit modal ────────────────────────────────────────────────
@@ -154,9 +203,12 @@ const ClssTeamAdmin = ({ onLogout }) => {
                     accessCode
                 );
                 if (res.ok) {
-                    setSuccess(res.accessCode
-                        ? 'User updated. New access code: ' + res.accessCode
-                        : 'User updated successfully.');
+                    if (res.accessCode) {
+                        setSuccess('User updated. New access code:');
+                        setSuccessAccessCode(res.accessCode);
+                    } else {
+                        setSuccess('User updated successfully.');
+                    }
                     closeModal();
                 } else {
                     setError(res.errorMessage || 'Failed to update user');
@@ -169,9 +221,12 @@ const ClssTeamAdmin = ({ onLogout }) => {
                     accessCode
                 );
                 if (res.ok) {
-                    setSuccess(res.accessCode
-                        ? 'User created. Access code: ' + res.accessCode
-                        : 'User created successfully.');
+                    if (res.accessCode) {
+                        setSuccess('User created. Access code:');
+                        setSuccessAccessCode(res.accessCode);
+                    } else {
+                        setSuccess('User created successfully.');
+                    }
                     closeModal();
                 } else {
                     setError(res.errorMessage || 'Failed to create user');
@@ -200,10 +255,21 @@ const ClssTeamAdmin = ({ onLogout }) => {
         setDeleting(false);
     };
 
-    // ── Filter ───────────────────────────────────────────────────────
+    // ── Filter + pagination ───────────────────────────────────────────
     const filteredUsers = users.filter((u) =>
         (u.LoginName || '').toLowerCase().includes(filter.toLowerCase())
     );
+
+    const totalRecords = filteredUsers.length;
+    const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+    const currentPage = Math.min(page, totalPages - 1);
+    const startIdx = currentPage * pageSize;
+    const pagedUsers = filteredUsers.slice(startIdx, startIdx + pageSize);
+
+    // Reset to first page whenever the filter or page size changes.
+    useEffect(() => {
+        setPage(0);
+    }, [filter, pageSize]);
 
     // ── Render ───────────────────────────────────────────────────────
     return (
@@ -238,8 +304,29 @@ const ClssTeamAdmin = ({ onLogout }) => {
                 </div>
             )}
             {success && (
-                <div className="alert alert-success" role="alert">
+                <div className="alert " role="alert">
                     <i className="bi bi-check-circle me-1"></i> {success}
+                    {successAccessCode && (
+                        <>
+                            <div className="d-flex align-items-center gap-2 mt-2">
+                                <code className="fs-5 fw-bold bg-dark text-success px-2 py-1 rounded">{successAccessCode}</code>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-success"
+                                    onClick={copyAccessCode}
+                                    title="Copy access code"
+                                >
+                                    {copied
+                                        ? <><i className="bi bi-check2"></i> Copied</>
+                                        : <><i className="bi bi-clipboard"></i> Copy</>}
+                                </button>
+                            </div>
+                            <div className="mt-2 text-warning small">
+                                <i className="bi bi-exclamation-triangle me-1"></i>
+                                This is the last time this access code will be shown in plain text. Copy it now — it cannot be retrieved later.
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
 
@@ -268,9 +355,9 @@ const ClssTeamAdmin = ({ onLogout }) => {
                             <div className="col-md-2 mb-2">
                                 <small className="text-muted d-block">Enabled</small>
                                 {teamInfo.Enabled ? (
-                                    <span className="badge bg-success">Yes</span>
+                                    <span className="badge bg-success" style={{ minWidth: '60px' }}>Yes</span>
                                 ) : (
-                                    <span className="badge bg-secondary">No</span>
+                                    <span className="badge bg-secondary" style={{ minWidth: '60px' }}>No</span>
                                 )}
                             </div>
                         </div>
@@ -305,7 +392,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         </div>
-                    ) : filteredUsers.length === 0 ? (
+                    ) : totalRecords === 0 ? (
                         <div className="alert alert-info text-center">
                             No users found. Click "Add New User" to create one.
                         </div>
@@ -321,7 +408,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredUsers.map((user) => {
+                                    {pagedUsers.map((user) => {
                                         const isSelf = user.LoginName === js_andruavAuth.m_username;
                                         return (
                                         <tr key={user.LoginID || user.LoginName}>
@@ -363,6 +450,48 @@ const ClssTeamAdmin = ({ onLogout }) => {
                         </div>
                     )}
                 </div>
+                {/* Pagination controls */}
+                {totalRecords > 0 && (
+                    <div className="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2 txt-theme-aware-bg" style={{ borderTop: '1px solid var(--bs-border-color, #495057)' }}>
+                        <div className="d-flex align-items-center gap-2">
+                            <label className="text-muted small mb-0">Rows per page:</label>
+                            <select
+                                className="form-select form-select-sm"
+                                style={{ width: 'auto', ...inputStyle }}
+                                value={pageSize}
+                                onChange={(e) => setPageSize(Number(e.target.value))}
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                            </select>
+                            <span className="text-muted small">
+                                {startIdx + 1}–{Math.min(startIdx + pageSize, totalRecords)} of {totalRecords}
+                            </span>
+                        </div>
+                        <div className="d-flex align-items-center gap-1">
+                            <button
+                                className="btn btn-sm btn-outline-secondary"
+                                disabled={currentPage === 0}
+                                onClick={() => setPage(currentPage - 1)}
+                            >
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <span className="text-muted small px-2">
+                                Page {currentPage + 1} / {totalPages}
+                            </span>
+                            <button
+                                className="btn btn-sm btn-outline-secondary"
+                                disabled={currentPage >= totalPages - 1}
+                                onClick={() => setPage(currentPage + 1)}
+                            >
+                                <i className="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Add/Edit Modal */}
@@ -417,9 +546,6 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                         </div>
                                         <div className="mb-3">
                                             <label className="form-label text-muted">Permissions (hex)</label>
-                                            {/* TODO: Replace raw hex input with checkboxes for account-type bits:
-                                                bit 31 (0x80000000) = GCS login, bit 30 (0x40000000) = unit login.
-                                                See CONST_ALLOW_GCS_LOGIN / CONST_ALLOW_UNIT_LOGIN in js_andruavMessages.js. */}
                                             <input
                                                 type="text"
                                                 className="form-control"
@@ -429,7 +555,33 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                 required
                                                 placeholder="0xffffffff"
                                             />
-                                            <small className="text-muted">e.g., 0xffffffff for full permissions</small>
+                                            <small className="text-muted">e.g., 0xffffffff for full permissions. Bits 31/30 are controlled by the checkboxes below; the remaining bits are kept as typed.</small>
+                                            <div className="mt-2 d-flex flex-column gap-1">
+                                                <div className="form-check">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input"
+                                                        id="allowGcsCheckbox"
+                                                        checked={isBitSet(formData.permissions, js_andruavMessages.CONST_ALLOW_GCS_LOGIN)}
+                                                        onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_GCS_LOGIN, e.target.checked) }))}
+                                                    />
+                                                    <label className="form-check-label text-muted" htmlFor="allowGcsCheckbox">
+                                                        Allow GCS Login <span className="text-muted small">(bit 31 · 0x80000000)</span>
+                                                    </label>
+                                                </div>
+                                                <div className="form-check">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input"
+                                                        id="allowUnitCheckbox"
+                                                        checked={isBitSet(formData.permissions, js_andruavMessages.CONST_ALLOW_UNIT_LOGIN)}
+                                                        onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_UNIT_LOGIN, e.target.checked) }))}
+                                                    />
+                                                    <label className="form-check-label text-muted" htmlFor="allowUnitCheckbox">
+                                                        Allow Unit Login <span className="text-muted small">(bit 30 · 0x40000000)</span>
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="mb-3 form-check">
                                             <input
