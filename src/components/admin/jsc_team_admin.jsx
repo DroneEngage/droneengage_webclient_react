@@ -417,6 +417,9 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                         </div>
                                         <div className="mb-3">
                                             <label className="form-label text-muted">Permissions (hex)</label>
+                                            {/* TODO: Replace raw hex input with checkboxes for account-type bits:
+                                                bit 31 (0x80000000) = GCS login, bit 30 (0x40000000) = unit login.
+                                                See CONST_ALLOW_GCS_LOGIN / CONST_ALLOW_UNIT_LOGIN in js_andruavMessages.js. */}
                                             <input
                                                 type="text"
                                                 className="form-control"

@@ -306,6 +306,25 @@ export const CONST_ALLOW_GCS_WP_CONTROL = 0x00000100;
 export const CONST_ALLOW_GCS_MODES_CONTROL = 0x00000200;
 export const CONST_ALLOW_GCS_VIDEO = 0x0000f000;
 
+// Account-type bits (top of the 32-bit mask).
+// Bit 31: account may be used as a GCS login.
+// Bit 30: account may be used as a unit login.
+export const CONST_ALLOW_GCS_LOGIN = 0x80000000;
+export const CONST_ALLOW_UNIT_LOGIN = 0x40000000;
+
+// Message-category permission bits (bits 16-25).
+// These gate specific message categories in de_comm's CAndruavParser.
+export const CONST_ALLOW_SWARM = 0x00010000;
+export const CONST_ALLOW_TRACKING = 0x00020000;
+export const CONST_ALLOW_GEOFENCE = 0x00040000;
+export const CONST_ALLOW_SOUND = 0x00080000;
+export const CONST_ALLOW_SDR = 0x00100000;
+export const CONST_ALLOW_GPIO = 0x00200000;
+export const CONST_ALLOW_TELNET = 0x00400000;
+export const CONST_ALLOW_P2P = 0x00800000;
+export const CONST_ALLOW_CHAT = 0x01000000;
+export const CONST_ALLOW_CONFIG = 0x02000000;
+
 export const CONST_DESTINATION_GUIDED_POINT = 0;
 export const CONST_DESTINATION_SWARM_MY_LOCATION = 1;
 

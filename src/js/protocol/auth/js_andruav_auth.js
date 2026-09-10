@@ -163,6 +163,22 @@ class CAndruavAuth {
     }
 
     /**
+     * Checks if the account is allowed to login as a GCS (bit 31).
+     * @returns {boolean} True if GCS login is granted.
+     */
+    fn_do_canGCSLogin() {
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_LOGIN) >>> 0) === (js_andruavMessages.CONST_ALLOW_GCS_LOGIN >>> 0);
+    }
+
+    /**
+     * Checks if the account is allowed to login as a Unit (bit 30).
+     * @returns {boolean} True if unit login is granted.
+     */
+    fn_do_canUnitLogin() {
+        return ((this._m_perm & js_andruavMessages.CONST_ALLOW_UNIT_LOGIN) >>> 0) === (js_andruavMessages.CONST_ALLOW_UNIT_LOGIN >>> 0);
+    }
+
+    /**
      * Checks if the user has full GCS control permission.
      * @returns {boolean} True if full control is granted.
      */
@@ -192,6 +208,86 @@ class CAndruavAuth {
      */
     fn_do_canVideo() {
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_VIDEO) === js_andruavMessages.CONST_ALLOW_GCS_VIDEO;
+    }
+
+    /**
+     * Checks if the user can manage swarm.
+     * @returns {boolean} True if swarm permission is granted.
+     */
+    fn_do_canSwarm() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_SWARM) === js_andruavMessages.CONST_ALLOW_SWARM;
+    }
+
+    /**
+     * Checks if the user can manage tracking/AI.
+     * @returns {boolean} True if tracking permission is granted.
+     */
+    fn_do_canTracking() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_TRACKING) === js_andruavMessages.CONST_ALLOW_TRACKING;
+    }
+
+    /**
+     * Checks if the user can manage geofence.
+     * @returns {boolean} True if geofence permission is granted.
+     */
+    fn_do_canGeofence() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_GEOFENCE) === js_andruavMessages.CONST_ALLOW_GEOFENCE;
+    }
+
+    /**
+     * Checks if the user can play sounds.
+     * @returns {boolean} True if sound permission is granted.
+     */
+    fn_do_canSound() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_SOUND) === js_andruavMessages.CONST_ALLOW_SOUND;
+    }
+
+    /**
+     * Checks if the user can control SDR.
+     * @returns {boolean} True if SDR permission is granted.
+     */
+    fn_do_canSDR() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_SDR) === js_andruavMessages.CONST_ALLOW_SDR;
+    }
+
+    /**
+     * Checks if the user can control GPIO.
+     * @returns {boolean} True if GPIO permission is granted.
+     */
+    fn_do_canGPIO() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_GPIO) === js_andruavMessages.CONST_ALLOW_GPIO;
+    }
+
+    /**
+     * Checks if the user can use telnet.
+     * @returns {boolean} True if telnet permission is granted.
+     */
+    fn_do_canTelnet() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_TELNET) === js_andruavMessages.CONST_ALLOW_TELNET;
+    }
+
+    /**
+     * Checks if the user can manage P2P.
+     * @returns {boolean} True if P2P permission is granted.
+     */
+    fn_do_canP2P() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_P2P) === js_andruavMessages.CONST_ALLOW_P2P;
+    }
+
+    /**
+     * Checks if the user can send chat messages.
+     * @returns {boolean} True if chat permission is granted.
+     */
+    fn_do_canChat() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_CHAT) === js_andruavMessages.CONST_ALLOW_CHAT;
+    }
+
+    /**
+     * Checks if the user can change unit config.
+     * @returns {boolean} True if config permission is granted.
+     */
+    fn_do_canConfig() {
+        return (this._m_perm & js_andruavMessages.CONST_ALLOW_CONFIG) === js_andruavMessages.CONST_ALLOW_CONFIG;
     }
 
     /**
