@@ -79,6 +79,7 @@ class ClssHeaderControl extends React.Component {
                             <li key="Contact"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_CONTACT_URL} target='_blank' rel="noopener noreferrer">{t('header.contact')}</a></li>
                             {js_siteConfig.CONST_ANDRUAV_URL_ENABLE && <li key="AndruavAPK"><a className="dropdown-item text-warning" href={js_siteConfig.CONST_ANDRUAV_URL} target='_blank' rel="noopener noreferrer">AndruavAP APK</a></li>}
                             {js_siteConfig.CONST_ACCOUNT_URL_ENABLE && <li key="Account"><a className="dropdown-item txt-theme-aware" href="./accounts" target='_blank' rel="noopener noreferrer">{t('header.account')}</a></li>}
+            <li key="TeamAdmin"><a className="dropdown-item txt-theme-aware" href="./teamadmin" target='_blank' rel="noopener noreferrer">{t('header.team_admin')}</a></li>
                             <li key="Lang"><hr className="dropdown-divider" /></li>
                             <li key="LangItem" className="px-3 py-1">
                                 <ClssLanguageSwitcher className="w-100" />
