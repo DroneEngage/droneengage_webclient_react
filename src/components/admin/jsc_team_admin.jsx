@@ -16,6 +16,29 @@ const inputStyle = {
 const modalStyle = { zIndex: 3000 };
 const backdropStyle = { zIndex: 2999 };
 
+// Permission bits shown as bootstrap-icons in the users table and in the
+// edit dialog labels. Keep the order: GCS, Unit, View (read-only).
+const CONST_PERMISSION_BITS = [
+    {
+        bit: js_andruavMessages.CONST_ALLOW_GCS_LOGIN,
+        icon: 'bi-display',
+        color: 'text-primary',
+        title: 'Allow GCS Login (bit 31 · 0x80000000)',
+    },
+    {
+        bit: js_andruavMessages.CONST_ALLOW_UNIT_LOGIN,
+        icon: 'bi-robot',
+        color: 'text-warning',
+        title: 'Allow Unit Login (bit 30 · 0x40000000)',
+    },
+    {
+        bit: js_andruavMessages.CONST_ALLOW_VIEW_MODE,
+        icon: 'bi-eye',
+        color: 'text-success',
+        title: 'View Mode / read-only (bit 29 · 0x20000000)',
+    },
+];
+
 /**
  * Team Admin component — manage users (logins) within the caller's own team.
  *
@@ -108,6 +131,22 @@ const ClssTeamAdmin = ({ onLogout }) => {
         const next = on ? (v | bit) : (v & ~bit);
         return formatPerm(next);
     };
+
+    // Icon strip showing which permission bits are set (green) or clear (dim).
+    const renderPermIcons = (hex) => (
+        <span className="d-inline-flex gap-2">
+            {CONST_PERMISSION_BITS.map((p) => {
+                const on = isBitSet(hex, p.bit);
+                return (
+                    <i
+                        key={p.icon}
+                        className={`bi ${p.icon} ${on ? p.color : 'text-secondary opacity-50'}`}
+                        title={`${p.title} — ${on ? 'allowed' : 'denied'}`}
+                    ></i>
+                );
+            })}
+        </span>
+    );
 
     // ── Helpers ───────────────────────────────────────────────────────
     const regenerateAccessCode = () => {
@@ -418,7 +457,10 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                     <span className="badge bg-info ms-2">You</span>
                                                 )}
                                             </td>
-                                            <td className="txt-theme-aware">{user.Permissions || 'N/A'}</td>
+                                            <td className="txt-theme-aware">
+                                                <span className="me-2">{user.Permissions || 'N/A'}</span>
+                                                {renderPermIcons(user.Permissions)}
+                                            </td>
                                             <td>
                                                 <span className="badge" style={{ minWidth: '60px', backgroundColor: user.IsAdmin ? 'var(--bs-warning, #ffc107)' : 'var(--bs-primary, #0d6efd)', color: user.IsAdmin ? '#000' : '#fff' }}>
                                                     {user.IsAdmin ? 'Admin' : 'User'}
@@ -584,6 +626,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                         onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_GCS_LOGIN, e.target.checked) }))}
                                                     />
                                                     <label className="form-check-label text-muted" htmlFor="allowGcsCheckbox">
+                                                        <i className="bi bi-display text-primary me-1"></i>
                                                         Allow GCS Login <span className="text-muted small">(bit 31 · 0x80000000)</span>
                                                     </label>
                                                 </div>
@@ -596,6 +639,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                         onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_UNIT_LOGIN, e.target.checked) }))}
                                                     />
                                                     <label className="form-check-label text-muted" htmlFor="allowUnitCheckbox">
+                                                        <i className="bi bi-robot text-warning me-1"></i>
                                                         Allow Unit Login <span className="text-muted small">(bit 30 · 0x40000000)</span>
                                                     </label>
                                                 </div>
@@ -608,6 +652,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                         onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_VIEW_MODE, e.target.checked) }))}
                                                     />
                                                     <label className="form-check-label text-muted" htmlFor="allowViewModeCheckbox">
+                                                        <i className="bi bi-eye text-success me-1"></i>
                                                         View Mode <span className="text-muted small">(bit 29 · 0x20000000) — read-only: observe + chat only</span>
                                                     </label>
                                                 </div>
