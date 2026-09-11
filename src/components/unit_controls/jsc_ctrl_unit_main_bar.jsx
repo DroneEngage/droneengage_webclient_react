@@ -6,8 +6,6 @@ import * as js_helpers from '../../js/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';
 import * as js_common from '../../js/js_common.js'
 
-import { EVENTS as js_event } from '../../js/events/js_eventList.js'
-import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
@@ -44,12 +42,18 @@ class ClssCtrlUnitMainBar extends React.Component {
 
   componentDidMount() {
     this.m_flag_mounted = true;
-    // Field-granular: re-render when the mobile battery fields change,
-    // replacing the coarse EE_unitPowUpdated trigger. EE_unitUpdated is
-    // still subscribed below (render()) as a broad fallback for fields not
-    // yet migrated (online/armed status, camera/video state, signal
-    // strength, name) — filtered by partyID in fn_onUpdate so it only
-    // re-renders this row for this unit's own updates.
+    // Field-granular: re-render only when a field this row actually reads
+    // changes, replacing the coarse EE_unitUpdated/EE_unitPowUpdated
+    // triggers entirely (see TASK-16).
+    //
+    // m_SignalStatus.m_mobile/m_mobileSignalLevel/m_mobileNetworkType/
+    // m_mobileNetworkTypeRank: render() reads these WITHOUT the 'm_' prefix
+    // (v_andruavUnit.m_SignalStatus.mobile, .mobileSignalLevel,
+    // .mobileNetworkType) which do not exist on C_SignalStatus (real fields
+    // are m_mobile, m_mobileSignalLevel, m_mobileNetworkType,
+    // m_mobileNetworkTypeRank) — pre-existing bug, the mobile-signal display
+    // branch is dead code today. Subscribed on the real field names anyway
+    // so this is correct once the read-side bug is fixed. See FINDINGS.md.
     const partyId = this.props.p_unit?.getPartyID();
     if (partyId) {
       const fields = [
@@ -58,6 +62,19 @@ class ClssCtrlUnitMainBar extends React.Component {
         'm_Power._Mobile.p_Battery.p_hasPowerInfo',
         'm_Power._Mobile.p_Battery.Voltage',
         'm_Power._Mobile.p_Battery.Health',
+        'm_isArmed',
+        'm_IsDisconnectedFromGCS',
+        'm_IsShutdown',
+        'm_SignalStatus.m_mobile',
+        'm_SignalStatus.m_mobileSignalLevel',
+        'm_SignalStatus.m_mobileNetworkType',
+        'm_SignalStatus.m_mobileNetworkTypeRank',
+        'm_unitName',
+        'm_FCBParameters.m_systemID',
+        'm_Video.m_videoactiveTracks',
+        'm_Video.VideoRecording',
+        'm_modules.m_list',
+        'm_Permissions',
       ];
       for (const fp of fields) {
         this.m_unsubs.push(subscribeUnitField(partyId, fp, () => this.fn_onUpdate(this.props.p_unit)));
@@ -414,7 +431,6 @@ class ClssCtrlUnitMainBar extends React.Component {
 
     return (
       <div key={id} className="row ms-1 padding_zero user-select-none">
-        <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_onUpdate(p_andruavUnit)} />
         <div key={id + '__1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <ClssCtrlUnitIcon p_unit={v_andruavUnit} />
         </div>

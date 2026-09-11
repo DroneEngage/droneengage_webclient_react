@@ -20,10 +20,15 @@ export class ClssAndruavUnitBase extends React.Component {
         };
 
         this.m_flag_mounted = false;
-
-        this.lastUpdateTime = null;
     }
 
+    // Real side effect, not a render trigger: when a unit flips between
+    // Drone and GCS type it needs a whole different component class, so we
+    // ask the list to re-add it. This must run on every EE_unitUpdated
+    // (unthrottled) so the flip is never missed. Per TASK-16 this is why it
+    // stays on EventBridge instead of being replaced with a field-store
+    // subscription — it is not "re-render this component so a field
+    // repaints", it is "this component is no longer valid, replace it".
     fn_unitUpdated(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) {
@@ -34,36 +39,22 @@ export class ClssAndruavUnitBase extends React.Component {
             // Drone converted to GCS or other type... class is not valid now and an add new should be created.
             js_eventEmitter.fn_dispatch(js_event.EE_unitAdded, p_andruavUnit);
         }
-
-        const now = new Date();
-        if (this.lastUpdateTime === null) {
-            this.lastUpdateTime = now;
-        } else {
-            if ((now - this.lastUpdateTime) < 300) {
-                return;
-            }
-            this.lastUpdateTime = now;
-        }
-
-        if (!this.m_flag_mounted ) return;
-
-        this.setState({ 'm_update': this.state.m_update + 1 });
     }
 
-    fn_unitTelemetryOn(p_andruavUnit) {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) {
-            return; // not me
-        }
-
-        this.setState({ 'm_update': this.state.m_update + 1 });
-    }
-
+    // m_Telemetry._isActive (set to false at the one dispatch site in
+    // js_andruav_facade.js API_stopTelemetry) has no render consumer
+    // anywhere in the codebase (grep-verified) — nothing reads it, so a
+    // field-store subscription on it would be a no-op. Kept as a genuine
+    // one-shot signal on EventBridge per TASK-16 rather than migrated;
+    // revisit if a consumer is ever added, or remove alongside it as dead
+    // weight.
     fn_unitTelemetryOFF(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) {
             return; // not me
         }
+
+        if (!this.m_flag_mounted) return;
 
         this.setState({ 'm_update': this.state.m_update + 1 });
     }
@@ -112,8 +103,6 @@ export class ClssAndruavUnitBase extends React.Component {
         return (
             <>
                 <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
-                <EventBridge eventName={js_event.EE_unitTelemetryOn} onEvent={(p_andruavUnit) => this.fn_unitTelemetryOn(p_andruavUnit)} />
                 <EventBridge eventName={js_event.EE_unitTelemetryOff} onEvent={(p_andruavUnit) => this.fn_unitTelemetryOFF(p_andruavUnit)} />
             </>
         );

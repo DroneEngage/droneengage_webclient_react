@@ -98,3 +98,99 @@ telemetry.
 `src/js/hooks/useUnitField.sibling.test.js` renders two sibling gadgets for
 the same unit, each reading a different field via `useUnitField`, patches
 only one field, and asserts the other sibling did not re-render.
+
+# TASK-16 Findings
+
+Steps 1-3 of TASK-16 (`jsc_ctrl_unit_main_bar.jsx`, `jsc_unit_control_base.jsx`,
+`jsc_unit_control_drone.jsx`) are complete; step 4
+(`jsc_unitControlArrayView.jsx`) needs live-browser profiling and was
+deferred to `Tasks/webclient/TASK-17-array-view-row-profiling.md`.
+
+## Pre-existing bug found, not fixed (behaviour-preserving task)
+
+`jsc_ctrl_unit_main_bar.jsx` (and sibling `jsc_ctrl_unit_planning_bar.jsx`,
+untouched) read `v_andruavUnit.m_SignalStatus.mobile` / `.mobileSignalLevel`
+/ `.mobileNetworkType` — **without** the `m_` prefix. The real fields on
+`C_SignalStatus` (`js_andruavUnit.js`) are `m_mobile`, `m_mobileSignalLevel`,
+`m_mobileNetworkType`, `m_mobileNetworkTypeRank`. `C_SignalStatus` is not
+sealed, so the mismatched reads silently return `undefined` instead of
+throwing — the mobile-signal-strength display branch in both files has
+therefore always been dead code (`v_andruavUnit.m_SignalStatus.mobile ===
+true` is never true). Not fixed inline per the "don't fix bugs beyond
+documented scope" rule. `jsc_ctrl_unit_main_bar.jsx`'s new field-store
+subscriptions use the *real* field names (`m_SignalStatus.m_mobile` etc.)
+so the migration is already correct once someone fixes the read side.
+
+## Missing field-store notifiers found and added
+
+- `js_andruav_parser.js` `_fn_checkStatus()`: `unit.m_IsDisconnectedFromGCS
+  = true` dispatched `EE_unitOnlineChanged` but never called
+  `notifyUnitFieldChanged` — added.
+- `js_main.js` `onWEBRTCSessionStarted` / `onWEBRTCSessionEnded` /
+  `onWEBRTCSessionOrphanEnded`: mutate
+  `m_Video.m_videoactiveTracks[...].VideoStreaming` directly (this is what
+  `fn_getVideoStreaming()` derives from) with no notifier — added
+  `notifyUnitFieldChanged(partyId, 'm_Video.m_videoactiveTracks')` at all
+  three sites.
+- `reduce.ts`'s `fn_setVersion` `method` op (DE/Andruav version detection,
+  phase 5) had no `notifyFields` at all, so version changes were never
+  field-store notified. Added `notifyFields: ['m_version']` — this backs
+  `jsc_unit_control_drone.jsx`'s `createTabs()` main-module-version-warning
+  check (`v_andruavUnit.fn_getVersion()` vs `m_module_version_info`).
+
+## Fields intentionally left uncovered (same call already made in TASK-13)
+
+`m_modules.has_camera_alive` / `has_gpio` / `has_sound` / `has_telnet` /
+`has_tracking` / `m_old_version` are not individually listed in
+`addModules`'s `notifyFields` (only `has_fcb`/`has_viewlink`/
+`has_ai_recognition`/`has_p2p`/`has_sdr`/`m_list` are), but all are set
+inside the same `addModules()` call that unconditionally notifies
+`m_modules.m_list` every time it runs — so a single subscription on
+`m_modules.m_list` catches changes to all of them too. Used for
+`jsc_ctrl_unit_main_bar.jsx`'s `fn_canCamera()`/`fn_canVideo()` bump and
+`jsc_unit_control_drone.jsx`'s tab-visibility/module-list bump, matching
+the reasoning already used for `jsc_mobile_module_details_panel.jsx` in
+TASK-13.
+
+## `m_Telemetry._isActive` — kept on EventBridge, not migrated
+
+`m_Telemetry._isActive` (behind `EE_unitTelemetryOff`, dispatched from
+`js_andruav_facade.js` `API_stopTelemetry`, the only mutation site) is
+write-only: grep-verified zero reads anywhere in `src/`. A field-store
+subscription on it would be a no-op since no render depends on it. Left as
+a genuine one-shot `EventBridge` signal on
+`jsc_unit_control_base.jsx`; revisit if a consumer is ever added, or
+remove alongside it as dead weight in a future cleanup.
+
+## `EE_unitTelemetryOn` — removed (dead code)
+
+Zero dispatchers repo-wide (grep-verified before and after removal). The
+`fn_unitTelemetryOn` handler, its `EventBridge` subscription in
+`jsc_unit_control_base.jsx`, and the `"EE_unitTelemetryOn"` entry in
+`js_eventList.js` were deleted.
+
+## `jsc_unit_control_base.jsx`'s `fn_unitUpdated` split
+
+The mixed handler (m_IsGCS-flip side effect + 300ms-throttled re-render
+bump) was split: the base now only keeps the IsGCS-flip side-effect check,
+unthrottled, on `EE_unitUpdated` (a real cross-cutting signal: the unit's
+component class itself becomes invalid, not "a field to repaint"). The
+render-bump half and the `EE_unitNavUpdated` subscription were removed
+from the base per TASK-16 ("this base class itself renders nothing").
+
+`jsc_unit_control_drone.jsx` (the subclass with the largest field surface —
+`createTabs()`/`renderControl()`/`hlp_getflightButtonStyles()` read ~15
+fields including `m_isArmed`, `m_useFCBIMU`, `m_autoPilot`,
+`m_Telemetry.*`, `m_lidar_info`, GCS/shutdown/disconnected flags — full
+enumeration of all of them is out of TASK-16's stated scope, which only
+targeted the `EE_OldModule` handler for this file) now carries its own
+coarse `EE_unitUpdated`/`EE_unitNavUpdated` → `fn_update()` fallback,
+partyID-filtered, so none of those still-unmigrated fields silently went
+stale. This mirrors the "kept as an unfiltered/filtered fallback for
+fields not yet migrated" pattern already used elsewhere in TASK-13/16.
+
+`jsc_unit_control_gcs.jsx` (the other subclass of `ClssAndruavUnitBase`,
+not in TASK-16's file list) was checked and needs **no** change: its
+`render()` never calls `super.render()`, so it never actually rendered the
+base class's `EventBridge` subscriptions in the first place — removing the
+base's coarse bump does not regress it further than it already was.

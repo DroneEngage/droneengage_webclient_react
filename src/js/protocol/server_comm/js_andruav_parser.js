@@ -80,6 +80,7 @@ class CAndruavClientParser {
 
             if (timeSinceLastActive > js_andruavMessages.CONST_checkStatus_Interverl1 && !unit.m_IsDisconnectedFromGCS) {
                 unit.m_IsDisconnectedFromGCS = true;
+                notifyUnitFieldChanged(unit.getPartyID(), 'm_IsDisconnectedFromGCS');
                 js_eventEmitter.fn_dispatch(js_event.EE_unitOnlineChanged, unit);
             }
         }

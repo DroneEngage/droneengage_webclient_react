@@ -609,6 +609,7 @@ function onWEBRTCSessionStarted(c_talk) {
 	let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(c_talk.number);
 	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack] = c_talk;
+	notifyUnitFieldChanged(v_andruavUnit.getPartyID(), 'm_Video.m_videoactiveTracks');
 	js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStarted, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
 	js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 }
@@ -618,6 +619,7 @@ function onWEBRTCSessionEnded(c_talk) {
 	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_talk.targetVideoTrack].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+	notifyUnitFieldChanged(v_andruavUnit.getPartyID(), 'm_Video.m_videoactiveTracks');
 	js_eventEmitter.fn_dispatch(js_event.EE_videoStreamStopped, { 'andruavUnit': v_andruavUnit, 'talk': c_talk });
 	js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 }
@@ -627,6 +629,7 @@ function onWEBRTCSessionOrphanEnded(c_number) {
 	let v_andruavUnit = js_session.fn_getAndruavUnitList().fn_getUnit(c_number);
 	if (v_andruavUnit === null || v_andruavUnit === undefined) return;
 	v_andruavUnit.m_Video.m_videoactiveTracks[c_number].VideoStreaming = js_andruavUnit.CONST_VIDEOSTREAMING_OFF;
+	notifyUnitFieldChanged(v_andruavUnit.getPartyID(), 'm_Video.m_videoactiveTracks');
 	js_eventEmitter.fn_dispatch(js_event.EE_unitUpdated, v_andruavUnit);
 }
 

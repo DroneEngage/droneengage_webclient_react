@@ -88,8 +88,8 @@ class ClssAndruavUnitGCSList extends React.Component {
 
         // EventBridge siblings must stay mounted even while the list is empty
         // or GCS display is disabled: EE_unitAdded / EE_onPreferenceChanged /
-        // EE_requestGamePadonSocketStatus are what populate the list and
-        // re-enable display. They render null, so they don't affect layout.
+        // EE_onSocketStatus are what populate the list and re-enable display.
+        // They render null, so they don't affect layout.
         const gcsDisplayEnabled = js_localStorage.fn_getGCSDisplayEnabled() !== false;
 
         let units_gcs = [];
@@ -132,7 +132,7 @@ class ClssAndruavUnitGCSList extends React.Component {
 
         return (
             <>
-            <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+            <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
             <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
             <EventBridge eventName={js_event.EE_unitOnlineChanged} onEvent={() => this.fn_unitOnlineChanged()} />
             <EventBridge eventName={js_event.EE_andruavUnitArmedUpdated} onEvent={() => this.fn_unitOnlineChanged()} />

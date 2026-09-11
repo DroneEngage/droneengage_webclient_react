@@ -37,6 +37,7 @@ import { ClssAndruavUnitBase } from './jsc_unit_control_base.jsx'
 import ClssCtrlUnitMainBar from './jsc_ctrl_unit_main_bar.jsx'
 import ClssCtrlUnitPlanningBar from './jsc_ctrl_unit_planning_bar.jsx'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 
 /**
  * This class is full control of Drone.
@@ -65,6 +66,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         
         js_unitUiPrefs.fn_setUnitPref(this.props.p_unit.getPartyID(), 'speed_link', false);
         this.key = Math.random().toString();
+        this.m_unsubs = [];
 
         // Event subscriptions are owned by EventBridge siblings rendered
         // below (see render()), which auto-unsubscribe on unmount via
@@ -75,11 +77,29 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     componentDidMount() {
         super.componentDidMount();
         this.m_flag_mounted = true;
+
+        // Field-granular replacement for the old unfiltered EE_OldModule
+        // bump (TASK-16): this row only renders its OWN unit's module/
+        // version info (createTabs()'s had_disconnected_module,
+        // had_version_warning, and the m_modules.has_* tab-visibility
+        // checks all read this.props.p_unit.m_modules), so a per-unit
+        // subscription is strictly more correct than the old global event.
+        // 'm_modules.m_list' is notified unconditionally on every
+        // m_modules.addModules() call (see reduce.ts), which is the same
+        // function that sets has_p2p/has_sdr/has_gpio/has_sound/has_telnet/
+        // has_tracking/m_old_version, so one subscription covers all of
+        // them even though only some are in that op's notifyFields list.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            this.m_unsubs.push(subscribeUnitField(partyId, 'm_modules.m_list', () => this.fn_update()));
+            this.m_unsubs.push(subscribeUnitField(partyId, 'm_version', () => this.fn_update()));
+        }
     }
 
 
     fn_update()
     {
+        if (this.m_flag_mounted === false) return;
         this.setState({'m_update': this.state.m_update +1});
     }
 
@@ -99,8 +119,14 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
     fn_webRX_toggle(p_andruavUnit) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
         if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
+            // API_disengageRX already dispatches EE_releaseGamePad.
+            // The previous fn_dispatch(EE_requestGamePadreleaseGamePad) used
+            // an event name that was never added to js_eventList.js, so it
+            // resolved to `undefined` and collided with the unit lists'
+            // EE_requestGamePadonSocketStatus subscription (also `undefined`),
+            // reaching fn_onSocketStatus with a unit object as params and
+            // clearing the Online Units list. Removed.
             js_session.fn_getAndruavFacade().API_disengageRX(p_andruavUnit);
-            js_eventEmitter.fn_dispatch(js_event.EE_requestGamePadreleaseGamePad, p_andruavUnit);
             p_andruavUnit.m_Telemetry.m_rxEngaged = false;
 
         }
@@ -427,8 +453,24 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        this.m_flag_mounted = false;
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
+        // Unsubscription of the EventBridge siblings (useEventSubscription)
+        // below is handled automatically on unmount.
+    }
+
+    // createTabs()/renderControl()/hlp_getflightButtonStyles() also read
+    // several fields not yet migrated to field-store (m_isArmed,
+    // m_useFCBIMU, m_autoPilot, m_Telemetry.*, m_lidar_info, IsGCS,
+    // IsShutdown, IsDisconnectedFromGCS...) — full migration of this row is
+    // out of TASK-16's scope (only the EE_OldModule bump was targeted).
+    // This coarse, partyID-filtered fallback keeps those fields live until
+    // a future pass migrates them individually.
+    fn_onCoarseUpdate(p_andruavUnit) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) return; // not me
+        this.fn_update();
     }
 
 
@@ -552,7 +594,8 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             <div key={id + "1"} id={id} className={"row mb-1 mt-0 me-0 ms-0 pt-1 user-select-none IsGCS_" + v_andruavUnit.m_IsGCS + " card border-light IsShutdown_" + (v_andruavUnit.m_IsShutdown || v_andruavUnit.m_IsDisconnectedFromGCS)}>
 
                 {super.render()}
-                <EventBridge eventName={js_event.EE_OldModule} onEvent={() => this.fn_update()} />
+                <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_onCoarseUpdate(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_unitNavUpdated} onEvent={(p_andruavUnit) => this.fn_onCoarseUpdate(p_andruavUnit)} />
                 <EventBridge eventName={js_event.EE_requestGamePad} onEvent={(p_andruavUnit) => this.fn_requestGamePad(p_andruavUnit)} />
 
                 {main_bar}

@@ -313,8 +313,15 @@ class ClssAndruavUnitList extends React.Component {
 
     return (
                 <div key='main' className='margin_zero width_100'>
-                    <EventBridge eventName={js_event.EE_requestGamePadonPreferenceChanged} onEvent={() => this.fn_onPreferenceChanged()} />
-                    <EventBridge eventName={js_event.EE_requestGamePadonSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
+                    {/* EE_requestGamePadonPreferenceChanged / EE_requestGamePadonSocketStatus
+                        were never added to js_eventList.js, so they resolved to
+                        `undefined` and collided with any other undefined-name
+                        dispatch (e.g. the old EE_requestGamePadreleaseGamePad in
+                        fn_webRX_toggle), which reached fn_onSocketStatus with a
+                        unit object and cleared the list. EE_onPreferenceChanged
+                        is already subscribed below; socket status uses the real
+                        EE_onSocketStatus event like every other component. */}
+                    <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(params) => this.fn_onSocketStatus(params)} />
                     <EventBridge eventName={js_event.EE_unitAdded} onEvent={(p_andruavUnit) => this.fn_unitAdded(p_andruavUnit)} />
                     <EventBridge eventName={js_event.EE_onPreferenceChanged} onEvent={(p_andruavUnit) => this.fn_unitOnlineChanged(p_andruavUnit)} />
                     <EventBridge eventName={js_event.EE_unitHighlighted} onEvent={(p_andruavUnit) => this.fn_unitOnUnitHighlighted(p_andruavUnit)} />

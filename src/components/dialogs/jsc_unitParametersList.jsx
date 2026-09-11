@@ -184,6 +184,16 @@ export default class ClssUnitParametersList extends ClssDialogBase {
         if (this.m_close) return;
 
         if (!this.m_flag_mounted) return;
+
+        // EE_updateParameters is dispatched for ANY unit that receives a
+        // PARAM_VALUE message. Only refresh when the update is for the
+        // unit this dialog was opened for, otherwise multiple units
+        // streaming params would flip the dialog between them every few
+        // seconds.
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+        if (this.state.p_unit === null || this.state.p_unit === undefined) return;
+        if (p_andruavUnit.getPartyID() !== this.state.p_unit.getPartyID()) return;
+
         this.setState({ p_unit: p_andruavUnit, m_update: this.state.m_update + 1 });
     }
 

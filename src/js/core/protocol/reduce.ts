@@ -506,13 +506,13 @@ export function reduceID(unit: CAndruavUnit, msg: Message): ReduceResult {
     if (p.dv) {
         ops.push({ op: 'method', method: 'fn_setIsDE', arg: true });
         if (unit.fn_getVersion && unit.fn_getVersion() !== p.dv) {
-            ops.push({ op: 'method', method: 'fn_setVersion', arg: p.dv });
+            ops.push({ op: 'method', method: 'fn_setVersion', arg: p.dv, notifyFields: ['m_version'] });
             ops.push({ op: 'dispatch', name: '__delayedVersionNotice', payload: { unit, label: `DE SW ver: ${p.dv}` } });
         }
     } else {
         ops.push({ op: 'method', method: 'fn_setIsDE', arg: false });
         if (p.av && unit.fn_getVersion && unit.fn_getVersion() !== p.av) {
-            ops.push({ op: 'method', method: 'fn_setVersion', arg: p.av });
+            ops.push({ op: 'method', method: 'fn_setVersion', arg: p.av, notifyFields: ['m_version'] });
             ops.push({ op: 'dispatch', name: '__delayedVersionNotice', payload: { unit, label: `Andruav version: ${p.av}` } });
         }
     }
@@ -873,7 +873,7 @@ function reduceViewlinkStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
                 patches: [],
                 events: [{
                     name: js_event.EE_viewLinkGimbalAttitude,
-                    payload: { gm: { y: p.y ?? 0, p: p.p ?? 0, r: p.r ?? 0 } },
+                    payload: { unit, gm: { y: p.y ?? 0, p: p.p ?? 0, r: p.r ?? 0 } },
                     method: 'm_Gimbal.setOrientation',
                     methodArg: [p.y ?? 0, p.p ?? 0, p.r ?? 0],
                 }],
@@ -883,7 +883,7 @@ function reduceViewlinkStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
             const gmSrc: GimbalOrientation = p.gm || {};
             const lrt: { d?: number; a?: number } = p.lrf || {};
             const events: Dispatch[] = [
-                { name: js_event.EE_viewLinkGimbalAttitude, payload: { gm: { y: gmSrc.y ?? 0, p: gmSrc.p ?? 0, r: gmSrc.r ?? 0 }, tr: p.tr || p.tracking || {}, lrf: p.lrf || {}, ai: p.ai || {}, g: p.g || {} }, method: 'm_Gimbal.setOrientation', methodArg: [gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0] },
+                { name: js_event.EE_viewLinkGimbalAttitude, payload: { unit, gm: { y: gmSrc.y ?? 0, p: gmSrc.p ?? 0, r: gmSrc.r ?? 0 }, tr: p.tr || p.tracking || {}, lrf: p.lrf || {}, ai: p.ai || {}, g: p.g || {} }, method: 'm_Gimbal.setOrientation', methodArg: [gmSrc.y ?? 0, gmSrc.p ?? 0, gmSrc.r ?? 0] },
                 { name: '__viewlinkLRF', payload: unit, method: 'm_Gimbal.setLRF', methodArg: [lrt.d, lrt.a] },
             ];
             return { patches: [], events };

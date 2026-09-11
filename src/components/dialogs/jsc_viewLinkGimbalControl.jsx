@@ -234,7 +234,17 @@ class ClssViewLinkGimbal extends ClssDialogBase {
 
     fn_onGimbalAttitude(p_status) {
         if (this.m_flag_mounted === false) return;
-        
+
+        // EE_viewLinkGimbalAttitude is dispatched for ANY unit that sends a
+        // ViewlinkStatus message. Only update when the event is for the unit
+        // this dialog was opened for, otherwise multiple units would flip
+        // the gimbal display between them.
+        if (p_status && p_status.unit) {
+            const myPartyID = this.state.p_session && this.state.p_session.m_unit ? this.state.p_session.m_unit.getPartyID() : null;
+            if (myPartyID === null) return;
+            if (p_status.unit.getPartyID() !== myPartyID) return;
+        }
+
         const c_gimbal = (p_status && p_status.gm) ? p_status.gm : p_status;
         this.setState({
             gimbal_yaw: c_gimbal.y,
