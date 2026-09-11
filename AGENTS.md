@@ -177,8 +177,10 @@ and merges new props without closing/reopening (used by the draggable
 - The old `v_ADSB_Exchange`/`v_adsbObject` jQuery implementation and the
   `AdsbExchangeProvider` (VirtualRadar endpoint) have been removed; OpenSky
   is the active aircraft provider.
-- The `tasks/` directory holds the structural-refactor task specs
-  (TASK-01 … TASK-11) and `README.md` with their dependency order and the
+- The webclient structural-refactor task specs (TASK-01 … TASK-15,
+  `README.md`, `FINDINGS.md`, `MapPlan.md`) have moved to the workspace-level
+  `../Tasks/webclient/` folder — see `../Tasks/` for all cross-module task
+  specs and plans. The `README.md` there has the dependency order and the
   rules that apply to every task (behaviour-preserving, `fn_`/`m_`/`p_`
   naming, never edit `js_mavlink_v2.js`, don't touch the build, don't
   rename rendering-contract fields, safety-critical events stay

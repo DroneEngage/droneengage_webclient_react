@@ -179,10 +179,26 @@ class CAndruavAuth {
     }
 
     /**
+     * Checks if the account is in view-only mode (bit 29 AND no category/action bits).
+     * A view-mode account can observe telemetry/video/map/geofence status
+     * and chat, but cannot issue any control/planning/mutation commands.
+     * A full-control account (0xffffffff) has bit 29 set but also has category
+     * bits, so it is NOT view-mode.
+     * @returns {boolean} True if view-mode is active.
+     */
+    fn_do_isViewMode() {
+        const perm = this._m_perm >>> 0;
+        const viewBit = js_andruavMessages.CONST_ALLOW_VIEW_MODE >>> 0;
+        const catMask = js_andruavMessages.CONST_CATEGORY_ACTION_MASK >>> 0;
+        return ((perm & viewBit) === viewBit) && ((perm & catMask) === 0);
+    }
+
+    /**
      * Checks if the user has full GCS control permission.
      * @returns {boolean} True if full control is granted.
      */
     fn_do_canControl() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_FULL_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_FULL_CONTROL;
     }
 
@@ -191,6 +207,7 @@ class CAndruavAuth {
      * @returns {boolean} True if waypoint control is granted.
      */
     fn_do_canControlWP() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_WP_CONTROL;
     }
 
@@ -199,14 +216,16 @@ class CAndruavAuth {
      * @returns {boolean} True if mode control is granted.
      */
     fn_do_canControlModes() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL) === js_andruavMessages.CONST_ALLOW_GCS_MODES_CONTROL;
     }
 
     /**
-     * Checks if the user can access video.
+     * Checks if the user can access video (control commands, not display).
      * @returns {boolean} True if video access is granted.
      */
     fn_do_canVideo() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GCS_VIDEO) === js_andruavMessages.CONST_ALLOW_GCS_VIDEO;
     }
 
@@ -215,6 +234,7 @@ class CAndruavAuth {
      * @returns {boolean} True if swarm permission is granted.
      */
     fn_do_canSwarm() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_SWARM) === js_andruavMessages.CONST_ALLOW_SWARM;
     }
 
@@ -223,6 +243,7 @@ class CAndruavAuth {
      * @returns {boolean} True if tracking permission is granted.
      */
     fn_do_canTracking() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_TRACKING) === js_andruavMessages.CONST_ALLOW_TRACKING;
     }
 
@@ -231,6 +252,7 @@ class CAndruavAuth {
      * @returns {boolean} True if geofence permission is granted.
      */
     fn_do_canGeofence() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GEOFENCE) === js_andruavMessages.CONST_ALLOW_GEOFENCE;
     }
 
@@ -239,6 +261,7 @@ class CAndruavAuth {
      * @returns {boolean} True if sound permission is granted.
      */
     fn_do_canSound() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_SOUND) === js_andruavMessages.CONST_ALLOW_SOUND;
     }
 
@@ -247,6 +270,7 @@ class CAndruavAuth {
      * @returns {boolean} True if SDR permission is granted.
      */
     fn_do_canSDR() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_SDR) === js_andruavMessages.CONST_ALLOW_SDR;
     }
 
@@ -255,6 +279,7 @@ class CAndruavAuth {
      * @returns {boolean} True if GPIO permission is granted.
      */
     fn_do_canGPIO() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_GPIO) === js_andruavMessages.CONST_ALLOW_GPIO;
     }
 
@@ -263,6 +288,7 @@ class CAndruavAuth {
      * @returns {boolean} True if telnet permission is granted.
      */
     fn_do_canTelnet() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_TELNET) === js_andruavMessages.CONST_ALLOW_TELNET;
     }
 
@@ -271,14 +297,18 @@ class CAndruavAuth {
      * @returns {boolean} True if P2P permission is granted.
      */
     fn_do_canP2P() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_P2P) === js_andruavMessages.CONST_ALLOW_P2P;
     }
 
     /**
      * Checks if the user can send chat messages.
+     * View-mode accounts can always chat (chat is the one allowed action);
+     * other accounts need the chat bit.
      * @returns {boolean} True if chat permission is granted.
      */
     fn_do_canChat() {
+        if (this.fn_do_isViewMode()) return true;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_CHAT) === js_andruavMessages.CONST_ALLOW_CHAT;
     }
 
@@ -287,6 +317,7 @@ class CAndruavAuth {
      * @returns {boolean} True if config permission is granted.
      */
     fn_do_canConfig() {
+        if (this.fn_do_isViewMode()) return false;
         return (this._m_perm & js_andruavMessages.CONST_ALLOW_CONFIG) === js_andruavMessages.CONST_ALLOW_CONFIG;
     }
 

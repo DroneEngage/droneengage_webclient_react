@@ -1,28 +1,24 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as js_session from '../../../js/state/session.js';
 import { useTranslation } from 'react-i18next';
 
-import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
-import { useEventSubscription } from '../../../js/hooks/useEventSubscription.js';
+import { useUnitField } from '../../../js/hooks/useUnitField.js';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 
 const TELEMETRY_LEVEL_LABEL = ['OFF', '1', '2', '3'];
 
 const ClssMobileTelemetryPanel = ({ p_unit, p_isOpen, p_onClose }) => {
   const { t } = useTranslation('udpProxyTelemetry');
-  const [, forceUpdate] = useState(0);
   const [copiedField, setCopiedField] = useState(null);
-  const tickRef = useRef(0);
 
-  const refresh = useCallback(() => {
-    tickRef.current++;
-    forceUpdate(tickRef.current);
-  }, []);
-
-  useEventSubscription(js_event.EE_onProxyInfoUpdated, (p_andruavUnit) => {
-    if (!p_unit || !p_andruavUnit || p_andruavUnit.getPartyID() !== p_unit.getPartyID()) return;
-    refresh();
-  });
+  // Field-granular re-render: only re-render when the displayed telemetry
+  // proxy fields change, not on every coarse EE_onProxyInfoUpdated.
+  const _partyId = p_unit?.getPartyID();
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_active');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_ip');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_port');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_paused');
+  useUnitField(_partyId, 'm_Telemetry.m_telemetry_level');
 
   useEffect(() => {
     if (p_isOpen && p_unit && js_session.fn_getAndruavFacade()) {

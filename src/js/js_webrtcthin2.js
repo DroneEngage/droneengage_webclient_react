@@ -4,6 +4,7 @@ import { js_eventEmitter } from './events/js_eventEmitter';
 import { fn_videoStatsEvent } from './events/eventPayloads.js';
 import * as js_siteConfig from "./js_siteConfig";
 import * as js_common from './js_common.js';
+import { notifyUnitFieldChanged } from './store/unitStore.js';
 
 const SEC_1 = 1000;
 
@@ -156,6 +157,7 @@ class CTalk {
       const deltaBytes = this.m_bytesReceived - this._lastBytesReceived;
       v_andruavUnit.m_Video.m_total_transfer_bytes += deltaBytes;
       this._lastBytesReceived = this.m_bytesReceived;
+      notifyUnitFieldChanged(v_andruavUnit.getPartyID(), 'm_Video.m_total_transfer_bytes');
       js_eventEmitter.fn_dispatch(js_event.EE_onWebRTC_Video_Statistics, fn_videoStatsEvent(v_andruavUnit, this.targetVideoTrack, { fps: currentFrameRate, rx: this.m_bytesReceived }));
 
 

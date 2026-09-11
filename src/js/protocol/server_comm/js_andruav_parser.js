@@ -392,6 +392,7 @@ class CAndruavClientParser {
                 case mavlink20.MAVLINK_MSG_ID_DISTANCE_SENSOR:
                     {
                         p_unit.m_lidar_info.update(c_mavlinkMessage);
+                        notifyUnitFieldChanged(p_unit.getPartyID(), 'm_lidar_info.m_distance_sensors');
                         js_eventEmitter.fn_dispatch(js_event.EE_andruavUnitLidarInfo, p_unit);
                     }
                     break;

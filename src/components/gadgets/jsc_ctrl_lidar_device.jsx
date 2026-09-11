@@ -1,12 +1,11 @@
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 
 import {Class_Radar_Screen} from '../micro_gadgets/jsc_mctrl_radar_screen.jsx'
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 
 function distanceToRingIndex(distance, maxDistance, numRings) {
     // Clamp the distance to be within the max range
@@ -37,16 +36,13 @@ function distanceToRGB(distance, minDistance, maxDistance) {
 }
 
 export function ClssCtrlLidarDevice({ p_unit, follow_unit, rotation_ticks }) {
-    const [, setTick] = useState(0);
-
-    const fn_update_lidar = useCallback((p_andruavUnit) => {
-        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
-        if (p_unit === null || p_unit === undefined) return;
-        if (p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-        setTick((t) => t + 1);
-    }, [p_unit]);
-
-    useEventSubscription(js_event.EE_andruavUnitLidarInfo, fn_update_lidar);
+    // Field-granular re-render: only re-render when this unit's distance
+    // sensors or heading change, not on every coarse EE_andruavUnitLidarInfo
+    // for the whole unit. m_lidar_info.update() is a legacy direct mutation
+    // (js_andruav_parser.js), so that call site notifies this field manually.
+    const _partyId = p_unit?.getPartyID();
+    useUnitField(_partyId, 'm_lidar_info.m_distance_sensors');
+    useUnitField(_partyId, 'm_Nav_Info.p_Orientation.yaw');
 
     let obstacles = [];
     let rotation = 0;

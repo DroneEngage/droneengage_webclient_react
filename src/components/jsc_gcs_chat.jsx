@@ -7,6 +7,7 @@ import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import { CONST_TARGETS_GCS } from '../js/protocol/server_comm/js_andruav_ws.js';
+import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
 import EventBridge from '../js/hooks/EventBridge.jsx';
 
@@ -172,6 +173,11 @@ class ClssGCSChat extends ClssDialogBase {
     fn_handleSend() {
         const rawText = this.state.text.trim();
         if (rawText.length === 0) return;
+
+        // Defense in depth: only accounts with chat permission may send.
+        // View-mode accounts pass (fn_do_canChat returns true in view mode);
+        // non-chat, non-view-mode accounts are blocked here.
+        if (!js_andruavAuth.fn_do_canChat()) return;
 
         const { target, text } = this.fn_resolveTargetAndText(rawText);
         if (text.length === 0 && rawText.startsWith('@')) return;

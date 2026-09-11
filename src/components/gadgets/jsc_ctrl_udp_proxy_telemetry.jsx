@@ -3,6 +3,7 @@ import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
+import { useUnitField } from '../../js/hooks/useUnitField.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
 
 const telemetry_level = ["OFF", "1", "2", "3"];
@@ -10,16 +11,19 @@ const telemetry_level = ["OFF", "1", "2", "3"];
 function ClssCtrlUDPPoxyTelemetry({ p_unit, i18n, t }) {
   const [, setTick] = useState(0);
 
-  const fn_onProxyInfoUpdated = useCallback((p_andruavUnit) => {
-    if (p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
-    setTick((tk) => tk + 1);
-  }, [p_unit]);
+  // Field-granular re-render: only re-render when the displayed telemetry
+  // proxy fields change, not on every coarse EE_onProxyInfoUpdated for the whole unit.
+  const _partyId = p_unit?.getPartyID();
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_active');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_ip');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_port');
+  useUnitField(_partyId, 'm_Telemetry.m_udpProxy_paused');
+  useUnitField(_partyId, 'm_Telemetry.m_telemetry_level');
 
   const fn_updateLanguage = useCallback(() => {
     setTick((tk) => tk + 1);
   }, []);
 
-  useEventSubscription(js_event.EE_onProxyInfoUpdated, fn_onProxyInfoUpdated);
   useEventSubscription(js_event.EE_Language_Changed, fn_updateLanguage);
 
   const fn_requestUdpProxyStatus = (p_andruavUnit) => {

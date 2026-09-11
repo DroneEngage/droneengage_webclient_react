@@ -4,6 +4,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
+import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 import { fn_changeUDPPort } from '../../js/js_main.js';
 import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_message_control.jsx';
@@ -21,26 +22,38 @@ class ClssCtrlUnitDetails extends React.Component {
         };
 
         this.m_flag_mounted = false;
+        this.m_unsubs = [];
         this.key = Math.random().toString();
 
-        // Event subscriptions are owned by EventBridge siblings rendered
-        // below (see render()), which auto-unsubscribe on unmount via
-        // useEventSubscription.
+        // EE_OldModule (global main-module version signal) is still owned
+        // by the EventBridge sibling rendered below (see render()), which
+        // auto-unsubscribes on unmount via useEventSubscription. Per-unit
+        // telemetry fields are subscribed via subscribeUnitField below.
     }
 
     componentWillUnmount() {
-        // Unsubscription is handled automatically by the EventBridge
-        // siblings (useEventSubscription) on unmount.
+        for (const fn of this.m_unsubs) fn();
+        this.m_unsubs = [];
     }
 
     componentDidMount() {
         this.m_flag_mounted = true;
+        // Field-granular re-render: replaces the coarse EE_unitUpdated
+        // trigger. m_received_msg co-updates with m_received_bytes /
+        // m_lastActiveTime in the same write (see runtime.js), so one
+        // subscription covers all three displayed message-accounting fields.
+        const partyId = this.props.p_unit?.getPartyID();
+        if (partyId) {
+            const fields = ['m_Messages.m_received_msg', 'm_modules.m_list', 'm_Video.m_total_transfer_bytes'];
+            for (const fp of fields) {
+                this.m_unsubs.push(subscribeUnitField(partyId, fp, () => this.fn_refresh()));
+            }
+        }
     }
 
-    fn_unitUpdated(p_andruavUnit) {
-        if (this.props.p_unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+    fn_refresh() {
         if (this.m_flag_mounted === false) return;
-        this.setState({ 'm_update': this.state.m_update + 1 });
+        this.setState((prevState) => ({ 'm_update': prevState.m_update + 1 }));
     }
 
     fn_changeTelemetryPort(p_andruavUnit) {
@@ -179,7 +192,7 @@ class ClssCtrlUnitDetails extends React.Component {
 
         return (
             <div key={v_andruavUnit.getPartyID() + 'settings'} style={{ position: 'relative' }}>
-                <EventBridge eventName={js_event.EE_unitUpdated} onEvent={(p_andruavUnit) => this.fn_unitUpdated(p_andruavUnit)} />
+                <EventBridge eventName={js_event.EE_OldModule} onEvent={() => this.fn_refresh()} />
                 <div key={v_andruavUnit.getPartyID() + 'settings_1'} className='row css_margin_zero padding_zero '>
                     <div key={v_andruavUnit.getPartyID() + 'settings_01'} className="col-4 cursor_hand">
                         <p key={v_andruavUnit.getPartyID() + 'settings_011'} className="textunit_w135 user-select-all m-0 no-wrap" onClick={(e) => this.fn_toggleTrafficMonitor(e)}>

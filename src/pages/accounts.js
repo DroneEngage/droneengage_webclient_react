@@ -90,7 +90,7 @@ const Accounts = () => {
                     <div id="help" className='col-12 col-md-8 col-lg-5'>
                         <div className="card shadow-sm border-0 rounded_10px h-100">
                             <div className="card-body p-4">
-                                <h5 className="card-title text-primary mb-3">
+                                <h5 className="card-title text-light mb-3">
                                     <i className="bi bi-info-circle me-2"></i>
                                     Quick Help
                                 </h5>
@@ -99,7 +99,7 @@ const Accounts = () => {
                                     <li className="mb-2"> The system will generate your account credentials. Please save them.</li>
                                     <li className="mb-2"> Make sure you use a valid email.</li>
                                     <li className="mb-2"> "Regenerate" will create a new AccessCode under the same account.</li>
-                                    <li className="mb-2"> Use the <a href="admin.html" target="_blank" rel="noreferrer">Admin page</a> to manage your team members after login.</li>
+                                    <li className="mb-2"> Use the <a href="teamadmin" target="_blank" rel="noreferrer">Team Admin</a> to manage your team members after login.</li>
                                     <li className="mb-2"> Check this <a href="https://cloud.ardupilot.org/de-account-create.html" target="_blank" rel="noreferrer">page</a> for simple installation instructions.</li>
                                     <li className="mb-0"> For Support please contribute to <a href="https://discuss.ardupilot.org/" target="_blank" rel="noreferrer">https://discuss.ardupilot.org/</a></li>
                                 </ol>

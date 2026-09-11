@@ -1,8 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import * as js_session from '../../js/state/session.js';
 
-import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import { useEventSubscription } from '../../js/hooks/useEventSubscription.js'
+import { useUnitField } from '../../js/hooks/useUnitField.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 
@@ -21,19 +20,14 @@ function fn_isGPIOFlashAllON(gpio_flash) {
  * GPIO-flash state (on/off/enabled) is derived via a method call
  * (m_GPIOs.getGPIOByName(...)) rather than a plain dot-path field, so it
  * is read fresh at render time (same as the original) rather than routed
- * through useUnitField. The event subscription only needs to force a
- * re-render when this unit's GPIO state changes.
+ * through useUnitField's return value. Field-granular: re-render only when
+ * this unit's m_GPIOs.m_gpios changes, replacing the coarse
+ * EE_unitGPIOUpdated event (matches jsc_ctrl_gpio.jsx).
  */
 export default function ClssCtrlGPIO_Flash({ id, className, title, p_unit }) {
-    const [, setTick] = useState(0);
     const key = useState(() => Math.random().toString())[0];
 
-    const fnl_gpioFlashChanged = useCallback((p_unit_updated) => {
-        if (p_unit_updated.getPartyID() !== p_unit.getPartyID()) return;
-        setTick((t) => t + 1);
-    }, [p_unit]);
-
-    useEventSubscription(js_event.EE_unitGPIOUpdated, fnl_gpioFlashChanged);
+    useUnitField(p_unit?.getPartyID(), 'm_GPIOs.m_gpios');
 
     const fnl_gpioFlashOnOff = (e) => {
         const gpio_flash = p_unit.m_GPIOs.getGPIOByName(js_andruavMessages.GPIO_CAMERA_FLASH_NAME);

@@ -77,6 +77,7 @@ async function fn_startApp() {
   const DebugPage = lazy(() => import('./pages/debug').then(m => ({ default: m.default })));
   const Mobile = lazy(() => import('./pages/mobile').then(m => ({ default: m.default })));
   const { ThemeProvider } = await import('./js/js_theme_context');
+  const { js_andruavAuth } = await import('./js/protocol/auth/js_andruav_auth.js');
 
 
   // Index route: send mobile devices to /mobile, everyone else to Home.
@@ -85,6 +86,16 @@ async function fn_startApp() {
       return <Navigate to="/mobile" replace />;
     }
     return <Home />;
+  };
+
+  // View-mode guard: a view-only account (bit 29) cannot enter the planning
+  // page. Redirect to /home. Defense-in-depth: planning.js also guards
+  // itself. Read live on every render so a login/logout cycle re-checks.
+  const ViewModeGuard = ({ children }) => {
+    if (js_andruavAuth.fn_do_isViewMode()) {
+      return <Navigate to="/home" replace />;
+    }
+    return children;
   };
 
 
@@ -100,9 +111,9 @@ async function fn_startApp() {
               <Route path="index" element={<IndexRoute />} />
               <Route path="home" element={<Home />} />
               <Route path="webclient" element={<Home />} />
-              <Route path="planner" element={<Planning />} />
-              <Route path="planning" element={<Planning />} />
-              <Route path="mapeditor" element={<Planning />} />
+              <Route path="planner" element={<ViewModeGuard><Planning /></ViewModeGuard>} />
+              <Route path="planning" element={<ViewModeGuard><Planning /></ViewModeGuard>} />
+              <Route path="mapeditor" element={<ViewModeGuard><Planning /></ViewModeGuard>} />
               <Route path="accounts" element={<Accounts />} />
               <Route path="accounts.html" element={<Accounts />} />
               <Route path="account" element={<Accounts />} />

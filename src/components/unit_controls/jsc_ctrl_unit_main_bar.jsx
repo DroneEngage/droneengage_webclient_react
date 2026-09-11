@@ -46,8 +46,10 @@ class ClssCtrlUnitMainBar extends React.Component {
     this.m_flag_mounted = true;
     // Field-granular: re-render when the mobile battery fields change,
     // replacing the coarse EE_unitPowUpdated trigger. EE_unitUpdated is
-    // retained (broad unit-state re-render; that event remains for
-    // adsbManager side effects).
+    // still subscribed below (render()) as a broad fallback for fields not
+    // yet migrated (online/armed status, camera/video state, signal
+    // strength, name) — filtered by partyID in fn_onUpdate so it only
+    // re-renders this row for this unit's own updates.
     const partyId = this.props.p_unit?.getPartyID();
     if (partyId) {
       const fields = [
@@ -102,6 +104,8 @@ class ClssCtrlUnitMainBar extends React.Component {
   }
 
   fn_onUpdate(p_andruavUnit) {
+    if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+    if (p_andruavUnit.getPartyID() !== this.props.p_unit.getPartyID()) return; // not me
     if (this.m_flag_mounted === false) return;
     this.setState({ m_update: this.state.m_update + 1 });
   }

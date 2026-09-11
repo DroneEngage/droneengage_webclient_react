@@ -7,6 +7,7 @@ import ClssLoginControl from './gadgets/jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'
 import ThemeSwitcher from './jsc_theme_switcher.jsx'
 import { ClssLanguageSwitcher } from './gadgets/jsc_language_switcher.jsx'
+import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js'
 
 import { withTranslation } from 'react-i18next';
 
@@ -71,7 +72,7 @@ class ClssHeaderControl extends React.Component {
                         </button>
                         <ul className="dropdown-menu dropdown-menu-start" style={{minWidth: '180px', maxWidth: '90vw'}}>
                             <li key="Home"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_HOME_URL}>{t('header.home')}</a></li>
-                            <li key="Geo"><a className="dropdown-item txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a></li>
+                            {!js_andruavAuth.fn_do_isViewMode() && <li key="Geo"><a className="dropdown-item txt-theme-aware" id='mapeditor' href="./mapeditor" target='_blank' rel="noopener noreferrer">{t('header.planner')}</a></li>}
                             <li key="Mobile"><a className="dropdown-item txt-theme-aware" id='mobile' href="./mobile" target='_blank' rel="noopener noreferrer">{t('header.mobile')}</a></li>
                             <li key="Manual"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_MANUAL_URL} target='_blank' rel="noopener noreferrer">Wiki</a></li>
                             <li key="FAQ"><a className="dropdown-item txt-theme-aware" href={js_siteConfig.CONST_FAQ_URL} target='_blank' rel="noopener noreferrer">FAQ</a></li>

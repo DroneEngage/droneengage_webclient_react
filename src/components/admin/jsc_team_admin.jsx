@@ -555,7 +555,25 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                 required
                                                 placeholder="0xffffffff"
                                             />
-                                            <small className="text-muted">e.g., 0xffffffff for full permissions. Bits 31/30 are controlled by the checkboxes below; the remaining bits are kept as typed.</small>
+                                            <small className="text-muted">e.g., 0xffffffff for full permissions. Bits 31/30/29 are controlled by the checkboxes below; the remaining bits are kept as typed.</small>
+                                            <div className="mt-2 d-flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    onClick={() => setFormData((prev) => ({ ...prev, permissions: '0xa0000000' }))}
+                                                    title="Set GCS login + view mode (read-only: observe + chat only)"
+                                                >
+                                                    <i className="bi bi-eye me-1"></i> View-only GCS
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    onClick={() => setFormData((prev) => ({ ...prev, permissions: '0xffffffff' }))}
+                                                    title="Set all permission bits"
+                                                >
+                                                    <i className="bi bi-unlock me-1"></i> Full Control
+                                                </button>
+                                            </div>
                                             <div className="mt-2 d-flex flex-column gap-1">
                                                 <div className="form-check">
                                                     <input
@@ -579,6 +597,18 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                     />
                                                     <label className="form-check-label text-muted" htmlFor="allowUnitCheckbox">
                                                         Allow Unit Login <span className="text-muted small">(bit 30 · 0x40000000)</span>
+                                                    </label>
+                                                </div>
+                                                <div className="form-check">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input"
+                                                        id="allowViewModeCheckbox"
+                                                        checked={isBitSet(formData.permissions, js_andruavMessages.CONST_ALLOW_VIEW_MODE)}
+                                                        onChange={(e) => setFormData((prev) => ({ ...prev, permissions: toggleBit(prev.permissions, js_andruavMessages.CONST_ALLOW_VIEW_MODE, e.target.checked) }))}
+                                                    />
+                                                    <label className="form-check-label text-muted" htmlFor="allowViewModeCheckbox">
+                                                        View Mode <span className="text-muted small">(bit 29 · 0x20000000) — read-only: observe + chat only</span>
                                                     </label>
                                                 </div>
                                             </div>

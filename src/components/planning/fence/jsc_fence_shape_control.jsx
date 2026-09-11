@@ -4,6 +4,7 @@ import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_common from '../../../js/js_common.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
+import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js'
 
 
 const DEFAULT_DISTANCE = 10;
@@ -545,7 +546,18 @@ export default class ClssFence_Shape_Control extends React.Component {
         {
             if (this.state.is_connected === true)
             {
-                this._renderswitch(v_unit);
+                // Defense-in-depth: view-mode (and other no-geofence-bit)
+                // accounts cannot mutate fences. The route guard already
+                // keeps them off the planning page, but this component could
+                // be mounted elsewhere — gate it here too.
+                if (!js_andruavAuth.fn_do_canGeofence())
+                {
+                    v_unit.push (<h4 key='FCSCtrlRO' className='text-warning'>View only — geofence editing is disabled.</h4>);
+                }
+                else
+                {
+                    this._renderswitch(v_unit);
+                }
             }
             else
             {

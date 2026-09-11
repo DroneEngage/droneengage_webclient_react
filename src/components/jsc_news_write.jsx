@@ -7,15 +7,16 @@ import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import {EventBridge} from '../js/hooks/EventBridge.jsx';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
+import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
 
 /**
  * Draggable panel to post an ACCOUNT-scoped news item (mirrors jsc_gcs_chat.jsx).
  * Global-scope news can only be posted from the storage server admin dashboard.
  *
- * TODO: gate visibility/usage of this control behind a super-user/permission
- * check once role information is available on the client session. For now it
- * is always available, per explicit product decision to defer permissions.
+ * Gated behind the view-mode check: a view-only account (bit 29) cannot post
+ * news — news-write is an admin/config action, not chat. Non-view-mode
+ * accounts remain governed by their own permission bits server-side.
  */
 class ClssNewsWrite extends ClssDialogBase {
     constructor(props) {
@@ -57,6 +58,8 @@ class ClssNewsWrite extends ClssDialogBase {
 
     fn_onNewsWriteToggle(p_data) {
         if (this.fn_isMounted() === false) return;
+        // View-mode accounts cannot post news; never show the panel.
+        if (js_andruavAuth.fn_do_isViewMode()) return;
         const visible = p_data && p_data.visible === true;
         this.setState({ isVisible: visible });
     }
@@ -98,7 +101,7 @@ class ClssNewsWrite extends ClssDialogBase {
         return (
             <>
             <EventBridge eventName={js_event.EE_onNewsWriteToggle} onEvent={(p_data) => this.fn_onNewsWriteToggle(p_data)} />
-            {this.state.isVisible === true && (
+            {this.state.isVisible === true && !js_andruavAuth.fn_do_isViewMode() && (
             <Draggable nodeRef={this.m_panelRef} handle=".js-draggable-handle" cancel="button, input, select, textarea">
                 <div
                     className="card css_ontop news-write-panel p-0"

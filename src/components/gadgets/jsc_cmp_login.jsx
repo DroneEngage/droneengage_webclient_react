@@ -158,7 +158,7 @@ export default class ClssLoginControl extends React.Component {
                 <EventBridge eventName={js_event.EE_Auth_Login_In_Progress} onEvent={() => this.fn_EE_authInProgress()} />
                 <EventBridge eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_EE_authBadLogin(data)} />
                 <EventBridge eventName={js_event.EE_onSocketStatus} onEvent={(data) => this.fn_EE_socketStatus(data)} />
-                <p className="bg-success txt-theme-aware text-center p-2"><strong>{login}</strong></p>
+                <p className="txt-theme-aware text-center border border-success p-2"><strong>{login}</strong></p>
                 
                 {this.state.errorMessage && (
                     <div className="alert alert-danger text-center" role="alert">
