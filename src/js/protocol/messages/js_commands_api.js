@@ -577,6 +577,30 @@ export class CCommandAPI {
         return msg;
     }
 
+    static API_PrecisionLanding( p_enable) {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_PRECLAND_ACTION,
+            'ms': {
+                a: (p_enable===true)?js_andruavMessages.CONST_PRECLAND_ACTION_ENABLE:js_andruavMessages.CONST_PRECLAND_ACTION_DISABLE
+            }
+        };
+
+        return msg;
+    }
+
+    static API_PrecisionLandingSelfTest() {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_PRECLAND_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_PRECLAND_ACTION_SELFTEST
+            }
+        };
+
+        return msg;
+    }
+
     static API_EnableTracking_AIDriver( p_enable) {
         const msg =
         {

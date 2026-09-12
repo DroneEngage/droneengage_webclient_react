@@ -13,6 +13,7 @@ import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, g
 import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
+import ClssCtrlPreclandStatus from '../gadgets/jsc_ctrl_precland_status.jsx'
 import { ClssCtrlDEPilot } from '../de_pilot/jsc_ctrl_depilot.jsx'
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
@@ -896,6 +897,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
                     </button>
                     <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={this.props.v_andruavUnit} title='object AI tracker' />
+                    <ClssCtrlPreclandStatus className={'btn btn-sm'} p_unit={this.props.v_andruavUnit} title='precision landing' />
                     </div></div>);
                     }
             break;

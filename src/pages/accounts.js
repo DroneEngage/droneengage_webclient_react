@@ -95,7 +95,7 @@ const Accounts = () => {
                                     Quick Help
                                 </h5>
                                 <ol className="ps-3 mb-0">
-                                    <li className="mb-2"> Enter your email and press "AccessCode" to create a new TeamID with a single Admin account.</li>
+                                    <li className="mb-2"> Enter your email and press "AccessCode" to create a new TeamID with an Admin (Full Control) account.</li>
                                     <li className="mb-2"> The system will generate your account credentials. Please save them.</li>
                                     <li className="mb-2"> Make sure you use a valid email.</li>
                                     <li className="mb-2"> "Regenerate" will create a new AccessCode under the same account.</li>

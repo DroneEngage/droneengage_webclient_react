@@ -212,6 +212,43 @@ class C_Tracker {
   }
 }
 
+/**
+ * Precision-landing module state (de_precland).
+ * Updated from CONST_TYPE_AndruavMessage_PRECLAND_STATUS payloads:
+ *   a: state (CONST_PRECLAND_STATUS_*)
+ *   b: processing fps
+ *   c: last reprojection RMSE in px
+ *   d: slant range in m
+ *   e: array of fused tag ids
+ *   f: error / gate reason string
+ */
+class C_Precland {
+  constructor(p_parent) {
+    this.m_parent = p_parent;
+    this.m_valid_unit_feedback = false;
+    // derived enable flag: module is enabled whenever state != DISABLED
+    this.m_enabled = false;
+    this.m_state = js_andruavMessages.CONST_PRECLAND_STATUS_DISABLED;
+    this.m_fps = 0;
+    this.m_rmse_px = null;
+    this.m_range_m = null;
+    this.m_tag_ids = [];
+    this.m_reason = null;
+  }
+
+  fn_updatePreclandStatus(status) {
+    if (status === null || status === undefined) return;
+    this.m_valid_unit_feedback = true;
+    this.m_state = status.a;
+    if (status.b != null) this.m_fps = status.b;
+    this.m_rmse_px = (status.c != null) ? status.c : null;
+    this.m_range_m = (status.d != null) ? status.d : null;
+    this.m_tag_ids = (status.e != null) ? status.e : [];
+    this.m_reason = (status.f != null) ? status.f : null;
+    this.m_enabled = (status.a !== js_andruavMessages.CONST_PRECLAND_STATUS_DISABLED);
+  }
+}
+
 class C_Obstacles {
   constructor(p_parent) {
     this.m_parent = p_parent;
@@ -945,6 +982,8 @@ class C_Modules {
     this.has_viewlink_alive = false;
     this.has_telnet = false;
     this.has_telnet_alive = false;
+    this.has_precision_landing = false;
+    this.has_precision_landing_alive = false;
 
     this.m_old_version = false;
 
@@ -1101,6 +1140,14 @@ class C_Modules {
           this.has_telnet_alive = module.d === false;
           module.z = js_siteConfig.CONST_MODULE_VERSIONS.tel ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.tel.version) : 0;
           module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.tel;
+          old_module = old_module || (module.z == -1);
+          break;
+
+        case js_andruavMessages.TYPE_MODULE_CLASS_PRECISION_LANDING:
+          this.has_precision_landing = true;
+          this.has_precision_landing_alive = module.d === false;
+          module.z = js_siteConfig.CONST_MODULE_VERSIONS.pl ? this.compareVersions(module.v, js_siteConfig.CONST_MODULE_VERSIONS.pl.version) : 0;
+          module.version_info = js_siteConfig.CONST_MODULE_VERSIONS.pl;
           old_module = old_module || (module.z == -1);
           break;
 
@@ -1345,6 +1392,7 @@ export class CAndruavUnitObject {
     this.m_Obstacles = new C_Obstacles(this);
     this.m_tracker = new C_Tracker(this);
     this.m_tracker_ai = new C_TRACKER_AI(this);
+    this.m_precland = new C_Precland(this);
     this.m_DetectedTargets = new C_DetectedTargets(this);
 
     this.m_Swarm = new C_Swarm(this);

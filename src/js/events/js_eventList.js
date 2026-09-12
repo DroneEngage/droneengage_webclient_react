@@ -113,6 +113,7 @@ const EVENT_LIST = Object.freeze({
 
 			"EE_onMissionItemToggle",
 			"EE_onTrackingStatusChanged",
+			"EE_unitPreclandStatusChanged",
 			"EE_onTrackingAIStatusChanged",
 			"EE_onTrackingAIObjectListUpdate",
 

@@ -35,16 +35,22 @@ export const CONST_CMD_GET_ACCOUNT_NAME = 'gan'; // from fn_accountOperation
 export const CONST_CMD_VERIFY_HARDWARE_BY_ID = 'vhw'; // from fn_hardwareOperationFromAgent
 
 /**
- * Error codes.
+ * Error codes — MUST match the authenticator's js_constants.js.
  */
-export const CONST_ERROR_NON = 0; // from fn_createLoginCard, fn_accountOperation
-export const CONST_ERROR_ACCOUNT_NOT_FOUND = 1; // Implied from fn_createLoginCard
-export const CONST_ERROR_NO_PERMISSION = 2; // from fn_newLoginCard
-export const CONST_ERROR_OLD_APP_VERSION = 3; // from fn_checkAppVersion
-export const CONST_ERROR_SERVER_NOT_AVAILABLE = 4; // from fn_handleLoginResponses
-export const CONST_ERROR_SESSION_NOT_FOUND = 5; // from fn_hardwareOperationFromAgent
-export const CONST_ERROR_HARDWARE_NOT_FOUND = 6; // from fn_do_verifyHardwareByAccountSID
-export const CONST_ERROR_DATA_UNKNOWN_ERROR = 7; // from fn_sendSubscriptionEmail
+export const CONST_ERROR_NON                         = 0;
+export const CONST_ERROR_INVALID_DATA                = 1;
+export const CONST_ERROR_ACCOUNT_NOT_FOUND           = 2;
+export const CONST_ERROR_DATA_DATABASE_ERROR         = 3;
+export const CONST_ERROR_SERVER_NOT_AVAILABLE        = 5;
+export const CONST_ERROR_NO_PERMISSION               = 6;
+export const CONST_ERROR_SESSION_NOT_FOUND           = 7;
+export const CONST_ERROR_HARDWARE_NOT_FOUND          = 8;
+export const CONST_ERROR_ACCOUNT_DISABLED            = 9;
+export const CONST_ERROR_NOT_FOUND                   = 10;
+export const CONST_ERROR_NOT_SUPPORTED_SINGLE_MODE   = 11;
+export const CONST_ERROR_OLD_APP_VERSION             = 999; // legacy, not used by current auth server
+export const CONST_ERROR_UNKNOWN                     = 999;
+export const CONST_ERROR_DATA_UNKNOWN_ERROR          = 999;
 
 
 
@@ -255,6 +261,24 @@ export const CONST_MODULE_HEALTH_STATUS_CRITICAL = 2;
 export const CONST_MODULE_HEALTH_TREND_STABLE = 0;
 export const CONST_MODULE_HEALTH_TREND_UP = 1;
 export const CONST_MODULE_HEALTH_TREND_DOWN = 2;
+
+// Precision landing (de_precland) - mirrors the TrackingTarget_* triple
+export const CONST_TYPE_AndruavMessage_PRECLAND_ACTION = 6536;
+export const CONST_TYPE_AndruavMessage_PRECLAND_TARGET = 6537;
+export const CONST_TYPE_AndruavMessage_PRECLAND_STATUS = 6538;
+
+// PRECLAND_ACTION sub-codes (field [a])
+export const CONST_PRECLAND_ACTION_DISABLE = 0;
+export const CONST_PRECLAND_ACTION_ENABLE = 1;
+export const CONST_PRECLAND_ACTION_SET_TARGET = 2;
+export const CONST_PRECLAND_ACTION_SELFTEST = 3;
+
+// PRECLAND_STATUS sub-codes (field [a])
+export const CONST_PRECLAND_STATUS_DISABLED = 0;
+export const CONST_PRECLAND_STATUS_SEARCHING = 1;
+export const CONST_PRECLAND_STATUS_LOCKED = 2;
+export const CONST_PRECLAND_STATUS_DEGRADED = 3;
+export const CONST_PRECLAND_STATUS_ERROR = 4;
 
 
 // System Messages
@@ -710,6 +734,9 @@ export const message_names = {
   6533: "Telnet Data - 6533",
   6534: "Telnet Remote Execute - 6534",
   6535: "Module Health Status - 6535",
+  6536: "Precision Landing Action - 6536",
+  6537: "Precision Landing Target - 6537",
+  6538: "Precision Landing Status - 6538",
 };
 
 export const swarm_formation_names = {
@@ -731,6 +758,7 @@ export const TYPE_MODULE_CLASS_COMM = "comm";
 export const TYPE_MODULE_CLASS_FCB = "fcb";
 export const TYPE_MODULE_CLASS_CAMERA = "camera";
 export const TYPE_MODULE_CLASS_P2P = "p2p";
+export const TYPE_MODULE_CLASS_PRECISION_LANDING = "pl";
 export const TYPE_MODULE_CLASS_SDR = "sdr";
 export const TYPE_MODULE_CLASS_SOUND = "snd";
 export const TYPE_MODULE_CLASS_GPIO = "gpio";

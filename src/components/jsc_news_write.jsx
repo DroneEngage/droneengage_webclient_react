@@ -76,6 +76,7 @@ class ClssNewsWrite extends ClssDialogBase {
             expiresStr = expiresStr.replace('T00:00', 'T23:59');
         }
         const expiresAt = Math.floor(new Date(expiresStr).getTime() / 1000);
+        if (!Number.isFinite(expiresAt)) return;
 
         AndruavClientFacade.API_saveNews(this.state.title.trim(), body, parseInt(this.state.priority, 10), expiresAt);
 

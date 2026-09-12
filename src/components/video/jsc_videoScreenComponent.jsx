@@ -241,7 +241,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         // flash value: f
         if ((!p_obj.p_jmsg.hasOwnProperty('f'))
-            && (typeof p_obj.p_jmsg['f'] !== 'number')) return;
+            || (typeof p_obj.p_jmsg['f'] !== 'number')) return;
 
         const flashValue = p_obj.p_jmsg['f'];
         js_common.fn_console_log("Flash Updated", flashValue);
@@ -256,7 +256,7 @@ export default class ClssCVideoScreen extends React.Component {
 
         // zoom value: b
         if ((!p_obj.p_jmsg.hasOwnProperty('b'))
-            && (typeof p_obj.p_jmsg['b'] !== 'number')) return;
+            || (typeof p_obj.p_jmsg['b'] !== 'number')) return;
 
         const zoomValue = (p_obj.p_jmsg['b'] !== 0.0);
         js_common.fn_console_log("Zoom Updated", zoomValue);
@@ -429,18 +429,10 @@ export default class ClssCVideoScreen extends React.Component {
 
     fnl_flashOnOff (e, p_obj)
     {
-        let v_flashValue = js_andruavMessages.CONST_FLASH_OFF
-        if (this.state.m_flash === js_andruavMessages.CONST_FLASH_OFF)
-        {   
-            v_flashValue = js_andruavMessages.CONST_FLASH_ON;
-        }else if (this.state.m_flash === js_andruavMessages.CONST_FLASH_ON)
-        {   
-            v_flashValue = js_andruavMessages.CONST_FLASH_OFF;
-        }
-        else
+        let v_flashValue = js_andruavMessages.CONST_FLASH_ON
+        if (this.state.m_flash === js_andruavMessages.CONST_FLASH_ON)
         {
-            // disabled.
-            return ; 
+            v_flashValue = js_andruavMessages.CONST_FLASH_OFF;
         }
         js_common.fn_console_log ("fnl_flashOnOff p_cameraIndex: " + JSON.stringify(p_obj) + "  " + v_flashValue);
         js_session.fn_getAndruavFacade().API_TurnMobileFlash (p_obj.v_unit, v_flashValue, p_obj.v_track);

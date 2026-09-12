@@ -496,6 +496,9 @@ class CAndruavAuth {
                     [js_andruavMessages.CONST_ERROR_ACCOUNT_NOT_FOUND]: 'Account not found',
                     [js_andruavMessages.CONST_ERROR_NO_PERMISSION]: 'Insufficient permissions',
                     [js_andruavMessages.CONST_ERROR_OLD_APP_VERSION]: 'Please upgrade your app',
+                    [js_andruavMessages.CONST_ERROR_DATA_DATABASE_ERROR]: 'Database error',
+                    [js_andruavMessages.CONST_ERROR_SERVER_NOT_AVAILABLE]: 'Server not available',
+                    [js_andruavMessages.CONST_ERROR_ACCOUNT_DISABLED]: 'Account is disabled',
                 };
                 const errorMessage = errorMessages[response.e] || response.em || 'Login failed';
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {

@@ -38,6 +38,12 @@ export const LS_MAP3D_ICONS_ONLY = '_vMap3dIconsOnly';
 // Help popup "don't show again" flags — one key per topic id
 // (`${LS_HELP_SUPPRESSED_PREFIX}<topicId>`), e.g. '_vHelpSuppressed_map3d'.
 export const LS_HELP_SUPPRESSED_PREFIX = '_vHelpSuppressed_';
+export const LS_CHAT_VISIBLE = '_vChatVisible';
+export const LS_NEWS_VISIBLE = '_vNewsVisible';
+// JSON array of news item ids the user has already seen — used to light
+// the news button red only when genuinely new items exist while the
+// panel is hidden.
+export const LS_NEWS_SEEN_IDS = '_vNewsSeenIds';
 
 Object.freeze({
 	LS_UNIT_ID, LS_UNIT_ID_SHARED, LS_EMAIL, LS_LOGIN_NAME, LS_GROUP_NAME,
@@ -48,5 +54,6 @@ Object.freeze({
 	LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER, LS_ENABLE_ADSB,
 	LS_ENABLE_AISSTREAM, LS_ENABLE_WIND, LS_ENABLE_SMOOTH_MOVEMENT, LS_ADSB_RADIUS_KM, LS_ADSB_PROVIDER,
 	LS_ADSB_REFRESH_RATE_MS, LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET,
-	LS_MAP3D_ICONS_ONLY, LS_HELP_SUPPRESSED_PREFIX,
+	LS_MAP3D_ICONS_ONLY, LS_HELP_SUPPRESSED_PREFIX, LS_CHAT_VISIBLE,
+	LS_NEWS_VISIBLE, LS_NEWS_SEEN_IDS,
 });

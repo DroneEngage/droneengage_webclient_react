@@ -39,6 +39,7 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_RemoteExecute,
          CONST_TYPE_AndruavMessage_DistinationLocation,
          CONST_TYPE_AndruavMessage_Viewlink_STATUS,
+         CONST_TYPE_AndruavMessage_PRECLAND_STATUS,
          CONST_TYPE_AndruavMessage_TargetTrackingtLocation,
          CONST_TYPE_AndruavMessage_SearchTargetList,
          CONST_TYPE_AndruavMessage_CameraList,
@@ -84,6 +85,7 @@ import type {
     GeoFenceAttachStatusPayload, WayPointsPayload, SearchTargetListPayload,
     TargetTrackingLocationPayload, CameraListPayload, SoundListPayload,
     ConfigStatusPayload, SignalingPayload, IDPayload, GimbalOrientation,
+    PreclandStatusPayload,
 } from './messages';
 import type { CAndruavUnit } from '../model/unit';
 
@@ -164,6 +166,8 @@ export function fn_reduce(unit: CAndruavUnit, msg: Message): ReduceResult | null
             return reduceRemoteExecute(unit, msg);
         case CONST_TYPE_AndruavMessage_Viewlink_STATUS:
             return reduceViewlinkStatus(unit, msg);
+        case CONST_TYPE_AndruavMessage_PRECLAND_STATUS:
+            return reducePreclandStatus(unit, msg);
         case CONST_TYPE_AndruavMessage_GeoFence:
             return reduceGeoFence(unit, msg);
         case CONST_TYPE_AndruavMessage_ExternalGeoFence:
@@ -221,6 +225,7 @@ export function fn_isMigrated(type: number): boolean {
         || type === CONST_TYPE_AndruavMessage_SDR_ACTION
         || type === CONST_TYPE_AndruavMessage_RemoteExecute
         || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS
+        || type === CONST_TYPE_AndruavMessage_PRECLAND_STATUS
         || type === CONST_TYPE_AndruavMessage_GeoFence
         || type === CONST_TYPE_AndruavMessage_ExternalGeoFence
         || type === CONST_TYPE_AndruavMessage_GeoFenceAttachStatus
@@ -387,6 +392,39 @@ function reduceTrackingStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
             method: 'm_tracker.fn_updateTrackerStatus',
             methodArg: msg.payload,
             notifyFields: ['m_tracker.m_enable_gui_tracker', 'm_tracker.m_active', 'm_tracker.m_ai_driven'],
+        }],
+    };
+}
+
+// ---------------------------------------------------------------------------
+// PRECLAND_STATUS — precision-landing module status. Calls
+// unit.m_precland.fn_updatePreclandStatus(payload) then dispatches
+// EE_unitPreclandStatusChanged. New-style only: de_precland always sends an
+// object payload so no string-decode is needed in decode.ts.
+// ---------------------------------------------------------------------------
+function reducePreclandStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
+    const p = msg.payload as PreclandStatusPayload;
+    if (p === null || typeof p !== 'object' || typeof p.a !== 'number') {
+        // Malformed payload — drop it rather than corrupting unit state.
+        return { patches: [], events: [] };
+    }
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_unitPreclandStatusChanged,
+            payload: unit,
+            method: 'm_precland.fn_updatePreclandStatus',
+            methodArg: msg.payload,
+            notifyFields: [
+                'm_precland.m_valid_unit_feedback',
+                'm_precland.m_enabled',
+                'm_precland.m_state',
+                'm_precland.m_fps',
+                'm_precland.m_rmse_px',
+                'm_precland.m_range_m',
+                'm_precland.m_tag_ids',
+                'm_precland.m_reason',
+            ],
         }],
     };
 }

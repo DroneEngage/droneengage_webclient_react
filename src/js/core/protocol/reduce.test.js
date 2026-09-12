@@ -35,6 +35,7 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_SOUND_LIST,
          CONST_TYPE_AndruavMessage_CONFIG_STATUS,
          CONST_TYPE_AndruavMessage_Signaling,
+         CONST_TYPE_AndruavMessage_PRECLAND_STATUS,
          CONST_TYPE_LinearFence,
          CONST_TYPE_PolygonFence,
          CONST_TYPE_CylinderFence,
@@ -269,6 +270,35 @@ describe('TASK-02 fn_decode + fn_reduce (no socket, no DOM)', () => {
         expect(result.events[0].name).toBe(js_event.EE_onTrackingAIObjectListUpdate);
         expect(result.events[0].method).toBe('m_tracker_ai.fn_addObjectClass');
         expect(result.events[0].methodArg).toEqual([['car', 'person']]);
+    });
+
+    test('PRECLAND_STATUS: method dispatch + event + notifyFields', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_PRECLAND_STATUS, 'u', {
+            a: 2, b: 10, c: 0.35, d: 4.2, e: [0, 7], f: null,
+        });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events[0].name).toBe(js_event.EE_unitPreclandStatusChanged);
+        expect(result.events[0].method).toBe('m_precland.fn_updatePreclandStatus');
+        expect(result.events[0].methodArg).toEqual({ a: 2, b: 10, c: 0.35, d: 4.2, e: [0, 7], f: null });
+        expect(result.events[0].notifyFields).toContain('m_precland.m_state');
+        expect(result.events[0].notifyFields).toContain('m_precland.m_range_m');
+    });
+
+    test('PRECLAND_STATUS: malformed payload is dropped', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_PRECLAND_STATUS, 'u', 'not-an-object');
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.patches).toHaveLength(0);
+        expect(result.events).toHaveLength(0);
+    });
+
+    test('PRECLAND_STATUS: missing state field is dropped', () => {
+        const raw = frame(CONST_TYPE_AndruavMessage_PRECLAND_STATUS, 'u', { b: 10 });
+        const msg = fn_decode(raw, 1);
+        const result = fn_reduce(makeUnit(), msg);
+        expect(result.events).toHaveLength(0);
     });
 
     test('AI_Recognition_STATUS: status sub-case', () => {

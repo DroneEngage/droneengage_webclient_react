@@ -27,15 +27,16 @@ class ClssLoginControl extends React.Component {
       is_connected: CONST_NOT_CONNECTION_OFFLINE,
       m_update: 0,
       use_plugin: false,
-      is_chat_visible: true,
+      is_chat_visible: js_localStorage.fn_getChatVisible(),
       chat_unread: 0,
-      is_news_visible: true,
+      is_news_visible: js_localStorage.fn_getNewsVisible(),
       news_unread: 0,
       errorMessage: '',
       successMessage: '',
     };
 
     this.m_flag_mounted = false;
+    this.m_newsUnreadIds = new Set();
     this.key = Math.random().toString();
     this.txtLoginNameRef = React.createRef();
     this.txtAccessCodeRef = React.createRef();
@@ -49,6 +50,7 @@ class ClssLoginControl extends React.Component {
     this.fn_onChatToggle = this.fn_onChatToggle.bind(this);
     this.fn_toggleChat = this.fn_toggleChat.bind(this);
     this.fn_onNewsPush = this.fn_onNewsPush.bind(this);
+    this.fn_onNewsLoaded = this.fn_onNewsLoaded.bind(this);
     this.fn_onNewsToggle = this.fn_onNewsToggle.bind(this);
     this.fn_toggleNews = this.fn_toggleNews.bind(this);
     this.fn_onWebConnectorNotRunning = this.fn_onWebConnectorNotRunning.bind(this);
@@ -160,6 +162,7 @@ class ClssLoginControl extends React.Component {
   fn_onChatToggle(p_data) {
     if (this.m_flag_mounted === false) return;
     const visible = p_data && p_data.visible === true;
+    js_localStorage.fn_setChatVisible(visible);
     this.setState({ is_chat_visible: visible, chat_unread: visible ? 0 : this.state.chat_unread });
   }
 
@@ -174,16 +177,58 @@ class ClssLoginControl extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onChatToggle, { visible: nextVisible });
   }
 
-  fn_onNewsPush() {
+  fn_onNewsPush(p_payload) {
     if (this.m_flag_mounted === false) return;
-    if (this.state.is_news_visible === false) {
-      this.setState(prevState => ({ news_unread: prevState.news_unread + 1 }));
+    const id = p_payload && p_payload.id;
+    if (this.state.is_news_visible === true) {
+      if (id) js_localStorage.fn_addNewsSeenIds([id]);
+      return;
     }
+    if (!id) return;
+    // A push can also be a disable/delete marker ({ id, disabled: 1 }) —
+    // only genuinely new, unseen items light the button red.
+    if (p_payload.disabled) {
+      this.m_newsUnreadIds.delete(id);
+    } else if (!js_localStorage.fn_getNewsSeenIds().includes(id)) {
+      this.m_newsUnreadIds.add(id);
+    }
+    this.setState({ news_unread: this.m_newsUnreadIds.size });
+  }
+
+  fn_onNewsLoaded(p_payload) {
+    if (this.m_flag_mounted === false) return;
+    if (!p_payload || !Array.isArray(p_payload.news)) return;
+
+    if (this.state.is_news_visible === true) {
+      js_localStorage.fn_addNewsSeenIds(p_payload.news.map(item => item && item.id));
+      this.m_newsUnreadIds.clear();
+      if (this.state.news_unread > 0) {
+        this.setState({ news_unread: 0 });
+      }
+      return;
+    }
+
+    const seenIds = js_localStorage.fn_getNewsSeenIds();
+    p_payload.news.forEach(item => {
+      if (!item || !item.id) return;
+      if (!item.disabled &&
+          !(item.expires_at && (item.expires_at * 1000) <= Date.now()) &&
+          !seenIds.includes(item.id)) {
+        this.m_newsUnreadIds.add(item.id);
+      } else {
+        this.m_newsUnreadIds.delete(item.id);
+      }
+    });
+    this.setState({ news_unread: this.m_newsUnreadIds.size });
   }
 
   fn_onNewsToggle(p_data) {
     if (this.m_flag_mounted === false) return;
     const visible = p_data && p_data.visible === true;
+    js_localStorage.fn_setNewsVisible(visible);
+    if (visible === true) {
+      this.m_newsUnreadIds.clear();
+    }
     this.setState({ is_news_visible: visible, news_unread: visible ? 0 : this.state.news_unread });
   }
 
@@ -554,7 +599,8 @@ class ClssLoginControl extends React.Component {
     control.push(<EventBridge key="eb_EE_Auth_BAD_Logined" eventName={js_event.EE_Auth_BAD_Logined} onEvent={(data) => this.fn_onAuthBad(data)} />);
     control.push(<EventBridge key="eb_EE_onChatMessage" eventName={js_event.EE_onChatMessage} onEvent={(data) => this.fn_onChatMessage(data)} />);
     control.push(<EventBridge key="eb_EE_onChatToggle" eventName={js_event.EE_onChatToggle} onEvent={(data) => this.fn_onChatToggle(data)} />);
-    control.push(<EventBridge key="eb_EE_News_Push" eventName={js_event.EE_News_Push} onEvent={() => this.fn_onNewsPush()} />);
+    control.push(<EventBridge key="eb_EE_News_Loaded" eventName={js_event.EE_News_Loaded} onEvent={(data) => this.fn_onNewsLoaded(data)} />);
+    control.push(<EventBridge key="eb_EE_News_Push" eventName={js_event.EE_News_Push} onEvent={(data) => this.fn_onNewsPush(data)} />);
     control.push(<EventBridge key="eb_EE_onNewsToggle" eventName={js_event.EE_onNewsToggle} onEvent={(data) => this.fn_onNewsToggle(data)} />);
     control.push(<EventBridge key="eb_EE_WebConnector_Not_Running" eventName={js_event.EE_WebConnector_Not_Running} onEvent={(data) => this.fn_onWebConnectorNotRunning(data)} />);
 

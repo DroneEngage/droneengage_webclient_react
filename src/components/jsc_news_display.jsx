@@ -4,6 +4,7 @@ import Draggable from 'react-draggable';
 
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 import {EventBridge} from '../js/hooks/EventBridge.jsx';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
 import { CONST_FEATURE as js_siteConfig_CONST_FEATURE } from '../js/config/js_siteConfig.js';
@@ -21,7 +22,7 @@ class ClssNewsDisplay extends ClssDialogBase {
         this.state = {
             ...this.state,
             newsById: {},
-            isVisible: true
+            isVisible: js_localStorage.fn_getNewsVisible()
         };
 
         this.m_flag_mounted = false;
@@ -66,6 +67,14 @@ class ClssNewsDisplay extends ClssDialogBase {
         const newsById = {};
         p_payload.news.forEach(item => { newsById[item.id] = item; });
         this.setState({ newsById });
+        // Everything on screen counts as seen so a later LoadNews resync
+        // does not flag it as new.
+        this.fn_markNewsSeen(p_payload.news.map(item => item && item.id));
+    }
+
+    fn_markNewsSeen(p_ids) {
+        if (this.state.isVisible !== true) return;
+        js_localStorage.fn_addNewsSeenIds(p_ids);
     }
 
     // p_payload here is the unsolicited NewsPush's msgPayload: a single news item
@@ -77,12 +86,17 @@ class ClssNewsDisplay extends ClssDialogBase {
         this.setState(prevState => ({
             newsById: { ...prevState.newsById, [p_payload.id]: { ...prevState.newsById[p_payload.id], ...p_payload } }
         }));
+        this.fn_markNewsSeen([p_payload.id]);
     }
 
     fn_onNewsToggle(p_data) {
         if (this.fn_isMounted() === false) return;
         const visible = p_data && p_data.visible === true;
+        js_localStorage.fn_setNewsVisible(visible);
         this.setState({ isVisible: visible });
+        if (visible === true) {
+            js_localStorage.fn_addNewsSeenIds(Object.keys(this.state.newsById));
+        }
     }
 
     fn_getActiveNews() {

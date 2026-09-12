@@ -12,7 +12,8 @@ import {
 	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
-	LS_MAP3D_ICONS_ONLY, LS_HELP_SUPPRESSED_PREFIX,
+	LS_MAP3D_ICONS_ONLY, LS_HELP_SUPPRESSED_PREFIX, LS_CHAT_VISIBLE,
+	LS_NEWS_VISIBLE, LS_NEWS_SEEN_IDS,
 } from '../storage/localstorage_keys.js';
 
 class CLocalStorage {
@@ -557,6 +558,53 @@ class CLocalStorage {
 
     fn_getSMSPhoneNumber() {
         return this._getValue(LS_SMS_PHONE_NUMBER, '');
+    }
+
+    // GCS Chat panel visibility (runtime preference). Remembered across
+    // logins so the panel does not reappear each session.
+    fn_setChatVisible(value) {
+        this._setValue(LS_CHAT_VISIBLE, value === true ? 'true' : 'false');
+    }
+
+    fn_getChatVisible() {
+        return this._getValue(LS_CHAT_VISIBLE, 'true') === 'true';
+    }
+
+    // News panel visibility (runtime preference). Remembered across
+    // logins so the panel does not reappear each session.
+    fn_setNewsVisible(value) {
+        this._setValue(LS_NEWS_VISIBLE, value === true ? 'true' : 'false');
+    }
+
+    fn_getNewsVisible() {
+        return this._getValue(LS_NEWS_VISIBLE, 'true') === 'true';
+    }
+
+    // Seen news item ids — items the user has already had on screen.
+    // The login news button turns red only for ids not in this set.
+    fn_getNewsSeenIds() {
+        try {
+            const v = JSON.parse(this._getValue(LS_NEWS_SEEN_IDS, '[]'));
+            return Array.isArray(v) ? v : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    fn_setNewsSeenIds(ids) {
+        const capped = (Array.isArray(ids) ? ids : []).slice(-500);
+        this._setValue(LS_NEWS_SEEN_IDS, JSON.stringify(capped));
+    }
+
+    fn_addNewsSeenIds(ids) {
+        if (!Array.isArray(ids) || ids.length === 0) return;
+        const merged = this.fn_getNewsSeenIds();
+        ids.forEach((id) => {
+            if (id !== undefined && id !== null && !merged.includes(id)) {
+                merged.push(id);
+            }
+        });
+        this.fn_setNewsSeenIds(merged);
     }
 }
 

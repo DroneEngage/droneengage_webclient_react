@@ -146,6 +146,8 @@ export interface CModules {
     has_ai_recognition: boolean;
     has_p2p: boolean;
     has_sdr: boolean;
+    has_precision_landing: boolean;
+    has_precision_landing_alive: boolean;
     addModules(modules: any[]): void;
     getModuleByKey(key: string): { template?: any; [key: string]: any } | null;
 }
@@ -183,6 +185,18 @@ export interface CTracker {
     m_enable_gui_tracker: boolean;
     m_active: boolean;
     m_ai_driven: boolean;
+}
+
+export interface CPrecland {
+    fn_updatePreclandStatus(payload: any): void;
+    m_valid_unit_feedback: boolean;
+    m_enabled: boolean;
+    m_state: number;
+    m_fps: number;
+    m_rmse_px: number | null;
+    m_range_m: number | null;
+    m_tag_ids: number[];
+    m_reason: string | null;
 }
 
 export interface CTrackerAI {
@@ -258,6 +272,7 @@ export interface CAndruavUnit {
     m_Sound: CSound;
     m_tracker: CTracker;
     m_tracker_ai: CTrackerAI;
+    m_precland: CPrecland;
     m_DetectedTargets: CDetectedTargets;
     m_GPIOs: CGPIOs;
     m_Messages: CMessages;

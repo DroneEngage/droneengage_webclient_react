@@ -131,6 +131,16 @@ export interface ModuleHealthStatusPayload {
     up: number;                 // uptime
 }
 
+/** CONST_TYPE_AndruavMessage_PRECLAND_STATUS — precision-landing module status. */
+export interface PreclandStatusPayload {
+    a: number;                  // state (CONST_PRECLAND_STATUS_*)
+    b?: number;                 // processing fps
+    c?: number;                 // last reprojection RMSE in px
+    d?: number;                 // slant range in m
+    e?: number[];               // fused tag ids
+    f?: string;                 // error / gate reason
+}
+
 /** A single detected P2P node entry. */
 export interface P2PNodeEntry {
     m: string;                  // mac

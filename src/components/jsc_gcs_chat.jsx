@@ -5,6 +5,7 @@ import Draggable from 'react-draggable';
 
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 import { AndruavClientFacade } from '../js/protocol/server_comm/js_andruav_facade.js';
 import { CONST_TARGETS_GCS } from '../js/protocol/server_comm/js_andruav_ws.js';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js';
@@ -21,7 +22,7 @@ class ClssGCSChat extends ClssDialogBase {
             gcsUnits: [],
             selectedTarget: CONST_TARGETS_GCS,
             text: '',
-            isVisible: true,
+            isVisible: js_localStorage.fn_getChatVisible(),
             unreadCount: 0
         };
 
@@ -115,6 +116,7 @@ class ClssGCSChat extends ClssDialogBase {
     fn_onChatToggle(p_data) {
         if (this.fn_isMounted() === false) return;
         const visible = p_data && p_data.visible === true;
+        js_localStorage.fn_setChatVisible(visible);
         this.setState({ isVisible: visible });
     }
 
