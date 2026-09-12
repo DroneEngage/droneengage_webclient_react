@@ -5,7 +5,7 @@
 
 *****************************************************/
 
-import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
+import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js'
 
 
 

@@ -1,4 +1,4 @@
-import { v_colorDrawPathes } from './config/assets.js';
+import { v_colorDrawPathes } from '../config/assets.js';
 import { ClssAndruavMissionPlan } from './js_plan_mission.js';
 
 /**

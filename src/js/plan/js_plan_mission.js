@@ -2,16 +2,16 @@
     30 Jul 2016
     30 Aug 2024
 *****************************************************/
-import * as js_helpers from "./helpers/js_helpers.js";
-import * as js_session from './state/session.js';
-import { EVENTS as js_event } from './events/js_eventList.js'
-import { js_eventEmitter } from "./events/js_eventEmitter.js";
-import { js_leafletmap } from "./maps/js_leafletmap.js";
+import * as js_helpers from "../helpers/js_helpers.js";
+import * as js_session from '../state/session.js';
+import { EVENTS as js_event } from '../events/js_eventList.js'
+import { js_eventEmitter } from "../events/js_eventEmitter.js";
+import { js_leafletmap } from "../maps/js_leafletmap.js";
 
-import * as js_andruavMessages from "./protocol/messages/js_andruavMessages.js";
-import { js_andruavAuth } from "./protocol/auth/js_andruav_auth.js";
+import * as js_andruavMessages from "../protocol/messages/js_andruavMessages.js";
+import { js_andruavAuth } from "../protocol/auth/js_andruav_auth.js";
 import { ClssAndruavFencePlan } from "./js_plan_fence.js";
-import { mavlink20 } from "./js_mavlink_v2.js";
+import { mavlink20 } from "../js_mavlink_v2.js";
 
 /**
  * Represents a single unit plan.

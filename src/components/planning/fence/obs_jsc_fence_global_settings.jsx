@@ -5,7 +5,7 @@ import * as js_helpers from '../../../js/helpers/js_helpers.js'
 import {js_localStorage} from '../../../js/js_localStorage.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import * as js_common from '../../../js/helpers/js_common.js'
-import * as js_mission_plan from '../../../js/js_plan_mission.js'
+import * as js_mission_plan from '../../../js/plan/js_plan_mission.js'
 import * as js_fence_plan from '../../../js/js_mission_fence.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 

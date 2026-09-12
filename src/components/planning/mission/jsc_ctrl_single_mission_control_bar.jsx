@@ -7,7 +7,7 @@ import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'
 import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
-import { js_mapmission_planmanager } from '../../../js/js_mapmissionPlanManager.js'
+import { js_mapmission_planmanager } from '../../../js/plan/js_mapmissionPlanManager.js'
 
 import {
     fn_requestWayPoints,
