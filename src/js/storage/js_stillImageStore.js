@@ -15,8 +15,8 @@
  *   js_stillImageStore.fn_clearImages(partyId);
  */
 
-import { EVENTS as js_event } from './events/js_eventList.js';
-import { js_eventEmitter } from './events/js_eventEmitter.js';
+import { EVENTS as js_event } from '../events/js_eventList.js';
+import { js_eventEmitter } from '../events/js_eventEmitter.js';
 
 const DB_NAME = 'de_still_images';
 const DB_VERSION = 1;

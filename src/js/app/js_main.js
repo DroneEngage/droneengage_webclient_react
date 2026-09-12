@@ -49,7 +49,7 @@ import { js_dialogs } from './dialogService.js'
 import { mapPopupService } from '../services/map/mapPopupService.js'
 // eslint-disable-next-line no-unused-vars
 import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js'
-import { js_stillImageStore } from '../js_stillImageStore.js'
+import { js_stillImageStore } from '../storage/js_stillImageStore.js'
 import i18n from '../i18n.js';
 
 var oldAppend = $.fn.append;

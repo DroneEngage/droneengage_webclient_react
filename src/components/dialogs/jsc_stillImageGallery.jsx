@@ -3,7 +3,7 @@ import React from 'react';
 import * as js_common from '../../js/helpers/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { EventBridge } from '../../js/hooks/EventBridge.jsx';
-import { js_stillImageStore } from '../../js/js_stillImageStore.js';
+import { js_stillImageStore } from '../../js/storage/js_stillImageStore.js';
 import { js_dialogs } from '../../js/app/dialogService.js';
 
 // Number of thumbnails shown in the gallery strip.

@@ -9,7 +9,7 @@ import * as js_common from '../../js/helpers/js_common.js'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
-import { js_stillImageStore } from '../../js/js_stillImageStore.js';
+import { js_stillImageStore } from '../../js/storage/js_stillImageStore.js';
 import { EventBridge } from '../../js/hooks/EventBridge.jsx';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 
