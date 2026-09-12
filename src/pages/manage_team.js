@@ -7,7 +7,7 @@ import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
 
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js';
-import { js_localStorage } from '../js/js_localStorage.js';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { useEventSubscription } from '../js/hooks/useEventSubscription.js';
 

@@ -32,7 +32,7 @@ import { js_leafletmap } from './maps/js_leafletmap.js'
 import { js_map3d } from './maps/js_map3d.js'
 import { js_eventEmitter } from './events/js_eventEmitter'
 import './events/js_eventEmitterConfig' // side-effect: opts telemetry-frequency events into rAF batching
-import { js_localStorage } from './js_localStorage'
+import { js_localStorage } from './state/js_localStorage.js'
 import { js_webrtcstream } from './js_webrtcthin2.js'
 import { js_adsbUnit } from './model/js_adsbUnit.js'
 import { js_adsbManager } from './adsb/js_adsbManager.js'

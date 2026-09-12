@@ -5,7 +5,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter';
 import { js_speak } from '../../js/js_speak';
-import { js_localStorage } from '../../js/js_localStorage';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 import { js_websocket_bridge } from '../../js/CPC/js_websocket_bridge.js';
 
 class ClssPreferences extends React.Component {

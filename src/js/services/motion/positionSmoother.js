@@ -30,7 +30,7 @@
 
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js';
-import { js_localStorage } from '../../js_localStorage.js';
+import { js_localStorage } from '../../state/js_localStorage.js';
 
 // Min/max interpolation window (ms). A floor so even back-to-back ticks get
 // *some* animation; a ceiling so a long stall doesn't leave the marker

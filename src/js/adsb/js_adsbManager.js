@@ -25,7 +25,7 @@
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
 import * as js_session from '../state/session.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
-import { js_localStorage } from '../js_localStorage.js';
+import { js_localStorage } from '../state/js_localStorage.js';
 import { js_adsbUnit } from '../model/js_adsbUnit.js';
 import * as js_siteConfig from '../js_siteConfig.js';
 import { OpenSkyProvider } from './js_adsbProviderOpenSky.js';

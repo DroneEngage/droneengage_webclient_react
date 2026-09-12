@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';
 
 
-import { js_localStorage } from '../js/js_localStorage.js';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 import { CONST_METER_TO_FEET } from '../js/helpers/js_helpers.js';
 import { useEventSubscription } from '../js/hooks/useEventSubscription.js';
 import ClssHeaderControl from '../components/jsc_header';

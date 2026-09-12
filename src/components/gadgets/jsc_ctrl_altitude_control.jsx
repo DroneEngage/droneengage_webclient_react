@@ -7,7 +7,7 @@ import { useUnitField } from '../../js/hooks/useUnitField.js';
 import * as js_helpers from '../../js/helpers/js_helpers.js'
 import { js_speak } from '../../js/js_speak.js'
 import * as js_common from '../../js/helpers/js_common.js'
-import {js_localStorage} from '../../js/js_localStorage'
+import {js_localStorage} from '../../js/state/js_localStorage.js'
 import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 
 import { fn_changeAltitude, fn_convertToMeter } from '../../js/js_main.js'

@@ -5,7 +5,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { gui_toggleUnits } from '../../js/js_main';
-import { js_localStorage } from '../../js/js_localStorage';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 
 class ClssDefault extends React.Component {
   constructor() {

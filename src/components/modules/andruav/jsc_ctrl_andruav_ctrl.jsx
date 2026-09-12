@@ -1,7 +1,7 @@
 import React from 'react';
 import * as js_session from '../../../js/state/session.js';
 
-import { js_localStorage } from '../../../js/js_localStorage.js'
+import { js_localStorage } from '../../../js/state/js_localStorage.js'
 
 export class ClssCtrlAndruavCtrl extends React.Component {
 

@@ -5,7 +5,7 @@ import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
-import { js_localStorage } from '../../js/js_localStorage';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 import { js_adsbManager } from '../../js/adsb/js_adsbManager.js';
 import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
 

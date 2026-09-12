@@ -9,7 +9,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_helpers from '../../js/helpers/js_helpers.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
-import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_localStorage} from '../../js/state/js_localStorage.js'
 import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
 import * as js_common from '../../js/helpers/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'

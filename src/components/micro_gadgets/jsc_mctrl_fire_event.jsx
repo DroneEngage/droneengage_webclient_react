@@ -3,7 +3,7 @@ import React from 'react';
 
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
-import { js_localStorage } from '../../js/js_localStorage'
+import { js_localStorage } from '../../js/state/js_localStorage.js'
 
 export class ClssFireEvent extends React.Component {
 

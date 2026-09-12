@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useTheme } from '../js/theme/js_theme_context.js';
-import { js_localStorage } from '../js/js_localStorage';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 
 export class ClssThemeSwitcher extends React.Component {
     constructor(props) {

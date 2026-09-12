@@ -5,7 +5,7 @@ import * as js_siteConfig from '../../js_siteConfig.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../helpers/js_common.js'
-import { js_localStorage } from '../../js_localStorage.js'
+import { js_localStorage } from '../../state/js_localStorage.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
 

@@ -7,7 +7,7 @@ import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
 import * as js_common from '../../js/helpers/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_localStorage } from '../../js/js_localStorage.js';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import EventBridge from '../../js/hooks/EventBridge.jsx';

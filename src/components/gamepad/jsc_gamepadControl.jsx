@@ -5,7 +5,7 @@ import React    from 'react';
 
 import { STICK_MODE_MAPPING, STICK_MODE_MAPPING_NAMES } from '../../js/config/gamepadMap.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_localStorage} from '../../js/state/js_localStorage.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import * as js_common from '../../js/helpers/js_common.js'
 

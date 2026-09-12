@@ -5,7 +5,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
-import { js_localStorage } from '../../js/js_localStorage';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { useUnitField } from '../../js/hooks/useUnitField.js';
 import ClssCtrlSWARMFormation from './jsc_mctrl_swarm_formation.jsx';

@@ -38,7 +38,7 @@
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
 import * as js_session from './session.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
-import { js_localStorage } from '../js_localStorage.js';
+import { js_localStorage } from './js_localStorage.js';
 
 export const EE_LAYOUT_CHANGED = js_event.EE_LayoutChanged;
 

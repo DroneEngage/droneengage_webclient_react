@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/js_siteConfig.js';
-import { js_localStorage } from '../../js/js_localStorage';
+import { js_localStorage } from '../../js/state/js_localStorage.js';
 import { CPasswordReveal } from '../micro_gadgets/jsc_mctrl_password_reveal.jsx';
 import { js_leafletmap } from '../../js/maps/js_leafletmap.js';
 import { js_map3d } from '../../js/maps/js_map3d.js';

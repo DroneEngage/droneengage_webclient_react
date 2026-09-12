@@ -40,7 +40,7 @@ import ClssMobileModuleDetailsPanel from '../components/gadgets/mobile/jsc_mobil
 import ClssMobileTelemetryGrid from '../components/gadgets/mobile/jsc_mobile_telemetry_grid.jsx';
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth';
 import { js_speak } from '../js/js_speak.js';
-import { js_localStorage } from '../js/js_localStorage';
+import { js_localStorage } from '../js/state/js_localStorage.js';
 
 fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);
 

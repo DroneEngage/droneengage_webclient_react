@@ -1,5 +1,5 @@
 import * as js_common from './helpers/js_common.js';
-import { js_localStorage } from './js_localStorage';
+import { js_localStorage } from './state/js_localStorage.js';
 
 /***************************************************
 

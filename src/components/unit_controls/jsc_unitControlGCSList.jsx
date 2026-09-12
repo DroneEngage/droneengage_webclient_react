@@ -4,7 +4,7 @@ import { withTranslation } from 'react-i18next';
 
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import {js_localStorage} from '../../js/js_localStorage.js'
+import {js_localStorage} from '../../js/state/js_localStorage.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'

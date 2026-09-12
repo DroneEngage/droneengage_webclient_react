@@ -1,8 +1,8 @@
 /*jshint esversion: 6 */
-import * as js_preferences from './state/preferences.js';
-import { CONST_DEFAULT_VOLUME } from './config/constants.js';
-import * as js_common from './helpers/js_common.js'
-import * as js_siteConfig from './js_siteConfig.js';
+import * as js_preferences from './preferences.js';
+import { CONST_DEFAULT_VOLUME } from '../config/constants.js';
+import * as js_common from '../helpers/js_common.js'
+import * as js_siteConfig from '../js_siteConfig.js';
 import {
 	LS_LANG, LS_EMAIL, LS_LOGIN_NAME, LS_ACCESS_CODE, LS_UNIT_ID,
 	LS_UNIT_ID_SHARED, LS_WEB_GCS, LS_GROUP_NAME, LS_DISPLAY_MODE,
@@ -13,7 +13,7 @@ import {
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
 	LS_MAP3D_ICONS_ONLY,
-} from './storage/localstorage_keys.js';
+} from '../storage/localstorage_keys.js';
 
 class CLocalStorage {
     constructor() {
