@@ -4,21 +4,18 @@ A quick reference for the 3D view.
 
 ## Unit size
 
-- Press **X** or **+** to grow unit models, **Z** or **-** to shrink them
-- Hold **Shift** with the key for a bigger step
+- Press **X** to grow unit models, **Z** to shrink them
 - Or use the **UNITS + / -** buttons on the map (double-click for a bigger step)
-- ADSB aircraft have their own size control next to it
+- ADSB aircraft can be grown and shrunk from the buttons in the upper-left
+
+## Icons
+
+- When you zoom out, 3D models are replaced by flat icons
+- You can keep them as icons at every zoom level using the **3D** toggle at the bottom-left
 
 ## Camera
 
-- Drag to pan, right-drag to rotate and tilt
-- The **follow** button locks the camera to the selected unit
-- Moving the camera manually releases follow mode until re-enabled
-
-## Actions
-
-- **Double-click** the map to drop a target marker and open the context menu (Goto Here, Set Home)
-- The target marker is **draggable** — the open popup follows it
+- Select a unit, then press the **follow** button (bottom-left) to lock the camera onto it and track its movement
 
 ## Display
 
