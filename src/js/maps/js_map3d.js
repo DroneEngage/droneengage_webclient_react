@@ -2241,7 +2241,7 @@ class CAndruavMap3D {
      * relative to any drone's home point, so it's converted to height above
      * the local terrain surface before calling Marker#setAltitude (which
      * expects meters above the terrain, like the drone markers in fn_syncUnit).
-     * @param {import '../model/js_adsbUnit.js').CADSBObject} p_adsbObject
+     * @param {import('../model/js_adsbUnit.js').CADSBObject} p_adsbObject
      * @param {string} markerIconUrl
      * @param {Function} [onClickCallback] (p_adsbObject) => void, called when
      *   the aircraft's icon is clicked (bound once per marker).

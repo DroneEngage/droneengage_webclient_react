@@ -76,7 +76,7 @@ async function fn_startApp() {
   const GamePadTesterPage = lazy(() => import('./pages/gamepadTester').then(m => ({ default: m.default })));
   const DebugPage = lazy(() => import('./pages/debug').then(m => ({ default: m.default })));
   const Mobile = lazy(() => import('./pages/mobile').then(m => ({ default: m.default })));
-  const { ThemeProvider } = await import('./js/js_theme_context');
+  const { ThemeProvider } = await import('./js/theme/js_theme_context.js');
   const { js_andruavAuth } = await import('./js/protocol/auth/js_andruav_auth.js');
 
 
