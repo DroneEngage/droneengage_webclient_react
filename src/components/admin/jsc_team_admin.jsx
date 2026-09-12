@@ -114,11 +114,18 @@ const ClssTeamAdmin = ({ onLogout }) => {
     // Bit 31 (0x80000000) = allow GCS login, bit 30 (0x40000000) = allow unit login.
     // The remaining bits are preserved untouched in the hex text field.
     const parsePerm = (hex) => {
-        const m = /^0x([0-9a-fA-F]{1,8})$/.exec((hex || '').trim());
+        if (typeof hex === 'number' && Number.isFinite(hex)) return hex >>> 0;
+        const m = /^0x([0-9a-fA-F]{1,8})$/.exec(String(hex ?? '').trim());
         return m ? parseInt(m[1], 16) >>> 0 : null;
     };
 
     const formatPerm = (val) => '0x' + (val >>> 0).toString(16).padStart(8, '0');
+
+    // DB stores Permissions as INTEGER; always render it as '0x........' hex.
+    const displayPerm = (perm) => {
+        const v = parsePerm(perm);
+        return v === null ? 'N/A' : formatPerm(v);
+    };
 
     const isBitSet = (hex, bit) => {
         const v = parsePerm(hex);
@@ -201,7 +208,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
         setFormData({
             loginName: user.LoginName,
             accessCode: '',
-            permissions: user.Permissions || '0xffffffff',
+            permissions: parsePerm(user.Permissions) === null ? '0xffffffff' : formatPerm(parsePerm(user.Permissions)),
             isAdmin: user.IsAdmin === true,
         });
         setModalOpen(true);
@@ -458,7 +465,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                 )}
                                             </td>
                                             <td className="txt-theme-aware">
-                                                <span className="me-2">{user.Permissions || 'N/A'}</span>
+                                                <span className="me-2">{displayPerm(user.Permissions)}</span>
                                                 {renderPermIcons(user.Permissions)}
                                             </td>
                                             <td>
