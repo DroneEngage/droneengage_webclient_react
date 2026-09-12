@@ -398,6 +398,7 @@ div#modal_ctrl_servo {
 	left: 100px;
 	min-width: 400px !important;
 	opacity: 0.85;
+	z-index: 2100 !important;
 	float: left;
 }
 

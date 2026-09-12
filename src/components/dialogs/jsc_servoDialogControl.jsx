@@ -252,10 +252,6 @@ export default class ClssServoControl extends ClssDialogBase {
 
         if (this.props.dialogProps) this.fn_displayForm(this, this.props.dialogProps?.partyID);
 
-        if (this.modal_ctrl_srv.current) {
-            this.modal_ctrl_srv.current.style.display = 'none';
-        }
-
         if (this.btnCloseRef.current) {
             this.btnCloseRef.current.onclick = () => {
                 if (this.modal_ctrl_srv.current) {
@@ -300,12 +296,14 @@ export default class ClssServoControl extends ClssDialogBase {
                 );
             }
 
-            // Group servo units into s of 4
+            // Group servo units into columns of 2 so the dialog stays
+            // wider than it is tall (each unit is ~200px high with its
+            // vertical slider; 3-per-column made the dialog ~600px tall).
             const s = [];
-            for (let i = 0; i < servoUnits.length; i += 3) {
+            for (let i = 0; i < servoUnits.length; i += 2) {
                 s.push(
                     <div className=' mt-1' key={this.key + `-${i}`}>
-                        {servoUnits.slice(i, i + 3)}
+                        {servoUnits.slice(i, i + 2)}
                     </div>
                 );
             }
