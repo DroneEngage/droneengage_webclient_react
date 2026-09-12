@@ -50,6 +50,7 @@ import { mapPopupService } from '../services/map/mapPopupService.js'
 // eslint-disable-next-line no-unused-vars
 import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js'
 import { js_stillImageStore } from '../storage/js_stillImageStore.js'
+import { js_help } from '../help/js_helpService.js'
 import i18n from '../i18n.js';
 
 var oldAppend = $.fn.append;
@@ -575,6 +576,7 @@ export function fn_showMap() {
 export function fn_showMap3D() {
 	js_layout.fn_showMap3D();
 	js_map3d.fn_show();
+	js_help.fn_showHelpFor('map3d');
 
 	// Sync the 3D map's start location to the leaflet map's current center so
 	// it does not stay stuck at its hardcoded initial center.
