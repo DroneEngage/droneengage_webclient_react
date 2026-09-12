@@ -1,4 +1,4 @@
-import { fn_do_modal_alert } from '../js_main.js';
+import { fn_do_modal_alert } from '../app/js_main.js';
 
 // Builds initial values for form fields from the template
 // Recursively processes nested objects and sets default values for text, number, checkbox, combo, and array types

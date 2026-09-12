@@ -4,7 +4,7 @@ import Draggable from "react-draggable";
 import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 
 import { subscribeUnitField } from '../../js/store/unitStore.js';
-import {fn_helpPage} from '../../js/js_main.js';
+import {fn_helpPage} from '../../js/app/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 

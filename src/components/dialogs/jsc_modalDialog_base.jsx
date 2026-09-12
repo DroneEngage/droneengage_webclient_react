@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { fn_gotoUnit_byPartyID } from '../../js/js_main.js';
+import { fn_gotoUnit_byPartyID } from '../../js/app/js_main.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 
 class ClssModalDialogBase extends React.Component {

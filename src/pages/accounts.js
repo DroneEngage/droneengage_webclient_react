@@ -14,7 +14,7 @@ import 'jquery-ui-dist/jquery-ui.min.js';
 
 import  'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import {fn_on_account_ready} from '../js/js_main_accounts'
+import {fn_on_account_ready} from '../js/app/js_main_accounts.js'
 
 
 import ClssHeaderControl from '../components/jsc_header'

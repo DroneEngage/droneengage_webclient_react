@@ -6,7 +6,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import { subscribeUnitField } from '../../js/store/unitStore.js';
-import {fn_doYAW} from '../../js/js_main.js'
+import {fn_doYAW} from '../../js/app/js_main.js'
 import * as js_helpers from '../../js/helpers/js_helpers.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';

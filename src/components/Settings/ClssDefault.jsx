@@ -4,7 +4,7 @@ import { withTranslation } from 'react-i18next';
 import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
-import { gui_toggleUnits } from '../../js/js_main';
+import { gui_toggleUnits } from '../../js/app/js_main.js';
 import { js_localStorage } from '../../js/state/js_localStorage.js';
 
 class ClssDefault extends React.Component {

@@ -9,7 +9,7 @@ import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessag
 import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 import * as js_helpers from '../../js/helpers/js_helpers.js'
 import {js_speak} from '../../js/js_speak'
-import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, gui_doYAW} from '../../js/js_main'
+import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, gui_doYAW} from '../../js/app/js_main.js'
 import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'

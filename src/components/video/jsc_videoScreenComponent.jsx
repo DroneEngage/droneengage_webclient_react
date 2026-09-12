@@ -12,7 +12,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js'
 
-import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord } from '../../js/js_main.js'
+import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord } from '../../js/app/js_main.js'
 import ClssCtrlGpioFlash from '../gadgets/jsc_ctrl_gpio_flash.jsx'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlVideoFPS from '../gadgets/jsc_ctrl_video_fps_control.jsx'

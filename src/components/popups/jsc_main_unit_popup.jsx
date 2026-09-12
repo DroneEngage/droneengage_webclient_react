@@ -1,7 +1,7 @@
 import React from 'react';
 import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
-import { hlp_getFlightMode, fn_getWindData } from '../../js/js_main.js';
+import { hlp_getFlightMode, fn_getWindData } from '../../js/app/js_main.js';
 import * as js_helpers from '../../js/helpers/js_helpers.js';
 
 class ClssMainUnitPopup extends React.Component {

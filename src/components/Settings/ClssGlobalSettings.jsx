@@ -6,7 +6,7 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth';
 import { ClssFireEvent } from '../micro_gadgets/jsc_mctrl_fire_event.jsx';
-import { setSelectedMissionFilePathToWrite } from '../../js/js_main.js';
+import { setSelectedMissionFilePathToWrite } from '../../js/app/js_main.js';
 
 import ClssDefault from './ClssDefault.jsx';
 import ClssPreferences from './ClssPreferences.jsx';

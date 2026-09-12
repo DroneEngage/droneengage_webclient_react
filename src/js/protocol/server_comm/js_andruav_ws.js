@@ -7,7 +7,7 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import * as js_common from '../../helpers/js_common.js'
 import { js_localStorage } from '../../state/js_localStorage.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
-import { fn_showSecurityDialog, fn_do_modal_alert } from '../../js_main.js'
+import { fn_showSecurityDialog, fn_do_modal_alert } from '../../app/js_main.js'
 
 import * as js_andruav_facade from './js_andruav_facade.js'
 import * as js_andruav_parser from './js_andruav_parser.js'

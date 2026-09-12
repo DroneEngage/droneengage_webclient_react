@@ -8,7 +8,7 @@ import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import * as js_common from '../../js/helpers/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
-import { fn_do_modal_confirmation, fn_do_modal_alert, fn_helpPage } from '../../js/js_main.js';
+import { fn_do_modal_confirmation, fn_do_modal_alert, fn_helpPage } from '../../js/app/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService, js_dialogs } from '../../js/app/dialogService.js';
 

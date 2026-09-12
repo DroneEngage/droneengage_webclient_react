@@ -25,7 +25,7 @@ import {ClssCtrlArdupilotEkf} from '../gadgets/jsc_ctrl_ardupilot_ekf.jsx'
 import {ClssCtrlVibration} from '../gadgets/jsc_ctrl_vibration.jsx'
 import {ClssCtrlBattery} from '../gadgets/jsc_ctrl_battery.jsx'
 
-import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../../js/js_main.js'
+import {hlp_getFlightMode, fn_gotoUnit_byPartyID} from '../../js/app/js_main.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 
 class ClssAndruavUnitDroneHeader extends React.Component{

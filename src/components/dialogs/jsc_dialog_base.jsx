@@ -1,6 +1,6 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
-import { fn_gotoUnit_byPartyID } from '../../js/js_main.js';
+import { fn_gotoUnit_byPartyID } from '../../js/app/js_main.js';
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 
 class ClssDialogBase extends React.Component {

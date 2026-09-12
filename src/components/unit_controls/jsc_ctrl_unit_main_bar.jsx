@@ -22,7 +22,7 @@ import {
   toggleVideo,
   toggleRecrodingVideo,
   fn_changeUnitPathColor
-} from '../../js/js_main.js'
+} from '../../js/app/js_main.js'
 
 import { flightPath_colors } from '../../js/config/assets.js'
 

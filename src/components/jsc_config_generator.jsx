@@ -12,7 +12,7 @@ import { withTranslation } from 'react-i18next';
 
 import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages'
-import { fn_do_modal_alert, fn_do_modal_confirmation } from '../js/js_main.js';
+import { fn_do_modal_alert, fn_do_modal_confirmation } from '../js/app/js_main.js';
 import {
   buildInitialValues,
   buildInitialEnabled,

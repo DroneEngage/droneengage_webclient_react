@@ -5,7 +5,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
-import {fn_changeAltitude} from '../../js/js_main'
+import {fn_changeAltitude} from '../../js/app/js_main.js'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 import * as  js_siteConfig from '../../js/config/js_siteConfig.js';
 

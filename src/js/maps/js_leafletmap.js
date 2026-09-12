@@ -21,7 +21,7 @@ import {js_tileCache} from './js_tileCache.js'
 import {js_localStorage} from '../state/js_localStorage.js'
 import {js_windProvider} from '../weather/js_windProvider.js'
 
-import {fn_contextMenu} from '../js_main.js'
+import {fn_contextMenu} from '../app/js_main.js'
 
 // Fix Leaflet's default marker icon paths for CRA/webpack bundling.
 // This replaces the CSS `content: url(...)` hack which caused a white

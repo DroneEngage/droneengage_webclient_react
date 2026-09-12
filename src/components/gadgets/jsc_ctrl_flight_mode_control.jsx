@@ -4,7 +4,7 @@ import { withTranslation } from 'react-i18next';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { useUnitField } from '../../js/hooks/useUnitField.js';
-import { hlp_getFlightMode } from '../../js/js_main.js';
+import { hlp_getFlightMode } from '../../js/app/js_main.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
 

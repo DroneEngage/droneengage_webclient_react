@@ -12,7 +12,7 @@ import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import EventBridge from '../../js/hooks/EventBridge.jsx';
 import { js_speak } from '../../js/js_speak.js';
-import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../../js/js_main.js';
+import { QueryString, fn_connect, fn_logout, getTabStatus, fn_showSecurityDialog, fn_do_modal_confirmation } from '../../js/app/js_main.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 
 const CONST_NOT_CONNECTION_OFFLINE = 0;

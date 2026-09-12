@@ -7,7 +7,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/state/js_localStorage.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
-import {fn_gotoUnit_byPartyID} from '../../js/js_main.js'
+import {fn_gotoUnit_byPartyID} from '../../js/app/js_main.js'
 import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 

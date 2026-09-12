@@ -1,8 +1,8 @@
 
 import React from 'react';
-import * as js_session from './state/session.js';
-import * as js_preferences from './state/preferences.js';
-import { CONST_MAP_GOOLE, v_mission_file_extension } from './config/constants.js';
+import * as js_session from '../state/session.js';
+import * as js_preferences from '../state/preferences.js';
+import { CONST_MAP_GOOLE, v_mission_file_extension } from '../config/constants.js';
 
 
 
@@ -14,43 +14,43 @@ import * as bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RecordRTC from 'recordrtc';
 
 
-import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
-import * as js_siteConfig from './config/js_siteConfig.js'
-import * as js_helpers from './helpers/js_helpers.js'
-import { CONST_MAP_WIND_ARROW_REFRESH_MS } from './config/mapStyle.js';
-import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from './config/assets.js';
-import { EVENTS as js_event } from './events/js_eventList.js'
-import { js_speak } from './js_speak'
-import * as js_common from './helpers/js_common.js'
-import * as js_andruavUnit from './model/js_andruavUnit.js'
-import * as js_andruav_ws from './protocol/server_comm/js_andruav_ws.js'
-import * as js_andruav_parser from './protocol/server_comm/js_andruav_parser.js'
-import * as js_andruav_facade from './protocol/server_comm/js_andruav_facade.js'
-import { ClssAndruavFencePlan } from './plan/js_plan_fence.js'
-import { js_andruavAuth } from './protocol/auth/js_andruav_auth'
-import { js_leafletmap } from './maps/js_leafletmap.js'
-import { js_map3d } from './maps/js_map3d.js'
-import { js_eventEmitter } from './events/js_eventEmitter'
-import './events/js_eventEmitterConfig' // side-effect: opts telemetry-frequency events into rAF batching
-import { js_localStorage } from './state/js_localStorage.js'
-import { js_webrtcstream } from './js_webrtcthin2.js'
-import { js_adsbUnit } from './model/js_adsbUnit.js'
-import { js_adsbManager } from './adsb/js_adsbManager.js'
-import { js_windProvider } from './weather/js_windProvider.js'
-import { mavlink20 } from './js_mavlink_v2.js'
-import { notifyUnitFieldChanged } from './store/unitStore.js'
-import { fn_initFacadeSubscriptions } from './core/protocol/runtime.js'
-import { js_layout } from './state/layoutStore.js'
-import { js_unitUiPrefs } from './state/unitUiPrefs.js'
-import { js_unitLayerRegistry } from './services/map/unitLayerRegistry.js'
-import { positionSmoother } from './services/motion/positionSmoother.js'
-import { js_geoFenceRegistry } from './services/geo/geoFenceRegistry.js'
-import { js_dialogs } from './app/dialogService.js'
-import { mapPopupService } from './services/map/mapPopupService.js'
+import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js'
+import * as js_siteConfig from '../config/js_siteConfig.js'
+import * as js_helpers from '../helpers/js_helpers.js'
+import { CONST_MAP_WIND_ARROW_REFRESH_MS } from '../config/mapStyle.js';
+import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from '../config/assets.js';
+import { EVENTS as js_event } from '../events/js_eventList.js'
+import { js_speak } from '../js_speak'
+import * as js_common from '../helpers/js_common.js'
+import * as js_andruavUnit from '../model/js_andruavUnit.js'
+import * as js_andruav_ws from '../protocol/server_comm/js_andruav_ws.js'
+import * as js_andruav_parser from '../protocol/server_comm/js_andruav_parser.js'
+import * as js_andruav_facade from '../protocol/server_comm/js_andruav_facade.js'
+import { ClssAndruavFencePlan } from '../plan/js_plan_fence.js'
+import { js_andruavAuth } from '../protocol/auth/js_andruav_auth'
+import { js_leafletmap } from '../maps/js_leafletmap.js'
+import { js_map3d } from '../maps/js_map3d.js'
+import { js_eventEmitter } from '../events/js_eventEmitter'
+import '../events/js_eventEmitterConfig' // side-effect: opts telemetry-frequency events into rAF batching
+import { js_localStorage } from '../state/js_localStorage.js'
+import { js_webrtcstream } from '../js_webrtcthin2.js'
+import { js_adsbUnit } from '../model/js_adsbUnit.js'
+import { js_adsbManager } from '../adsb/js_adsbManager.js'
+import { js_windProvider } from '../weather/js_windProvider.js'
+import { mavlink20 } from '../js_mavlink_v2.js'
+import { notifyUnitFieldChanged } from '../store/unitStore.js'
+import { fn_initFacadeSubscriptions } from '../core/protocol/runtime.js'
+import { js_layout } from '../state/layoutStore.js'
+import { js_unitUiPrefs } from '../state/unitUiPrefs.js'
+import { js_unitLayerRegistry } from '../services/map/unitLayerRegistry.js'
+import { positionSmoother } from '../services/motion/positionSmoother.js'
+import { js_geoFenceRegistry } from '../services/geo/geoFenceRegistry.js'
+import { js_dialogs } from './dialogService.js'
+import { mapPopupService } from '../services/map/mapPopupService.js'
 // eslint-disable-next-line no-unused-vars
-import { js_websocket_bridge } from './CPC/js_websocket_bridge.js'
-import { js_stillImageStore } from './js_stillImageStore.js'
-import i18n from './i18n.js';
+import { js_websocket_bridge } from '../CPC/js_websocket_bridge.js'
+import { js_stillImageStore } from '../js_stillImageStore.js'
+import i18n from '../i18n.js';
 
 var oldAppend = $.fn.append;
 

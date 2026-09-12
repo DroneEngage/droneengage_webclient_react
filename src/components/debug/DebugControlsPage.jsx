@@ -5,7 +5,7 @@ import { Class_Radar_Screen } from '../micro_gadgets/jsc_mctrl_radar_screen';
 import { CTriStateChecked } from '../micro_gadgets/jsc_mctrl_tri_state_check';
 import { Class_2D_Joystick } from '../micro_gadgets/jsc_mctrl_2d_joystick';
 import { CONST_DEBUG_CONTROL_PAGE } from '../../js/config/js_siteConfig.js';
-import { fn_do_modal_alert } from '../../js/js_main.js';
+import { fn_do_modal_alert } from '../../js/app/js_main.js';
 
 const DebugControlsPage = () => {
     const [fieldCheckValue, setFieldCheckValue] = useState('');

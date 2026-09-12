@@ -17,7 +17,7 @@ import {
     fn_readMissionFile,
     fn_do_modal_apply_all,
     fn_do_modal_mission_load
-    } from '../../../js/js_main.js'
+    } from '../../../js/app/js_main.js'
 
 
 

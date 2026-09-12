@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import 'jquery-ui-dist/jquery-ui.min.js';
 
-import * as js_siteConfig from './config/js_siteConfig.js'
+import * as js_siteConfig from '../config/js_siteConfig.js'
 
 
 export function fn_on_account_ready() {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { loadCaptchaEnginge, LoadCanvasTemplate, LoadCanvasTemplateNoReload, validateCaptcha } from 'react-simple-captcha';
-import { fn_do_modal_alert } from '../js/js_main.js';
+import { fn_do_modal_alert } from '../js/app/js_main.js';
 
 
 

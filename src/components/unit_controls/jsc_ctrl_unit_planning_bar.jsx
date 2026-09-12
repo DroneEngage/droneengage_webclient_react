@@ -13,7 +13,7 @@ import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
 import {
     fn_changeUnitInfo,
     fn_gotoUnit_byPartyID,
-} from '../../js/js_main.js'
+} from '../../js/app/js_main.js'
 
 
 

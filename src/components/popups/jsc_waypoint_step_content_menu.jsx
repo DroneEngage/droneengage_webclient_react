@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
-import { fn_doStartMissionFrom} from '../../js/js_main.js'
+import { fn_doStartMissionFrom} from '../../js/app/js_main.js'
 
 
 

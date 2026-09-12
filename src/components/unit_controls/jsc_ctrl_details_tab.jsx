@@ -6,7 +6,7 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
-import { fn_changeUDPPort } from '../../js/js_main.js';
+import { fn_changeUDPPort } from '../../js/app/js_main.js';
 import { ClssRX_MESSAGE } from '../gadgets/jsc_ctrl_rx_message_control.jsx';
 import { ClssModuleDetails } from '../gadgets/jsc_ctrl_unit_module_details.jsx';
 import { ClssAndruavExtraData } from '../gadgets/mobile/jsc_ctrl_andruav_extra_data.jsx';

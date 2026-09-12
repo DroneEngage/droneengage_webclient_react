@@ -5,7 +5,7 @@ import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
 import EventBridge from '../../../js/hooks/EventBridge.jsx';
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 import { js_localStorage } from '../../../js/state/js_localStorage.js';
-import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/js_main.js';
+import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/app/js_main.js';
 
 import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
 

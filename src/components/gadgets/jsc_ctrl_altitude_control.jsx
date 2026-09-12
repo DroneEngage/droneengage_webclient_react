@@ -10,7 +10,7 @@ import * as js_common from '../../js/helpers/js_common.js'
 import {js_localStorage} from '../../js/state/js_localStorage.js'
 import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 
-import { fn_changeAltitude, fn_convertToMeter } from '../../js/js_main.js'
+import { fn_changeAltitude, fn_convertToMeter } from '../../js/app/js_main.js'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 

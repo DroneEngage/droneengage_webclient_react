@@ -27,7 +27,7 @@ import ClssAndruavUnitList from '../components/unit_controls/jsc_unitControlMain
 import ClssMain_Control_Buttons from '../components/planning/jsc_ctrl_main_control_buttons.jsx'
 import DialogHost from '../components/DialogHost.jsx'
 import MapPopupHost from '../components/popups/MapPopupHost.jsx'
-import { fn_on_ready } from '../js/js_main'
+import { fn_on_ready } from '../js/app/js_main.js'
 import { js_andruavAuth } from '../js/protocol/auth/js_andruav_auth.js'
 
 fn_ensureVendorCSS(VENDOR_CSS.leaflet.id, VENDOR_CSS.leaflet.href);

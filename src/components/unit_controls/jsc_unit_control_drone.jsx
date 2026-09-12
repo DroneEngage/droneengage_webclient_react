@@ -13,7 +13,7 @@ import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import {
     fn_requestWayPoints,
     fn_clearWayPoints, fn_putWayPoints
-} from '../../js/js_main.js'
+} from '../../js/app/js_main.js'
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'

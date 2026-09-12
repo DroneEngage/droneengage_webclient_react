@@ -21,7 +21,7 @@ import { js_eventEmitter } from '../js/events/js_eventEmitter';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_dialogs } from '../js/app/dialogService.js';
 import { CONST_VIDEOSTREAMING_ON } from '../js/model/js_andruavUnit.js';
-import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_showMap, toggleVideo } from '../js/js_main';
+import { hlp_getFlightMode, fn_gotoUnit_byPartyID, fn_on_ready, fn_showMap, toggleVideo } from '../js/app/js_main.js';
 import { fn_stopVideo } from '../js/mobile/js_mobile_commands.js';
 import { ClssCtrlMobileFlightControl } from '../components/flight_controllers/jsc_ctrl_mobile_flightControl.jsx';
 

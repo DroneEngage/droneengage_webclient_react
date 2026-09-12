@@ -31,7 +31,7 @@ import ClssNewsDisplay from '../components/jsc_news_display.jsx';
 import ClssNewsWrite from '../components/jsc_news_write.jsx';
 import DialogHost from '../components/DialogHost.jsx';
 import MapPopupHost from '../components/popups/MapPopupHost.jsx';
-import { fn_on_ready } from '../js/js_main';
+import { fn_on_ready } from '../js/app/js_main.js';
 import { js_layout } from '../js/state/layoutStore.js';
 import { useLayout } from '../js/hooks/useLayout.js';
 

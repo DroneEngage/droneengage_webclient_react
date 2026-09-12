@@ -7,7 +7,7 @@ import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js';
 import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import { js_leafletmap } from '../../../js/maps/js_leafletmap.js';
 import { ClssSinglePlanContainer } from './jsc_ctrl_single_plan_container.jsx';
-import { setSelectedMissionFilePathToRead } from '../../../js/js_main.js';
+import { setSelectedMissionFilePathToRead } from '../../../js/app/js_main.js';
 import ClssFence_Shape_Control from '../fence/jsc_fence_shape_control.jsx';
 
 const CONST_FENCE_TAB_ID = 'fences';
