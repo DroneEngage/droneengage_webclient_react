@@ -1,5 +1,5 @@
 import * as js_session from '../state/session.js';
-import { CAndruavUnitObject, CONST_VEHICLE_GCS } from '../js_andruavUnit.js';
+import { CAndruavUnitObject, CONST_VEHICLE_GCS } from './js_andruavUnit.js';
 import { CONST_TYPE_AndruavMessage_ID, CONST_Unknown_Telemetry } from '../protocol/messages/js_andruavMessages.js';
 
 /**

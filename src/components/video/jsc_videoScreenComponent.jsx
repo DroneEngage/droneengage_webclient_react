@@ -9,7 +9,7 @@ import { js_eventEmitter } from '../../js/events/js_eventEmitter.js'
 import { js_dialogs } from '../../js/app/dialogService.js'
 import * as js_common from '../../js/helpers/js_common.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import * as js_andruavUnit from '../../js/js_andruavUnit.js'
+import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js'
 
 import { fn_showMap, fn_gotoUnit_byPartyID, fn_takeLocalImage, fn_startrecord } from '../../js/js_main.js'

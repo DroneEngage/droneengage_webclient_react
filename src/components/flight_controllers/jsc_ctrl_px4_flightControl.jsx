@@ -5,7 +5,7 @@ import * as js_session from '../../js/state/session.js';
 import {js_speak} from '../../js/js_speak'
 
 import {fn_do_modal_confirmation, fn_changeAltitude, gui_doYAW} from '../../js/js_main'
-import * as js_andruavUnit from '../../js/js_andruavUnit.js';
+import * as js_andruavUnit from '../../js/model/js_andruavUnit.js';
 
 export class ClssCtrlPx4FlightControl extends React.Component {
     constructor()

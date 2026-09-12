@@ -5,7 +5,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
 import {mavlink20} from '../../js/js_mavlink_v2.js';
 import {js_andruavAuth} from '../../js/protocol/auth/js_andruav_auth.js';
-import * as js_andruavUnit from '../../js/js_andruavUnit.js';
+import * as js_andruavUnit from '../../js/model/js_andruavUnit.js';
 import {fn_do_modal_confirmation} from '../../js/js_main';
 
 export class ClssCtrlMobileFlightControl extends React.Component {

@@ -1,4 +1,4 @@
-import * as js_andruavUnit from '../js_andruavUnit'
+import * as js_andruavUnit from '../model/js_andruavUnit.js'
 import * as js_session from '../state/session.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_common from '../helpers/js_common.js'

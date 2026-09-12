@@ -6,7 +6,7 @@ import Draggable from "react-draggable";
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
-import * as js_andruavUnit from '../../js/js_andruavUnit.js'
+import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';

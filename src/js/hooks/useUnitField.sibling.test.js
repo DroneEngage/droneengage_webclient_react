@@ -15,7 +15,7 @@
 import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { CAndruavUnitObject, AndruavUnitList } from '../js_andruavUnit.js';
+import { CAndruavUnitObject, AndruavUnitList } from '../model/js_andruavUnit.js';
 import * as js_session from '../state/session.js';
 import { useUnitField } from './useUnitField.js';
 import { notifyUnitFieldChanged } from '../store/unitStore.js';

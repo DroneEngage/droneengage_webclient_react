@@ -3,7 +3,7 @@ import * as js_session from '../../js/state/session.js';
 
 import { js_localStorage } from '../../js/js_localStorage'
 import { js_leafletmap } from '../../js/maps/js_leafletmap.js'
-import * as js_andruavUnit from '../../js/js_andruavUnit'
+import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 import { fn_doFlyHere, fn_doSetHome } from '../../js/js_main'
 
 // Registration and Regeneration Control

@@ -13,7 +13,7 @@ import { fn_decode } from './decode';
 import { fn_reduce } from './reduce';
 import { fn_setByPath, fn_getByPath } from './path.js';
 
-import { CAndruavUnitObject } from '../../js_andruavUnit.js';
+import { CAndruavUnitObject } from '../../model/js_andruavUnit.js';
 import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_POW,
          CONST_TYPE_AndruavMessage_NAV_INFO,

@@ -5,7 +5,7 @@ import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
-import * as js_andruavUnit from '../js_andruavUnit';
+import * as js_andruavUnit from '../model/js_andruavUnit.js';
 import * as js_mapboxVendor from './js_mapboxVendor.js';
 import { ModelHitTester } from './js_modelHitTester.js';
 import '../../css/css_map3d.css';
@@ -2241,7 +2241,7 @@ class CAndruavMap3D {
      * relative to any drone's home point, so it's converted to height above
      * the local terrain surface before calling Marker#setAltitude (which
      * expects meters above the terrain, like the drone markers in fn_syncUnit).
-     * @param {import('../js_adsbUnit.js').CADSBObject} p_adsbObject
+     * @param {import '../model/js_adsbUnit.js').CADSBObject} p_adsbObject
      * @param {string} markerIconUrl
      * @param {Function} [onClickCallback] (p_adsbObject) => void, called when
      *   the aircraft's icon is clicked (bound once per marker).

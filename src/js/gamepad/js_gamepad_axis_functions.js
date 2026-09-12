@@ -1,4 +1,4 @@
-import * as js_andruavUnit from '../js_andruavUnit'
+import * as js_andruavUnit from '../model/js_andruavUnit.js'
 import * as js_session from '../state/session.js';
 import * as js_preferences from '../state/preferences.js';
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'

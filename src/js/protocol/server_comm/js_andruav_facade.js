@@ -24,7 +24,7 @@ import * as js_helpers from '../../helpers/js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import { js_andruav_gamepad } from '../../gamepad/js_andruav_gamepad.js'
-import * as js_andruavUnit from '../../js_andruavUnit.js';
+import * as js_andruavUnit from '../../model/js_andruavUnit.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../helpers/js_common.js'
