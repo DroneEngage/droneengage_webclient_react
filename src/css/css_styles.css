@@ -458,6 +458,14 @@ div#andruavUnits {
 	min-width:100%;
 }
 
+/* Unit-bar path-color badge: tiny "C" button that opens the color picker. */
+.css_unitbar_pathcolor {
+	font-size: 0.7rem;
+	line-height: 1rem;
+	min-width: 1.2rem;
+	margin-right: -2px;
+}
+
 div.log_ctrl {
 	display:  block;
 	color: crimson;

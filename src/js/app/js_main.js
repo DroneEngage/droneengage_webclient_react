@@ -1796,6 +1796,7 @@ export function fn_changeUnitPathColor(p_andruavUnit, p_color) {
 	if (p_andruavUnit === null || p_andruavUnit === undefined || !p_color) return;
 
 	p_andruavUnit.m_pathColor = p_color;
+	notifyUnitFieldChanged(p_andruavUnit.getPartyID(), 'm_pathColor');
 
 	const layers = js_unitLayerRegistry.fn_getOrCreate(p_andruavUnit.getPartyID());
 	if (layers.m_flightPath_style) {
