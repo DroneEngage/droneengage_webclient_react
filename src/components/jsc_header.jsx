@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-import * as  js_siteConfig from '../js/js_siteConfig'
+import * as  js_siteConfig from '../js/config/js_siteConfig.js'
 
 import ClssLoginControl from './gadgets/jsc_login.jsx'
 import ClssCtrlLayout from './jsc_ctrl_layoutControl.jsx'

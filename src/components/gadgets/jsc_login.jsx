@@ -8,7 +8,7 @@ import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessag
 import * as js_common from '../../js/helpers/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { js_localStorage } from '../../js/state/js_localStorage.js';
-import * as js_siteConfig from '../../js/js_siteConfig.js';
+import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { js_eventEmitter } from '../../js/events/js_eventEmitter.js';
 import EventBridge from '../../js/hooks/EventBridge.jsx';
 import { js_speak } from '../../js/js_speak.js';

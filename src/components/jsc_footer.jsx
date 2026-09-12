@@ -3,7 +3,7 @@ import packageJson from  '../../package.json'
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import * as  js_siteConfig from '../js/js_siteConfig.js';
+import * as  js_siteConfig from '../js/config/js_siteConfig.js';
 
 class ClssFooterControl extends React.Component {
 	constructor()

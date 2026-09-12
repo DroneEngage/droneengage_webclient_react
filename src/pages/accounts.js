@@ -1,6 +1,6 @@
 import React , { useEffect } from 'react';
 import * as js_preferences from '../js/state/preferences.js';
-import * as js_siteConfig from '../js/js_siteConfig.js';
+import * as js_siteConfig from '../js/config/js_siteConfig.js';
 
 import '../css/bootstrap-icons/font/bootstrap-icons.css'
 import '../css/css_styles.css';
@@ -8,7 +8,7 @@ import '../css/css_styles2.css';
 import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 
-import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/config/js_vendor_css.js';
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 

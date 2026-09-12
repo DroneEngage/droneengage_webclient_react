@@ -2,7 +2,7 @@ import * as js_session from './state/session.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_eventEmitter } from './events/js_eventEmitter';
 import { fn_videoStatsEvent } from './events/eventPayloads.js';
-import * as js_siteConfig from "./js_siteConfig";
+import * as js_siteConfig from "./config/js_siteConfig.js";
 import * as js_common from './helpers/js_common.js';
 import { notifyUnitFieldChanged } from './store/unitStore.js';
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import * as js_siteConfig from '../../js/js_siteConfig.js'
+import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../js/events/js_eventEmitter'
 import { useUnitField } from '../../js/hooks/useUnitField.js'

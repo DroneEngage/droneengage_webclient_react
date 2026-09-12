@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { fn_showSettings, fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/js_main';
-import { CONST_FEATURE } from '../js/js_siteConfig';
+import { CONST_FEATURE } from '../js/config/js_siteConfig.js';
 import { useLayout } from '../js/hooks/useLayout.js';
 
 function ClssCtrlLayout({ showMap3D, t }) {

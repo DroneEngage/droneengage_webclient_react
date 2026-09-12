@@ -6,7 +6,7 @@ import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter.js';
 import {EventBridge} from '../js/hooks/EventBridge.jsx';
 import * as js_andruavMessages from '../js/protocol/messages/js_andruavMessages.js';
-import { CONST_FEATURE as js_siteConfig_CONST_FEATURE } from '../js/js_siteConfig.js';
+import { CONST_FEATURE as js_siteConfig_CONST_FEATURE } from '../js/config/js_siteConfig.js';
 import ClssDialogBase from './dialogs/jsc_dialog_base.jsx';
 
 /**

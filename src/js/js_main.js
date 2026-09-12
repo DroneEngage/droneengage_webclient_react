@@ -15,7 +15,7 @@ import RecordRTC from 'recordrtc';
 
 
 import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
-import * as js_siteConfig from './js_siteConfig'
+import * as js_siteConfig from './config/js_siteConfig.js'
 import * as js_helpers from './helpers/js_helpers.js'
 import { CONST_MAP_WIND_ARROW_REFRESH_MS } from './config/mapStyle.js';
 import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from './config/assets.js';

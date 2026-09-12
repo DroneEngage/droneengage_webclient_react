@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import * as js_siteConfig from '../../js/js_siteConfig.js';
+import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 

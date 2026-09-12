@@ -7,7 +7,7 @@ import '../css/css_header_responsive.css';
 import '../css/css_planning.css';
 import '../css/css_gamepad.css';
 
-import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/config/js_vendor_css.js';
 
 import 'leaflet';              // side-effect: sets window.L. Must load before
                                // leaflet.pm — the plugin extends leaflet's

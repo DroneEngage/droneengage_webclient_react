@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_session from '../../js/state/session.js';
 import { withTranslation } from 'react-i18next';
 
-import * as js_siteConfig from '../../js/js_siteConfig.js';
+import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { js_dialogs } from '../../js/app/dialogService.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 

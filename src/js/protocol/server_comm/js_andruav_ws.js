@@ -1,7 +1,7 @@
 import * as js_session from '../../state/session.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../helpers/js_helpers.js';
-import * as js_siteConfig from '../../js_siteConfig.js';
+import * as js_siteConfig from '../../config/js_siteConfig.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
 import * as js_common from '../../helpers/js_common.js'

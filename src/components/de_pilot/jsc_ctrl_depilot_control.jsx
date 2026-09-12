@@ -7,7 +7,7 @@ import { subscribeUnitField } from '../../js/store/unitStore.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import {fn_changeAltitude} from '../../js/js_main'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
-import * as  js_siteConfig from '../../js/js_siteConfig.js';
+import * as  js_siteConfig from '../../js/config/js_siteConfig.js';
 
 export class ClssCtrlDEPilotControl extends React.Component {
     constructor(props)

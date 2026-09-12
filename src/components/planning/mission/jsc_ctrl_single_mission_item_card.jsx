@@ -1,6 +1,6 @@
 import React    from 'react';
 
-import * as js_siteConfig from '../../../js/js_siteConfig.js'
+import * as js_siteConfig from '../../../js/config/js_siteConfig.js'
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'

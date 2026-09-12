@@ -1,4 +1,4 @@
-import { fn_loadConfig } from './js/js_siteConfig.js';
+import { fn_loadConfig } from './js/config/js_siteConfig.js';
 
 
 // Detects mobile browsers (phone or tablet) so we can route them to the

@@ -21,7 +21,7 @@ import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
 import * as js_helpers from '../../helpers/js_helpers.js';
-import * as js_siteConfig from '../../js_siteConfig.js';
+import * as js_siteConfig from '../../config/js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import { js_andruav_gamepad } from '../../gamepad/js_andruav_gamepad.js'
 import * as js_andruavUnit from '../../model/js_andruavUnit.js';

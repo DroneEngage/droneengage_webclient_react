@@ -31,7 +31,7 @@
 *
 *********************************************************************************** */
 
-import * as js_siteConfig from '../js_siteConfig.js';
+import * as js_siteConfig from '../config/js_siteConfig.js';
 
 const DB_NAME = 'DroneEngageTileCache';
 const DB_VERSION = 2; // v2: per-tile lastAccessed index replaces the v1 array-based LRU record

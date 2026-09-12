@@ -16,7 +16,7 @@
  * Auth: Mohammad Hefny
  */
 
-import * as js_siteConfig from '../js_siteConfig.js';
+import * as js_siteConfig from '../config/js_siteConfig.js';
 
 /**
  * Open-Meteo fixed AGL levels (meters) and the API variable names for

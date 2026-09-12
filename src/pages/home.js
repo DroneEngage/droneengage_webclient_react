@@ -8,7 +8,7 @@ import '../css/css_gamepad.css';
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
 
-import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/config/js_vendor_css.js';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation, withTranslation } from 'react-i18next';

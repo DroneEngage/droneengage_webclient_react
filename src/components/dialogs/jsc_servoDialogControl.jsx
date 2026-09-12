@@ -1,7 +1,7 @@
 import React from 'react';
 import * as js_session from '../../js/state/session.js';
 import Draggable from "react-draggable";
-import * as js_siteConfig from '../../js/js_siteConfig.js'
+import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import {fn_helpPage} from '../../js/js_main.js';

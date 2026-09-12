@@ -2,7 +2,7 @@
 import * as js_preferences from './preferences.js';
 import { CONST_DEFAULT_VOLUME } from '../config/constants.js';
 import * as js_common from '../helpers/js_common.js'
-import * as js_siteConfig from '../js_siteConfig.js';
+import * as js_siteConfig from '../config/js_siteConfig.js';
 import {
 	LS_LANG, LS_EMAIL, LS_LOGIN_NAME, LS_ACCESS_CODE, LS_UNIT_ID,
 	LS_UNIT_ID_SHARED, LS_WEB_GCS, LS_GROUP_NAME, LS_DISPLAY_MODE,

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
-import * as js_siteConfig from '../../js/js_siteConfig.js';
+import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import {EventBridge} from '../../js/hooks/EventBridge.jsx';
 import { gui_toggleUnits } from '../../js/js_main';

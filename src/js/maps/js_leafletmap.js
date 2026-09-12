@@ -14,7 +14,7 @@ import L from 'leaflet';
 import 'leaflet-rotatedmarker';
 
 
-import * as js_siteConfig from '../js_siteConfig.js'
+import * as js_siteConfig from '../config/js_siteConfig.js'
 import {EVENTS as js_event} from '../events/js_eventList.js'
 import {js_eventEmitter} from '../events/js_eventEmitter.js'
 import {js_tileCache} from './js_tileCache.js'

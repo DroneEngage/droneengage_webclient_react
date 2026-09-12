@@ -1,6 +1,6 @@
 import React from 'react';
 import { v_gamepad_function_array, v_gamepad_button_function_array, v_gamepad_configuration, v_gamepad_button_types, STICK_MODE_RUD, STICK_MODE_ELE, STICK_MODE_ALE, STICK_MODE_THR } from '../../js/config/gamepadMap.js';
-import * as js_siteConfig from '../../js/js_siteConfig.js';
+import * as js_siteConfig from '../../js/config/js_siteConfig.js';
 import { js_localStorage } from '../../js/state/js_localStorage.js';
 import { js_speak } from '../../js/js_speak.js';
 import { fn_helpPage, fn_do_modal_alert } from '../../js/js_main.js';

@@ -7,7 +7,7 @@ import '../css/css_header_responsive.css';
 import '../css/css_gamepad.css';
 import '../css/css_mobile.css';
 
-import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/js_vendor_css.js';
+import { fn_ensureVendorCSS, VENDOR_CSS } from '../js/config/js_vendor_css.js';
 
 import 'jquery-ui-dist/jquery-ui.min.js';
 import 'jquery-knob/dist/jquery.knob.min.js';
@@ -16,7 +16,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useTranslation, withTranslation } from 'react-i18next';
 
-import * as js_siteConfig from '../js/js_siteConfig.js';
+import * as js_siteConfig from '../js/config/js_siteConfig.js';
 import { js_eventEmitter } from '../js/events/js_eventEmitter';
 import { EVENTS as js_event } from '../js/events/js_eventList.js';
 import { js_dialogs } from '../js/app/dialogService.js';
