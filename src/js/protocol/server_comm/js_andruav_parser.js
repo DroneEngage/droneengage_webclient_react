@@ -17,11 +17,11 @@
 /*jshint esversion: 6 */
 import * as js_session from '../../state/session.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
-import * as js_helpers from '../../js_helpers.js';
+import * as js_helpers from '../../helpers/js_helpers.js';
 import * as js_andruavUnit from '../../js_andruavUnit.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
-import * as js_common from '../../js_common.js'
+import * as js_common from '../../helpers/js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { js_websocket_bridge } from '../../CPC/js_websocket_bridge.js';
 import { notifyUnitFieldChanged } from '../../store/unitStore.js';

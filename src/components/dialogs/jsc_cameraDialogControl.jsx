@@ -6,7 +6,7 @@ import React    from 'react';
 import Draggable from "react-draggable";
 
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
-import * as js_common from '../../js/js_common.js'
+import * as js_common from '../../js/helpers/js_common.js'
 
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';

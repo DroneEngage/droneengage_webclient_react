@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 import * as js_preferences from './state/preferences.js';
 import { CONST_DEFAULT_VOLUME } from './config/constants.js';
-import * as js_common from './js_common.js'
+import * as js_common from './helpers/js_common.js'
 import * as js_siteConfig from './js_siteConfig.js';
 import {
 	LS_LANG, LS_EMAIL, LS_LOGIN_NAME, LS_ACCESS_CODE, LS_UNIT_ID,

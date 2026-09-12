@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_session from '../../js/state/session.js';
 
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
 
 import { fn_showVideoMainTab } from '../../js/js_main.js'

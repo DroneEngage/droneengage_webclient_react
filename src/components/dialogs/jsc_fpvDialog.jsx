@@ -5,9 +5,9 @@ import React from 'react';
 import Draggable from 'react-draggable';
 import { withTranslation } from 'react-i18next';
 
-import * as js_common from '../../js/js_common.js';
+import * as js_common from '../../js/helpers/js_common.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
-import { fn_saveData } from '../../js/js_helpers.js';
+import { fn_saveData } from '../../js/helpers/js_helpers.js';
 
 import ClssDialogBase from './jsc_dialog_base.jsx';
 

@@ -3,7 +3,7 @@ import * as js_session from '../../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../../js/config/constants.js';
 
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
-import * as js_common from '../../../js/js_common.js'
+import * as js_common from '../../../js/helpers/js_common.js'
 
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'

@@ -2,8 +2,8 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 
-import * as js_helpers from '../../js/js_helpers.js'
-import * as js_common from '../../js/js_common.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
+import * as js_common from '../../js/helpers/js_common.js'
 
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
 

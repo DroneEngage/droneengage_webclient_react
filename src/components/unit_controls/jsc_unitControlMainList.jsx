@@ -5,7 +5,7 @@ import React    from 'react';
 import { withTranslation } from 'react-i18next';
 
 
-import * as js_common from '../../js/js_common.js'
+import * as js_common from '../../js/helpers/js_common.js'
 import { DIALOG_ICONS } from '../../js/config/assets.js';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'

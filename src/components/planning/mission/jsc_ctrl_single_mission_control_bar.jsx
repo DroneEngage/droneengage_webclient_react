@@ -2,7 +2,7 @@ import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED, v_mission_file_extension } from '../../../js/config/constants.js';
 
-import * as js_helpers from '../../../js/js_helpers.js'
+import * as js_helpers from '../../../js/helpers/js_helpers.js'
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
 import {js_andruavAuth} from '../../../js/protocol/auth/js_andruav_auth.js'
 import { js_eventEmitter } from '../../../js/events/js_eventEmitter.js'

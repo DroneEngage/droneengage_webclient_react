@@ -3,7 +3,7 @@ import React    from 'react';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
-import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
+import C_GUI_READING_VALUE from '../../js/helpers/js_gui_helper.js'
 export class ClssCtrlArdupilotEkf extends React.Component {
     constructor()
 	{

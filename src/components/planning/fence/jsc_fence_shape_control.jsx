@@ -1,7 +1,7 @@
 import React    from 'react';
 
 import {EVENTS as js_event} from '../../../js/events/js_eventList.js'
-import * as js_common from '../../../js/js_common.js'
+import * as js_common from '../../../js/helpers/js_common.js'
 import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages'
 import {EventBridge} from '../../../js/hooks/EventBridge.jsx'
 import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js'

@@ -2,7 +2,7 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 
 import { subscribeUnitField } from '../../../js/store/unitStore.js';
-import * as js_helpers from '../../../js/js_helpers.js';
+import * as js_helpers from '../../../js/helpers/js_helpers.js';
 
 
 class ClssAndruavExtraData extends React.Component {

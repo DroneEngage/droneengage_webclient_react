@@ -3,7 +3,7 @@ import * as js_session from '../../js/state/session.js';
 import * as js_preferences from '../../js/state/preferences.js';
 import { CONST_DFM_FAR, CONST_DFM_SAFE } from '../../js/config/constants.js';
 import { withTranslation } from 'react-i18next';
-import * as js_helpers from '../../js/js_helpers.js';
+import * as js_helpers from '../../js/helpers/js_helpers.js';
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import { hlp_getFlightMode, fn_switchGPS, fn_openFenceManager, fn_isBadFencing } from '../../js/js_main.js';
 import * as js_andruavUnit from '../../js/js_andruavUnit.js';

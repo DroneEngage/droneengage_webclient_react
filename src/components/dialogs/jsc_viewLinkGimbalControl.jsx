@@ -9,7 +9,7 @@ import { withTranslation } from 'react-i18next';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import * as js_andruavUnit from '../../js/js_andruavUnit.js'
-import * as js_common from '../../js/js_common.js'
+import * as js_common from '../../js/helpers/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 
 import ClssDialogBase from './jsc_dialog_base.jsx';

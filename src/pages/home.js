@@ -15,7 +15,7 @@ import { useTranslation, withTranslation } from 'react-i18next';
 
 
 import { js_localStorage } from '../js/js_localStorage.js';
-import { CONST_METER_TO_FEET } from '../js/js_helpers.js';
+import { CONST_METER_TO_FEET } from '../js/helpers/js_helpers.js';
 import { useEventSubscription } from '../js/hooks/useEventSubscription.js';
 import ClssHeaderControl from '../components/jsc_header';
 import ClssFooterControl from '../components/jsc_footer';

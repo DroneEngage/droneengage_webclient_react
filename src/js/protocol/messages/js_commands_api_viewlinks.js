@@ -10,7 +10,7 @@
 
 import * as js_andruavMessages from './js_andruavMessages.js';
 import { CONST_IR_DIGITAL_ZOOM_MAX, CONST_IR_DIGITAL_ZOOM_MIN, CONST_OPTICAL_ZOOM_MAX, CONST_OPTICAL_ZOOM_MIN } from '../../config/constants.js';
-import * as js_common from '../../js_common.js'
+import * as js_common from '../../helpers/js_common.js'
 import { mavlink20 } from '../../js_mavlink_v2.js'
 
 export class CCommandAPI_ViewLink {

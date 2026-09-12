@@ -3,7 +3,7 @@ import * as js_session from '../state/session.js';
 import * as js_preferences from '../state/preferences.js';
 import { js_andruav_gamepad } from './js_andruav_gamepad.js'
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
-import * as js_common from '../js_common.js'
+import * as js_common from '../helpers/js_common.js'
 
 import { GP_EPSILON_CHANGE, GP_MIN_GAP_FAST_MS } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js'

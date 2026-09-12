@@ -6,12 +6,12 @@ import React    from 'react';
 import { withTranslation } from 'react-i18next';
 
 
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_leafletmap} from '../../js/maps/js_leafletmap.js'
-import * as js_common from '../../js/js_common.js'
+import * as js_common from '../../js/helpers/js_common.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import { mavlink20 } from '../../js/js_mavlink_v2.js';
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
@@ -19,7 +19,7 @@ import { js_unitLayerRegistry } from '../../js/services/map/unitLayerRegistry.js
 
 
 
-import C_GUI_READING_VALUE from '../../js/js_gui_helper.js'
+import C_GUI_READING_VALUE from '../../js/helpers/js_gui_helper.js'
 
 import {ClssCtrlArdupilotEkf} from '../gadgets/jsc_ctrl_ardupilot_ekf.jsx'
 import {ClssCtrlVibration} from '../gadgets/jsc_ctrl_vibration.jsx'

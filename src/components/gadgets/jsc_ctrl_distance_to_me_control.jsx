@@ -6,7 +6,7 @@ import { withTranslation } from 'react-i18next';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { useUnitField } from '../../js/hooks/useUnitField.js';
-import * as js_helpers from '../../js/js_helpers.js';
+import * as js_helpers from '../../js/helpers/js_helpers.js';
 import { fn_do_modal_alert } from '../../js/js_main.js';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
 

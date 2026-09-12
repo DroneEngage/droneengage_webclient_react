@@ -4,7 +4,7 @@ import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {EventBridge} from '../../js/hooks/EventBridge.jsx'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 
 export default class ClssCVideoHUDOverlay extends React.Component {
 

@@ -6,7 +6,7 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { useUnitField } from '../../js/hooks/useUnitField.js';
 import { notifyUnitFieldChanged } from '../../js/store/unitStore.js';
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 import { js_speak } from '../../js/js_speak'
 import { fn_changeSpeed as fn_changeSpeed_main } from '../../js/js_main.js'
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'

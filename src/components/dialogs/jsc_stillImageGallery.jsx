@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as js_common from '../../js/js_common.js';
+import * as js_common from '../../js/helpers/js_common.js';
 import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { EventBridge } from '../../js/hooks/EventBridge.jsx';
 import { js_stillImageStore } from '../../js/js_stillImageStore.js';

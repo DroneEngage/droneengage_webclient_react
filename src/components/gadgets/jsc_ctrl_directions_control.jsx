@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 import { useUnitField } from '../../js/hooks/useUnitField.js'
 
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 
 /**
  * Canvas-drawn bearing indicator. target_bearing/nav_bearing only drive an

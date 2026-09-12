@@ -14,12 +14,12 @@
 
 import * as js_andruavMessages from '../protocol/messages/js_andruavMessages.js';
 import * as js_preferences from '../state/preferences.js';
-import * as js_helpers from '../js_helpers.js';
+import * as js_helpers from '../helpers/js_helpers.js';
 import { v_gamepad_button_types, v_total_gampad_buttons, STICK_LEFT_HORIZONTAL, STICK_LEFT_VERTICAL, STICK_RIGHT_HORIZONTAL, STICK_RIGHT_VERTICAL, STICK_MODE_MAPPING } from '../config/gamepadMap.js';
 import { EVENTS as js_event } from '../events/js_eventList.js';
 import { js_localStorage } from '../js_localStorage.js';
 import { js_eventEmitter } from '../events/js_eventEmitter.js';
-import * as js_common from '../js_common.js';
+import * as js_common from '../helpers/js_common.js';
 import { js_gamepadButtonFunctions } from './js_gamepad_button_functions.js';
 import { js_gamepadAxisFunctions } from './js_gamepad_axis_functions.js';
 

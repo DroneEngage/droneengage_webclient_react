@@ -1,7 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 
-import { CONST_METER_TO_FEET } from '../../../js/js_helpers.js';
+import { CONST_METER_TO_FEET } from '../../../js/helpers/js_helpers.js';
 import { fn_changeAltitude, fn_changeSpeed } from '../../../js/js_main.js';
 import { subscribeUnitField } from '../../../js/store/unitStore.js';
 import ClssCtrlDistanceToMeControl from '../jsc_ctrl_distance_to_me_control.jsx';

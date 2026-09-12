@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as js_helpers from '../../js/js_helpers.js'
+import * as js_helpers from '../../js/helpers/js_helpers.js'
 
 /**
  * This is a GUI control that displays a radar-like screen 

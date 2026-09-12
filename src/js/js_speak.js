@@ -1,4 +1,4 @@
-import * as js_common from './js_common.js';
+import * as js_common from './helpers/js_common.js';
 import { js_localStorage } from './js_localStorage';
 
 /***************************************************

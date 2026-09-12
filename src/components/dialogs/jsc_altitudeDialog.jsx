@@ -2,7 +2,7 @@ import React from 'react';
 import * as js_preferences from '../../js/state/preferences.js';
 import { withTranslation } from 'react-i18next';
 
-import { CONST_METER_TO_FEET } from '../../js/js_helpers.js';
+import { CONST_METER_TO_FEET } from '../../js/helpers/js_helpers.js';
 import { fn_closeDialog as fn_closeDialogService } from '../../js/app/dialogService.js';
 import ClssModalDialogBase from './jsc_modalDialog_base.jsx';
 

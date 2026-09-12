@@ -2,7 +2,7 @@
     30 Jul 2016
     30 Aug 2024
 *****************************************************/
-import * as js_helpers from "./js_helpers.js";
+import * as js_helpers from "./helpers/js_helpers.js";
 import * as js_session from './state/session.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_eventEmitter } from "./events/js_eventEmitter.js";

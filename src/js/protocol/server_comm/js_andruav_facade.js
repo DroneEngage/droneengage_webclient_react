@@ -20,14 +20,14 @@ import * as js_preferences from '../../state/preferences.js';
 import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../config/constants.js';
 import { GP_EPSILON_CHANGE, GP_SUDDEN_CHANGE, GP_MIN_GAP_FAST_MS, GP_HEARTBEAT_MS } from '../../config/gamepadMap.js';
 import { EVENTS as js_event } from '../../events/js_eventList.js'
-import * as js_helpers from '../../js_helpers.js';
+import * as js_helpers from '../../helpers/js_helpers.js';
 import * as js_siteConfig from '../../js_siteConfig.js';
 //import {CADSBObject, CADSBObjectList} from 'js_adsbUnit.js';
 import { js_andruav_gamepad } from '../../gamepad/js_andruav_gamepad.js'
 import * as js_andruavUnit from '../../js_andruavUnit.js';
 import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 
-import * as js_common from '../../js_common.js'
+import * as js_common from '../../helpers/js_common.js'
 import { js_eventEmitter } from '../../events/js_eventEmitter.js'
 import { CCommandAPI } from '../messages/js_commands_api.js'
 import {CCommandAPI_ViewLink} from '../messages/js_commands_api_viewlinks.js'

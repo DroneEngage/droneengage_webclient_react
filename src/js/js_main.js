@@ -16,12 +16,12 @@ import RecordRTC from 'recordrtc';
 
 import * as js_andruavMessages from './protocol/messages/js_andruavMessages.js'
 import * as js_siteConfig from './js_siteConfig'
-import * as js_helpers from './js_helpers'
+import * as js_helpers from './helpers/js_helpers.js'
 import { CONST_MAP_WIND_ARROW_REFRESH_MS } from './config/mapStyle.js';
 import { planes_icon, quad_icon, rover_icon, boat_icon, flightPath_colors, swarm_quad_location_icon, swarm_plane_location_icon } from './config/assets.js';
 import { EVENTS as js_event } from './events/js_eventList.js'
 import { js_speak } from './js_speak'
-import * as js_common from './js_common.js'
+import * as js_common from './helpers/js_common.js'
 import * as js_andruavUnit from './js_andruavUnit'
 import * as js_andruav_ws from './protocol/server_comm/js_andruav_ws.js'
 import * as js_andruav_parser from './protocol/server_comm/js_andruav_parser.js'

@@ -8,7 +8,7 @@ import React    from 'react';
 import * as js_session from '../../../js/state/session.js';
 
 
-import * as js_helpers from '../../../js/js_helpers.js'
+import * as js_helpers from '../../../js/helpers/js_helpers.js'
 import { subscribeUnitField } from '../../../js/store/unitStore.js';
 
 

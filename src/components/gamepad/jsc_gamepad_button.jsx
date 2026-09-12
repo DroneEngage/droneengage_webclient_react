@@ -1,5 +1,5 @@
 import React from 'react';
-import * as js_common from '../../js/js_common.js';
+import * as js_common from '../../js/helpers/js_common.js';
 
 export class ClssGamePadButton extends React.Component {
 

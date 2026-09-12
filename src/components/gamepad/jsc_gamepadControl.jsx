@@ -7,7 +7,7 @@ import { STICK_MODE_MAPPING, STICK_MODE_MAPPING_NAMES } from '../../js/config/ga
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_localStorage} from '../../js/js_localStorage.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter.js'
-import * as js_common from '../../js/js_common.js'
+import * as js_common from '../../js/helpers/js_common.js'
 
 import {js_andruav_gamepad} from '../../js/gamepad/js_andruav_gamepad.js'
 
