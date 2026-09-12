@@ -34,5 +34,7 @@
     "adsbRadiusLabel": "ADSB Radius",
     "enableAISStreamLabel": "Enable AIS",
     "enableWindLabel": "Enable Wind Arrow",
-    "enableSmoothMovementLabel": "Smooth movement"
+    "enableSmoothMovementLabel": "Smooth movement",
+    "helpTipsLabel": "Help Tips",
+    "resetHelpTips": "Reset"
 }

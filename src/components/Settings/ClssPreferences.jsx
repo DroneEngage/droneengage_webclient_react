@@ -106,6 +106,10 @@ class ClssPreferences extends React.Component {
     js_eventEmitter.fn_dispatch(js_event.EE_onPreferenceChanged);
   }
 
+  fn_resetHelpTips() {
+    js_localStorage.fn_resetHelpSuppressed();
+  }
+
   render() {
     const { t } = this.props;
     const dir = this.props.i18n.language === 'ar' ? 'al_r' : 'al_l';
@@ -243,6 +247,19 @@ class ClssPreferences extends React.Component {
             defaultChecked={js_localStorage.fn_getSmoothMovementEnabled()}
             onClick={(e) => this.fn_enableSmoothMovement(e)}
           />
+        </div>
+        <div className="row mb-12 align-items-center">
+          <label htmlFor="btn_reset_help_tips" className={`col-sm-4 col-form-label ${dir}`}>
+            {t('globalSettings:helpTipsLabel')}
+          </label>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm col-sm-4"
+            id="btn_reset_help_tips"
+            onClick={() => this.fn_resetHelpTips()}
+          >
+            {t('globalSettings:resetHelpTips')}
+          </button>
         </div>
       </fieldset>
     );

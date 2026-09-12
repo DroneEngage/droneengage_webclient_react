@@ -12,7 +12,7 @@ import {
 	LS_ADSB_OPENSKY_CLIENT_ID, LS_ADSB_OPENSKY_CLIENT_SECRET, LS_DEFAULT_VOLUME,
 	LS_TAB_DISPLAY_ENABLED, LS_SHOW_ME_GCS, LS_UNIT_SORTED_ENABLED,
 	LS_SELECTED_THEME, LS_WEBCONNECTOR_ENABLED, LS_SMS_PHONE_NUMBER,
-	LS_MAP3D_ICONS_ONLY,
+	LS_MAP3D_ICONS_ONLY, LS_HELP_SUPPRESSED_PREFIX,
 } from '../storage/localstorage_keys.js';
 
 class CLocalStorage {
@@ -425,6 +425,29 @@ class CLocalStorage {
 
     fn_getMap3dIconsOnly() {
         return this._getValue(LS_MAP3D_ICONS_ONLY, 'false') === 'true';
+    }
+
+    // Help popup "don't show again" flags — one localStorage key per
+    // help topic id. Set by the help dialog's checkbox; a Preferences
+    // "reset help tips" action clears them all via fn_resetHelpSuppressed.
+    fn_setHelpSuppressed(topicId, value) {
+        this._setValue(`${LS_HELP_SUPPRESSED_PREFIX}${topicId}`, value === true ? 'true' : 'false');
+    }
+
+    fn_getHelpSuppressed(topicId) {
+        return this._getValue(`${LS_HELP_SUPPRESSED_PREFIX}${topicId}`, 'false') === 'true';
+    }
+
+    fn_resetHelpSuppressed() {
+        if (this.isSupported() !== true) return;
+        const keys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith(LS_HELP_SUPPRESSED_PREFIX)) {
+                keys.push(key);
+            }
+        }
+        keys.forEach((key) => localStorage.removeItem(key));
     }
 
     // GCS Display Enabled

@@ -32,6 +32,7 @@ import ClssServoControl from './dialogs/jsc_servoDialogControl.jsx';
 import ClssUnitParametersList from './dialogs/jsc_unitParametersList.jsx';
 import ClssConfigGenerator from './jsc_config_generator.jsx';
 import ClssLidarInfoDialog from './dialogs/jsc_lidarInfoDialogControl.jsx';
+import ClssHelpDialog from './dialogs/jsc_helpDialog.jsx';
 
 // Map: dialog name -> component. DialogHost renders only the active entry.
 const DIALOG_COMPONENTS = {
@@ -51,6 +52,7 @@ const DIALOG_COMPONENTS = {
     unitParametersList:  ClssUnitParametersList,
     configGenerator:     ClssConfigGenerator,
     lidarInfoDialog:     ClssLidarInfoDialog,
+    helpDialog:          ClssHelpDialog,
 };
 
 const DialogHost = () => {
