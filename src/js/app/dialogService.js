@@ -26,17 +26,27 @@
 let _state = { activeDialog: null, props: {} };
 const _listeners = new Set();
 
+// Dialog stack: when a dialog opens while another is already active, the
+// current dialog is pushed here so fn_closeDialog can restore it. This lets
+// a dialog open a sub-dialog (e.g. camera dialog → FPV viewer) and return
+// to the caller when the sub-dialog closes.
+const _stack = [];
+
 function _emit() {
     _listeners.forEach((l) => l());
 }
 
 /**
  * Open a dialog by name, carrying props that the dialog component will
- * receive via <DialogHost>.
+ * receive via <DialogHost>. If another dialog is currently active it is
+ * pushed onto the stack so fn_closeDialog can restore it.
  * @param {string} name - dialog name (matches the key in DialogHost's map)
  * @param {object} [props={}] - dialog-specific props
  */
 export function fn_openDialog(name, props = {}) {
+    if (_state.activeDialog !== null) {
+        _stack.push(_state);
+    }
     _state = { activeDialog: name, props };
     _emit();
 }
@@ -44,10 +54,16 @@ export function fn_openDialog(name, props = {}) {
 /**
  * Close whatever dialog is currently active. Called by dialog components
  * when the user clicks Close/OK/backdrop, and by fn_hide* helpers.
+ * If a previous dialog was pushed onto the stack (opened before this
+ * one), it is restored as the active dialog.
  */
 export function fn_closeDialog() {
     if (_state.activeDialog === null) return;
-    _state = { activeDialog: null, props: {} };
+    if (_stack.length > 0) {
+        _state = _stack.pop();
+    } else {
+        _state = { activeDialog: null, props: {} };
+    }
     _emit();
 }
 

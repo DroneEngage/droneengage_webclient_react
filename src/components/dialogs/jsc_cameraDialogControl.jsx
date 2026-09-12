@@ -11,6 +11,7 @@ import * as js_common from '../../js/js_common.js'
 import {fn_VIDEO_login, fn_VIDEO_Record} from '../../js/js_main.js';
 import ClssDialogBase from './jsc_dialog_base.jsx';
 import { fn_closeDialog as fn_closeDialogService, js_dialogs } from '../../js/app/dialogService.js';
+import ClssStillImageGallery from './jsc_stillImageGallery.jsx';
 
 class ClssCameraDevice extends React.Component {
 
@@ -152,7 +153,6 @@ export default class ClssCameraDialog extends ClssDialogBase
         this.modal_ctrl_cam = React.createRef();
         this.txt_TotalImages = React.createRef();
         this.txt_ShootingInterval = React.createRef();
-
     }
 
 
@@ -285,11 +285,8 @@ export default class ClssCameraDialog extends ClssDialogBase
             v_unitName = p_session.m_unit.m_unitName
         }
 
-
-        
-        
-
         const isCompact = this.fn_isCompact();
+        const partyId = this.fn_getCurrentPartyID();
 
         // Compact mode: render as mobile bottom sheet instead of draggable card
         if (isCompact) {
@@ -384,21 +381,28 @@ export default class ClssCameraDialog extends ClssDialogBase
                             <div className="col-4">
                                     <div className="form-group">
                                     <div>
-                                        <label htmlFor="txt_ShootingInterval" className="text-warning"><small>Each&nbsp;N&nbsp;sec</small></label>
+                                        <label htmlFor="txt_ShootingInterval" className="text-warning"><small>Every&nbsp;N&nbsp;seconds</small></label>
                                         <input id="txt_ShootingInterval" type="number"  className="form-control input-xs input-sm"  ref={this.txt_ShootingInterval} defaultValue={1} />
                                     </div>
                                     </div>
                             </div>
                             <div className="col-4">
                                     <div className="form-group">
-                                        <div>
-                                        <label htmlFor="txt_TotalImages" className="text-warning"  ><small>Total&nbsp;Img</small></label>
+                                    <div>
+                                        <label htmlFor="txt_TotalImages" className="text-warning"  ><small>Total&nbsp;No.&nbsp;of&nbsp;Images</small></label>
                                         <input id="txt_TotalImages" type="number"  className="form-control input-xs input-sm" ref={this.txt_TotalImages} defaultValue={1} />
                                         </div>
                                     </div>
                             </div>
                         </div>
                     </div>
+                    {/* Still image gallery — desktop only */}
+                    {partyId && (
+                        <>
+                            <hr className="my-2" />
+                            <ClssStillImageGallery partyId={partyId} isCompact={false} />
+                        </>
+                    )}
                 </div>
                 )}
                 {this.fn_renderDialogFooter()}
@@ -408,6 +412,7 @@ export default class ClssCameraDialog extends ClssDialogBase
     }
 
 }
+
 
 
        

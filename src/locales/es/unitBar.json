@@ -4,6 +4,7 @@
   "armed": "Armado",
   "noSignalInfo": "sin información de señal",
   "takePhoto": "Tomar Foto",
+  "storedImages": "Imágenes almacenadas: {{count}}",
   "startLiveStream": "Iniciar Transmisión en Vivo",
   "startRecordingOnDrone": "Iniciar Grabación en Drones",
   "changePathColor": "Cambiar el color de la ruta del dron",

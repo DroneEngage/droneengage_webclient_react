@@ -152,18 +152,18 @@ class ClssCtrlUnitPlanningBar extends React.Component {
 
 
             if ((v_andruavUnit.m_IsDisconnectedFromGCS !== true) || (v_andruavUnit.m_IsShutdown !== true)) {
-                if ((v_andruavUnit.m_SignalStatus.mobile === true)) {
+                if ((v_andruavUnit.m_SignalStatus.m_mobile === true)) {
                     //mobileNetworkType
                     //NETWORK_TYPE_LTE
-                    let level = v_andruavUnit.m_SignalStatus.mobileSignalLevel;
-                    if (v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank < js_helpers.CONST_TELEPHONE_400G) {
+                    let level = v_andruavUnit.m_SignalStatus.m_mobileSignalLevel;
+                    if (v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank < js_helpers.CONST_TELEPHONE_400G) {
                         if (level < -100) {
                             online_class = " badge badge-default ";
-                        } else if ((level < -95) || (v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_200G)) {
+                        } else if ((level < -95) || (v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_200G)) {
                             online_class = " badge badge-danger ";
-                        } else if ((level < -80) || (v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_250G)) {  // or condition
+                        } else if ((level < -80) || (v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_250G)) {  // or condition
                             online_class = " badge badge-warning ";
-                        } else if ((level < -70) || (v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_300G)) {
+                        } else if ((level < -70) || (v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_300G)) {
                             online_class = " badge badge-info ";
                         } else if (level < -60) {
                             online_class = " badge badge-primary ";
@@ -187,7 +187,7 @@ class ClssCtrlUnitPlanningBar extends React.Component {
                         }
                     }
 
-                    online_comment = js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank] + " [" + js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.mobileNetworkType] + "] " + level + " dbm";
+                    online_comment = js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank] + " [" + js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.m_mobileNetworkType] + "] " + level + " dbm";
 
                 }
                 else {

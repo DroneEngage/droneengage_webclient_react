@@ -106,20 +106,20 @@ Steps 1-3 of TASK-16 (`jsc_ctrl_unit_main_bar.jsx`, `jsc_unit_control_base.jsx`,
 (`jsc_unitControlArrayView.jsx`) needs live-browser profiling and was
 deferred to `Tasks/webclient/TASK-17-array-view-row-profiling.md`.
 
-## Pre-existing bug found, not fixed (behaviour-preserving task)
+## Pre-existing bug found — fixed post-TASK-16
 
-`jsc_ctrl_unit_main_bar.jsx` (and sibling `jsc_ctrl_unit_planning_bar.jsx`,
-untouched) read `v_andruavUnit.m_SignalStatus.mobile` / `.mobileSignalLevel`
+`jsc_ctrl_unit_main_bar.jsx` (and sibling `jsc_ctrl_unit_planning_bar.jsx`)
+read `v_andruavUnit.m_SignalStatus.mobile` / `.mobileSignalLevel`
 / `.mobileNetworkType` — **without** the `m_` prefix. The real fields on
 `C_SignalStatus` (`js_andruavUnit.js`) are `m_mobile`, `m_mobileSignalLevel`,
 `m_mobileNetworkType`, `m_mobileNetworkTypeRank`. `C_SignalStatus` is not
-sealed, so the mismatched reads silently return `undefined` instead of
-throwing — the mobile-signal-strength display branch in both files has
-therefore always been dead code (`v_andruavUnit.m_SignalStatus.mobile ===
-true` is never true). Not fixed inline per the "don't fix bugs beyond
-documented scope" rule. `jsc_ctrl_unit_main_bar.jsx`'s new field-store
-subscriptions use the *real* field names (`m_SignalStatus.m_mobile` etc.)
-so the migration is already correct once someone fixes the read side.
+sealed, so the mismatched reads silently returned `undefined` instead of
+throwing — the mobile-signal-strength display branch in both files was
+dead code (`v_andruavUnit.m_SignalStatus.mobile === true` was never true).
+Left unfixed during TASK-16 per the "don't fix bugs beyond documented
+scope" rule; the read side has since been fixed to the `m_`-prefixed
+field names in both files, matching `jsc_ctrl_unit_main_bar.jsx`'s
+field-store subscriptions (`m_SignalStatus.m_mobile` etc.).
 
 ## Missing field-store notifiers found and added
 

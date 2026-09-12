@@ -4,6 +4,7 @@
   "armed": "مفعل",
   "noSignalInfo": "لا إشارة",
   "takePhoto": "صورة",
+  "storedImages": "صور مخزنة: {{count}}",
   "startLiveStream": "بث فيديو حى",
   "startRecordingOnDrone": "تسجيل فيديو على الوحدة",
   "changePathColor": "تغيير لون مسار الطائرة",

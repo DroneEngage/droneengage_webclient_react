@@ -3,6 +3,7 @@
   "offline": "Hors-Ligne",
   "noSignalInfo": "Pas d'infos signal",
   "takePhoto": "Prendre une Photo",
+  "storedImages": "Images stockées : {{count}}",
   "startLiveStream": "Démarrer Stream en direct",
   "startRecordingOnDrone": "Démarrer l'enregistrement sur le Drone",
   "changePathColor": "Changer la couleur du trajet du drone",

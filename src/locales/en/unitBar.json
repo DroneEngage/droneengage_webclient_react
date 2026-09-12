@@ -3,6 +3,7 @@
   "offline": "offline",
   "noSignalInfo": "no signal info",
   "takePhoto": "Take Photo",
+  "storedImages": "Stored images: {{count}}",
   "startLiveStream": "Start Live Stream",
   "startRecordingOnDrone": "Start Recording on Drone",
   "changePathColor": "Change Drone Path Color",

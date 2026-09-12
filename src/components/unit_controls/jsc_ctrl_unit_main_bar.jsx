@@ -9,6 +9,9 @@ import * as js_common from '../../js/js_common.js'
 import { subscribeUnitField } from '../../js/store/unitStore.js';
 import { js_dialogs } from '../../js/app/dialogService.js'
 import { ClssCtrlUnitIcon } from '../gadgets/jsc_ctrl_unit_icon.jsx'
+import { js_stillImageStore } from '../../js/js_stillImageStore.js';
+import { EventBridge } from '../../js/hooks/EventBridge.jsx';
+import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 
 
 
@@ -33,6 +36,7 @@ class ClssCtrlUnitMainBar extends React.Component {
     super(props);
     this.state = {
       m_update: 0,
+      m_storedImageCount: 0,
     };
     this.m_flag_mounted = false;
     this.m_unsubs = [];
@@ -45,15 +49,6 @@ class ClssCtrlUnitMainBar extends React.Component {
     // Field-granular: re-render only when a field this row actually reads
     // changes, replacing the coarse EE_unitUpdated/EE_unitPowUpdated
     // triggers entirely (see TASK-16).
-    //
-    // m_SignalStatus.m_mobile/m_mobileSignalLevel/m_mobileNetworkType/
-    // m_mobileNetworkTypeRank: render() reads these WITHOUT the 'm_' prefix
-    // (v_andruavUnit.m_SignalStatus.mobile, .mobileSignalLevel,
-    // .mobileNetworkType) which do not exist on C_SignalStatus (real fields
-    // are m_mobile, m_mobileSignalLevel, m_mobileNetworkType,
-    // m_mobileNetworkTypeRank) — pre-existing bug, the mobile-signal display
-    // branch is dead code today. Subscribed on the real field names anyway
-    // so this is correct once the read-side bug is fixed. See FINDINGS.md.
     const partyId = this.props.p_unit?.getPartyID();
     if (partyId) {
       const fields = [
@@ -81,6 +76,34 @@ class ClssCtrlUnitMainBar extends React.Component {
       }
     }
     this.fn_refreshPathColor();
+
+    // Stored still images live in IndexedDB, outside the unit store, so the
+    // badge has its own EE_stillImagesChanged subscription via the
+    // EventBridge sibling in render().
+    this.fn_refreshStoredImageCount();
+  }
+
+  fn_onStillImagesChanged(p_data) {
+    const partyId = this.props.p_unit?.getPartyID();
+    if (p_data != null && p_data.partyId && partyId && p_data.partyId !== partyId) return; // not me
+    this.fn_refreshStoredImageCount();
+  }
+
+  /**
+   * Read the number of still images stored for this unit and refresh the
+   * badge shown next to the camera icon.
+   */
+  fn_refreshStoredImageCount() {
+    const partyId = this.props.p_unit?.getPartyID();
+    if (!partyId) return;
+
+    js_stillImageStore.fn_getImageCount(partyId).then((p_count) => {
+      if (this.m_flag_mounted === false) return;
+      if (p_count === this.state.m_storedImageCount) return;
+      this.setState({ m_storedImageCount: p_count });
+    }).catch((e) => {
+      js_common.fn_console_log('Stored image count error: ' + e);
+    });
   }
 
   fn_getPathColor() {
@@ -286,16 +309,16 @@ class ClssCtrlUnitMainBar extends React.Component {
       }
 
       if (!v_andruavUnit.m_IsDisconnectedFromGCS && !v_andruavUnit.m_IsShutdown) {
-        if (v_andruavUnit.m_SignalStatus.mobile === true) {
-          let level = v_andruavUnit.m_SignalStatus.mobileSignalLevel;
-          if (v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank < js_helpers.CONST_TELEPHONE_400G) {
+        if (v_andruavUnit.m_SignalStatus.m_mobile === true) {
+          let level = v_andruavUnit.m_SignalStatus.m_mobileSignalLevel;
+          if (v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank < js_helpers.CONST_TELEPHONE_400G) {
             if (level < -100) {
               online_class = ' badge badge-default ';
-            } else if (level < -95 || v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_200G) {
+            } else if (level < -95 || v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_200G) {
               online_class = ' badge badge-danger ';
-            } else if (level < -80 || v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_250G) {
+            } else if (level < -80 || v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_250G) {
               online_class = ' badge badge-warning ';
-            } else if (level < -70 || v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_300G) {
+            } else if (level < -70 || v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank <= js_helpers.CONST_TELEPHONE_300G) {
               online_class = ' badge badge-info ';
             } else if (level < -60) {
               online_class = ' badge badge-primary ';
@@ -318,8 +341,8 @@ class ClssCtrlUnitMainBar extends React.Component {
             }
           }
           online_comment = t('unitBar:networkSignal', {
-            networkType: js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.mobileNetworkTypeRank],
-            networkName: js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.mobileNetworkType],
+            networkType: js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.m_mobileNetworkTypeRank],
+            networkName: js_helpers.v_NETWORK_G_TYPE[v_andruavUnit.m_SignalStatus.m_mobileNetworkType],
             level: level,
           }); // e.g., "4G [LTE] -90 dBm"
         }
@@ -431,11 +454,23 @@ class ClssCtrlUnitMainBar extends React.Component {
 
     return (
       <div key={id} className="row ms-1 padding_zero user-select-none">
+        <EventBridge eventName={js_event.EE_stillImagesChanged} onEvent={(p_data) => this.fn_onStillImagesChanged(p_data)} />
         <div key={id + '__1'} className="col-1 padding_zero d-flex justify-content-center align-items-center">
           <ClssCtrlUnitIcon p_unit={v_andruavUnit} />
         </div>
         <div key={id + '__2'} className="col-1 padding_zero d-none d-sm-flex justify-content-center align-items-center">
-          <i className={camera_class} title={t('unitBar:takePhoto')} onClick={() => this.fn_toggleCamera(v_andruavUnit)}></i>
+          <span className="position-relative d-inline-flex">
+            <i className={camera_class} title={t('unitBar:takePhoto')} onClick={() => this.fn_toggleCamera(v_andruavUnit)}></i>
+            {this.state.m_storedImageCount > 0 && (
+              <span
+                className="badge rounded-pill bg-info position-absolute top-50 translate-middle"
+                style={{ fontSize: '0.55rem', padding: '0.15em 0.35em' }}
+                title={t('unitBar:storedImages', { count: this.state.m_storedImageCount })}
+              >
+                {this.state.m_storedImageCount}
+              </span>
+            )}
+          </span>
         </div>
         <div key={id + '__3'} className="col-1 padding_zero d-none d-sm-flex justify-content-center align-items-center">
           <i className={video_class} title={t('unitBar:startLiveStream')} onClick={() => toggleVideo(v_andruavUnit)}></i>

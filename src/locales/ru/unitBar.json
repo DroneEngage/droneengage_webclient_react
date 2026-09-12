@@ -4,6 +4,7 @@
   "armed": "Вооружён",
   "noSignalInfo": "нет информации о сигнале",
   "takePhoto": "Сделать фото",
+  "storedImages": "Сохранённые изображения: {{count}}",
   "startLiveStream": "Начать прямую трансляцию",
   "startRecordingOnDrone": "Начать запись на дроне",
   "changePathColor": "Изменить цвет траектории дрона",

@@ -49,6 +49,7 @@ import { js_dialogs } from './app/dialogService.js'
 import { mapPopupService } from './services/map/mapPopupService.js'
 // eslint-disable-next-line no-unused-vars
 import { js_websocket_bridge } from './CPC/js_websocket_bridge.js'
+import { js_stillImageStore } from './js_stillImageStore.js'
 import i18n from './i18n.js';
 
 var oldAppend = $.fn.append;
@@ -2907,57 +2908,33 @@ function EVT_msgFromUnit_IMG(me, data) { //,p_andruavUnit, bin, description, lat
 	if (data.img.length > 0) {
 		var blob = new Blob([data.img], { type: 'image/jpeg' });
 
-
-		var reader = new FileReader();
-		reader.onload = function (event) {
-			var contents = event.target.result;
-			$('#unitImg').data('binaryImage', contents);
-
-			// Cleanup the reader object
-			reader.abort();
-			reader = null;
-			return;
-		};
-
-		reader.onerror = function (event) {
-			console.p_error("File could not be read! Code " + event.target.p_error.code);
-		};
-
-		reader.readAsDataURL(blob);
+		// Store the image in the IndexedDB still image store so the
+		// camera dialog gallery can display all captured images. The
+		// store dispatches EE_stillImagesChanged which the gallery
+		// subscribes to.
+		const partyId = data.v_unit ? data.v_unit.getPartyID() : null;
+		if (partyId) {
+			js_stillImageStore.fn_addImage(partyId, blob, {
+				lat: data.lat,
+				lng: data.lng,
+				alt: data.alt,
+				description: data.des,
+			}).catch((e) => {
+				js_common.fn_console_log('Still image store error: ' + e);
+			});
+		}
 
 		const imageSrc = 'data:image/jpeg;base64,' + js_helpers.fn_arrayBufferToBase64(data.img);
-		js_dialogs.fn_showFpv({ image_src: imageSrc, party_id: data.v_unit ? data.v_unit.getPartyID() : null });
+		js_dialogs.fn_showFpv({ image_src: imageSrc, party_id: partyId });
 	}
 
 	const latlng = js_leafletmap.fn_getLocationObjectBy_latlng(data.lat, data.lng);
-	$('#unitImg').data('imgLocation', latlng);
 	fn_showCameraIcon(latlng);
 }
 
 function fn_showCameraIcon(latlng) {
 	const v_marker = js_leafletmap.fn_CreateMarker('/images/camera_24x24.png', 'image');
 	js_leafletmap.fn_setPosition(v_marker, latlng);
-}
-
-// eslint-disable-next-line no-unused-vars
-function hlp_saveImage_html() {
-	const contents = $('#unitImg').data('binaryImage');
-	saveData(contents, 'image.jpg');
-
-}
-
-
-// eslint-disable-next-line no-unused-vars
-function hlp_gotoImage_Map() {
-	const location = $('#unitImg').data('imgLocation');
-	if (location !== null && location !== undefined) {
-		// if (js_leafletmap.fn_getZoom() < 14) {
-		// 	js_leafletmap.fn_setZoom(14);
-		// }
-
-		const mapAdapter = (js_layout.fn_getMapMode() === '3d') ? js_map3d : js_leafletmap;
-		mapAdapter.fn_PanTo_latlng(location.lat, location.lng);
-	}
 }
 
 
