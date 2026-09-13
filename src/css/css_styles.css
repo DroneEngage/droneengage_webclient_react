@@ -1461,6 +1461,35 @@ body.theme-vapor .btn-close {
   color: #fff !important;
 }
 
+/* Dark themes - alert-success uses a solid theme-coloured background
+ * (e.g. darkly's #00bc8c) while --bs-success-text-emphasis stays a light
+ * muted tone, producing washed-out text. Force white for contrast. */
+body.theme-cyborg .alert-success,
+body.theme-darkly .alert-success,
+body.theme-morph .alert-success,
+body.theme-slate .alert-success,
+body.theme-solar .alert-success,
+body.theme-spacelab .alert-success,
+body.theme-superhero .alert-success,
+body.theme-vapor .alert-success {
+  color: #fff !important;
+  --bs-alert-color: #fff;
+}
+
+/* Dark themes - alert-danger also gets a solid background override; ensure
+ * text stays white for contrast. */
+body.theme-cyborg .alert-danger,
+body.theme-darkly .alert-danger,
+body.theme-morph .alert-danger,
+body.theme-slate .alert-danger,
+body.theme-solar .alert-danger,
+body.theme-spacelab .alert-danger,
+body.theme-superhero .alert-danger,
+body.theme-vapor .alert-danger {
+  color: #fff !important;
+  --bs-alert-color: #fff;
+}
+
 .gcs-chat-container {
   position: fixed;
   bottom: 10px;
