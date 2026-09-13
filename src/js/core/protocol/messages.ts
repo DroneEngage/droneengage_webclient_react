@@ -138,7 +138,11 @@ export interface PreclandStatusPayload {
     c?: number;                 // last reprojection RMSE in px
     d?: number;                 // slant range in m
     e?: number[];               // fused tag ids
-    f?: string;                 // error / gate reason
+    f?: number;                 // gate reason code (CONST_PRECLAND_REASON_*)
+    g?: number;                 // calibration status (CONST_PRECLAND_CALIB_STATUS_*)
+    h?: number;                 // calibration views captured
+    i?: number;                 // calibration views total
+    j?: number;                 // calibration RMS px (on completion)
 }
 
 /** A single detected P2P node entry. */

@@ -272,6 +272,8 @@ export const CONST_PRECLAND_ACTION_DISABLE = 0;
 export const CONST_PRECLAND_ACTION_ENABLE = 1;
 export const CONST_PRECLAND_ACTION_SET_TARGET = 2;
 export const CONST_PRECLAND_ACTION_SELFTEST = 3;
+export const CONST_PRECLAND_ACTION_CALIBRATE = 4;
+// CALIBRATE uses fields: b=cols c=rows d=square_size_m e=views f=width g=height
 
 // PRECLAND_STATUS sub-codes (field [a])
 export const CONST_PRECLAND_STATUS_DISABLED = 0;
@@ -279,6 +281,43 @@ export const CONST_PRECLAND_STATUS_SEARCHING = 1;
 export const CONST_PRECLAND_STATUS_LOCKED = 2;
 export const CONST_PRECLAND_STATUS_DEGRADED = 3;
 export const CONST_PRECLAND_STATUS_ERROR = 4;
+
+// PRECLAND_REASON gate reason codes (PRECLAND_STATUS field [f]) — mirrors
+// de_common/de_databus/messages.hpp PRECLAND_REASON_* and the
+// preclandReasonName() text in precland_gate.hpp. NOMINAL (0) means the
+// gate accepted the pose; any other value is why it was rejected.
+export const CONST_PRECLAND_REASON_NOMINAL = 0;
+export const CONST_PRECLAND_REASON_NO_TARGET = 1;
+export const CONST_PRECLAND_REASON_STALE = 2;
+export const CONST_PRECLAND_REASON_MIN_TAGS = 3;
+export const CONST_PRECLAND_REASON_RMSE = 4;
+export const CONST_PRECLAND_REASON_ERROR = 5;
+
+export const CONST_PRECLAND_REASON_NAMES = {
+    [CONST_PRECLAND_REASON_NOMINAL]:   'nominal',
+    [CONST_PRECLAND_REASON_NO_TARGET]: 'no target',
+    [CONST_PRECLAND_REASON_STALE]:     'stale',
+    [CONST_PRECLAND_REASON_MIN_TAGS]:  'min tags',
+    [CONST_PRECLAND_REASON_RMSE]:      'rmse',
+    [CONST_PRECLAND_REASON_ERROR]:     'error',
+};
+
+// PRECLAND_CALIB_STATUS sub-codes (PRECLAND_STATUS field [g]) — mirrors
+// de_common/de_databus/messages.hpp PRECLAND_CALIB_STATUS_*.  Present only
+// while/after a calibration run is triggered by PRECLAND_ACTION_CALIBRATE.
+export const CONST_PRECLAND_CALIB_STATUS_IDLE = 0;
+export const CONST_PRECLAND_CALIB_STATUS_CAPTURING = 1;
+export const CONST_PRECLAND_CALIB_STATUS_COMPUTING = 2;
+export const CONST_PRECLAND_CALIB_STATUS_DONE = 3;
+export const CONST_PRECLAND_CALIB_STATUS_FAILED = 4;
+
+export const CONST_PRECLAND_CALIB_STATUS_NAMES = {
+    [CONST_PRECLAND_CALIB_STATUS_IDLE]:      'idle',
+    [CONST_PRECLAND_CALIB_STATUS_CAPTURING]: 'capturing',
+    [CONST_PRECLAND_CALIB_STATUS_COMPUTING]: 'computing',
+    [CONST_PRECLAND_CALIB_STATUS_DONE]:       'done',
+    [CONST_PRECLAND_CALIB_STATUS_FAILED]:     'failed',
+};
 
 
 // System Messages

@@ -424,6 +424,10 @@ function reducePreclandStatus(unit: CAndruavUnit, msg: Message): ReduceResult {
                 'm_precland.m_range_m',
                 'm_precland.m_tag_ids',
                 'm_precland.m_reason',
+                'm_precland.m_calib_status',
+                'm_precland.m_calib_views_cap',
+                'm_precland.m_calib_views_total',
+                'm_precland.m_calib_rms',
             ],
         }],
     };

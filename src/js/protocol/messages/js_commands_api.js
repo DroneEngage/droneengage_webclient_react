@@ -601,6 +601,28 @@ export class CCommandAPI {
         return msg;
     }
 
+    /**
+     * Trigger chessboard camera calibration on the precland module.
+     * @param {object} params - { cols, rows, square_size_m, views, width, height }
+     */
+    static API_PrecisionLandingCalibrate(params) {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_PRECLAND_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_PRECLAND_ACTION_CALIBRATE,
+                b: params.cols,
+                c: params.rows,
+                d: params.square_size_m,
+                e: params.views,
+                f: params.width,
+                g: params.height
+            }
+        };
+
+        return msg;
+    }
+
     static API_EnableTracking_AIDriver( p_enable) {
         const msg =
         {

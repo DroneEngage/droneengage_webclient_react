@@ -220,7 +220,11 @@ class C_Tracker {
  *   c: last reprojection RMSE in px
  *   d: slant range in m
  *   e: array of fused tag ids
- *   f: error / gate reason string
+ *   f: gate reason code (CONST_PRECLAND_REASON_*)
+ *   g: calibration status (CONST_PRECLAND_CALIB_STATUS_*, optional)
+ *   h: calibration views captured (optional)
+ *   i: calibration views total (optional)
+ *   j: calibration RMS px (optional, on completion)
  */
 class C_Precland {
   constructor(p_parent) {
@@ -234,6 +238,11 @@ class C_Precland {
     this.m_range_m = null;
     this.m_tag_ids = [];
     this.m_reason = null;
+    // calibration state (absent unless PRECLAND_ACTION_CALIBRATE was sent)
+    this.m_calib_status = null;
+    this.m_calib_views_cap = null;
+    this.m_calib_views_total = null;
+    this.m_calib_rms = null;
   }
 
   fn_updatePreclandStatus(status) {
@@ -246,6 +255,11 @@ class C_Precland {
     this.m_tag_ids = (status.e != null) ? status.e : [];
     this.m_reason = (status.f != null) ? status.f : null;
     this.m_enabled = (status.a !== js_andruavMessages.CONST_PRECLAND_STATUS_DISABLED);
+    // calibration fields are optional - only present during/after calibration
+    this.m_calib_status      = (status.g != null) ? status.g : null;
+    this.m_calib_views_cap   = (status.h != null) ? status.h : null;
+    this.m_calib_views_total = (status.i != null) ? status.i : null;
+    this.m_calib_rms         = (status.j != null) ? status.j : null;
   }
 }
 

@@ -1297,6 +1297,13 @@ class CAndruavClientFacade {
         js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
     }
 
+    API_PrecisionLandingCalibrate(p_andruavUnit, params) {
+        if (p_andruavUnit === null || p_andruavUnit === undefined) return;
+
+        const cmd = CCommandAPI.API_PrecisionLandingCalibrate(params);
+        js_andruav_ws.AndruavClientWS.API_sendCMD(p_andruavUnit.getPartyID(), cmd.mt, cmd.ms);
+    }
+
 
     API_EnableTracking_AIDriver(p_andruavUnit, p_enable) {
         if (p_andruavUnit === null || p_andruavUnit === undefined) return;
