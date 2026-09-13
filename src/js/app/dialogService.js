@@ -134,6 +134,9 @@ export const js_dialogs = {
     // --- Lidar info (bridged from EE_andruavUnitLidarShow, not an EE_display* event) ---
     fn_showLidarInfo(unit) { fn_openDialog('lidarInfoDialog', { unit }); },
 
+    // --- Precision landing status ---
+    fn_showPreclandStatus(unit) { fn_openDialog('preclandDialog', { unit }); },
+
     // --- Help popup (markdown-driven, opened via js_help.fn_showHelpFor) ---
     fn_showHelpDialog(props) { fn_openDialog('helpDialog', props); },
 };

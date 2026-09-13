@@ -13,7 +13,6 @@ import {fn_do_modal_confirmation, fn_changeAltitude, fn_changeSpeed, fn_doYAW, g
 import * as js_siteConfig from '../../js/config/js_siteConfig.js'
 import ClssCtrlObjectTracker from '../gadgets/jsc_ctrl_tracker_button.jsx'
 import ClssCtrlObjectTrackerAIList from '../gadgets/jsc_ctrl_tracker_ai_list.jsx'
-import ClssCtrlPreclandStatus from '../gadgets/jsc_ctrl_precland_status.jsx'
 import { ClssCtrlDEPilot } from '../de_pilot/jsc_ctrl_depilot.jsx'
 import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 
@@ -532,6 +531,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
         // Tracking button styles
         res.btn_object_tracking_class = " disabled hidden ";
         res.btn_object_ai_tracking_class = " disabled hidden ";
+        res.btn_precland_class = " disabled hidden ";
 
             if ((js_siteConfig.CONST_FEATURE.DISABLE_TRACKING != null)
                 && (js_siteConfig.CONST_FEATURE.DISABLE_TRACKING === false)) {
@@ -542,6 +542,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 if (this.props.v_andruavUnit.m_modules.has_ai_recognition) {
                     res.btn_object_ai_tracking_class = " btn-primary   ";
                 }
+            }
+
+            if (this.props.v_andruavUnit.m_modules.has_precision_landing) {
+                res.btn_precland_class = " btn-primary ";
             }
 
 	    return res;
@@ -897,7 +901,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
                     </button>
                     <ClssCtrlObjectTrackerAIList className={'btn btn-sm ' + btn.btn_object_ai_tracking_class} p_unit={this.props.v_andruavUnit} title='object AI tracker' />
-                    <ClssCtrlPreclandStatus className={'btn btn-sm'} p_unit={this.props.v_andruavUnit} title='precision landing' />
+                    {!document.body.classList.contains('mobile-mode') &&
+                    <button id='btn_precland' type='button' title='Precision Landing' className={'btn btn-sm flgtctrlbtn bi bi-bullseye btn-with-icon-margin ' + btn.btn_precland_class} onClick={(e) => js_dialogs.fn_showPreclandStatus(this.props.v_andruavUnit)}>PCL</button>
+                    }
                     </div></div>);
                     }
             break;
