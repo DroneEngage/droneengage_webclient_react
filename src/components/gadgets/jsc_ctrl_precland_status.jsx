@@ -59,6 +59,7 @@ function ClssPreclandStatusPanel({ p_unit }) {
     const [calibSquare, setCalibSquare] = useState('');
     const [calibViews, setCalibViews] = useState(20);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [calibExpanded, setCalibExpanded] = useState(false);
 
     const canControl = js_andruavAuth.fn_do_canTracking();
     const canConfig = js_andruavAuth.fn_do_canConfig();
@@ -73,7 +74,7 @@ function ClssPreclandStatusPanel({ p_unit }) {
 
     const fnl_preclandOnOff = useCallback(() => {
         if (canControl !== true) return;
-        js_session.fn_getAndruvFacade().API_PrecisionLanding(p_unit, !(enabled === true));
+        js_session.fn_getAndruavFacade().API_PrecisionLanding(p_unit, !(enabled === true));
     }, [p_unit, enabled, canControl]);
 
     const fnl_preclandSelfTest = useCallback(() => {
@@ -170,9 +171,9 @@ function ClssPreclandStatusPanel({ p_unit }) {
                         )}{(fps_text != null) ? ' fps' : ''}
                     </span>
                 </div>
-                {(reason_text != null) && (reason !== js_andruavMessages.CONST_PRECLAND_REASON_NOMINAL) &&
-                    <div className="text-danger mt-1">Reason: {reason_text}</div>
-                }
+                <div className="text-danger mt-1" style={{ visibility: ((reason_text != null) && (reason !== js_andruavMessages.CONST_PRECLAND_REASON_NOMINAL)) ? 'visible' : 'hidden' }}>
+                    Reason: {(reason_text != null) ? reason_text : ' '}
+                </div>
             </div>
             {(canControl === true) &&
                 <div className="d-flex gap-2 mt-3">
@@ -186,8 +187,19 @@ function ClssPreclandStatusPanel({ p_unit }) {
             {/* Camera calibration section — T7: requires CONFIG permission */}
             {(canControl === true && canConfig === true) &&
                 <div className="mt-3 border-top pt-2">
-                    <div className="text-warning small fw-bold mb-1">Camera Calibration</div>
+                    <div className="d-flex align-items-center justify-content-between mb-1">
+                        <span className="text-warning small fw-bold">Camera Calibration</span>
+                        <button
+                            type="button"
+                            className="btn btn-sm btn-link p-0 text-warning"
+                            onClick={() => setCalibExpanded(!calibExpanded)}
+                            title={calibExpanded ? 'Hide camera calibration' : 'Show camera calibration'}
+                        >
+                            <i className={'bi ' + (calibExpanded ? 'bi-chevron-up' : 'bi-chevron-down')} />
+                        </button>
+                    </div>
 
+                    {calibExpanded && <div>
                     {/* T7: armed/flying guard warning */}
                     {isArmedOrFlying &&
                         <div className="text-danger small mb-1">
@@ -312,6 +324,7 @@ function ClssPreclandStatusPanel({ p_unit }) {
                             </div>
                         </div>
                     }
+                    </div>}
                 </div>
             }
 
