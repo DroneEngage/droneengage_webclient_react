@@ -101,6 +101,9 @@ export const CONST_TYPE_AndruavMessage_GPS = 1002;
 export const CONST_TYPE_AndruavMessage_POW = 1003;
 export const CONST_TYPE_AndruavMessage_ID = 1004;
 export const CONST_TYPE_AndruavMessage_RemoteExecute = 1005;
+// Generic result/ack reply for RemoteExecute commands that have no dedicated
+// STATUS message. fields: C (echoed command id), er (result code), DS?, rq?
+export const CONST_TYPE_AndruavMessage_RemoteExecute_Result = 1084;
 export const CONST_TYPE_AndruavMessage_Telemetry = 1007;
 export const CONST_TYPE_AndruavMessage_Error = 1008;
 export const CONST_TYPE_AndruavMessage_FlightControl = 1010;

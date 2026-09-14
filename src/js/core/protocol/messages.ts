@@ -213,6 +213,14 @@ export interface RemoteExecutePayload {
     C: number;                  // inner message type (e.g. CONST_TYPE_AndruavMessage_ID)
 }
 
+/** CONST_TYPE_AndruavMessage_RemoteExecute_Result — generic command result/ack. */
+export interface RemoteExecuteResultPayload {
+    C: number;                  // echoed RemoteCommand id being answered
+    er: number;                 // result code (0 = ok/dispatched)
+    DS?: string;                // human-readable detail (optional)
+    rq?: number;                // echoed request id (optional)
+}
+
 /** Gimbal orientation sub-object. */
 export interface GimbalOrientation {
     y?: number;                 // yaw

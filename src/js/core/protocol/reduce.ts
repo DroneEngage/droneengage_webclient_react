@@ -37,6 +37,7 @@ import { CONST_TYPE_AndruavMessage_GPS,
          CONST_TYPE_AndruavMessage_P2P_INFO,
          CONST_TYPE_AndruavMessage_SDR_ACTION,
          CONST_TYPE_AndruavMessage_RemoteExecute,
+         CONST_TYPE_AndruavMessage_RemoteExecute_Result,
          CONST_TYPE_AndruavMessage_DistinationLocation,
          CONST_TYPE_AndruavMessage_Viewlink_STATUS,
          CONST_TYPE_AndruavMessage_PRECLAND_STATUS,
@@ -81,7 +82,7 @@ import type {
     DistinationLocationPayload, DroneReportPayload, ErrorPayload,
     GeoFenceHitPayload, ModuleHealthStatusPayload, P2PInRangeNodePayload,
     P2PInRangeBssidPayload, P2PInfoPayload, SdrActionPayload,
-    RemoteExecutePayload, ViewlinkStatusPayload, GeoFencePayload,
+    RemoteExecutePayload, RemoteExecuteResultPayload, ViewlinkStatusPayload, GeoFencePayload,
     GeoFenceAttachStatusPayload, WayPointsPayload, SearchTargetListPayload,
     TargetTrackingLocationPayload, CameraListPayload, SoundListPayload,
     ConfigStatusPayload, SignalingPayload, IDPayload, GimbalOrientation,
@@ -164,6 +165,8 @@ export function fn_reduce(unit: CAndruavUnit, msg: Message): ReduceResult | null
             return reduceSDRAction(unit, msg);
         case CONST_TYPE_AndruavMessage_RemoteExecute:
             return reduceRemoteExecute(unit, msg);
+        case CONST_TYPE_AndruavMessage_RemoteExecute_Result:
+            return reduceRemoteExecuteResult(unit, msg);
         case CONST_TYPE_AndruavMessage_Viewlink_STATUS:
             return reduceViewlinkStatus(unit, msg);
         case CONST_TYPE_AndruavMessage_PRECLAND_STATUS:
@@ -224,6 +227,7 @@ export function fn_isMigrated(type: number): boolean {
         || type === CONST_TYPE_AndruavMessage_P2P_INFO
         || type === CONST_TYPE_AndruavMessage_SDR_ACTION
         || type === CONST_TYPE_AndruavMessage_RemoteExecute
+        || type === CONST_TYPE_AndruavMessage_RemoteExecute_Result
         || type === CONST_TYPE_AndruavMessage_Viewlink_STATUS
         || type === CONST_TYPE_AndruavMessage_PRECLAND_STATUS
         || type === CONST_TYPE_AndruavMessage_GeoFence
@@ -902,6 +906,20 @@ function reduceRemoteExecute(unit: CAndruavUnit, msg: Message): ReduceResult {
     // The only live case in the sub-switch is CONST_TYPE_AndruavMessage_ID ->
     // API_sendID. That becomes a Command returned by effects.
     return { patches: [], events: [], remoteExecuteC: p.C };
+}
+
+// ---------------------------------------------------------------------------
+// RemoteExecute_Result — generic command ack; dispatch EE_unitRemoteExecuteResult.
+// ---------------------------------------------------------------------------
+function reduceRemoteExecuteResult(unit: CAndruavUnit, msg: Message): ReduceResult {
+    const p = msg.payload as RemoteExecuteResultPayload;
+    return {
+        patches: [],
+        events: [{
+            name: js_event.EE_unitRemoteExecuteResult,
+            payload: { unit, result: { C: p.C, er: p.er, DS: p.DS, rq: p.rq } },
+        }],
+    };
 }
 
 // ---------------------------------------------------------------------------

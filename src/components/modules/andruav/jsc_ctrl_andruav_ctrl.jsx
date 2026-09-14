@@ -1,7 +1,13 @@
 import React from 'react';
 import * as js_session from '../../../js/state/session.js';
+import { EventBridge } from '../../../js/hooks/EventBridge.jsx';
+import { EVENTS as js_event } from '../../../js/events/js_eventList.js';
+import * as js_andruavMessages from '../../../js/protocol/messages/js_andruavMessages.js';
 
 import { js_localStorage } from '../../../js/state/js_localStorage.js'
+
+const SMS_RESULT_TIMEOUT_MS = 12000;
+const SMS_RESULT_DISPLAY_MS = 5000;
 
 export class ClssCtrlAndruavCtrl extends React.Component {
 
@@ -10,12 +16,17 @@ export class ClssCtrlAndruavCtrl extends React.Component {
         this.state = {
             m_update: 0,
             m_flashActive: false,
-            m_sirenActive: false
+            m_sirenActive: false,
+            m_smsPending: false,
+            m_smsResult: null,
+            m_smsResultText: null
         };
 
         this.m_flag_mounted = false;
 
         this.m_smsNumberRef = React.createRef();
+        this.m_smsTimeoutId = null;
+        this.m_smsResultTimeoutId = null;
 
         // NOTE: this component previously subscribed to EE_BattViewToggle
         // with this.fn_toggle_global, but fn_toggle_global was never
@@ -34,6 +45,8 @@ export class ClssCtrlAndruavCtrl extends React.Component {
 
     componentWillUnmount () {
         this.m_flag_mounted = false;
+        if (this.m_smsTimeoutId !== null) clearTimeout(this.m_smsTimeoutId);
+        if (this.m_smsResultTimeoutId !== null) clearTimeout(this.m_smsResultTimeoutId);
     }
 
     fn_makeFlash(p_andruavUnit) {
@@ -49,6 +62,44 @@ export class ClssCtrlAndruavCtrl extends React.Component {
     fn_sendSMS(p_andruavUnit) {
         const p_phoneNumber = this.m_smsNumberRef.current.value;
         js_session.fn_getAndruavFacade().API_sendSMSLocation(p_andruavUnit, p_phoneNumber);
+
+        if (this.m_smsTimeoutId !== null) clearTimeout(this.m_smsTimeoutId);
+        if (this.m_smsResultTimeoutId !== null) clearTimeout(this.m_smsResultTimeoutId);
+        this.setState({ m_smsPending: true, m_smsResult: null, m_smsResultText: null });
+        this.m_smsTimeoutId = setTimeout(() => {
+            this.m_smsTimeoutId = null;
+            if (this.m_flag_mounted) {
+                this.setState({ m_smsPending: false, m_smsResult: 'timeout', m_smsResultText: 'no reply' });
+                this.m_smsResultTimeoutId = setTimeout(() => {
+                    this.m_smsResultTimeoutId = null;
+                    if (this.m_flag_mounted) this.setState({ m_smsResult: null, m_smsResultText: null });
+                }, SMS_RESULT_DISPLAY_MS);
+            }
+        }, SMS_RESULT_TIMEOUT_MS);
+    }
+
+    fn_onRemoteExecuteResult(p_andruavUnit, p_data) {
+        if ((p_data === null) || (p_data === undefined)) return;
+        if ((p_data.unit === null) || (p_data.unit === undefined)) return;
+        if (p_data.unit.getPartyID() !== p_andruavUnit.getPartyID()) return;
+        if ((p_data.result === null) || (p_data.result === undefined)) return;
+        if (p_data.result.C !== js_andruavMessages.CONST_RemoteCommand_SMSwGPS) return;
+        if (this.state.m_smsPending !== true) return;
+
+        if (this.m_smsTimeoutId !== null) {
+            clearTimeout(this.m_smsTimeoutId);
+            this.m_smsTimeoutId = null;
+        }
+        const v_ok = (p_data.result.er === 0);
+        this.setState({
+            m_smsPending: false,
+            m_smsResult: v_ok ? 'ok' : 'error',
+            m_smsResultText: v_ok ? 'sent' : ((p_data.result.DS !== null && p_data.result.DS !== undefined) ? p_data.result.DS : 'error')
+        });
+        this.m_smsResultTimeoutId = setTimeout(() => {
+            this.m_smsResultTimeoutId = null;
+            if (this.m_flag_mounted) this.setState({ m_smsResult: null, m_smsResultText: null });
+        }, SMS_RESULT_DISPLAY_MS);
     }
 
     fn_saveSMSNumber() {
@@ -58,8 +109,13 @@ export class ClssCtrlAndruavCtrl extends React.Component {
     render() {
         const v_andruavUnit = this.props.p_unit;
         const id = v_andruavUnit.getPartyID() + "_ctl_andruav_ctrl";
+        const smsBtnClass = this.state.m_smsPending ? "btn-warning"
+            : (this.state.m_smsResult === 'ok') ? "btn-success"
+            : (this.state.m_smsResult === 'error') ? "btn-danger"
+            : "btn-primary";
         return (
             <div id={id} key={id} className="ms-1">
+                <EventBridge eventName={js_event.EE_unitRemoteExecuteResult} onEvent={(p_data) => this.fn_onRemoteExecuteResult(v_andruavUnit, p_data)} />
                 <div className="row mt-2 mb-3">
                     <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
                         <button type="button"
@@ -85,9 +141,18 @@ export class ClssCtrlAndruavCtrl extends React.Component {
                             onBlur={() => this.fn_saveSMSNumber()} />
 
                         <button type="button"
-                            className="btn btn-sm btn-primary"
+                            className={"btn btn-sm " + smsBtnClass}
                             title='Send SMS with GPS location'
+                            disabled={this.state.m_smsPending}
                             onClick={() => this.fn_sendSMS(v_andruavUnit)}>Send SMS</button>
+
+                        {(this.state.m_smsPending === true || this.state.m_smsResultText !== null) &&
+                            <span className={"small " + (this.state.m_smsPending ? "text-warning"
+                                : (this.state.m_smsResult === 'ok') ? "text-success"
+                                : (this.state.m_smsResult === 'error') ? "text-danger"
+                                : "text-muted")}>
+                                {this.state.m_smsPending ? "sending…" : this.state.m_smsResultText}
+                            </span>}
                     </div>
                 </div>
             </div>

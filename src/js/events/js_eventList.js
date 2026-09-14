@@ -141,7 +141,8 @@ const EVENT_LIST = Object.freeze({
 		"EE_LayoutChanged",
 		"EE_MapPopupChanged",
 
-		"EE_stillImagesChanged"
+		"EE_stillImagesChanged",
+		"EE_unitRemoteExecuteResult"
 		].reduce((acc, name, index) => {
 			acc[name] = `EVT_${index + 1}`;
 			return acc;
