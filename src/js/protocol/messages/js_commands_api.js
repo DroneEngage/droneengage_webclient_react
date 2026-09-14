@@ -603,7 +603,9 @@ export class CCommandAPI {
 
     /**
      * Trigger chessboard camera calibration on the precland module.
-     * @param {object} params - { cols, rows, square_size_m, views, width, height }
+     * T4/F-6: width/height (f/g) removed — calibration runs at the
+     * configured capture resolution.
+     * @param {object} params - { cols, rows, square_size_m, views }
      */
     static API_PrecisionLandingCalibrate(params) {
         const msg =
@@ -614,9 +616,22 @@ export class CCommandAPI {
                 b: params.cols,
                 c: params.rows,
                 d: params.square_size_m,
-                e: params.views,
-                f: params.width,
-                g: params.height
+                e: params.views
+            }
+        };
+
+        return msg;
+    }
+
+    /**
+     * Cancel a running camera calibration.
+     */
+    static API_PrecisionLandingCalibrateCancel() {
+        const msg =
+        {
+            'mt': js_andruavMessages.CONST_TYPE_AndruavMessage_PRECLAND_ACTION,
+            'ms': {
+                a: js_andruavMessages.CONST_PRECLAND_ACTION_CALIBRATE_CANCEL
             }
         };
 

@@ -273,6 +273,7 @@ export const CONST_PRECLAND_ACTION_ENABLE = 1;
 export const CONST_PRECLAND_ACTION_SET_TARGET = 2;
 export const CONST_PRECLAND_ACTION_SELFTEST = 3;
 export const CONST_PRECLAND_ACTION_CALIBRATE = 4;
+export const CONST_PRECLAND_ACTION_CALIBRATE_CANCEL = 5;
 // CALIBRATE uses fields: b=cols c=rows d=square_size_m e=views f=width g=height
 
 // PRECLAND_STATUS sub-codes (field [a])
