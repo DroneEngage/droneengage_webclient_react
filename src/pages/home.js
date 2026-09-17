@@ -164,7 +164,9 @@ const Home = () => {
         <div id="row_2" className={profile.row2.visible ? `${profile.row2.col} ${isRow2Collapsed ? 'collapsed-right' : ''}` : 'd-none'}>
           <div id="andruavUnits" className="col-sm-12 padding_zero" style={{ display: isRow2Collapsed ? 'none' : 'block' }}>
             <div id="andruavUnits_in" className="">
-              <ClssGlobalSettings />
+              <div id="div_global_settings" style={{ display: layout.showSettings ? 'block' : 'none' }}>
+                <ClssGlobalSettings />
+              </div>
               <div id="andruavUnitGlobals"></div>
               <ClssAndruavUnitGCSList />
               <ClssAndruavUnitList

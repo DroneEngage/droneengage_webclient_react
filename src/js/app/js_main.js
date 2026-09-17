@@ -601,7 +601,7 @@ function fn_onMap3dDblClick(p_lat, p_lng) {
 }
 
 export function fn_showSettings() {
-	$('#andruavUnits_in').toggle();
+	js_layout.fn_toggleSettings();
 
 	$([document.documentElement, document.body]).animate({
 		scrollTop: $("#row_2").offset().top

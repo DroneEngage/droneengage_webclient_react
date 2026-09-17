@@ -25,6 +25,7 @@
  *     showMap2d:   boolean,           // #div_map_view visible
  *     showMap3d:   boolean,           // #div_map3d_view shown
  *     showVideo:   boolean,           // #div_video_control visible
+ *     showSettings:boolean,           // settings card inside #andruavUnits_in visible
  *     btn:         { settings, map, map3d, video }, // toolbar button visibility
  *     activeTab:   string,
  *   }
@@ -159,6 +160,7 @@ class CLayoutStore {
 			showMap2d: true,
 			showMap3d: false,
 			showVideo: true,
+			showSettings: true,
 			btn: { settings: true, map: true, map3d: true, video: true },
 			activeTab: js_session.fn_getCurrentTabStatus() || 'unknown',
 		};
@@ -188,6 +190,7 @@ class CLayoutStore {
 			showMap2d: this.m_state.showMap2d,
 			showMap3d: this.m_state.showMap3d,
 			showVideo: this.m_state.showVideo,
+			showSettings: this.m_state.showSettings,
 			btn: { ...this.m_state.btn },
 			activeTab: this.m_state.activeTab,
 		};
@@ -278,6 +281,18 @@ class CLayoutStore {
 			map3d: true,
 			video: false,
 		};
+		this._fn_emit();
+	}
+
+	/**
+	 * Toggle the settings card inside #andruavUnits_in (replaces the jQuery
+	 * `$('#andruavUnits_in').toggle()`, which hid the whole right column —
+	 * settings, unit globals, GCS list and unit list — instead of just the
+	 * settings card). Deliberately not part of the mode profiles: the old
+	 * `fn_activate*` functions never touched it.
+	 */
+	fn_toggleSettings() {
+		this.m_state.showSettings = !this.m_state.showSettings;
 		this._fn_emit();
 	}
 
