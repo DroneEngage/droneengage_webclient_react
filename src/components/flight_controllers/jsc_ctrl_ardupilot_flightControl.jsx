@@ -4,7 +4,7 @@ import { CONST_EXPERIMENTAL_FEATURES_ENABLED } from '../../js/config/constants.j
 import { withTranslation } from 'react-i18next';
 import {EVENTS as js_event} from '../../js/events/js_eventList.js'
 import {js_eventEmitter} from '../../js/events/js_eventEmitter'
-import { js_dialogs } from '../../js/app/dialogService.js'
+import { js_dialogs, fn_getDialogState, subscribeDialog } from '../../js/app/dialogService.js'
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages'
 import * as js_andruavUnit from '../../js/model/js_andruavUnit.js'
 import * as js_helpers from '../../js/helpers/js_helpers.js'
@@ -29,12 +29,22 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
 		        m_is_ready_to_arm: p_andruavUnit.m_is_ready_to_arm,
 		        m_isArmed: p_andruavUnit.m_isArmed,
 		        m_applyOnAllSameType: false,
-		        m_hasSameTypeUnits: hasSameTypeUnits
+		        m_hasSameTypeUnits: hasSameTypeUnits,
+		        m_dialogTick: 0
 			};
     }
 
     componentDidMount() {
-        // No need to subscribe here since it's done in constructor
+        this.m_flag_mounted = true;
+        this.m_unsubDialog = subscribeDialog(() => {
+            if (this.m_flag_mounted === false) return;
+            this.setState({ m_dialogTick: this.state.m_dialogTick + 1 });
+        });
+    }
+
+    componentWillUnmount() {
+        this.m_flag_mounted = false;
+        if (this.m_unsubDialog) this.m_unsubDialog();
     }
 
     hlp_adjustFlightModeButtonClass (p_className, p_isActive)
@@ -83,6 +93,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
             || (p_andruavUnit.m_flightMode != v_andruavUnit.m_flightMode)
             || p_andruavUnit.m_applyOnAllSameType != nextState.m_applyOnAllSameType
             || p_andruavUnit.m_hasSameTypeUnits != nextState.m_hasSameTypeUnits
+            || p_andruavUnit.m_dialogTick !== nextState.m_dialogTick
         );
 
         return update;
@@ -548,6 +559,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 res.btn_precland_class = " btn-primary ";
             }
 
+		if (p_andruavUnit.m_isArmed === true) {
+			res.btn_arm_class += ' css_pushed ';
+		}
+
 	    return res;
 	}
 
@@ -853,6 +868,22 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
     render ()
     {
         const btn = this.hlp_getflightButtonStyles(this.props.v_andruavUnit);
+
+        // Dialog buttons behave as push-buttons: outline when idle, solid
+        // success + pressed-in while their dialog is the active one.
+        // hidden/disabled classes pass through untouched.
+        const v_dlg = fn_getDialogState();
+        const v_partyID = this.props.v_andruavUnit.getPartyID();
+        const fn_pushable = (p_class, p_active) =>
+            (p_class === null || p_class === undefined || p_class.includes('hidden') || p_class.includes('disabled'))
+                ? p_class
+                : (p_active ? ' btn-success css_pushed ' : ' btn-outline-success ');
+        const v_yaw_class = fn_pushable(btn.btn_yaw_class,
+            v_dlg.activeDialog === 'yawDialog' && v_dlg.props.unit?.getPartyID() === v_partyID);
+        const v_speed_class = fn_pushable(btn.btn_speed_class,
+            v_dlg.activeDialog === 'speedDialog' && v_dlg.props.p_dialogType === 'speed' && v_dlg.props.p_andruavUnit?.getPartyID() === v_partyID);
+        const v_servo_class = fn_pushable(btn.btn_servo_class,
+            v_dlg.activeDialog === 'servoControl' && v_dlg.props.partyID === v_partyID);
         let ctrl=[];
         const hasSameTypeUnits = this.state.m_hasSameTypeUnits;
         
@@ -864,7 +895,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 // DEPILOT toggle row
                 ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
-                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
+                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail '>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
@@ -878,7 +909,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>Hold</button>
                     </div></div>);
 
-                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
+                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
                     <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
                     <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
                     <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
@@ -893,10 +924,10 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     </div></div>);
 
                 
-                ctrl.push(<div key={this.props.id+"rc3"}   id={this.props.id+"rc3"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-16 me-1 btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-16 me-1 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-16 btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
+                ctrl.push(<div key={this.props.id+"rc3"}   id={this.props.id+"rc3"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise w-16 me-1 btn-with-icon-margin' + v_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 w-16 me-1 btn-with-icon-margin' + v_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical w-16 btn-with-icon-margin' + v_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     <button id='btn_tracking' key={this.props.id + 'btn_tracking'} type='button' title="Object Tracking" className={'btn btn-sm flgtctrlbtn ' + btn.btn_object_tracking_class}>
                         <ClssCtrlObjectTracker className='d-inline-flex' p_unit={this.props.v_andruavUnit} title='object tracker' displayText='Tracker' />
                     </button>
@@ -913,7 +944,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 // DEPILOT toggle row
                 ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
-                ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
+                ctrl.push(<div key={this.props.id+"rc1"} id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
@@ -927,7 +958,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
                     </div></div>);
         
-                ctrl.push(<div key={this.props.id+"rc2"}  id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
+                ctrl.push(<div key={this.props.id+"rc2"}  id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
                     <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
                     <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
                     <button id='btn_stabilize' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_stabilize_class } onClick={ (e) => this.fn_doStabilize(this.props.v_andruavUnit)}>Stabilize</button>
@@ -936,13 +967,13 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>Cruise</button>
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => this.fn_changeSpeedWrapper(this.props.v_andruavUnit)}>GS</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + v_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + v_speed_class } onClick={ (e) => this.fn_changeSpeedWrapper(this.props.v_andruavUnit)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + v_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     </div></div>);
             
             
-                ctrl.push(<div key={this.props.id+"rc22"} id={this.props.id+"rc22"}   className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
+                ctrl.push(<div key={this.props.id+"rc22"} id={this.props.id+"rc22"}   className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
                     <button id='btn_q_sblt' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_q_stabilize } onClick={ (e) => this.fn_doQStabilize(this.props.v_andruavUnit)}>QStab</button>
                     <button id='btn_q_loiter' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_q_loiter } onClick={ (e) => this.fn_doQLoiter(this.props.v_andruavUnit)}>QLoiter</button>
                     <button id='btn_q_hover' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_q_hover } onClick={ (e) => this.fn_doQHover(this.props.v_andruavUnit)}>QHover</button>
@@ -958,7 +989,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                 // DEPILOT toggle row
                 ctrl.push(<ClssCtrlDEPilot key={this.props.id+"depilot"} id={this.props.id} v_andruavUnit={this.props.v_andruavUnit} />);
 
-                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap'>
+                ctrl.push(<div key={this.props.id+"rc1"}  id={this.props.id+"rc1"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
                     <button id='btn_arm' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-power btn-with-icon-margin' + btn.btn_arm_class}  title='ARM / DISARM' onClick={ () => this.fn_ToggleArm(this.props.v_andruavUnit)}>ARM</button>
                     <button id='btn_climb' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-bar-up btn-with-icon-margin'  + btn.btn_climb_class } onClick={ (e) => this.fn_changeAltitudeWrapper(this.props.v_andruavUnit)}>{btn.btn_climb_text}</button>
                     <button id='btn_takeoff' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_takeoff_class } onClick={ (e) => this.fn_doTakeOffPlane(this.props.v_andruavUnit)}>TakeOff</button>
@@ -971,7 +1002,7 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_hold' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_hold_class } onClick={ (e) => this.fn_doHold(this.props.v_andruavUnit)}>Hold</button>
                     </div></div>);
 
-                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
+                ctrl.push(<div key={this.props.id+"rc2"}   id={this.props.id+"rc2"}  className= 'col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail '>
                     <button id='btn_posh' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_pos_hold_class } onClick={ (e) => this.fn_doPosHold(this.props.v_andruavUnit)}>Pos-H</button>
                     <button id='btn_loiter' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_loiter_class } onClick={ (e) => this.fn_doLoiter(this.props.v_andruavUnit)}>Loiter</button>
                     <button id='btn_manual' type='button' className={'btn btn-sm flgtctrlbtn btn-with-icon-margin' + btn.btn_manual_class } onClick={ (e) => this.fn_doManual(this.props.v_andruavUnit)}>Manual</button>
@@ -981,9 +1012,9 @@ export class ClssCtrlArdupilotFlightController extends React.Component {
                     <button id='btn_cruse' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_cruise_class } onClick={ (e) => this.fn_doCruise(this.props.v_andruavUnit)}>Cruise</button>
                     <button id='btn_fbwa' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWA(this.props.v_andruavUnit)}>FBWA</button>
                     <button id='btn_fbwb' type='button' className={'btn btn-sm  flgtctrlbtn btn-with-icon-margin' + btn.btn_fbwa_class } onClick={ (e) => this.fn_doFBWB(this.props.v_andruavUnit)}>FBWB</button>
-                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + btn.btn_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
-                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + btn.btn_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
-                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + btn.btn_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
+                    <button id='btn_yaw' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-arrow-clockwise btn-with-icon-margin' + v_yaw_class } onClick={ (e) => this.fn_doYawWrapper(this.props.v_andruavUnit)}>YAW</button>
+                    <button id='btn_speed' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-speedometer2 btn-with-icon-margin' + v_speed_class } onClick={ (e) => fn_changeSpeed(this.props.v_andruavUnit,this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed!=null?this.props.v_andruavUnit.m_Nav_Info.p_Location.ground_speed:js_unitUiPrefs.fn_getUnitPrefs(this.props.v_andruavUnit.getPartyID()).speed_link)}>GS</button>
+                    <button id='btn_servos' type='button' className={'btn btn-sm  flgtctrlbtn bi bi-sliders2-vertical btn-with-icon-margin' + v_servo_class } onClick={ (e) => this.fn_ServoControl(this.props.v_andruavUnit)}>SRV</button>
                     </div></div>);
                     }
                 break;

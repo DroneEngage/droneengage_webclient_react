@@ -201,7 +201,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
             || (p_andruavUnit.m_Telemetry.fn_getManualTXBlockedSubAction() === js_andruavMessages.CONST_RC_SUB_ACTION_JOYSTICK_CHANNELS_GUIDED)) {
 
             if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
-                res.btn_rx_class = " btn-danger bi bi-dpad";
+                res.btn_rx_class = " btn-danger css_pushed bi bi-dpad";
                 res.btn_rx_text = " R/C On";
                 res.btn_rx_title = " You control this drone using Web - TX";
 
@@ -214,7 +214,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
         }
         else {
             if (p_andruavUnit.m_Telemetry.m_rxEngaged === true) {
-                res.btn_rx_class = " btn-danger bi bi-dpad";
+                res.btn_rx_class = " btn-danger css_pushed bi bi-dpad";
                 res.btn_rx_text = " R/C On";
                 res.btn_rx_title = " You control this drone using Web - TX";
 
@@ -533,7 +533,7 @@ export class ClssAndruavUnitDrone extends ClssAndruavUnitBase {
 
 
 
-        ctrl2_1.push(<div key={p_andruavUnit.getPartyID() + "rc3"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap '>
+        ctrl2_1.push(<div key={p_andruavUnit.getPartyID() + "rc3"} id='rc33' className='col-12  al_l ctrldiv'><div className='btn-group w-100 d-flex flex-wrap css_ctrlbtn_rail'>
             <button id='btn_refreshwp' key={this.key + 'btn_refreshwp'} type='button' className={'btn btn-sm flgtctrlbtn ' + btn.btn_load_wp_class} onClick={(e) => fn_requestWayPoints(p_andruavUnit, true)} title="Read Waypoints from Drone">&nbsp;R-WP</button>
             <button id='btn_writewp' key={this.key + 'btn_writewp'} type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_save_wp_class} onClick={(e) => fn_putWayPoints(p_andruavUnit, true)} title="Write Waypoints into Drone">&nbsp;W-WP</button>
             <button id='btn_clearwp' key={this.key + 'btn_clearwp'} type='button' className={'btn btn-sm flgtctrlbtn ' + cls_ctrl_wp + btn.btn_clear_wp_class} onClick={(e) => fn_clearWayPoints(p_andruavUnit)} title="Clear Waypoints" >&nbsp;C-WP</button>

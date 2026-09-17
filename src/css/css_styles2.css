@@ -502,6 +502,51 @@ input#txt_defaultSwarmDistance {
 	font-weight: bold !important;
 }
 
+/* Flight-control button strip: buttons fused into one recessed grooved
+   rail, separated by divider grooves (segmented panel look). */
+.css_ctrlbtn_rail {
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(0, 0, 0, 0.55);
+	border-radius: 8px;
+	box-shadow:
+		inset 0 2px 5px rgba(0, 0, 0, 0.55),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+		0 1px 0 rgba(255, 255, 255, 0.05);
+	padding: 0;
+	overflow: hidden;
+}
+
+/* Unpushed: flat segment inside the rail; the btn-* color still shows. */
+.css_ctrlbtn_rail .btn.flgtctrlbtn {
+	margin: 0 !important;
+	border: none !important;
+	border-left: 1px solid rgba(0, 0, 0, 0.55) !important;
+	border-radius: 0 !important;
+	box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.05);
+	background-image: none;
+}
+
+.css_ctrlbtn_rail .btn.flgtctrlbtn:first-child {
+	border-left: none !important;
+	box-shadow: none;
+}
+
+.css_ctrlbtn_rail .btn.flgtctrlbtn:hover {
+	background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Pushed: momentary press + latched/engaged state (css_pushed). */
+.css_ctrlbtn_rail .btn.flgtctrlbtn:active,
+.css_ctrlbtn_rail .btn.flgtctrlbtn.css_pushed {
+	box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+/* Disabled: muted. Hidden keeps display:none untouched. */
+.css_ctrlbtn_rail .btn.flgtctrlbtn.disabled,
+.css_ctrlbtn_rail .btn.flgtctrlbtn:disabled {
+	opacity: 0.45;
+}
+
 .flgtctrlbtn_icon {
 	width: 70px !important;
 	height: 24px !important;
