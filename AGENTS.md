@@ -173,7 +173,15 @@ and merges new props without closing/reopening (used by the draggable
 
 ## Notes
 
-- `js_mavlink_v2.js` is eslint-ignored (generated).
+- `js_mavlink_v2.js` is a small ESM adapter over `src/js/mavlink_generated/mavlink.js`
+  (real generated code from pymavlink `JavaScript_NextGen`, all.xml, wire 2.0).
+  The adapter re-exports `mavlink20`/`MAVLink20Processor` and installs compat
+  getters (`id`/`name`/`header`/`msgbuf`/`payload`/`format`/`data`/`reason` →
+  `_`-prefixed internals) so the rest of the app keeps the pre-PR431 API.
+  Regenerate with `src/js/mavlink_generated/regen.sh` — it re-creates the
+  `node_modules` symlinks to `local_modules/` and re-applies the patch that
+  fixes the broken async jspack loader and hides `require("events")`/`util`
+  from webpack. Never edit `mavlink.js` by hand.
 - The old `v_ADSB_Exchange`/`v_adsbObject` jQuery implementation and the
   `AdsbExchangeProvider` (VirtualRadar endpoint) have been removed; OpenSky
   is the active aircraft provider.

@@ -34,7 +34,6 @@
     "jquery": "^3.7.1",
     "jquery-knob": "^1.2.11",
     "jquery-ui-dist": "^1.13.3",
-    "jspack": "^0.0.4",
     "leaflet": "^1.8.0",
     "leaflet-rotatedmarker": "^0.2.0",
     "leaflet.pm": "^2.2.0",
@@ -65,7 +64,8 @@
       "react-app/jest"
     ],
     "ignorePatterns": [
-      "js_mavlink_v2.js"
+      "js_mavlink_v2.js",
+      "mavlink_generated"
     ],
     "rules": {
       "no-unused-vars": [
