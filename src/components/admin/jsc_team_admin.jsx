@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { js_andruavAuth } from '../../js/protocol/auth/js_andruav_auth.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages.js';
+import ClssLoginQr from './ClssLoginQr.jsx';
 
 // Dark-theme-aware input style: ensures text is visible on dark background.
 // Bootstrap form-control defaults to white background which makes
@@ -57,8 +58,17 @@ const ClssTeamAdmin = ({ onLogout }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [successAccessCode, setSuccessAccessCode] = useState('');
+    const [successLoginName, setSuccessLoginName] = useState('');
     const [copied, setCopied] = useState(false);
     const [filter, setFilter] = useState('');
+
+    // QR modal state — qrTarget is the user row; qrStep: 'input' | 'rotate' | 'done'
+    const [qrTarget, setQrTarget] = useState(null);
+    const [qrAccessCode, setQrAccessCode] = useState('');
+    const [qrVerifiedCode, setQrVerifiedCode] = useState('');
+    const [qrStep, setQrStep] = useState('input');
+    const [qrError, setQrError] = useState('');
+    const [qrBusy, setQrBusy] = useState(false);
 
     // Pagination state (display-only; all users are loaded)
     const [page, setPage] = useState(0);
@@ -156,19 +166,24 @@ const ClssTeamAdmin = ({ onLogout }) => {
     );
 
     // ── Helpers ───────────────────────────────────────────────────────
-    const regenerateAccessCode = () => {
+    const generateAccessCodeValue = () => {
         const chars = '0123456789abcdef';
         let code = '';
         for (let i = 0; i < 12; i++) {
             code += chars[Math.floor(Math.random() * chars.length)];
         }
-        setFormData((prev) => ({ ...prev, accessCode: code }));
+        return code;
+    };
+
+    const regenerateAccessCode = () => {
+        setFormData((prev) => ({ ...prev, accessCode: generateAccessCodeValue() }));
     };
 
     const clearMessages = () => {
         setError('');
         setSuccess('');
         setSuccessAccessCode('');
+        setSuccessLoginName('');
         setCopied(false);
     };
 
@@ -252,6 +267,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                     if (res.accessCode) {
                         setSuccess('User updated. New access code:');
                         setSuccessAccessCode(res.accessCode);
+                        setSuccessLoginName(formData.loginName);
                     } else {
                         setSuccess('User updated successfully.');
                     }
@@ -270,6 +286,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                     if (res.accessCode) {
                         setSuccess('User created. Access code:');
                         setSuccessAccessCode(res.accessCode);
+                        setSuccessLoginName(formData.loginName);
                     } else {
                         setSuccess('User created successfully.');
                     }
@@ -299,6 +316,68 @@ const ClssTeamAdmin = ({ onLogout }) => {
             setError(res.errorMessage || 'Failed to delete user');
         }
         setDeleting(false);
+    };
+
+    // ── QR code generation ────────────────────────────────────────────
+    // Access codes are stored hashed, so a QR for an existing login can
+    // only embed a code the admin types (verified server-side, scoped to
+    // this team) or a freshly rotated one.
+    const openQrModal = (user) => {
+        setQrTarget(user);
+        setQrAccessCode('');
+        setQrVerifiedCode('');
+        setQrStep('input');
+        setQrError('');
+        setQrBusy(false);
+    };
+
+    const closeQrModal = () => {
+        setQrTarget(null);
+        setQrAccessCode('');
+        setQrVerifiedCode('');
+        setQrError('');
+        setQrBusy(false);
+    };
+
+    const handleQrVerify = async () => {
+        const code = qrAccessCode.trim();
+        if (!code) {
+            setQrError('Enter the access code for this login.');
+            return;
+        }
+        setQrBusy(true);
+        setQrError('');
+        const res = await js_andruavAuth.fn_verifyTeamUserPassword(qrTarget.LoginName, code);
+        setQrBusy(false);
+        if (res.ok) {
+            setQrVerifiedCode(code);
+            setQrStep('done');
+        } else {
+            setQrError(res.errorMessage || 'Access code does not match.');
+        }
+    };
+
+    const handleQrRotate = async () => {
+        setQrBusy(true);
+        setQrError('');
+        const newCode = generateAccessCodeValue();
+        const permHex = parsePerm(qrTarget.Permissions) === null
+            ? '0xffffffff'
+            : formatPerm(parsePerm(qrTarget.Permissions));
+        const res = await js_andruavAuth.fn_updateTeamUser(
+            qrTarget.LoginName,
+            permHex,
+            qrTarget.IsAdmin === true,
+            newCode
+        );
+        setQrBusy(false);
+        if (res.ok) {
+            setQrVerifiedCode(newCode);
+            setQrStep('done');
+            loadUsers();
+        } else {
+            setQrError(res.errorMessage || 'Failed to rotate access code.');
+        }
     };
 
     // ── Filter + pagination ───────────────────────────────────────────
@@ -371,6 +450,7 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                 <i className="bi bi-exclamation-triangle me-1"></i>
                                 This is the last time this access code will be shown in plain text. Copy it now — it cannot be retrieved later.
                             </div>
+                            <ClssLoginQr loginName={successLoginName} accessCode={successAccessCode} />
                         </>
                     )}
                 </div>
@@ -474,6 +554,13 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                                 </span>
                                             </td>
                                             <td>
+                                                <button
+                                                    className="btn btn-sm btn-outline-success me-1"
+                                                    onClick={() => openQrModal(user)}
+                                                    title="Generate login QR code"
+                                                >
+                                                    <i className="bi bi-qr-code"></i>
+                                                </button>
                                                 <button
                                                     className="btn btn-sm btn-outline-primary me-1"
                                                     onClick={() => openEditModal(user)}
@@ -696,6 +783,108 @@ const ClssTeamAdmin = ({ onLogout }) => {
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* Login QR Modal */}
+            {qrTarget && (
+                <>
+                    <div className="modal-backdrop fade show" style={backdropStyle} onClick={closeQrModal}></div>
+                    <div className="modal d-block" tabIndex="-1" style={modalStyle}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content txt-theme-aware-bg" style={{ border: '1px solid var(--bs-border-color, #495057)' }}>
+                                <div className="modal-header txt-theme-aware-bg" style={{ borderBottom: '1px solid var(--bs-border-color, #495057)' }}>
+                                    <h5 className="modal-title txt-theme-aware">
+                                        <i className="bi bi-qr-code me-2"></i>Login QR — {qrTarget.LoginName}
+                                    </h5>
+                                    <button type="button" className="btn-close" onClick={closeQrModal}></button>
+                                </div>
+                                <div className="modal-body txt-theme-aware-bg">
+                                    {qrStep === 'done' ? (
+                                        <>
+                                            <ClssLoginQr loginName={qrTarget.LoginName} accessCode={qrVerifiedCode} />
+                                            <div className="mt-2 text-warning small">
+                                                <i className="bi bi-exclamation-triangle me-1"></i>
+                                                This QR contains a login credential — treat it like a password.
+                                            </div>
+                                        </>
+                                    ) : qrStep === 'rotate' ? (
+                                        <>
+                                            <p className="txt-theme-aware">
+                                                Generating a QR for <strong>{qrTarget.LoginName}</strong> requires a
+                                                <strong> new access code</strong>. The current code will stop working
+                                                for new logins (existing sessions are unaffected).
+                                            </p>
+                                            {qrError && (
+                                                <div className="alert alert-danger" role="alert">{qrError}</div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-muted">
+                                                Enter this login's access code. It is verified against the server
+                                                before the QR is generated — the code itself is never stored
+                                                or sent back.
+                                            </p>
+                                            <div className="mb-3">
+                                                <label className="form-label text-muted">Access Code</label>
+                                                <input
+                                                    type="password"
+                                                    className="form-control"
+                                                    style={inputStyle}
+                                                    value={qrAccessCode}
+                                                    onChange={(e) => setQrAccessCode(e.target.value)}
+                                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleQrVerify(); } }}
+                                                    disabled={qrBusy}
+                                                    placeholder="Enter access code"
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            {qrError && (
+                                                <div className="alert alert-danger" role="alert">{qrError}</div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                                <div className="modal-footer txt-theme-aware-bg" style={{ borderTop: '1px solid var(--bs-border-color, #495057)' }}>
+                                    {qrStep === 'done' ? (
+                                        <button type="button" className="btn btn-primary" onClick={closeQrModal}>
+                                            Done
+                                        </button>
+                                    ) : qrStep === 'rotate' ? (
+                                        <>
+                                            <button type="button" className="btn btn-secondary" onClick={() => { setQrStep('input'); setQrError(''); }} disabled={qrBusy}>
+                                                Back
+                                            </button>
+                                            <button type="button" className="btn btn-warning" onClick={handleQrRotate} disabled={qrBusy}>
+                                                {qrBusy ? (
+                                                    <><span className="spinner-border spinner-border-sm me-1"></span>Rotating...</>
+                                                ) : (
+                                                    <><i className="bi bi-arrow-repeat me-1"></i>Rotate &amp; Generate QR</>
+                                                )}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button type="button" className="btn btn-outline-secondary me-auto" onClick={() => { setQrStep('rotate'); setQrError(''); }} disabled={qrBusy}>
+                                                Don't know the code? Rotate it
+                                            </button>
+                                            <button type="button" className="btn btn-secondary" onClick={closeQrModal} disabled={qrBusy}>
+                                                Cancel
+                                            </button>
+                                            <button type="button" className="btn btn-primary" onClick={handleQrVerify} disabled={qrBusy || !qrAccessCode.trim()}>
+                                                {qrBusy ? (
+                                                    <><span className="spinner-border spinner-border-sm me-1"></span>Verifying...</>
+                                                ) : (
+                                                    <><i className="bi bi-check-lg me-1"></i>Verify &amp; Generate</>
+                                                )}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

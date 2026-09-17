@@ -4,7 +4,6 @@ import * as js_andruavMessages from '../messages/js_andruavMessages.js';
 import { js_eventEmitter } from '../../events/js_eventEmitter.js';
 import { js_localStorage } from '../../state/js_localStorage.js';
 import {
-    fn_buildAuthUrl,
     fn_buildAuthUrlEx,
     fn_buildHealthBaseUrl,
     fn_buildHealthBaseUrlEx,
@@ -920,6 +919,21 @@ class CAndruavAuth {
     }
 
     /**
+     * Verify a login's plaintext access code against the stored hash
+     * (team-scoped, admin-gated).  Used by the QR-code flow — the server
+     * replies ok/fail only and never echoes the code.
+     * @param {string} targetLoginName - Email/login name of the user.
+     * @param {string} accessCode - Plaintext access code to verify.
+     * @returns {Promise<{ok:boolean,error:*,errorMessage:*}>}
+     */
+    async fn_verifyTeamUserPassword(targetLoginName, accessCode) {
+        return this.#teamAdminRequest(js_andruavMessages.CONST_CMD_VERIFY_TEAM_USER, {
+            [js_andruavMessages.CONST_TARGET_LOGIN_PARAMETER]: targetLoginName,
+            [js_andruavMessages.CONST_ACCESS_CODE_PARAMETER]: accessCode,
+        });
+    }
+
+    /**
      * Internal helper: POST a team-admin request to /w/am.
      * @param {string} subCommand - The CONST_CMD_* team-admin sub-command.
      * @param {object} extraParams - Additional body parameters.
@@ -1034,7 +1048,10 @@ class CAndruavAuth {
     async #logoutViaPlugin() {
         const pluginAuthHost = this.fn_getPluginAuthHost();
         const pluginAuthPort = this.fn_getPluginAuthPort();
-        const pluginLogoutUrl = fn_buildAuthUrl(true, pluginAuthHost, pluginAuthPort, js_andruavMessages.CONST_WEB_LOGOUT_COMMAND);
+        // The connector serves plain HTTP on localhost (no TLS) — match the
+        // login path, which also honours CONST_WEBCONNECTOR_CONFIG.BASE_PATH.
+        const pluginBasePath = js_siteConfig.CONST_WEBCONNECTOR_CONFIG.BASE_PATH;
+        const pluginLogoutUrl = fn_buildAuthUrlEx(false, pluginAuthHost, pluginAuthPort, pluginBasePath, js_andruavMessages.CONST_WEB_LOGOUT_COMMAND);
 
         const headers = { 'Content-Type': 'application/json' };
         const apiKey = this.fn_getPluginApiKey();

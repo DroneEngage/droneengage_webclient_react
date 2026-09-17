@@ -82,6 +82,7 @@ export const CONST_CMD_ADD_TEAM_USER      = "atu"; // add a login to caller's te
 export const CONST_CMD_UPDATE_TEAM_USER  = "utu"; // edit a login in caller's team
 export const CONST_CMD_DELETE_TEAM_USER   = "dtu"; // delete a login from caller's team
 export const CONST_CMD_GET_TEAM_INFO      = "gti"; // get caller's team info (read-only)
+export const CONST_CMD_VERIFY_TEAM_USER   = "vtu"; // verify a login's access code (QR generation aid)
 
 export const CONST_ACCOUNT_NAME_PARAMETER = "acc";
 export const CONST_ACCESS_CODE_PARAMETER = "pwd";
