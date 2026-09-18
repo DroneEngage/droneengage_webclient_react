@@ -10,7 +10,7 @@ import * as js_helpers from '../../js/helpers/js_helpers.js';
 import { fn_do_modal_alert } from '../../js/app/js_main.js';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
 
-function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
+function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, p_tile, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
     const [, setTick] = useState(0);
 
@@ -175,6 +175,20 @@ function ClssCtrlDistanceToMeControl({ t, p_unit, isHUD, p_compact, id, classNam
             >
                 <span className="mobile-tel-label">{t('unit_control_imu:distance.label')}</span>
                 <span className="mobile-tel-value">{v_distanceToMe_text}</span>
+            </div>
+        );
+    }
+
+    // TILE MODE: renders as a css_imu_railseg inside an IMU rail strip.
+    if (p_tile === true) {
+        return (
+            <div
+                id={id || "DFM"}
+                className={'css_imu_railseg' + js_helpers.fn_tileAccent(v_distanceToMe_class)}
+                title={t('unit_control_imu:distance.title')}
+            >
+                <span className="t_label">{t('unit_control_imu:distance.label')}</span>
+                <span className="t_value">{v_distanceToMe_text}</span>
             </div>
         );
     }

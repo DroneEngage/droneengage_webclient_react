@@ -13,7 +13,7 @@ import { js_unitUiPrefs } from '../../js/state/unitUiPrefs.js'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 
-export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
+export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, p_tile, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
     const key = useState(() => Math.random().toString())[0];
 
@@ -127,6 +127,31 @@ export function ClssCtrlDrone_Speed_Ctrl({ p_unit, isHUD, id, className, x, y, o
 
     // Standard Rendering
     const v_speed_text = v_speed_val === 'NA' ? 'NA' : (v_speed_val + ' ' + v_unit_text);
+
+    // TILE MODE: renders as a css_imu_railseg inside an IMU rail strip.
+    if (p_tile === true) {
+        return (
+            <div key={key + 'spd_ctrl'} className='css_imu_railseg acc-warning cursor_hand' title='Ground Speed'>
+                <span className="t_label">GS</span>
+                <span className="t_value">
+                    <span title={"decrease speed"} onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, - CONST_DEFAULT_SPEED_STEP)}>
+                        <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                        </svg>
+                    </span>
+                    <span id='speed' title={"target speed: " + v_targetspeed} onClick={(e) => fn_changeSpeed(e, v_andruavUnit, v_andruavUnit.m_Nav_Info.p_Location.ground_speed != null ? v_andruavUnit.m_Nav_Info.p_Location.ground_speed : js_unitUiPrefs.fn_getUnitPrefs(v_andruavUnit.getPartyID()).speed_link)}>
+                        <b>&nbsp;{v_speed_text}&nbsp;</b>
+                    </span>
+                    <span title="increase speed" onClick={(e) => fn_changeSpeedByStep(e, v_andruavUnit, + CONST_DEFAULT_SPEED_STEP)}>
+                        <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z" />
+                        </svg>
+                    </span>
+                </span>
+                <span className="t_sub" title={"target speed: " + v_targetspeed}>{v_targetspeed}</span>
+            </div>
+        );
+    }
 
     return (
         <p key={key + 'spd_ctrl'} className={className + ' rounded-3 text-warning cursor_hand textunit_w135'} title='Ground Speed'>

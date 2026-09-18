@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "label": "CONFIGURACIÓN",
-    "title": "Mostrar/Ocultar Sección de Configuración"
-  },
   "map": {
     "label": "MAPA",
     "title": "Mostrar Mapa (ctrl+m)"

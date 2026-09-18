@@ -5,10 +5,11 @@ import { EVENTS as js_event } from '../../js/events/js_eventList.js';
 import { useEventSubscription } from '../../js/hooks/useEventSubscription.js';
 import { useUnitField } from '../../js/hooks/useUnitField.js';
 import { hlp_getFlightMode } from '../../js/app/js_main.js';
+import * as js_helpers from '../../js/helpers/js_helpers.js';
 import * as js_andruavMessages from '../../js/protocol/messages/js_andruavMessages';
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx';
 
-function ClssCtrlDrone_FlightMode_Ctrl({ t, p_unit, isHUD, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
+function ClssCtrlDrone_FlightMode_Ctrl({ t, p_unit, isHUD, p_tile, id, className, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents }) {
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
 
     // Field-granular re-render: only re-render when the displayed flight-mode
@@ -92,6 +93,21 @@ function ClssCtrlDrone_FlightMode_Ctrl({ t, p_unit, isHUD, id, className, x, y, 
                 p_unit={{ text: '', color: ClssCVideoCanvasLabel.defaultProps.unit_color }}
             />
          );
+    }
+
+    // TILE MODE: renders as a css_imu_railseg inside an IMU rail strip.
+    if (p_tile === true) {
+        return (
+            <div
+                id={id || "fcb_mode"}
+                className={'css_imu_railseg cursor_hand' + js_helpers.fn_tileAccent(v_flight_mode_class)}
+                title={v_fcb_mode_title}
+                onClick={() => fn_connectToFCB(p_unit)}
+            >
+                <span className="t_label">{t('unit_control_imu:telemetry.flightModeTitle')}</span>
+                <span className="t_value">{v_flight_mode_val !== '' ? v_flight_mode_val : v_flight_mode_text}</span>
+            </div>
+        );
     }
 
     return (

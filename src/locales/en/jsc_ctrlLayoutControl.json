@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "label": "SETTINGS",
-    "title": "Show/Hide Settings Section"
-  },
   "map": {
     "label": "MAP",
     "title": "Show Map (ctrl+m)"

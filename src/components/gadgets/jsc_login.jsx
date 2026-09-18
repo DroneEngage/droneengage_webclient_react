@@ -609,40 +609,36 @@ class ClssLoginControl extends React.Component {
       : (this.state.is_chat_visible ? 'bi-chat-dots-fill' : 'bi-chat');
     const v_chatBtnClass = this.state.is_chat_visible ? 'btn-primary' : 'btn-secondary';
 
-    control.push(
-      <button
-        key={'btn_chat' + this.key}
-        type="button"
-        className={'btn btn-sm mt-1 ms-1 bi ' + v_chatIconClass + ' btn_bi_fixer me-1 ' + v_chatBtnClass}
-        title={this.state.chat_unread > 0 ? 'GCS Chat (' + this.state.chat_unread + ')' : 'GCS Chat'}
-        onClick={(e) => this.fn_toggleChat(e)}
-      >
-      </button>
-    );
-
     const v_newsIconClass = this.state.news_unread > 0
       ? 'bi-megaphone-fill text-danger'
       : (this.state.is_news_visible ? 'bi-megaphone-fill' : 'bi-megaphone');
     const v_newsBtnClass = this.state.is_news_visible ? 'btn-primary' : 'btn-secondary';
 
     control.push(
+      <div key={'ClssLoginControl_rail' + this.key} className="css_ctrlbtn_rail d-flex mt-1 ms-1">
+      <button
+        key={'btn_chat' + this.key}
+        type="button"
+        className={'btn btn-sm bi ' + v_chatIconClass + ' btn_bi_fixer ' + v_chatBtnClass}
+        title={this.state.chat_unread > 0 ? 'GCS Chat (' + this.state.chat_unread + ')' : 'GCS Chat'}
+        onClick={(e) => this.fn_toggleChat(e)}
+      >
+      </button>
       <button
         key={'btn_news' + this.key}
         type="button"
-        className={'btn btn-sm mt-1 ms-1 bi ' + v_newsIconClass + ' btn_bi_fixer me-1 ' + v_newsBtnClass}
+        className={'btn btn-sm bi ' + v_newsIconClass + ' btn_bi_fixer ' + v_newsBtnClass}
         title={this.state.news_unread > 0 ? 'News (' + this.state.news_unread + ')' : 'News'}
         onClick={(e) => this.fn_toggleNews(e)}
       >
       </button>
-    );
-
-    control.push(
       <div key={'ClssLoginControl_complex' + this.key} className="dropdown">
         <button
-          className={'btn btn-secondary dropdown-toggle btn-sm mt-1 ' + css}
+          className={'btn btn-secondary dropdown-toggle btn-sm ' + css}
           type="button"
           id="dropdownMenuButton1"
           data-bs-toggle="dropdown"
+          data-bs-popper-config='{"strategy":"fixed"}'
           aria-expanded="false"
         >
           {title}
@@ -672,6 +668,7 @@ class ClssLoginControl extends React.Component {
             {ctrls2}
           </div>
         </div>
+      </div>
       </div>
     );
 

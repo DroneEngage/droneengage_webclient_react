@@ -26,7 +26,7 @@
  *     showMap3d:   boolean,           // #div_map3d_view shown
  *     showVideo:   boolean,           // #div_video_control visible
  *     showSettings:boolean,           // settings card inside #andruavUnits_in visible
- *     btn:         { settings, map, map3d, video }, // toolbar button visibility
+ *     btn:         { map, map3d, video },         // toolbar button visibility
  *     activeTab:   string,
  *   }
  *
@@ -65,7 +65,7 @@ const COL_12 = 'col-12';
  * @property {boolean} fixed
  * @property {boolean} float
  * @property {boolean} scroll
- * @property {{settings:boolean,map:boolean,map3d:boolean,video:boolean}} btn
+ * @property {{map:boolean,map3d:boolean,video:boolean}} btn
  */
 const PROFILES = {
 	classical: {
@@ -75,7 +75,7 @@ const PROFILES = {
 		fixed: false,
 		float: false,
 		scroll: true,
-		btn: { settings: true, map: true, map3d: true, video: true },
+		btn: { map: true, map3d: true, video: true },
 	},
 	mapCamera: {
 		row1: { visible: true, col: COL_12 },
@@ -84,7 +84,7 @@ const PROFILES = {
 		fixed: false,
 		float: false,
 		scroll: false,
-		btn: { settings: false, map: false, map3d: true, video: true },
+		btn: { map: false, map3d: true, video: true },
 	},
 	mapCameraFloat: {
 		row1: { visible: true, col: COL_12 },
@@ -93,7 +93,7 @@ const PROFILES = {
 		fixed: false,
 		float: true,
 		scroll: false,
-		btn: { settings: false, map: false, map3d: true, video: true },
+		btn: { map: false, map3d: true, video: true },
 	},
 	fixedList: {
 		row1: { visible: true, col: COL_12 },
@@ -102,7 +102,7 @@ const PROFILES = {
 		fixed: true,
 		float: false,
 		scroll: false,
-		btn: { settings: false, map: false, map3d: false, video: false },
+		btn: { map: false, map3d: false, video: false },
 	},
 	vehicleCard: {
 		row1: { visible: false, col: '' },
@@ -111,7 +111,7 @@ const PROFILES = {
 		fixed: false,
 		float: false,
 		scroll: false,
-		btn: { settings: true, map: false, map3d: false, video: false },
+		btn: { map: false, map3d: false, video: false },
 	},
 	allViews: {
 		row1: { visible: true, col: COL_8_4 },
@@ -120,7 +120,7 @@ const PROFILES = {
 		fixed: false,
 		float: true,
 		scroll: true,
-		btn: { settings: true, map: true, map3d: true, video: true },
+		btn: { map: true, map3d: true, video: true },
 	},
 };
 
@@ -161,7 +161,7 @@ class CLayoutStore {
 			showMap3d: false,
 			showVideo: true,
 			showSettings: true,
-			btn: { settings: true, map: true, map3d: true, video: true },
+			btn: { map: true, map3d: true, video: true },
 			activeTab: js_session.fn_getCurrentTabStatus() || 'unknown',
 		};
 	}

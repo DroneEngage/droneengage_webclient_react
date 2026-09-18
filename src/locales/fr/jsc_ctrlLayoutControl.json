@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "label": "PARAMETRES",
-    "title": "Voir/Cacher les paramètres"
-  },
   "map": {
     "label": "MAP",
     "title": "Voir Map (ctrl+m)"

@@ -14,7 +14,7 @@ import { fn_changeAltitude, fn_convertToMeter } from '../../js/app/js_main.js'
 import ClssCVideoCanvasLabel from '../video/jsc_videoCanvasLabel.jsx'
 
 
-export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents, className }) {
+export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, p_tile, x, y, originX, originY, width, height, style, css_class, backgroundColor, borderRadius, padding, pointerEvents, className }) {
     const [opacity, setOpacity] = useState(ClssCVideoCanvasLabel.defaultProps.opacity);
 
     // Field-granular re-render: only re-render when the displayed altitude
@@ -136,6 +136,30 @@ export function ClssCtrlDrone_Altitude_Ctrl({ p_unit, isHUD, x, y, originX, orig
     const legacy_rel = v_alt_rel_str === 'NA' ? 'NA' : (v_alt_rel_str + v_unit_text);
     const legacy_abs = v_alt_abs_str === 'NA' ? 'NA' : (v_alt_abs_str + v_unit_text);
     const v_altitude_text = legacy_rel + '/' + legacy_abs;
+
+    // TILE MODE: renders as a css_imu_railseg inside an IMU rail strip.
+    if (p_tile === true) {
+        return (
+            <div id='alt' className='css_imu_railseg acc-warning cursor_hand'>
+                <span className="t_label">{v_alt_title}</span>
+                <span className="t_value">
+                    <span title={"decrease altitude"} onClick={() => fn_doChangeAltitudeByStep(v_andruavUnit.m_Nav_Info.p_Location.alt_relative - fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()))}>
+                        <svg className="bi bi-caret-down-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                        </svg>
+                    </span>
+                    <span title={v_alt_remark} onClick={() => fn_changeAltitude(v_andruavUnit)}>
+                        <b>&nbsp;{v_altitude_text}&nbsp;</b>
+                    </span>
+                    <span title="increase altitude" onClick={() => fn_doChangeAltitudeByStep(v_andruavUnit.m_Nav_Info.p_Location.alt_relative + fn_convertToMeter(js_localStorage.fn_getDefaultAltitude()))}>
+                        <svg className="bi bi-caret-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.204 11L8 5.519 12.796 11H3.204zm-.753-.659l4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z" />
+                        </svg>
+                    </span>
+                </span>
+            </div>
+        );
+    }
 
     return (
             <p id='alt' className={className + ' rounded-3 cursor_hand textunit_att_btn text-warning '} >

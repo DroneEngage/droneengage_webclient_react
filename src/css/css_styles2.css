@@ -516,8 +516,11 @@ input#txt_defaultSwarmDistance {
 	overflow: hidden;
 }
 
-/* Unpushed: flat segment inside the rail; the btn-* color still shows. */
-.css_ctrlbtn_rail .btn.flgtctrlbtn {
+/* Unpushed: flat segment inside the rail; the btn-* color still shows.
+   Covers direct-child buttons plus the first button inside a wrapper
+   (e.g. .dropdown), so dropdown toggles fuse into the rail too. */
+.css_ctrlbtn_rail > .btn,
+.css_ctrlbtn_rail > * > .btn:first-child {
 	margin: 0 !important;
 	border: none !important;
 	border-left: 1px solid rgba(0, 0, 0, 0.55) !important;
@@ -526,24 +529,30 @@ input#txt_defaultSwarmDistance {
 	background-image: none;
 }
 
-.css_ctrlbtn_rail .btn.flgtctrlbtn:first-child {
+.css_ctrlbtn_rail > .btn:first-child,
+.css_ctrlbtn_rail > :first-child > .btn:first-child {
 	border-left: none !important;
 	box-shadow: none;
 }
 
-.css_ctrlbtn_rail .btn.flgtctrlbtn:hover {
+.css_ctrlbtn_rail > .btn:hover,
+.css_ctrlbtn_rail > * > .btn:first-child:hover {
 	background-color: rgba(255, 255, 255, 0.06);
 }
 
 /* Pushed: momentary press + latched/engaged state (css_pushed). */
-.css_ctrlbtn_rail .btn.flgtctrlbtn:active,
-.css_ctrlbtn_rail .btn.flgtctrlbtn.css_pushed {
+.css_ctrlbtn_rail > .btn:active,
+.css_ctrlbtn_rail > * > .btn:active:first-child,
+.css_ctrlbtn_rail > .btn.css_pushed,
+.css_ctrlbtn_rail > * > .btn.css_pushed:first-child {
 	box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6);
 }
 
 /* Disabled: muted. Hidden keeps display:none untouched. */
-.css_ctrlbtn_rail .btn.flgtctrlbtn.disabled,
-.css_ctrlbtn_rail .btn.flgtctrlbtn:disabled {
+.css_ctrlbtn_rail > .btn.disabled,
+.css_ctrlbtn_rail > * > .btn.disabled:first-child,
+.css_ctrlbtn_rail > .btn:disabled,
+.css_ctrlbtn_rail > * > .btn:disabled:first-child {
 	opacity: 0.45;
 }
 
@@ -969,6 +978,71 @@ div.msgerror {
 	width: 100% !important;
 	height: -webkit-fill-available !important;
 }
+
+/* IMU status rail: one grooved strip per row; divider grooves between segments. */
+.css_imu_rail {
+	display: flex;
+	background: rgba(0, 0, 0, 0.28);
+	border: 1px solid rgba(0, 0, 0, 0.55);
+	border-radius: 8px;
+	box-shadow:
+		inset 0 2px 4px rgba(0, 0, 0, 0.5),
+		inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+	overflow: hidden;
+}
+
+.css_imu_railseg {
+	flex: 1 1 0;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: 3rem;
+	padding: 3px 6px;
+	margin: 0;
+	border-left: 1px solid rgba(0, 0, 0, 0.6);
+	box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.07);
+	overflow: hidden;
+	text-align: center;
+}
+
+.css_imu_railseg:first-child {
+	border-left: none;
+	box-shadow: none;
+}
+
+.css_imu_railseg:hover {
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.css_imu_railseg .t_label {
+	font-size: 0.62rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	opacity: 0.75;
+	line-height: 1.1;
+}
+
+.css_imu_railseg .t_value {
+	font-size: 0.85rem;
+	font-weight: 700;
+	line-height: 1.15;
+	overflow-wrap: break-word;
+}
+
+.css_imu_railseg .t_sub {
+	font-size: 0.68rem;
+	opacity: 0.8;
+	line-height: 1.1;
+}
+
+.css_imu_railseg.acc-danger    .t_value { color: var(--bs-danger); }
+.css_imu_railseg.acc-warning   .t_value { color: var(--bs-warning); }
+.css_imu_railseg.acc-success   .t_value { color: var(--bs-success); }
+.css_imu_railseg.acc-info      .t_value { color: var(--bs-info); }
+.css_imu_railseg.acc-primary   .t_value { color: var(--bs-primary); }
+.css_imu_railseg.acc-secondary .t_value { color: var(--bs-secondary); }
+.css_imu_railseg.acc-light     .t_value { color: var(--bs-light); }
 
 .textunit_nowidth {
 	display: inline-block;

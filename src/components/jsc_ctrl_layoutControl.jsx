@@ -1,6 +1,6 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
-import { fn_showSettings, fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/app/js_main.js';
+import { fn_showMap, fn_showMap3D, fn_showVideoMainTab, fn_showControl } from '../js/app/js_main.js';
 import { CONST_FEATURE } from '../js/config/js_siteConfig.js';
 import { useLayout } from '../js/hooks/useLayout.js';
 
@@ -16,15 +16,6 @@ function ClssCtrlLayout({ showMap3D, t }) {
 
     return (
         <div id="main_btn_group" role="group" className="d-flex flex-wrap align-items-center gap-1" >
-            <button
-                type="button"
-                id="btn_showSettings"
-                className={`btn btn-success btn-sm  bi bi-gear-fill btn_bi_fixer ${layout.btn.settings ? '' : 'd-none'}`}
-                title={t('ctrlLayout:settings.title')}
-                onClick={(e) => fn_showSettings()}
-            >
-                <strong>{t('ctrlLayout:settings.label')}</strong>
-            </button>
             <button
                 type="button"
                 id="btn_showMap"

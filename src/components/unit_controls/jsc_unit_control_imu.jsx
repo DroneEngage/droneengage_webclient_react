@@ -246,62 +246,53 @@ class ClssCtrlDroneIMU extends React.Component {
                 className="row al_l css_margin_zero"
                 dir='ltr' //{this.props.i18n.language === 'ar' ? 'rtl' : 'ltr'}
             >
-                <div key={'gs_ctrl' + v_andruavUnit.getPartyID()} className="row al_l css_margin_zero d-flex">
-                    <div key={'alt_ctrl1' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 user-select-none p-1">
-                        <ClssCtrlDrone_Speed_Ctrl p_unit={v_andruavUnit} className='' />
+                <div key={'gs_ctrl' + v_andruavUnit.getPartyID()} className="css_imu_rail al_l css_margin_zero pb-1">
+                    <ClssCtrlDrone_Speed_Ctrl key={'alt_ctrl1' + v_andruavUnit.getPartyID()} p_unit={v_andruavUnit} p_tile={true} />
+                    <div
+                        key="gps"
+                        id="gps"
+                        className={'css_imu_railseg cursor_hand user-select-none' + js_helpers.fn_tileAccent(gps.m_gps_class)}
+                        title={gps.m_gps_status}
+                        onClick={(e) => fn_switchGPS(v_andruavUnit)}
+                    >
+                        <span className="t_label"><i className={gps.m_gps_source}></i> GPS</span>
+                        <span className="t_value">{' ' + gps.m_gps_text + ' ' + gps.m_gps_text2}</span>
+                        <span className="t_sub">{gps.m_gps_status}</span>
                     </div>
-                    <div key="gps" className="col-6 col-md-3 user-select-none p-1">
-                        <p
-                            id="gps"
-                            className={'rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + gps.m_gps_class + gps.m_gps_source}
-                            title={gps.m_gps_status}
-                            onClick={(e) => fn_switchGPS(v_andruavUnit)}
-                        >
-                            <span className={gps.m_gps_class2}>
-                                {' ' + gps.m_gps_text + ' ' + gps.m_gps_text2}
-                            </span>
-                        </p>
-                    </div>
-                    <div key="DFM" className="col-6 col-md-3 user-select-none p-1">
-                        <ClssCtrlDistanceToMeControl p_unit={v_andruavUnit} />
-                    </div>
-                    <div key="fence" className="col-6 col-md-3 user-select-none p-1">
-                        <p
-                            id="fence"
-                            className={'rounded-3 textunit_att_btn text-center cursor_hand p-1 ' + v_fence_class}
-                            title={t('unit_control_imu:fence.title')}
-                            onClick={(e) => fn_openFenceManager(v_andruavUnit.getPartyID())}
-                        >
-                            {v_fence_text}
-                        </p>
+                    <ClssCtrlDistanceToMeControl key="DFM" p_unit={v_andruavUnit} p_tile={true} />
+                    <div
+                        key="fence"
+                        id="fence"
+                        className={'css_imu_railseg cursor_hand user-select-none' + js_helpers.fn_tileAccent(v_fence_class)}
+                        title={t('unit_control_imu:fence.title')}
+                        onClick={(e) => fn_openFenceManager(v_andruavUnit.getPartyID())}
+                    >
+                        <span className="t_label"><i className="bi bi-bounding-box-circles"></i></span>
+                        <span className="t_value">{v_fence_text}</span>
                     </div>
                 </div>
 
-                <div key={'alt_ctrl' + v_andruavUnit.getPartyID()} className="row al_l css_margin_zero d-flex">
-                    <div key="alt_ctrl1" className="col-6 col-md-3 user-select-none p-1">
-                        <ClssCtrlDrone_Altitude_Ctrl p_unit={v_andruavUnit} />
+                <div key={'alt_ctrl' + v_andruavUnit.getPartyID()} className="css_imu_rail al_l css_margin_zero pb-1">
+                    <ClssCtrlDrone_Altitude_Ctrl key="alt_ctrl1" p_unit={v_andruavUnit} p_tile={true} />
+                    <div
+                        key={'alt_ctrl2' + v_andruavUnit.getPartyID()}
+                        id="fstatus"
+                        className={'css_imu_railseg user-select-none' + js_helpers.fn_tileAccent(v_flight_status_class)}
+                        title={t('unit_control_imu:flight.totalFlying', { time: v_totalFlyingTime })}
+                    >
+                        <span className="t_value">{v_flight_status_text}</span>
+                        <span className="t_sub">{v_flyingTime}</span>
                     </div>
-                    <div key={'alt_ctrl2' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 css_margin_zero user-select-none p-1">
-                        <p
-                            id="fstatus"
-                            className={'rounded-3 textunit_att_btn text-center p-1 ' + v_flight_status_class}
-                            title={t('unit_control_imu:flight.totalFlying', { time: v_totalFlyingTime })}
-                        >
-                            {v_flight_status_text + ' '} <small>{v_flyingTime}</small>
-                        </p>
+                    <div
+                        key={'wpd_ctrl3' + v_andruavUnit.getPartyID()}
+                        id="wpd"
+                        className={'css_imu_railseg cursor_hand user-select-none' + js_helpers.fn_tileAccent(distanceToWP_class)}
+                        title={t('unit_control_imu:waypoint.title')}
+                    >
+                        <span className="t_label"><i className="bi bi-geo-alt-fill"></i></span>
+                        <span className="t_value">{' ' + wpdst_text}</span>
                     </div>
-                    <div key={'wpd_ctrl3' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 css_margin_zero user-select-none p-1">
-                        <p
-                            id="wpd"
-                            className={'rounded-3 textunit_att_btn text-center p-1 ' + distanceToWP_class}
-                            title={t('unit_control_imu:waypoint.title')}
-                        >
-                            {' ' + wpdst_text}
-                        </p>
-                    </div>
-                    <div key={'fcb_mode_ctrl4' + v_andruavUnit.getPartyID()} className="col-6 col-md-3 css_margin_zero user-select-none p-1">
-                        <ClssCtrlDrone_FlightMode_Ctrl p_unit={v_andruavUnit} />
-                    </div>
+                    <ClssCtrlDrone_FlightMode_Ctrl key={'fcb_mode_ctrl4' + v_andruavUnit.getPartyID()} p_unit={v_andruavUnit} p_tile={true} />
                 </div>
 
                 <div key={'yaw_ctrl' + v_andruavUnit.getPartyID()} className="row al_l bg-gradient css_margin_zero user-select-none">

@@ -464,3 +464,14 @@ export function fn_isEdge() {
 }
 
 
+
+/**
+ * Map an existing bg-* status class to an IMU tile accent class (acc-*).
+ */
+export function fn_tileAccent(p_statusClass) {
+    if (p_statusClass === null || p_statusClass === undefined) return '';
+    for (const c of ['danger', 'warning', 'success', 'info', 'primary', 'secondary', 'light']) {
+        if (p_statusClass.indexOf('bg-' + c) !== -1) return ' acc-' + c;
+    }
+    return '';
+}
