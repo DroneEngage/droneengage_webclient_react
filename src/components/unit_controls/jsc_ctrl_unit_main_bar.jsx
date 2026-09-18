@@ -471,7 +471,7 @@ class ClssCtrlUnitMainBar extends React.Component {
             title={t('unitBar:changePathColor')}
             style={{ backgroundColor: this.fn_getPathColor() }}
           >
-            C
+            <i className="bi bi-palette-fill"></i>
             <input
               type='color'
               className="d-none"
