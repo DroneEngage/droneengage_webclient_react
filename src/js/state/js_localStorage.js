@@ -145,7 +145,10 @@ class CLocalStorage {
     }
 
     fn_getGroupName() {
-        return this._getValue(LS_GROUP_NAME, '1');
+        // An empty stored value must fall back to the default group — the
+        // authenticator rejects a blank 'gr' field as invalid input.
+        const v = this._getValue(LS_GROUP_NAME, '1');
+        return v !== '' ? v : '1';
     }
 
     // Display Mode

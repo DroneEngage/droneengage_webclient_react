@@ -387,6 +387,24 @@ class CAndruavAuth {
     }
 
     /**
+     * Reads a fetch Response body as JSON, tolerating non-JSON replies —
+     * a proxy/gateway or an old server may answer an API call with an HTML
+     * error page, which used to surface as a JSON.parse SyntaxError that
+     * hid the real HTTP status.
+     * @param {Response} fetchRes - The fetch Response.
+     * @returns {Promise<{status:number, ok:boolean, json:object|null}>}
+     */
+    async #readJsonResponse(fetchRes) {
+        let json = null;
+        try {
+            json = JSON.parse(await fetchRes.text());
+        } catch {
+            json = null;
+        }
+        return { status: fetchRes.status, ok: fetchRes.ok, json };
+    }
+
+    /**
      * Logs in a user with the provided credentials.
      * @param {string} p_userName - The username (email).
      * @param {string} p_accessCode - The access code (password).
@@ -463,13 +481,31 @@ class CAndruavAuth {
         }
 
         try {
-            const response = await fetch(url, {
+            const res = await this.#readJsonResponse(await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
 
+            if (!res.ok || res.json === null) {
+                // The server rejected the request outright (validation,
+                // rate limit, ...) or replied with a non-JSON error page.
+                // Retrying the identical payload cannot succeed — stop the
+                // retry loop so it does not feed the rate limiter.
+                this._m_logined = false;
+                const isRateLimited = res.status === 429;
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
+                    e: isRateLimited ? ERROR_CODES.RATE_LIMITED : (res.json?.e ?? ERROR_CODES.INVALID_INPUT),
+                    em: res.json?.em || (isRateLimited
+                        ? 'Too many login attempts. Please wait a minute and try again.'
+                        : `Server rejected the login request (HTTP ${res.status}). Check the login name, access code and group name.`),
+                    httpStatus: res.status,
+                });
+                return false;
+            }
+
+            const response = res.json;
             const parsed = fn_parseLoginResponse(response);
             if (parsed.ok === true) {
                 this._m_logined = true;
@@ -588,7 +624,8 @@ class CAndruavAuth {
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
             });
 
-            const response = await fetchRes.json();
+            const res = await this.#readJsonResponse(fetchRes);
+            const response = res.json;
 
             const parsed = fn_parseLoginResponse(response);
             if (parsed.ok !== true) {
@@ -602,7 +639,7 @@ class CAndruavAuth {
                 if (js_siteConfig.CONST_WEBCONNECTOR_CONFIG.AUTO_FALLBACK !== true) {
                     js_eventEmitter.fn_dispatch(js_event.EE_Auth_BAD_Logined, {
                         e: parsed.error ?? ERROR_CODES.UNKNOWN_ERROR,
-                        em: parsed.errorMessage || 'Plugin login failed',
+                        em: parsed.errorMessage || `Plugin login failed (HTTP ${fetchRes.status})`,
                     });
                 }
                 return false;
@@ -734,12 +771,21 @@ class CAndruavAuth {
         };
 
         try {
-            const response = await fetch(url, {
+            const res = await this.#readJsonResponse(await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
+            const response = res.json;
+
+            if (!res.ok || response === null) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
+                    e: response?.e ?? (res.status === 429 ? ERROR_CODES.RATE_LIMITED : ERROR_CODES.NETWORK_ERROR),
+                    em: response?.em || `Server rejected the request (HTTP ${res.status}).`,
+                });
+                return;
+            }
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Created, {
@@ -813,12 +859,21 @@ class CAndruavAuth {
         };
 
         try {
-            const response = await fetch(url, {
+            const res = await this.#readJsonResponse(await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
+            const response = res.json;
+
+            if (!res.ok || response === null) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
+                    e: response?.e ?? (res.status === 429 ? ERROR_CODES.RATE_LIMITED : ERROR_CODES.NETWORK_ERROR),
+                    em: response?.em || `Server rejected the request (HTTP ${res.status}).`,
+                });
+                return;
+            }
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_Regenerated, {
@@ -952,12 +1007,22 @@ class CAndruavAuth {
         };
 
         try {
-            const response = await fetch(url, {
+            const res = await this.#readJsonResponse(await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
+            const response = res.json;
+
+            if (!res.ok || response === null) {
+                return {
+                    ok: false,
+                    error: response?.e ?? (res.status === 429 ? ERROR_CODES.RATE_LIMITED : ERROR_CODES.NETWORK_ERROR),
+                    errorMessage: response?.em || `Server rejected the request (HTTP ${res.status}).`,
+                    data: null,
+                };
+            }
 
             const ok = response.e === js_andruavMessages.CONST_ERROR_NON;
             return {
@@ -1001,12 +1066,21 @@ class CAndruavAuth {
         };
 
         try {
-            const response = await fetch(url, {
+            const res = await this.#readJsonResponse(await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
+            const response = res.json;
+
+            if (!res.ok || response === null) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Failed, {
+                    e: response?.e ?? ERROR_CODES.NETWORK_ERROR,
+                    em: response?.em || `Server rejected the request (HTTP ${res.status}).`,
+                });
+                return;
+            }
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 this._m_logined = false;
@@ -1064,12 +1138,21 @@ class CAndruavAuth {
         };
 
         try {
-            const response = await fetch(pluginLogoutUrl, {
+            const res = await this.#readJsonResponse(await fetch(pluginLogoutUrl, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(keyValues),
                 signal: AbortSignal.timeout(AUTH_REQUEST_TIMEOUT),
-            }).then(res => res.json());
+            }));
+            const response = res.json;
+
+            if (!res.ok || response === null) {
+                js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Failed, {
+                    e: response?.e ?? ERROR_CODES.NETWORK_ERROR,
+                    em: response?.em || `Logout failed (HTTP ${res.status}).`,
+                });
+                return;
+            }
 
             if (response.e === js_andruavMessages.CONST_ERROR_NON) {
                 js_eventEmitter.fn_dispatch(js_event.EE_Auth_Logout_Completed, {
