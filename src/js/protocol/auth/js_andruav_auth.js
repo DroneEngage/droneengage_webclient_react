@@ -792,6 +792,7 @@ class CAndruavAuth {
                     accountId: response[js_andruavMessages.CONST_ACCOUNT_ID_PARAMETER],
                     loginId: response[js_andruavMessages.CONST_LOGIN_ID_PARAMETER],
                     accessCode: response[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER],
+                    recoveryCode: response[js_andruavMessages.CONST_RECOVERY_CODE_PARAMETER],
                     message: `Access code generated for ${p_accountName}`,
                 });
             } else {
@@ -820,12 +821,17 @@ class CAndruavAuth {
     }
 
     /**
-     * Regenerates an access code for an account.
+     * Regenerates an access code for an account. Ownership proof is
+     * mandatory: the server accepts a live session (sent automatically when
+     * logged in), the current access code, or the account's one-time
+     * recovery code.
      * @param {string} p_accountName - The account email.
      * @param {string} p_permission - The permission string (hex).
+     * @param {string} [p_accessCode] - Current access code (ownership proof).
+     * @param {string} [p_recoveryCode] - One-time recovery code (ownership proof).
      * @returns {Promise<void>}
      */
-    async fn_regenerateAccessCode(p_accountName, p_permission) {
+    async fn_regenerateAccessCode(p_accountName, p_permission, p_accessCode, p_recoveryCode) {
         const rateCheck = this.#fn_canRequestAccessCode();
         if (!rateCheck.ok) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
@@ -857,6 +863,15 @@ class CAndruavAuth {
             [js_andruavMessages.CONST_PERMISSION_PARAMETER]: p_permission,
             [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID
         };
+        // Ownership proofs — send whichever the caller supplied; the server
+        // accepts a live session, the current access code, or the recovery
+        // code.
+        if (p_accessCode) {
+            keyValues[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER] = p_accessCode;
+        }
+        if (p_recoveryCode) {
+            keyValues[js_andruavMessages.CONST_RECOVERY_CODE_PARAMETER] = p_recoveryCode;
+        }
 
         try {
             const res = await this.#readJsonResponse(await fetch(url, {
@@ -880,6 +895,7 @@ class CAndruavAuth {
                     accountId: response[js_andruavMessages.CONST_ACCOUNT_ID_PARAMETER],
                     loginId: response[js_andruavMessages.CONST_LOGIN_ID_PARAMETER],
                     accessCode: response[js_andruavMessages.CONST_ACCESS_CODE_PARAMETER],
+                    recoveryCode: response[js_andruavMessages.CONST_RECOVERY_CODE_PARAMETER],
                     message: `New access code generated for ${p_accountName}`,
                 });
             } else {

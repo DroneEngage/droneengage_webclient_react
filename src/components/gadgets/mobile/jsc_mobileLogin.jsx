@@ -20,6 +20,7 @@ class MobileLoginPanel extends React.Component {
     this.state = {
       is_connected: CONST_OFFLINE,
       accessCode: '',
+      recoveryCode: '',
       errorMessage: '',
       successMessage: '',
       showGenPanel: false,
@@ -27,6 +28,7 @@ class MobileLoginPanel extends React.Component {
 
     this.m_loginNameRef = React.createRef();
     this.m_accessCodeRef = React.createRef();
+    this.m_recoveryRef = React.createRef();
     this.m_chk_fullctrl = React.createRef();
     this.m_chk_readonlyctrl = React.createRef();
     this.m_webConnectorRetried = false;
@@ -124,7 +126,8 @@ class MobileLoginPanel extends React.Component {
   fn_onAccessCodeGenerated(params) {
     this.setState({
       accessCode: params.accessCode || '',
-      successMessage: 'Access code generated. Copy it and use it to login.',
+      recoveryCode: params.recoveryCode || '',
+      successMessage: 'Access code generated. Copy it — and save the Recovery Code shown below; it is the only way to regenerate if you lose the access code.',
       errorMessage: '',
     });
   }
@@ -188,12 +191,20 @@ class MobileLoginPanel extends React.Component {
 
   fn_clickRegenerate(e) {
     if (e) e.preventDefault();
+    const v_accessCode = this.m_accessCodeRef.current ? this.m_accessCodeRef.current.value.trim() : '';
+    const v_recoveryCode = this.m_recoveryRef.current ? this.m_recoveryRef.current.value.trim() : '';
+    if (!v_accessCode && !v_recoveryCode) {
+      this.setState({ errorMessage: 'Regenerate requires your current Access Code or Recovery Code.' });
+      return;
+    }
     this.fn_validateCaptcha(() => {
+      // Regenerate rotates the existing credential; the requested
+      // permission is ignored server-side (stored permission preserved).
       let v_permission = '0xffffffff';
       if (this.m_chk_readonlyctrl.current && this.m_chk_readonlyctrl.current.checked) {
         v_permission = '0xffff00ff';
       }
-      js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission);
+      js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission, v_accessCode, v_recoveryCode);
     });
   }
 
@@ -304,6 +315,18 @@ class MobileLoginPanel extends React.Component {
           </div>
         )}
 
+        {this.state.recoveryCode && (
+          <div className="mobile-login-accesscode-box">
+            <label>Recovery Code (save it — shown once):</label>
+            <input
+              type="text"
+              className="mobile-login-input"
+              value={this.state.recoveryCode}
+              readOnly
+            />
+          </div>
+        )}
+
         <button
           className="mobile-action-btn login"
           onClick={(e) => this.fn_clickLogin(e)}
@@ -343,6 +366,13 @@ class MobileLoginPanel extends React.Component {
                 Read Only
               </label>
             </div>
+
+            <input
+              type="password"
+              ref={this.m_recoveryRef}
+              placeholder="Recovery Code (only needed to Regenerate)"
+              className="mobile-login-input"
+            />
 
             <div className="mobile-login-captcha">
               <LoadCanvasTemplate />

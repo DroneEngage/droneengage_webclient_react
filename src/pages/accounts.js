@@ -96,9 +96,10 @@ const Accounts = () => {
                                 </h5>
                                 <ol className="ps-3 mb-0">
                                     <li className="mb-2"> Enter your email and press "AccessCode" to create a new TeamID with an Admin (Full Control) account.</li>
-                                    <li className="mb-2"> The system will generate your account credentials. Please save them.</li>
+                                    <li className="mb-2"> The system will generate your AccessCode and a one-time Recovery Code. <strong>Save both</strong> — they are shown only once.</li>
                                     <li className="mb-2"> Make sure you use a valid email.</li>
-                                    <li className="mb-2"> "Regenerate" will create a new AccessCode under the same account.</li>
+                                    <li className="mb-2"> "Regenerate" creates a new AccessCode for the same account — it requires proof of ownership: your current AccessCode, your Recovery Code, or an active login session.</li>
+                                    <li className="mb-2"> There is no email recovery. If you lose your AccessCode AND your Recovery Code, ask your Team Admin or the server operator to reset the account.</li>
                                     <li className="mb-2"> Use the <a href="teamadmin" target="_blank" rel="noreferrer">Team Admin</a> to manage your team members after login.</li>
                                     <li className="mb-2"> Check this <a href="https://cloud.ardupilot.org/de-account-create.html" target="_blank" rel="noreferrer">page</a> for simple installation instructions.</li>
                                     <li className="mb-0"> For Support please contribute to <a href="https://discuss.ardupilot.org/" target="_blank" rel="noreferrer">https://discuss.ardupilot.org/</a></li>

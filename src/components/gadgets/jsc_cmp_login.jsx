@@ -19,11 +19,13 @@ export default class ClssLoginControl extends React.Component {
             accountId: '',
             loginId: '',
             accessCode: '',
+            recoveryCode: '',
             errorMessage: '',
             successMessage: '',
         };
 
         this.m_loginNameRef = React.createRef();
+        this.m_proofRef = React.createRef();
 
         // Event subscriptions are owned by EventBridge siblings rendered
         // below (see render()), which auto-unsubscribe on unmount via
@@ -41,7 +43,8 @@ export default class ClssLoginControl extends React.Component {
             accountId: params.accountId || '',
             loginId: params.loginId || '',
             accessCode: params.accessCode || '',
-            successMessage: "Access code generated successfully. Please save your AccountID, LoginID and AccessCode.",
+            recoveryCode: params.recoveryCode || '',
+            successMessage: "Access code generated successfully. Please save your AccessCode and Recovery Code — the recovery code is the only way to regenerate if you lose the access code.",
             errorMessage: ''
         });
     }
@@ -106,10 +109,22 @@ export default class ClssLoginControl extends React.Component {
 
     fn_clickRegenerate(e) {
         e.preventDefault(); // Prevent default anchor behavior
+        const v_proof = this.m_proofRef.current ? this.m_proofRef.current.value.trim() : '';
+        if (!v_proof) {
+            this.setState({
+                errorMessage: 'Regenerate requires your current Access Code or Recovery Code as proof of ownership.',
+                successMessage: ''
+            });
+            return;
+        }
         this.fn_validateCaptcha(() => {
-            // Public deployment always creates a Full Control (admin) account.
+            // Regenerate rotates the existing account's credential — the
+            // requested permission is ignored server-side (the stored
+            // permission is preserved).
             const v_permission = '0xffffffff';
-            js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission);
+            // The typed proof may be either credential — the server accepts
+            // the current access code in 'pwd' or the recovery code in 'rc'.
+            js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission, v_proof, v_proof);
         });
     }
 
@@ -199,6 +214,22 @@ export default class ClssLoginControl extends React.Component {
                                 </div>
                             </div>
                         )}
+                        {this.state.recoveryCode && (
+                            <div className="mt-3">
+                                <label className="form-label">Recovery Code (save it — shown once):</label>
+                                <div className="input-group">
+                                    <input
+                                        type="text"
+                                        className="form-control text-info bg-secondary fw-bold"
+                                        value={this.state.recoveryCode}
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <label htmlFor="txtAccountProof" className="form-label mt-3">Current Access Code or Recovery Code (required to Regenerate)</label>
+                        <input type="password" id="txtAccountProof" ref={this.m_proofRef} name="txtAccountProof" className="form-control" placeholder="Access Code or Recovery Code" />
                     </div>
 
                     <br />
@@ -207,7 +238,7 @@ export default class ClssLoginControl extends React.Component {
                 <div className="mb-3">
                     <p className="text-warning small mb-0">
                         <i className="bi bi-shield-check me-1"></i>
-                        This creates a new TeamID with a single Admin (Full Control) account.
+                        "AccessCode" creates a new TeamID with an Admin (Full Control) account. "Regenerate" requires your current Access Code or Recovery Code.
                     </p>
                 </div>
 

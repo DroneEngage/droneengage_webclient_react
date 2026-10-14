@@ -90,6 +90,7 @@ export const CONST_ACCOUNT_ID_PARAMETER = "aid";
 export const CONST_LOGIN_ID_PARAMETER = "lid";
 export const CONST_TARGET_LOGIN_PARAMETER = "tln";   // target login name for team-admin edit/delete
 export const CONST_IS_ADMIN_PARAMETER = "isadmin";    // isadmin flag (team-admin)
+export const CONST_RECOVERY_CODE_PARAMETER = "rc";    // one-time recovery code: regenerate proof + issued-code reply
 export const CONST_SUB_COMMAND = "scm";
 export const CONST_ERROR_MSG = "em";
 export const CONST_ACTOR_TYPE = "at";
