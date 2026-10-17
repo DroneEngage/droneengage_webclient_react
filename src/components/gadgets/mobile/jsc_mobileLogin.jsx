@@ -7,7 +7,7 @@ import { js_andruavAuth } from '../../../js/protocol/auth/js_andruav_auth.js';
 import { js_localStorage } from '../../../js/state/js_localStorage.js';
 import { fn_connect, fn_logout, fn_showSecurityDialog } from '../../../js/app/js_main.js';
 
-import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
+import ClssAltcha from '../../micro_gadgets/jsc_altcha.jsx';
 
 const CONST_OFFLINE = 0;
 const CONST_IN_PROGRESS = 1;
@@ -29,6 +29,7 @@ class MobileLoginPanel extends React.Component {
     this.m_loginNameRef = React.createRef();
     this.m_accessCodeRef = React.createRef();
     this.m_recoveryRef = React.createRef();
+    this.m_altchaRef = React.createRef();
     this.m_chk_fullctrl = React.createRef();
     this.m_chk_readonlyctrl = React.createRef();
     this.m_webConnectorRetried = false;
@@ -137,28 +138,27 @@ class MobileLoginPanel extends React.Component {
       errorMessage: params && params.em ? params.em : 'Error generating access code',
       successMessage: '',
     });
-    loadCaptchaEnginge(6);
   }
 
-  fn_validateCaptcha(callback) {
-    let user_captcha = document.getElementById('user_captcha_input');
-    if (!user_captcha) {
-      if (callback) callback();
-      return;
-    }
-    let val = user_captcha.value;
-    if (validateCaptcha(val) === true) {
-      user_captcha.value = '';
-      this.setState({ errorMessage: '' });
-      if (callback) callback();
-    } else {
+  /**
+   * Reads the solved ALTCHA payload from the widget. Payloads are
+   * single-use server-side, so the widget is reset after every read —
+   * the next submit needs a fresh solve.
+   * @returns {string|null} the payload, or null (error message set) when
+   * the widget has not verified yet.
+   */
+  fn_takeCaptchaPayload() {
+    const widget = this.m_altchaRef.current;
+    const payload = widget ? widget.fn_getPayload() : null;
+    if (!payload) {
       this.setState({
-        errorMessage: 'Captcha does not match',
+        errorMessage: 'Please wait for the captcha check to complete, then retry.',
         successMessage: '',
       });
-      user_captcha.value = '';
-      loadCaptchaEnginge(6);
+      return null;
     }
+    widget.fn_reset();
+    return payload;
   }
 
   fn_clickLogin(e) {
@@ -183,10 +183,10 @@ class MobileLoginPanel extends React.Component {
 
   fn_clickGenerate(e) {
     if (e) e.preventDefault();
-    this.fn_validateCaptcha(() => {
-      const v_permission = '0xffffffff';
-      js_andruavAuth.fn_generateAccessCode(this.m_loginNameRef.current.value, v_permission);
-    });
+    const v_captchaPayload = this.fn_takeCaptchaPayload();
+    if (!v_captchaPayload) return;
+    const v_permission = '0xffffffff';
+    js_andruavAuth.fn_generateAccessCode(this.m_loginNameRef.current.value, v_permission, v_captchaPayload);
   }
 
   fn_clickRegenerate(e) {
@@ -197,15 +197,15 @@ class MobileLoginPanel extends React.Component {
       this.setState({ errorMessage: 'Regenerate requires your current Access Code or Recovery Code.' });
       return;
     }
-    this.fn_validateCaptcha(() => {
-      // Regenerate rotates the existing credential; the requested
-      // permission is ignored server-side (stored permission preserved).
-      let v_permission = '0xffffffff';
-      if (this.m_chk_readonlyctrl.current && this.m_chk_readonlyctrl.current.checked) {
-        v_permission = '0xffff00ff';
-      }
-      js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission, v_accessCode, v_recoveryCode);
-    });
+    const v_captchaPayload = this.fn_takeCaptchaPayload();
+    if (!v_captchaPayload) return;
+    // Regenerate rotates the existing credential; the requested
+    // permission is ignored server-side (stored permission preserved).
+    let v_permission = '0xffffffff';
+    if (this.m_chk_readonlyctrl.current && this.m_chk_readonlyctrl.current.checked) {
+      v_permission = '0xffff00ff';
+    }
+    js_andruavAuth.fn_regenerateAccessCode(this.m_loginNameRef.current.value, v_permission, v_accessCode, v_recoveryCode, v_captchaPayload);
   }
 
   fn_copyToClipboard() {
@@ -220,9 +220,6 @@ class MobileLoginPanel extends React.Component {
   fn_toggleGenPanel() {
     const next = !this.state.showGenPanel;
     this.setState({ showGenPanel: next });
-    if (next === true) {
-      setTimeout(() => loadCaptchaEnginge(6), 50);
-    }
   }
 
   render() {
@@ -375,14 +372,8 @@ class MobileLoginPanel extends React.Component {
             />
 
             <div className="mobile-login-captcha">
-              <LoadCanvasTemplate />
+              <ClssAltcha ref={this.m_altchaRef} p_challengeUrl={js_andruavAuth.fn_getCaptchaChallengeUrl()} />
             </div>
-            <input
-              type="text"
-              id="user_captcha_input"
-              placeholder="Enter Captcha"
-              className="mobile-login-input"
-            />
 
             <div className="mobile-login-gen-buttons">
               <button

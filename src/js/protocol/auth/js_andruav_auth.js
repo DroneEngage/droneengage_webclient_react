@@ -387,6 +387,14 @@ class CAndruavAuth {
     }
 
     /**
+     * URL the ALTCHA widget fetches its proof-of-work challenge from.
+     * @returns {string} The challenge endpoint URL.
+     */
+    fn_getCaptchaChallengeUrl() {
+        return this.#getBaseUrl(js_andruavMessages.CONST_CAPTCHA_CHALLENGE);
+    }
+
+    /**
      * Reads a fetch Response body as JSON, tolerating non-JSON replies —
      * a proxy/gateway or an old server may answer an API call with an HTML
      * error page, which used to surface as a JSON.parse SyntaxError that
@@ -737,7 +745,7 @@ class CAndruavAuth {
         return { ok: true };
     }
 
-    async fn_generateAccessCode(p_accountName, p_permission) {
+    async fn_generateAccessCode(p_accountName, p_permission, p_captchaPayload) {
         const rateCheck = this.#fn_canRequestAccessCode();
         if (!rateCheck.ok) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
@@ -769,6 +777,9 @@ class CAndruavAuth {
             [js_andruavMessages.CONST_SESSION_ID]: this._m_session_ID,
             [js_andruavMessages.CONST_PERMISSION_PARAMETER]: p_permission,
         };
+        if (p_captchaPayload) {
+            keyValues[js_andruavMessages.CONST_CAPTCHA_PAYLOAD_PARAMETER] = p_captchaPayload;
+        }
 
         try {
             const res = await this.#readJsonResponse(await fetch(url, {
@@ -829,9 +840,10 @@ class CAndruavAuth {
      * @param {string} p_permission - The permission string (hex).
      * @param {string} [p_accessCode] - Current access code (ownership proof).
      * @param {string} [p_recoveryCode] - One-time recovery code (ownership proof).
+     * @param {string} [p_captchaPayload] - Solved ALTCHA payload (captcha proof).
      * @returns {Promise<void>}
      */
-    async fn_regenerateAccessCode(p_accountName, p_permission, p_accessCode, p_recoveryCode) {
+    async fn_regenerateAccessCode(p_accountName, p_permission, p_accessCode, p_recoveryCode, p_captchaPayload) {
         const rateCheck = this.#fn_canRequestAccessCode();
         if (!rateCheck.ok) {
             js_eventEmitter.fn_dispatch(js_event.EE_Auth_Account_BAD_Operation, {
@@ -871,6 +883,9 @@ class CAndruavAuth {
         }
         if (p_recoveryCode) {
             keyValues[js_andruavMessages.CONST_RECOVERY_CODE_PARAMETER] = p_recoveryCode;
+        }
+        if (p_captchaPayload) {
+            keyValues[js_andruavMessages.CONST_CAPTCHA_PAYLOAD_PARAMETER] = p_captchaPayload;
         }
 
         try {

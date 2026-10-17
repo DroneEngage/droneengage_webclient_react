@@ -1368,3 +1368,26 @@ p#fence::before,
 	background: #0d6efd;
 	border: none;
 }
+
+/* Dark skin for the ALTCHA widget — matches the darkly palette
+   (bs-primary #375a7f / bs-dark #303030 / warning accent #f39c12).
+   Custom props pierce the widget's shadow DOM via inheritance. */
+altcha-widget.css_altcha_dark {
+	--altcha-color-base: #303030;
+	--altcha-color-base-content: #dee2e6;
+	--altcha-color-neutral: #444444;
+	--altcha-color-neutral-content: #dee2e6;
+	--altcha-color-primary: #375a7f;
+	--altcha-color-primary-content: #ffffff;
+	--altcha-color-success: #00bc8c;
+	--altcha-color-success-content: #ffffff;
+	--altcha-border-color: #495057;
+	--altcha-border-radius: 8px;
+	--altcha-input-background-color: #303030;
+	--altcha-input-color: #dee2e6;
+	--altcha-checkbox-border-color: #6c757d;
+	--altcha-spinner-color: #f39c12;
+	--altcha-popover-color: #303030;
+	--altcha-switch-background-color: #444444;
+	--altcha-switch-toggle-color: #dee2e6;
+}

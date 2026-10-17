@@ -25,6 +25,7 @@
   "WEB_SSL_KEY": "./ssl/localssl.key",
   "private": true,
   "dependencies": {
+    "altcha": "^3.3.0",
     "bootstrap": "^5.3.3",
     "buffer": "^6.0.3",
     "file-saver": "^2.0.5",
